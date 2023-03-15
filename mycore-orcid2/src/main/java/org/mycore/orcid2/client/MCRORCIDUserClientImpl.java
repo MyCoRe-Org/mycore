@@ -20,6 +20,7 @@ package org.mycore.orcid2.client;
 
 import java.net.URI;
 import java.util.Locale;
+import java.util.Objects;
 
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.client.Entity;
@@ -59,7 +60,7 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     @Override
     public long create(MCRORCIDSection section, Object object) throws MCRORCIDRequestException {
         final Response response = write(section.getPath(), HttpMethod.POST, object);
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
         return Long.parseLong(getLastPathSegment(response.getLocation()));
@@ -69,7 +70,7 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     public void update(MCRORCIDSection section, long putCode, Object object) throws MCRORCIDRequestException {
         final Response response = write(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode),
             HttpMethod.PUT, object);
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
     }
@@ -77,7 +78,7 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     @Override
     public void delete(MCRORCIDSection section, long putCode) throws MCRORCIDRequestException {
         final Response response = delete(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode));
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
     }
