@@ -83,7 +83,13 @@ public class MCRPDFTools implements AutoCloseable {
         try (PDDocument pdf = PDDocument.load(fileIS)) {
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
             final PDPage page = resolveOpenActionPage(pdf);
-            BufferedImage level1Image = pdfRenderer.renderImage(pdf.getPages().indexOf(page));
+            int pageIndex = pdf.getPages().indexOf(page);
+            if (pageIndex < 0) {
+                // Iterating per page and use equals does also not work in the case I had, so fall back to first page
+                LOGGER.warn("Could not resolve initial page, using first page.");
+                pageIndex = 0;
+            }
+            BufferedImage level1Image = pdfRenderer.renderImage(pageIndex);
             if (thumbnailSize < 0) {
                 return level1Image;
             }
