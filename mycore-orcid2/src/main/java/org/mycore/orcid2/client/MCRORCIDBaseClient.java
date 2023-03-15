@@ -50,6 +50,8 @@ abstract class MCRORCIDBaseClient {
 
     private final WebTarget baseTarget;
 
+    private MCRORCIDClientErrorHandler errorHandler;
+
     /**
      * Creates MCRORCIDBaseClient with rest url and token.
      * 
@@ -62,6 +64,15 @@ abstract class MCRORCIDBaseClient {
         client.register(new MCRORCIDXMLWriter());
         Optional.ofNullable(token).ifPresent(t -> client.register(new MCRORCIDAuthenticationFilter(t)));
         this.baseTarget = client.target(restURL.endsWith("/") ? restURL : restURL + "/");
+    }
+
+    /**
+     * Registers error handler.
+     * 
+     * @param errorHandler the error handler
+     */
+    public void registerErrorHandler(MCRORCIDClientErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 
     /**
@@ -106,6 +117,9 @@ abstract class MCRORCIDBaseClient {
      * @param response the error response
      */
     protected void handleError(Response response) throws MCRORCIDRequestException {
+        if (errorHandler != null) {
+            errorHandler.handleErrorResponse(response);
+        }
         throw new MCRORCIDRequestException(response);
     }
 

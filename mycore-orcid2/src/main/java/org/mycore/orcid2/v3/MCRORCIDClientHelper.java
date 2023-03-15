@@ -60,7 +60,7 @@ public class MCRORCIDClientHelper {
                 try {
                     return getClientFactory().createUserClient(orcid, credential).fetch(section, valueType, putCodes);
                 } catch (MCRORCIDRequestException e) {
-                    final Response response = e.getErrorResponse();
+                    final Response response = e.getResponse();
                     if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
                         LOGGER.info(
                             "Request with credential for orcid {} has failed with status code {}."
@@ -82,7 +82,7 @@ public class MCRORCIDClientHelper {
      * @return OrcidError
      */
     public static OrcidError getORCIDErrorFromException(MCRORCIDRequestException exception) {
-        return exception.getErrorResponse().readEntity(OrcidError.class);
+        return exception.getResponse().readEntity(OrcidError.class);
     }
 
     /**

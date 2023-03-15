@@ -30,26 +30,36 @@ public class MCRORCIDRequestException extends MCRORCIDException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The error response.
+     * The response.
     */
-    private final Response errorResponse;
+    private final Response response;
 
     /**
-     * Creates exception with error response.
+     * Creates exception with response.
      *
-     * @param errorResponse the response
+     * @param response the response
      */
-    public MCRORCIDRequestException(Response errorResponse) {
-        super("Request failed");
-        this.errorResponse = errorResponse;
+    public MCRORCIDRequestException(Response response) {
+        this("Request failed", response);
     }
 
     /**
-     * Returns the error response.
-     * 
-     * @return the error response
+     * Creates exception with message and response.
+     *
+     * @param message the message
+     * @param response the response
      */
-    public Response getErrorResponse() {
-        return errorResponse;
+    public MCRORCIDRequestException(String message, Response response) {
+        super(message);
+        this.response = response;
+    }
+
+    /**
+     * Returns the response.
+     * 
+     * @return the response
+     */
+    public Response getResponse() {
+        return response;
     }
 }

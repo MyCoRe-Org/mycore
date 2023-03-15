@@ -48,6 +48,8 @@ public class MCRORCIDClientFactory {
 
     private final String memberAPI;
 
+    private final MCRORCIDClientErrorHandler errorHandler;
+
     private final ReadClientMode mode;
 
     private MCRORCIDReadClient readClient = null;
@@ -57,6 +59,8 @@ public class MCRORCIDClientFactory {
         publicAPI = MCRConfiguration2.getStringOrThrow(prefix + ".PublicAPI");
         memberAPI = MCRConfiguration2.getStringOrThrow(prefix + ".MemberAPI");
         final String modeString = MCRConfiguration2.getStringOrThrow(prefix + ".APIMode");
+        errorHandler = MCRConfiguration2.<MCRORCIDClientErrorHandler>getInstanceOf(prefix + ".ErrorHandler.Class")
+            .orElse(null);
         try {
             mode = ReadClientMode.valueOf(modeString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
@@ -110,9 +114,12 @@ public class MCRORCIDClientFactory {
     public MCRORCIDUserClient createUserClient(String orcid, MCRORCIDCredential credential)
         throws MCRORCIDException {
         if (checkMemberMode()) {
-            return new MCRORCIDUserClientImpl(memberAPI, orcid, credential);
+            MCRORCIDUserClientImpl client = new MCRORCIDUserClientImpl(memberAPI, orcid, credential);
+            client.registerErrorHandler(errorHandler);
+            return client;
+        } else {
+            throw new MCRORCIDException("Client is not in member mode");
         }
-        throw new MCRORCIDException("Client is not in member mode");
     }
 
     /**
@@ -125,17 +132,20 @@ public class MCRORCIDClientFactory {
     }
 
     private MCRORCIDReadClient initReadClient() throws MCRORCIDException {
+        MCRORCIDReadClientImpl client = null;
         if (checkMemberMode()) {
             if (READ_PUBLIC_TOKEN == null) {
                 throw new MCRORCIDException("MCR.ORCID2.ReadPublicToken is not set");
             }
-            return new MCRORCIDReadClientImpl(memberAPI, READ_PUBLIC_TOKEN);
+            client = new MCRORCIDReadClientImpl(memberAPI, READ_PUBLIC_TOKEN);
         } else {
             if (READ_PUBLIC_TOKEN == null) {
                 LOGGER.info("MCR.ORCID2.ReadPublicToken is not set.");
             }
-            return new MCRORCIDReadClientImpl(publicAPI, READ_PUBLIC_TOKEN);
+            client = new MCRORCIDReadClientImpl(publicAPI, READ_PUBLIC_TOKEN);
         }
+        client.registerErrorHandler(errorHandler);
+        return client;
     }
 
     enum ReadClientMode {
