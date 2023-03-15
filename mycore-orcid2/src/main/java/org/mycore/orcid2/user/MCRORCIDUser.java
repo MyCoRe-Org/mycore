@@ -272,8 +272,7 @@ public class MCRORCIDUser {
     protected static String serializeCredential(MCRORCIDUserCredential credential) throws IllegalArgumentException {
         try {
             final MCRORCIDUserCredential cloned = (MCRORCIDUserCredential) credential.clone();
-            cloned.setExpiresIn(null);
-            cloned.setName(null);
+            // saving the orcid is redundant
             cloned.setORCID(null);
             final ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules();

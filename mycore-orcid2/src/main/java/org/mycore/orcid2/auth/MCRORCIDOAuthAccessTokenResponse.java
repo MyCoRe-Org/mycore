@@ -16,65 +16,37 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.user;
+package org.mycore.orcid2.auth;
 
-import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents the ORCID user credential including access token.
+ * Represents the ORCID OAuth access token response.
+ * 
+ * See <a href="https://members.orcid.org/api/oauth/3legged-oauth">ORCID documentation</a>
  */
-public class MCRORCIDUserCredential implements Cloneable {
-
-    private String orcid;
+public class MCRORCIDOAuthAccessTokenResponse {
 
     private String accessToken;
 
+    private String tokenType;
+
     private String refreshToken;
 
-    private String tokenType;
+    private String expiresIn;
+
+    private String name;
 
     private String scope;
 
-    private LocalDate expiration;
+    private String orcid;
 
     /**
-     * Creates MCRORCIDUserCredential object with ORCID iD and access token.
-     * 
-     * @param orcid the ORCID iD
-     * @param accessToken the access token
+     * Creates empty MCRORCIDOAuthAccessTokenResponse object.
      */
-    public MCRORCIDUserCredential(String orcid, String accessToken) {
-        this.orcid = orcid;
-        this.accessToken = accessToken;
-    }
-
-    /**
-     * Creates empty MCRORCIDUserCredential object.
-     */
-    public MCRORCIDUserCredential() {
-    }
-
-    /**
-     * Returns the ORCID iD.
-     * 
-     * @return ORCID iD
-     */
-    @JsonProperty("orcid")
-    public String getORCID() {
-        return orcid;
-    }
-
-    /**
-     * Sets the ORCID iD.
-     * 
-     * @param orcid the ORCID iD
-     */
-    public void setORCID(String orcid) {
-        this.orcid = orcid;
+    public MCRORCIDOAuthAccessTokenResponse() {
     }
 
     /**
@@ -135,6 +107,25 @@ public class MCRORCIDUserCredential implements Cloneable {
     }
 
     /**
+     * Returns the token life time in seconds.
+     * 
+     * @return token life time
+     */
+    @JsonProperty("expires_in")
+    public String getExpiresIn() {
+        return expiresIn;
+    }
+
+    /**
+     * Sets the life time in seconds.
+     * 
+     * @param expiresIn life time in seconds
+     */
+    public void setExpiresIn(String expiresIn) {
+        this.expiresIn = expiresIn;
+    }
+
+    /**
      * Returns the scope.
      * 
      * @return scope
@@ -154,26 +145,46 @@ public class MCRORCIDUserCredential implements Cloneable {
     }
 
     /**
-     * Returns the expire date.
+     * Returns the name.
      * 
-     * @return expiration
+     * @return name
      */
-    public LocalDate getExpiration() {
-        return expiration;
+    @JsonProperty("name")
+    public String getName() {
+        return name;
     }
 
     /**
-     * Sets the expire date.
+     * Sets the name.
      * 
-     * @param expiration expiration to set
+     * @param name the name
      */
-    public void setExpiration(LocalDate expiration) {
-        this.expiration = expiration;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Returns the ORCID iD.
+     * 
+     * @return ORCID iD
+     */
+    @JsonProperty("orcid")
+    public String getORCID() {
+        return orcid;
+    }
+
+    /**
+     * Sets the ORCID iD.
+     * 
+     * @param orcid the ORCID iD
+     */
+    public void setORCID(String orcid) {
+        this.orcid = orcid;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accessToken, orcid, refreshToken, scope, tokenType, expiration);
+        return Objects.hash(accessToken, tokenType, refreshToken, expiresIn, name, scope, orcid);
     }
 
     @Override
@@ -187,24 +198,10 @@ public class MCRORCIDUserCredential implements Cloneable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        MCRORCIDUserCredential other = (MCRORCIDUserCredential) obj;
-        return Objects.equals(accessToken, other.accessToken) && Objects.equals(orcid, other.orcid)
-            && Objects.equals(refreshToken, other.refreshToken) && Objects.equals(scope, other.scope)
-            && Objects.equals(tokenType, other.tokenType) && Objects.equals(expiration, other.expiration);
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format(Locale.ROOT, "orcid: %s\n", orcid));
-        builder.append(String.format(Locale.ROOT, "access token: %s\n", accessToken));
-        builder.append(String.format(Locale.ROOT, "refresh token: %s\n", refreshToken));
-        builder.append(String.format(Locale.ROOT, "scope: %s", scope));
-        return builder.toString();
+        MCRORCIDOAuthAccessTokenResponse other = (MCRORCIDOAuthAccessTokenResponse) obj;
+        return Objects.equals(accessToken, other.accessToken) && Objects.equals(expiresIn, other.expiresIn)
+            && Objects.equals(name, other.name) && Objects.equals(refreshToken, other.refreshToken)
+            && Objects.equals(scope, other.scope) && Objects.equals(tokenType, other.tokenType)
+            && Objects.equals(orcid, other.orcid);
     }
 }

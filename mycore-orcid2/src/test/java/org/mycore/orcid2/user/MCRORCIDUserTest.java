@@ -72,9 +72,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(ORCID, ACCESS_TOKEN);
         credential.setTokenType("bearer");
         credential.setRefreshToken("refreshToken");
-        credential.setExpiresIn("631138518");
         credential.setScope("/read-limited");
-        credential.setName("MyCoRe");
         credential.setExpiration(LocalDate.now());
         final String credentialString = MCRORCIDUser.serializeCredential(credential);
         LOGGER.info(credentialString);
@@ -84,7 +82,6 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         assertEquals(credential.getTokenType(), result.getTokenType());
         assertEquals(credential.getScope(), result.getScope());
         assertEquals(credential.getExpiration(), result.getExpiration());
-        assertNull(result.getName());
         assertNull(result.getORCID());
     }
 }

@@ -74,7 +74,7 @@ public class MCRORCIDWorkHelper {
         = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "CollectExternalPutCodes", Boolean::parseBoolean);
 
     /**
-     * Publishes MCRObject to ORCID for MCRCredentials.
+     * Publishes MCRObject to ORCID for MCRORCIDUserCredential.
      * 
      * @param object the MCRObject
      * @param credential the MCRORCIDUserCredential
@@ -87,7 +87,7 @@ public class MCRORCIDWorkHelper {
     }
 
     /**
-     * Publishes MCRObject to ORCID for given List of MCRCredentials.
+     * Publishes MCRObject to ORCID for given List of MCRORCIDUserCredential.
      * In the process, put codes may be collected and stored in the flags.
      *
      * Update and create strategies can be set via:
@@ -304,7 +304,6 @@ public class MCRORCIDWorkHelper {
         }
     }
 
-    // TODO test if escaping is necessary
     private static String buildORCIDIdentifierSearchQuery(Set<MCRIdentifier> identifiers) {
         String query = "";
         for (MCRIdentifier i : List.copyOf(identifiers)) {
@@ -324,7 +323,7 @@ public class MCRORCIDWorkHelper {
                 final MCRORCIDUserInfo userInfo
                     = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
                         .orElseGet(() -> new MCRORCIDUserInfo(orcid));
-                final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo(); // no clone necessary
+                final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo();
                 retrieveWorkInfo(object, orcid, userInfo);
                 if (userInfo.getWorkInfo().getOwnPutCode() != 0) {
                     final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();

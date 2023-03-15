@@ -29,11 +29,11 @@ import jakarta.ws.rs.core.Response;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 
 /**
- * Client for the OAuth2 API of orcid.org. Used to
- * get or revoke access tokens. Minimum configuration requires to set
+ * Client for the OAuth2 API of orcid.org.
+ * Used to exchange or revoke access tokens.
+ * Minimum configuration requires to set:
  *
  * MCR.ORCID2.BaseURL
  * MCR.ORCID2.OAuth.ClientID
@@ -69,7 +69,7 @@ public class MCRORCIDOAuthClient {
     }
 
     /**
-     * Revokes given bearer acces token.
+     * Revokes given bearer access token.
      *
      * @param token revoke token
      * @throws MCRORCIDRequestException if request fails
@@ -86,15 +86,16 @@ public class MCRORCIDOAuthClient {
     }
 
     /**
-     * Exchanges authorization code for an access token.
+     * Exchanges authorization code for an MCRORCIDOAuthAccessTokenResponse.
      * 
-     * @param code the orcid auth code
+     * @param code the ORCiD auth code
      * @param redirectURI the redirect uri
-     * @return response serialized as MCRORCIDUserCredential
+     * @return the MCRORCIDOAuthAccessTokenResponse
      * @throws MCRORCIDRequestException if request fails
-     * @see MCRORCIDUserCredential
+     * @see MCRORCIDOAuthAccessTokenResponse
      */
-    public MCRORCIDUserCredential exchangeCode(String code, String redirectURI) throws MCRORCIDRequestException {
+    public MCRORCIDOAuthAccessTokenResponse exchangeCode(String code, String redirectURI)
+        throws MCRORCIDRequestException {
         Form form = new Form();
         form.param("client_id", CLIENT_ID);
         form.param("client_secret", CLIENT_SECRET);
@@ -105,7 +106,7 @@ public class MCRORCIDOAuthClient {
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
-        return response.readEntity(MCRORCIDUserCredential.class);
+        return response.readEntity(MCRORCIDOAuthAccessTokenResponse.class);
     }
 
     private void handleError(Response response) throws MCRORCIDRequestException {

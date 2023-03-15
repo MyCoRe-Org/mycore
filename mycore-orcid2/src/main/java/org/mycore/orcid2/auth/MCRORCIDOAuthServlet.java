@@ -125,9 +125,9 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
                 res.sendError(HttpServletResponse.SC_UNAUTHORIZED, msg);
             }
             try {
-                final MCRORCIDUserCredential credential
+                final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
                     = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
-                setExpiration(credential);
+                final MCRORCIDUserCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
                 MCRORCIDSessionUtils.getCurrentUser().storeCredential(credential);
                 res.sendRedirect(userProfileURL);
             } catch (MCRORCIDRequestException e) {
@@ -136,11 +136,18 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         }
     }
 
-    private void setExpiration(MCRORCIDUserCredential credential) {
+    private MCRORCIDUserCredential accessTokenResponseToUserCredential(MCRORCIDOAuthAccessTokenResponse response) {
+        final MCRORCIDUserCredential credential
+            = new MCRORCIDUserCredential(response.getORCID(), response.getAccessToken());
+        credential.setTokenType(response.getTokenType());
+        credential.setRefreshToken(response.getRefreshToken());
         final LocalDate expireDate = LocalDateTime.now(ZoneId.systemDefault())
-            .plusSeconds(Integer.parseInt(credential.getExpiresIn()))
+            .plusSeconds(Integer.parseInt(response.getExpiresIn()))
             .toLocalDate();
         credential.setExpiration(expireDate);
+        credential.setScope(response.getScope());
+        credential.setORCID(response.getORCID());
+        return credential;
     }
 
     private void handleAuth(HttpServletRequest req, HttpServletResponse res) throws Exception {
