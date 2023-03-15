@@ -111,6 +111,7 @@ abstract class MCRORCIDBaseClient {
         }
         return response.readEntity(valueType); // may ProcessingException
     }
+
     /**
      * Handles error response.
      * 

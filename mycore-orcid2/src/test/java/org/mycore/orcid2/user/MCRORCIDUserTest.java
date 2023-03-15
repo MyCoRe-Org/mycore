@@ -20,7 +20,6 @@ package org.mycore.orcid2.user;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.time.LocalDate;
 

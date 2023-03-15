@@ -105,7 +105,8 @@ public class MCRORCIDUser {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
         final MCRUserAttribute attribute = new MCRUserAttribute(ATTR_ORCID_ID, orcid);
-        if (!user.getAttributes().contains(attribute)) { // allow more than one orcid id per user
+        // allow more than one orcid id per user
+        if (!user.getAttributes().contains(attribute)) {
             user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
             MCRUserManager.updateUser(user);
         }
@@ -229,8 +230,9 @@ public class MCRORCIDUser {
      */
     public boolean isMyPublication(MCRObjectID objectID) throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+        // TODO uniqueness of ids
         final Set<MCRIdentifier> nameIdentifiers
-            = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object)); // TODO uniqueness of ids
+            = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object));
         nameIdentifiers.retainAll(getTrustedIdentifiers());
         return !nameIdentifiers.isEmpty();
     }

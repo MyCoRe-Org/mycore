@@ -44,12 +44,6 @@ public class MCRORCIDOAuthAccessTokenResponse {
     private String orcid;
 
     /**
-     * Creates empty MCRORCIDOAuthAccessTokenResponse object.
-     */
-    public MCRORCIDOAuthAccessTokenResponse() {
-    }
-
-    /**
      * Returns the access token.
      * 
      * @return access token
