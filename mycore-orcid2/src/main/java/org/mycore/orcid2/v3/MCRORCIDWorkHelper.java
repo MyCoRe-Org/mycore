@@ -40,6 +40,7 @@ import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.MCRORCIDUserClient;
+import org.mycore.orcid2.client.exception.MCRORCIDInvalidScopeException;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
@@ -245,14 +246,14 @@ public class MCRORCIDWorkHelper {
      * @param work the Work
      * @param credential the MCRORCIDCredential
      * @param workInfo the MCRORCIDUserInfo
-     * @throws MCRORCIDException if scope is invalid
+     * @throws MCRORCIDInvalidScopeException if scope is invalid
      * @throws MCRORCIDRequestException if publishing fails
      */
     private static void publishWork(Work work, String orcid, MCRORCIDCredential credential,
-        MCRORCIDPutCodeInfo workInfo) throws MCRORCIDRequestException, MCRORCIDException {
+        MCRORCIDPutCodeInfo workInfo) throws MCRORCIDRequestException, MCRORCIDInvalidScopeException {
         final Optional<String> scope = Optional.ofNullable(credential.getScope());
         if (scope.isPresent() && !scope.get().contains(ScopeConstants.ACTIVITIES_UPDATE)) {
-            throw new MCRORCIDException("The scope is invalid");
+            throw new MCRORCIDInvalidScopeException();
         }
         final MCRORCIDUserClient memberClient
             = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
