@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -120,12 +119,9 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
     public void timerTask() throws Exception {
         System.out.println("Start: " + new Date());
 
-        MCRURNGranularRESTRegistrationStarter starter = new MCRURNGranularRESTRegistrationStarter(2, TimeUnit.SECONDS);
-        starter.startUp(null);
-        Thread.sleep(12000);
+        new MCRURNGranularRESTRegistrationCronjob().runJob();
 
         System.out.println("End: " + new Date());
-
     }
 
     protected Map<String, String> getTestServiceProperties() {
@@ -161,6 +157,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         testProperties.put("MCR.PI.Generator.UUID.Namespace", "frontend-");
         testProperties.put("MCR.PI.DNB.Credentials.Login", "test");
         testProperties.put("MCR.PI.DNB.Credentials.Password", "test");
+
         return testProperties;
     }
 
