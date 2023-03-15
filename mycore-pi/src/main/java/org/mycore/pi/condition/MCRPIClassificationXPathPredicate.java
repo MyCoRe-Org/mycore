@@ -47,7 +47,7 @@ public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase implem
         super(propertyPrefix);
         XPathFactory factory = XPathFactory.instance();
         classificationBaseExpression = compileXpath(factory, Filters.element(), requireProperty("BaseXPath"));
-        classificationIdExpression = compileXpath(factory, Filters.fstring(), requireProperty("ClassIdPath"));
+        classificationIdExpression = compileXpath(factory, Filters.fstring(), requireProperty("ClassIdXPath"));
         categoryIdExpression = compileXpath(factory, Filters.fstring(), requireProperty("CategIdXPath"));
         expression = compileXpath(factory, Filters.fboolean(), "boolean(" + requireProperty("XPath") + ")");
     }
