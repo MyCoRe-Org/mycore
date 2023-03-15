@@ -13,7 +13,7 @@
   <xsl:template match="work:type">
     <xsl:variable name="genre">
       <xsl:choose>
-        <!--xsl:when test="text()='book'"><xsl:value-of select="text()" /></xsl:when-->
+        <xsl:when test="text()='book'"><xsl:value-of select="text()" /></xsl:when>
         <!--xsl:when test="text()='book-chapter'"><xsl:value-of select="text()" /></xsl:when-->
         <!--xsl:when test="text()='book-review'"><xsl:value-of select="text()" /></xsl:when-->
         <!--xsl:when test="text()='dictionary-entry'"><xsl:value-of select="text()" /></xsl:when-->

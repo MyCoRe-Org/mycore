@@ -155,10 +155,10 @@
         <xsl:value-of select="common:year/text()" />
         <xsl:if test="common:month/text()">
           <xsl:text>-</xsl:text>
-          <xsl:value-of select='format-number(common:month/text(),"00"' />
+          <xsl:value-of select='format-number(common:month/text(),"00")' />
           <xsl:if test="common:day/text()">
             <xsl:text>-</xsl:text>
-            <xsl:value-of select='format-number(common:day/text(),"00' />
+            <xsl:value-of select='format-number(common:day/text(),"00")' />
           </xsl:if>
         </xsl:if>
       </mods:dateIssued>
