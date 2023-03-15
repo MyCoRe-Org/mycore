@@ -38,6 +38,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.MCRORCIDUserClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
@@ -45,7 +46,6 @@ import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.message.ScopeConstants;
@@ -76,24 +76,24 @@ public class MCRORCIDWorkHelper {
         = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "CollectExternalPutCodes", Boolean::parseBoolean);
 
     /**
-     * Publishes MCRObject to ORCID for MCRORCIDUserCredential.
+     * Publishes MCRObject to ORCID for MCRORCIDCredential.
      * 
      * @param object the MCRObject
      * @param orcid the ORCID iD
-     * @param credential the MCRORCIDUserCredential
+     * @param credential the MCRORCIDCredential
      * @throws MCRORCIDException if there is a general error
-     * @see #publishObjectToORCID(MCRObject, Map<String, MCRORCIDUserCredential>)
+     * @see #publishObjectToORCID(MCRObject, Map<String, MCRORCIDCredential>)
      *
      */
     public static void publishToORCIDAndUpdateWorkInfo(MCRObject object, String orcid,
-        MCRORCIDUserCredential credential) throws MCRORCIDException {
-        final Map<String, MCRORCIDUserCredential> credentials = new HashMap<>();
+        MCRORCIDCredential credential) throws MCRORCIDException {
+        final Map<String, MCRORCIDCredential> credentials = new HashMap<>();
         credentials.put(orcid, credential);
         publishObjectToORCID(object, credentials);
     }
 
     /**
-     * Publishes MCRObject to ORCID for given List of MCRORCIDUserCredential.
+     * Publishes MCRObject to ORCID for given List of MCRORCIDCredential.
      * In the process, put codes may be collected and stored in the flags.
      *
      * Update and create strategies can be set via:
@@ -104,12 +104,12 @@ public class MCRORCIDWorkHelper {
      * MCR.ORCID2.Work.CollectExternalPutCodes=
      * 
      * @param object the MCRObject
-     * @param credentials List of MCRORCIDUserCredential
+     * @param credentials List of MCRORCIDCredential
      * @throws MCRORCIDException if work transformation fails or cannot update flags
      * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     public static void publishToORCIDAndUpdateWorkInfo(MCRObject object,
-        Map<String, MCRORCIDUserCredential> credentials) throws MCRORCIDException {
+        Map<String, MCRORCIDCredential> credentials) throws MCRORCIDException {
         final List<String> orcids = credentials.entrySet().stream().map(Map.Entry::getKey).toList();
         MCRORCIDMetadataUtils.cleanUpWorkInfosExcludingORCIDs(object, orcids);
         if (!credentials.isEmpty()) {
@@ -127,13 +127,13 @@ public class MCRORCIDWorkHelper {
         }
     }
 
-    private static void publishObjectToORCID(MCRObject object, Map<String, MCRORCIDUserCredential> credentials)
+    private static void publishObjectToORCID(MCRObject object, Map<String, MCRORCIDCredential> credentials)
         throws MCRORCIDTransformationException {
         final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
         final List<String> failedORCIDs = new ArrayList<>();
-        for (Map.Entry<String, MCRORCIDUserCredential> entry : credentials.entrySet()) {
+        for (Map.Entry<String, MCRORCIDCredential> entry : credentials.entrySet()) {
             final String orcid = entry.getKey();
-            final MCRORCIDUserCredential credential = entry.getValue();
+            final MCRORCIDCredential credential = entry.getValue();
             try {
                 final MCRORCIDUserInfo userInfo
                     = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
@@ -182,7 +182,7 @@ public class MCRORCIDWorkHelper {
     }
 
     /**
-     * Retrieves work info for MCRORCIDUserInfo of MCRObject with MCRORCIDUserCredential.
+     * Retrieves work info for MCRORCIDUserInfo of MCRObject with MCRORCIDCredential.
      * 
      * Strategie can be set via:
      * 
@@ -190,12 +190,12 @@ public class MCRORCIDWorkHelper {
      * 
      * @param object the MCRObject
      * @param orcid the ORCID iD
-     * @param credential the MCRORCIDUserCredential
+     * @param credential the MCRORCIDCredential
      * @param userInfo the userInfo
      * @throws MCRORCIDException if retrieving fails
      * @see MCRORCIDUtils#getTrustedIdentifiers
      */
-    public static void retrieveWorkInfo(MCRObject object, String orcid, MCRORCIDUserCredential credential,
+    public static void retrieveWorkInfo(MCRObject object, String orcid, MCRORCIDCredential credential,
         MCRORCIDUserInfo userInfo) throws MCRORCIDException {
         if (userInfo.getWorkInfo() == null || ALWAYS_UPDATE_PUT_CODES) {
             if (userInfo.getWorkInfo() == null) {
@@ -206,15 +206,15 @@ public class MCRORCIDWorkHelper {
     }
 
     /**
-     * Updates work info for MCRORCIDUserCredential with MCRObject as reference.
+     * Updates work info for MCRORCIDCredential with MCRObject as reference.
      * 
      * @param object the MCRObject
-     * @param credential the MCRORCIDUserCredential
+     * @param credential the MCRORCIDCredential
      * @param workInfo the initial work info
      * @throws MCRORCIDException look up request fails
      * @see MCRORCIDUtils#getTrustedIdentifiers
      */
-    private static void updateWorkInfo(MCRObject object, String orcid, MCRORCIDUserCredential credential,
+    private static void updateWorkInfo(MCRObject object, String orcid, MCRORCIDCredential credential,
         MCRORCIDPutCodeInfo workInfo) throws MCRORCIDException {
         List<WorkSummary> summaries = null;
         try {
@@ -235,7 +235,7 @@ public class MCRORCIDWorkHelper {
     }
 
     /**
-     * Creates/Updates Work to ORCID profile by MCRORCIDUserCredential and MCRORCIDUserInfo.
+     * Creates/Updates Work to ORCID profile by MCRORCIDCredential and MCRORCIDUserInfo.
      * 
      * Update and create strategies can be set via:
      * 
@@ -243,12 +243,12 @@ public class MCRORCIDWorkHelper {
      * MCR.ORCID2.Work.AlwaysCreateOwn=
      * 
      * @param work the Work
-     * @param credential the MCRORCIDUserCredential
+     * @param credential the MCRORCIDCredential
      * @param workInfo the MCRORCIDUserInfo
      * @throws MCRORCIDException if scope is invalid
      * @throws MCRORCIDRequestException if publishing fails
      */
-    private static void publishWork(Work work, String orcid, MCRORCIDUserCredential credential,
+    private static void publishWork(Work work, String orcid, MCRORCIDCredential credential,
         MCRORCIDPutCodeInfo workInfo) throws MCRORCIDRequestException, MCRORCIDException {
         final Optional<String> scope = Optional.ofNullable(credential.getScope());
         if (scope.isPresent() && !scope.get().contains(ScopeConstants.ACTIVITIES_UPDATE)) {

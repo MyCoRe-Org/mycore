@@ -29,7 +29,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 
 /**
  * Factory for various ORCID clients.
@@ -101,14 +100,14 @@ public class MCRORCIDClientFactory {
     }
 
     /**
-     * Creates a MCRORCIDUserClient for user with MCRORCIDUserCredential.
+     * Creates a MCRORCIDUserClient for user with MCRORCIDCredential.
      *
      * @param orcid the ORCID iD
-     * @param credential the MCRORCIDUserCredential
+     * @param credential the MCRORCIDCredential
      * @return MCRORCIDClient
      * @throws MCRORCIDException if client is not in member mode
      */
-    public MCRORCIDUserClient createUserClient(String orcid, MCRORCIDUserCredential credential)
+    public MCRORCIDUserClient createUserClient(String orcid, MCRORCIDCredential credential)
         throws MCRORCIDException {
         if (checkMemberMode()) {
             return new MCRORCIDUserClientImpl(memberAPI, orcid, credential);

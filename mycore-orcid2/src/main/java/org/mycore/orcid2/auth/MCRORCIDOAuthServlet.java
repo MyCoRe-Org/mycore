@@ -41,8 +41,8 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.orcid2.MCRORCIDConstants;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -127,7 +127,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             try {
                 final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
                     = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
-                final MCRORCIDUserCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
+                final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
                 MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
                 res.sendRedirect(userProfileURL);
             } catch (MCRORCIDRequestException e) {
@@ -136,8 +136,8 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         }
     }
 
-    private MCRORCIDUserCredential accessTokenResponseToUserCredential(MCRORCIDOAuthAccessTokenResponse response) {
-        final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(response.getAccessToken());
+    private MCRORCIDCredential accessTokenResponseToUserCredential(MCRORCIDOAuthAccessTokenResponse response) {
+        final MCRORCIDCredential credential = new MCRORCIDCredential(response.getAccessToken());
         credential.setTokenType(response.getTokenType());
         credential.setRefreshToken(response.getRefreshToken());
         final LocalDate expireDate = LocalDateTime.now(ZoneId.systemDefault())

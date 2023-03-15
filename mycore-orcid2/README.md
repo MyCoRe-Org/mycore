@@ -2,7 +2,8 @@
 
 ## Overview
 
-The approaches are based on the official [orcid-model](https://github.com/ORCID/orcid-model) and use the section models.
+Module is based on the official [orcid-model](https://github.com/ORCID/orcid-model) and uses the section models.
+The approach is based on OAuth.
 
 ## Configuration
 
@@ -23,7 +24,7 @@ Steps:
 ### Fetching works from Public API v3
 
     String orcid = "0000-0001-5065-6970";
-    MCRORCIDReadClient client = MCRORCIDClientFactory.getInstance("v3").createPublicClient();
+    MCRORCIDReadClient client = MCRORCIDClientFactory.getInstance("V3").createPublicClient();
 
     // fetch work summary
     List<WorkSummary> summaries = client.fetch(orcid, MCRORCIDSectionImpl.WORKS, Works.class).getWorkGroup()
@@ -45,8 +46,8 @@ Steps:
     Work work = MCRORCIDWorkTransformerHelper.transformContent(object);
 
     // initialize member client for current user
-    MCRORCIDUserCredentials credential = MCRORCIDSessionUtils.getCurrentUser().getCredential("ORCID");
-    MCRORCIDClient client = MCRORCIDClientFactory.getInstance("v3").createMemberClient(credential);
+    MCRORCIDCredential credential = MCRORCIDSessionUtils.getCurrentUser().getCredentialByORCID("ORCID");
+    MCRORCIDClient client = MCRORCIDClientFactory.getInstance("V3").createMemberClient(credential);
 
     // publish work to orcid
     long putCode = client.create(MCRORCIDSectionImpl.WORKS, work);

@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.user;
+package org.mycore.orcid2.client;
 
 import java.time.LocalDate;
 import java.util.Locale;
@@ -25,9 +25,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents the ORCID user credential including access token.
+ * Represents the ORCID credential including access token.
  */
-public class MCRORCIDUserCredential {
+public class MCRORCIDCredential {
 
     private String accessToken;
 
@@ -40,18 +40,18 @@ public class MCRORCIDUserCredential {
     private LocalDate expiration;
 
     /**
-     * Creates MCRORCIDUserCredential object with access token.
+     * Creates MCRORCIDCredential object with access token.
      * 
      * @param accessToken the access token
      */
-    public MCRORCIDUserCredential(String accessToken) {
+    public MCRORCIDCredential(String accessToken) {
         this.accessToken = accessToken;
     }
 
     /**
-     * Creates empty MCRORCIDUserCredential object.
+     * Creates empty MCRORCIDCredential object.
      */
-    public MCRORCIDUserCredential() {
+    public MCRORCIDCredential() {
     }
 
     /**
@@ -164,7 +164,7 @@ public class MCRORCIDUserCredential {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        MCRORCIDUserCredential other = (MCRORCIDUserCredential) obj;
+        MCRORCIDCredential other = (MCRORCIDCredential) obj;
         return Objects.equals(accessToken, other.accessToken) && Objects.equals(refreshToken, other.refreshToken)
             && Objects.equals(scope, other.scope) && Objects.equals(tokenType, other.tokenType)
             && Objects.equals(expiration, other.expiration);

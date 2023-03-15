@@ -27,8 +27,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.client.MCRORCIDClientFactory;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.orcid.jaxb.model.v3.release.error.OrcidError;
 
 /**
@@ -55,7 +55,7 @@ public class MCRORCIDClientHelper {
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
         long... putCodes) throws MCRORCIDRequestException {
         if (getClientFactory().checkMemberMode()) {
-            final MCRORCIDUserCredential credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid); // TODO exception
+            final MCRORCIDCredential credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid); // TODO exception
             if (credential != null) {
                 try {
                     return getClientFactory().createUserClient(orcid, credential).fetch(section, valueType, putCodes);

@@ -38,6 +38,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
@@ -119,15 +120,15 @@ public class MCRORCIDUser {
     }
 
     /** 
-     * Sets MCRORCIDUserCredential to user's MCRUserAttribute.
+     * Sets MCRORCIDCredential to user's MCRUserAttribute.
      * Also, adds ORCID iD to user attributes.
      * 
      * @param orcid the ORCID iD
-     * @param credential the MCRORCIDUserCredential
+     * @param credential the MCRORCIDCredential
      * @throws MCRORCIDException if crededentials are invalid
      * @see MCRORCIDUser#addORCID
      */
-    public void storeCredential(String orcid, MCRORCIDUserCredential credential) throws MCRORCIDException {
+    public void storeCredential(String orcid, MCRORCIDCredential credential) throws MCRORCIDException {
         addORCID(orcid);
         if (!MCRORCIDValidationHelper.validateCredential(credential)) {
             throw new MCRORCIDException("Credentials are invalid");
@@ -144,7 +145,7 @@ public class MCRORCIDUser {
 
 
     /**
-     * Removes all MCRORCIDUserCredential attributes.
+     * Removes all MCRORCIDCredential attributes.
      */
     public void removeAllCredentials() {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
@@ -159,7 +160,7 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Removes MCROCIDCredentials by ORCID id if exists.
+     * Removes MCROCIDCredential by ORCID iD if exists.
      * 
      * @param orcid the ORCID iD
      */
@@ -176,9 +177,9 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Checks if user has MCRORCIDUserCredential.
+     * Checks if user has MCRORCIDCredential.
      * 
-     * @return true if user has MCRCredentials
+     * @return true if user has at least one MCRORCIDCredential
      */
     public boolean hasCredential() {
         return user.getAttributes().stream()
@@ -186,12 +187,12 @@ public class MCRORCIDUser {
     }
 
     /** 
-     * Returns user's MCRORCIDUserCredential from user attributes.
+     * Returns user's MCRORCIDCredential from user attributes.
      * 
-     * @return Map of MCRORCIDUserCredentials
+     * @return Map of MCRORCIDCredentials
      * @throws MCRORCIDException if the are corrupt MCRCredentials
      */
-    public Map<String, MCRORCIDUserCredential> getCredentials() throws MCRORCIDException {
+    public Map<String, MCRORCIDCredential> getCredentials() throws MCRORCIDException {
         try {
             return user.getAttributes().stream()
                 .collect(Collectors.toMap(a -> a.getName().substring(ATTR_ORCID_CREDENTIAL.length()),
@@ -202,13 +203,13 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Gets user's MCRORCIDUserCredential by ORCID iD.
+     * Gets user's MCRORCIDCredential by ORCID iD.
      * 
      * @param orcid the ORCID iD
      * @return MCRCredentials or null
      * @throws MCRORCIDException if the MCRCredentials are corrupt
      */
-    public MCRORCIDUserCredential getCredentialByORCID(String orcid) throws MCRORCIDException {
+    public MCRORCIDCredential getCredentialByORCID(String orcid) throws MCRORCIDException {
         try {
             return Optional.ofNullable(getCredentialAttributeValueByORCID(orcid))
                 .map(s -> deserializeCredential(s)).orElse(null);
@@ -256,13 +257,13 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Serializes MCRORCIDUserCredential to String.
+     * Serializes MCRORCIDCredential to String.
      * 
-     * @param credential MCRORCIDUserCredentials
-     * @return MCRORCIDUserCredential as String
+     * @param credential MCRORCIDCredentials
+     * @return MCRORCIDCredential as String
      * @throws IllegalArgumentException if serialization fails
      */
-    protected static String serializeCredential(MCRORCIDUserCredential credential) throws IllegalArgumentException {
+    protected static String serializeCredential(MCRORCIDCredential credential) throws IllegalArgumentException {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules();
@@ -274,18 +275,18 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Deserializes String to MCRORCIDUserCredential.
+     * Deserializes String to MCRORCIDCredential.
      * 
      * @param credentialString MCRORCIDCredentials as String
-     * @return MCRORCIDUserCredential
+     * @return MCRORCIDCredential
      * @throws IllegalArgumentException if deserialisation fails
      */
-    protected static MCRORCIDUserCredential deserializeCredential(String credentialString)
+    protected static MCRORCIDCredential deserializeCredential(String credentialString)
         throws IllegalArgumentException {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules();
-            return mapper.readValue(credentialString, MCRORCIDUserCredential.class);
+            return mapper.readValue(credentialString, MCRORCIDCredential.class);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }

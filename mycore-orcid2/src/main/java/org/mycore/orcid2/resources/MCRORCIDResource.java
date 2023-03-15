@@ -71,7 +71,7 @@ public class MCRORCIDResource {
      * @return Response
      */
     @GET
-    @Path("oauth/revoke")
+    @Path("revoke")
     public Response revoke(@PathParam("orcid") String orcid) throws WebApplicationException {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);

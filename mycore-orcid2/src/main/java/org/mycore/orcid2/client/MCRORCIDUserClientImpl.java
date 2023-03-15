@@ -27,7 +27,6 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 
 /**
  * See {@link MCRORCIDUserClient}.
@@ -40,13 +39,13 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     private final String orcid;
 
     /**
-     * Creates an MCRORCIDUserClient with given api url and MCRORCIDUserCredential.
+     * Creates an MCRORCIDUserClient with given api url and MCRORCIDCredential.
      * 
      * @param restURL rest url of ORCID api url
      * @param orcid the ORCID iD
-     * @param credential the MCRORCIDUserCredential
+     * @param credential the MCRORCIDCredential
      */
-    public MCRORCIDUserClientImpl(String restURL, String orcid, MCRORCIDUserCredential credential) {
+    public MCRORCIDUserClientImpl(String restURL, String orcid, MCRORCIDCredential credential) {
         super(restURL, credential.getAccessToken());
         this.orcid = orcid;
         this.baseTarget = getBaseTarget().path(orcid);

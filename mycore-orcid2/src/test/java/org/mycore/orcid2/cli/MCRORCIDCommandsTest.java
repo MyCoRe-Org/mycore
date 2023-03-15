@@ -24,8 +24,8 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -48,7 +48,7 @@ public class MCRORCIDCommandsTest extends MCRJPATestCase {
         assertEquals(ORCID_ID, user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_ID));
         assertNotNull(user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_CREDENTIAL + ORCID_ID));
         final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(ORCID_ID);
+        final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(ORCID_ID);
         assertNotNull(credential);
         assertEquals(ORCID_ACCESS_TOKEN, credential.getAccessToken());
     }

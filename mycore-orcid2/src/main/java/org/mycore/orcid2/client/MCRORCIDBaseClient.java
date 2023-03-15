@@ -82,7 +82,7 @@ abstract class MCRORCIDBaseClient {
     /**
      * Fetches section/object of orcid profile and wraps response into type.
      * 
-     * @param orcid the orcid
+     * @param orcid the ORCID iD
      * @param section the ORCID section
      * @param <T> the result class
      * @param valueType the result class

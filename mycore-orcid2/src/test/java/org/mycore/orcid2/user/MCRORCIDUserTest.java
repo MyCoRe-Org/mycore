@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -45,7 +46,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         assertEquals(0, orcidUser.getCredentials().size());
-        final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(ACCESS_TOKEN);
+        final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
         orcidUser.storeCredential(ORCID, credential);
         // id_orcid + orcid_credential_orcid
         assertEquals(2, user.getAttributes().size());
@@ -59,7 +60,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-        final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(ACCESS_TOKEN);
+        final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
         orcidUser.storeCredential(ORCID, credential);
         user.setUserAttribute("test", "test");
         orcidUser.removeAllCredentials();
@@ -71,14 +72,14 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
 
     @Test
     public void testSerialization() {
-        final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(ACCESS_TOKEN);
+        final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
         credential.setTokenType("bearer");
         credential.setRefreshToken("refreshToken");
         credential.setScope("/read-limited");
         credential.setExpiration(LocalDate.now());
         final String credentialString = MCRORCIDUser.serializeCredential(credential);
         LOGGER.info(credentialString);
-        final MCRORCIDUserCredential result = MCRORCIDUser.deserializeCredential(credentialString);
+        final MCRORCIDCredential result = MCRORCIDUser.deserializeCredential(credentialString);
         assertEquals(credential.getAccessToken(), result.getAccessToken());
         assertEquals(credential.getRefreshToken(), result.getRefreshToken());
         assertEquals(credential.getTokenType(), result.getTokenType());

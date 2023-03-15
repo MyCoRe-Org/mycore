@@ -26,9 +26,9 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDUser;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -47,7 +47,7 @@ public class MCRORCIDCommands {
     protected static final String ORCID_TOKEN_ATTRIBUTE_NAME = "token_orcid";
 
     /**
-     * Migrates all orcid token user attributes to MCRORCIDUserCredential.
+     * Migrates all orcid token user attributes to MCRORCIDCredential.
      * 
      * @throws MCRORCIDException if migration fails
      * @throws MCRException if there is more than ORCiD attribute for one user
@@ -65,7 +65,7 @@ public class MCRORCIDCommands {
                 LOGGER.info("Ignored {}, ORCiD attribute is missing.", user.getUserName());
                 continue;
             }
-            final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(token);
+            final MCRORCIDCredential credential = new MCRORCIDCredential(token);
             credential.setTokenType("bearer");
             final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
             orcidUser.storeCredential(orcid, credential);

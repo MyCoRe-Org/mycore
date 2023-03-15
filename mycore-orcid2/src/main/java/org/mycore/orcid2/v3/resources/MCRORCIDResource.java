@@ -40,7 +40,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.orcid2.MCRORCIDUtils;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
+import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.v3.MCRORCIDClientHelper;
@@ -95,7 +95,7 @@ public class MCRORCIDResource {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         final String orcid = orcids.iterator().next();
-        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcid);
+        final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(orcid);
         if (credential == null) {
             return new MCRORCIDPublicationStatus(true, false);
         }
@@ -148,7 +148,7 @@ public class MCRORCIDResource {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         final String orcid = orcids.iterator().next();
-        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcid);
+        final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(orcid);
         if (credential == null || credential.getAccessToken() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
