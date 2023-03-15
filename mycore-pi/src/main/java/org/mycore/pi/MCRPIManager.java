@@ -261,7 +261,7 @@ public class MCRPIManager {
         return typedQuery.getResultList();
     }
 
-    public Integer setRegisteredDateForUnregisteredIdenifiers(
+    public Integer setRegisteredDateForUnregisteredIdentifiers(
         String type,
         Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider, Integer batchSize) {
 
