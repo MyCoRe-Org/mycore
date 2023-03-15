@@ -18,8 +18,8 @@
 
 package org.mycore.orcid2.user;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -65,7 +65,7 @@ public class MCRORCIDUser {
     /**
      * Prefix for orcid credential user attribute.
      */
-    public static final String ATTR_ORCID_CREDENTIALS = "orcid_credential_";
+    public static final String ATTR_ORCID_CREDENTIAL = "orcid_credential_";
 
     /**
      * ORCID iD user attribute name.
@@ -120,14 +120,14 @@ public class MCRORCIDUser {
 
     /** 
      * Sets MCRORCIDUserCredential to user's MCRUserAttribute.
-     * Also, adds ORCID id to user attributes.
+     * Also, adds ORCID iD to user attributes.
      * 
+     * @param orcid the ORCID iD
      * @param credential the MCRORCIDUserCredential
      * @throws MCRORCIDException if crededentials are invalid
      * @see MCRORCIDUser#addORCID
      */
-    public void storeCredential(MCRORCIDUserCredential credential) throws MCRORCIDException {
-        final String orcid = credential.getORCID();
+    public void storeCredential(String orcid, MCRORCIDUserCredential credential) throws MCRORCIDException {
         addORCID(orcid);
         if (!MCRORCIDValidationHelper.validateCredential(credential)) {
             throw new MCRORCIDException("Credentials are invalid");
@@ -138,9 +138,10 @@ public class MCRORCIDUser {
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Credentials are invalid");
         }
-        user.setUserAttribute(ATTR_ORCID_CREDENTIALS + orcid, credentialString);
+        user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
         MCRUserManager.updateUser(user);
     }
+
 
     /**
      * Removes all MCRORCIDUserCredential attributes.
@@ -149,7 +150,7 @@ public class MCRORCIDUser {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
         final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
         for (MCRUserAttribute attribute : attributes) {
-            if (!attribute.getName().startsWith(ATTR_ORCID_CREDENTIALS)) {
+            if (!attribute.getName().startsWith(ATTR_ORCID_CREDENTIAL)) {
                 toKeep.add(attribute);
             }
         }
@@ -166,7 +167,7 @@ public class MCRORCIDUser {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
         final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
         for (MCRUserAttribute attribute : attributes) {
-            if (!attribute.getName().equals(ATTR_ORCID_CREDENTIALS + orcid)) {
+            if (!attribute.getName().equals(getCredentialAttributeNameByORCID(orcid))) {
                 toKeep.add(attribute);
             }
         }
@@ -181,28 +182,23 @@ public class MCRORCIDUser {
      */
     public boolean hasCredential() {
         return user.getAttributes().stream()
-            .filter(attribute -> attribute.getName().startsWith(ATTR_ORCID_CREDENTIALS)).findAny().isPresent();
+            .filter(attribute -> attribute.getName().startsWith(ATTR_ORCID_CREDENTIAL)).findAny().isPresent();
     }
 
     /** 
-     * Lists user's MCRORCIDUserCredential from user attributes.
+     * Returns user's MCRORCIDUserCredential from user attributes.
      * 
-     * @return List of MCRCredentials
+     * @return Map of MCRORCIDUserCredentials
      * @throws MCRORCIDException if the are corrupt MCRCredentials
      */
-    public List<MCRORCIDUserCredential> listCredentials() throws MCRORCIDException {
-        final List<MCRUserAttribute> attributes = user.getAttributes().stream()
-            .filter(attribute -> attribute.getName().startsWith(ATTR_ORCID_CREDENTIALS)).toList();
-        if (attributes.isEmpty()) {
-            return List.of();
+    public Map<String, MCRORCIDUserCredential> getCredentials() throws MCRORCIDException {
+        try {
+            return user.getAttributes().stream()
+                .collect(Collectors.toMap(a -> a.getName().substring(ATTR_ORCID_CREDENTIAL.length()),
+                    a -> deserializeCredential(a.getValue())));
+        } catch (IllegalArgumentException e) {
+            throw new MCRORCIDException("Credentials are corrupt");
         }
-        final List<MCRORCIDUserCredential> credentials = new ArrayList<MCRORCIDUserCredential>();
-        for (MCRUserAttribute attribute : attributes) {
-            final MCRORCIDUserCredential tmp = deserializeCredential(attribute.getValue());
-            final String orcid = attribute.getName().substring(ATTR_ORCID_CREDENTIALS.length());
-            tmp.setORCID(orcid);
-        }
-        return credentials;
     }
 
     /**
@@ -213,15 +209,12 @@ public class MCRORCIDUser {
      * @throws MCRORCIDException if the MCRCredentials are corrupt
      */
     public MCRORCIDUserCredential getCredentialByORCID(String orcid) throws MCRORCIDException {
-        Optional<MCRORCIDUserCredential> credential = null;
         try {
-            credential = Optional.ofNullable(getCredentialAttributeValueByORCID(orcid))
-                .map(s -> deserializeCredential(s));
+            return Optional.ofNullable(getCredentialAttributeValueByORCID(orcid))
+                .map(s -> deserializeCredential(s)).orElse(null);
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Credentials are corrupt");
         }
-        credential.ifPresent(c -> c.setORCID(orcid));
-        return credential.orElse(null);
     }
 
     /**
@@ -271,14 +264,11 @@ public class MCRORCIDUser {
      */
     protected static String serializeCredential(MCRORCIDUserCredential credential) throws IllegalArgumentException {
         try {
-            final MCRORCIDUserCredential cloned = (MCRORCIDUserCredential) credential.clone();
-            // saving the orcid is redundant
-            cloned.setORCID(null);
             final ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules();
             mapper.setSerializationInclusion(Include.NON_NULL);
-            return mapper.writeValueAsString(cloned);
-        } catch (JsonProcessingException | CloneNotSupportedException e) {
+            return mapper.writeValueAsString(credential);
+        } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -302,6 +292,10 @@ public class MCRORCIDUser {
     }
 
     private String getCredentialAttributeValueByORCID(String orcid) {
-        return user.getUserAttribute(ATTR_ORCID_CREDENTIALS + orcid);
+        return user.getUserAttribute(getCredentialAttributeNameByORCID(orcid));
+    }
+
+    private static String getCredentialAttributeNameByORCID(String orcid) {
+        return ATTR_ORCID_CREDENTIAL + orcid;
     }
 }

@@ -103,13 +103,15 @@ public class MCRORCIDClientFactory {
     /**
      * Creates a MCRORCIDUserClient for user with MCRORCIDUserCredential.
      *
+     * @param orcid the ORCID iD
      * @param credential the MCRORCIDUserCredential
      * @return MCRORCIDClient
      * @throws MCRORCIDException if client is not in member mode
      */
-    public MCRORCIDUserClient createUserClient(MCRORCIDUserCredential credential) throws MCRORCIDException {
+    public MCRORCIDUserClient createUserClient(String orcid, MCRORCIDUserCredential credential)
+        throws MCRORCIDException {
         if (checkMemberMode()) {
-            return new MCRORCIDUserClientImpl(memberAPI, credential);
+            return new MCRORCIDUserClientImpl(memberAPI, orcid, credential);
         }
         throw new MCRORCIDException("Client is not in member mode");
     }

@@ -18,6 +18,8 @@
 
 package org.mycore.orcid2.resources;
 
+import java.util.Map;
+
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -29,7 +31,6 @@ import jakarta.ws.rs.core.Response.Status;
 
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
@@ -58,8 +59,8 @@ public class MCRORCIDResource {
         }
         final MCRORCIDUser user = MCRORCIDSessionUtils.getCurrentUser();
         final String[] orcids = user.getORCIDs().toArray(String[]::new);
-        final String[] credentials =
-            user.listCredentials().stream().map(MCRORCIDUserCredential::getORCID).toArray(String[]::new);
+        final String[] credentials = user.getCredentials().entrySet().stream().map(Map.Entry::getValue)
+            .toArray(String[]::new);
         return new MCRORCIDUserStatus(orcids, credentials);
     }
 
@@ -70,7 +71,7 @@ public class MCRORCIDResource {
      * @return Response
      */
     @GET
-    @Path("revoke")
+    @Path("oauth/revoke")
     public Response revoke(@PathParam("orcid") String orcid) throws WebApplicationException {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);

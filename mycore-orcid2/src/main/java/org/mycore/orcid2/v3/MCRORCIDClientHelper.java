@@ -55,10 +55,10 @@ public class MCRORCIDClientHelper {
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
         long... putCodes) throws MCRORCIDRequestException {
         if (getClientFactory().checkMemberMode()) {
-            final MCRORCIDUserCredential credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
+            final MCRORCIDUserCredential credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid); // TODO exception
             if (credential != null) {
                 try {
-                    return getClientFactory().createUserClient(credential).fetch(section, valueType, putCodes);
+                    return getClientFactory().createUserClient(orcid, credential).fetch(section, valueType, putCodes);
                 } catch (MCRORCIDRequestException e) {
                     final Response response = e.getErrorResponse();
                     if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {

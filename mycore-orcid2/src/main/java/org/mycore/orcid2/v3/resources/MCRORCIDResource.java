@@ -94,12 +94,13 @@ public class MCRORCIDResource {
         if (orcids.size() > 1) { // should not happen
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcids.iterator().next());
+        final String orcid = orcids.iterator().next();
+        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcid);
         if (credential == null) {
             return new MCRORCIDPublicationStatus(true, false);
         }
         try {
-            final Works works = MCRORCIDClientHelper.getClientFactory().createUserClient(credential)
+            final Works works = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential)
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
@@ -146,12 +147,13 @@ public class MCRORCIDResource {
         if (orcids.isEmpty() || orcids.size() > 1) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcids.iterator().next());
+        final String orcid = orcids.iterator().next();
+        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcid);
         if (credential == null || credential.getAccessToken() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         try {
-            MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credential);
+            MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, orcid, credential);
             return Response.ok().build();
         } catch (Exception e) {
             LOGGER.error("Error while publishing: ", e);

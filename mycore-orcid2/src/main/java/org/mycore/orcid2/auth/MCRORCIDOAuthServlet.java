@@ -128,7 +128,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
                 final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
                     = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
                 final MCRORCIDUserCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
-                MCRORCIDSessionUtils.getCurrentUser().storeCredential(credential);
+                MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
                 res.sendRedirect(userProfileURL);
             } catch (MCRORCIDRequestException e) {
                 LOGGER.error("Cannot exchange token.", e);
@@ -137,8 +137,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
     }
 
     private MCRORCIDUserCredential accessTokenResponseToUserCredential(MCRORCIDOAuthAccessTokenResponse response) {
-        final MCRORCIDUserCredential credential
-            = new MCRORCIDUserCredential(response.getORCID(), response.getAccessToken());
+        final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(response.getAccessToken());
         credential.setTokenType(response.getTokenType());
         credential.setRefreshToken(response.getRefreshToken());
         final LocalDate expireDate = LocalDateTime.now(ZoneId.systemDefault())
@@ -146,7 +145,6 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             .toLocalDate();
         credential.setExpiration(expireDate);
         credential.setScope(response.getScope());
-        credential.setORCID(response.getORCID());
         return credential;
     }
 

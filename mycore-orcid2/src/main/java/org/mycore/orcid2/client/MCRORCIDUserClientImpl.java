@@ -37,23 +37,24 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
 
     private final WebTarget baseTarget;
 
-    private final MCRORCIDUserCredential credential;
+    private final String orcid;
 
     /**
      * Creates an MCRORCIDUserClient with given api url and MCRORCIDUserCredential.
      * 
      * @param restURL rest url of ORCID api url
+     * @param orcid the ORCID iD
      * @param credential the MCRORCIDUserCredential
      */
-    public MCRORCIDUserClientImpl(String restURL, MCRORCIDUserCredential credential) {
+    public MCRORCIDUserClientImpl(String restURL, String orcid, MCRORCIDUserCredential credential) {
         super(restURL, credential.getAccessToken());
-        this.credential = credential;
-        this.baseTarget = getBaseTarget().path(credential.getORCID());
+        this.orcid = orcid;
+        this.baseTarget = getBaseTarget().path(orcid);
     }
 
     @Override
     public <T> T fetch(MCRORCIDSection section, Class<T> valueType, long... putCodes) throws MCRORCIDRequestException {
-        return doFetch(credential.getORCID(), section, valueType, putCodes);
+        return doFetch(orcid, section, valueType, putCodes);
     }
 
     @Override

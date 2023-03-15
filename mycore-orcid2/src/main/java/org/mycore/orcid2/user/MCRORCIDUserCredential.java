@@ -27,9 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Represents the ORCID user credential including access token.
  */
-public class MCRORCIDUserCredential implements Cloneable {
-
-    private String orcid;
+public class MCRORCIDUserCredential {
 
     private String accessToken;
 
@@ -42,13 +40,11 @@ public class MCRORCIDUserCredential implements Cloneable {
     private LocalDate expiration;
 
     /**
-     * Creates MCRORCIDUserCredential object with ORCID iD and access token.
+     * Creates MCRORCIDUserCredential object with access token.
      * 
-     * @param orcid the ORCID iD
      * @param accessToken the access token
      */
-    public MCRORCIDUserCredential(String orcid, String accessToken) {
-        this.orcid = orcid;
+    public MCRORCIDUserCredential(String accessToken) {
         this.accessToken = accessToken;
     }
 
@@ -56,25 +52,6 @@ public class MCRORCIDUserCredential implements Cloneable {
      * Creates empty MCRORCIDUserCredential object.
      */
     public MCRORCIDUserCredential() {
-    }
-
-    /**
-     * Returns the ORCID iD.
-     * 
-     * @return ORCID iD
-     */
-    @JsonProperty("orcid")
-    public String getORCID() {
-        return orcid;
-    }
-
-    /**
-     * Sets the ORCID iD.
-     * 
-     * @param orcid the ORCID iD
-     */
-    public void setORCID(String orcid) {
-        this.orcid = orcid;
     }
 
     /**
@@ -173,7 +150,7 @@ public class MCRORCIDUserCredential implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(accessToken, orcid, refreshToken, scope, tokenType, expiration);
+        return Objects.hash(accessToken, refreshToken, scope, tokenType, expiration);
     }
 
     @Override
@@ -188,20 +165,14 @@ public class MCRORCIDUserCredential implements Cloneable {
             return false;
         }
         MCRORCIDUserCredential other = (MCRORCIDUserCredential) obj;
-        return Objects.equals(accessToken, other.accessToken) && Objects.equals(orcid, other.orcid)
-            && Objects.equals(refreshToken, other.refreshToken) && Objects.equals(scope, other.scope)
-            && Objects.equals(tokenType, other.tokenType) && Objects.equals(expiration, other.expiration);
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+        return Objects.equals(accessToken, other.accessToken) && Objects.equals(refreshToken, other.refreshToken)
+            && Objects.equals(scope, other.scope) && Objects.equals(tokenType, other.tokenType)
+            && Objects.equals(expiration, other.expiration);
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format(Locale.ROOT, "orcid: %s\n", orcid));
         builder.append(String.format(Locale.ROOT, "access token: %s\n", accessToken));
         builder.append(String.format(Locale.ROOT, "refresh token: %s\n", refreshToken));
         builder.append(String.format(Locale.ROOT, "scope: %s", scope));

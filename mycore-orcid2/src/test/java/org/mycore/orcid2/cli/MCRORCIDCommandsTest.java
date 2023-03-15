@@ -46,11 +46,10 @@ public class MCRORCIDCommandsTest extends MCRJPATestCase {
         assertEquals(2, user.getAttributes().size());
         assertNull(user.getUserAttribute(MCRORCIDCommands.ORCID_TOKEN_ATTRIBUTE_NAME));
         assertEquals(ORCID_ID, user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_ID));
-        assertNotNull(user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_CREDENTIALS + ORCID_ID));
+        assertNotNull(user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_CREDENTIAL + ORCID_ID));
         final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(ORCID_ID);
         assertNotNull(credential);
-        assertEquals(ORCID_ID, credential.getORCID());
         assertEquals(ORCID_ACCESS_TOKEN, credential.getAccessToken());
     }
 }

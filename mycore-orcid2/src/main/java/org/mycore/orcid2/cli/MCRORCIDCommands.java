@@ -65,10 +65,10 @@ public class MCRORCIDCommands {
                 LOGGER.info("Ignored {}, ORCiD attribute is missing.", user.getUserName());
                 continue;
             }
-            final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(orcid, token);
+            final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(token);
             credential.setTokenType("bearer");
             final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-            orcidUser.storeCredential(credential);
+            orcidUser.storeCredential(orcid, credential);
             user.getAttributes().removeIf(a -> Objects.equals(a.getName(), ORCID_TOKEN_ATTRIBUTE_NAME));
             MCRUserManager.updateUser(user);
         }

@@ -32,14 +32,9 @@ public class MCRORCIDValidationHelper {
      * @return true if credential is valid
      */
     public static boolean validateCredential(MCRORCIDUserCredential credential) {
-        final String orcid = credential.getORCID();
-        if (orcid == null || !validateORCID(orcid)) {
-            return false;
-        }
         final String accessToken = credential.getAccessToken();
         return accessToken != null && !accessToken.isEmpty();
     }
-
 
     /**
      * Validates an ORCID iD.
