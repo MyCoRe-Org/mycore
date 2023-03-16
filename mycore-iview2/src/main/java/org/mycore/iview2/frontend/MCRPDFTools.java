@@ -84,7 +84,7 @@ public class MCRPDFTools implements AutoCloseable {
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
             final PDPage page = resolveOpenActionPage(pdf);
             int pageIndex = pdf.getPages().indexOf(page);
-            if (pageIndex < 0) {
+            if (pageIndex == -1) {
                 // Iterating per page and use equals does also not work in the case I had, so fall back to first page
                 LOGGER.warn("Could not resolve initial page, using first page.");
                 pageIndex = 0;
