@@ -193,7 +193,7 @@
       <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>citeproc-java</artifactId>
-        <version>3.0.0-alpha.6</version>
+        <version>3.0.0-beta.2</version>
       </dependency>
       <dependency>
         <groupId>edu.wisc.library.ocfl</groupId>
