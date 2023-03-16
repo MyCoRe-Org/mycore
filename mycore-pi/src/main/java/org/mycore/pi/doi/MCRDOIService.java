@@ -338,17 +338,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         Document newDataciteMetadata = transform(object, doi.asString());
         MCRDataciteClient dataciteClient = getDataciteClient();
 
-        try {
-            URI uri = dataciteClient.resolveDOI(doi);
-            URI registeredURI = getRegisteredURI(object);
-            if (!uri.equals(registeredURI)) {
-                LOGGER.info("Sending new URL({}) to Datacite!", registeredURI);
-                dataciteClient.mintDOI(doi, registeredURI);
-            }
-        } catch (URISyntaxException e) {
-            throw new MCRPersistentIdentifierException("Error while updating URL!", e);
-        }
-
         Document oldDataciteMetadata = null;
         try {
             oldDataciteMetadata = dataciteClient.resolveMetadata(doi);
@@ -358,6 +347,17 @@ public class MCRDOIService extends MCRDOIBaseService {
         if (oldDataciteMetadata == null || !MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
             LOGGER.info("Sending new Metadata of {} to Datacite!", idString);
             dataciteClient.storeMetadata(newDataciteMetadata);
+        }
+
+        try {
+            URI uri = dataciteClient.resolveDOI(doi);
+            URI registeredURI = getRegisteredURI(object);
+            if (!uri.equals(registeredURI)) {
+                LOGGER.info("Sending new URL({}) to Datacite!", registeredURI);
+                dataciteClient.mintDOI(doi, registeredURI);
+            }
+        } catch (URISyntaxException e) {
+            throw new MCRPersistentIdentifierException("Error while updating URL!", e);
         }
     }
 
