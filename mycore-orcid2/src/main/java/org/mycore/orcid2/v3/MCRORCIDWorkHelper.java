@@ -179,7 +179,7 @@ public class MCRORCIDWorkHelper {
      */
     public static void retrieveWorkInfo(MCRObject object, String orcid, MCRORCIDUserInfo userInfo)
         throws MCRORCIDException {
-        retrieveWorkInfo(object, orcid, null, userInfo);
+        retrieveWorkInfo(object, orcid, new MCRORCIDCredential(), userInfo);
     }
 
     /**
