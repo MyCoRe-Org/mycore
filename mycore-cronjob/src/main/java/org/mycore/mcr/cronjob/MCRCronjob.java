@@ -62,6 +62,8 @@ public abstract class MCRCronjob implements Runnable {
 
     private String id;
 
+    private String property;
+
     public String getID() {
         return id;
     }
@@ -138,6 +140,16 @@ public abstract class MCRCronjob implements Runnable {
     public Cron getCron() {
         return cron;
     }
+
+    @MCRPostConstruction
+    public void setProperty(String property) {
+        this.property = property;
+    }
+
+    public String getProperty() {
+        return property;
+    }
+
 
     public Optional<Long> getNextExecution() {
         Cron cron = getCron();
