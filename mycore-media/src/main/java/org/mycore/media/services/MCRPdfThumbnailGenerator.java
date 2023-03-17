@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDDestinationOrAction;
@@ -37,6 +39,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final Pattern MATCHING_MIMETYPE = Pattern.compile("^application/pdf");
 
     @Override
@@ -54,7 +57,12 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
             final float scale = newWidth / pdfWidth;
 
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
-            BufferedImage pdfRender = pdfRenderer.renderImage(pdf.getPages().indexOf(page), scale);
+            int pageIndex = pdf.getPages().indexOf(page);
+            if (pageIndex == -1) {
+                LOGGER.warn("Could not resolve initial page, using first page.");
+                pageIndex = 0;
+            }
+            BufferedImage pdfRender = pdfRenderer.renderImage(pageIndex, scale);
             int imageType = MCRThumbnailUtils.getImageType(pdfRender);
             if (imageType == BufferedImage.TYPE_BYTE_BINARY || imageType == BufferedImage.TYPE_BYTE_GRAY) {
                 BufferedImage thumbnail = new BufferedImage(pdfRender.getWidth(), pdfRender.getHeight(),
