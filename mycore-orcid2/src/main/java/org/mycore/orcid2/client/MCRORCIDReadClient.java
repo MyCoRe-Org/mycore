@@ -18,8 +18,6 @@
 
 package org.mycore.orcid2.client;
 
-import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-
 /**
  * Interface for client that is at least compatible with ORCID Public or Member API.
  */
@@ -34,10 +32,9 @@ public interface MCRORCIDReadClient {
      * @param valueType the result class
      * @param putCodes optional put code(s)
      * @return transformed section/object
-     * @throws MCRORCIDRequestException if request fails
+     * @throws org.mycore.orcid2.client.exception.MCRORCIDRequestException if request fails
      */
-    <T> T fetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes)
-        throws MCRORCIDRequestException;
+    <T> T fetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes);
 
     /**
      * Queries section and wraps result into given class.
@@ -47,9 +44,9 @@ public interface MCRORCIDReadClient {
      * @param <T> the result type
      * @param valueType the result type
      * @return search result
-     * @throws MCRORCIDRequestException if request fails
+     * @throws org.mycore.orcid2.client.exception.MCRORCIDRequestException if request fails
      */
-    <T> T search(MCRORCIDSearch type, String query, Class<T> valueType) throws MCRORCIDRequestException;
+    <T> T search(MCRORCIDSearch type, String query, Class<T> valueType);
 
     /**
      * Queries section and wraps result into given class.
@@ -61,8 +58,7 @@ public interface MCRORCIDReadClient {
      * @param <T> the result type
      * @param valueType the result type
      * @return search result
-     * @throws MCRORCIDRequestException if request fails
+     * @throws org.mycore.orcid2.client.exception.MCRORCIDRequestException if request fails
      */
-    <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType)
-        throws MCRORCIDRequestException;
+    <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType);
 }

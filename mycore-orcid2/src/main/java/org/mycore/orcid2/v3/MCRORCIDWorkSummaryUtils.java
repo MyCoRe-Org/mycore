@@ -53,8 +53,7 @@ public class MCRORCIDWorkSummaryUtils {
      * @return List of elements
      * @throws MCRORCIDException if build fails
      */
-    public static List<Element> buildUnmergedMODSFromWorkSummaries(List<WorkSummary> works)
-        throws MCRORCIDTransformationException {
+    public static List<Element> buildUnmergedMODSFromWorkSummaries(List<WorkSummary> works) {
         final List<Element> modsElements = new ArrayList<>();
         works.forEach(w -> {
             try {

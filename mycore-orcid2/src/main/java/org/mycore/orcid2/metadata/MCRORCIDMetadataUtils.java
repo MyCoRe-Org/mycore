@@ -55,7 +55,7 @@ public class MCRORCIDMetadataUtils {
      * @return the MCRORCIDFlagContent or null
      * @throws MCRORCIDException if orcid flag is broken
      */
-    public static MCRORCIDFlagContent getORCIDFlagContent(MCRObject object) throws MCRORCIDException {
+    public static MCRORCIDFlagContent getORCIDFlagContent(MCRObject object) {
         try {
             return getORCIDFlagContentString(object).map(s -> transformFlagContentString(s)).orElse(null);
         } catch (MCRORCIDTransformationException e) {
@@ -70,7 +70,7 @@ public class MCRORCIDMetadataUtils {
      * @param flagContent the MCRORCIDFlagContent
      * @throws MCRORCIDException if update fails
      */
-    public static void setORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent) throws MCRORCIDException {
+    public static void setORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent) {
         try {
             doSetORCIDFlagContent(object, flagContent);
         } catch (MCRPersistenceException e) {
@@ -84,7 +84,7 @@ public class MCRORCIDMetadataUtils {
      * @param object the MCRObject
      * @throws MCRORCIDException if cannot remove flag
      */
-    public static void removeORCIDFlag(MCRObject object) throws MCRORCIDException {
+    public static void removeORCIDFlag(MCRObject object) {
         object.getService().removeFlags(ORCID_FLAG);
     }
 
@@ -96,7 +96,7 @@ public class MCRORCIDMetadataUtils {
      * @return the MCRORCIDUserInfo or null
      * @throws MCRORCIDException if MCRORCIDUserInfo is broken
      */
-    public static MCRORCIDUserInfo getUserInfoByORCID(MCRObject object, String orcid) throws MCRORCIDException {
+    public static MCRORCIDUserInfo getUserInfoByORCID(MCRObject object, String orcid) {
         return Optional.ofNullable(getORCIDFlagContent(object)).map(f -> f.getUserInfoByORCID(orcid)).orElse(null);
     }
 
@@ -108,8 +108,7 @@ public class MCRORCIDMetadataUtils {
      * @param userInfo the MCRORCIDUserInfo
      * @throws MCRORCIDException if update fails
      */
-    public static void updateUserInfoByORCID(MCRObject object, String orcid, MCRORCIDUserInfo userInfo)
-        throws MCRORCIDException {
+    public static void updateUserInfoByORCID(MCRObject object, String orcid, MCRORCIDUserInfo userInfo) {
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(getORCIDFlagContent(object))
             .orElse(new MCRORCIDFlagContent());
         flagContent.updateUserInfoByORCID(orcid, userInfo);
@@ -123,7 +122,7 @@ public class MCRORCIDMetadataUtils {
      * @param orcids List of ORCID iDs
      * @throws MCRORCIDException if clean up fails
      */
-    public static void cleanUpWorkInfosExcludingORCIDs(MCRObject object, List<String> orcids) throws MCRORCIDException {
+    public static void cleanUpWorkInfosExcludingORCIDs(MCRObject object, List<String> orcids) {
         final MCRORCIDFlagContent flagContent = getORCIDFlagContent(object);
         // nothing to clean up
         if (flagContent == null) {
@@ -144,8 +143,7 @@ public class MCRORCIDMetadataUtils {
      * @param flagContent the MCRORCIDFlagContent
      * @throws MCRORCIDException if update fails
      */
-    protected static void doSetORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent)
-        throws MCRORCIDException {
+    protected static void doSetORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent) {
         removeORCIDFlags(object);
         if (!SAVE_OTHER_PUT_CODES) {
             // may rudimentary approach
@@ -168,8 +166,7 @@ public class MCRORCIDMetadataUtils {
      * @return MCRORCIDFlagContent as String
      * @throws MCRORCIDTransformationException if collection transformation fails
      */
-    protected static String transformFlagContent(MCRORCIDFlagContent flagContent)
-        throws MCRORCIDTransformationException {
+    protected static String transformFlagContent(MCRORCIDFlagContent flagContent) {
         try {
             return new ObjectMapper().writeValueAsString(flagContent);
         } catch (JsonProcessingException e) {
@@ -184,8 +181,7 @@ public class MCRORCIDMetadataUtils {
      * @return MCRORCIDFlagContent
      * @throws MCRORCIDTransformationException if string transformation fails
      */
-    protected static MCRORCIDFlagContent transformFlagContentString(String flagContentString)
-        throws MCRORCIDTransformationException {
+    protected static MCRORCIDFlagContent transformFlagContentString(String flagContentString) {
         try {
             return new ObjectMapper().readValue(flagContentString, MCRORCIDFlagContent.class);
         } catch (JsonProcessingException e) {

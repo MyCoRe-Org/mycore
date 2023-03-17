@@ -29,7 +29,7 @@ import org.mycore.orcid2.client.MCRORCIDCredential;
 public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler {
 
     @Override
-    protected void publishObject(MCRObject object, Map<String, MCRORCIDCredential> credentials) throws Exception {
+    protected void publishObject(MCRObject object, Map<String, MCRORCIDCredential> credentials) {
         MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credentials);
     }
 }

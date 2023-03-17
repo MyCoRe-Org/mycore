@@ -53,7 +53,7 @@ public class MCRORCIDClientHelper {
      * @throws MCRORCIDRequestException if the request fails
      */
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
-        long... putCodes) throws MCRORCIDRequestException {
+        long... putCodes) {
         if (getClientFactory().checkMemberMode()) {
             final MCRORCIDCredential credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid); // TODO exception
             if (credential != null) {

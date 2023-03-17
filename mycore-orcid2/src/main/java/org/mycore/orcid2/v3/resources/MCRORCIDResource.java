@@ -68,12 +68,12 @@ public class MCRORCIDResource {
      *
      * @param objectIDString the MCRObjectID as String
      * @return the publication status
+     * @throws WebApplicationException if request fails
      */
     @GET
     @Path("objectStatus/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public MCRORCIDPublicationStatus getPublicationStatus(@PathParam("objectID") String objectIDString)
-        throws WebApplicationException {
+    public MCRORCIDPublicationStatus getPublicationStatus(@PathParam("objectID") String objectIDString) {
         if (isCurrentUserGuest()) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
@@ -123,11 +123,12 @@ public class MCRORCIDResource {
      *
      * @param objectIDString the MCRObjectID as String
      * @return the new publication status
+     * @throws WebApplicationException if request fails
      */
     @GET
     @Path("publish/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response publish(@PathParam("objectID") String objectIDString) throws WebApplicationException {
+    public Response publish(@PathParam("objectID") String objectIDString) {
         if (isCurrentUserGuest()) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }

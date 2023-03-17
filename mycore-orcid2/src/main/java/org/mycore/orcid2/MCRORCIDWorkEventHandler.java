@@ -32,7 +32,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.user2.MCRUser;
 import org.mycore.orcid2.client.MCRORCIDCredential;
-import org.mycore.orcid2.exception.MCRORCIDTransformationException;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
@@ -64,7 +64,6 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
      * Publishes MCRObject to all linked ORCID profiles.
      * 
      * @param object the MCRObject
-     * @throws MCRORCIDTransformationException if transformation to orcid model fails
      */
     private void handlePublication(MCRObject object) {
         LOGGER.info("Start publishing {} to ORCID.", object.getId());
@@ -139,8 +138,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
      * 
      * @param object the MCRObject
      * @param credentials List of MCRORCIDCredential
-     * @throws Exception if Publish fails in general
+     * @throws MCRORCIDException if Publish fails in general
      */
-    abstract protected void publishObject(MCRObject object, Map<String, MCRORCIDCredential> credentials)
-        throws Exception;
+    abstract protected void publishObject(MCRObject object, Map<String, MCRORCIDCredential> credentials);
 }

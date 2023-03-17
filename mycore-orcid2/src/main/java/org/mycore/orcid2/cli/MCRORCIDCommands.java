@@ -54,7 +54,7 @@ public class MCRORCIDCommands {
      */
     @MCRCommand(syntax = "migrate all orcid access token attributes",
         help = "Migrates orcid user access token attributes to orcid2 oauth credential")
-    public static void migrateORCIDTokenAttributes() throws MCRORCIDException, MCRException {
+    public static void migrateORCIDTokenAttributes() {
         final List<MCRUser> users
             = MCRUserManager.listUsers(null, null, null, null, ORCID_TOKEN_ATTRIBUTE_NAME, 0, Integer.MAX_VALUE);
         for (MCRUser user : users) {

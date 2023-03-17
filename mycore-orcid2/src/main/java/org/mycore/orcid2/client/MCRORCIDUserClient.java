@@ -18,8 +18,6 @@
 
 package org.mycore.orcid2.client;
 
-import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-
 /**
  * Interface for ORCID client which bound to specific MCRCredentials.
  */
@@ -33,9 +31,9 @@ public interface MCRORCIDUserClient {
      * @param type the result class
      * @param putCodes optional put code(s)
      * @return transformed section/object
-     * @throws MCRORCIDRequestException if request fails
+     * @throws org.mycore.orcid2.client.exception.MCRORCIDRequestException if request fails
      */
-    <T> T fetch(MCRORCIDSection section, Class<T> type, long... putCodes) throws MCRORCIDRequestException;
+    <T> T fetch(MCRORCIDSection section, Class<T> type, long... putCodes);
 
     /**
      * Creates object in section.
@@ -43,9 +41,9 @@ public interface MCRORCIDUserClient {
      * @param section the ORCID section
      * @param object the element
      * @return put code of created object
-     * @throws MCRORCIDRequestException if request fails
+     * @throws org.mycore.orcid2.client.exception.MCRORCIDRequestException if request fails
      */
-    long create(MCRORCIDSection section, Object object) throws MCRORCIDRequestException;
+    long create(MCRORCIDSection section, Object object);
 
     /**
      * Updates object in section by put code.
@@ -53,16 +51,16 @@ public interface MCRORCIDUserClient {
      * @param section the ORCID section
      * @param putCode the put code
      * @param object the object
-     * @throws MCRORCIDRequestException if request fails
+     * @throws org.mycore.orcid2.client.exception.MCRORCIDRequestException if request fails
      */
-    void update(MCRORCIDSection section, long putCode, Object object) throws MCRORCIDRequestException;
+    void update(MCRORCIDSection section, long putCode, Object object);
 
     /**
      * Deletes object in section by put code.
      * 
      * @param section the ORCID section
      * @param putCode the put code
-     * @throws MCRORCIDRequestException if request fails
+     * @throws org.mycore.orcid2.client.exception.MCRORCIDRequestException if request fails
      */
-    void delete(MCRORCIDSection section, long putCode) throws MCRORCIDRequestException;
+    void delete(MCRORCIDSection section, long putCode);
 }

@@ -49,11 +49,12 @@ public class MCRORCIDResource {
      *   trustedOrcids: ['0000-0001-5484-889X'],
      * }
      * @return the user status
+     * @throws WebApplicationException if user is guest
      */
     @GET
     @Path("userStatus")
     @Produces(MediaType.APPLICATION_JSON)
-    public MCRORCIDUserStatus getUserStatus() throws WebApplicationException {
+    public MCRORCIDUserStatus getUserStatus() {
         if (isCurrentUserGuest()) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
@@ -69,10 +70,11 @@ public class MCRORCIDResource {
      * 
      * @param orcid the ORCID iD
      * @return Response
+     * @throws WebApplicationException if orcid is null, user is guest or revoke fails
      */
     @GET
     @Path("revoke")
-    public Response revoke(@PathParam("orcid") String orcid) throws WebApplicationException {
+    public Response revoke(@PathParam("orcid") String orcid) {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }

@@ -44,7 +44,7 @@ public class MCRORCIDTransformerHelper {
      * @return MODS Element
      * @throws MCRORCIDTransformationException if transformation fails
      */
-    public static Element transformBibTeXToMODS(String bibTeX) throws MCRORCIDTransformationException {
+    public static Element transformBibTeXToMODS(String bibTeX) {
         Element modsCollection = null;
         try {
             modsCollection = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX)).asXML().getRootElement();

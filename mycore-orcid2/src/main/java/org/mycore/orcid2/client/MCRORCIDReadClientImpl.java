@@ -24,8 +24,6 @@ import java.util.Objects;
 
 import jakarta.ws.rs.core.Response;
 
-import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-
 /**
  * Provides an ORCID Client with read methods.
  * Can be used to talk to Public or Member API.
@@ -55,24 +53,21 @@ public class MCRORCIDReadClientImpl extends MCRORCIDBaseClient implements MCRORC
     }
 
     @Override
-    public <T> T fetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes)
-        throws MCRORCIDRequestException {
+    public <T> T fetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes) {
         return doFetch(orcid, section, valueType, putCodes);
     }
 
     @Override
-    public <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType)
-        throws MCRORCIDRequestException {
+    public <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType) {
         return doSearch(type.getPath(), query, offset, limit, valueType);
     }
 
     @Override
-    public <T> T search(MCRORCIDSearch type, String query, Class<T> valueType) throws MCRORCIDRequestException {
+    public <T> T search(MCRORCIDSearch type, String query, Class<T> valueType) {
         return search(type, query, 0, DEFAULT_SEARCH_LIMIT, valueType);
     }
 
-    private <T> T doSearch(String path, String query, int offset, int limit, Class<T> valueType)
-        throws MCRORCIDRequestException {
+    private <T> T doSearch(String path, String query, int offset, int limit, Class<T> valueType) {
         if (offset < 0 || limit < 0) {
             throw new IllegalArgumentException("Offset or limit must be positive.");
         }
@@ -82,7 +77,7 @@ public class MCRORCIDReadClientImpl extends MCRORCIDBaseClient implements MCRORC
         queryMap.put("rows", limit);
         final Response response = fetch(path + "/", queryMap);
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
-            throw new MCRORCIDRequestException(response);
+            handleError(response);
         }
         return response.readEntity(valueType);
     }

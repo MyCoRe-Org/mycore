@@ -49,7 +49,7 @@ public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
     }
 
     @Test
-    public void testTransformFlagContent() throws MCRORCIDTransformationException {
+    public void testTransformFlagContent() {
         final MCRORCIDFlagContent flagContent = new MCRORCIDFlagContent();
         String result = MCRORCIDMetadataUtils.transformFlagContent(flagContent);
         String expectedResult = "{\"userInfos\":[]}";
@@ -74,7 +74,7 @@ public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
     }
 
     @Test
-    public void testDoSetORCIDFlagContent() throws MCRORCIDTransformationException {
+    public void testDoSetORCIDFlagContent() {
         final MCRObject object = new MCRObject();
         final MCRORCIDFlagContent flagContent = new MCRORCIDFlagContent();
         MCRORCIDMetadataUtils.doSetORCIDFlagContent(object, flagContent);

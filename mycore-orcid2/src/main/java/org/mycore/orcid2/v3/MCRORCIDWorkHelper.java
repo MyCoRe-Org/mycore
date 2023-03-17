@@ -86,8 +86,7 @@ public class MCRORCIDWorkHelper {
      * @see #publishObjectToORCID(MCRObject, Map<String, MCRORCIDCredential>)
      *
      */
-    public static void publishToORCIDAndUpdateWorkInfo(MCRObject object, String orcid,
-        MCRORCIDCredential credential) throws MCRORCIDException {
+    public static void publishToORCIDAndUpdateWorkInfo(MCRObject object, String orcid, MCRORCIDCredential credential) {
         final Map<String, MCRORCIDCredential> credentials = new HashMap<>();
         credentials.put(orcid, credential);
         publishObjectToORCID(object, credentials);
@@ -109,8 +108,7 @@ public class MCRORCIDWorkHelper {
      * @throws MCRORCIDException if work transformation fails or cannot update flags
      * @see MCRORCIDUtils#getTrustedIdentifiers
      */
-    public static void publishToORCIDAndUpdateWorkInfo(MCRObject object,
-        Map<String, MCRORCIDCredential> credentials) throws MCRORCIDException {
+    public static void publishToORCIDAndUpdateWorkInfo(MCRObject object, Map<String, MCRORCIDCredential> credentials) {
         final List<String> orcids = credentials.entrySet().stream().map(Map.Entry::getKey).toList();
         MCRORCIDMetadataUtils.cleanUpWorkInfosExcludingORCIDs(object, orcids);
         if (!credentials.isEmpty()) {
@@ -128,8 +126,7 @@ public class MCRORCIDWorkHelper {
         }
     }
 
-    private static void publishObjectToORCID(MCRObject object, Map<String, MCRORCIDCredential> credentials)
-        throws MCRORCIDTransformationException {
+    private static void publishObjectToORCID(MCRObject object, Map<String, MCRORCIDCredential> credentials) {
         final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
         final List<String> failedORCIDs = new ArrayList<>();
         for (Map.Entry<String, MCRORCIDCredential> entry : credentials.entrySet()) {
@@ -197,7 +194,7 @@ public class MCRORCIDWorkHelper {
      * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     public static void retrieveWorkInfo(MCRObject object, String orcid, MCRORCIDCredential credential,
-        MCRORCIDUserInfo userInfo) throws MCRORCIDException {
+        MCRORCIDUserInfo userInfo) {
         if (userInfo.getWorkInfo() == null || ALWAYS_UPDATE_PUT_CODES) {
             if (userInfo.getWorkInfo() == null) {
                 userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
@@ -216,7 +213,7 @@ public class MCRORCIDWorkHelper {
      * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     private static void updateWorkInfo(MCRObject object, String orcid, MCRORCIDCredential credential,
-        MCRORCIDPutCodeInfo workInfo) throws MCRORCIDException {
+        MCRORCIDPutCodeInfo workInfo) {
         List<WorkSummary> summaries = null;
         try {
             Works works = null;
@@ -250,7 +247,7 @@ public class MCRORCIDWorkHelper {
      * @throws MCRORCIDRequestException if publishing fails
      */
     private static void publishWork(Work work, String orcid, MCRORCIDCredential credential,
-        MCRORCIDPutCodeInfo workInfo) throws MCRORCIDRequestException, MCRORCIDInvalidScopeException {
+        MCRORCIDPutCodeInfo workInfo) {
         final Optional<String> scope = Optional.ofNullable(credential.getScope());
         if (scope.isPresent() && !scope.get().contains(ScopeConstants.ACTIVITIES_UPDATE)) {
             throw new MCRORCIDInvalidScopeException();
@@ -299,7 +296,7 @@ public class MCRORCIDWorkHelper {
         }
     }
 
-    private static List<String> getMatchingORCIDs(MCRObject object) throws MCRORCIDException {
+    private static List<String> getMatchingORCIDs(MCRObject object) {
         final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getTrustedIdentifiers(new MCRMODSWrapper(object));
         final String query = buildORCIDIdentifierSearchQuery(identifiers);
         try {

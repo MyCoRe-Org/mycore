@@ -33,5 +33,5 @@ public interface MCRORCIDClientErrorHandler {
      * @param response the Response
      * @throws MCRORCIDRequestException always
      */
-    void handleErrorResponse(Response response) throws MCRORCIDRequestException;
+    void handleErrorResponse(Response response);
 }

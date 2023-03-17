@@ -101,8 +101,7 @@ abstract class MCRORCIDBaseClient {
      * @return transformed section/object
      * @throws MCRORCIDRequestException if request fails
      */
-    protected <T> T doFetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes)
-        throws MCRORCIDRequestException {
+    protected <T> T doFetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes) {
         final String putCodeString = (putCodes == null || putCodes.length == 0) ? "" : StringUtils.join(putCodes, ',');
         final Response response
             = fetch(String.format(Locale.ROOT, "%s/%s/%s", orcid, section.getPath(), putCodeString));
@@ -116,8 +115,9 @@ abstract class MCRORCIDBaseClient {
      * Handles error response.
      * 
      * @param response the error response
+     * @throws MCRORCIDRequestException always
      */
-    protected void handleError(Response response) throws MCRORCIDRequestException {
+    protected void handleError(Response response) {
         if (errorHandler != null) {
             errorHandler.handleErrorResponse(response);
         }

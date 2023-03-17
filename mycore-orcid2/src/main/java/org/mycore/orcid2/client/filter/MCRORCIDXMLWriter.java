@@ -25,7 +25,6 @@ import java.lang.reflect.Type;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
@@ -47,7 +46,7 @@ public class MCRORCIDXMLWriter implements MessageBodyWriter<Object> {
 
     @Override
     public void writeTo(Object object, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-        MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException, WebApplicationException {
+        MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(type);
             jaxbContext.createMarshaller().marshal(object, out);

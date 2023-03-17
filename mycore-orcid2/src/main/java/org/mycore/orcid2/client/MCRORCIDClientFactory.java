@@ -54,7 +54,7 @@ public class MCRORCIDClientFactory {
 
     private MCRORCIDReadClient readClient = null;
 
-    private MCRORCIDClientFactory(String version) throws MCRConfigurationException {
+    private MCRORCIDClientFactory(String version) {
         final String prefix = CONFIG_PREFIX + version;
         publicAPI = MCRConfiguration2.getStringOrThrow(prefix + ".PublicAPI");
         memberAPI = MCRConfiguration2.getStringOrThrow(prefix + ".MemberAPI");
@@ -75,7 +75,7 @@ public class MCRORCIDClientFactory {
      * @return MCRORCIDClientFactory
      * @throws MCRConfigurationException if factory cannot be initialized
      */
-    public static MCRORCIDClientFactory getInstance(String version) throws MCRConfigurationException {
+    public static MCRORCIDClientFactory getInstance(String version) {
         MCRORCIDClientFactory factory = null;
         if (factories.containsKey(version)) {
             factory = factories.get(version);
@@ -96,7 +96,7 @@ public class MCRORCIDClientFactory {
      * @throws MCRORCIDException if MCR.ORCID2.Client.ReadPublicToken is required but not set
      * @return MCRORCIDReadClient
      */
-    public MCRORCIDReadClient createReadClient() throws MCRORCIDException {
+    public MCRORCIDReadClient createReadClient() {
         if (readClient == null) {
             readClient = initReadClient();
         }
@@ -111,8 +111,7 @@ public class MCRORCIDClientFactory {
      * @return MCRORCIDClient
      * @throws MCRORCIDException if client is not in member mode
      */
-    public MCRORCIDUserClient createUserClient(String orcid, MCRORCIDCredential credential)
-        throws MCRORCIDException {
+    public MCRORCIDUserClient createUserClient(String orcid, MCRORCIDCredential credential) {
         if (checkMemberMode()) {
             MCRORCIDUserClientImpl client = new MCRORCIDUserClientImpl(memberAPI, orcid, credential);
             client.registerErrorHandler(errorHandler);
@@ -131,7 +130,7 @@ public class MCRORCIDClientFactory {
         return Objects.equals(mode, ReadClientMode.MEMBER);
     }
 
-    private MCRORCIDReadClient initReadClient() throws MCRORCIDException {
+    private MCRORCIDReadClient initReadClient() {
         MCRORCIDReadClientImpl client = null;
         if (checkMemberMode()) {
             if (READ_PUBLIC_TOKEN == null) {

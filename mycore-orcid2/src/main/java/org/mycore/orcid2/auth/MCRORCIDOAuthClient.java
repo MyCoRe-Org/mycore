@@ -74,7 +74,7 @@ public class MCRORCIDOAuthClient {
      * @param token revoke token
      * @throws MCRORCIDRequestException if request fails
      */
-    public void revokeToken(String token) throws MCRORCIDRequestException {
+    public void revokeToken(String token) {
         Form form = new Form();
         form.param("client_id", CLIENT_ID);
         form.param("client_secret", CLIENT_SECRET);
@@ -94,8 +94,7 @@ public class MCRORCIDOAuthClient {
      * @throws MCRORCIDRequestException if request fails
      * @see MCRORCIDOAuthAccessTokenResponse
      */
-    public MCRORCIDOAuthAccessTokenResponse exchangeCode(String code, String redirectURI)
-        throws MCRORCIDRequestException {
+    public MCRORCIDOAuthAccessTokenResponse exchangeCode(String code, String redirectURI) {
         Form form = new Form();
         form.param("client_id", CLIENT_ID);
         form.param("client_secret", CLIENT_SECRET);
@@ -109,7 +108,7 @@ public class MCRORCIDOAuthClient {
         return response.readEntity(MCRORCIDOAuthAccessTokenResponse.class);
     }
 
-    private void handleError(Response response) throws MCRORCIDRequestException {
+    private void handleError(Response response) {
         throw new MCRORCIDRequestException(response);
     }
 

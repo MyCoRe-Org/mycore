@@ -29,7 +29,7 @@ import org.orcid.jaxb.model.v3.release.error.OrcidError;
 public class MCRORCIDClientErrorHandlerImpl implements org.mycore.orcid2.client.MCRORCIDClientErrorHandler {
 
     @Override
-    public void handleErrorResponse(Response response) throws MCRORCIDRequestException {
+    public void handleErrorResponse(Response response) {
         final OrcidError error = response.readEntity(OrcidError.class);
         throw new MCRORCIDRequestException(error.getDeveloperMessage(), response);
     }

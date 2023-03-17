@@ -100,7 +100,7 @@ public class MCRORCIDUser {
      * @param orcid the ORCID iD
      * @throws MCRORCIDException if ORCID iD is invalid
      */
-    public void addORCID(String orcid) throws MCRORCIDException {
+    public void addORCID(String orcid) {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
@@ -130,7 +130,7 @@ public class MCRORCIDUser {
      * @throws MCRORCIDException if crededential is invalid
      * @see MCRORCIDUser#addORCID
      */
-    public void storeCredential(String orcid, MCRORCIDCredential credential) throws MCRORCIDException {
+    public void storeCredential(String orcid, MCRORCIDCredential credential) {
         addORCID(orcid);
         if (!MCRORCIDValidationHelper.validateCredential(credential)) {
             throw new MCRORCIDException("Credential is invalid");
@@ -196,13 +196,13 @@ public class MCRORCIDUser {
      * @return Map of MCRORCIDCredentials
      * @throws MCRORCIDException if at least one MCRORCIDCredential is corrupt
      */
-    public Map<String, MCRORCIDCredential> getCredentials() throws MCRORCIDException {
+    public Map<String, MCRORCIDCredential> getCredentials() {
         try {
             return user.getAttributes().stream()
                 .collect(Collectors.toMap(a -> a.getName().substring(ATTR_ORCID_CREDENTIAL.length()),
                     a -> deserializeCredential(a.getValue())));
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Found corrupt credential");
+            throw new MCRORCIDException("Found corrupt credential", e);
         }
     }
 
@@ -213,12 +213,12 @@ public class MCRORCIDUser {
      * @return MCRCredentials or null
      * @throws MCRORCIDException if the MCRORCIDCredential is corrupt
      */
-    public MCRORCIDCredential getCredentialByORCID(String orcid) throws MCRORCIDException {
+    public MCRORCIDCredential getCredentialByORCID(String orcid) {
         try {
             return Optional.ofNullable(getCredentialAttributeValueByORCID(orcid))
                 .map(s -> deserializeCredential(s)).orElse(null);
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Credential is corrupt");
+            throw new MCRORCIDException("Credential is corrupt", e);
         }
     }
 
@@ -227,9 +227,15 @@ public class MCRORCIDUser {
      * 
      * @param objectID objects id
      * @return true is user owns object
+     * @throws MCRORCIDException if check fails
      */
-    public boolean isMyPublication(MCRObjectID objectID) throws MCRPersistenceException {
-        final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+    public boolean isMyPublication(MCRObjectID objectID) {
+        MCRObject object = null;
+        try {
+            object = MCRMetadataManager.retrieveMCRObject(objectID);
+        } catch (MCRPersistenceException e) {
+            throw new MCRORCIDException("Cannot check publication", e);
+        }
         // TODO uniqueness of ids
         final Set<MCRIdentifier> nameIdentifiers
             = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object));
@@ -268,7 +274,7 @@ public class MCRORCIDUser {
      * @return MCRORCIDCredential as String
      * @throws IllegalArgumentException if serialization fails
      */
-    protected static String serializeCredential(MCRORCIDCredential credential) throws IllegalArgumentException {
+    protected static String serializeCredential(MCRORCIDCredential credential) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules();
@@ -286,8 +292,7 @@ public class MCRORCIDUser {
      * @return MCRORCIDCredential
      * @throws IllegalArgumentException if deserialisation fails
      */
-    protected static MCRORCIDCredential deserializeCredential(String credentialString)
-        throws IllegalArgumentException {
+    protected static MCRORCIDCredential deserializeCredential(String credentialString) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules();

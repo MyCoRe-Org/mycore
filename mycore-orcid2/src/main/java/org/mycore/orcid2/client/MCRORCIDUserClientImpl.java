@@ -27,7 +27,6 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
-import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 
 /**
  * See {@link MCRORCIDUserClient}.
@@ -53,12 +52,12 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     }
 
     @Override
-    public <T> T fetch(MCRORCIDSection section, Class<T> valueType, long... putCodes) throws MCRORCIDRequestException {
+    public <T> T fetch(MCRORCIDSection section, Class<T> valueType, long... putCodes) {
         return doFetch(orcid, section, valueType, putCodes);
     }
 
     @Override
-    public long create(MCRORCIDSection section, Object object) throws MCRORCIDRequestException {
+    public long create(MCRORCIDSection section, Object object) {
         final Response response = write(section.getPath(), HttpMethod.POST, object);
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
@@ -67,7 +66,7 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     }
 
     @Override
-    public void update(MCRORCIDSection section, long putCode, Object object) throws MCRORCIDRequestException {
+    public void update(MCRORCIDSection section, long putCode, Object object) {
         final Response response = write(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode),
             HttpMethod.PUT, object);
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
@@ -76,7 +75,7 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     }
 
     @Override
-    public void delete(MCRORCIDSection section, long putCode) throws MCRORCIDRequestException {
+    public void delete(MCRORCIDSection section, long putCode) {
         final Response response = delete(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode));
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);

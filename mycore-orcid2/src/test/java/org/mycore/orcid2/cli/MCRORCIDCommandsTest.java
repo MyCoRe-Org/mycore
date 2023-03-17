@@ -37,7 +37,7 @@ public class MCRORCIDCommandsTest extends MCRJPATestCase {
     private static final String ORCID_ACCESS_TOKEN = "token";
 
     @Test
-    public void migrateORCIDTokenAttributeTest() throws MCRORCIDException {
+    public void migrateORCIDTokenAttributeTest() {
         final MCRUser user = new MCRUser("junit");
         user.setUserAttribute(MCRORCIDCommands.ORCID_TOKEN_ATTRIBUTE_NAME, ORCID_ACCESS_TOKEN);
         user.setUserAttribute(MCRORCIDUser.ATTR_ORCID_ID, ORCID_ID);

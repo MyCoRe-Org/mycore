@@ -73,7 +73,7 @@ public class MCRORCIDWorkTransformerHelper {
      * @return the Work
      * @throws MCRORCIDTransformationException if transformation failed
      */
-    public static Work transformContent(MCRContent content) throws MCRORCIDTransformationException {
+    public static Work transformContent(MCRContent content) {
         try {
             return unmarshalWork(new MCRJDOMContent(MCRXMLParserFactory.getValidatingParser()
 				    .parseXML(T_MODS_WORK.transform(content))));
@@ -88,9 +88,9 @@ public class MCRORCIDWorkTransformerHelper {
      * 
      * @param work the Work
      * @return the mods MCRContent
-     * @throws MCRORCIDTransformationException if transformation fails
+     * @throws MCRORCIDTransformationException if transformation failed
      */
-    public static MCRContent transformWork(Work work) throws MCRORCIDTransformationException {
+    public static MCRContent transformWork(Work work) {
         checkContext();
         final MCRJAXBContent<Work> workContent = new MCRJAXBContent(context, work);
         Element mods = null;
@@ -113,9 +113,9 @@ public class MCRORCIDWorkTransformerHelper {
      * 
      * @param work the WorkSummary
      * @return the mods MCRContent
-     * @throws MCRORCIDTransformationException if transformation fails
+     * @throws MCRORCIDTransformationException if transformation failed
      */
-    public static MCRContent transformWorkSummary(WorkSummary work) throws MCRORCIDTransformationException {
+    public static MCRContent transformWorkSummary(WorkSummary work) {
         checkContext();
         final MCRJAXBContent<WorkSummary> workContent = new MCRJAXBContent(context, work);
         Element mods = null;
@@ -128,7 +128,7 @@ public class MCRORCIDWorkTransformerHelper {
         return new MCRJDOMContent(mods);
     }
 
-    private static Work unmarshalWork(MCRContent content) throws MCRORCIDTransformationException {
+    private static Work unmarshalWork(MCRContent content) {
         checkContext();
         try {
             final Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -138,9 +138,9 @@ public class MCRORCIDWorkTransformerHelper {
         }
     }
 
-    private static void checkContext() throws MCRORCIDTransformationException {
+    private static void checkContext() {
         if (context == null) {
-            throw new MCRORCIDTransformationException("Jaxb context is not inited");
+            throw new MCRORCIDTransformationException("Jaxb context is not initialized");
         }
     }
 }

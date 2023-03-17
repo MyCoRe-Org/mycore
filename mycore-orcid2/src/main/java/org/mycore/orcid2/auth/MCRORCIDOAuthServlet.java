@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.auth;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -113,7 +114,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         }
     }
 
-    private void handleCode(HttpServletRequest req, HttpServletResponse res) throws Exception {
+    private void handleCode(HttpServletRequest req, HttpServletResponse res) throws IOException {
         final String code = req.getParameter("code");
         final String error = req.getParameter("error");
         if ((error != null) && !error.trim().isEmpty()) {
