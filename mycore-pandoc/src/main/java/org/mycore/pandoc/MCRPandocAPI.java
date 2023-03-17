@@ -55,8 +55,9 @@ public class MCRPandocAPI {
      * @param args Command line arguments to Pandoc
      * @param input Input to Pandoc (Stdin)
      * @return String of parsed output from Pandoc (Stdout)
+     * @throws MCRPandocException in case of unsuccessful call to Pandoc
      */
-    public static String call(String args, String input) throws MCRPandocException {
+    public static String call(String args, String input) {
         String command = PANDOC_BASE_COMMAND.trim() + " " + args.trim();
         String[] argsArray = command.split(" ");
         byte[] inputByteArray = input.getBytes(StandardCharsets.UTF_8);
@@ -74,8 +75,9 @@ public class MCRPandocAPI {
      * @param importFormat Import format (cf. pandoc -f)
      * @param outputFormat Output format (cf. pandoc -t)
      * @return String of output from Pandoc (Stdout)
+     * @throws MCRPandocException in case of unsuccessful call to Pandoc
      */
-    public static String convert(String content, String importFormat, String outputFormat) throws MCRPandocException {
+    public static String convert(String content, String importFormat, String outputFormat) {
         String pandocArgs = "-f " + convertFormatToPath(Action.Reader, importFormat)
             + " -t " + convertFormatToPath(Action.Writer, outputFormat);
         return call(pandocArgs, content);
@@ -91,9 +93,9 @@ public class MCRPandocAPI {
      * @param importFormat Import format (cf. pandoc -f)
      * @param outputFormat Output format (cf. pandoc -t)
      * @return Element of parsed output from Pandoc (Stdout)
+     * @throws MCRPandocException in case of unsuccessful call to Pandoc
      */
-    public static Element convertToXML(String content, String importFormat, String outputFormat)
-            throws MCRPandocException {
+    public static Element convertToXML(String content, String importFormat, String outputFormat) {
         String output = "<pandoc>" + convert(content, importFormat, outputFormat) + "</pandoc>";
         try {
             return new SAXBuilder().build(new StringReader(output)).getRootElement().detach();
@@ -117,7 +119,7 @@ public class MCRPandocAPI {
         }
     }
 
-    private static byte[] callPandoc(String[] args, byte[] input) throws MCRPandocException {
+    private static byte[] callPandoc(String[] args, byte[] input) {
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.environment().put("LUA_PATH", LUA_PATH);
         Process p;
