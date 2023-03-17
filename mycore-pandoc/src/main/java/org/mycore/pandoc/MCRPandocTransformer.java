@@ -18,13 +18,14 @@
 
 package org.mycore.pandoc;
 
+import java.io.IOException;
+
 import org.jdom2.Element;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
-import org.mycore.common.MCRException;
 
 /**
  * Generic transformer using Pandoc
@@ -37,10 +38,6 @@ public class MCRPandocTransformer extends MCRContentTransformer {
     private String outputFormat;
 
     @Override
-    /**
-     * Init method
-     * @param id Id of Pandoc transformer (reads MCR.ContentTransformer.[id].(Input|Output)Format)
-     */
     public void init(String id) {
         super.init(id);
         inputFormat = MCRConfiguration2.getStringOrThrow("MCR.ContentTransformer." + id + ".InputFormat");
@@ -48,12 +45,7 @@ public class MCRPandocTransformer extends MCRContentTransformer {
     }
 
     @Override
-    /**
-     * Actual method
-     * @param source Pandoc input
-     * @return MCRJDOMContent of parsed output from Pandoc
-     */
-    public MCRJDOMContent transform(MCRContent source) {
+    public MCRContent transform(MCRContent source) throws IOException {
         try {
             Element pandoc = MCRPandocAPI.convertToXML(source.asString(), inputFormat, outputFormat);
             if(!pandoc.getChildren().isEmpty()) {
@@ -62,7 +54,7 @@ public class MCRPandocTransformer extends MCRContentTransformer {
             return new MCRJDOMContent(pandoc);
         } catch (Exception ex) {
             String msg = "Exception transforming from " + inputFormat + " to " + outputFormat + " via Pandoc";
-            throw new MCRException(msg, ex);
+            throw new IOException(msg, ex);
         }
     }
 }
