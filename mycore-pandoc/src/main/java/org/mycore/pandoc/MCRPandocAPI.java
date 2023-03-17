@@ -127,7 +127,6 @@ public class MCRPandocAPI {
             p = pb.start();
             p.getOutputStream().write(input);
             p.getOutputStream().close();
-            p.getOutputStream().close();
         } catch(IOException ex) {
             String msg = "Exception invoking Pandoc " + String.join(" ", args);
             throw new MCRPandocException(msg, ex);
