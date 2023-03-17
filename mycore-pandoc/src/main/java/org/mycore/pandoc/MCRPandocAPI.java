@@ -28,7 +28,6 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.MCRException;
 
 /**
  * Interface to the command line utility <a href="https://pandoc.org">Pandoc</a>,
@@ -53,7 +52,7 @@ public class MCRPandocAPI {
      * @param input Input to Pandoc (Stdin)
      * @return String of parsed output from Pandoc (Stdout)
      */
-    public static String call(String args, String input) {
+    public static String call(String args, String input) throws MCRPandocException {
         String command = PANDOC_BASE_COMMAND.trim() + " " + args.trim();
         String[] argsArray = command.split(" ");
         byte[] inputByteArray = input.getBytes(StandardCharsets.UTF_8);
@@ -72,7 +71,7 @@ public class MCRPandocAPI {
      * @param outputFormat Output format (cf. pandoc -t)
      * @return String of output from Pandoc (Stdout)
      */
-    public static String convert(String content, String importFormat, String outputFormat) {
+    public static String convert(String content, String importFormat, String outputFormat) throws MCRPandocException {
         String pandocArgs = "-f " + convertFormatToPath(Action.Reader, importFormat)
             + " -t " + convertFormatToPath(Action.Writer, outputFormat);
         return call(pandocArgs, content);
@@ -89,13 +88,14 @@ public class MCRPandocAPI {
      * @param outputFormat Output format (cf. pandoc -t)
      * @return Element of parsed output from Pandoc (Stdout)
      */
-    public static Element convertToXML(String content, String importFormat, String outputFormat) {
+    public static Element convertToXML(String content, String importFormat, String outputFormat)
+            throws MCRPandocException {
         String output = "<pandoc>" + convert(content, importFormat, outputFormat) + "</pandoc>";
         try {
             return new SAXBuilder().build(new StringReader(output)).getRootElement().detach();
         } catch (Exception ex) {
             String msg = "Exception converting Pandoc output to XML element";
-            throw new MCRException(msg, ex);
+            throw new MCRPandocException(msg, ex);
         }
     }
 
@@ -113,22 +113,22 @@ public class MCRPandocAPI {
         }
     }
 
-    private static byte[] callPandoc(String[] args, byte[] input) {
+    private static byte[] callPandoc(String[] args, byte[] input) throws MCRPandocException {
         Process p;
         try {
             p = initPandoc(args, input);
         } catch(IOException ex) {
             String msg = "Exception invoking Pandoc " + String.join(" ", args);
-            throw new MCRException(msg, ex);
+            throw new MCRPandocException(msg, ex);
         }
         try {
             return readPandocOutput(p);
         } catch(IOException ex) {
             String msg = "Exception reading output from Pandoc" + String.join(" ", args);
-            throw new MCRException(msg, ex);
+            throw new MCRPandocException(msg, ex);
         } catch(InterruptedException ex) {
             String msg = "Exception shutting down Pandoc " + String.join(" ", args);
-            throw new MCRException(msg, ex);
+            throw new MCRPandocException(msg, ex);
         }
     }
 
