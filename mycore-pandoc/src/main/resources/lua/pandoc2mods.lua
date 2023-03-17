@@ -79,7 +79,8 @@ function bookCommon(o)
     elseif o['type'] ~= "chapter" then
         mods = mods .. modsTitleInfo(o, "title")
     end
-    if o['collection-title'] ~= nil or o['volume-title'] ~= nil or o['volume'] ~= nil or o['issue'] ~= nil or o['collection-number'] ~= nil then
+    if o['collection-title'] ~= nil or o['volume-title'] ~= nil or o['volume'] ~= nil or o['issue'] ~= nil
+        or o['collection-number'] ~= nil then
         mods = mods .. "<mods:relatedItem type=\"host\">\n"
         mods = mods .. modsGenre("series")
         if o['volume-title'] ~= nil then

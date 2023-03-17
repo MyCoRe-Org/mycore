@@ -9,7 +9,7 @@ end
 
 function modsCollection(o)
     local mods = "<mods:modsCollection xmlns:mods=\"http://www.loc.gov/mods/v3\">\n"
-    for k,v in pairs(o['references']) do
+    for _,v in pairs(o['references']) do
         mods = mods .. modsEntry(v)
     end
     mods = mods .. "</mods:modsCollection>"
@@ -35,14 +35,16 @@ function modsTitleInfo(o, t)
         mods = mods .. "<mods:titleInfo>\n"
         if o[t .. '-short'] ~= nil and o[t]:sub(1,string.len(o[t .. '-short'])) == o[t .. '-short'] then
             mods = mods .. "<mods:title>" .. o[t .. '-short'] .. "</mods:title>\n"
-            mods = mods .. "<mods:subTitle>" .. o[t]:sub(string.len(o[t .. '-short'])+3,string.len(o[t])) .. "</mods:subTitle>\n"
+            mods = mods .. "<mods:subTitle>" .. o[t]:sub(string.len(o[t .. '-short'])+3,string.len(o[t]))
+            mods = mods .. "</mods:subTitle>\n"
         else
             mods = mods .. "<mods:title>" .. o[t] .. "</mods:title>\n"
         end
         mods = mods .. "</mods:titleInfo>\n"
     end
     if o[t .. '-short'] ~= nil then
-        mods = mods .. "<mods:titleInfo type=\"abbreviated\">\n<mods:title>" .. o[t .. '-short'] .. "</mods:title>\n</mods:titleInfo>\n"
+        mods = mods .. "<mods:titleInfo type=\"abbreviated\">\n<mods:title>" .. o[t .. '-short']
+        mods = mods .. "</mods:title>\n</mods:titleInfo>\n"
     end
     return mods
 end
@@ -50,7 +52,7 @@ end
 function persons(o, r, m)
     local a = ""
     if o[r] ~= nil then
-        for k,v in pairs(o[r]) do
+        for _,v in pairs(o[r]) do
             a = a .. modsName(v, "personal", m)
         end
     end
@@ -126,7 +128,8 @@ function modsNamePart(o, t)
 end
 
 function modsRole(s)
-    return "<mods:role>\n<mods:roleTerm type=\"code\" authority=\"marcrelator\">" .. s .. "</mods:roleTerm>\n</mods:role>\n"
+    return "<mods:role>\n<mods:roleTerm type=\"code\" authority=\"marcrelator\">" .. s
+        ..  "</mods:roleTerm>\n</mods:role>\n"
 end
 
 function modsDateIssued(o)
@@ -148,7 +151,8 @@ end
 function modsPlace(o)
     local mods = ""
     if o['publisher-place'] ~= nil then
-        mods = mods .. "<mods:place>\n<mods:placeTerm type=\"text\">" .. o['publisher-place'] .. "</mods:placeTerm>\n</mods:place>\n"
+        mods = mods .. "<mods:place>\n<mods:placeTerm type=\"text\">" .. o['publisher-place']
+        mods = mods .. "</mods:placeTerm>\n</mods:place>\n"
     end
     return mods
 end
@@ -243,7 +247,7 @@ function modsPart(o,k)
     if k[1] == nil then
         k = {k}
     end
-    for i,j in ipairs(k) do
+    for _,j in ipairs(k) do
         if string.match(j, "page") then
             mods = mods .. pages(o)
         end
@@ -254,7 +258,7 @@ function modsPart(o,k)
             mods = mods .. volume(o)
         end
     end
-    if mods == "<mods:part>\n" then 
+    if mods == "<mods:part>\n" then
         return ""
     else
         return mods .. "</mods:part>\n"

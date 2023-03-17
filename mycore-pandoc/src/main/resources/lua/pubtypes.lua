@@ -30,7 +30,8 @@ function bill(o)
     return default(o)
 end
 
--- Bib(La)TeX: book, collection, manual, mvbook, mvcollection, mvproceedings, mvreference, proceedings, reference, software, commentary
+-- Bib(La)TeX: book, collection, manual, mvbook, mvcollection, mvproceedings, mvreference, proceedings, reference,
+--             software, commentary
 -- EndnoteXML: Book, Dictionary, Edited Book, Electronic Book, Encyclopedia
 -- RIS:        ANCIENT, BOOK, CLSWK, DICT, EBOOK, EDBOOK
 function book(o)
