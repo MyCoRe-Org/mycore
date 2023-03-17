@@ -19,10 +19,12 @@
 package org.mycore.pandoc;
 
 import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -40,6 +42,8 @@ public class MCRPandocAPI {
     private static final String PANDOC_BASE_COMMAND = MCRConfiguration2.getStringOrThrow("MCR.Pandoc.BaseCommand");
 
     private static final int BUFFER_SIZE = MCRConfiguration2.getInt("MCR.Pandoc.BufferSize").orElse(64 * 1024);
+
+    private static final int TIMEOUT = MCRConfiguration2.getInt("MCR.Pandoc.Timeout").orElse(5);
 
     private static final String LUA_PATH = MCRConfiguration2.getString("MCR.Pandoc.LuaPath")
         .orElse(Thread.currentThread().getContextClassLoader().getResource("lua").getPath() + "?.lua");
@@ -114,36 +118,47 @@ public class MCRPandocAPI {
     }
 
     private static byte[] callPandoc(String[] args, byte[] input) throws MCRPandocException {
+        ProcessBuilder pb = new ProcessBuilder(args);
+        pb.environment().put("LUA_PATH", LUA_PATH);
         Process p;
         try {
-            p = initPandoc(args, input);
+            p = pb.start();
+            p.getOutputStream().write(input);
+            p.getOutputStream().close();
+            p.getOutputStream().close();
         } catch(IOException ex) {
             String msg = "Exception invoking Pandoc " + String.join(" ", args);
             throw new MCRPandocException(msg, ex);
         }
         try {
-            return readPandocOutput(p);
-        } catch(IOException ex) {
-            String msg = "Exception reading output from Pandoc" + String.join(" ", args);
-            throw new MCRPandocException(msg, ex);
+            p.waitFor(TIMEOUT, TimeUnit.SECONDS);
         } catch(InterruptedException ex) {
-            String msg = "Exception shutting down Pandoc " + String.join(" ", args);
+            String msg = "Pandoc process " + String.join(" ", args) + " was terminated after reaching a timeout of "
+                + TIMEOUT + " seconds";
+            throw new MCRPandocException(msg, ex);
+        }
+        if(p.exitValue() != 0) {
+            String msg = "Pandoc process " + String.join(" ", args) + " terminated with error code " + p.exitValue();
+            try {
+                msg += " and error message \n"
+                    + new String(readPandocOutput(p.getErrorStream()), StandardCharsets.UTF_8);
+            } catch(IOException ex) {
+                throw new MCRPandocException(msg);
+            } finally {
+                p.destroy();
+            }
+            throw new MCRPandocException(msg);
+        }
+        try {
+            return readPandocOutput(p.getInputStream());
+        } catch(IOException ex) {
+            String msg = "Exception reading output from Pandoc " + String.join(" ", args);
             throw new MCRPandocException(msg, ex);
         }
     }
 
-    private static Process initPandoc(String[] args, byte[] input) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(args);
-        pb.environment().put("LUA_PATH", LUA_PATH);
-        Process p;
-        p = pb.start();
-        p.getOutputStream().write(input);
-        p.getOutputStream().close();
-        return p;
-    }
-
-    private static byte[] readPandocOutput(Process p) throws IOException, InterruptedException {
-        BufferedInputStream pandocStream = new BufferedInputStream(p.getInputStream());
+    private static byte[] readPandocOutput(InputStream s) throws IOException {
+        BufferedInputStream pandocStream = new BufferedInputStream(s);
         byte[] buffer = new byte[BUFFER_SIZE];
         byte[] output = new byte[0];
         int readBytes;
@@ -153,7 +168,6 @@ public class MCRPandocAPI {
             System.arraycopy(buffer, 0, newOutput, output.length, readBytes);
             output = newOutput;
         }
-        p.waitFor();
         pandocStream.close();
         return output;
     }
