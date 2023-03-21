@@ -29,10 +29,12 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
+import org.mycore.restapi.v2.MCRRestDerivates;
 import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -64,11 +66,17 @@ public class MCRRestDerivateAccessKeys {
     @Context
     UriInfo uriInfo;
 
+    @Parameter(example = "mir_mods_00004711")
+    @PathParam(PARAM_MCRID)
+    MCRObjectID mcrId;
+
     @GET
     @Operation(
         summary = "Lists all access keys for a derivate",
         responses = {
-            @ApiResponse(responseCode = "200", content = { @Content(mediaType = MediaType.APPLICATION_JSON,
+            @ApiResponse(responseCode = "200",
+                description = "List of access keys attached to this derivate",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON,
                 array = @ArraySchema(schema = @Schema(implementation = MCRAccessKey.class))) }),
             @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
@@ -84,6 +92,7 @@ public class MCRRestDerivateAccessKeys {
     public Response listAccessKeysForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @DefaultValue("0") @QueryParam("offset") final int offset,
         @DefaultValue("128") @QueryParam("limit") final int limit) {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doListAccessKeys(derivateId, offset, limit);
     }
 
@@ -92,7 +101,9 @@ public class MCRRestDerivateAccessKeys {
     @Operation(
         summary = "Gets access key for a derivate",
         responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON,
+            @ApiResponse(responseCode = "200",
+                description = "Information about a specific access key",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON,
                 schema = @Schema(implementation = MCRAccessKey.class))),
             @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
@@ -108,6 +119,7 @@ public class MCRRestDerivateAccessKeys {
     public Response getAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @PathParam(PARAM_SECRET) final String secret,
         @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doGetAccessKey(derivateId, secret, secretEncoding);
     }
 
@@ -116,7 +128,9 @@ public class MCRRestDerivateAccessKeys {
         summary = "Creates an access key for a derivate",
         responses = {
             @ApiResponse(responseCode = "201", description = "Access key was successfully created",
-                headers = @Header(name = HttpHeaders.LOCATION)),
+                headers = @Header(name = HttpHeaders.LOCATION,
+                    schema = @Schema(type = "string", format = "uri"),
+                    description = "Location of the new access keyD")),
             @ApiResponse(responseCode = "400", description = "Invalid ID or invalid access key",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = "401",
@@ -134,6 +148,7 @@ public class MCRRestDerivateAccessKeys {
     @MCRRequireTransaction
     public Response createAccessKeyForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         final String accessKeyJson) {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doCreateAccessKey(derivateId, accessKeyJson, uriInfo);
     }
 
@@ -161,6 +176,7 @@ public class MCRRestDerivateAccessKeys {
     public Response updateAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @PathParam(PARAM_SECRET) final String encodedSecret, final String accessKeyJson,
         @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doUpdateAccessKey(derivateId, encodedSecret, accessKeyJson, secretEncoding);
     }
 
@@ -185,6 +201,7 @@ public class MCRRestDerivateAccessKeys {
     public Response removeAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @PathParam(PARAM_SECRET) final String secret,
         @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, secret, secretEncoding);
     }
 }

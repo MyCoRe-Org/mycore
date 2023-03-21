@@ -41,9 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.UriBuilder;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,8 +83,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -103,6 +100,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -112,12 +110,14 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 
@@ -249,6 +249,7 @@ public class MCRRestObjects {
                 description = "sort objects by 'id', 'created' (default) or 'modified'")
         },
         responses = @ApiResponse(
+            description = "List of all or matched metadata object IDs with time of last modification",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRObjectIDDate.class)))),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @XmlElementWrapper(name = "mycoreobjects")
@@ -344,7 +345,10 @@ public class MCRRestObjects {
     @Operation(
         summary = "Create a new MyCoRe Object",
         responses = @ApiResponse(responseCode = "201",
-            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new MyCoRe Object")),
+            description = "Metadata object successfully created",
+            headers = @Header(name = HttpHeaders.LOCATION,
+                schema = @Schema(type = "string", format = "uri"),
+                description = "URL of the new MyCoRe Object")),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @Consumes(MediaType.APPLICATION_XML)
     @RequestBody(required = true,
@@ -529,9 +533,11 @@ public class MCRRestObjects {
     @Path("/{" + PARAM_MCRID + "}/versions")
     @Operation(
         summary = "Returns MCRObject with the given " + PARAM_MCRID + ".",
-        responses = @ApiResponse(content = @Content(
-            array = @ArraySchema(uniqueItems = true,
-                schema = @Schema(implementation = MCRAbstractMetadataVersion.class)))),
+        responses = @ApiResponse(
+            description = "List of available versions for this metadata object",
+            content = @Content(
+                array = @ArraySchema(uniqueItems = true,
+                    schema = @Schema(implementation = MCRAbstractMetadataVersion.class)))),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     @XmlElementWrapper(name = "versions")

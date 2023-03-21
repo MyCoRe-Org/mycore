@@ -81,6 +81,7 @@ public class MCRRestClassifications {
     @Operation(
         summary = "Lists all classifications in this repository",
         responses = @ApiResponse(
+            description = "List of root categories without child categories",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRClass.class)))),
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @XmlElementWrapper(name = "classifications")
@@ -120,6 +121,7 @@ public class MCRRestClassifications {
     @Operation(
         summary = "Returns Classification with the given " + PARAM_CLASSID + ".",
         responses = @ApiResponse(
+            description = "Classification with all child categories",
             content = @Content(schema = @Schema(implementation = MCRClass.class))),
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId) {

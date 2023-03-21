@@ -68,7 +68,9 @@ public class MCRInfo {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @Operation(description = "get MyCoRe version information",
         responses = {
-            @ApiResponse(content = @Content(schema = @Schema(implementation = GitInfo.class)))
+            @ApiResponse(
+                description = "Information about the MyCoRe version",
+                content = @Content(schema = @Schema(implementation = GitInfo.class)))
         },
         tags = MCRRestUtils.TAG_MYCORE_ABOUT)
     public Response getVersion() {
