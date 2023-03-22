@@ -3,6 +3,7 @@ package org.mycore.mods.csl;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.junit.Before;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.MCRSystemUserInformation;
@@ -21,16 +22,16 @@ import java.util.stream.Stream;
 
 public class MCRMODSCSLTest extends MCRStoreTestCase {
 
-    private final String TEST_ID_1 = "junit_mods_00002050";
-    private final String TEST_ID_2 = "junit_mods_00002056";
-    private final String TEST_ID_3 = "junit_mods_00002489";
-    private final String TEST_ID_4 = "junit_mods_00002052";
+    private static final String TEST_ID_1 = "junit_mods_00002050";
+    private static final String TEST_ID_2 = "junit_mods_00002056";
+    private static final String TEST_ID_3 = "junit_mods_00002489";
+    private static final String TEST_ID_4 = "junit_mods_00002052";
 
     protected static String getIDFromContent(MCRContent c) {
         try {
             return c.asXML().getRootElement().getAttributeValue("ID");
         } catch (JDOMException | IOException | SAXException e) {
-            throw new RuntimeException(e);
+            throw new MCRException(e);
         }
     }
 
