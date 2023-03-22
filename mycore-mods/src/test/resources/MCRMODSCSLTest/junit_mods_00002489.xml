@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="junit_mods_00002489" version="2021.06.2-SNAPSHOT" label="junit_mods_00002489">
+  <structure/>
+  <metadata>
+    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+      <modsContainer inherited="0">
+        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+          <mods:typeOfResource>text</mods:typeOfResource>
+          <mods:genre type="intern" authorityURI="https://publikationsserver.phtg.ch/classifications/mir_genres" valueURI="https://publikationsserver.phtg.ch/classifications/mir_genres#speech"/>
+          <mods:titleInfo xml:lang="de" xlink:type="simple">
+            <mods:title>foo und bar baz</mods:title>
+          </mods:titleInfo>
+          <mods:name type="personal" xlink:type="simple">
+            <mods:displayForm>foo, bar</mods:displayForm>
+            <mods:role>
+              <mods:roleTerm authority="marcrelator" type="code">aut</mods:roleTerm>
+            </mods:role>
+            <mods:affiliation>bar bar bar</mods:affiliation>
+            <mods:nameIdentifier type="gnd">11234151X</mods:nameIdentifier>
+            <mods:namePart type="family">bar</mods:namePart>
+            <mods:namePart type="given">foo</mods:namePart>
+          </mods:name>
+        </mods:mods>
+      </modsContainer>
+    </def.modsContainer>
+  </metadata>
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2023-01-09T13:46:28.223Z</servdate>
+      <servdate type="modifydate" inherited="0">2023-01-18T12:21:24.053Z</servdate>
+    </servdates>
+    <servflags class="MCRMetaLangText">
+      <servflag type="createdby" inherited="0" form="plain">somebody</servflag>
+      <servflag type="modifiedby" inherited="0" form="plain">somebody</servflag>
+    </servflags>
+    <servstates class="MCRMetaClassification">
+      <servstate inherited="0" classid="state" categid="published"/>
+    </servstates>
+  </service>
+</mycoreobject>

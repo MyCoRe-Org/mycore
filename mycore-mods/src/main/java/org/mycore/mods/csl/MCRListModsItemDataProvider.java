@@ -33,8 +33,8 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Does the same as @{@link MCRModsItemDataProvider} but you can provide multiple objects
@@ -79,6 +79,6 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
     @Override
     public Collection<String> getIds() {
-        return Set.copyOf(this.store.keySet());
+        return new LinkedHashSet<>(this.store.keySet());
     }
 }
