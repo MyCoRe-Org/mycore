@@ -299,8 +299,7 @@ public class MCRUploadResource {
         @QueryParam("size") String size) {
         String fileName = Paths.get(path).getFileName().toString();
         String unicodeNormalizedFileName =  Normalizer.normalize(fileName, Normalizer.Form.NFC);
-        String translation;
-        translation = MCRTranslation.translate("IFS.invalid.fileName", unicodeNormalizedFileName);
+        String translation = MCRTranslation.translate("IFS.invalid.fileName", unicodeNormalizedFileName);
         try {
             MCRUploadHelper.checkPathName(unicodeNormalizedFileName);
         } catch (MCRException e) {
