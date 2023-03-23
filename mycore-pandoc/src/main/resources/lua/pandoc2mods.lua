@@ -59,7 +59,7 @@ end
 
 function bookCommon(o)
     local mods = ""
-    if o['event'] ~= nil or o['event-place'] ~= nil then
+    if o['event'] ~= nil or o['event-place'] ~= nil or o['type'] == 'paper-conference' then
         mods = mods .. modsGenre("proceedings")
         mods = mods .. event(o)
     elseif o['type'] == "entry-encyclopedia" then

@@ -33,17 +33,17 @@ function modsTitleInfo(o, t)
     local mods = ""
     if o[t] ~= nil then
         mods = mods .. "<mods:titleInfo>\n"
-        if o[t .. '-short'] ~= nil and o[t]:sub(1,string.len(o[t .. '-short'])) == o[t .. '-short'] then
-            mods = mods .. "<mods:title>" .. o[t .. '-short'] .. "</mods:title>\n"
-            mods = mods .. "<mods:subTitle>" .. o[t]:sub(string.len(o[t .. '-short'])+3,string.len(o[t]))
+        if o[t .. '-short'] ~= nil and escape(stringify(o[t])):sub(1,string.len(escape(stringify(o[t .. '-short'])))) == escape(stringify(o[t .. '-short'])) then
+            mods = mods .. "<mods:title>" .. escape(stringify(o[t .. '-short'])) .. "</mods:title>\n"
+            mods = mods .. "<mods:subTitle>" .. escape(stringify(o[t])):sub(string.len(escape(stringify(o[t .. '-short'])))+3,string.len(escape(stringify(o[t]))))
             mods = mods .. "</mods:subTitle>\n"
         else
-            mods = mods .. "<mods:title>" .. o[t] .. "</mods:title>\n"
+            mods = mods .. "<mods:title>" .. escape(stringify(o[t])) .. "</mods:title>\n"
         end
         mods = mods .. "</mods:titleInfo>\n"
     end
     if o[t .. '-short'] ~= nil then
-        mods = mods .. "<mods:titleInfo type=\"abbreviated\">\n<mods:title>" .. o[t .. '-short']
+        mods = mods .. "<mods:titleInfo type=\"abbreviated\">\n<mods:title>" .. escape(stringify(o[t .. '-short']))
         mods = mods .. "</mods:title>\n</mods:titleInfo>\n"
     end
     return mods
@@ -105,12 +105,12 @@ end
 function conference(o)
     local event = ""
     if o['event'] ~= nil then
-        event = o['event']
+        event = escape(stringify(o['event']))
         if o['event-place'] ~= nil then
-            event = event .. ", " .. o['event-place']
+            event = event .. ", " .. escape(stringify(o['event-place']))
         end
         if o['event-date'] ~= nil then
-            event = event .. ", " .. o['event-date']
+            event = event .. ", " .. escape(stringify(o['event-date']))
         end
         event = modsNamePart(o, event)
     end
@@ -120,9 +120,9 @@ end
 function modsNamePart(o, t)
     local mods = ""
     if o[t] ~= nil then
-        mods = mods .. "<mods:namePart type=\"" .. t .. "\">" .. o[t] .. "</mods:namePart>\n"
+        mods = mods .. "<mods:namePart type=\"" .. t .. "\">" .. escape(o[t]) .. "</mods:namePart>\n"
     else
-        mods = mods .. "<mods:namePart>" .. t .. "</mods:namePart>\n"
+        mods = mods .. "<mods:namePart>" .. escape(t) .. "</mods:namePart>\n"
     end
     return mods
 end
@@ -135,7 +135,7 @@ end
 function modsDateIssued(o)
     local mods = ""
     if o['issued'] ~= nil then
-        mods = mods .. "<mods:dateIssued encoding=\"w3cdtf\">" .. o['issued'] .. "</mods:dateIssued>\n"
+        mods = mods .. "<mods:dateIssued encoding=\"w3cdtf\">" .. escape(o['issued']) .. "</mods:dateIssued>\n"
     end
     return mods
 end
@@ -143,7 +143,7 @@ end
 function modsPublisher(o)
     local mods = ""
     if o['publisher'] ~= nil then
-        mods = mods .. "<mods:publisher>" .. o['publisher'] .. "</mods:publisher>\n"
+        mods = mods .. "<mods:publisher>" .. escape(stringify(o['publisher'])) .. "</mods:publisher>\n"
     end
     return mods
 end
@@ -151,7 +151,7 @@ end
 function modsPlace(o)
     local mods = ""
     if o['publisher-place'] ~= nil then
-        mods = mods .. "<mods:place>\n<mods:placeTerm type=\"text\">" .. o['publisher-place']
+        mods = mods .. "<mods:place>\n<mods:placeTerm type=\"text\">" .. escape(stringify(o['publisher-place']))
         mods = mods .. "</mods:placeTerm>\n</mods:place>\n"
     end
     return mods
@@ -181,7 +181,7 @@ end
 function modsLocation(o)
     local mods = ""
     if o['url'] ~= nil then
-        mods = mods .. "<mods:location>\n<mods:url>" .. o['url'] .. "</mods:url>\n</mods:location>\n"
+        mods = mods .. "<mods:location>\n<mods:url>" .. escape(o['url']) .. "</mods:url>\n</mods:location>\n"
     end
     return mods
 end
@@ -189,9 +189,9 @@ end
 function modsIdentifier(o,id)
     local mods = ""
     if o[id] ~= nil then
-        mods = mods .. "<mods:identifier type=\"" .. id .. "\">" .. o[id] .. "</mods:identifier>\n"
+        mods = mods .. "<mods:identifier type=\"" .. id .. "\">" .. escape(o[id]) .. "</mods:identifier>\n"
     elseif o[id:upper()] ~= nil then
-        mods = mods .. "<mods:identifier type=\"" .. id .. "\">" .. o[id:upper()] .. "</mods:identifier>\n"
+        mods = mods .. "<mods:identifier type=\"" .. id .. "\">" .. escape(o[id:upper()]) .. "</mods:identifier>\n"
     end
     return mods
 end
@@ -200,9 +200,9 @@ function pages(o)
     local mods = ""
     local p = ""
     if o['page'] ~= nil then
-        p = o['page']
+        p = escape(stringify(o['page']))
     elseif o['pages'] ~= nil then
-        p = o['pages']
+        p = escape(stringify(o['pages']))
     end
     if p ~= "" then
         local s,e = p:match("([^\\-]+)[\\-]*(.*)")
@@ -220,9 +220,9 @@ function issue(o)
     local mods = ""
     local i = ""
     if o['issue'] ~= nil then
-        i = o['issue']
+        i = escape(stringify(o['issue']))
     elseif o['collection-number'] ~= nil then
-        i = o['collection-number']
+        i = escape(stringify(o['collection-number']))
     end
     if i ~= "" then
         mods = mods .. "<mods:detail type=\"issue\">\n"
@@ -236,7 +236,7 @@ function volume(o)
     local mods = ""
     if o['volume'] ~= nil then
         mods = mods .. "<mods:detail type=\"volume\">\n"
-        mods = mods .. "<mods:number>" .. o['volume'] .. "</mods:number>\n"
+        mods = mods .. "<mods:number>" .. escape(stringify(o['volume'])) .. "</mods:number>\n"
         mods = mods .. "</mods:detail>\n"
     end
     return mods
@@ -268,7 +268,7 @@ end
 function modsNote(o)
     local mods = ""
     if o['note'] ~= nil then
-        mods = mods .. "<mods:note>" .. o['note'] .. "</mods:note>\n"
+        mods = mods .. "<mods:note>" .. escape(stringify(o['note'])) .. "</mods:note>\n"
     end
     return mods
 end
@@ -293,18 +293,15 @@ function default(o)
     return mods
 end
 
--- Character escaping
+-- Required escapes.
+-- Ampersand ('&') MUST be the first element added to table `escapes`.
+local escapes = {}
+escapes["&"] = "&amp;"
+escapes["<"] = "&lt;"
+escapes[">"] = "&gt;"
 function escape(s)
   return s:gsub('[<>&]',
     function(x)
-      if x == '<' then
-        return '&lt;'
-      elseif x == '>' then
-        return '&gt;'
-      elseif x == '&' then
-        return '&amp;'
-      else
-        return x
-      end
+        return escapes[x]
     end)
 end

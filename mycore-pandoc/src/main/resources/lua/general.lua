@@ -1,8 +1,10 @@
+stringify = pandoc.utils.stringify
+
 -- This function is called once for the whole document. Parameters:
--- body is a string, metadata is a table, variables is a table.
-function Doc(body, metadata, variables)
-    print(transform(metadata))
-    return body
+-- doc is the pandoc AST, doc.meta is a table of metadata, opts contains writer options
+-- cf. https://pandoc.org/custom-writers.html
+function Writer (doc, opts)
+    return transform(doc.meta)
 end
 
 function pubtype(o)
@@ -11,26 +13,6 @@ function pubtype(o)
         func = "default"
     end
     return _G[func](o)
-end
-
-function Str(s)
-  return escape(s)
-end
-
-function Space()
-  return " "
-end
-
-function Span(s, attr)
-  return s
-end
-
-function Blocksep()
-  return ""
-end
-
-function Cite(s, cs)
-  return s
 end
 
 function dumpPandocAst(o)
@@ -42,7 +24,7 @@ function dumpPandocAst(o)
       end
       return s .. '} '
    else
-      return tostring(o)
+      return stringify(o)
    end
 end
 
