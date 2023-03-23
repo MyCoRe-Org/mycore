@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -296,13 +297,13 @@ public class MCRUploadResource {
     public Response validateFile(@PathParam("path") String path,
         @PathParam("objectID") String objectID,
         @QueryParam("size") String size) {
-        String actualStringFileName = Paths.get(path).getFileName().toString();
-        String translation;
-        translation = MCRTranslation.translate("IFS.invalid.fileName", actualStringFileName);
+        String fileName = Paths.get(path).getFileName().toString();
+        String unicodeNormalizedFileName =  Normalizer.normalize(fileName, Normalizer.Form.NFC);
+        String translation = MCRTranslation.translate("IFS.invalid.fileName", unicodeNormalizedFileName);
         try {
-            MCRUploadHelper.checkPathName(actualStringFileName);
+            MCRUploadHelper.checkPathName(unicodeNormalizedFileName);
         } catch (MCRException e) {
-            LOGGER.warn("Invalid file name: {} -> {}", actualStringFileName, e.getMessage());
+            LOGGER.warn("Invalid file name: {} -> {}", unicodeNormalizedFileName, e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), translation)
                     .entity(translation).build();
         }
@@ -312,7 +313,7 @@ public class MCRUploadResource {
 
         if (sizeL > maxSize) {
             translation = MCRTranslation.translate("component.webtools.upload.invalid.fileSize",
-                actualStringFileName, MCRUtils.getSizeFormatted(sizeL), MCRUtils.getSizeFormatted(maxSize));
+                unicodeNormalizedFileName, MCRUtils.getSizeFormatted(sizeL), MCRUtils.getSizeFormatted(maxSize));
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
                 translation).entity(translation).build();
         }
@@ -336,7 +337,8 @@ public class MCRUploadResource {
 
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getOrCreateBucket(uploadID, objectID);
 
-        final java.nio.file.Path filePath = MCRUtils.safeResolve(bucket.getRoot(), path);
+        String unicodeNormalizedPath = Normalizer.normalize(path, Normalizer.Form.NFC);
+        final java.nio.file.Path filePath = MCRUtils.safeResolve(bucket.getRoot(), unicodeNormalizedPath);
         if (filePath.getNameCount() > 1) {
             java.nio.file.Path parentDirectory = filePath.getParent();
             if (!Files.exists(parentDirectory)) {
@@ -356,11 +358,11 @@ public class MCRUploadResource {
         if (contentLength == null || Long.parseLong(contentLength) == 0) {
             Files.createDirectory(filePath);
         } else if (Long.parseLong(contentLength) > maxSize) {
-            throw new BadRequestException("File is to big. " + path);
+            throw new BadRequestException("File is to big. " + unicodeNormalizedPath);
         } else {
             final List<MCRPostUploadFileProcessor> processors = FILE_PROCESSORS.stream()
                 .filter(procesor -> {
-                    return procesor.isProcessable(path);
+                    return procesor.isProcessable(unicodeNormalizedPath);
                 }).collect(Collectors.toList());
 
             if (processors.size() == 0) {
@@ -371,7 +373,8 @@ public class MCRUploadResource {
 
                 for (MCRPostUploadFileProcessor processor : processors) {
                     final java.nio.file.Path tempFile2 = Files.createTempFile("processing", ".temp");
-                    final java.nio.file.Path result = processor.processFile(path, input, () -> tempFile2);
+                    final java.nio.file.Path result = processor.processFile(unicodeNormalizedPath, input,
+                            () -> tempFile2);
                     if (result != null) {
                         Files.deleteIfExists(input);
                         input = result;
