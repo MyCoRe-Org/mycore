@@ -14,10 +14,10 @@ end
 -- all of the functions you need for the custom writer, so it's useful
 -- to include when you're working on a writer.
 meta.__index =
-  function(_, key)
+function(_, key)
     io.stderr:write(string.format("WARNING: Undefined function '%s'\n",key))
     return function() return "" end
-  end
+end
 --]]
 
 defaultGenre = "misc"

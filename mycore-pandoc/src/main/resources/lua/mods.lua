@@ -33,9 +33,11 @@ function modsTitleInfo(o, t)
     local mods = ""
     if o[t] ~= nil then
         mods = mods .. "<mods:titleInfo>\n"
-        if o[t .. '-short'] ~= nil and escape(stringify(o[t])):sub(1,string.len(escape(stringify(o[t .. '-short'])))) == escape(stringify(o[t .. '-short'])) then
+        if o[t .. '-short'] ~= nil and escape(stringify(o[t])):sub(1,string.len(escape(stringify(o[t .. '-short']))))
+            == escape(stringify(o[t .. '-short'])) then
             mods = mods .. "<mods:title>" .. escape(stringify(o[t .. '-short'])) .. "</mods:title>\n"
-            mods = mods .. "<mods:subTitle>" .. escape(stringify(o[t])):sub(string.len(escape(stringify(o[t .. '-short'])))+3,string.len(escape(stringify(o[t]))))
+            mods = mods .. "<mods:subTitle>" .. escape(stringify(o[t])):sub(string.len(escape(
+            stringify(o[t .. '-short'])))+3,string.len(escape(stringify(o[t]))))
             mods = mods .. "</mods:subTitle>\n"
         else
             mods = mods .. "<mods:title>" .. escape(stringify(o[t])) .. "</mods:title>\n"
@@ -129,7 +131,7 @@ end
 
 function modsRole(s)
     return "<mods:role>\n<mods:roleTerm type=\"code\" authority=\"marcrelator\">" .. s
-        ..  "</mods:roleTerm>\n</mods:role>\n"
+    ..  "</mods:roleTerm>\n</mods:role>\n"
 end
 
 function modsDateIssued(o)
@@ -300,7 +302,7 @@ escapes["&"] = "&amp;"
 escapes["<"] = "&lt;"
 escapes[">"] = "&gt;"
 function escape(s)
-  return s:gsub('[<>&]',
+    return s:gsub('[<>&]',
     function(x)
         return escapes[x]
     end)

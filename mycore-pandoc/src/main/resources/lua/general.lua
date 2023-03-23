@@ -16,21 +16,21 @@ function pubtype(o)
 end
 
 function dumpPandocAst(o)
-   if type(o) == 'table' then
-      local s = '{ \n'
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dumpPandocAst(v) .. ',\n'
-      end
-      return s .. '} '
-   else
-      return stringify(o)
-   end
+    if type(o) == 'table' then
+        local s = '{ \n'
+        for k,v in pairs(o) do
+            if type(k) ~= 'number' then k = '"'..k..'"' end
+            s = s .. '['..k..'] = ' .. dumpPandocAst(v) .. ',\n'
+        end
+        return s .. '} '
+    else
+        return stringify(o)
+    end
 end
 
 meta = {}
 meta.__index =
-  function(_, key)
+function(_, key)
     return function() return "" end
-  end
+end
 setmetatable(_G, meta)
