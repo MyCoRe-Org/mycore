@@ -57,7 +57,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         .build(new CacheLoader<String, MCRPath>() {
 
             @Override
-            public MCRPath load(final String owner) throws Exception {
+            public MCRPath load(final String owner) {
                 return getPath(owner, "/", instance());
             }
         });
@@ -172,7 +172,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     public abstract void removeRoot(String owner) throws FileSystemException;
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         throw new UnsupportedOperationException();
     }
 
@@ -248,7 +248,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     }
 
     @Override
-    public WatchService newWatchService() throws IOException {
+    public WatchService newWatchService() {
         throw new UnsupportedOperationException();
     }
 

@@ -68,8 +68,7 @@ public abstract class MCRContentServlet extends MCRServlet {
     }
 
     @Override
-    protected void doOptions(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
-        IOException {
+    protected void doOptions(final HttpServletRequest req, final HttpServletResponse resp) {
         resp.setHeader("Allow", "GET, HEAD, POST, OPTIONS");
     }
 

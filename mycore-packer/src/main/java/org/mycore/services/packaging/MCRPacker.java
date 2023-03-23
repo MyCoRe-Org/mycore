@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUsageException;
 
 /**
@@ -40,9 +39,8 @@ public abstract class MCRPacker {
     /**
      * should check if all required parameters are set!
      * @throws MCRUsageException if parameters are illegal
-     * @throws MCRAccessException if the Users doesn't have the rights to use the Packer
      */
-    public abstract void checkSetup() throws MCRUsageException, MCRAccessException;
+    public abstract void checkSetup() throws MCRUsageException;
 
     /**
      * This method will be called and the MCRPacker should start packing according to the {@link #getConfiguration()}

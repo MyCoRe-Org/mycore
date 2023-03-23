@@ -71,7 +71,7 @@ public class MCREditorSubmission {
         return sb.toString().trim();
     }
 
-    public void setXPaths2CheckResubmission(String xPaths) throws JDOMException {
+    public void setXPaths2CheckResubmission(String xPaths) {
         xPaths2CheckResubmission.clear();
         String rootXPath = MCRXPathBuilder.buildXPath(session.getEditedXML().getRootElement()) + "/";
         if (xPaths != null) {
@@ -140,7 +140,7 @@ public class MCREditorSubmission {
         session.setBreakpoint("After setting submitted values");
     }
 
-    private void setSubmittedValues(MCRBinding binding, String[] values) throws JDOMException, JaxenException {
+    private void setSubmittedValues(MCRBinding binding, String[] values) {
         List<Object> boundNodes = binding.getBoundNodes();
 
         while (boundNodes.size() < values.length) {

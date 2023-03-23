@@ -20,7 +20,6 @@ package org.mycore.datamodel.metadata;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
@@ -65,7 +64,7 @@ public class MCRObjectTest extends MCRTestCase {
     }
 
     @Test
-    public void createJSON() throws Exception {
+    public void createJSON() {
         JsonObject json = testObject.createJSON();
         assertEquals("Invalid id", "mcr_test_00000001", json.getAsJsonPrimitive("id").getAsString());
         JsonObject textfield = json.getAsJsonObject("metadata").getAsJsonObject("def.textfield");
@@ -76,7 +75,7 @@ public class MCRObjectTest extends MCRTestCase {
         System.out.println(gson.toJson(json));
     }
 
-    private static Document loadResourceDocument(String resource) throws MCRException, SAXParseException, IOException {
+    private static Document loadResourceDocument(String resource) throws MCRException, SAXParseException {
         URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
         return MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(mcrTestUrl));
     }

@@ -64,7 +64,7 @@ public class MCRORCIDResource {
     @GET
     @Path("status")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getUserStatus() throws JDOMException, IOException, SAXException {
+    public String getUserStatus() {
         MCRORCIDUser user = MCRORCIDSession.getCurrentUser();
         Gson gson = MCRJSONManager.instance().createGson();
         return gson.toJson(user.getStatus());
@@ -111,7 +111,7 @@ public class MCRORCIDResource {
     @GET
     @Path("publish/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String publish(@PathParam("objectID") String objectID) throws JDOMException, IOException, SAXException {
+    public String publish(@PathParam("objectID") String objectID) {
         MCRObjectID oid = checkID(objectID);
         MCRORCIDUser user = MCRORCIDSession.getCurrentUser();
 

@@ -224,7 +224,7 @@ public final class MCRGoogleSitemapCommon {
      *
      * @return The sitemap_google.xml as JDOM document
      */
-    protected Document buildSingleSitemap() throws Exception {
+    protected Document buildSingleSitemap() {
         LOGGER.debug("Build Google URL sitemap_google.xml for whole items.");
         // build document frame
         Element urlset = new Element("urlset", NS);
@@ -245,7 +245,7 @@ public final class MCRGoogleSitemapCommon {
      *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
      * @return The sitemap.xml as JDOM document
      */
-    protected Document buildPartSitemap(int number) throws Exception {
+    protected Document buildPartSitemap(int number) {
         LOGGER.debug("Build Google URL sitemap list number {}", Integer.toString(number));
         // build document frame
         Element urlset = new Element("urlset", NS);

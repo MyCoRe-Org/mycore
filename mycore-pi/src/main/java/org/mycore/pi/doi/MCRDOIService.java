@@ -297,8 +297,7 @@ public class MCRDOIService extends MCRDOIBaseService {
     }
 
     @Override
-    public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional) {
         if (hasRegistrationStarted(obj.getId(), additional) || this.isRegistered(obj.getId(), additional)) {
             LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj.getId(),
                 doi.asString());

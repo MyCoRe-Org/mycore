@@ -521,7 +521,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     /** Reports an exception to the log */
-    protected void reportException(Exception ex) throws Exception {
+    protected void reportException(Exception ex) {
         String cname = this.getClass().getName();
         String servlet = cname.substring(cname.lastIndexOf(".") + 1);
 

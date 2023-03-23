@@ -26,7 +26,7 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRMETSGeneratorFactoryTest {
 
     @Test
-    public void getGenerator() throws Exception {
+    public void getGenerator() {
         // prepare config
         MCRConfiguration2.set("MCR.Component.MetsMods.Generator", TestGenerator.class.getName());
         // check getGenerator

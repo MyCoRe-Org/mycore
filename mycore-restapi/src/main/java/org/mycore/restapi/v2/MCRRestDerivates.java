@@ -480,8 +480,7 @@ public class MCRRestDerivates {
                 description = "You do not have write permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have write permission"),
         })
-    public Response testUpdateDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
-        throws IOException {
+    public Response testUpdateDerivate(@PathParam(PARAM_DERID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
@@ -495,8 +494,7 @@ public class MCRRestDerivates {
                 description = "You do not have delete permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
         })
-    public Response testDeleteDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
-        throws IOException {
+    public Response testDeleteDerivate(@PathParam(PARAM_DERID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 

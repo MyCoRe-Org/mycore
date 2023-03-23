@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.DAO;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.WORLD_CLASS_RESOURCE_NAME;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -272,7 +271,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
             references.size());
     }
 
-    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(worlClassUrl));
         category = MCRXMLTransformer.getCategory(xml);

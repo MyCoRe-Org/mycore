@@ -84,12 +84,12 @@ public class MCRXHTML2PDFTransformer extends MCRContentTransformer {
     }
 
     @Override
-    public String getFileExtension() throws Exception {
+    public String getFileExtension() {
         return "pdf";
     }
 
     @Override
-    public String getMimeType() throws Exception {
+    public String getMimeType() {
         return "application/pdf";
     }
 }

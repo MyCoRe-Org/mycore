@@ -33,7 +33,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
@@ -47,7 +46,6 @@ import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.xml.sax.SAXParseException;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -651,7 +649,7 @@ public class MCRMailer extends MCRServlet {
             final MCRJAXBContent<EMail> content = new MCRJAXBContent<>(JAXB_CONTEXT, this);
             try {
                 return content.asXML();
-            } catch (final SAXParseException | JDOMException | IOException e) {
+            } catch (final IOException e) {
                 throw new MCRException("Exception while transforming EMail to JDOM document.", e);
             }
         }

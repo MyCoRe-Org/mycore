@@ -453,7 +453,7 @@ public abstract class MCRStore {
      *            the id of the data
      * @return the file object storing that data
      */
-    protected Path getSlot(final int id) throws IOException {
+    protected Path getSlot(final int id) {
         String slotPath = getSlotPath(id);
         return baseDirectory.resolve(toNativePath.apply(slotPath));
     }

@@ -18,7 +18,6 @@
 
 package org.mycore.csl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -76,7 +75,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     }
 
     @Override
-    public MCRContent transform(MCRContent source) throws IOException {
+    public MCRContent transform(MCRContent source) {
         return null;
     }
 
@@ -120,7 +119,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     }
 
     @Override
-    public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) throws IOException {
+    public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) {
         final String format = parameter != null ? parameter.getParameter("format", configuredFormat) : configuredFormat;
         final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format)) {

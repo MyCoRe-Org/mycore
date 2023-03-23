@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import org.junit.Assert;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRMockMetadataService extends MCRPIMetadataService<MCRMockIdentifier> {
 
@@ -35,8 +34,7 @@ public class MCRMockMetadataService extends MCRPIMetadataService<MCRMockIdentifi
     private Map<String, MCRMockIdentifier> map = new HashMap<>();
 
     @Override
-    public void insertIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    public void insertIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional) {
         Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
         map.put(obj + additional, identifier);
     }
@@ -48,8 +46,7 @@ public class MCRMockMetadataService extends MCRPIMetadataService<MCRMockIdentifi
     }
 
     @Override
-    public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional) {
         return Optional.ofNullable(map.get(obj + additional));
     }
 

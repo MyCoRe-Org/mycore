@@ -64,7 +64,7 @@ public class MCRSwordContainerManager implements ContainerManager {
 
     @Override
     public DepositReceipt getEntry(String editIRI, Map<String, String> map, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordServerException, SwordError, SwordAuthException {
+        SwordConfiguration swordConfiguration) throws SwordError, SwordAuthException {
         IRI iri = new IRI(editIRI);
         String collection = MCRSwordUtil.ParseLinkUtil.EditIRI.getCollectionFromEditIRI(iri);
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
@@ -94,7 +94,7 @@ public class MCRSwordContainerManager implements ContainerManager {
 
     @Override
     public DepositReceipt addMetadataAndResources(String editIRI, Deposit deposit, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) {
         // this is not even supported by the JavaSwordServer
         return null;
     }
@@ -191,13 +191,13 @@ public class MCRSwordContainerManager implements ContainerManager {
 
     @Override
     public DepositReceipt useHeaders(String editIRI, Deposit deposit, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isStatementRequest(String editIRI, Map<String, String> map, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) {
         return false;
     }
 }

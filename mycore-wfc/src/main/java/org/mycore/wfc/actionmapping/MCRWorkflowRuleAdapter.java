@@ -45,12 +45,12 @@ public class MCRWorkflowRuleAdapter extends XmlAdapter<String, MCRCondition<?>> 
     }
 
     @Override
-    public MCRCondition<?> unmarshal(final String v) throws Exception {
+    public MCRCondition<?> unmarshal(final String v) {
         return parser.parse(v);
     }
 
     @Override
-    public String marshal(final MCRCondition<?> v) throws Exception {
+    public String marshal(final MCRCondition<?> v) {
         return v.toString();
     }
 

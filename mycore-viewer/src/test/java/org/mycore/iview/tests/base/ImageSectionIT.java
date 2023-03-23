@@ -55,7 +55,7 @@ public class ImageSectionIT extends ViewerTestBase {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void testImageZoom() throws IOException, InterruptedException {
+    public void testImageZoom() throws InterruptedException {
         this.setTestName(getClassname() + "-testImageZoom");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getTestDerivate());

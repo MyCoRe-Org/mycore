@@ -50,7 +50,7 @@ public class MCRCombinedResourceBundleControl extends Control {
 
     @Override
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IOException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("New bundle: {}, locale {}", baseName, locale);
         }

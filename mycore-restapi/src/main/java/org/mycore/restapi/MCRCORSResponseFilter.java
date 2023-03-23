@@ -18,7 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
@@ -83,8 +82,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-        throws IOException {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         LOGGER.debug("Request-Header: {}", requestContext.getHeaders());
         String origin = requestContext.getHeaderString(ORIGIN);
         if (origin == null) {

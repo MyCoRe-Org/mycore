@@ -23,10 +23,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -52,7 +50,7 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
     }
 
     @Test
-    public void testEvaluator() throws JaxenException, JDOMException {
+    public void testEvaluator() {
         assertEquals("n1", evaluator.replaceXPathOrI18n("name[1]/@id"));
         assertEquals("n1", evaluator.replaceXPathOrI18n("/document/name[1]/@id"));
     }

@@ -125,14 +125,12 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     @Override
-    protected void delete(MCRHandle identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void delete(MCRHandle identifier, MCRBase obj, String additional) {
         this.startDeleteJob(obj, identifier);
     }
 
     @Override
-    protected void update(MCRHandle identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void update(MCRHandle identifier, MCRBase obj, String additional) {
         if (!this.hasRegistrationStarted(obj.getId(), additional)) {
             Predicate<MCRBase> registrationCondition = this.getRegistrationPredicate();
             if (registrationCondition.test(obj)) {

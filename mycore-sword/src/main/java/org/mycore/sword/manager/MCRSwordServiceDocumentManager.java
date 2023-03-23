@@ -29,11 +29,8 @@ import org.mycore.sword.application.MCRSwordCollectionProvider;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.ServiceDocument;
 import org.swordapp.server.ServiceDocumentManager;
-import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordCollection;
 import org.swordapp.server.SwordConfiguration;
-import org.swordapp.server.SwordError;
-import org.swordapp.server.SwordServerException;
 import org.swordapp.server.SwordWorkspace;
 
 /**
@@ -42,8 +39,7 @@ import org.swordapp.server.SwordWorkspace;
 public class MCRSwordServiceDocumentManager implements ServiceDocumentManager {
 
     @Override
-    public ServiceDocument getServiceDocument(String sdUri, AuthCredentials auth, SwordConfiguration config)
-        throws SwordError, SwordServerException, SwordAuthException {
+    public ServiceDocument getServiceDocument(String sdUri, AuthCredentials auth, SwordConfiguration config) {
         ServiceDocument serviceDocument = new ServiceDocument();
 
         MCRSword.getWorkspaces().forEach(workspaceName -> {

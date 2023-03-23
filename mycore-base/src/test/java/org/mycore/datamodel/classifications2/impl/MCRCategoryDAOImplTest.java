@@ -381,7 +381,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void moveCategoryWithoutIndex() throws SQLException {
+    public void moveCategoryWithoutIndex() {
         addWorldClassification();
         checkLeftRightLevelValue(getRootCategoryFromSession(), 0, 0);
         startNewTransaction();
@@ -394,7 +394,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void moveCategoryInParent() throws SQLException {
+    public void moveCategoryInParent() {
         addWorldClassification();
         MCRCategory moveNode = category.getChildren().get(1);
         DAO.moveCategory(moveNode.getId(), moveNode.getParent().getId(), 0);
@@ -406,7 +406,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void moveRightCategory() throws SQLException {
+    public void moveRightCategory() {
         String rootIDStr = "rootID";
         MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
@@ -700,7 +700,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         category = loadClassificationResource(WORLD_CLASS_RESOURCE_NAME);
     }
 
-    public static MCRCategory loadClassificationResource(String resourceName) throws SAXParseException, IOException,
+    public static MCRCategory loadClassificationResource(String resourceName) throws SAXParseException,
         URISyntaxException {
         URL classResourceUrl = MCRCategoryDAOImplTest.class.getResource(resourceName);
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(classResourceUrl));

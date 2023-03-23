@@ -99,7 +99,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
 
     @Test
     public void testUpdate() throws IOException, URISyntaxException, MCRPersistenceException,
-        MCRActiveLinkException, JDOMException, SAXException, MCRAccessException {
+        JDOMException, SAXException, MCRAccessException {
         MCRObject seriesNew = new MCRObject(getResourceAsURL(seriesID + "-updated.xml").toURI());
         MCRMetadataManager.update(seriesNew);
         Document bookNew = MCRXMLMetadataManager.instance().retrieveXML(bookID);

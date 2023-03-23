@@ -296,7 +296,7 @@ public class MCRLoginServlet extends MCRServlet {
         MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, url);
     }
 
-    private String encodePath(String path) throws Exception {
+    private String encodePath(String path) {
         path = path.replace('\\', '/');
 
         StringBuilder result = new StringBuilder();

@@ -27,11 +27,9 @@ import java.util.Properties;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -56,7 +54,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
-        ServletException, MCRActiveLinkException, SAXParseException, JDOMException, IOException {
+        ServletException, SAXParseException, IOException {
         Document editorSubmission = MCRPersistenceHelper.getEditorSubmission(request, false);
         if (editorSubmission != null) {
             MCRObjectID objectID = updateDerivateXML(editorSubmission);

@@ -121,7 +121,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setHeader("Cache-Control", "public");
         resp.setHeader("Cache-Control", "max-age=120");
 

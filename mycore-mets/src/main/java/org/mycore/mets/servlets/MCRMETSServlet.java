@@ -109,7 +109,7 @@ public class MCRMETSServlet extends MCRServlet {
     /**
      * Returns the mets document wrapped in a {@link MCRContent} object.
      */
-    static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) throws Exception {
+    static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) {
         MCRPath metsPath = MCRPath.getPath(derivate, "/mets.xml");
 
         try {

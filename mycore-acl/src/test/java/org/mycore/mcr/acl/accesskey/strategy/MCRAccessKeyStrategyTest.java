@@ -23,8 +23,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;

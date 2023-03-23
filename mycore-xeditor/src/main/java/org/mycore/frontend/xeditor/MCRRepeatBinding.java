@@ -67,7 +67,7 @@ public class MCRRepeatBinding extends MCRBinding {
         return repeatPosition;
     }
 
-    public MCRBinding bindRepeatPosition() throws JDOMException, JaxenException {
+    public MCRBinding bindRepeatPosition() {
         repeatPosition++;
         return new MCRBinding(repeatPosition, this);
     }

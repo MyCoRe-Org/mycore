@@ -717,10 +717,8 @@ public class MCRRestAPIObjectsHelper {
      * @param mcrDerID - the MyCoRe Derivate ID
      * 
      * @return the Resolving URL for the main document of the derivate
-     * @throws IOException
      */
-    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID, Application app)
-        throws IOException {
+    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID, Application app) {
         try {
             MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);

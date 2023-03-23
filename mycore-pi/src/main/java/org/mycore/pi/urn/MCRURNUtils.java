@@ -35,7 +35,7 @@ public class MCRURNUtils {
     public static Optional<Date> getDNBRegisterDate(MCRPIRegistrationInfo dnburn) {
         try {
             return Optional.of(getDNBRegisterDate(dnburn.getIdentifier()));
-        } catch (MCRIdentifierUnresolvableException | ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
@@ -46,8 +46,8 @@ public class MCRURNUtils {
         return getDNBRegisterDate(dnburn.asString());
     }
 
-    public static Date getDNBRegisterDate(String identifier) throws MCRIdentifierUnresolvableException,
-            ParseException {
+    public static Date getDNBRegisterDate(String identifier) throws
+        ParseException {
 
         String date = MCRDNBURNRestClient.getRegistrationInfo(identifier)
                 .map(info -> info.get("created"))

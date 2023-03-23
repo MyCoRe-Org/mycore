@@ -212,11 +212,9 @@ public class MCRIView2Tools {
      * @return a combined image
      * @throws IOException
      *             any IOException while reading tiles
-     * @throws JDOMException
-     *             if image properties could not be parsed.
      */
     public static BufferedImage getZoomLevel(final Path iviewFileRoot, final MCRTiledPictureProps imageProperties,
-        final ImageReader reader, final int zoomLevel) throws IOException, JDOMException {
+        final ImageReader reader, final int zoomLevel) throws IOException {
         if (zoomLevel == 0) {
             return readTile(iviewFileRoot, reader, 0, 0, 0);
         }

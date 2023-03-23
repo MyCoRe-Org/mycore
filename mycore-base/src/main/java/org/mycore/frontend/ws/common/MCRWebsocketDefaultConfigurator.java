@@ -37,7 +37,7 @@ public class MCRWebsocketDefaultConfigurator extends ServerEndpointConfig.Config
     public static final String HTTP_SESSION = "http.session";
 
     @Override
-    public <T> T getEndpointInstance(Class<T> endpointClass) throws InstantiationException {
+    public <T> T getEndpointInstance(Class<T> endpointClass) {
         return MCRConfiguration2.instantiateClass(endpointClass.getName());
     }
 

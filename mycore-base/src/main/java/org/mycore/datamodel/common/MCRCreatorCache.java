@@ -44,7 +44,7 @@ public class MCRCreatorCache {
     private static LoadingCache<MCRObjectID, String> CACHE = CacheBuilder.newBuilder()
         .maximumSize(CACHE_SIZE).build(new CacheLoader<MCRObjectID, String>() {
             @Override
-            public String load(final MCRObjectID objectId) throws Exception {
+            public String load(final MCRObjectID objectId) {
                 return Optional.ofNullable(MCRMetadataManager.retrieveMCRObject(objectId).getService()).map(os -> {
                     if (os.isFlagTypeSet("createdby")) {
                         final String creator = os.getFlags("createdby").get(0);

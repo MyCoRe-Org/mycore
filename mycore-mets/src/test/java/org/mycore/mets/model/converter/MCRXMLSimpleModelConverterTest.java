@@ -65,7 +65,7 @@ public class MCRXMLSimpleModelConverterTest {
     }
 
     @org.junit.Test
-    public void testFromXMLMetsFiles() throws Exception {
+    public void testFromXMLMetsFiles() {
         Iterator<MCRMetsFile> hrefIterator = metsSimpleModel.getMetsPageList()
             .stream()
             .map((p) -> {
@@ -91,7 +91,7 @@ public class MCRXMLSimpleModelConverterTest {
     }
 
     @org.junit.Test
-    public void testFromXMLMetsSection() throws Exception {
+    public void testFromXMLMetsSection() {
         MCRMetsSection rootSection = metsSimpleModel.getRootSection();
         Assert.assertEquals("The rootSection label should be " + ROOT_SECTION_LABEL, rootSection.getLabel(),
             ROOT_SECTION_LABEL);

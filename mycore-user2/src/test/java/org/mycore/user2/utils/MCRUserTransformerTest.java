@@ -41,7 +41,6 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserTestCase;
 
 import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -59,11 +58,10 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
 
     /**
      * Test method for {@link org.mycore.user2.utils.MCRUserTransformer#buildMCRUser(org.jdom2.Element)}.
-     * @throws IOException 
-     * @throws JAXBException 
+     * @throws IOException
      */
     @Test
-    public final void testBuildMCRUser() throws IOException, JAXBException {
+    public final void testBuildMCRUser() throws IOException {
         Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
         MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
         Document output = MCRUserTransformer.buildExportableXML(mcrUser);

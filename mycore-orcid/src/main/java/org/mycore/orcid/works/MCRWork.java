@@ -101,7 +101,7 @@ public class MCRWork {
      * If this work's source is this MyCoRe application,
      * updates the work in the remote ORCID profile from the local MyCoRe object
      */
-    public void update(MCRObjectID objectID) throws IOException, SAXException, JDOMException {
+    public void update(MCRObjectID objectID) throws IOException, SAXException {
         if (!source.isThisApplication()) {
             throw new MCRORCIDException("can not update that work, is not from us");
         }

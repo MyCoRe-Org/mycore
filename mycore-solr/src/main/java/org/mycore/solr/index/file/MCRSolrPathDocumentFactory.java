@@ -93,7 +93,7 @@ public class MCRSolrPathDocumentFactory {
      * @see MCRSolrFilesIndexHandler
      * @see MCRSolrIndexHandlerFactory
      */
-    public SolrInputDocument getDocument(Path input, BasicFileAttributes attr) throws IOException,
+    public SolrInputDocument getDocument(Path input, BasicFileAttributes attr) throws
         MCRPersistenceException {
         SolrInputDocument doc = new SolrInputDocument();
 

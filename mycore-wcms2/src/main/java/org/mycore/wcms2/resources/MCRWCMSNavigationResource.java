@@ -109,7 +109,7 @@ public class MCRWCMSNavigationResource {
     @GET
     @Path("templates")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getTemplates(@Context ServletContext servletContext) throws Exception {
+    public String getTemplates(@Context ServletContext servletContext) {
         // templates of navigation.xml
         Document xml = MCRWCMSNavigationUtils.getNavigationAsXML();
         List<Element> elementList = TEMPLATE_PATH.evaluate(xml);

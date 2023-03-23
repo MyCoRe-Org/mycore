@@ -19,7 +19,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -83,8 +82,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         return builder.toString();
     }
 
-    private void setXSLParameters(URL resource, HttpServletRequest request)
-        throws MalformedURLException, URISyntaxException {
+    private void setXSLParameters(URL resource, HttpServletRequest request) {
         String path = resource.getProtocol().equals("file") ? resource.getPath() : resource.toExternalForm();
         int lastPathElement = path.lastIndexOf('/') + 1;
         String fileName = path.substring(lastPathElement);

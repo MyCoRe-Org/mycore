@@ -33,7 +33,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
-import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -175,15 +174,15 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
                 int batchSize = 100;
 
                 @Override
-                public void checkCancelled() throws SVNCancelException {
+                public void checkCancelled() {
                 }
 
                 @Override
-                public void handleEvent(SVNEvent event, double progress) throws SVNException {
+                public void handleEvent(SVNEvent event, double progress) {
                 }
 
                 @Override
-                public void handleAdminEvent(SVNAdminEvent event, double progress) throws SVNException {
+                public void handleAdminEvent(SVNAdminEvent event, double progress) {
                     if (event.getMessage() != null) {
                         if (event.getRevision() % batchSize != 0 || event.getRevision() == 0) {
                             LOGGER.debug(event::getMessage);

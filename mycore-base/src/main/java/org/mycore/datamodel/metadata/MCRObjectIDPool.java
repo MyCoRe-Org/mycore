@@ -36,7 +36,7 @@ class MCRObjectIDPool {
         .weakValues()
         .build(new CacheLoader<String, MCRObjectID>() {
             @Override
-            public MCRObjectID load(String id) throws Exception {
+            public MCRObjectID load(String id) {
                 return new MCRObjectID(id);
             }
         });

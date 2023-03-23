@@ -64,7 +64,6 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -122,13 +121,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *
      * @param id
      *            the ID of the MCRDerivate that should be deleted
-     * @throws MCRActiveLinkException
      * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
      */
     @MCRCommand(syntax = "delete derivate {0}",
         help = "The command remove a derivate with the MCRObjectID {0}",
         order = 30)
-    public static void delete(String id) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+    public static void delete(String id) throws MCRPersistenceException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCRMetadataManager.deleteMCRDerivate(objectID);
         LOGGER.info("{} deleted.", objectID);
@@ -141,13 +139,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the start ID for deleting the MCRDerivate
      * @param idTo
      *            the stop ID for deleting the MCRDerivate
-     * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
      */
     @MCRCommand(syntax = "delete derivate from {0} to {1}",
         help = "The command remove derivates in the number range between the MCRObjectID {0} and {1}.",
         order = 20)
     public static List<String> delete(String idFrom, String idTo)
-        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        throws MCRPersistenceException {
         return MCRCommandUtils.getIdsFromIdToId(idFrom, idTo)
             .map(id -> "delete derivate " + id)
             .collect(Collectors.toList());
@@ -723,7 +720,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "check object entries in derivates for base {0}",
         help = "check in all derivates of MCR base ID {0} for existing linked objects",
         order = 400)
-    public static void checkObjectsInDerivates(String baseId) throws IOException {
+    public static void checkObjectsInDerivates(String baseId) {
         if (baseId == null || baseId.length() == 0) {
             LOGGER.error("Base ID missed for check object entries in derivates for base {0}");
             return;

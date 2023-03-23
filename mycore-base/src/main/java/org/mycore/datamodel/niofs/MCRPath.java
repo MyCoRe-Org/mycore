@@ -483,8 +483,7 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#register(java.nio.file.WatchService, java.nio.file.WatchEvent.Kind[], java.nio.file.WatchEvent.Modifier[])
      */
     @Override
-    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers)
-        throws IOException {
+    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers) {
         throw new UnsupportedOperationException();
     }
 

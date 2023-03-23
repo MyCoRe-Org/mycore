@@ -38,7 +38,7 @@ public class ColorFilter implements PixelFilter {
     public boolean filter(Pixel pixel) {
         Color color = pixel.getColor();
         if (color.equals(colorToFilter)) {
-            return true ^ !(throwOut);
+            return throwOut;
         } else {
             int red = color.getRed();
             int blue = color.getBlue();

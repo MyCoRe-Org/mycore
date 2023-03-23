@@ -146,7 +146,7 @@ public class MCRPICommands {
         order = 40)
     public static void controlObjectWithServiceAndAdditional(String objectIDString, String serviceID,
         final String additional)
-        throws MCRAccessException, MCRActiveLinkException, IOException {
+        throws MCRAccessException {
 
         String trimAdditional = additional != null ? additional.trim() : null;
         MCRPIService<MCRPersistentIdentifier> service = MCRPIServiceManager
@@ -186,7 +186,7 @@ public class MCRPICommands {
             + "pi control from the object {0}(object id) with the serivce {1}(service id) and the additional {2}",
         order = 60)
     public static void removeControlFromObject(String objectIDString, String serviceID, String additional)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRPersistentIdentifierException {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
         MCRPI mcrpi = MCRPIManager.getInstance()
             .get(serviceID, objectIDString, additional != null ? additional.trim() : null);

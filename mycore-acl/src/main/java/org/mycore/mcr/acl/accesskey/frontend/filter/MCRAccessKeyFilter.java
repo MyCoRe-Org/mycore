@@ -48,7 +48,7 @@ public class MCRAccessKeyFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
             LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}",
                 String.join(",", MCRAccessKeyUtils.getAllowedSessionPermissionTypes()));

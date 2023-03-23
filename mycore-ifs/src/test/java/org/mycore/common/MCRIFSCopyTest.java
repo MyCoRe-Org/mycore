@@ -121,7 +121,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         }
 
         @Override
-        public Exception call() throws Exception {
+        public Exception call() {
             try {
                 MCRIFSCopyTest.copy("/" + fileName, fileName, derivate);
                 return null;

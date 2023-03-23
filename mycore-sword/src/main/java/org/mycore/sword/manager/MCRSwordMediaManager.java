@@ -65,7 +65,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
     }
 
     public static void doAuthentication(AuthCredentials authCredentials, String collection)
-        throws SwordError, SwordServerException, SwordAuthException {
+        throws SwordAuthException {
         MCRSword.getCollection(collection).getAuthHandler().authentication(authCredentials);
     }
 

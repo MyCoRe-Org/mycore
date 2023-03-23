@@ -30,7 +30,6 @@ import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -41,7 +40,7 @@ import org.mycore.common.MCRTestCase;
 public class MCRNodeBuilderTest extends MCRTestCase {
 
     @Test
-    public void testBuildingElements() throws JaxenException, JDOMException {
+    public void testBuildingElements() throws JaxenException {
         Element built = new MCRNodeBuilder().buildElement("element", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -61,7 +60,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testBuildingAttributes() throws JaxenException, JDOMException {
+    public void testBuildingAttributes() throws JaxenException {
         Attribute built = new MCRNodeBuilder().buildAttribute("@attribute", null, null);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
@@ -81,7 +80,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testBuildingValues() throws JaxenException, JDOMException {
+    public void testBuildingValues() throws JaxenException {
         Attribute built = new MCRNodeBuilder().buildAttribute("@attribute='A \"test\"'", "ignore", null);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
@@ -104,7 +103,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testBuildingTrees() throws JaxenException, JDOMException {
+    public void testBuildingTrees() throws JaxenException {
         Element root = new Element("root");
         Attribute built = new MCRNodeBuilder().buildAttribute("parent/child/@attribute", null, root);
         assertNotNull(built);
@@ -118,7 +117,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testFirstNodeBuilt() throws JaxenException, JDOMException {
+    public void testFirstNodeBuilt() throws JaxenException {
         MCRNodeBuilder builder = new MCRNodeBuilder();
         builder.buildElement("element", null, null);
         assertEquals("element", ((Element) (builder.getFirstNodeBuilt())).getName());
@@ -153,7 +152,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testSimplePredicates() throws JaxenException, JDOMException {
+    public void testSimplePredicates() throws JaxenException {
         Element built = new MCRNodeBuilder().buildElement("element[child]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -174,7 +173,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testPredicatesWithValues() throws JaxenException, JDOMException {
+    public void testPredicatesWithValues() throws JaxenException {
         Element built = new MCRNodeBuilder()
             .buildElement("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null);
         assertNotNull(built);
@@ -186,7 +185,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testMultiplePredicates() throws JaxenException, JDOMException {
+    public void testMultiplePredicates() throws JaxenException {
         Element built = new MCRNodeBuilder().buildElement("element[child1][child2]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -196,7 +195,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testNestedPredicates() throws JaxenException, JDOMException {
+    public void testNestedPredicates() throws JaxenException {
         Element built = new MCRNodeBuilder().buildElement("element[child[grandchild1]/grandchild2]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -207,7 +206,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testExpressionsToIgnore() throws JaxenException, JDOMException {
+    public void testExpressionsToIgnore() throws JaxenException {
         Element built = new MCRNodeBuilder().buildElement("element[2]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -234,7 +233,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testAlreadyExisting() throws JaxenException, JDOMException {
+    public void testAlreadyExisting() throws JaxenException {
         Element existingChild = new MCRNodeBuilder().buildElement("parent/child", null, null);
         Element existingParent = existingChild.getParentElement();
         assertEquals(existingChild, new MCRNodeBuilder().buildNode("child", null, existingParent));
@@ -263,7 +262,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testNamespaces() throws JaxenException, JDOMException {
+    public void testNamespaces() throws JaxenException {
         Element role = new MCRNodeBuilder().buildElement("mods:name[@xlink:href='id']/mods:role[@type='creator']", null,
             null);
         assertEquals("role", role.getName());
@@ -273,7 +272,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testAssigningValueToLastGenreatedNode() throws JaxenException, JDOMException {
+    public void testAssigningValueToLastGenreatedNode() throws JaxenException {
         String value = "value";
         Element generated = new MCRNodeBuilder().buildElement("titleInfo/title", value, null);
         assertEquals(value, generated.getText());
@@ -281,7 +280,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testBuildingNodeName() throws JaxenException, JDOMException {
+    public void testBuildingNodeName() throws JaxenException {
         Element generated = new MCRNodeBuilder().buildElement("mycoreobject/metadata/def.modsContainer/modsContainer",
             null, null);
         assertEquals("modsContainer", generated.getName());
@@ -289,7 +288,7 @@ public class MCRNodeBuilderTest extends MCRTestCase {
     }
 
     @Test
-    public void testBuildingRootComponents() throws JaxenException, JDOMException {
+    public void testBuildingRootComponents() throws JaxenException {
         Element existingRoot = new Element("root");
         existingRoot.setAttribute("type", "existing");
         Document document = new Document(existingRoot);

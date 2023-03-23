@@ -18,7 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -51,7 +50,7 @@ public class MCRApiDraftFilter implements ContainerRequestFilter {
     ResourceInfo resourceInfo;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         final Optional<MCRApiDraft> apiDraft = Stream
             .of(resourceInfo.getResourceMethod(), resourceInfo.getResourceClass())
             .map(r -> r.getAnnotation(MCRApiDraft.class))

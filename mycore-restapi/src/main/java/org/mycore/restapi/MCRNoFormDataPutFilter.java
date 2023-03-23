@@ -18,8 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
-
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.HttpMethod;
@@ -36,7 +34,7 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class MCRNoFormDataPutFilter implements ContainerRequestFilter {
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         if (requestContext.getMethod().equals(HttpMethod.PUT) && requestContext.getMediaType() != null
             && requestContext.getMediaType().isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
             throw new BadRequestException("Cannot PUT form data on this resource.");

@@ -151,11 +151,9 @@ public class MCRTestCase {
     /**
      * Creates a temporary properties file if the system variable MCR.Configuration.File is not set.
      *
-     * @throws IOException
-     *             Thrown if the creation of the temporary properties file failed.
      * @author Marcel Heusinger &lt;marcel.heusinger[at]uni-due.de&gt;
      */
-    protected void initSystemProperties() throws IOException {
+    protected void initSystemProperties() {
         String currentComponent = getCurrentComponentName();
         System.setProperty("MCRRuntimeComponentDetector.underTesting", currentComponent);
     }

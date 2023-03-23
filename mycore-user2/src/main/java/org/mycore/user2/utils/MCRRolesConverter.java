@@ -31,8 +31,7 @@ import org.mycore.user2.MCRUserAttributeConverter;
 public class MCRRolesConverter implements MCRUserAttributeConverter<String, Collection<String>> {
 
     @Override
-    public Collection<String> convert(String value, String separator, Map<String, String> valueMapping)
-        throws Exception {
+    public Collection<String> convert(String value, String separator, Map<String, String> valueMapping) {
         Collection<String> roles = new HashSet<>();
 
         if (value != null) {

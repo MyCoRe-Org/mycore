@@ -84,7 +84,7 @@ public class MCRPNGTools implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         for (ImageWriter imageWriter : imageWriters) {
             imageWriter.dispose();
         }

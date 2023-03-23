@@ -18,7 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,7 +77,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
     HttpServletResponse response;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         UriInfo uriInfo = requestContext.getUriInfo();
         String path = uriInfo.getPath().toString();
         String[] pathParts = path.split("/", -1);

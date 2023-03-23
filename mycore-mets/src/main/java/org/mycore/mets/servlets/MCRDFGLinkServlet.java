@@ -176,10 +176,8 @@ public class MCRDFGLinkServlet extends MCRServlet {
      * @param job
      * @param useExistingMets
      * @return
-     * @throws Exception
      */
-    private static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate)
-        throws Exception {
+    private static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) {
 
         MCRPath metsFile = MCRPath.getPath(derivate, "/mets.xml");
 

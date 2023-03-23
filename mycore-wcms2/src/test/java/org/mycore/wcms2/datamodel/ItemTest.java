@@ -83,7 +83,7 @@ public class ItemTest {
     }
 
     @Test
-    public void toJSON() throws Exception {
+    public void toJSON() {
         Gson gson = new Gson();
         JsonElement jsonElement = gson.toJsonTree(this.item);
         JsonObject navigationObject = jsonElement.getAsJsonObject();

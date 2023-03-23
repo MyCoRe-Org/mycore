@@ -51,8 +51,7 @@ public class MCRMetsFileIndexAccumulator implements MCRSolrFileIndexAccumulator 
     protected static Logger LOGGER = LogManager.getLogger(MCRMetsFileIndexAccumulator.class);
 
     @Override
-    public void accumulate(SolrInputDocument solrInputDocument, Path path, BasicFileAttributes basicFileAttributes)
-        throws IOException {
+    public void accumulate(SolrInputDocument solrInputDocument, Path path, BasicFileAttributes basicFileAttributes) {
         if (!MCRConfiguration2.getString("MCR.Mets.Filename").get().equals(path.getFileName().toString())) {
             return;
         }

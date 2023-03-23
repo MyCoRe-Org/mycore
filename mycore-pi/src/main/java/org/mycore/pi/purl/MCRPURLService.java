@@ -150,14 +150,12 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     }
 
     @Override
-    protected void delete(MCRPURL identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void delete(MCRPURL identifier, MCRBase obj, String additional) {
         // not supported
     }
 
     @Override
-    protected void update(MCRPURL purl, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void update(MCRPURL purl, MCRBase obj, String additional) {
         if (isRegistered(obj.getId(), additional)) {
             startUpdateJob(obj, purl);
         } else if (!hasRegistrationStarted(obj.getId(), additional)

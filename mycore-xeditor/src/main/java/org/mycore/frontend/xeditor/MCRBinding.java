@@ -69,7 +69,7 @@ public class MCRBinding {
 
     private Map<String, Object> staticVariables = null;
 
-    public MCRBinding(Document document) throws JDOMException {
+    public MCRBinding(Document document) {
         this.boundNodes.add(document);
     }
 
@@ -84,13 +84,13 @@ public class MCRBinding {
         parent.children.add(this);
     }
 
-    public MCRBinding(String xPath, boolean buildIfNotExists, MCRBinding parent) throws JDOMException, JaxenException {
+    public MCRBinding(String xPath, boolean buildIfNotExists, MCRBinding parent) throws JaxenException {
         this(parent);
         bind(xPath, buildIfNotExists, null);
     }
 
     public MCRBinding(String xPath, String initialValue, String name, MCRBinding parent)
-        throws JDOMException, JaxenException {
+        throws JaxenException {
         this(parent);
         this.name = (name != null) && !name.isEmpty() ? name : null;
         bind(xPath, true, initialValue);

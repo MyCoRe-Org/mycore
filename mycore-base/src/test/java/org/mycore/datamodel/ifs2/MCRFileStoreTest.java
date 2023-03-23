@@ -273,7 +273,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         return sa.equals(sb);
     }
 
-    private void sortChildren(Element parent) throws Exception {
+    private void sortChildren(Element parent) {
         @SuppressWarnings("unchecked")
         List<Element> children = parent.getChildren();
         if (children == null || children.size() == 0) {

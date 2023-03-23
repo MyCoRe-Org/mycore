@@ -121,7 +121,7 @@ public class MCRStoredMetadata {
      *
      * @return the stored XML document
      */
-    public MCRContent getMetadata() throws IOException {
+    public MCRContent getMetadata() {
         MCRPathContent pathContent = new MCRPathContent(path);
         pathContent.setDocType(docType);
         return pathContent;
@@ -181,7 +181,7 @@ public class MCRStoredMetadata {
     /**
      * Returns true if this object is deleted
      */
-    public boolean isDeleted() throws IOException {
+    public boolean isDeleted() {
         return deleted;
     }
 }

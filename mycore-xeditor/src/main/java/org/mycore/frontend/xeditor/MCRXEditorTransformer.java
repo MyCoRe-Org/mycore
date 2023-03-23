@@ -81,7 +81,7 @@ public class MCRXEditorTransformer {
         this.transformationParameters = transformationParameters;
     }
 
-    public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
+    public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getValidator().clearRules();
         editorSession.getSubmission().clear();
 
@@ -179,7 +179,7 @@ public class MCRXEditorTransformer {
         currentBinding.setValues(value);
     }
 
-    public void setDefault(String value) throws JaxenException, JDOMException {
+    public void setDefault(String value) {
         currentBinding.setDefault(value);
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
@@ -320,7 +320,7 @@ public class MCRXEditorTransformer {
         return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }
 
-    public NodeSet getAdditionalParameters() throws ParserConfigurationException, TransformerException {
+    public NodeSet getAdditionalParameters() throws ParserConfigurationException {
         org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         NodeSet nodeSet = new NodeSet();
 

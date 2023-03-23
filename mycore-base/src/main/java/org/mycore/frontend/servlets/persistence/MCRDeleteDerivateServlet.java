@@ -20,14 +20,11 @@ package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
 
-import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.frontend.cli.MCRDerivateCommands;
-import org.xml.sax.SAXParseException;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -45,12 +42,12 @@ public class MCRDeleteDerivateServlet extends MCRPersistenceServlet {
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
-        ServletException, MCRActiveLinkException, SAXParseException, JDOMException, IOException {
+        MCRActiveLinkException {
         MCRDerivateCommands.delete(getProperty(request, "id"));
     }
 
     @Override
-    void displayResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    void displayResult(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.sendRedirect(response.encodeRedirectURL(getReferer(request).toString()));
     }
 

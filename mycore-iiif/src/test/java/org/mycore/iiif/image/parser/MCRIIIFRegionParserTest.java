@@ -31,7 +31,7 @@ public class MCRIIIFRegionParserTest {
     public static final int IMAGE_HEIGHT = 400;
 
     @org.junit.Test
-    public void testParseImageRegion() throws Exception {
+    public void testParseImageRegion() {
         Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
 
         validCoords.put("0,0,100,100", new MCRIIIFImageSourceRegion(0, 0, 100, 100));

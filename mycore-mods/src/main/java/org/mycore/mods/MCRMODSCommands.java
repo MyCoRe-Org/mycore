@@ -154,7 +154,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     private static MCRObjectID saveAsMyCoReObject(String projectID, Element modsRoot)
-        throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsRoot, projectID);
         mcrObject.setId(MCRObjectID.getNextFreeId(mcrObject.getId().getBase()));
         MCRMetadataManager.create(mcrObject);

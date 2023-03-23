@@ -73,12 +73,12 @@ public class MCRStringContent extends MCRContent {
     }
 
     @Override
-    public long length() throws IOException {
+    public long length() {
         return bytes.length;
     }
 
     @Override
-    public long lastModified() throws IOException {
+    public long lastModified() {
         return -1;
     }
 

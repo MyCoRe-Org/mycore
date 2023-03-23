@@ -18,8 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
-
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -28,7 +26,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 @Priority(Priorities.USER - 500)
 public class MCREnableTransactionFilter implements ContainerRequestFilter {
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         requestContext.setProperty(MCRTransactionFilter.PROP_REQUIRE_TRANSACTION, true);
     }
 }

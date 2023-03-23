@@ -171,11 +171,10 @@ public class MCRDataURL implements Serializable {
      * @param mimeType the mime-type
      * @param charset the charset
      * @return a string with "data" URL
-     * @throws TransformerException
      * @throws MalformedURLException
      */
     public static String build(final String str, final String encoding, final String mimeType, final String charset)
-        throws TransformerException, MalformedURLException {
+        throws MalformedURLException {
         MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;
 
         final Matcher mtm = PATTERN_MIMETYPE.matcher(mimeType);

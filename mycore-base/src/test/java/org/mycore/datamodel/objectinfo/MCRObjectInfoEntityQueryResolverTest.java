@@ -18,7 +18,6 @@
 
 package org.mycore.datamodel.objectinfo;
 
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
@@ -84,7 +83,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
 
     private MCRObjectQueryResolver instance;
 
-    private static void initClassifications() throws SAXParseException, MalformedURLException, URISyntaxException {
+    private static void initClassifications() throws SAXParseException, URISyntaxException {
         DAO = new MCRCategoryDAOImpl();
         CLS = MCRCategLinkServiceFactory.getInstance();
 

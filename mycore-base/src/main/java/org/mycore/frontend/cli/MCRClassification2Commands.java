@@ -122,7 +122,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load classification from file {0}",
         help = "The command adds a new classification from file {0} to the system.",
         order = 10)
-    public static List<String> loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
+    public static List<String> loadFromFile(String filename) throws MCRException,
         IOException {
         String fileURL = Paths.get(filename).toAbsolutePath().normalize().toUri().toURL().toString();
         return Collections.singletonList("load classification from url " + fileURL);
@@ -157,7 +157,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command updates a classification from file {0} to the system.",
         order = 20)
     public static List<String> updateFromFile(String filename)
-        throws URISyntaxException, MCRException, SAXParseException,
+        throws MCRException,
         IOException {
         String fileURL = Paths.get(filename).toAbsolutePath().normalize().toUri().toURL().toString();
         return Collections.singletonList("update classification from url " + fileURL);
@@ -227,9 +227,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param update
      *            if true, classification will be updated, else Classification
      *            is created
-     * @throws MCRActiveLinkException
      */
-    private static List<String> processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
+    private static List<String> processFromDirectory(String directory, boolean update) {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {

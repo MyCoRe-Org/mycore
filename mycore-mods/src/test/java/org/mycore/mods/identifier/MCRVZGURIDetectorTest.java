@@ -42,7 +42,7 @@ public class MCRVZGURIDetectorTest {
     }
 
     @Test
-    public void testDetect() throws Exception {
+    public void testDetect() {
         MCRGBVURLDetector detector = new MCRGBVURLDetector();
         testData.forEach((key, value) -> {
             Optional<Map.Entry<String, String>> maybeDetectedGND = detector.detect(key);

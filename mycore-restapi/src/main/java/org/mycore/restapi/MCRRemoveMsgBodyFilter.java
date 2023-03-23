@@ -18,8 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,7 +44,7 @@ public class MCRRemoveMsgBodyFilter implements ContainerRequestFilter {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         MultivaluedMap<String, String> headers = requestContext.getHeaders();
         if (headers.containsKey(IGNORE_MESSAGE_BODY_HEADER)) {
             LOGGER.info("Found {} header. Remove request message body.", IGNORE_MESSAGE_BODY_HEADER);

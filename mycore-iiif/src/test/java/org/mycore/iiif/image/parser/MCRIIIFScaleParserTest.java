@@ -30,7 +30,7 @@ public class MCRIIIFScaleParserTest {
     public static final int IMAGE_HEIGHT = 400;
 
     @org.junit.Test
-    public void testParseTargetScale() throws Exception {
+    public void testParseTargetScale() {
 
         Map<String, MCRIIIFImageTargetSize> testValues = new Hashtable<>();
         testValues.put("!1100,800", new MCRIIIFImageTargetSize(1000, 800));

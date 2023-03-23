@@ -93,7 +93,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
         }
     }
 
-    public Element resolveElement(String uri) throws Exception {
+    public Element resolveElement(String uri) {
         if (xmlFile == null) {
             throw new NullPointerException("No xml file set in '" + this.getClass().getName() + "'!");
         }

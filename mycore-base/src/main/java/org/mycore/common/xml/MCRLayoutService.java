@@ -135,8 +135,7 @@ public class MCRLayoutService {
         }
     }
 
-    public static MCRContentTransformer getContentTransformer(String docType, MCRParameterCollector parameter)
-        throws Exception {
+    public static MCRContentTransformer getContentTransformer(String docType, MCRParameterCollector parameter) {
         String transformerId = parameter.getParameter("Transformer", null);
         if (transformerId == null) {
             String style = parameter.getParameter("Style", "default");

@@ -59,7 +59,7 @@ public class MCRExportCollection {
     /**
      * Adds the contents of the given basket.
      */
-    public void add(MCRBasket basketOfMODS) throws Exception {
+    public void add(MCRBasket basketOfMODS) {
         for (MCRBasketEntry entry : basketOfMODS) {
             collection.addContent(basketBuilder.buildXML(entry));
         }

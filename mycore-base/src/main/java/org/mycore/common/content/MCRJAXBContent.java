@@ -25,9 +25,7 @@ import java.io.OutputStream;
 import javax.xml.transform.Source;
 
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMResult;
-import org.xml.sax.SAXParseException;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -115,7 +113,7 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
      * @see org.mycore.common.content.MCRContent#asXML()
      */
     @Override
-    public Document asXML() throws JDOMException, IOException, SAXParseException {
+    public Document asXML() throws IOException {
         JDOMResult result = new JDOMResult();
         try {
             Marshaller marshaller = getMarshaller();

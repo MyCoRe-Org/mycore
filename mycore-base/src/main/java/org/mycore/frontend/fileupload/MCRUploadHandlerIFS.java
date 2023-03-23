@@ -143,7 +143,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     private MCRDerivate createDerivate(MCRObjectID derivateID)
-        throws MCRPersistenceException, IOException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
 

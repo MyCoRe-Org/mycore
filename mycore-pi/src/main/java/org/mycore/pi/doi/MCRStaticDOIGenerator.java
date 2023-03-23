@@ -23,7 +23,6 @@ import java.util.Optional;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
  * Just for testing. Provides the doi in the doi property.
@@ -36,8 +35,7 @@ public class MCRStaticDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdenti
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRBase mcrBase, String additional)
-        throws MCRPersistentIdentifierException {
+    public MCRDigitalObjectIdentifier generate(MCRBase mcrBase, String additional) {
         final String doi = getProperties().get("doi");
         final Optional<MCRDigitalObjectIdentifier> generatedDOI = new MCRDOIParser().parse(doi);
         return generatedDOI

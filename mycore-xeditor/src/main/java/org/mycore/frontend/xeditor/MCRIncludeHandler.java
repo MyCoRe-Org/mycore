@@ -86,7 +86,7 @@ public class MCRIncludeHandler {
     }
 
     private void preloadFromURI(String uri, String sStatic)
-        throws TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerFactoryConfigurationError {
         if (uri.trim().isEmpty()) {
             return;
         }
@@ -233,7 +233,7 @@ public class MCRIncludeHandler {
     }
 
     private Element resolve(String uri, String sStatic)
-        throws TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerFactoryConfigurationError {
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
 
         if (cache.containsKey(uri)) {
@@ -254,14 +254,14 @@ public class MCRIncludeHandler {
         }
     }
 
-    private Node jdom2dom(Element element) throws TransformerException, JDOMException {
+    private Node jdom2dom(Element element) throws TransformerException {
         DOMResult result = new DOMResult();
         JDOMSource source = new JDOMSource(element);
         TransformerFactory.newInstance().newTransformer().transform(source, result);
         return result.getNode();
     }
 
-    private XNodeSet asNodeSet(ExpressionContext context, Node node) throws TransformerException, JDOMException {
+    private XNodeSet asNodeSet(ExpressionContext context, Node node) throws TransformerException {
         NodeSet nodeSet = new NodeSet();
         nodeSet.addNode(node);
         XPathContext xpc = context.getXPathContext();

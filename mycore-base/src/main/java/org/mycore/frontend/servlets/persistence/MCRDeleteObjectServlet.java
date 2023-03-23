@@ -20,16 +20,13 @@ package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
 
-import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.cli.MCRObjectCommands;
-import org.xml.sax.SAXParseException;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -47,12 +44,12 @@ public class MCRDeleteObjectServlet extends MCRPersistenceServlet {
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
-        ServletException, MCRActiveLinkException, SAXParseException, JDOMException, IOException {
+        MCRActiveLinkException {
         MCRObjectCommands.delete(getProperty(request, "id"));
     }
 
     @Override
-    void displayResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    void displayResult(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String deletedRedirect = MCRConfiguration2.getStringOrThrow("MCR.Persistence.PageDelete");
         response.sendRedirect(response.encodeRedirectURL(MCRFrontendUtil.getBaseURL() + deletedRedirect));
     }

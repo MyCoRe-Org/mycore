@@ -26,10 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -57,7 +55,7 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
     }
 
     @Test
-    public void testGenerateID() throws JaxenException, JDOMException {
+    public void testGenerateID() {
         String id = evaluator.replaceXPathOrI18n("xed:generate-id(/document)");
         assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(.)"));
         assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id()"));
@@ -70,7 +68,7 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
     }
 
     @Test
-    public void testJavaCall() throws JaxenException, JDOMException {
+    public void testJavaCall() {
         String res = evaluator.replaceXPathOrI18n(
             "xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testNoArgs')");
         assertEquals(testNoArgs(), res);
@@ -101,7 +99,7 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
     }
 
     @Test
-    public void testExternalJavaTest() throws JaxenException, JDOMException {
+    public void testExternalJavaTest() {
         assertTrue(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserGuestUser')"));
         assertFalse(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserSuperUser')"));
         assertFalse(

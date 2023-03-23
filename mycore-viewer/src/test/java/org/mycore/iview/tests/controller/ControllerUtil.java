@@ -53,14 +53,6 @@ public class ControllerUtil {
      */
     public static void waitForPageReady(WebDriver driver) {
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-        //WebDriverWait webDriverWait = new WebDriverWait(driver, 10);
-        //webDriverWait.until(new Predicate<WebDriver>() {
-        //    @Override
-        //    public boolean apply(WebDriver webDriver) {
-        //        JavascriptExecutor js = (JavascriptExecutor) webDriver;
-        //        return js.executeScript("return document.readyState").equals("complete");
-        //    }
-        //});
     }
 
     /**

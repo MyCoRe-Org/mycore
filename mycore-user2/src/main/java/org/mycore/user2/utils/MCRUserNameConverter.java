@@ -28,7 +28,7 @@ import org.mycore.user2.MCRUserAttributeConverter;
 public class MCRUserNameConverter implements MCRUserAttributeConverter<String, String> {
 
     @Override
-    public String convert(String value, String separator, Map<String, String> valueMapping) throws Exception {
+    public String convert(String value, String separator, Map<String, String> valueMapping) {
         return value.contains("@") ? value.substring(0, value.indexOf("@")) : value;
     }
 

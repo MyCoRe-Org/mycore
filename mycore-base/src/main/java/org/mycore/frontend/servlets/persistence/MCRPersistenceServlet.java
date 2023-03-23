@@ -112,7 +112,7 @@ abstract class MCRPersistenceServlet extends MCRServlet {
 
     protected void redirectToUploadForm(ServletContext context, HttpServletRequest request,
         HttpServletResponse response, String objectId, String derivateId)
-        throws ServletException, IOException {
+        throws IOException {
         MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(objectId, derivateId,
             MCRPersistenceHelper.getCancelUrl(request));
         String fuhid = fuh.getID();

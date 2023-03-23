@@ -184,7 +184,7 @@ public class MCREditorSession {
         return editedXML;
     }
 
-    public void setEditedXML(Document editedXML) throws JDOMException {
+    public void setEditedXML(Document editedXML) {
         this.editedXML = editedXML;
         addNamespacesFrom(editedXML.getRootElement());
     }

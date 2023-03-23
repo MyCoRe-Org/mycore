@@ -101,12 +101,11 @@ public class MCRBasketPersistence {
      * @param ownerID the ID of the object owning the new derivate
      * @param derivateOID a free derivate ID to use for the newly created derivate
      * @return the empty derivate that was created.
-     * @throws IOException 
-     * @throws MCRPersistenceException 
+     * @throws MCRPersistenceException
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      */
     private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID)
-        throws MCRPersistenceException, IOException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateOID);
         derivate.getDerivate().getTitles()

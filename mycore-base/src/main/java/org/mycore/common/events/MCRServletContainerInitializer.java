@@ -33,7 +33,6 @@ import org.mycore.common.MCRClassTools;
 
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventorFactory;
 
@@ -46,7 +45,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
      * @see jakarta.servlet.ServletContainerInitializer#onStartup(java.util.Set, jakarta.servlet.ServletContext)
      */
     @Override
-    public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
+    public void onStartup(final Set<Class<?>> c, final ServletContext ctx) {
         final boolean runClassLoaderLeakPreventor = runClassLoaderLeakPreventor();
         ClassLoaderLeakPreventor leakPreventor = null;
         if (runClassLoaderLeakPreventor) {

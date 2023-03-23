@@ -99,14 +99,14 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void create() throws IOException {
+    public void create() {
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
         getStore().create(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
     }
 
     @Test
-    public void delete() throws IOException {
+    public void delete() {
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
         assertTrue(MyCoRe_document_00000001.id + " should exist", getStore().exists(MyCoRe_document_00000001.id));
@@ -120,7 +120,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void update() throws IOException {
+    public void update() {
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
         getStore().update(MyCoRe_document_00000001_new.id, MyCoRe_document_00000001_new.blob,
@@ -168,7 +168,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void exists() throws IOException {
+    public void exists() {
         assertFalse("Object " + MyCoRe_document_00000001.id + " should not exist.",
             getStore().exists(MyCoRe_document_00000001.id));
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
@@ -178,7 +178,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void retrieveAllIDs() throws IOException {
+    public void retrieveAllIDs() {
         assertEquals("Store should not contain any objects.", 0, getStore().listIDs().size());
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);

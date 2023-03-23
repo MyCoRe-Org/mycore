@@ -20,8 +20,6 @@ package org.mycore.datamodel.metadata;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
@@ -202,8 +200,8 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         fail("Not yet implemented"); // TODO
     }
 
-    private static Document loadResourceDocument(String resource) throws URISyntaxException, MCRException,
-        SAXParseException, IOException {
+    private static Document loadResourceDocument(String resource) throws MCRException,
+        SAXParseException {
         URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
         return MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(mcrTestUrl));
     }

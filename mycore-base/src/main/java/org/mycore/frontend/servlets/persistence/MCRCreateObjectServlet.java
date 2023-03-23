@@ -106,8 +106,6 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
      *  MyCoRe object as XML
      * @return
      *  MCRObjectID of the newly created object.
-     * @throws MCRActiveLinkException
-     *  If links from or to other objects will fail.
      * @throws JDOMException
      *  from {@link MCRPersistenceHelper#getMCRObject(Document)}
      * @throws IOException
@@ -117,7 +115,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
      * @throws MCRAccessException 
      */
     private MCRObjectID createObject(Document doc)
-        throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException, MCRAccessException {
+        throws JDOMException, IOException, MCRException, SAXParseException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
         //noinspection SynchronizeOnNonFinalField

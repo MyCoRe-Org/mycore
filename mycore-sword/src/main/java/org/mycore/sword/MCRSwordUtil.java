@@ -257,7 +257,7 @@ public class MCRSwordUtil {
     }
 
     public static void extractZipToPath(Path zipFilePath, MCRPath target)
-        throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
+        throws IOException, URISyntaxException {
         LOGGER.info("Extracting zip: {}", zipFilePath);
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
@@ -321,7 +321,7 @@ public class MCRSwordUtil {
             ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     MCRValidationResult validationResult = validator.validate(file);
                     if (!validationResult.isValid()) {
                         validationResults.add(validationResult);
@@ -353,7 +353,7 @@ public class MCRSwordUtil {
         }
     }
 
-    public static DepositReceipt buildDepositReceipt(IRI iri) throws SwordError {
+    public static DepositReceipt buildDepositReceipt(IRI iri) {
         DepositReceipt depositReceipt = new DepositReceipt();
         depositReceipt.setEditIRI(iri);
         return depositReceipt;
@@ -526,8 +526,7 @@ public class MCRSwordUtil {
                 List<IRI> iris = new ArrayList<>();
                 Files.walkFileTree(derivateRootPath, new SimpleFileVisitor<Path>() {
                     @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                        throws IOException {
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                         String relativePath = derivateRootPath.relativize(file).toString();
                         final String uri = new MessageFormat("{0}{1}{2}/{3}/{4}", Locale.ROOT).format(
                             new Object[] { MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI,

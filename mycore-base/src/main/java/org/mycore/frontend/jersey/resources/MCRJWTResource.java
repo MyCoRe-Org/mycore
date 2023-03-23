@@ -19,7 +19,6 @@
 package org.mycore.frontend.jersey.resources;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 import org.mycore.common.MCRSession;
@@ -72,8 +71,7 @@ public class MCRJWTResource {
         return MCRJWTUtil.getJWTLoginSuccessResponse(jwt);
     }
 
-    private String getToken(MCRSession mcrSession, String[] userAttributes, String[] sessionAttributes)
-        throws UnsupportedEncodingException {
+    private String getToken(MCRSession mcrSession, String[] userAttributes, String[] sessionAttributes) {
         String issuer = request.getRequestURL().toString();
         return MCRJWTUtil.getJWTBuilder(mcrSession, userAttributes, sessionAttributes)
             .withJWTId(mcrSession.getID())

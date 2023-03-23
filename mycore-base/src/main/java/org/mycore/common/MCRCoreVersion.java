@@ -66,7 +66,7 @@ public class MCRCoreVersion {
         if (gitPropURL == null) {
             return new InputStream() {
                 @Override
-                public int read() throws IOException {
+                public int read() {
                     return -1;
                 }
             };

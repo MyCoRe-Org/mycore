@@ -20,7 +20,6 @@ package org.mycore.common.xml;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 
@@ -64,7 +63,7 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
     static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         String query = href.substring(href.indexOf(":") + 1);
 
         String key = query.substring(0, query.indexOf(":"));

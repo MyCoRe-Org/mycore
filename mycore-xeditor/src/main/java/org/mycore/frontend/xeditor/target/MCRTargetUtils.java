@@ -21,13 +21,10 @@ package org.mycore.frontend.xeditor.target;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jaxen.JaxenException;
-import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 public class MCRTargetUtils {
-    static Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath)
-        throws JDOMException, JaxenException {
+    static Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath) {
         Map<String, String[]> valuesToSet = new HashMap<>();
 
         for (String paramName : job.getRequest().getParameterMap().keySet()) {

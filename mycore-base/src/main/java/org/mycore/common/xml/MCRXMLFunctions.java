@@ -169,8 +169,7 @@ public class MCRXMLFunctions {
     }
 
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language,
-        String timeZone)
-        throws ParseException {
+        String timeZone) {
         if (LOGGER.isDebugEnabled()) {
             String sb = "isoDate=" + isoDate + ", simpleFormat=" + simpleFormat + ", isoFormat=" + isoFormat
                 + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
@@ -432,7 +431,7 @@ public class MCRXMLFunctions {
      *         with the display attribute set to true, <code>false</code>
      *         otherwise
      */
-    public static boolean hasDisplayableDerivates(String objectId) throws Exception {
+    public static boolean hasDisplayableDerivates(String objectId) {
         return Optional.of(MCRObjectID.getInstance(objectId))
             .filter(MCRMetadataManager::exists)
             .map(MCRMetadataManager::retrieveMCRObject)
@@ -721,7 +720,7 @@ public class MCRXMLFunctions {
         AtomicInteger i = new AtomicInteger(0);
         Files.walkFileTree(MCRPath.getPath(derivateId, "/"), new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 i.incrementAndGet();
                 return FileVisitResult.CONTINUE;
             }

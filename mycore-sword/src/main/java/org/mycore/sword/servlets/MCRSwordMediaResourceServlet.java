@@ -34,7 +34,7 @@ public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
 
     private MediaResourceAPI api;
 
-    public void init() throws ServletException {
+    public void init() {
         MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
         mrm = new MCRSwordMediaManager();
         api = new MediaResourceAPI(mrm, swordConfiguration);

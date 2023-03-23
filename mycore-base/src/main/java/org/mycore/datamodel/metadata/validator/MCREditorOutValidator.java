@@ -273,7 +273,7 @@ public class MCREditorOutValidator {
      *
      * @return MCRObject
      */
-    public Document generateValidMyCoReObject() throws JDOMException, SAXParseException, IOException {
+    public Document generateValidMyCoReObject() throws SAXParseException, IOException {
         MCRObject obj;
         // load the JDOM object
         XPathFactory.instance()

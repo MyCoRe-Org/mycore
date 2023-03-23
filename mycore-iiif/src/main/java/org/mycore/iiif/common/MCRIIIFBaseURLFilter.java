@@ -20,8 +20,6 @@ package org.mycore.iiif.common;
 
 import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
-import java.io.IOException;
-
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -36,7 +34,7 @@ public class MCRIIIFBaseURLFilter implements ContainerRequestFilter {
     private HttpServletRequest httpRequest;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         // set BASE_URL_ATTRIBUTE to MCRSession
         if (httpRequest.getAttribute(BASE_URL_ATTRIBUTE) != null) {
             final MCRSession currentSession = MCRSessionMgr.getCurrentSession();

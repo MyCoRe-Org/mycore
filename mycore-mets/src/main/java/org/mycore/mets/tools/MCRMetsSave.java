@@ -20,7 +20,6 @@ package org.mycore.mets.tools;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -534,8 +533,7 @@ public class MCRMetsSave {
      * @param mets the {@link Mets} object were the URNs should be inserted.
      * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
      */
-    public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap)
-        throws UnsupportedEncodingException {
+    public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap) {
         // put all files of the mets in a list
         List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
         List<File> files = new ArrayList<>();

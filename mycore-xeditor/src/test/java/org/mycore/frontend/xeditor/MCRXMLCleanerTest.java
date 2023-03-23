@@ -110,7 +110,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         assertTrue(MCRXMLHelper.deepEqual(expectedXML, result));
     }
 
-    private Document buildTestDocument(String xPath) throws JaxenException, JDOMException {
+    private Document buildTestDocument(String xPath) throws JaxenException {
         return new Document(new MCRNodeBuilder().buildElement(xPath, null, null));
     }
 }

@@ -44,7 +44,6 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -109,7 +108,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
     @Override
     public MCRDNBURN register(MCRBase obj, String filePath, boolean updateObject)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, filePath);
 
         if (obj instanceof MCRDerivate) {
@@ -254,8 +253,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
-        throws MCRPersistentIdentifierException {
+    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) {
         // not used in this impl
     }
 
@@ -266,8 +264,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void update(MCRDNBURN identifier, MCRBase obj, String additional) {
         //TODO: improve API, don't override method to do nothing
         LOGGER.info("No update in this implementation");
     }

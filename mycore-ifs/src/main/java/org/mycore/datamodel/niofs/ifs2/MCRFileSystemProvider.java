@@ -117,7 +117,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#newFileSystem(java.net.URI, java.util.Map)
      */
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
+    public FileSystem newFileSystem(URI uri, Map<String, ?> env) {
         throw new FileSystemAlreadyExistsException();
     }
 
@@ -426,7 +426,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#isSameFile(java.nio.file.Path, java.nio.file.Path)
      */
     @Override
-    public boolean isSameFile(Path path, Path path2) throws IOException {
+    public boolean isSameFile(Path path, Path path2) {
         return MCRFileSystemUtils.checkPathAbsolute(path).equals(MCRFileSystemUtils.checkPathAbsolute(path2));
     }
 
@@ -434,7 +434,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#isHidden(java.nio.file.Path)
      */
     @Override
-    public boolean isHidden(Path path) throws IOException {
+    public boolean isHidden(Path path) {
         MCRFileSystemUtils.checkPathAbsolute(path);
         return false;
     }
@@ -568,7 +568,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#setAttribute(java.nio.file.Path, java.lang.String, java.lang.Object, java.nio.file.LinkOption[])
      */
     @Override
-    public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
+    public void setAttribute(Path path, String attribute, Object value, LinkOption... options) {
         throw new UnsupportedOperationException("setAttributes is not implemented yet.");
     }
 

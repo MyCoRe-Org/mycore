@@ -17,7 +17,6 @@
  */
 package org.mycore.common.content.streams;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -30,7 +29,7 @@ public class MCRDevNull extends OutputStream {
      * @see java.io.OutputStream#write(int)
      */
     @Override
-    public void write(int arg0) throws IOException {
+    public void write(int arg0) {
     }
 
 }

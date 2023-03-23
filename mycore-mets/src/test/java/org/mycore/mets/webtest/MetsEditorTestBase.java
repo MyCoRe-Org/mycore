@@ -37,12 +37,12 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
     private static final int ONE_SECOND_IN_MILLISECONDS = 1000;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.getDriver().get(BASE_URL + "/classes/META-INF/resources/module/mets/example/mets-editor.html");
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         this.takeScreenshot();
     }
 

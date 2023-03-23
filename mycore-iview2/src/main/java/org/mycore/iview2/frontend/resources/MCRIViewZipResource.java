@@ -66,7 +66,7 @@ public class MCRIViewZipResource {
     @GET
     @Produces("application/zip")
     @Path("{derivateID}")
-    public Response zip(@PathParam("derivateID") String derivateID, @QueryParam("zoom") Integer zoom) throws Exception {
+    public Response zip(@PathParam("derivateID") String derivateID, @QueryParam("zoom") Integer zoom) {
         if (!MCRAccessManager.checkDerivateContentPermission(MCRObjectID.getInstance(derivateID),
             MCRAccessManager.PERMISSION_READ)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
@@ -92,7 +92,7 @@ public class MCRIViewZipResource {
         }
 
         @Override
-        public void write(OutputStream out) throws IOException, WebApplicationException {
+        public void write(OutputStream out) throws WebApplicationException {
             MCRSessionMgr.getCurrentSession();
             MCRTransactionHelper.beginTransaction();
             try {

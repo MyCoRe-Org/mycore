@@ -38,7 +38,6 @@ import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class provides a simple way to dynamically create MyCoRe webpages. These pages might be rendered 
@@ -105,7 +104,7 @@ public class MyCoReWebPageProvider {
      * @param lang the language of the section specified by a language key.
      * @return added section
      */
-    public Element addSection(String title, String xmlAsString, String lang) throws IOException, SAXParseException,
+    public Element addSection(String title, String xmlAsString, String lang) throws IOException,
         JDOMException {
         String sb = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             + "<!DOCTYPE MyCoReWebPage PUBLIC \"-//MYCORE//DTD MYCOREWEBPAGE 1.0//DE\" "

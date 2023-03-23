@@ -21,7 +21,6 @@ package org.mycore.restapi.v1;
 import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_MCRID;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -246,7 +245,7 @@ public class MCRRestAPIObjects {
             if (url != null) {
                 return Response.seeOther(new URI(url)).build();
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
                     "A problem occurred while opening maindoc from derivate " + mcrDerID, e.getMessage()));

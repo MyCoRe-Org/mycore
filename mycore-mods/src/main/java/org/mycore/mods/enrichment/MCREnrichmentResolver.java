@@ -19,7 +19,6 @@
 package org.mycore.mods.enrichment;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom2.Element;
@@ -47,7 +46,7 @@ import org.mycore.common.xml.MCRURIResolver;
 public class MCREnrichmentResolver implements URIResolver {
 
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         href = href.substring(href.indexOf(":") + 1);
         String configID = href.substring(0, href.indexOf(':'));
 

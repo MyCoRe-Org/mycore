@@ -62,7 +62,7 @@ public class MCRErrorListener implements ErrorListener {
      * @see javax.xml.transform.ErrorListener#warning(javax.xml.transform.TransformerException)
      */
     @Override
-    public void warning(TransformerException exception) throws TransformerException {
+    public void warning(TransformerException exception) {
         exception = unwrapException(exception);
         StackTraceElement[] stackTrace = exception.getStackTrace();
         if (stackTrace.length > 0 && stackTrace[0].getMethodName().equals("message")) {

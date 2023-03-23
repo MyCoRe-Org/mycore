@@ -308,14 +308,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @return the assigned Identifier
      * @throws MCRAccessException
      * the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException
-     * the {@link MCRPIMetadataService} lets
-     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException
      * see {@link org.mycore.pi.exceptions}
      */
     public synchronized T register(MCRBase obj, String additional, boolean updateObject)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
 
         // There are many querys that require the current database state.

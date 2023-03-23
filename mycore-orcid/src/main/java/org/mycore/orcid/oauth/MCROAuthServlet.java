@@ -23,14 +23,12 @@ import java.net.URISyntaxException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.orcid.user.MCRORCIDSession;
 import org.mycore.orcid.user.MCRORCIDUser;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -101,7 +99,7 @@ public class MCROAuthServlet extends MCRServlet {
     }
 
     private MCRTokenResponse exchangeCodeForAccessToken(String code)
-        throws JsonProcessingException, IOException, JDOMException, SAXException {
+        throws JsonProcessingException, IOException {
         MCRTokenRequest request = MCROAuthClient.instance().getTokenRequest();
         request.set("grant_type", "authorization_code");
         request.set("code", code);

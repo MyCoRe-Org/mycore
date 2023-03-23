@@ -62,7 +62,7 @@ public class MCRCORSFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         String filterName = filterConfig.getInitParameter(CORS_FILTER_NAME);
         if (filterName != null) {
             LOGGER.info("initializing {}", MCRCORSFilter.class.getSimpleName());

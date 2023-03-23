@@ -21,7 +21,6 @@ package org.mycore.pi;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
     protected static final String TYPE = "mock";
@@ -39,20 +38,17 @@ public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
     private boolean updatedCalled = false;
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi)
-        throws MCRPersistentIdentifierException {
+    protected void registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi) {
         registerCalled = true;
     }
 
     @Override
-    public void delete(MCRMockIdentifier identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    public void delete(MCRMockIdentifier identifier, MCRBase obj, String additional) {
         deleteCalled = true;
     }
 
     @Override
-    public void update(MCRMockIdentifier identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    public void update(MCRMockIdentifier identifier, MCRBase obj, String additional) {
         updatedCalled = true;
     }
 

@@ -19,7 +19,6 @@
 package org.mycore.restapi.v2;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom2.Element;
@@ -45,7 +44,7 @@ public class MCRRestCheckAPIAccessResolver implements URIResolver {
      * @see javax.xml.transform.URIResolver
      */
     @Override
-    public Source resolve(final String href, final String base) throws TransformerException, IllegalArgumentException {
+    public Source resolve(final String href, final String base) throws IllegalArgumentException {
         final String[] hrefParts = href.split(":");
         if (hrefParts.length == 3) {
             final String permission = hrefParts[2];

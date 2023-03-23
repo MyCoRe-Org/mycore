@@ -152,7 +152,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     private static class ExceptionTypeAdapter extends XmlAdapter<RException, Exception> {
         @Override
-        public Exception unmarshal(RException v) throws Exception {
+        public Exception unmarshal(RException v) {
             throw new UnsupportedOperationException();
         }
 

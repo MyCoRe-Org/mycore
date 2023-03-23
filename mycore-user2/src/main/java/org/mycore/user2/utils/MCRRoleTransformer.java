@@ -22,12 +22,10 @@ import java.io.IOException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.user2.MCRRole;
-import org.xml.sax.SAXParseException;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -58,7 +56,7 @@ public abstract class MCRRoleTransformer {
         MCRJAXBContent<MCRRole> content = new MCRJAXBContent<>(JAXB_CONTEXT, role);
         try {
             return content.asXML();
-        } catch (SAXParseException | JDOMException | IOException e) {
+        } catch (IOException e) {
             throw new MCRException("Exception while transforming MCRRole " + role.getName() + " to JDOM document.", e);
         }
     }

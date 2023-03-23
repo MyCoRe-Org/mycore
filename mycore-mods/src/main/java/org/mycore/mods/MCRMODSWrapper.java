@@ -32,12 +32,10 @@ import java.util.stream.Stream;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -49,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.mods.classification.MCRClassMapper;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler
  */
 public class MCRMODSWrapper {
@@ -180,31 +178,21 @@ public class MCRMODSWrapper {
         modsContainer.addContent(mods);
     }
 
-    private XPathExpression<Element> buildXPath(String xPath) throws JDOMException {
+    private XPathExpression<Element> buildXPath(String xPath) {
         return XPathFactory.instance().compile(xPath, Filters.element(), null, MCRConstants.MODS_NAMESPACE,
             MCRConstants.XLINK_NAMESPACE);
     }
 
     public Element getElement(String xPath) {
-        try {
-            return buildXPath(xPath).evaluateFirst(getMODS());
-        } catch (JDOMException ex) {
-            String msg = "Could not get MODS element from " + xPath;
-            throw new MCRException(msg, ex);
-        }
+        return buildXPath(xPath).evaluateFirst(getMODS());
     }
 
     public List<Element> getElements(String xPath) {
-        try {
-            Element eMODS = getMODS();
-            if (eMODS != null) {
-                return buildXPath(xPath).evaluate(eMODS);
-            } else {
-                return Collections.emptyList();
-            }
-        } catch (JDOMException ex) {
-            String msg = "Could not get elements at " + xPath;
-            throw new MCRException(msg, ex);
+        Element eMODS = getMODS();
+        if (eMODS != null) {
+            return buildXPath(xPath).evaluate(eMODS);
+        } else {
+            return Collections.emptyList();
         }
     }
 
@@ -308,12 +296,7 @@ public class MCRMODSWrapper {
 
     public void removeElements(String xPath) {
         Iterator<Element> selected;
-        try {
-            selected = buildXPath(xPath).evaluate(getMODS()).iterator();
-        } catch (JDOMException ex) {
-            String msg = "Could not remove elements at " + xPath;
-            throw new MCRException(msg, ex);
-        }
+        selected = buildXPath(xPath).evaluate(getMODS()).iterator();
 
         while (selected.hasNext()) {
             Element element = selected.next();

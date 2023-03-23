@@ -150,7 +150,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
             " (this command may take a while, use with care in case of a large number of objects)",
         order = 10)
-    public static void selectObjectsWithXpath(String xPath) throws Exception {
+    public static void selectObjectsWithXpath(String xPath) {
 
         XPathExpression<Object> xPathExpression = XPathFactory
             .instance()
@@ -176,7 +176,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "select descendants of object {0}",
         help = "Selects MCRObjects that are descendants of {0} (children, grandchildren, ...) and {0} itself.",
         order = 15)
-    public static void selectDescendantObjects(String id) throws Exception {
+    public static void selectDescendantObjects(String id) {
         List<String> descendants = new ArrayList<String>();
         if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
             fillWithDescendants(id, descendants);

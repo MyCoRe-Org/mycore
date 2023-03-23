@@ -709,7 +709,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String type = href.substring(href.indexOf(":") + 1);
             String path = "/templates/" + type + "/";
             LOGGER.debug("Reading templates from {}", path);
@@ -801,7 +801,7 @@ public final class MCRURIResolver implements URIResolver {
          * @return the root element of the xml document
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from session using key {}", key);
             Element value = (Element) MCRSessionMgr.getCurrentSession().get(key);
@@ -883,7 +883,7 @@ public final class MCRURIResolver implements URIResolver {
          * Returns access controll rules as XML
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from query result using key :{}", key);
 
@@ -986,7 +986,7 @@ public final class MCRURIResolver implements URIResolver {
          * @see MCRCategoryTransformer
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             LOGGER.debug("start resolving {}", href);
             String cacheKey = getCacheKey(href);
             Element returns = categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
@@ -1094,7 +1094,7 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRExceptionAsXMLResolver implements URIResolver {
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String target = href.substring(href.indexOf(":") + 1);
 
             try {
@@ -1131,7 +1131,7 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRNotNullResolver implements URIResolver {
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String target = href.substring(href.indexOf(":") + 1);
             // fixes exceptions if suburi is empty like "mcrobject:"
             String subUri = target.substring(target.indexOf(":") + 1);
@@ -1311,7 +1311,7 @@ public final class MCRURIResolver implements URIResolver {
         private static Logger LOGGER = LogManager.getLogger(MCRXslIncludeResolver.class);
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String includePart = href.substring(href.indexOf(":") + 1);
             Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
@@ -1445,7 +1445,7 @@ public final class MCRURIResolver implements URIResolver {
          * Builds a simple xml node tree on basis of name value pair
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Building xml from {}", key);
 
@@ -1492,7 +1492,7 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-        private Source getSource(Instant lastModified) throws IOException {
+        private Source getSource(Instant lastModified) {
             Element e = new Element("versions");
             Element v = new Element("version");
             e.addContent(v);
@@ -1546,7 +1546,7 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRFileMetadataResolver implements URIResolver {
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String[] parts = href.split(":");
             String completePath = parts[1];
             String[] pathParts = completePath.split("/", 2);
@@ -1746,7 +1746,7 @@ public final class MCRURIResolver implements URIResolver {
          * @see javax.xml.transform.URIResolver
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             final String[] split = href.split(":");
             boolean permission;
             switch (split.length) {
@@ -1796,7 +1796,7 @@ public final class MCRURIResolver implements URIResolver {
          * The default capacity is 100.
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String hrefToCache = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("resolving: " + hrefToCache);
 

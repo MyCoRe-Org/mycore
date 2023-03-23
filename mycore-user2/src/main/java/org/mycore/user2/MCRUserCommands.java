@@ -200,7 +200,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "import role from file {0}",
         help = "Imports a role from file, if that role does not exist",
         order = 90)
-    public static void addRole(String fileName) throws SAXParseException, IOException {
+    public static void addRole(String fileName) throws SAXParseException {
         LOGGER.info("Reading file {} ...", fileName);
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
         MCRRole role = MCRRoleTransformer.buildMCRRole(doc.getRootElement());
@@ -221,7 +221,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "delete user {0}",
         help = "Delete the user {0}.",
         order = 110)
-    public static void deleteUser(String userID) throws Exception {
+    public static void deleteUser(String userID) {
         MCRUserManager.deleteUser(userID);
     }
 
@@ -235,7 +235,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "enable user {0}",
         help = "Enables the user for the access.",
         order = 60)
-    public static void enableUser(String userID) throws Exception {
+    public static void enableUser(String userID) {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.enableLogin();
         MCRUserManager.updateUser(mcrUser);
@@ -286,7 +286,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "disable user {0}",
         help = "Disables access of the user {0}",
         order = 70)
-    public static void disableUser(String userID) throws Exception {
+    public static void disableUser(String userID) {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.disableLogin();
         MCRUserManager.updateUser(mcrUser);
@@ -300,7 +300,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "list all users",
         help = "Lists all users.",
         order = 160)
-    public static void listAllUsers() throws Exception {
+    public static void listAllUsers() {
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
 
         for (MCRUser uid : users) {
@@ -316,7 +316,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "list all roles",
         help = "List all roles.",
         order = 140)
-    public static void listAllRoles() throws Exception {
+    public static void listAllRoles() {
         List<MCRRole> roles = MCRRoleManager.listSystemRoles();
 
         for (MCRRole role : roles) {
@@ -350,7 +350,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "export all users to directory {0}",
         help = "Exports the data of all users to the directory {0}.")
-    public static List<String> exportAllUserToDirectory(String directory) throws IOException {
+    public static List<String> exportAllUserToDirectory(String directory) {
         File dir = new File(directory);
         if (!dir.exists() || !dir.isDirectory()) {
             throw new MCRException("Directory does not exist: " + dir.getAbsolutePath());
@@ -541,7 +541,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         MCRUserManager.updateUser(user);
     }
 
-    private static MCRUser getMCRUserFromFile(String filename) throws SAXParseException, IOException {
+    private static MCRUser getMCRUserFromFile(String filename) throws SAXParseException {
         File inputFile = getCheckedFile(filename);
         if (inputFile == null) {
             return null;

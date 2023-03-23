@@ -32,8 +32,7 @@ public interface MCRUserAttributeConverter<ValueType, BoundType> {
      * @param separator the value separator or <code>null</code>
      * @param valueMapping the value mapping or <code>null</code>
      * @return the converted value of type <code>&lt;BoundType&gt;</code>
-     * @throws Exception if there's an error during the conversion.
      */
     BoundType convert(ValueType value, String separator, Map<String, String> valueMapping)
-        throws Exception;
+    ;
 }

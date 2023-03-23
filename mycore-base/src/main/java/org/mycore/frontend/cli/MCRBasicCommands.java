@@ -321,7 +321,7 @@ public class MCRBasicCommands {
      *            the location of the xml file
      */
     @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
-    public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {
+    public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException {
         if (!fileName.endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", fileName);
 

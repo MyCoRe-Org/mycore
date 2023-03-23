@@ -28,7 +28,7 @@ import org.mycore.iiif.image.model.MCRIIIFImageTargetRotation;
 public class MCRIIIFRotationParserTest {
 
     @Test
-    public void testParse() throws Exception {
+    public void testParse() {
         Map<String, MCRIIIFImageTargetRotation> testValues = new Hashtable<>();
 
         testValues.put("0", new MCRIIIFImageTargetRotation(false, 0));

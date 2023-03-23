@@ -32,7 +32,7 @@ public class MCRSimpleModelJSONConverterTest {
     }
 
     @Test
-    public void testToJSON() throws Exception {
+    public void testToJSON() {
         MCRSimpleModelJSONConverter.toJSON(metsSimpleModel);
     }
 }

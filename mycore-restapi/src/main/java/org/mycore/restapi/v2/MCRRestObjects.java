@@ -276,7 +276,7 @@ public class MCRRestObjects {
         @QueryParam(PARAM_DELETED_BY) String deletedBy,
         @QueryParam(PARAM_SORT_BY) @DefaultValue("id") MCRObjectQuery.SortBy sortBy,
         @QueryParam(PARAM_SORT_ORDER) @DefaultValue("asc") MCRObjectQuery.SortOrder sortOrder,
-        @QueryParam(PARAM_CATEGORIES) List<String> categories) throws IOException {
+        @QueryParam(PARAM_CATEGORIES) List<String> categories) {
 
         MCRObjectQuery query = new MCRObjectQuery();
         int limitInt = Optional.ofNullable(limit)
@@ -776,8 +776,7 @@ public class MCRRestObjects {
                 description = "You do not have write permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have write permission"),
         })
-    public Response testUpdateObject(@PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
+    public Response testUpdateObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
@@ -791,8 +790,7 @@ public class MCRRestObjects {
                 description = "You do not have delete permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
         })
-    public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
+    public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 

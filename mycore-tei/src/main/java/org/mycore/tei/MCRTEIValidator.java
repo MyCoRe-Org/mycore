@@ -95,17 +95,17 @@ public class MCRTEIValidator implements ErrorHandler {
     }
 
     @Override
-    public void warning(SAXParseException exception) throws SAXException {
+    public void warning(SAXParseException exception) {
         this.exceptionMap.get(WARNING).add(exception);
     }
 
     @Override
-    public void error(SAXParseException exception) throws SAXException {
+    public void error(SAXParseException exception) {
         this.exceptionMap.get(ERROR).add(exception);
     }
 
     @Override
-    public void fatalError(SAXParseException exception) throws SAXException {
+    public void fatalError(SAXParseException exception) {
         this.exceptionMap.get(FATAL_ERROR).add(exception);
     }
 

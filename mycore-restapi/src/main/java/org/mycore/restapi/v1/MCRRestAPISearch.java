@@ -28,7 +28,6 @@ import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.solr.MCRSolrClientFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -87,7 +86,6 @@ public class MCRRestAPISearch {
      *      the name of the JSONP callback function - syntax as defined by SOLR 
      *
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
@@ -99,8 +97,7 @@ public class MCRRestAPISearch {
         @QueryParam("facet") String facet, @QueryParam("facet.sort") String facetSort,
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount,
-        @QueryParam("json.wrf") String jsonWrf)
-        throws MCRRestAPIException {
+        @QueryParam("json.wrf") String jsonWrf) {
         StringBuilder url = new StringBuilder(MCRSolrClientFactory.getMainSolrCore().getV1CoreURL());
         url.append("/select?");
 

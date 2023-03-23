@@ -57,7 +57,7 @@ public class MCRTestCategoryMapper extends MCRCategoryMapperBase {
     }
 
     @Test
-    public void doNothing() throws Exception {
+    public void doNothing() {
         // remove me if needed, just prevent test errors java.lang.Exception: No runnable methods
     }
 }

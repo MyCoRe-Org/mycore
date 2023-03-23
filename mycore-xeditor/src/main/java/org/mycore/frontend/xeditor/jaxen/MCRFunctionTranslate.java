@@ -21,7 +21,6 @@ package org.mycore.frontend.xeditor.jaxen;
 import java.util.List;
 
 import org.jaxen.Context;
-import org.jaxen.FunctionCallException;
 import org.mycore.services.i18n.MCRTranslation;
 
 /**
@@ -31,7 +30,7 @@ import org.mycore.services.i18n.MCRTranslation;
 class MCRFunctionTranslate implements org.jaxen.Function {
 
     @Override
-    public Object call(Context context, List args) throws FunctionCallException {
+    public Object call(Context context, List args) {
         String i18nkey = (String) (args.get(0));
         if (args.size() == 1) {
             return MCRTranslation.translate(i18nkey);

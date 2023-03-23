@@ -31,7 +31,7 @@ import org.mycore.common.MCRTextResolver.Term;
 public class MCRTextResolverTest extends MCRTestCase {
 
     @Test
-    public void variables() throws Exception {
+    public void variables() {
         Hashtable<String, String> variablesTable = new Hashtable<>();
         variablesTable.put("f1", "v1");
         variablesTable.put("f2", "v2");
@@ -68,7 +68,7 @@ public class MCRTextResolverTest extends MCRTestCase {
     }
 
     @Test
-    public void addRemove() throws Exception {
+    public void addRemove() {
         Hashtable<String, String> variablesTable = new Hashtable<>();
         variablesTable.put("f1", "v1");
         variablesTable.put("f2", "v2");
@@ -84,7 +84,7 @@ public class MCRTextResolverTest extends MCRTestCase {
     }
 
     @Test
-    public void resolveDepth() throws Exception {
+    public void resolveDepth() {
         MCRTextResolver resolver = new MCRTextResolver();
         resolver.addVariable("var1", "test1 & [{var2}]");
         resolver.addVariable("var2", "test2");

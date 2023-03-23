@@ -129,7 +129,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     }
 
     @Test
-    public void getRootCategories() throws Exception {
+    public void getRootCategories() {
         final String categoryJsonStr = target("classifications").request().get(String.class);
         MCRCategoryListWrapper categListWrapper = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
             MCRCategoryListWrapper.class);
@@ -138,7 +138,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     }
 
     @Test
-    public void getSingleCategory() throws Exception {
+    public void getSingleCategory() {
         Collection<MCRCategory> categs = categDAO.getCategs();
         for (MCRCategory mcrCategory : categs) {
             MCRCategoryID id = mcrCategory.getId();

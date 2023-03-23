@@ -19,7 +19,6 @@
 package org.mycore.common.xml;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -53,7 +52,7 @@ public class MCRMockResolver implements URIResolver {
     }
 
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         final MCRMockResolverCall mcrMockResolverCall = new MCRMockResolverCall(href, base);
         CALLS.add(mcrMockResolverCall);
         return getResultSource();

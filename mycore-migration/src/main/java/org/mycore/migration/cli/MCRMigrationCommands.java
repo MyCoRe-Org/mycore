@@ -55,7 +55,6 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -105,7 +104,7 @@ public class MCRMigrationCommands {
         help = "Create missing servflags for createdby and modifiedby for object {0}. (MCR-786)",
         order = 10)
     public static void addServFlags(String id)
-        throws IOException, MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCRBase obj = MCRMetadataManager.retrieve(objectID);
         MCRObjectService service = obj.getService();
@@ -239,7 +238,7 @@ public class MCRMigrationCommands {
     @MCRCommand(syntax = "add missing children to {0}",
         help = "Adds missing children to structure of parent {0}. (MCR-1480)",
         order = 15)
-    public static void fixMissingChildren(String id) throws IOException, JDOMException, SAXException {
+    public static void fixMissingChildren(String id) {
         MCRObjectID parentId = MCRObjectID.getInstance(id);
         Collection<String> children = MCRLinkTableManager.instance().getSourceOf(parentId,
             MCRLinkTableManager.ENTRY_TYPE_PARENT);
@@ -266,7 +265,7 @@ public class MCRMigrationCommands {
     @MCRCommand(syntax = "add missing children",
         help = "Adds missing children to structure of parent objects using MCRLinkTableManager. (MCR-1480)",
         order = 20)
-    public static List<String> fixMissingChildren() throws IOException, JDOMException, SAXException {
+    public static List<String> fixMissingChildren() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<String> query = cb.createQuery(String.class);

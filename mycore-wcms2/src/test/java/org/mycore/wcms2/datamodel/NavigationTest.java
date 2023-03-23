@@ -126,7 +126,7 @@ public class NavigationTest {
     }
 
     @Test
-    public void toJSON() throws Exception {
+    public void toJSON() {
         Gson gson = new Gson();
         JsonElement jsonElement = gson.toJsonTree(this.navigation);
         JsonObject navigationObject = jsonElement.getAsJsonObject();

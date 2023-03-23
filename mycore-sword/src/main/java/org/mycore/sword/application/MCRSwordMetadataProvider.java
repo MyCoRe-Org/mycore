@@ -31,7 +31,7 @@ import org.swordapp.server.SwordError;
 public abstract class MCRSwordMetadataProvider implements MCRSwordLifecycle {
     private MCRSwordLifecycleConfiguration lifecycleConfiguration;
 
-    public abstract DepositReceipt provideMetadata(MCRObject object) throws SwordError;
+    public abstract DepositReceipt provideMetadata(MCRObject object);
 
     /**
      * @param id    the id of the MyCoReObject as String

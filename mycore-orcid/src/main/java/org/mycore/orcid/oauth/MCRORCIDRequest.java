@@ -18,8 +18,6 @@
 
 package org.mycore.orcid.oauth;
 
-import java.io.IOException;
-
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
@@ -54,7 +52,7 @@ class MCRORCIDRequest {
      *
      * @throws MCRConfigurationException if request fails, e.g. because of misconfigured client ID and secret
      */
-    public Response post(String path) throws MCRConfigurationException, IOException {
+    public Response post(String path) throws MCRConfigurationException {
         Entity<Form> formEntity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 
         WebTarget target = baseTarget.path(path);

@@ -61,7 +61,7 @@ public class MCRMODSPagesHelperTest extends MCRTestCase {
         testPattern("123 - 7", "start=123", "end=127");
     }
 
-    private void testPattern(String input, String... expected) throws Exception {
+    private void testPattern(String input, String... expected) {
         Element extent = MCRMODSPagesHelper.buildExtentPages(input);
         assertEquals(expected.length, extent.getChildren().size());
         for (String token : expected) {

@@ -75,7 +75,7 @@ public final class MCRWebsiteWriteProtection {
         return Boolean.valueOf(protection);
     }
 
-    public static org.w3c.dom.Document getMessage() throws JDOMException, IOException {
+    public static org.w3c.dom.Document getMessage() throws JDOMException {
         Element config = getConfiguration();
         if (config == null) {
             return new DOMOutputter().output(new Document());

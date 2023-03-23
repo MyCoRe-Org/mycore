@@ -366,7 +366,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
 
         @Override
-        public String getMimeType() throws IOException {
+        public String getMimeType() {
             return mimeType;
         }
 
@@ -375,8 +375,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             return name;
         }
 
-        private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
-            throws IOException {
+        private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode) {
             //parameterHashCode is stable for this session and current request URL
             long systemLastModified = MCRConfigurationBase.getSystemLastModified();
             StringBuilder b = new StringBuilder("\"");
@@ -421,12 +420,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
 
         @Override
-        public long lastModified() throws IOException {
+        public long lastModified() {
             return lastModified;
         }
 
         @Override
-        public String getETag() throws IOException {
+        public String getETag() {
             return eTag;
         }
 

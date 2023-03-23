@@ -32,7 +32,6 @@ import org.jdom2.Text;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.tools.MyCoReWebPageProvider;
-import org.xml.sax.SAXParseException;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -158,7 +157,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             String xmlAsString = sectionObject.get(JSON_DATA).getAsJsonPrimitive().getAsString();
             try {
                 wp.addSection(title, xmlAsString, lang);
-            } catch (IOException | SAXParseException | JDOMException exc) {
+            } catch (IOException | JDOMException exc) {
                 throw new WebApplicationException("unable to add section " + title, exc);
             }
         }

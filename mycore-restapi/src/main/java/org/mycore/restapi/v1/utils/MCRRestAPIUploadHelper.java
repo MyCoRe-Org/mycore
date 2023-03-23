@@ -157,10 +157,9 @@ public class MCRRestAPIUploadHelper {
      * @param overwriteOnExisting, if true, an existing MyCoRe derivate
      *        with the given label or classification will be returned 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID, String label,
-        String classifications, boolean overwriteOnExisting) throws MCRRestAPIException {
+        String classifications, boolean overwriteOnExisting) {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         //  File fXML = null;
@@ -356,10 +355,9 @@ public class MCRRestAPIUploadHelper {
      * @param pathParamMcrObjID - the MyCoRe Object ID
      * @param pathParamMcrDerID - the MyCoRe Derivate ID
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException
      */
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
-        String pathParamMcrDerID) throws MCRRestAPIException {
+        String pathParamMcrDerID) {
 
         SortedMap<String, String> parameter = new TreeMap<>();
         parameter.put("mcrObjectID", pathParamMcrObjID);

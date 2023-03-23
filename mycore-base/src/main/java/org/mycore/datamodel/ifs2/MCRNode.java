@@ -113,7 +113,7 @@ public abstract class MCRNode {
      * 
      * @return true if this node is a file
      */
-    public boolean isFile() throws IOException {
+    public boolean isFile() {
         return Files.isRegularFile(path);
     }
 
@@ -122,7 +122,7 @@ public abstract class MCRNode {
      * 
      * @return true if this node is a directory
      */
-    public boolean isDirectory() throws IOException {
+    public boolean isDirectory() {
         return Files.isDirectory(path);
     }
 
@@ -222,7 +222,7 @@ public abstract class MCRNode {
      *            . or ..
      * @return the node at the given path, or null
      */
-    public MCRNode getNodeByPath(String path) throws IOException {
+    public MCRNode getNodeByPath(String path) {
         MCRNode current = path.startsWith("/") ? getRoot() : this;
         StringTokenizer st = new StringTokenizer(path, "/");
         while (st.hasMoreTokens() && current != null) {
@@ -250,7 +250,7 @@ public abstract class MCRNode {
         return attrs.isRegularFile() ? doGetContent(attrs) : null;
     }
 
-    private MCRPathContent doGetContent(BasicFileAttributes attrs) throws IOException {
+    private MCRPathContent doGetContent(BasicFileAttributes attrs) {
         return new MCRPathContent(path, attrs);
     }
 

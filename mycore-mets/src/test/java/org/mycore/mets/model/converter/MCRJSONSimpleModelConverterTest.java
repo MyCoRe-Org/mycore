@@ -38,7 +38,7 @@ public class MCRJSONSimpleModelConverterTest {
     }
 
     @Test
-    public void testToSimpleModel() throws Exception {
+    public void testToSimpleModel() {
         MCRMetsSimpleModel metsSimpleModel = MCRJSONSimpleModelConverter.toSimpleModel(json);
         MCRMetsSimpleModel compareSimpleModel = MCRMetsTestUtil.buildMetsSimpleModel();
 

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -67,7 +66,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
      * @see org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler#index()
      */
     @Override
-    public void index() throws IOException, SolrServerException {
+    public void index() throws IOException {
         try {
             this.document = MCRSolrInputDocumentFactory.getInstance().getDocument(id, content);
         } catch (SAXException e) {

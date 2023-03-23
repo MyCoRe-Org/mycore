@@ -75,7 +75,7 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @HeaderParam("Cache-Control") String cacheControl) throws CloneNotSupportedException {
+        @HeaderParam("Cache-Control") String cacheControl) {
         String normalizedID = MCRIIIFPresentationImpl.getInstance(impl).normalizeIdentifier(identifier);
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, normalizedID,
             cacheHeaderAsList(cacheControl).contains("no-cache"));

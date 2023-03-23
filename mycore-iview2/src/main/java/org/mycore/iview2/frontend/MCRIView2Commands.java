@@ -43,7 +43,6 @@ import javax.imageio.ImageReader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -278,7 +277,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 } finally {
                     imageReader.dispose();
                 }
-            } catch (IOException | JDOMException e) {
+            } catch (IOException e) {
                 LOGGER.warn("Could not read thumbnail of {}", iviewFile, e);
                 tileImage(derivate, absoluteImagePath);
             }

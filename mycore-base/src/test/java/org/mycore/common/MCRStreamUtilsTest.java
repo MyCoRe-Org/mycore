@@ -33,7 +33,7 @@ import org.junit.Test;
 public class MCRStreamUtilsTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     @Test

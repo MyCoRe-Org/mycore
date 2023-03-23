@@ -139,7 +139,7 @@ public class MCRObjectStaticContentGenerator {
         return Files.newInputStream(getFilePath(id));
     }
 
-    private Path getFilePath(MCRObjectID id) throws IOException {
+    private Path getFilePath(MCRObjectID id) {
         return getSlotDirPath(id).resolve(id.toString().concat(".xml"));
     }
 

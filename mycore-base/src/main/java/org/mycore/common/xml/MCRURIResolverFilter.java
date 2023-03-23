@@ -135,7 +135,7 @@ public class MCRURIResolverFilter implements Filter {
      * 
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
-    public void init(FilterConfig arg0) throws ServletException {
+    public void init(FilterConfig arg0) {
         // no inititalization parameters required so far
     }
 
@@ -194,7 +194,7 @@ public class MCRURIResolverFilter implements Filter {
         }
 
         @Override
-        public ServletOutputStream getOutputStream() throws IOException {
+        public ServletOutputStream getOutputStream() {
             return new MyServletOutputStream();
         }
 
@@ -213,7 +213,7 @@ public class MCRURIResolverFilter implements Filter {
             }
 
             @Override
-            public void write(int b) throws IOException {
+            public void write(int b) {
                 output.write(b);
             }
 

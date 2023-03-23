@@ -18,7 +18,6 @@
 
 package org.mycore.restapi.converter;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import org.mycore.common.config.MCRConfigurationException;
@@ -38,7 +37,7 @@ public class MCRContentJSONWriter extends MCRContentAbstractWriter {
     }
 
     @Override
-    protected void handleFallback(MCRContent content, OutputStream entityStream) throws IOException {
+    protected void handleFallback(MCRContent content, OutputStream entityStream) {
         String msg = "No Transformer defined to transform MCRContent to JSON";
         if (content.getSystemId() != null) {
             msg = "No Transformer defined to transform MCRContent " + content.getSystemId() + " to JSON";

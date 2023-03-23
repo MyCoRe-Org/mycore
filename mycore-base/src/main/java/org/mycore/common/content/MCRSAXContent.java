@@ -20,13 +20,11 @@ package org.mycore.common.content;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.jdom2.input.sax.SAXHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -53,12 +51,12 @@ public class MCRSAXContent extends MCRXMLContent {
      * @see org.mycore.common.content.MCRContent#getInputStream()
      */
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         return inputSource.getByteStream();
     }
 
     @Override
-    public Source getSource() throws IOException {
+    public Source getSource() {
         return new SAXSource(this.xmlReader, this.inputSource);
     }
 
@@ -68,7 +66,7 @@ public class MCRSAXContent extends MCRXMLContent {
     }
 
     @Override
-    public Document asXML() throws JDOMException, IOException, SAXException {
+    public Document asXML() throws IOException, SAXException {
         SAXHandler jdomContentHandler = new SAXHandler();
         xmlReader.setContentHandler(jdomContentHandler);
         xmlReader.parse(inputSource);
@@ -76,7 +74,7 @@ public class MCRSAXContent extends MCRXMLContent {
     }
 
     @Override
-    public void setEncoding(String encoding) throws UnsupportedEncodingException {
+    public void setEncoding(String encoding) {
         //defined by inputSource
     }
 

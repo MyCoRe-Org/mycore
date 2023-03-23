@@ -153,7 +153,7 @@ public class MCRFileStore extends MCRAbstractFileStore {
     }
 
     @Override
-    public Path getBaseDirectory() throws IOException {
+    public Path getBaseDirectory() {
         return this.contentStore.getBaseDirectory();
     }
 

@@ -80,7 +80,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
     }
 
     @Test
-    public void xmlRoundrip() throws IOException {
+    public void xmlRoundrip() {
         // test 0.100
         MCRMetaNumber meta_number = new MCRMetaNumber();
         Element imported = new Element("number");

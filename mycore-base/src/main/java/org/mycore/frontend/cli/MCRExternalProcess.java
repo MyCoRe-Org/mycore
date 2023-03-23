@@ -89,7 +89,7 @@ public class MCRExternalProcess {
         return new String(errors.join().asByteArray(), Charset.defaultCharset());
     }
 
-    public MCRContent getOutput() throws IOException {
+    public MCRContent getOutput() {
         return output.join();
     }
 

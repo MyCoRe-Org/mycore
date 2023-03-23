@@ -21,7 +21,6 @@ package org.mycore.user2;
 import java.util.List;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom2.Document;
@@ -47,7 +46,7 @@ public class MCRRealmResolver implements URIResolver {
      * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
      */
     @Override
-    public Source resolve(final String href, final String base) throws TransformerException {
+    public Source resolve(final String href, final String base) {
         String realmID = href.split(":")[1];
         if ("all".equals(realmID)) {
             return MCRRealmFactory.getRealmsSource();

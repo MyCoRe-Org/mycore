@@ -27,7 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -133,8 +132,7 @@ public class MCRPersistentIdentifierRegistrationResource {
         MCRBase object = MCRMetadataManager.retrieve(mycoreIDObject);
         try {
             identifier = registrationService.register(object, additional, true);
-        } catch (MCRPersistentIdentifierException | MCRActiveLinkException | ExecutionException
-            | InterruptedException e) {
+        } catch (MCRPersistentIdentifierException | ExecutionException | InterruptedException e) {
             LOGGER.error("Error while registering PI:", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();

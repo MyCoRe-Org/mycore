@@ -37,23 +37,23 @@ public class MCRFileCollectingFileVisitor<T> implements FileVisitor<T> {
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(T dir, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult preVisitDirectory(T dir, BasicFileAttributes attrs) {
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult visitFile(T file, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult visitFile(T file, BasicFileAttributes attrs) {
         paths.add(file);
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult visitFileFailed(T file, IOException exc) throws IOException {
+    public FileVisitResult visitFileFailed(T file, IOException exc) {
         return FileVisitResult.TERMINATE;
     }
 
     @Override
-    public FileVisitResult postVisitDirectory(T dir, IOException exc) throws IOException {
+    public FileVisitResult postVisitDirectory(T dir, IOException exc) {
         return FileVisitResult.CONTINUE;
     }
 }

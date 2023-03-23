@@ -46,7 +46,7 @@ public class MCRResourceAccessFilter implements ContainerRequestFilter {
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         // TODO due to ContainerRequest.getEntity() consumes InputStream, we need to keep a copy of it in memory
         try (InputStream in = requestContext.getEntityStream()) {
             ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);

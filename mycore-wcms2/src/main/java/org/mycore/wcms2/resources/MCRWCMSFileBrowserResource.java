@@ -83,7 +83,7 @@ public class MCRWCMSFileBrowserResource {
     ServletContext context;
 
     @GET
-    public InputStream getFileBrowser() throws Exception {
+    public InputStream getFileBrowser() {
         return getClass().getResourceAsStream("/META-INF/resources/modules/wcms2/filebrowser.html");
     }
 

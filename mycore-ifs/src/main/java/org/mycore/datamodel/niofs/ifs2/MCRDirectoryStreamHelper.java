@@ -357,7 +357,7 @@ class MCRDirectoryStreamHelper {
         }
 
         @Override
-        public BasicFileAttributes readAttributes() throws IOException {
+        public BasicFileAttributes readAttributes() {
             return null;
         }
 

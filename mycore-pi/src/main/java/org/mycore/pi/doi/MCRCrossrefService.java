@@ -139,7 +139,7 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     }
 
     @Override
-    protected void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+    protected void deleteJob(Map<String, String> parameters) {
 
     }
 

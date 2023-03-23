@@ -24,14 +24,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -54,7 +52,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
      * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom2.Element, java.lang.String)}.
      */
     @Test
-    public void testWrapMODSDocument() throws SAXParseException, URISyntaxException, JDOMException, IOException {
+    public void testWrapMODSDocument() throws SAXParseException, IOException {
         Document modsDoc = loadMODSDocument();
         MCRObject mcrObj = MCRMODSWrapper.wrapMODSDocument(modsDoc.getRootElement(), "JUnit");
         assertTrue("Generated MCRObject is not valid.", mcrObj.isValid());
@@ -67,13 +65,13 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
     }
 
-    private Document loadMODSDocument() throws SAXParseException, IOException {
+    private Document loadMODSDocument() throws SAXParseException {
         URL worldClassUrl = this.getClass().getResource("/mods80700998.xml");
         return MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(worldClassUrl));
     }
 
     @Test
-    public void testSetMODS() throws SAXParseException, IOException, JDOMException {
+    public void testSetMODS() throws SAXParseException, IOException {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         wrapper.setID("JUnit", 4711);

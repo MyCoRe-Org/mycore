@@ -112,7 +112,7 @@ public class MCRSassCompilerManager {
      * @return the compiled css
      * @throws CompilationException
      */
-    private String compile(String name, List<Importer> importer) throws CompilationException, IOException {
+    private String compile(String name, List<Importer> importer) throws CompilationException {
         Options options = new Options();
         Collection<Importer> importerList = options.getImporters();
         importerList.addAll(importer);

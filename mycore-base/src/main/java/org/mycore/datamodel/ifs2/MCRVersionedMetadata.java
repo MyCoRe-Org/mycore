@@ -381,7 +381,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         }
 
         @Override
-        public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
+        public void handleLogEntry(SVNLogEntry logEntry) {
             SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
             if (svnLogEntryPath != null) {
                 char type = svnLogEntryPath.getType();
