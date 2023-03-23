@@ -115,7 +115,7 @@ end
 
 function chapter(o)
     local mods = modsGenre("contribution")
-    if o['type'] == "chapter" then
+    if o['type'] == "chapter" or o['type'] == "paper-conference" then
         mods = mods .. modsTitleInfo(o, "title")
     end
     mods = mods .. "<mods:relatedItem type=\"host\">\n"
