@@ -23,7 +23,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +51,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
      * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom2.Element, java.lang.String)}.
      */
     @Test
-    public void testWrapMODSDocument() throws SAXParseException, IOException {
+    public void testWrapMODSDocument() throws SAXParseException {
         Document modsDoc = loadMODSDocument();
         MCRObject mcrObj = MCRMODSWrapper.wrapMODSDocument(modsDoc.getRootElement(), "JUnit");
         assertTrue("Generated MCRObject is not valid.", mcrObj.isValid());
@@ -71,7 +70,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     }
 
     @Test
-    public void testSetMODS() throws SAXParseException, IOException {
+    public void testSetMODS() throws SAXParseException {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         wrapper.setID("JUnit", 4711);
@@ -91,7 +90,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     }
 
     @Test
-    public void setElement() throws SAXParseException, IOException {
+    public void setElement() throws SAXParseException {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         wrapper.setID("JUnit", 4711);
@@ -130,7 +129,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     }
 
     @Test
-    public void testGetLinkedRelatedItems() throws SAXParseException, IOException {
+    public void testGetLinkedRelatedItems() throws SAXParseException {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
 

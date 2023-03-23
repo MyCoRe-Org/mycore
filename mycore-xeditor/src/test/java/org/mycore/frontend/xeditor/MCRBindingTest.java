@@ -28,7 +28,6 @@ import java.util.Map;
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -56,7 +55,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testSimpleBindings() throws JDOMException, JaxenException {
+    public void testSimpleBindings() throws JaxenException {
         binding = new MCRBinding("document", true, binding);
         binding = new MCRBinding("title", true, binding);
         assertEquals("title1", binding.getValue());
@@ -83,7 +82,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testComplexBindings() throws JDOMException, JaxenException {
+    public void testComplexBindings() throws JaxenException {
         binding = new MCRBinding("document/title[contains(text(),'1')]", true, binding);
         assertEquals("title1", binding.getValue());
         binding = binding.getParent();
@@ -108,7 +107,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testHasValue() throws JDOMException, JaxenException {
+    public void testHasValue() throws JaxenException {
         binding = new MCRBinding("document/title", true, binding);
         assertTrue(binding.hasValue("title1"));
         assertTrue(binding.hasValue("title2"));
@@ -122,7 +121,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testCollectorVariables() throws JDOMException, JaxenException {
+    public void testCollectorVariables() throws JaxenException {
         Map<String, Object> variables = new HashMap<>();
         variables.put("type", "main");
 
@@ -134,7 +133,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testDefiningVariables() throws JDOMException, JaxenException {
+    public void testDefiningVariables() throws JaxenException {
         binding = new MCRBinding("document", true, binding);
         new MCRBinding("title[1]", null, "inheritMe", binding);
         new MCRBinding("title[2]", null, "overwriteMe", binding);
@@ -147,7 +146,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testGroupByReferencedID() throws JDOMException, JaxenException {
+    public void testGroupByReferencedID() throws JaxenException {
         String builder
             = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);

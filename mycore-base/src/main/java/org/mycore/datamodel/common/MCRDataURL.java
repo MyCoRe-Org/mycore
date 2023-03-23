@@ -227,11 +227,10 @@ public class MCRDataURL implements Serializable {
      * @param str the string
      * @param mimeType the mime-type
      * @return a string with "data" URL
-     * @throws TransformerException
      * @throws MalformedURLException
      */
     public static String build(final String str, final String mimeType)
-        throws TransformerException, MalformedURLException {
+        throws MalformedURLException {
         return build(str, null, mimeType, "UTF-8");
     }
 
@@ -267,10 +266,9 @@ public class MCRDataURL implements Serializable {
      *
      * @param str the node list
      * @return a string with "data" URL
-     * @throws TransformerException
      * @throws MalformedURLException
      */
-    public static String build(final String str) throws TransformerException, MalformedURLException {
+    public static String build(final String str) throws MalformedURLException {
         return build(str, null, "text/palin", "UTF-8");
     }
 

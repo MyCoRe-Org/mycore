@@ -151,7 +151,7 @@ class MCRDirectoryStreamHelper {
                 getCurrentSecurePath(newDir));
         }
 
-        private MCRStoredNode resolve(Path path) throws IOException {
+        private MCRStoredNode resolve(Path path) {
             checkRelativePath(path);
             return (MCRStoredNode) dir.getNodeByPath(path.toString());
         }

@@ -92,7 +92,6 @@ import org.mycore.sword.application.MCRSwordCollectionProvider;
 import org.mycore.sword.application.MCRSwordObjectIDSupplier;
 import org.swordapp.server.DepositReceipt;
 import org.swordapp.server.MediaResource;
-import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
 
@@ -497,8 +496,7 @@ public class MCRSwordUtil {
          * @param mcrObjId the mcrobject id as String
          * @return returns a Stream which contains links to every derivate.
          */
-        public static Stream<Link> getEditMediaIRIStream(final String collection, final String mcrObjId)
-            throws SwordError {
+        public static Stream<Link> getEditMediaIRIStream(final String collection, final String mcrObjId) {
             return MCRSword.getCollection(collection).getDerivateIDsofObject(mcrObjId).map(derivateId -> {
                 final Factory abderaFactory = Abdera.getNewFactory();
                 final Stream<IRI> editMediaFileIRIStream = getEditMediaFileIRIStream(collection, derivateId);

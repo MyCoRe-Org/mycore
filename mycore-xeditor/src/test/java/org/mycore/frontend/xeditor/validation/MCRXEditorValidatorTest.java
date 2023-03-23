@@ -40,7 +40,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
  */
 public class MCRXEditorValidatorTest extends MCRTestCase {
 
-    private MCREditorSession buildSession(String template) throws JaxenException, JDOMException {
+    private MCREditorSession buildSession(String template) throws JaxenException {
         MCREditorSession session = new MCREditorSession();
         Document editedXML = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         session.setEditedXML(editedXML);

@@ -71,7 +71,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
 
     public MediaResource getMediaResourceRepresentation(String editMediaIRI, Map<String, String> accept,
         AuthCredentials authCredentials, SwordConfiguration swordConfiguration)
-        throws SwordError, SwordServerException, SwordAuthException {
+        throws SwordError, SwordAuthException {
         LOGGER.info("getMediaResourceRepresentation: {}", editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
         final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
@@ -87,7 +87,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
     }
 
     public DepositReceipt replaceMediaResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) throws SwordError, SwordAuthException {
         LOGGER.info("replaceMediaResource: {}", editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
 

@@ -83,7 +83,7 @@ public class MCRStringContent extends MCRContent {
     }
 
     @Override
-    public String getETag() throws IOException {
+    public String getETag() {
         String eTag = getSimpleWeakETag(getSystemId(), length(), lastModified());
         return eTag == null ? null : eTag.substring(2);
     }

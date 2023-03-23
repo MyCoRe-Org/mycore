@@ -63,7 +63,6 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXParseException;
@@ -202,7 +201,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load all classifications from directory {0}",
         help = "The command add all classifications in the directory {0} to the system.",
         order = 40)
-    public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(directory, false);
     }
 
@@ -215,7 +214,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "update all classifications from directory {0}",
         help = "The command update all classifications in the directory {0} to the system.",
         order = 50)
-    public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> updateFromDirectory(String directory) {
         return processFromDirectory(directory, true);
     }
 

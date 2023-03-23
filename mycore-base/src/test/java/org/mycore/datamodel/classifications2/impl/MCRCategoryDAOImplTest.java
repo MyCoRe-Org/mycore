@@ -553,7 +553,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void replaceCategoryWithAdoption() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void replaceCategoryWithAdoption() throws URISyntaxException, MCRException, SAXParseException {
         MCRCategory gc1 = loadClassificationResource("/grandchild.xml");
         MCRCategory gc2 = loadClassificationResource("/grandchild2.xml");
         DAO.addCategory(null, gc1);
@@ -696,7 +696,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
      * @throws SAXParseException
      * @throws MCRException
      */
-    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
         category = loadClassificationResource(WORLD_CLASS_RESOURCE_NAME);
     }
 
@@ -707,7 +707,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         return MCRXMLTransformer.getCategory(xml);
     }
 
-    private void loadWorldClassification2() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    private void loadWorldClassification2() throws URISyntaxException, MCRException, SAXParseException {
         category2 = loadClassificationResource(WORLD_CLASS2_RESOURCE_NAME);
     }
 

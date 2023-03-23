@@ -302,12 +302,7 @@ abstract class MCRFileSystemUtils {
             MCRObjectID derId = MCRObjectID.getInstance(parent.getOwner());
             return Optional.ofNullable(getStore(derId.getBase()))
                 .map(s -> {
-                    try {
-                        return s.retrieve(derId.getNumberAsInteger());
-                    } catch (IOException e) {
-                        LOGGER.warn("Exception while retrieving file collection " + derId, e);
-                        return null;
-                    }
+                    return s.retrieve(derId.getNumberAsInteger());
                 });
         }
         //recursive call

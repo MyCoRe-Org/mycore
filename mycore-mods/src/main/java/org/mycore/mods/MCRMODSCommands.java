@@ -46,7 +46,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -95,7 +94,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         help = "Load MODS document {0} as MyCoRe Object for project {1}",
         order = 20)
     public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException,
-        MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
+        SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a file.", modsFile.getAbsolutePath()));
@@ -124,7 +123,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         order = 10)
     public static void loadFromFileWithFiles(String modsFileName, String fileDirName, String projectID)
         throws JDOMException, IOException,
-        MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
+        SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a file.", modsFile.getAbsolutePath()));

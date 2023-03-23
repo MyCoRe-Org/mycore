@@ -28,7 +28,6 @@ import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
@@ -135,7 +134,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
     }
 
     @Test
-    public void testCompleteUndo() throws JaxenException, JDOMException {
+    public void testCompleteUndo() throws JaxenException {
         String template = "document[titles[title][title[2]]][authors/author[first='John'][last='Doe']]";
         Document doc = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         Document before = doc.clone();
@@ -161,7 +160,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
     }
 
     @Test
-    public void testRemoveChangeTracking() throws JaxenException, JDOMException {
+    public void testRemoveChangeTracking() throws JaxenException {
         String template = "document[titles[title][title[2]]][authors/author[first='John'][last='Doe']]";
         Document doc = new Document(new MCRNodeBuilder().buildElement(template, null, null));
 

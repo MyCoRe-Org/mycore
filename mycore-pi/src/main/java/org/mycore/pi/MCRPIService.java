@@ -273,7 +273,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * shorthand for {@link #register(MCRBase, String, boolean)} with update = true
      */
     public T register(MCRBase obj, String additional)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
         return register(obj, additional, true);
     }

@@ -81,7 +81,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
     public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request,
         HttpServletResponse response, String sessionID, String pageURL)
-        throws IOException, JDOMException, SAXException {
+        throws IOException {
         MCRParameterCollector pc = new MCRParameterCollector(request, false);
         MCREditorSession session = null;
 

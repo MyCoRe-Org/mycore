@@ -23,7 +23,6 @@ import java.util.Objects;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -47,7 +46,7 @@ public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
     }
 
     @Override
-    public MCRDNBURN generate(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException {
+    public MCRDNBURN generate(MCRBase mcrObj, String additional) {
         return generate(getNamespace(), mcrObj.getId(), additional);
     }
 

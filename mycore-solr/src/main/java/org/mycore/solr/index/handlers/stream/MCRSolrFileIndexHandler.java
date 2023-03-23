@@ -87,7 +87,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         } //MCR-1911: close any open resource
     }
 
-    private ModifiableSolrParams getSolrParams(Path file, BasicFileAttributes attrs) throws IOException {
+    private ModifiableSolrParams getSolrParams(Path file, BasicFileAttributes attrs) {
         ModifiableSolrParams params = new ModifiableSolrParams();
         SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
         for (SolrInputField field : doc) {

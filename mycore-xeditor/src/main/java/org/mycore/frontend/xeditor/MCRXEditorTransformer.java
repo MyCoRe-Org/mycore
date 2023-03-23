@@ -160,7 +160,7 @@ public class MCRXEditorTransformer {
         editorSession.getValidator().setValidationMarker(currentBinding);
     }
 
-    private void createEmptyDocumentFromXPath(String xPath) throws JaxenException, JDOMException {
+    private void createEmptyDocumentFromXPath(String xPath) throws JaxenException {
         Element root = createRootElement(xPath);
         editorSession.setEditedXML(new Document(root));
         editorSession.setBreakpoint("Starting with empty XML document");
@@ -265,7 +265,7 @@ public class MCRXEditorTransformer {
         return getCurrentRepeat().getRepeatPosition();
     }
 
-    public void bindRepeatPosition() throws JDOMException, JaxenException {
+    public void bindRepeatPosition() {
         setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
         editorSession.getValidator().setValidationMarker(currentBinding);
     }

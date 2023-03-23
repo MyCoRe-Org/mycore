@@ -163,8 +163,7 @@ public class MCRXMLFunctions {
         return formatISODate(isoDate, null, simpleFormat, iso639Language);
     }
 
-    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) {
         return formatISODate(isoDate, isoFormat, simpleFormat, iso639Language, TimeZone.getDefault().getID());
     }
 

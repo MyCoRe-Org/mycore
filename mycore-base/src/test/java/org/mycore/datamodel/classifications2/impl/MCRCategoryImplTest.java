@@ -19,7 +19,6 @@ package org.mycore.datamodel.classifications2.impl;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -70,7 +69,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getLeftSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getLeftSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -86,7 +85,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getLeftSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getLeftSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -98,7 +97,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getRightSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getRightSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -112,7 +111,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getRightSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getRightSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);

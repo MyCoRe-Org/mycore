@@ -27,7 +27,6 @@ import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -60,7 +59,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response)
-        throws MCRAccessException, ServletException, MCRActiveLinkException, SAXParseException, JDOMException,
+        throws MCRAccessException, ServletException, SAXParseException, JDOMException,
         IOException {
         Document editorSubmission = MCRPersistenceHelper.getEditorSubmission(request, false);
         MCRObjectID objectID;

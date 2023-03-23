@@ -19,7 +19,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -55,7 +54,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
-        URISyntaxException, TransformerException {
+        TransformerException {
         String webpageID = getWebpageId(job.getRequest());
         boolean hasAccess = MCRLayoutUtilities.webpageAccess(READ_WEBPAGE_PERMISSION, webpageID, true);
         if (!hasAccess) {

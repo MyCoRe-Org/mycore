@@ -33,7 +33,6 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
@@ -111,17 +110,13 @@ public class MCRIViewZipResource {
                             if (!Files.exists(iviewFile)) {
                                 return super.visitFile(iviewFile, attrs);
                             }
-                            try {
-                                MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
-                                Integer zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps
-                                    .getZoomlevel() : zoom;
-                                BufferedImage image = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
-                                ZipArchiveEntry entry = new ZipArchiveEntry(file.getFileName() + ".jpg");
-                                zipStream.putArchiveEntry(entry);
-                                ImageIO.write(image, "jpg", zipStream);
-                            } catch (JDOMException e) {
-                                throw new WebApplicationException(e);
-                            }
+                            MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
+                            Integer zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps
+                                .getZoomlevel() : zoom;
+                            BufferedImage image = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
+                            ZipArchiveEntry entry = new ZipArchiveEntry(file.getFileName() + ".jpg");
+                            zipStream.putArchiveEntry(entry);
+                            ImageIO.write(image, "jpg", zipStream);
                             zipStream.closeArchiveEntry();
                         }
                         return FileVisitResult.CONTINUE;

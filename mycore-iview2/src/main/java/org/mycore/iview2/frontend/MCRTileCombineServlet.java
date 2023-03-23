@@ -43,7 +43,6 @@ import javax.imageio.stream.ImageOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -128,7 +127,7 @@ public class MCRTileCombineServlet extends MCRServlet {
      * See {@link #init()} how to attach a footer to every generated image.
      */
     @Override
-    protected void think(final MCRServletJob job) throws IOException, JDOMException, URISyntaxException {
+    protected void think(final MCRServletJob job) throws IOException, URISyntaxException {
         final HttpServletRequest request = job.getRequest();
         try {
             String pathInfo = request.getPathInfo();

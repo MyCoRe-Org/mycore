@@ -39,7 +39,6 @@ import org.apache.xpath.XPathContext;
 import org.apache.xpath.objects.XNodeSet;
 import org.apache.xpath.objects.XNodeSetForDOM;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.transform.JDOMSource;
 import org.jdom2.util.IteratorIterable;
@@ -79,7 +78,7 @@ public class MCRIncludeHandler {
      *               otherwise reload at each XEditor form transformation
      */
     public void preloadFromURIs(String uris, String sStatic)
-        throws TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerFactoryConfigurationError {
         for (String uri : uris.split(",")) {
             preloadFromURI(uri, sStatic);
         }
@@ -210,7 +209,7 @@ public class MCRIncludeHandler {
         return refID != null;
     }
 
-    public XNodeSet resolve(ExpressionContext context, String ref) throws JDOMException, TransformerException {
+    public XNodeSet resolve(ExpressionContext context, String ref) throws TransformerException {
         LOGGER.debug("including component " + ref);
         Map<String, Element> cache = chooseCacheLevel(ref, Boolean.FALSE.toString());
         Element resolved = cache.get(ref);
@@ -218,7 +217,7 @@ public class MCRIncludeHandler {
     }
 
     public XNodeSet resolve(ExpressionContext context, String uri, String sStatic)
-        throws TransformerException, JDOMException {
+        throws TransformerException {
         LOGGER.debug("including xml " + uri);
 
         Element xml = resolve(uri, sStatic);

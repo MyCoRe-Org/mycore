@@ -305,7 +305,7 @@ public class MCROAIAdapter implements OAIAdapter {
 
     @Override
     public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Instant from, Instant until)
-        throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
+        throws NoSetHierarchyException, NoRecordsMatchException {
         //Update set for response header
         getSetManager().getDirectList();
         OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), from, until);

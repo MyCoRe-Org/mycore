@@ -26,7 +26,6 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -61,7 +60,7 @@ public class MCRCreateDerivateServlet extends MCRPersistenceServlet {
      * </dl>
      */
     @Override
-    void displayResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    void displayResult(HttpServletRequest request, HttpServletResponse response) throws IOException {
         redirectToUploadForm(getServletContext(), request, response, getObjectId(request), null);
     }
 

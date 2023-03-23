@@ -407,7 +407,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "import user from file {0}",
         help = "Imports a user from file {0}.")
-    public static void importUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void importUserFromFile(String filename) throws SAXParseException {
         MCRUser user = getMCRUserFromFile(filename);
         if (MCRUserManager.exists(user.getUserName(), user.getRealmID())) {
             throw new MCRException("User already exists: " + user.getUserID());
@@ -519,7 +519,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param filename
      *            the filename of the user data input
      */
-    public static void createUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void createUserFromFile(String filename) throws SAXParseException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.createUser(user);
     }
@@ -536,7 +536,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "update user from file {0}",
         help = "Updates a user from file {0}.",
         order = 200)
-    public static void updateUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void updateUserFromFile(String filename) throws SAXParseException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.updateUser(user);
     }

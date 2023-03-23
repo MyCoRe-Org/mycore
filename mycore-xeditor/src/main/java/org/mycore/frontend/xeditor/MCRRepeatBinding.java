@@ -57,7 +57,7 @@ public class MCRRepeatBinding extends MCRBinding {
         this.maxRepeats = Math.max(this.maxRepeats, getBoundNodes().size());
     }
 
-    public MCRRepeatBinding(String xPath, MCRBinding parent, String method) throws JaxenException, JDOMException {
+    public MCRRepeatBinding(String xPath, MCRBinding parent, String method) throws JaxenException {
         super(xPath, true, parent);
         this.method = "clone".equals(method) ? "clone" : "build".equals(method) ? "build" : DEFAULT_METHOD;
         this.maxRepeats = Integer.MAX_VALUE;

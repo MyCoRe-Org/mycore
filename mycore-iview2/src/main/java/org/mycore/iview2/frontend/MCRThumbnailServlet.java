@@ -186,7 +186,7 @@ public class MCRThumbnailServlet extends MCRServlet {
         return new ThumnailInfo(derivate, imagePath);
     }
 
-    private BufferedImage getThumbnail(Path iviewFile, boolean centered) throws IOException, JDOMException {
+    private BufferedImage getThumbnail(Path iviewFile, boolean centered) throws IOException {
         BufferedImage level1Image;
         try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
             Path iviewFileRoot = fs.getRootDirectories().iterator().next();

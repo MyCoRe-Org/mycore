@@ -96,8 +96,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     private void cleanAndCompareTo(String xPathInput, String xPathExpectedOutput, MCRCleaningRule... rules)
-        throws JaxenException,
-        JDOMException {
+        throws JaxenException {
         Document xmlToClean = buildTestDocument(xPathInput);
         Document expectedXML = buildTestDocument(xPathExpectedOutput);
 

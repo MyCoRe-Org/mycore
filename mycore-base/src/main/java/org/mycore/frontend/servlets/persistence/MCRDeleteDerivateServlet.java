@@ -21,7 +21,6 @@ package org.mycore.frontend.servlets.persistence;
 import java.io.IOException;
 
 import org.mycore.access.MCRAccessException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 
@@ -41,8 +40,8 @@ public class MCRDeleteDerivateServlet extends MCRPersistenceServlet {
     private static final long serialVersionUID = 1581063299429224344L;
 
     @Override
-    void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
-        MCRActiveLinkException {
+    void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response)
+        throws MCRAccessException {
         MCRDerivateCommands.delete(getProperty(request, "id"));
     }
 

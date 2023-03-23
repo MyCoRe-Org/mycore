@@ -152,7 +152,7 @@ public abstract class MCRStore {
      *            the ID of the data
      * @return true, if data for the given ID is existing in the store.
      */
-    public boolean exists(final int id) throws IOException {
+    public boolean exists(final int id) {
         return Files.exists(getSlot(id));
     }
 

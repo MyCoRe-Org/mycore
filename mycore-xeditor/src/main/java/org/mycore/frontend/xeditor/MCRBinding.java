@@ -30,7 +30,6 @@ import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
@@ -73,7 +72,7 @@ public class MCRBinding {
         this.boundNodes.add(document);
     }
 
-    public MCRBinding(Document document, MCRChangeTracker tracker) throws JDOMException {
+    public MCRBinding(Document document, MCRChangeTracker tracker) {
         this(document);
         this.tracker = tracker;
 

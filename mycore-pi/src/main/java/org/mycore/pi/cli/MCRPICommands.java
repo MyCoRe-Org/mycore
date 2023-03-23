@@ -18,7 +18,6 @@
 
 package org.mycore.pi.cli;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -135,7 +134,7 @@ public class MCRPICommands {
             " If the service configuration is right then the pi is under control of MyCoRe.",
         order = 50)
     public static void controlObjectWithService(String objectIDString, String serviceID)
-        throws MCRAccessException, MCRActiveLinkException, IOException {
+        throws MCRAccessException {
         controlObjectWithServiceAndAdditional(objectIDString, serviceID, null);
     }
 
@@ -205,7 +204,7 @@ public class MCRPICommands {
             + "pi control from the object {0}(object id) with the serivce {1}(service id)",
         order = 70)
     public static void removeControlFromObject(String objectIDString, String serviceID)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRPersistentIdentifierException {
         removeControlFromObject(objectIDString, serviceID, null);
     }
 

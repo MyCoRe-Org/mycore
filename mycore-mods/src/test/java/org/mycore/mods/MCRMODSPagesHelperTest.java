@@ -28,7 +28,7 @@ import org.mycore.common.MCRTestCase;
 public class MCRMODSPagesHelperTest extends MCRTestCase {
 
     @Test
-    public void testPages2Extent() throws Exception {
+    public void testPages2Extent() {
         testPattern("4-8", "start=4", "end=8");
         testPattern(" 234 - 238", "start=234", "end=238");
         testPattern("S. 234 - 238", "start=234", "end=238");
@@ -56,7 +56,7 @@ public class MCRMODSPagesHelperTest extends MCRTestCase {
     }
 
     @Test
-    public void testEndPageCompletion() throws Exception {
+    public void testEndPageCompletion() {
         testPattern("3845 - 53", "start=3845", "end=3853");
         testPattern("123 - 7", "start=123", "end=127");
     }

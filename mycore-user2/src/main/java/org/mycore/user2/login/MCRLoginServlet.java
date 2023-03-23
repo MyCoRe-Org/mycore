@@ -285,7 +285,7 @@ public class MCRLoginServlet extends MCRServlet {
      * Stores the given url in MCRSession. When login is canceled, or after
      * successful login, the browser is redirected to that url. 
      */
-    private void storeURL(String url) throws Exception {
+    private void storeURL(String url) {
         if ((url == null) || (url.trim().length() == 0)) {
             url = MCRFrontendUtil.getBaseURL();
         } else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {

@@ -93,7 +93,7 @@ public abstract class MCRSolrIndexHandlerFactory {
     }
 
     public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient,
-        boolean sendContent) throws IOException {
+        boolean sendContent) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: submitting file \"{} for indexing", file);
         }

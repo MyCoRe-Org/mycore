@@ -272,7 +272,6 @@ public class MCRCommandLineInterface {
             for (String command : queue) {
                 pw.println(command);
             }
-            pw.close();
         } catch (IOException ex) {
             MCRCLIExceptionHandler.handleException(ex);
         }

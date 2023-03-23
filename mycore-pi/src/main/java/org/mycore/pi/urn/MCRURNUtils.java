@@ -25,7 +25,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
 
 import com.google.gson.JsonElement;
@@ -42,7 +41,7 @@ public class MCRURNUtils {
         return Optional.empty();
     }
 
-    public static Date getDNBRegisterDate(MCRDNBURN dnburn) throws MCRIdentifierUnresolvableException, ParseException {
+    public static Date getDNBRegisterDate(MCRDNBURN dnburn) throws ParseException {
         return getDNBRegisterDate(dnburn.asString());
     }
 
