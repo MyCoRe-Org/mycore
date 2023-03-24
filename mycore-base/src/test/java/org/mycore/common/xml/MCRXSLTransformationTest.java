@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
+@Deprecated
 public class MCRXSLTransformationTest extends MCRTestCase {
 
     MCRXSLTransformation tr;
