@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,15 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.user2.MCRUser;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -37,6 +44,7 @@ import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.orcid.jaxb.model.message.ScopeConstants;
+import org.xml.sax.SAXException;
 
 /**
  * When a publication is created or updated locally in this application,
@@ -50,6 +58,9 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final MCRContentTransformer T_ORCID_MODS_FILTER
+        = MCRContentTransformerFactory.getTransformer("ORCIDMODSFilter");
+
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {
         handlePublication(object);
@@ -62,20 +73,43 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
 
     /**
      * Publishes MCRObject to all linked ORCID profiles.
+     * MCRObject can be filtered with ORCIDMODSFilter transformer.
+     * If the MODS is empty, the MCRObject is skipped.
      * 
      * @param object the MCRObject
      */
     private void handlePublication(MCRObject object) {
-        LOGGER.info("Start publishing {} to ORCID.", object.getId());
-        if (!MCRMODSWrapper.isSupported(object)) {
+        final MCRObjectID objectID = object.getId();
+        LOGGER.info("Start publishing {} to ORCID.", objectID);
+        final MCRObject filteredObject = filterObject(object);
+        if (!MCRMODSWrapper.isSupported(filteredObject)) {
             return;
         }
-        final Map<String, MCRORCIDCredential> credentials = listOrcidCredentials(object);
+        if (!checkPublish(filteredObject)) {
+            LOGGER.info("MODS ist empty. Skipping {}.", objectID);
+            return;
+        }
+        final Map<String, MCRORCIDCredential> credentials = listOrcidCredentials(filteredObject);
         try {
-            publishObject(object, credentials);
-            LOGGER.info("Finished publishing {} to ORCID.", object.getId());
+            publishObject(filteredObject, credentials);
+            LOGGER.info("Finished publishing {} to ORCID.", objectID);
         } catch (Exception e) {
-            LOGGER.warn("Error while publishing {} to ORCID:", object.getId(), e);
+            LOGGER.warn("Error while publishing {} to ORCID:", objectID, e);
+        }
+    }
+
+    protected static boolean checkPublish(MCRObject object) {
+        final MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+        return !wrapper.getMODS().getChildren().isEmpty();
+    }
+
+    protected static MCRObject filterObject(MCRObject object) {
+        try {
+            final MCRContent filtertedObjectContent
+                = T_ORCID_MODS_FILTER.transform(new MCRJDOMContent(object.createXML()));
+            return new MCRObject(filtertedObjectContent.asXML());
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRORCIDException("Filter transformation failed", e);
         }
     }
 
