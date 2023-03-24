@@ -35,6 +35,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -662,7 +663,7 @@ public class MCRRestDerivateContents {
                     }
                     return 1;
                 })
-                .compound((de1, de2) -> de1.getName().compareTo(de2.getName()))
+                .compound(Comparator.comparing(DirectoryEntry::getName))
                 .compare(this, o);
         }
     }

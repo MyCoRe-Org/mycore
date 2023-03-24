@@ -701,7 +701,7 @@ public class MCRMetsSave {
     public static boolean isComplete(final FileGrp fileGroup, MCRPath rootDir) {
         final AtomicBoolean complete = new AtomicBoolean(true);
         try {
-            Files.walkFileTree(rootDir, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(rootDir, new SimpleFileVisitor<>() {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

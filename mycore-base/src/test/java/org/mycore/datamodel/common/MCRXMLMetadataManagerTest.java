@@ -91,10 +91,8 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     static Document getDocument(InputStream in) throws JDOMException, IOException {
-        try {
+        try (in) {
             return SAX_BUILDER.build(in);
-        } finally {
-            in.close();
         }
     }
 

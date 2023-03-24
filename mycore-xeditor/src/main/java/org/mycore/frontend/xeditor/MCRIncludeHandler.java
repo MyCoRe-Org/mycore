@@ -161,7 +161,7 @@ public class MCRIncludeHandler {
     private void handleRemove(Element container, Element removeRule) {
         String id = removeRule.getAttributeValue(ATTR_REF);
         LOGGER.debug("removing " + id);
-        findDescendant(container, id).ifPresent(e -> e.detach());
+        findDescendant(container, id).ifPresent(Element::detach);
     }
 
     private Optional<Element> findDescendant(Element container, String id) {

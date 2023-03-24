@@ -30,6 +30,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -112,7 +113,7 @@ public class MCRLayoutUtilities {
     private static HashMap<String, Element> itemStore = new HashMap<>();
 
     private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
-        .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, DocumentHolder>() {
+        .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<>() {
 
             Executor executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "navigation.xml refresh"));
 
@@ -451,11 +452,7 @@ public class MCRLayoutUtilities {
     public static String getRuleID(String permission, String webpageID) {
         MCRAccessStore as = MCRAccessStore.getInstance();
         String ruleID = as.getRuleID(getWebpageACLID(webpageID), permission);
-        if (ruleID != null) {
-            return ruleID;
-        } else {
-            return "";
-        }
+        return Objects.requireNonNullElse(ruleID, "");
     }
 
     public static String getRuleDescr(String permission, String webpageID) {
@@ -464,11 +461,7 @@ public class MCRLayoutUtilities {
         if (am instanceof MCRRuleAccessInterface) {
             ruleDes = ((MCRRuleAccessInterface) am).getRuleDescription(getWebpageACLID(webpageID), permission);
         }
-        if (ruleDes != null) {
-            return ruleDes;
-        } else {
-            return "";
-        }
+        return Objects.requireNonNullElse(ruleDes, "");
     }
 
     public static String getPermission2ReadWebpage() {

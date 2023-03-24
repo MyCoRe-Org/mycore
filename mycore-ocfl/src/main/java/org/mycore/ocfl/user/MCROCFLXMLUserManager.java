@@ -117,9 +117,7 @@ public class MCROCFLXMLUserManager {
         MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-                updater -> {
-                    updater.writeFile(userAsStream, user.getUserID() + ".xml", OcflOption.OVERWRITE);
-                });
+                updater -> updater.writeFile(userAsStream, user.getUserID() + ".xml", OcflOption.OVERWRITE));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to update user '" + ocflUserID + "'", e);
         }
@@ -146,9 +144,7 @@ public class MCROCFLXMLUserManager {
         MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-                updater -> {
-                    updater.writeFile(userAsStream, user.getUserID() + ".xml");
-                });
+                updater -> updater.writeFile(userAsStream, user.getUserID() + ".xml"));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to update user '" + ocflUserID + "'", e);
         }
@@ -181,9 +177,7 @@ public class MCROCFLXMLUserManager {
             .setCreated(OffsetDateTime.now(ZoneOffset.UTC))
             .setUser(currentUser.getUserName(), buildEmail(currentUser));
         repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-            updater -> {
-                updater.removeFile(userId + ".xml");
-            });
+            updater -> updater.removeFile(userId + ".xml"));
     }
 
     public void purgeUser(String userId) {

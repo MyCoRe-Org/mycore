@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.ClassUtils;
@@ -124,11 +125,7 @@ public class MCRCommand {
         int pos = format.indexOf("{");
         suffix = pos == -1 ? format : format.substring(0, pos);
 
-        if (helpText != null) {
-            help = helpText;
-        } else {
-            help = "No help text available for this command";
-        }
+        help = Objects.requireNonNullElse(helpText, "No help text available for this command");
     }
 
     private void unsupportedArgException(String methodSignature, String token) {

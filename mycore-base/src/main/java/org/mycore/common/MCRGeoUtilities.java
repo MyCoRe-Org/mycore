@@ -49,12 +49,12 @@ public class MCRGeoUtilities {
             return 0d;
         }
 
-        int degree = Integer.valueOf(strings[1]);
-        int minutes = Integer.valueOf(strings[2]);
+        int degree = Integer.parseInt(strings[1]);
+        int minutes = Integer.parseInt(strings[2]);
         double seconds = 0d;
 
         if (strings.length >= 4) {
-            seconds = Double.valueOf(strings[3]);
+            seconds = Double.parseDouble(strings[3]);
         }
 
         int factor = "W".equals(strings[0]) || "S".equals(strings[0]) ? -1 : 1;
@@ -91,7 +91,7 @@ public class MCRGeoUtilities {
         double seconds = 0d;
 
         if (strings.length >= 4) {
-            seconds = Double.valueOf(strings[3]);
+            seconds = Double.parseDouble(strings[3]);
         }
 
         return new MessageFormat("{0}° {1}'' {2} {3}", Locale.ROOT).format(

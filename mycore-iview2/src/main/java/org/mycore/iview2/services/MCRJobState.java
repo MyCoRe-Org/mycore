@@ -18,10 +18,7 @@
 
 package org.mycore.iview2.services;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Represents the status of tiling jobs
@@ -46,13 +43,10 @@ public enum MCRJobState {
      */
     ERROR('e');
 
-    private static final Set<MCRJobState> NOT_COMPLETE_STATES = Collections.unmodifiableSet(Stream
-        .of(MCRJobState.ERROR, MCRJobState.PROCESSING, MCRJobState.NEW).collect(
-            Collectors.toSet()));
+    private static final Set<MCRJobState> NOT_COMPLETE_STATES = Set.of(MCRJobState.ERROR, MCRJobState.PROCESSING,
+        MCRJobState.NEW);
 
-    private static final Set<MCRJobState> COMPLETE_STATES = Collections.unmodifiableSet(Stream
-        .of(MCRJobState.FINISHED).collect(
-            Collectors.toSet()));
+    private static final Set<MCRJobState> COMPLETE_STATES = Set.of(MCRJobState.FINISHED);
 
     private char status;
 

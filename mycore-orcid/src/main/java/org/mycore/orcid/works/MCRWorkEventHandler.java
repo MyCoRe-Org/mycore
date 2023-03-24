@@ -71,7 +71,7 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
         Set<MCRUser> users = getUsersForGivenNameIdentifiers(nameIdentifierKeys);
 
         users.stream()
-            .map(user -> new MCRORCIDUser(user))
+            .map(MCRORCIDUser::new)
             .filter(user -> user.getStatus().isORCIDUser())
             .filter(user -> user.getStatus().weAreTrustedParty())
             .forEach(user -> publishToORCID(oid, user));

@@ -34,7 +34,6 @@ import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
@@ -697,7 +696,7 @@ public class MCRXMLFunctions {
     public static String getSize(String derivateId) throws IOException {
         MCRPath rootPath = MCRPath.getPath(derivateId, "/");
         final AtomicLong size = new AtomicLong();
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 size.addAndGet(attrs.size());
@@ -893,13 +892,10 @@ public class MCRXMLFunctions {
      * @return the order of nodes maybe changes
      */
     public static NodeList distinctValues(NodeList nodes) {
-        SortedSet<Node> distinctNodeSet = new TreeSet<>(new Comparator<Node>() {
-            @Override
-            public int compare(Node node, Node t1) {
-                String nodeValue = node.getNodeValue();
-                String nodeValue1 = t1.getNodeValue();
-                return Objects.equals(nodeValue1, nodeValue) ? 0 : -1;
-            }
+        SortedSet<Node> distinctNodeSet = new TreeSet<>((node, t1) -> {
+            String nodeValue = node.getNodeValue();
+            String nodeValue1 = t1.getNodeValue();
+            return Objects.equals(nodeValue1, nodeValue) ? 0 : -1;
         });
         for (int i = 0; i < nodes.getLength(); i++) {
             distinctNodeSet.add(nodes.item(i));

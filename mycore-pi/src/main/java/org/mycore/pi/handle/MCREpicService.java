@@ -228,21 +228,21 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     private void startUpdateJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<String, String>();
+        HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
         this.addUpdateJob(contextParameters);
     }
 
     private void startRegisterJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<String, String>();
+        HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
         this.addRegisterJob(contextParameters);
     }
 
     private void startDeleteJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<String, String>();
+        HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
         this.addDeleteJob(contextParameters);

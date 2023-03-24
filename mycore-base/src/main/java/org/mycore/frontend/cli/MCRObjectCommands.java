@@ -177,7 +177,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Selects MCRObjects that are descendants of {0} (children, grandchildren, ...) and {0} itself.",
         order = 15)
     public static void selectDescendantObjects(String id) {
-        List<String> descendants = new ArrayList<String>();
+        List<String> descendants = new ArrayList<>();
         if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
             fillWithDescendants(id, descendants);
         }

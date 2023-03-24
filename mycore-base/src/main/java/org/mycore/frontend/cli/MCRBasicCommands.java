@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -92,7 +93,7 @@ public class MCRBasicCommands {
     public static void listKnownCommandsBeginningWithPrefix(String pattern) {
         TreeMap<String, List<org.mycore.frontend.cli.MCRCommand>> matchingCommands = MCRCommandManager
             .getKnownCommands().entrySet().stream()
-            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 .filter(cmd -> cmd.getSyntax().contains(pattern) || cmd.getHelpText().contains(pattern))
                 .collect(Collectors.toList()), (k, v) -> k, TreeMap::new));
 

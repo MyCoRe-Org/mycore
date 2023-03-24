@@ -582,7 +582,7 @@ public class MCRRestAPIObjectsHelper {
                 String mcrID = der.getDerivate().getMetaLink().getXLinkHref();
                 eDerObject.setAttribute("metadata", mcrID);
                 if (der.getDerivate().getClassifications().size() > 0) {
-                    StringBuffer c = new StringBuffer();
+                    StringBuilder c = new StringBuilder();
                     for (int i = 0; i < der.getDerivate().getClassifications().size(); i++) {
                         if (i > 0) {
                             c.append(' ');

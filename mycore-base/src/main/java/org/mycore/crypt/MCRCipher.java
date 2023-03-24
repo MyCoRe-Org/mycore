@@ -85,7 +85,7 @@ public abstract class MCRCipher {
     @MCRProperty(name = "EnableACL", required = false)
     public void setAclEnabled(final String enabled) {
         if ("true".equalsIgnoreCase(enabled) || "false".equalsIgnoreCase(enabled)) {
-            aclEnabled = Boolean.valueOf(enabled);
+            aclEnabled = Boolean.parseBoolean(enabled);
         } else {
             throw new MCRConfigurationException("MCRCrypt: " + enabled + " is not a valid boolean.");
         }

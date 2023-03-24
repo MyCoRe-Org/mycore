@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -120,19 +121,19 @@ public class MCRProperties extends Properties {
             @Override
             public Set<Map.Entry<Object, Object>> entrySet() {
                 Set<Map.Entry<Object, Object>> sortedSet = new TreeSet<>(
-                    (o1, o2) -> o1.getKey().toString().compareTo(o2.getKey().toString()));
+                    Comparator.comparing(o -> o.getKey().toString()));
                 sortedSet.addAll(super.entrySet());
                 return sortedSet;
             }
 
             @Override
             public Set<Object> keySet() {
-                return new TreeSet<Object>(super.keySet());
+                return new TreeSet<>(super.keySet());
             }
 
             @Override
             public synchronized Enumeration<Object> keys() {
-                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+                return Collections.enumeration(new TreeSet<>(super.keySet()));
             }
 
         };

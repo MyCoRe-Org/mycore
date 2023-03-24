@@ -146,7 +146,7 @@ public class MCRCommandManager {
     public List<String> invokeCommand(String command) throws Exception {
         if (command.trim().startsWith("#")) {
             //ignore comment
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
         for (List<MCRCommand> commands : knownCommands.values()) {
             for (MCRCommand currentCommand : commands) {

@@ -187,7 +187,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
             persistURNStr(deriv, null).accept(derivURN::asString, "");
 
-            if (Boolean.valueOf(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
+            if (Boolean.parseBoolean(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
                 String suffix = "dfg";
                 persistURNStr(deriv, null, getServiceID() + "-" + suffix)
                     .accept(() -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");

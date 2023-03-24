@@ -549,14 +549,13 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 HttpCacheContext context = HttpCacheContext.create();
                 HttpGet get = new HttpGet(hrefURI);
-                CloseableHttpResponse response = restClient.execute(get, context);
-                logger.debug(() -> getCacheDebugMsg(hrefURI, context));
-                try (InputStream content = response.getEntity().getContent()) {
+                try (CloseableHttpResponse response = restClient.execute(get, context);
+                    InputStream content = response.getEntity().getContent()) {
+                    logger.debug(() -> getCacheDebugMsg(hrefURI, context));
                     final Source source = new MCRStreamContent(content).getReusableCopy().getSource();
                     source.setSystemId(hrefURI.toASCIIString());
                     return source;
                 } finally {
-                    response.close();
                     get.reset();
                 }
             } catch (IOException e) {

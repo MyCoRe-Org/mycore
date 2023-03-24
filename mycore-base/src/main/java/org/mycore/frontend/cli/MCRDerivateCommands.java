@@ -627,7 +627,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            a IFS node (file or directory)
      */
     private static void doForChildren(Path rootPath) throws IOException {
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 // handle events
@@ -757,7 +757,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
         PathMatcher matcher = derivateRoot.getFileSystem().getPathMatcher(pattern);
 
-        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {

@@ -60,9 +60,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
     public void resolveReadObjectForbidden() {
         MCRAccessMock.setMethodResult(false);
 
-        Assert.assertThrows(TransformerException.class, () -> {
-            MCRURIResolver.instance().resolve(READ_CALL, null);
-        });
+        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.instance().resolve(READ_CALL, null));
         assertReadCall();
         Assert.assertEquals("The resolver should not have been called", 0, MCRMockResolver.getCalls().size());
     }
@@ -106,9 +104,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
     public void resolvePermissionForbidden() {
         MCRAccessMock.setMethodResult(false);
 
-        Assert.assertThrows(TransformerException.class, () -> {
-            MCRURIResolver.instance().resolve(USE_STUFF_CALL, null);
-        });
+        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.instance().resolve(USE_STUFF_CALL, null));
         assertPermissionCall();
         Assert.assertEquals("The resolver should not have been called", 0, MCRMockResolver.getCalls().size());
     }

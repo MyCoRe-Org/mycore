@@ -98,9 +98,7 @@ class MCREventHandler {
             .getFlags(flagName)
             .stream()
             .findFirst()
-            .ifPresent(c -> {
-                json.addProperty(propertyName, c);
-            });
+            .ifPresent(c -> json.addProperty(propertyName, c));
     }
 
     public static class MCRObjectHandler implements org.mycore.common.events.MCREventHandler {

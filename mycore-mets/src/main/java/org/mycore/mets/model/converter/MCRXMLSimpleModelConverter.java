@@ -89,21 +89,19 @@ public class MCRXMLSimpleModelConverter {
         metsSection.setType(current.getType());
         metsSection.setParent(parent);
 
-        current.getFptrList().forEach(fptr -> fptr.getSeqList().forEach(seq -> {
-            seq.getAreaList().forEach(area -> {
-                String fileId = area.getFileId();
-                String begin = area.getBegin();
-                String end = area.getEnd();
+        current.getFptrList().forEach(fptr -> fptr.getSeqList().forEach(seq -> seq.getAreaList().forEach(area -> {
+            String fileId = area.getFileId();
+            String begin = area.getBegin();
+            String end = area.getEnd();
 
-                if (!idFileMap.containsKey(fileId)) {
-                    throw new MCRException("No file with id " + fileId + " found!");
-                }
+            if (!idFileMap.containsKey(fileId)) {
+                throw new MCRException("No file with id " + fileId + " found!");
+            }
 
-                MCRMetsFile file = idFileMap.get(fileId);
-                MCRMetsAltoLink e = new MCRMetsAltoLink(file, begin, end);
-                metsSection.addAltoLink(e);
-            });
-        }));
+            MCRMetsFile file = idFileMap.get(fileId);
+            MCRMetsAltoLink e = new MCRMetsAltoLink(file, begin, end);
+            metsSection.addAltoLink(e);
+        })));
 
         if (idSectionMap != null) {
             idSectionMap.put(current.getId(), metsSection);
@@ -170,10 +168,8 @@ public class MCRXMLSimpleModelConverter {
 
     private static void addFilesFromGroup(Map<String, MCRMetsFile> idPageMap, FileGrp fileGroup) {
         String fileGroupUse = fileGroup.getUse();
-        fileGroup.getFileList().forEach(file -> {
-            idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
-                file.getFLocat().getHref(), file.getMimeType(), fileGroupUse));
-        });
+        fileGroup.getFileList().forEach(file -> idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
+            file.getFLocat().getHref(), file.getMimeType(), fileGroupUse)));
     }
 
 }

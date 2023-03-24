@@ -41,7 +41,7 @@ public class MCRFactsHolder {
 
     private Collection<MCRFactComputable<MCRFact<?>>> computers;
 
-    private final Set<MCRFact<?>> facts = new HashSet<MCRFact<?>>();
+    private final Set<MCRFact<?>> facts = new HashSet<>();
 
     public MCRFactsHolder(Collection<MCRFactComputable<MCRFact<?>>> computers) {
         this.computers = computers;

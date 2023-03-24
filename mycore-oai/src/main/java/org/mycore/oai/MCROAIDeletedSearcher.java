@@ -62,8 +62,8 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
         if (cursor != null) {
             try {
                 String[] parts = cursor.substring((CURSOR_PREFIX + CURSOR_DELIMETER).length()).split(CURSOR_DELIMETER);
-                from = Integer.valueOf(parts[0]);
-                rows = Integer.valueOf(parts[1]);
+                from = Integer.parseInt(parts[0]);
+                rows = Integer.parseInt(parts[1]);
             } catch (Exception exc) {
                 throw new IllegalArgumentException("Invalid cursor " + cursor, exc);
             }

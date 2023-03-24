@@ -95,9 +95,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
                 MCRConfiguration2.getSubPropertiesMap(prefix)
                     .forEach((key, value) -> propertiesMap.put(prefix + key, value));
             } else {
-                MCRConfiguration2.getString(property).ifPresent((p) -> {
-                    propertiesMap.put(property, p);
-                });
+                MCRConfiguration2.getString(property).ifPresent((p) -> propertiesMap.put(property, p));
             }
         }
 

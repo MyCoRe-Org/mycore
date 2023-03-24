@@ -65,7 +65,7 @@ public class MCRXPathEvaluator {
 
     public String replaceXPaths(String text, boolean urlEncode) {
         Matcher m = PATTERN_XPATH.matcher(text);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (m.find()) {
             String replacement = replaceXPathOrI18n(m.group(1));
             if (urlEncode) {

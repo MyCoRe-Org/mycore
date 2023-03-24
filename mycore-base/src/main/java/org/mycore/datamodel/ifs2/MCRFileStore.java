@@ -44,7 +44,7 @@ public class MCRFileStore extends MCRStore {
     //MCR-1868: prevents parallel threads to read and write mcrmeta.xml concurrently on instantiation
     LoadingCache<Integer, MCRFileCollection> collectionLoadingCache = CacheBuilder.newBuilder()
         .weakValues()
-        .build(new CacheLoader<Integer, MCRFileCollection>() {
+        .build(new CacheLoader<>() {
             @Override
             public MCRFileCollection load(Integer key) throws Exception {
                 return new MCRFileCollection(thisInstance, key);

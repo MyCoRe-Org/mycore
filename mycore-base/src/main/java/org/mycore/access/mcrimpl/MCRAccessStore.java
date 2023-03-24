@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -156,11 +157,7 @@ public abstract class MCRAccessStore {
             def.setObjID(objid);
             for (String pool : pools) {
                 String rule = getRuleID(objid, pool);
-                if (rule != null) {
-                    def.addPool(pool, rule);
-                } else {
-                    def.addPool(pool, " ");
-                }
+                def.addPool(pool, Objects.requireNonNullElse(rule, " "));
             }
             ret.add(def);
             return ret;

@@ -51,7 +51,7 @@ public class MCRFileStore extends MCRAbstractFileStore {
     private FileStore baseFileStore;
 
     private static LoadingCache<String, MCRFileStore> instanceHolder = CacheBuilder.newBuilder().weakKeys()
-        .build(new CacheLoader<String, MCRFileStore>() {
+        .build(new CacheLoader<>() {
 
             @Override
             public MCRFileStore load(String contentStoreID) throws Exception {

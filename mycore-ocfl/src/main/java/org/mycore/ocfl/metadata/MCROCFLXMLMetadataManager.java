@@ -124,9 +124,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         String ocflObjectID = getOCFLObjectID(mcrid);
         VersionInfo info = buildVersionInfo(MESSAGE_CREATED, lastModified, user);
         try (InputStream objectAsStream = xml.getInputStream()) {
-            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), info, init -> {
-                init.writeFile(objectAsStream, buildFilePath(mcrid));
-            });
+            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), info,
+                init -> init.writeFile(objectAsStream, buildFilePath(mcrid)));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to create object '" + ocflObjectID + "'", e);
         }
@@ -156,9 +155,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         if (versionType == MCROCFLMetadataVersion.DELETED) {
             throw new MCRUsageException("Cannot delete already deleted object '" + ocflObjectID + "'");
         }
-        repo.updateObject(ObjectVersionId.head(ocflObjectID), buildVersionInfo(MESSAGE_DELETED, date, null), init -> {
-            init.removeFile(buildFilePath(mcrid));
-        });
+        repo.updateObject(ObjectVersionId.head(ocflObjectID), buildVersionInfo(MESSAGE_DELETED, date, null),
+            init -> init.removeFile(buildFilePath(mcrid)));
     }
 
     public void purge(MCRObjectID mcrid, Date date, String user) {
@@ -184,9 +182,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         }
         try (InputStream objectAsStream = xml.getInputStream()) {
             VersionInfo versionInfo = buildVersionInfo(MESSAGE_UPDATED, lastModified, user);
-            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo, init -> {
-                init.writeFile(objectAsStream, buildFilePath(mcrid), OcflOption.OVERWRITE);
-            });
+            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
+                init -> init.writeFile(objectAsStream, buildFilePath(mcrid), OcflOption.OVERWRITE));
         } catch (IOException e) {
             throw new MCRPersistenceException("Failed to update object '" + ocflObjectID + "'", e);
         }

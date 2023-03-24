@@ -181,7 +181,7 @@ public abstract class MCRNode {
             return Stream.empty();
         }
         return Files.list(path)
-            .map(child -> buildChildNode(child));
+            .map(this::buildChildNode);
     }
 
     /**

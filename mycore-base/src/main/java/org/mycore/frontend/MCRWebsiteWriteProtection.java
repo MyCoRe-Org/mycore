@@ -72,7 +72,7 @@ public final class MCRWebsiteWriteProtection {
         }
         // return value contained in config
         String protection = config.getChildTextTrim("protectionEnabled");
-        return Boolean.valueOf(protection);
+        return Boolean.parseBoolean(protection);
     }
 
     public static org.w3c.dom.Document getMessage() throws JDOMException {

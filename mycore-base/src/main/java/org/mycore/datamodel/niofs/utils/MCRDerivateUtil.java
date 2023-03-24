@@ -53,7 +53,7 @@ public class MCRDerivateUtil {
         MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
         Pattern patternObj = Pattern.compile(pattern);
         Map<String, String> resultMap = new HashMap<>();
-        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {

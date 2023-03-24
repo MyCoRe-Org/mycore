@@ -33,8 +33,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.undercouch.citeproc.helper.json.JsonBuilder;
-import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -56,6 +54,8 @@ import de.undercouch.citeproc.csl.CSLItemDataBuilder;
 import de.undercouch.citeproc.csl.CSLName;
 import de.undercouch.citeproc.csl.CSLNameBuilder;
 import de.undercouch.citeproc.csl.CSLType;
+import de.undercouch.citeproc.helper.json.JsonBuilder;
+import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 
 public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
@@ -145,9 +145,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             wrapper.getElement("mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 "mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']")))
-            .ifPresent(el -> {
-                idb.language(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.language(el.getTextNormalize()));
     }
 
     protected void processURL(String id, CSLItemDataBuilder idb) {
@@ -332,52 +330,40 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processAbstract(CSLItemDataBuilder idb) {
-        Optional.ofNullable(wrapper.getElement("mods:abstract[not(@altFormat)]")).ifPresent(abstr -> {
-            idb.abstrct(abstr.getTextNormalize());
-        });
+        Optional.ofNullable(wrapper.getElement("mods:abstract[not(@altFormat)]"))
+            .map(Element::getTextNormalize)
+            .ifPresent(idb::abstrct);
     }
 
     protected void processPublicationData(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm")))
-            .ifPresent(el -> {
-                idb.publisherPlace(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.publisherPlace(el.getTextNormalize()));
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher")))
-            .ifPresent(el -> {
-                idb.publisher(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.publisher(el.getTextNormalize()));
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition")))
-            .ifPresent(el -> {
-                idb.edition(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.edition(el.getTextNormalize()));
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued")))
-            .ifPresent(el -> {
-                idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build());
-            });
+            .ifPresent(el -> idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build()));
     }
 
     protected void processIdentifier(CSLItemDataBuilder idb) {
         final List<Element> parentIdentifiers = wrapper.getElements("mods:relatedItem[@type='host']/mods:identifier");
 
-        parentIdentifiers.forEach(parentIdentifier -> {
-            applyIdentifier(idb, parentIdentifier, true);
-        });
+        parentIdentifiers.forEach(parentIdentifier -> applyIdentifier(idb, parentIdentifier, true));
 
         final List<Element> identifiers = wrapper.getElements("mods:identifier");
-        identifiers.forEach(identifierElement -> {
-            applyIdentifier(idb, identifierElement, false);
-        });
+        identifiers.forEach(identifierElement -> applyIdentifier(idb, identifierElement, false));
 
     }
 
@@ -426,15 +412,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             });
 
         Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + SHORT_TITLE_XPATH))
-            .ifPresent((titleInfo) -> {
-                idb.containerTitleShort(buildShortTitle(titleInfo));
-            });
+            .ifPresent((titleInfo) -> idb.containerTitleShort(buildShortTitle(titleInfo)));
 
         wrapper.getElements(".//mods:relatedItem[@type='series' or (@type='host' and "
             + "mods:genre[@type='intern'] = 'series')]/" + USABLE_TITLE_XPATH).stream()
-            .findFirst().ifPresent((relatedItem) -> {
-                idb.collectionTitle(buildTitle(relatedItem));
-            });
+            .findFirst().ifPresent((relatedItem) -> idb.collectionTitle(buildTitle(relatedItem)));
     }
 
     protected void processNames(CSLItemDataBuilder idb) {

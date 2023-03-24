@@ -609,12 +609,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
         // Create the output
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
 
-        try {
+        try (outFile) {
             outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
         } catch (Exception e) {
             throw new MCRException("Error while save XML to file: " + e.getMessage());
-        } finally {
-            outFile.close();
         }
     }
 }

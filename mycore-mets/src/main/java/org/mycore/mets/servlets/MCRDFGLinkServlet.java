@@ -205,7 +205,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         if (useExistingMetsParam == null) {
             return true;
         }
-        return Boolean.valueOf(useExistingMetsParam);
+        return Boolean.parseBoolean(useExistingMetsParam);
     }
 
 }

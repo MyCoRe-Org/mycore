@@ -301,9 +301,7 @@ abstract class MCRFileSystemUtils {
         if (parent.getNameCount() == 0) {
             MCRObjectID derId = MCRObjectID.getInstance(parent.getOwner());
             return Optional.ofNullable(getStore(derId.getBase()))
-                .map(s -> {
-                    return s.retrieve(derId.getNumberAsInteger());
-                });
+                .map(s -> s.retrieve(derId.getNumberAsInteger()));
         }
         //recursive call
         String dirName = parent.getFileName().toString();

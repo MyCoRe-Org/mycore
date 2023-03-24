@@ -89,7 +89,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         final List<MCRSolrIndexHandler> subHandlerList = this.subHandlerList;
         final List<SolrInputDocument> docs = new ArrayList<>();
         final SolrClient solrClient = this.solrClient;
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

@@ -125,10 +125,10 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
             if (a == Action.ADD) {
                 add(base, field1, value1);
             } else if (a == Action.REMOVE) {
-                find(base, field1, value1).forEach(e -> e.detach());
+                find(base, field1, value1).forEach(Element::detach);
             } else if (a == Action.REPLACE) {
                 List<Element> found = find(base, field1, value1);
-                found.forEach(e -> e.detach());
+                found.forEach(Element::detach);
                 if (!found.isEmpty()) {
                     add(base, field2, value2);
                 }
@@ -138,7 +138,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
                 }
             } else if (a == Action.REMOVE_IF) {
                 if (!find(base, field1, value1).isEmpty()) {
-                    find(base, field2, value2).forEach(e -> e.detach());
+                    find(base, field2, value2).forEach(Element::detach);
                 }
             }
         }

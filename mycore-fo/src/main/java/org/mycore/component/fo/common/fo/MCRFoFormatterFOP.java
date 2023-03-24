@@ -149,7 +149,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     @Override
     public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException {
-        try {
+        try (out) {
             final FOUserAgent userAgent = fopFactory.newFOUserAgent();
             userAgent.setProducer(new MessageFormat("MyCoRe {0} ({1})", Locale.ROOT)
                 .format(new Object[] { MCRCoreVersion.getCompleteVersion(), userAgent.getProducer() }));
@@ -161,8 +161,6 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             transformer.transform(src, res);
         } catch (FOPException e) {
             throw new TransformerException(e);
-        } finally {
-            out.close();
         }
     }
 }

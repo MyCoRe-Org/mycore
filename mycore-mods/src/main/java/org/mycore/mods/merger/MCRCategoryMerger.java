@@ -89,7 +89,7 @@ public class MCRCategoryMerger extends MCRMerger {
     }
 
     private static List<MCRCategory> getAncestorsAndSelf(MCRCategoryID categoryID) {
-        List<MCRCategory> ancestorsAndSelf = new ArrayList<MCRCategory>();
+        List<MCRCategory> ancestorsAndSelf = new ArrayList<>();
         ancestorsAndSelf.addAll(DAO.getParents(categoryID));
         ancestorsAndSelf.remove(DAO.getRootCategory(categoryID, 0));
         ancestorsAndSelf.add(DAO.getCategory(categoryID, 0));

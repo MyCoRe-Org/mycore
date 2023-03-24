@@ -261,7 +261,7 @@ public class MCRSwordUtil {
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
-                new SimpleFileVisitor<Path>() {
+                new SimpleFileVisitor<>() {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                         throws IOException {
@@ -318,7 +318,7 @@ public class MCRSwordUtil {
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
             ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
-            Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     MCRValidationResult validationResult = validator.validate(file);
@@ -522,7 +522,7 @@ public class MCRSwordUtil {
             MCRPath derivateRootPath = MCRPath.getPath(derivateId, "/");
             try {
                 List<IRI> iris = new ArrayList<>();
-                Files.walkFileTree(derivateRootPath, new SimpleFileVisitor<Path>() {
+                Files.walkFileTree(derivateRootPath, new SimpleFileVisitor<>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                         String relativePath = derivateRootPath.relativize(file).toString();

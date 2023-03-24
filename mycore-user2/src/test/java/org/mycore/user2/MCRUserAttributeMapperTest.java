@@ -113,7 +113,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
-        extraAttribs.entrySet().forEach(e -> user.setUserAttribute(e.getKey(), e.getValue()));
+        extraAttribs.forEach((key, value) -> user.setUserAttribute(key, value));
 
         MCRUserManager.createUser(user);
 
@@ -149,7 +149,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
-        extraAttribs.entrySet().forEach(e -> user.setUserAttribute(e.getKey(), e.getValue()));
+        extraAttribs.forEach((key, value) -> user.setUserAttribute(key, value));
 
         MCRUserManager.createUser(user);
 

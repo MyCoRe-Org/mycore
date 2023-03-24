@@ -21,6 +21,7 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.xml.transform.TransformerException;
 
@@ -210,11 +211,7 @@ public class MCRErrorServlet extends HttpServlet {
 
         final String requestAttr = "MCRErrorServlet.generateErrorPage";
         if (!response.isCommitted() && request.getAttribute(requestAttr) == null) {
-            if (statusCode != null) {
-                response.setStatus(statusCode);
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
+            response.setStatus(Objects.requireNonNullElse(statusCode, HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
             request.setAttribute(requestAttr, msg);
             boolean currentSessionActive = MCRSessionMgr.hasCurrentSession();
             boolean sessionFromRequest = setCurrentSession(request);

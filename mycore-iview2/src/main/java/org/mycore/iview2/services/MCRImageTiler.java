@@ -164,8 +164,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                             }
                             EntityTransaction transaction = null;
                             MCRTileJob job = null;
-                            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-                            try {
+                            try (EntityManager em = MCREntityManagerProvider.getCurrentEntityManager()) {
                                 transaction = em.getTransaction();
                                 transaction.begin();
                                 job = TQ.poll();
@@ -181,8 +180,6 @@ public class MCRImageTiler implements Runnable, Closeable {
                                         LOGGER.warn("Could not rollback transaction.", re);
                                     }
                                 }
-                            } finally {
-                                em.close();
                             }
                             if (job != null && !tilingServe.getExecutor().isShutdown()) {
                                 LOGGER.info("Creating:{}", job.getPath());

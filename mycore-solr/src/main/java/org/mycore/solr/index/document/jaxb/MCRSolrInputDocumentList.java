@@ -27,6 +27,7 @@ package org.mycore.solr.index.document.jaxb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -133,11 +134,7 @@ public class MCRSolrInputDocumentList {
      *     
      */
     public boolean isOverwrite() {
-        if (overwrite == null) {
-            return true;
-        } else {
-            return overwrite;
-        }
+        return Objects.requireNonNullElse(overwrite, true);
     }
 
     /**

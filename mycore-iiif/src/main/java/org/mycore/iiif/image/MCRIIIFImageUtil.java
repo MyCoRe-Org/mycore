@@ -61,7 +61,7 @@ public class MCRIIIFImageUtil {
     }
 
     public static String getIIIFURL(MCRIIIFImageImpl impl) {
-        StringBuffer sb = new StringBuffer(MCRFrontendUtil.getBaseURL());
+        StringBuilder sb = new StringBuilder(MCRFrontendUtil.getBaseURL());
         sb.append("api/iiif/image/v2/");
         String defaultImpl = MCRConfiguration2.getString("MCR.IIIFImage.Default").orElse("");
         if (!defaultImpl.equals(impl.getImplName())) {

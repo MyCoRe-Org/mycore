@@ -162,7 +162,7 @@ public class MCRRestDerivates {
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
         List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
         return Response.ok()
-            .entity(new GenericEntity<List<MCRMetaEnrichedLinkID>>(derivates) {
+            .entity(new GenericEntity<>(derivates) {
             })
             .lastModified(lastModified)
             .build();

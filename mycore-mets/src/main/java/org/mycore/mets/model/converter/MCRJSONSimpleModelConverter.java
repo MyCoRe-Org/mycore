@@ -84,9 +84,7 @@ public class MCRJSONSimpleModelConverter {
         final Map<String, MCRMetsFile> idFileMap = new Hashtable<>();
         pages.forEach(p -> p.getFileList().stream()
             .filter(file -> file.getUse().equals(MCRMetsModelHelper.ALTO_USE))
-            .forEach(file -> {
-                idFileMap.put(file.getId(), file);
-            }));
+            .forEach(file -> idFileMap.put(file.getId(), file)));
 
         return idFileMap;
     }

@@ -370,7 +370,7 @@ public class MCRTranslation {
         return MCRConfiguration2.getString("MCR.Metadata.Languages")
             .map(MCRConfiguration2::splitValue)
             .map(s -> s.collect(Collectors.toSet()))
-            .orElseGet(() -> loadLanguagesByMessagesBundle()); //all languages by available messages_*.properties
+            .orElseGet(MCRTranslation::loadLanguagesByMessagesBundle);//all languages by available messages_*.properties
     }
 
     static Set<String> loadLanguagesByMessagesBundle() {

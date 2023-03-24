@@ -160,7 +160,7 @@ public class MCRMETSServlet extends MCRServlet {
         if (useExistingMetsParam == null) {
             return true;
         }
-        return Boolean.valueOf(useExistingMetsParam);
+        return Boolean.parseBoolean(useExistingMetsParam);
     }
 
     public static String getOwnerID(String pathInfo) {

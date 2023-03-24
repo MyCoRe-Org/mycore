@@ -34,7 +34,7 @@ class MCRObjectIDPool {
     private static LoadingCache<String, MCRObjectID> objectIDCache = CacheBuilder
         .newBuilder()
         .weakValues()
-        .build(new CacheLoader<String, MCRObjectID>() {
+        .build(new CacheLoader<>() {
             @Override
             public MCRObjectID load(String id) {
                 return new MCRObjectID(id);

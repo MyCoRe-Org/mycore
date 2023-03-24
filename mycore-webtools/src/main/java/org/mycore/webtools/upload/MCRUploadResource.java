@@ -39,8 +39,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -74,10 +72,12 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("files/upload/")
@@ -361,9 +361,8 @@ public class MCRUploadResource {
             throw new BadRequestException("File is to big. " + unicodeNormalizedPath);
         } else {
             final List<MCRPostUploadFileProcessor> processors = FILE_PROCESSORS.stream()
-                .filter(procesor -> {
-                    return procesor.isProcessable(unicodeNormalizedPath);
-                }).collect(Collectors.toList());
+                .filter(processor -> processor.isProcessable(unicodeNormalizedPath))
+                .collect(Collectors.toList());
 
             if (processors.size() == 0) {
                 Files.copy(contents, filePath, StandardCopyOption.REPLACE_EXISTING);

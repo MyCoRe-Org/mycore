@@ -35,9 +35,9 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
@@ -69,16 +69,14 @@ public class MCRAccessKeyUtils {
     }
 
     private static Set<String> loadAllowedObjectTypes() {
-        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_OBJECT_TYPES_PROP::equals, (p1, p2, p3) -> {
-            allowedObjectTypes = parseListStringToSet(p3);
-        });
+        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_OBJECT_TYPES_PROP::equals,
+            (p1, p2, p3) -> allowedObjectTypes = parseListStringToSet(p3));
         return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_OBJECT_TYPES_PROP));
     }
 
     private static Set<String> loadAllowedSessionPermissionTypes() {
-        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_SESSION_PERMISSION_TYPES_PROP::equals, (p1, p2, p3) -> {
-            allowedSessionPermissionTypes = parseListStringToSet(p3);
-        });
+        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_SESSION_PERMISSION_TYPES_PROP::equals,
+            (p1, p2, p3) -> allowedSessionPermissionTypes = parseListStringToSet(p3));
         return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_SESSION_PERMISSION_TYPES_PROP));
     }
 

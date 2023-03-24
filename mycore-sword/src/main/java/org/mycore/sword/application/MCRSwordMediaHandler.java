@@ -236,7 +236,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
             checkFile(path);
             try {
                 if (Files.isDirectory(path)) {
-                    Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                    Files.walkFileTree(path, new SimpleFileVisitor<>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                             Files.delete(file);

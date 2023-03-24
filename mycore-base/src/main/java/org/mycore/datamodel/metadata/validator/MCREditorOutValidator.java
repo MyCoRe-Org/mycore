@@ -504,8 +504,7 @@ public class MCREditorOutValidator {
         public String checkDataSubTag(Element datasubtag) {
             Element[] children = datasubtag.getChildren("text").toArray(Element[]::new);
             int textCount = children.length;
-            for (int i = 0; i < children.length; i++) {
-                Element child = children[i];
+            for (Element child : children) {
                 String text = child.getTextTrim();
                 if (text == null || text.length() == 0) {
                     child.detach();

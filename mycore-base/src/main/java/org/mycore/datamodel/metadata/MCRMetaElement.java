@@ -307,12 +307,12 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         tag = element.getName();
         String heritable = element.getAttributeValue("heritable");
         if (heritable != null) {
-            setHeritable(Boolean.valueOf(heritable));
+            setHeritable(Boolean.parseBoolean(heritable));
         }
 
         String notInherit = element.getAttributeValue("notinherit");
         if (notInherit != null) {
-            setNotInherit(Boolean.valueOf(notInherit));
+            setNotInherit(Boolean.parseBoolean(notInherit));
         }
 
         List<Element> elementList = element.getChildren();

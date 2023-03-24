@@ -54,7 +54,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR);
 
     private final LoadingCache<String, MCRPath> rootDirectoryCache = CacheBuilder.newBuilder().weakValues()
-        .build(new CacheLoader<String, MCRPath>() {
+        .build(new CacheLoader<>() {
 
             @Override
             public MCRPath load(final String owner) {

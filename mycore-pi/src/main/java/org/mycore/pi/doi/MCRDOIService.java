@@ -142,7 +142,7 @@ public class MCRDOIService extends MCRDOIBaseService {
     private void init() {
         Map<String, String> properties = getProperties();
         useTestServer = Boolean
-            .valueOf(properties.getOrDefault(TEST_SERVER, properties.getOrDefault(TEST_PREFIX, "false")));
+            .parseBoolean(properties.getOrDefault(TEST_SERVER, properties.getOrDefault(TEST_PREFIX, "false")));
         registerURL = properties.get("RegisterBaseURL");
         nameSpace = Namespace.getNamespace("datacite", properties.getOrDefault("Namespace", KERNEL_3_NAMESPACE_URI));
 

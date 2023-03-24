@@ -50,7 +50,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
     private MCRIdentifierPool idPool;
 
-    private List<Element> results = new ArrayList<Element>();
+    private List<Element> results = new ArrayList<>();
 
     private boolean gotResults = false;
 
