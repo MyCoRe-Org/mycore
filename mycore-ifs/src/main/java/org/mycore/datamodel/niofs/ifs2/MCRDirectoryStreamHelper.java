@@ -73,7 +73,7 @@ class MCRDirectoryStreamHelper {
             return new SecureDirectoryStream(dir, path,
                 (java.nio.file.SecureDirectoryStream<Path>) baseDirectoryStream);
         }
-        return new SimpleDirectoryStream(path, baseDirectoryStream);
+        return new SimpleDirectoryStream<>(path, baseDirectoryStream);
     }
 
     private static class AcceptAllFilter

@@ -122,11 +122,11 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     protected MCRCondition<?> parseString(String s) {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false")) {
-            return new MCRFalseCondition();
+            return new MCRFalseCondition<>();
         }
 
         if (s.equalsIgnoreCase("true")) {
-            return new MCRTrueCondition();
+            return new MCRTrueCondition<>();
         }
 
         if (s.startsWith("group")) {
