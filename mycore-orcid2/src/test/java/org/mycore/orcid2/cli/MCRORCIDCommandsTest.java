@@ -25,7 +25,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.orcid2.client.MCRORCIDCredential;
-import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
