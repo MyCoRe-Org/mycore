@@ -86,9 +86,7 @@ public class MCRPropertiesToJSONTransformer implements MessageBodyWriter<Propert
             final JsonSerializationContext context) {
             final JsonObject resultJson = new JsonObject();
 
-            for (final String key : bundleMap.keySet()) {
-                createFromBundleKey(resultJson, key, bundleMap.get(key));
-            }
+            bundleMap.forEach((key, value) -> createFromBundleKey(resultJson, key, value));
 
             return resultJson;
         }
