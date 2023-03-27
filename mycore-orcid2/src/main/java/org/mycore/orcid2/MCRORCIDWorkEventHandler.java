@@ -98,11 +98,23 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
         }
     }
 
+    /**
+     * Checks if MCRObject should be published.
+     * 
+     * @param object the MCRObject
+     * @return true if MCRObject is complete
+     */
     protected static boolean checkPublish(MCRObject object) {
         final MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
         return !wrapper.getMODS().getChildren().isEmpty();
     }
 
+    /**
+     * Filters MCRObject.
+     * 
+     * @param object the MCRObject
+     * @return filtered MCRObject
+     */
     protected static MCRObject filterObject(MCRObject object) {
         try {
             final MCRContent filtertedObjectContent

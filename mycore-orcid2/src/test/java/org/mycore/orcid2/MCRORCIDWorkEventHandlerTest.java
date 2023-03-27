@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -51,6 +52,13 @@ public class MCRORCIDWorkEventHandlerTest extends MCRJPATestCase {
         final MCRCategory state
             = MCRCategoryDAOImplTest.loadClassificationResource("/mycore-classifications/state.xml");
         DAO.addCategory(null, state);
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
+        return testProperties;
     }
 
     @Test
