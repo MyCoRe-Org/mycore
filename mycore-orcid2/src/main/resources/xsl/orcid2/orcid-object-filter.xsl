@@ -4,12 +4,7 @@
   xmlns:mods="http://www.loc.gov/mods/v3"
   exclude-result-prefixes="xsl">
 
-  <!-- TODO may use copynodes.xsl -->
-  <xsl:template match="node()|@*">
-    <xsl:copy>
-      <xsl:apply-templates select="node()|@*" />
-    </xsl:copy>
-  </xsl:template>
+  <xsl:include href="copynodes.xsl" />
 
   <xsl:template match="/">
     <xsl:apply-templates />
