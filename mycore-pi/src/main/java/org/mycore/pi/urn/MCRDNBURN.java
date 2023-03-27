@@ -180,9 +180,7 @@ public class MCRDNBURN extends MCRUniformResourceName {
         /* in this case we must add zeroes */
         if (valueSLen < maxSLen) {
             int zeroesToAdd = maxSLen - valueSLen;
-            for (int i = 0; i < zeroesToAdd; i++) {
-                builder.append(0);
-            }
+            builder.append("0".repeat(zeroesToAdd));
             return builder.append(valueS).toString();
         }
         /* no need to add zeroes at all */

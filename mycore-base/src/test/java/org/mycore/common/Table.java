@@ -52,9 +52,7 @@ public class Table {
             sb.delete(0, sb.length() + 1);
             for (int c = 0; c < columns; c++) {
                 String value = values.get(r * columns + c);
-                for (int i = 0; i <= colSize[c] - value.length(); i++) {
-                    sb.append(' ');
-                }
+                sb.append(" ".repeat(Math.max(0, colSize[c] - value.length() + 1)));
                 sb.append(value);
             }
             out.println(sb);

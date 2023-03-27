@@ -397,11 +397,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     private static void listCategory(MCRCategory categ) {
         int level = categ.getLevel();
-        StringBuilder sb = new StringBuilder(128);
-        for (int i = 0; i < level * 2; i++) {
-            sb.append(' ');
-        }
-        String space = sb.toString();
+        String space = " ".repeat(level * 2);
         if (categ.isCategory()) {
             LOGGER.info("{}  ID    : {}", space, categ.getId().getID());
         }
