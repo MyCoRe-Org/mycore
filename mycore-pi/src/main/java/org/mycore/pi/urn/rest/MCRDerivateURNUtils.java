@@ -80,10 +80,11 @@ public class MCRDerivateURNUtils {
                 if (!isFileSupported(file)) {
                     LOGGER.info("File is not displayable within iView2. Use {} as url",
                         MCRFileNodeServlet.class.getSimpleName());
-                    String filePath = "/" + file.getOwner() + "/" + file.getFileName();
+                    String fileName = URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8).replaceAll("+", "%20");
+                    String filePath = "/" + file.getOwner() + "/" + fileName;
                     return new URL(
                         MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
-                            + filePath.replaceAll(" ", "%20"));
+                            + filePath);
                 }
 
                 return new URL(getViewerURL(file));
