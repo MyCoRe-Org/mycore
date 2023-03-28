@@ -277,7 +277,7 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#getFileName()
      */
     @Override
-    public String getFileName() {
+    public Path getFileName() {
         final int nameCount = getNameCount();
         if (nameCount == 0) {
             return null;
