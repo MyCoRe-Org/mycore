@@ -37,9 +37,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
@@ -56,7 +56,7 @@ import org.xml.sax.SAXParseException;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
+public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
 
     MCRObjectID seriesID, bookID;
 
