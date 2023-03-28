@@ -105,19 +105,18 @@ public class MCRCommand {
 
             Format f = null;
             switch (token) {
-            case "int":
-                parameterTypes[i] = Integer.TYPE;
-                f = NumberFormat.getIntegerInstance(Locale.ROOT);
-                break;
-            case "long":
-                parameterTypes[i] = Long.TYPE;
-                f = NumberFormat.getIntegerInstance(Locale.ROOT);
-                break;
-            case "String":
-                parameterTypes[i] = String.class;
-                break;
-            default:
-                unsupportedArgException(methodSignature, token);
+                case "int" -> {
+                    parameterTypes[i] = Integer.TYPE;
+                    f = NumberFormat.getIntegerInstance(Locale.ROOT);
+                }
+                case "long" -> {
+                    parameterTypes[i] = Long.TYPE;
+                    f = NumberFormat.getIntegerInstance(Locale.ROOT);
+                }
+                //CSOFF: InnerAssignment
+                case "String" -> parameterTypes[i] = String.class;
+                //CSON: InnerAssignment
+                default -> unsupportedArgException(methodSignature, token);
             }
             messageFormat.setFormat(i, f);
         }

@@ -103,44 +103,23 @@ public class MCRTopologicalSort<T> {
             try (BufferedReader br = Files.newBufferedReader(dir.resolve(file))) {
                 XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(br);
                 while (xmlStreamReader.hasNext()) {
-                    switch (xmlStreamReader.getEventType()) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        if (xmlStreamReader.getLocalName().equals("mycoreobject")) {
-                            ts.getNodes().forcePut(i, xmlStreamReader
-                                .getAttributeValue(null, "ID"));
-                        } else {
-                            String href = xmlStreamReader
-                                .getAttributeValue("http://www.w3.org/1999/xlink", "href");
-                            if (xmlStreamReader.getLocalName().equals("parent")) {
-                                List<String> dependencyList = parentNames.computeIfAbsent(i,
-                                    e -> new ArrayList<>());
-                                dependencyList.add(
-                                    href);
-                            } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
-                                if (MCRObjectID.isValid(
-                                    href)) {
-                                    List<String> dependencyList = parentNames
-                                        .computeIfAbsent(i, e -> new ArrayList<>());
-                                    dependencyList.add(
-                                        href);
+                    if (xmlStreamReader.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                        switch (xmlStreamReader.getLocalName()) {
+                            case "mycoreobject" -> ts.getNodes().forcePut(i,
+                                xmlStreamReader.getAttributeValue(null, "ID"));
+                            case "parent", "relatedItem" -> {
+                                String href = xmlStreamReader
+                                    .getAttributeValue("http://www.w3.org/1999/xlink", "href");
+                                if (MCRObjectID.isValid(href)) {
+                                    List<String> dependencyList = parentNames.computeIfAbsent(i,
+                                        e -> new ArrayList<>());
+                                    dependencyList.add(href);
                                 }
-                            } else if (xmlStreamReader.getLocalName().equals("metadata")) {
-                                break;
                             }
                         }
-                        break;
-
-                    case XMLStreamConstants.END_ELEMENT:
-                        if (xmlStreamReader.getLocalName().equals("parents")) {
-                            break;
-                        } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
-                            break;
-                        }
-                        break;
                     }
                     xmlStreamReader.next();
                 }
-
             } catch (XMLStreamException | IOException e) {
                 e.printStackTrace();
             }

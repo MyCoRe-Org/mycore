@@ -149,17 +149,19 @@ public class MCRDNBURNRestClient {
 
         String identifier = urn.getIdentifier();
         switch (status) {
-        case HttpStatus.SC_OK:
-            LOGGER.info("URN {} is in database. No further information asked", identifier);
-            LOGGER.info("Performing update of url");
-            return update(urn);
-        case HttpStatus.SC_NOT_FOUND:
-            LOGGER.info("URN {} is not registered", identifier);
-            return registerNew(urn);
-        default:
-            LOGGER.error("Error while check if URN {} exists using url {}.", identifier, url);
-            logFailure("", response, status, urn.getIdentifier(), bundle.getUrl());
-            break;
+            case HttpStatus.SC_OK -> {
+                LOGGER.info("URN {} is in database. No further information asked", identifier);
+                LOGGER.info("Performing update of url");
+                return update(urn);
+            }
+            case HttpStatus.SC_NOT_FOUND -> {
+                LOGGER.info("URN {} is not registered", identifier);
+                return registerNew(urn);
+            }
+            default -> {
+                LOGGER.error("Error while check if URN {} exists using url {}.", identifier, url);
+                logFailure("", response, status, urn.getIdentifier(), bundle.getUrl());
+            }
         }
 
         return Optional.empty();
@@ -176,7 +178,7 @@ public class MCRDNBURNRestClient {
 
         int statusCode = response.getStatusLine().getStatusCode();
         switch (statusCode) {
-            case HttpStatus.SC_OK:
+            case HttpStatus.SC_OK -> {
                 HttpEntity entity = response.getEntity();
                 try {
                     Reader reader = new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8);
@@ -185,11 +187,11 @@ public class MCRDNBURNRestClient {
                 } catch (Exception e) {
                     LOGGER.error("Could not read Response from " + url);
                 }
-                break;
-            default:
+            }
+            default -> {
                 LOGGER.error("Error while get registration info for URN {} using url {}.", identifier, url);
-                logFailure("", response, statusCode, identifier, url);
-                break;
+                MCRDNBURNRestClient.logFailure("", response, statusCode, identifier, url);
+            }
         }
         return Optional.empty();
     }
@@ -223,17 +225,18 @@ public class MCRDNBURNRestClient {
         String identifier = urn.getIdentifier();
         URL url = bundle.getUrl();
         switch (postStatus) {
-        case HttpStatus.SC_CREATED:
-            LOGGER.info("URN {} registered to {}", identifier, url);
-            return Optional.ofNullable(response.getFirstHeader("date"))
-                .map(Header::getValue)
-                .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-                .map(Instant::from)
-                .map(Date::from);
-        default:
-            LOGGER.error("Error while register new URN {} using url {}.", identifier, url);
-            logFailure(json, response, postStatus, identifier, url);
-            break;
+            case HttpStatus.SC_CREATED -> {
+                LOGGER.info("URN {} registered to {}", identifier, url);
+                return Optional.ofNullable(response.getFirstHeader("date"))
+                    .map(Header::getValue)
+                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                    .map(Instant::from)
+                    .map(Date::from);
+            }
+            default -> {
+                LOGGER.error("Error while register new URN {} using url {}.", identifier, url);
+                logFailure(json, response, postStatus, identifier, url);
+            }
         }
         return Optional.empty();
     }
@@ -265,17 +268,18 @@ public class MCRDNBURNRestClient {
 
         String identifier = urn.getIdentifier();
         switch (patchStatus) {
-        case HttpStatus.SC_NO_CONTENT:
-            LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
-            return Optional.ofNullable(response.getFirstHeader("date"))
-                .map(Header::getValue)
-                .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-                .map(Instant::from)
-                .map(Date::from);
-        default:
-            LOGGER.error("Error while update URN {} using url {}.", identifier, updateURL);
-            logFailure(json, response, patchStatus, identifier, bundle.getUrl());
-            break;
+            case HttpStatus.SC_NO_CONTENT -> {
+                LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
+                return Optional.ofNullable(response.getFirstHeader("date"))
+                    .map(Header::getValue)
+                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                    .map(Instant::from)
+                    .map(Date::from);
+            }
+            default -> {
+                LOGGER.error("Error while update URN {} using url {}.", identifier, updateURL);
+                logFailure(json, response, patchStatus, identifier, bundle.getUrl());
+            }
         }
 
         return Optional.empty();

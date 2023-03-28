@@ -203,14 +203,11 @@ public class MCRLanguageFactory {
             .findFirst()
             .orElseGet(() -> {
                 String[] codeParts = xmlCode.split("_");
-                switch (codeParts.length) {
-                case 1:
-                    return new Locale(codeParts[0]);
-                case 2:
-                    return new Locale(codeParts[0], codeParts[1]);
-                default:
-                    return new Locale(codeParts[0], codeParts[1], codeParts[2]);
-                }
+                return switch (codeParts.length) {
+                    case 1 -> new Locale(codeParts[0]);
+                    case 2 -> new Locale(codeParts[0], codeParts[1]);
+                    default -> new Locale(codeParts[0], codeParts[1], codeParts[2]);
+                };
 
             });
         language.setLocale(locale);

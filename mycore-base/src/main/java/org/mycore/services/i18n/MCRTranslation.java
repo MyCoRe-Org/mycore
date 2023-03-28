@@ -302,26 +302,24 @@ public class MCRTranslation {
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                case ';':
-                    if (mask) {
-                        buf.append(';');
-                        mask = false;
-                    } else {
-                        a.add(buf.toString());
-                        buf.setLength(0);
+                    case ';' -> {
+                        if (mask) {
+                            buf.append(';');
+                            mask = false;
+                        } else {
+                            a.add(buf.toString());
+                            buf.setLength(0);
+                        }
                     }
-                    break;
-                case '\\':
-                    if (mask) {
-                        buf.append('\\');
-                        mask = false;
-                    } else {
-                        mask = true;
+                    case '\\' -> {
+                        if (mask) {
+                            buf.append('\\');
+                            mask = false;
+                        } else {
+                            mask = true;
+                        }
                     }
-                    break;
-                default:
-                    buf.append(masked.charAt(i));
-                    break;
+                    default -> buf.append(masked.charAt(i));
                 }
             }
             a.add(buf.toString());

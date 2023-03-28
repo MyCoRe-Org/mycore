@@ -146,31 +146,19 @@ public class MCRTileCombineServlet extends MCRServlet {
                 final int maxZoomLevel = pictureProps.getZoomlevel();
                 request.setAttribute(THUMBNAIL_KEY, iviewFile);
                 LOGGER.info("IView2 file: {}", iviewFile);
-                int zoomLevel = 0;
-                switch (zoomAlias) {
-                case "MIN":
-                    zoomLevel = 1;
-                    break;
-                case "MID":
-                    zoomLevel = 2;
-                    break;
-                case "MAX":
-                    zoomLevel = 3;
-                    break;
-                }
+                int zoomLevel = switch (zoomAlias) {
+                    case "MIN" -> 1;
+                    case "MID" -> 2;
+                    case "MAX" -> 3;
+                    default -> 0;
+                };
                 HttpServletResponse response = job.getResponse();
                 if (zoomLevel > maxZoomLevel) {
-                    switch (maxZoomLevel) {
-                    case 2:
-                        zoomAlias = "MID";
-                        break;
-                    case 1:
-                        zoomAlias = "MIN";
-                        break;
-                    default:
-                        zoomAlias = "THUMB";
-                        break;
-                    }
+                    zoomAlias = switch (maxZoomLevel) {
+                        case 2 -> "MID";
+                        case 1 -> "MIN";
+                        default -> "THUMB";
+                    };
                     if (!imagePath.startsWith("/")) {
                         imagePath = "/" + imagePath;
                     }

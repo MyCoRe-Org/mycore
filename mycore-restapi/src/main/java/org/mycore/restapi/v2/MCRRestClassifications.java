@@ -155,15 +155,12 @@ public class MCRRestClassifications {
             .map(MCRDetailLevel::valueOf).orElse(MCRDetailLevel.normal);
 
         MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
-        switch (detailLevel) {
-            case detailed:
-                return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
-            case summary:
-                return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
-            case normal: //default case
-            default:
-                return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
-        }
+        return switch (detailLevel) {
+            case detailed -> getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
+            case summary -> getClassification(classId, dao -> dao.getCategory(categoryID, 0));
+            //normal is also default case
+            default -> getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
+        };
     }
 
     private Response getClassification(String classId, Function<MCRCategoryDAO, MCRCategory> categorySupplier) {

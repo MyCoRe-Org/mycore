@@ -167,13 +167,10 @@ public class MCRMETSServlet extends MCRServlet {
         StringBuilder ownerID = new StringBuilder(pathInfo.length());
         boolean running = true;
         for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
-            switch (pathInfo.charAt(i)) {
-            case '/':
+            if (pathInfo.charAt(i) == '/') {
                 running = false;
-                break;
-            default:
+            } else {
                 ownerID.append(pathInfo.charAt(i));
-                break;
             }
         }
         return ownerID.toString();

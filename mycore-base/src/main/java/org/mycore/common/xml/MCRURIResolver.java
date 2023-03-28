@@ -121,7 +121,7 @@ import jakarta.servlet.ServletContext;
  * from URIs of type resource, webapp, file, session, query or mcrobject. MyCoRe editor include declarations can read
  * XML files from resource, webapp, file, session, http or https, query, or mcrobject URIs.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURIResolver implements URIResolver {
@@ -564,25 +564,14 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         private String getCacheDebugMsg(URI hrefURI, HttpCacheContext context) {
-            String msg = hrefURI.toASCIIString() + ": ";
+            return hrefURI.toASCIIString() + ": " +
             switch (context.getCacheResponseStatus()) {
-            case CACHE_HIT:
-                msg += "A response was generated from the cache with " +
-                    "no requests sent upstream";
-                break;
-            case CACHE_MODULE_RESPONSE:
-                msg += "The response was generated directly by the " +
-                    "caching module";
-                break;
-            case CACHE_MISS:
-                msg += "The response came from an upstream server";
-                break;
-            case VALIDATED:
-                msg += "The response was generated from the cache " +
-                    "after validating the entry with the origin server";
-                break;
-            }
-            return msg;
+                case CACHE_HIT -> "A response was generated from the cache with no requests sent upstream";
+                case CACHE_MODULE_RESPONSE -> "The response was generated directly by the caching module";
+                case CACHE_MISS -> "The response came from an upstream server";
+                case VALIDATED -> "The response was generated from the cache after validating the entry "
+                    + "with the origin server";
+                };
         }
 
     }
@@ -1747,18 +1736,12 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) {
             final String[] split = href.split(":");
-            boolean permission;
-            switch (split.length) {
-            case 2:
-                permission = MCRAccessManager.checkPermission(split[1]);
-                break;
-            case 3:
-                permission = MCRAccessManager.checkPermission(split[1], split[2]);
-                break;
-            default:
-                throw new IllegalArgumentException(
+            boolean permission = switch (split.length) {
+                case 2 -> MCRAccessManager.checkPermission(split[1]);
+                case 3 -> MCRAccessManager.checkPermission(split[1], split[2]);
+                default -> throw new IllegalArgumentException(
                     "Invalid format of uri for retrieval of checkPermission: " + href);
-            }
+            };
             Element root = new Element("boolean");
             root.setText(Boolean.toString(permission));
             return new JDOMSource(root);

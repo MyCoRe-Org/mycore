@@ -424,29 +424,20 @@ public class MCRFrontendUtil {
     }
 
     private static Boolean hasIPVersion(InetAddress ip, int version) {
-        int byteLength;
-        switch (version) {
-        case 4:
-            byteLength = 4;
-            break;
-        case 6:
-            byteLength = 16;
-            break;
-        default:
-            throw new IndexOutOfBoundsException("Unknown ip version: " + version);
-        }
+        int byteLength = switch (version) {
+            case 4 -> 4;
+            case 6 -> 16;
+            default -> throw new IndexOutOfBoundsException("Unknown ip version: " + version);
+        };
         return ip.getAddress().length == byteLength;
     }
 
     private static void addSessionListener() {
         MCRSessionMgr.addSessionListener(event -> {
             switch (event.getType()) {
-            case passivated:
-            case destroyed:
-                CURRENT_SERVLET_JOB.remove();
-                break;
-            default:
-                break;
+                case passivated, destroyed -> CURRENT_SERVLET_JOB.remove();
+                default -> {
+                }
             }
         });
     }

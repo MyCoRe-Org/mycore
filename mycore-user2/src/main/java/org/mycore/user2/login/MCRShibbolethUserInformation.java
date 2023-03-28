@@ -21,6 +21,7 @@ package org.mycore.user2.login;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.mycore.common.MCRUserInformation;
@@ -80,20 +81,19 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
      */
     @Override
     public String getUserAttribute(String attribute) {
-        String key;
         switch (attribute) {
-        case MCRUserInformation.ATT_REAL_NAME:
-            return this.realName;
-        case MCRRealm.USER_INFORMATION_ATTR:
-            return this.realmId;
-        default:
-            key = attribute;
-            break;
+            case MCRUserInformation.ATT_REAL_NAME -> {
+                return this.realName;
+            }
+            case MCRRealm.USER_INFORMATION_ATTR -> {
+                return this.realmId;
+            }
+            default -> {
+                return Optional.ofNullable(attributes.get(attribute))
+                    .map(Object::toString)
+                    .orElse(null);
+            }
         }
-
-        Object value = attributes.get(key);
-
-        return value != null ? value.toString() : null;
     }
 
     // This is used for MCRUserAttributeMapper

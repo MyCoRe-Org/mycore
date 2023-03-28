@@ -148,23 +148,15 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
         final int height = (int) (Math.abs(targetWidth * sinRotation) + Math.abs(targetHeight * cosRotation));
         final int width = (int) (Math.abs(targetWidth * cosRotation) + Math.abs(targetHeight * sinRotation));
+        final int imageType = switch (imageQuality) {
+            case bitonal -> BufferedImage.TYPE_BYTE_BINARY;
+            case gray -> BufferedImage.TYPE_BYTE_GRAY;
+            //color is also default case
+            default
+                -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR : BufferedImage.TYPE_3BYTE_BGR;
+        };
 
-        BufferedImage targetImage;
-        switch (imageQuality) {
-        case bitonal:
-            targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-            break;
-        case gray:
-            targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-            break;
-        case color:
-        default:
-            if (transparentFormats.contains(format)) {
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-            } else {
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-            }
-        }
+        BufferedImage targetImage = new BufferedImage(width, height, imageType);
 
         // this value determines the zoom level!
         double largestScaling = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight);
@@ -303,16 +295,11 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         String id = identifier.contains(":/") ? identifier.replaceFirst(":/", "/") : identifier;
         String separator = getProperties().getOrDefault(IDENTIFIER_SEPARATOR_PROPERTY, "/");
         String[] splittedIdentifier = id.split(separator, 2);
-        switch (splittedIdentifier.length) {
-        case 1:
-            tileInfo = new MCRTileInfo(null, identifier, null);
-            break;
-        case 2:
-            tileInfo = new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
-            break;
-        default:
-            throw new MCRIIIFImageNotFoundException(identifier);
-        }
+        tileInfo = switch (splittedIdentifier.length) {
+            case 1 -> new MCRTileInfo(null, identifier, null);
+            case 2 -> new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
+            default -> throw new MCRIIIFImageNotFoundException(identifier);
+        };
         return tileInfo;
     }
 

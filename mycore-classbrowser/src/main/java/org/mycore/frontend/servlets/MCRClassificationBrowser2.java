@@ -207,13 +207,10 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     /** Sorts by id, by label in current language, or keeps natural order */
     private void sortCategories(String sortBy, List<Element> data) {
         switch (sortBy) {
-        case "id":
-            data.sort(Comparator.comparing(e -> e.getAttributeValue("id")));
-            break;
-        case "label":
-            data.sort(Comparator.comparing(e -> e.getChildText("label"), String::compareToIgnoreCase));
-            break;
-        default:
+            case "id" -> data.sort(Comparator.comparing(e -> e.getAttributeValue("id")));
+            case "label" -> data.sort(Comparator.comparing(e -> e.getChildText("label"), String::compareToIgnoreCase));
+            default -> {
+            }
             //no sort;
         }
     }

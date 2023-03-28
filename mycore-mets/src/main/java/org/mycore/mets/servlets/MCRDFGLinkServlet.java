@@ -113,21 +113,13 @@ public class MCRDFGLinkServlet extends MCRServlet {
             imageNumber = getOrderNumber(metsContent.asXML(), filePath);
         }
 
-        String dfgURL = "";
         switch (imageNumber) {
-        case -1:
-            response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
-                "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
-            return;
-        case -2:
-            dfgURL = "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL;
-            break;
-        default:
-            dfgURL = "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber;
-            break;
+            case -1 -> response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
+                    "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
+            case -2 -> response.sendRedirect("https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL);
+            default -> response.sendRedirect(
+                "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber);
         }
-
-        response.sendRedirect(dfgURL);
     }
 
     private static int getOrderNumber(Document metsDoc, String fileHref) {

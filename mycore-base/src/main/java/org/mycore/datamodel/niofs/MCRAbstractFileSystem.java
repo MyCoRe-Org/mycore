@@ -213,14 +213,11 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         }
         final String syntax = syntaxAndPattern.substring(0, pos);
         final String pattern = syntaxAndPattern.substring(pos + 1);
-        switch (syntax) {
-        case "glob":
-            return new MCRGlobPathMatcher(pattern);
-        case "regex":
-            return new MCRPathMatcher(pattern);
-        default:
-            throw new UnsupportedOperationException("If the pattern syntax '" + syntax + "' is not known.");
-        }
+        return switch (syntax) {
+            case "glob" -> new MCRGlobPathMatcher(pattern);
+            case "regex" -> new MCRPathMatcher(pattern);
+            default -> throw new UnsupportedOperationException("If the pattern syntax '" + syntax + "' is not known.");
+        };
     }
 
     public MCRPath getRootDirectory(final String owner) {

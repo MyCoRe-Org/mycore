@@ -149,20 +149,12 @@ public class MCRRestAPISearch {
             try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
                 String text = scanner.useDelimiter("\\A").next();
 
-                String contentType;
-                switch (wt) {
-                case FORMAT_XML:
-                    contentType = "application/xml; charset=UTF-8";
-                    break;
-                case FORMAT_JSON:
-                    contentType = "application/json; charset=UTF-8";
-                    break;
-                case FORMAT_CSV:
-                    contentType = "text/comma-separated-values; charset=UTF-8";
-                    break;
-                default:
-                    contentType = "text";
-                }
+                String contentType = switch (wt) {
+                    case FORMAT_XML -> "application/xml; charset=UTF-8";
+                    case FORMAT_JSON -> "application/json; charset=UTF-8";
+                    case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
+                    default -> "text";
+                };
                 return Response.ok(text)
                     .type(contentType)
                     .build();

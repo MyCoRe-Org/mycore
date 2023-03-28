@@ -177,21 +177,19 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     Consumer<String> strFN = null;
                     Consumer<Integer> intFn = null;
                     switch (type) {
-                    case "issue":
-                        strFN = idb::issue;
-                        intFn = idb::issue;
-                        break;
-                    case "volume":
-                        strFN = idb::volume;
-                        intFn = idb::volume;
-                        break;
-                    case "article_number":
-                        intFn = idb::number;
-                        strFN = idb::number;
-                        break;
-                    default:
-                        LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
-                        break;
+                        case "issue" -> {
+                            strFN = idb::issue;
+                            intFn = idb::issue;
+                        }
+                        case "volume" -> {
+                            strFN = idb::volume;
+                            intFn = idb::volume;
+                        }
+                        case "article_number" -> {
+                            intFn = idb::number;
+                            strFN = idb::number;
+                        }
+                        default -> LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
                     }
 
                     try {
@@ -371,25 +369,19 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         final String type = identifierElement.getAttributeValue("type");
         final String identifier = identifierElement.getTextNormalize();
         switch (type) {
-        case "doi":
-            idb.DOI(identifier);
-            break;
-        case "isbn":
-            idb.ISBN(identifier);
-            break;
-        case "issn":
-            idb.ISSN(identifier);
-            break;
-        case "pmid":
-            if (!parent) {
-                idb.PMID(identifier);
+            case "doi" -> idb.DOI(identifier);
+            case "isbn" -> idb.ISBN(identifier);
+            case "issn" -> idb.ISSN(identifier);
+            case "pmid" -> {
+                if (!parent) {
+                    idb.PMID(identifier);
+                }
             }
-            break;
-        case "pmcid":
-            if (!parent) {
-                idb.PMCID(identifier);
+            case "pmcid" -> {
+                if (!parent) {
+                    idb.PMCID(identifier);
+                }
             }
-            break;
         }
     }
 
@@ -433,45 +425,24 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         roleNameMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
-            case "aut":
-            case "inv":
-                idb.author(cslNames);
-                break;
-            case "col":
-                idb.collectionEditor(cslNames);
-                break;
-            case "edt":
-                idb.editor(cslNames);
-                break;
-            case "fmd":
-                idb.director(cslNames);
-                break;
-            case "ivr":
-                idb.interviewer(cslNames);
-                break;
-            case "ive":
-                idb.author(cslNames);
-                break;
-            case "ill":
-                idb.illustrator(cslNames);
-                break;
-            case "trl":
-                idb.translator(cslNames);
-                break;
-            case "cmp":
-                idb.composer(cslNames);
-                break;
-            case "conference-name":
-            case "pup":
-                idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
-                break;
-            default:
-                if (KNOWN_UNMAPPED_PERSON_ROLES.contains(role)) {
-                    LOGGER.trace("Unmapped person role " + role + " in " + this.id);
-                } else {
-                    LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                case "aut", "inv" -> idb.author(cslNames);
+                case "col" -> idb.collectionEditor(cslNames);
+                case "edt" -> idb.editor(cslNames);
+                case "fmd" -> idb.director(cslNames);
+                case "ivr" -> idb.interviewer(cslNames);
+                case "ive" -> idb.author(cslNames);
+                case "ill" -> idb.illustrator(cslNames);
+                case "trl" -> idb.translator(cslNames);
+                case "cmp" -> idb.composer(cslNames);
+                case "conference-name", "pup" ->
+                    idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
+                default -> {
+                    if (KNOWN_UNMAPPED_PERSON_ROLES.contains(role)) {
+                        LOGGER.trace("Unmapped person role " + role + " in " + this.id);
+                    } else {
+                        LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                    }
                 }
-                break;
             }
         });
 
@@ -488,15 +459,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         parentRoleMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
-            case "aut":
-                idb.containerAuthor(cslNames);
-                break;
-            case "edt":
-                idb.collectionEditor(cslNames);
-                break;
-            default:
+                case "aut" -> idb.containerAuthor(cslNames);
+                case "edt" -> idb.collectionEditor(cslNames);
+                default -> {
+                }
                 // we dont care
-                break;
             }
         });
     }

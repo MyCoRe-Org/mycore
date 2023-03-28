@@ -167,16 +167,12 @@ public class MCROCFLMigration {
         Date date = rev.getDate();
         LOGGER.info("Migrate revision {} of {}", rev.getRevision(), objectID);
 
-        switch (rev.getType()) {
-        case 'A':
-            return new CreateMigrationStep(retriveActualContent(rev), user, date, objectID);
-        case 'D':
-            return new DeleteMigrationStep(user, date, objectID);
-        case 'M':
-            return new UpdateMigrationStep(retriveActualContent(rev), user, date, objectID);
-        default:
-            return null;
-        }
+        return switch (rev.getType()) {
+            case 'A' -> new CreateMigrationStep(retriveActualContent(rev), user, date, objectID);
+            case 'D' -> new DeleteMigrationStep(user, date, objectID);
+            case 'M' -> new UpdateMigrationStep(retriveActualContent(rev), user, date, objectID);
+            default -> null;
+        };
     }
 
     private MCRContent retriveActualContent(MCRAbstractMetadataVersion rev) throws IOException {

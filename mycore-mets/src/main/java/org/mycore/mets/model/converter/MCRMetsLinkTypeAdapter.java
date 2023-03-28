@@ -49,12 +49,8 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             switch (jsonReader.nextName()) {
-            case "from":
-                ml.setFromString(jsonReader.nextString());
-                break;
-            case "to":
-                ml.setToString(jsonReader.nextString());
-                break;
+                case "from" -> ml.setFromString(jsonReader.nextString());
+                case "to" -> ml.setToString(jsonReader.nextString());
             }
         }
         jsonReader.endObject();

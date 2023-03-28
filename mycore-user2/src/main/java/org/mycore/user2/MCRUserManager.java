@@ -618,44 +618,43 @@ public class MCRUserManager {
         }
         try {
             switch (user.getHashType()) {
-            case crypt:
-                //Wahh! did we ever thought about what "salt" means for passwd management?
-                String passwdHash = user.getPassword();
-                String salt = passwdHash.substring(0, 3);
-                if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
-                    //login failed
-                    waitLoginPanalty();
-                    return null;
+                case crypt -> {
+                    //Wahh! did we ever thought about what "salt" means for passwd management?
+                    String passwdHash = user.getPassword();
+                    String salt = passwdHash.substring(0, 3);
+                    if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
+                        //login failed
+                        waitLoginPanalty();
+                        return null;
+                    }
+                    //update to SHA-256
+                    updatePasswordHashToSHA256(user, password);
                 }
-                //update to SHA-256
-                updatePasswordHashToSHA256(user, password);
-                break;
-            case md5:
-                if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
-                    waitLoginPanalty();
-                    return null;
+                case md5 -> {
+                    if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
+                        waitLoginPanalty();
+                        return null;
+                    }
+                    //update to SHA-256
+                    updatePasswordHashToSHA256(user, password);
                 }
-                //update to SHA-256
-                updatePasswordHashToSHA256(user, password);
-                break;
-            case sha1:
-                if (!MCRUtils.asSHA1String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
-                    .equals(user.getPassword())) {
-                    waitLoginPanalty();
-                    return null;
+                case sha1 -> {
+                    if (!MCRUtils.asSHA1String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
+                        .equals(user.getPassword())) {
+                        waitLoginPanalty();
+                        return null;
+                    }
+                    //update to SHA-256
+                    updatePasswordHashToSHA256(user, password);
                 }
-                //update to SHA-256
-                updatePasswordHashToSHA256(user, password);
-                break;
-            case sha256:
-                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
-                    .equals(user.getPassword())) {
-                    waitLoginPanalty();
-                    return null;
+                case sha256 -> {
+                    if (!MCRUtils.asSHA256String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
+                        .equals(user.getPassword())) {
+                        waitLoginPanalty();
+                        return null;
+                    }
                 }
-                break;
-            default:
-                throw new MCRException("Cannot validate hash type " + user.getHashType());
+                default -> throw new MCRException("Cannot validate hash type " + user.getHashType());
             }
         } catch (NoSuchAlgorithmException e) {
             throw new MCRException("Error while validating login", e);

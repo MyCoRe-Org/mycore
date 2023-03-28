@@ -42,19 +42,10 @@ public class MCROCFLUserEventHandler implements MCREventHandler {
             LOGGER.debug("{} handling {} {}", getClass().getName(), user.getUserID(),
                 evt.getEventType());
             switch (evt.getEventType()) {
-            case UPDATE:
-                MANAGER.updateUser(user);
-                break;
-            case CREATE:
-                MANAGER.createUser(user);
-                break;
-            case DELETE:
-                MANAGER.deleteUser(user);
-                break;
-
-            default:
-                LOGGER.info("Event Type '{}' is not valid for {}", evt.getEventType(), getClass().getName());
-                break;
+                case UPDATE -> MANAGER.updateUser(user);
+                case CREATE -> MANAGER.createUser(user);
+                case DELETE -> MANAGER.deleteUser(user);
+                default -> LOGGER.info("Event Type '{}' is not valid for {}", evt.getEventType(), getClass().getName());
             }
         }
     }
