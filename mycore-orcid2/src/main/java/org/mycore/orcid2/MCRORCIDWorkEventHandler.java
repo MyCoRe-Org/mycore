@@ -86,7 +86,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
             return;
         }
         if (!checkPublish(filteredObject)) {
-            LOGGER.info("MODS ist empty. Skipping {}.", objectID);
+            LOGGER.info("MODS is empty. Skipping {}.", objectID);
             return;
         }
         final Map<String, MCRORCIDCredential> credentials = listOrcidCredentials(filteredObject);
@@ -153,7 +153,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                     final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
                     final Map<String, MCRORCIDCredential> tmp = orcidUser.getCredentials();
                     if (tmp.size() == 1) {
-                        credential = tmp.get(0);
+                        credential = tmp.entrySet().iterator().next().getValue();
                     } else {
                         LOGGER.info("Found multiple ORCID credentials for user: {}", user.getUserID());
                         continue;
