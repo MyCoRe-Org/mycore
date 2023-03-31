@@ -43,9 +43,6 @@ public class MCRORCIDOAuthClient {
 
     private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "OAuth.";
 
-    private static final String ORCID_BASE_URL
-        = MCRConfiguration2.getStringOrThrow(MCRORCIDConstants.CONFIG_PREFIX + "BaseURL");
-
     /**
      * Client id of the client.
      */
@@ -56,7 +53,7 @@ public class MCRORCIDOAuthClient {
     private final WebTarget webTarget;
 
     private MCRORCIDOAuthClient() {
-        webTarget = ClientBuilder.newClient().target(ORCID_BASE_URL).path("oauth");
+        webTarget = ClientBuilder.newClient().target(MCRORCIDConstants.ORCID_BASE_URL).path("oauth");
     }
 
     /**

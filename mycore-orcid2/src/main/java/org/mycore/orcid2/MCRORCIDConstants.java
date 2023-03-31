@@ -18,13 +18,29 @@
 
 package org.mycore.orcid2;
 
+import java.util.List;
+
+import org.mycore.common.config.MCRConfiguration2;
+
 /**
  * Provies general constants.
  */
 public class MCRORCIDConstants {
 
     /**
-     * Config prefix of mycore-orcid properties.
+     * Config prefix of mycore-orcid2 properties.
      */
     public static final String CONFIG_PREFIX = "MCR.ORCID2.";
+
+    /**
+     * ORCID Base url.
+     */
+    public static final String ORCID_BASE_URL = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "BaseURL");
+
+    /**
+     * List of all language codes supported by ORCID.
+     */
+    public static final List<String> SUPPORTED_LANGUAGE_CODES
+        = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedLanguageCodes").stream()
+        .flatMap(MCRConfiguration2::splitValue).toList();
 }

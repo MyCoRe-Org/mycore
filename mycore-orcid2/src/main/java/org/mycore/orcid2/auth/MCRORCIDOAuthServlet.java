@@ -71,9 +71,6 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
 
     private static final String USER_SERVLET_PATH = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "User.Servlet");
 
-    private static final String ORCID_BASE_URL
-        = MCRConfiguration2.getStringOrThrow(MCRORCIDConstants.CONFIG_PREFIX + "BaseURL");
-
     private static final String SCOPE = MCRConfiguration2.getString(CONFIG_PREFIX + "Scope").orElse(null);
 
     private static final boolean IS_PREFILL_REGISTRATION_FORM = MCRConfiguration2
@@ -151,11 +148,16 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
 
     private void handleAuth(HttpServletRequest req, HttpServletResponse res) throws Exception {
         final String scopeParam = req.getParameter("scope");
+        String langCode = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        if (!MCRORCIDConstants.SUPPORTED_LANGUAGE_CODES.contains(langCode)) {
+            // use english as fallback
+            langCode = "en";
+        }
         if (scopeParam != null) {
-            res.sendRedirect(buildRequestCodeURL(scopeParam).toString());
+            res.sendRedirect(buildRequestCodeURL(scopeParam, langCode).toString());
         } else if (SCOPE != null) {
             LOGGER.info("No scope param, using default scope ({}) as fallback.", SCOPE);
-            res.sendRedirect(buildRequestCodeURL(SCOPE).toString());
+            res.sendRedirect(buildRequestCodeURL(SCOPE, langCode).toString());
         } else {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Scope is required");
         }
@@ -172,19 +174,20 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
      * privacy.
      * 
      * @param scope not encoded scope string
+     * @param langCode language code
      * @return url to request authorization code
      * @throws URISyntaxException if BaseURL is malformed
      * @throws MalformedURLException if BaseURL is malformed
      */
-    private URL buildRequestCodeURL(String scope) throws URISyntaxException, MalformedURLException {
-        UriBuilder builder = UriBuilder.fromPath(ORCID_BASE_URL);
+    private URL buildRequestCodeURL(String scope, String langCode) throws URISyntaxException, MalformedURLException {
+        UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
         builder.path("oauth/authorize");
         builder.queryParam("redirect_uri", redirectURI);
         builder.queryParam("client_id", MCRORCIDOAuthClient.CLIENT_ID);
         builder.queryParam("response_type", "code");
         builder.queryParam("scope", scope);
         builder.queryParam("prompt", "login");
-        builder.queryParam("lang", "en"); // hard coded because german is not support
+        builder.queryParam("lang", langCode);
         builder.queryParam("state", buildStateParam());
         if (IS_PREFILL_REGISTRATION_FORM) {
             preFillRegistrationForm(builder);
