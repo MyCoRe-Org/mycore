@@ -20,13 +20,14 @@ package org.mycore.orcid2.v3;
 
 import jakarta.ws.rs.core.Response;
 
+import org.mycore.orcid2.client.MCRORCIDClientErrorHandler;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.orcid.jaxb.model.v3.release.error.OrcidError;
 
 /**
  * See {@link org.mycore.orcid2.client.MCRORCIDClientErrorHandler}.
  */
-public class MCRORCIDClientErrorHandlerImpl implements org.mycore.orcid2.client.MCRORCIDClientErrorHandler {
+public class MCRORCIDClientErrorHandlerImpl implements MCRORCIDClientErrorHandler {
 
     @Override
     public void handleErrorResponse(Response response) {
