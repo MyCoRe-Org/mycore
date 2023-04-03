@@ -127,7 +127,15 @@ public class MCRORCIDWorkHelper {
     }
 
     private static void publishObjectToORCID(MCRObject object, Map<String, MCRORCIDCredential> credentials) {
-        final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
+        if (!MCRORCIDUtils.checkPublishState(object)) {
+            throw new MCRORCIDException("Object has wrong state");
+        }
+        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+            throw new MCRORCIDException("Filtered MODS is empty.");
+        }
+        final Work work = MCRORCIDWorkTransformerHelper
+            .transformContent(new MCRJDOMContent(filteredObject.createXML()));
         final List<String> failedORCIDs = new ArrayList<>();
         for (Map.Entry<String, MCRORCIDCredential> entry : credentials.entrySet()) {
             final String orcid = entry.getKey();

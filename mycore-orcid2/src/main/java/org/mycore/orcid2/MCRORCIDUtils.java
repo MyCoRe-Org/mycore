@@ -18,26 +18,94 @@
 
 package org.mycore.orcid2;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.util.MCRIdentifier;
+import org.xml.sax.SAXException;
 
 /**
  * Provides utility methods.
  */
 public class MCRORCIDUtils {
 
+    private static final MCRContentTransformer T_ORCID_MODS_FILTER
+        = MCRContentTransformerFactory.getTransformer("ORCIDMODSFilter");
+
     private static final List<String> TRUSTED_IDENTIFIER_TYPES
         = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "Object.TrustedIdentifierTyps").stream()
           .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
+
+    private static final List<String> PUBLISH_STATES
+        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "Work.PublishStates").stream()
+        .flatMap(MCRConfiguration2::splitValue).toList();
+
+    /**
+     * Checks if MCRObjects' state is ready to publish.
+     * 
+     * @param object the MCRObject
+     * @return true if state is ready to publish or there is not state
+     */
+    public static boolean checkPublishState(MCRObject object) {
+        return getStateValue(object).map(s -> checkPublishState(s)).orElse(true);
+    }
+
+    /**
+     * Checks if state is ready to publish.
+     * 
+     * @param state the state
+     * @return true if state is ready to publish
+     */
+    public static boolean checkPublishState(String state) {
+        if (PUBLISH_STATES.contains(state)) {
+            return true;
+        }
+        return PUBLISH_STATES.size() == 1 && PUBLISH_STATES.contains("*");
+    }
+
+    /**
+     * Checks if MCRObject has empty MODS.
+     * 
+     * @param object the MCRObject
+     * @return true if MCRObject's MODS has children
+     */
+    public static boolean checkEmptyMODS(MCRObject object) {
+        final MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+        return !wrapper.getMODS().getChildren().isEmpty();
+    }
+
+    /**
+     * Filters MCRObject.
+     * 
+     * @param object the MCRObject
+     * @return filtered MCRObject
+     * @throws MCRORCIDException if filtering fails
+     */
+    public static MCRObject filterObject(MCRObject object) {
+        try {
+            final MCRContent filtertedObjectContent
+                = T_ORCID_MODS_FILTER.transform(new MCRJDOMContent(object.createXML()));
+            return new MCRObject(filtertedObjectContent.asXML());
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRORCIDException("Filter transformation failed", e);
+        }
+    }
 
     /**
      * Compares String with auth client's client id.
@@ -83,7 +151,7 @@ public class MCRORCIDUtils {
     }
 
     /**
-     * Returns mods:nameIdentifer.
+     PUBLISH_STATES* Returns mods:nameIdentifer.
      * 
      * @param nameElement the mods:name Element
      * @return Set of MCRIdentifier
@@ -138,5 +206,9 @@ public class MCRORCIDUtils {
 
     private static MCRIdentifier getIdentfierFromElement(Element element) {
         return new MCRIdentifier(element.getAttributeValue("type"), element.getTextTrim());
+    }
+
+    private static Optional<String> getStateValue(MCRObject object) {
+        return Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getID);
     }
 }
