@@ -151,7 +151,7 @@ public class MCRORCIDUtils {
     }
 
     /**
-     PUBLISH_STATES* Returns mods:nameIdentifer.
+     * Returns mods:nameIdentifer.
      * 
      * @param nameElement the mods:name Element
      * @return Set of MCRIdentifier
