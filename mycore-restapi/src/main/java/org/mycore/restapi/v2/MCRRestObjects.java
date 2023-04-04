@@ -166,6 +166,8 @@ public class MCRRestObjects {
 
     public static final String PARAM_SORT_BY = "sort_by";
 
+    public static final String HEADER_X_TOTAL_COUNT = "X-Total-Count";
+
     public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
         .unmodifiableList(MCRConfiguration2
             .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
@@ -254,6 +256,7 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
+    @MCRAccessControlExposeHeaders({HEADER_X_TOTAL_COUNT, HttpHeaders.LINK})
     public Response listObjects(
         @QueryParam(PARAM_AFTER_ID) MCRObjectID afterID,
         @QueryParam(PARAM_OFFSET) Integer offset,
@@ -332,7 +335,7 @@ public class MCRRestObjects {
 
         Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(restIdDate) {
         })
-            .header("X-Total-Count", count);
+            .header(HEADER_X_TOTAL_COUNT, count);
 
         if (nextBuilder != null) {
             responseBuilder.link("next", nextBuilder.toString());
