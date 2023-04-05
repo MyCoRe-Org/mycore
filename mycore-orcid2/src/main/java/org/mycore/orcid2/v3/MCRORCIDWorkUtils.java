@@ -148,7 +148,7 @@ public class MCRORCIDWorkUtils {
                      * always be true. Once the issue has been fixed equalContributorAttributes() can be replaced
                      * by Object.equals() */
                     if (!Objects.equals(ca.getContributorOrcid(), cb.getContributorOrcid()) ||
-                        ca.getContributorOrcid() == null && cb.getContributorOrcid() == null &&
+                        (ca.getContributorOrcid() == null && cb.getContributorOrcid() == null) &&
                         !Objects.equals(ca.getCreditName(), cb.getCreditName()) ||
                         !Objects.equals(ca.getContributorEmail(), cb.getContributorEmail()) ||
                         !equalContributorAttributes(ca.getContributorAttributes(), cb.getContributorAttributes())) {
