@@ -55,9 +55,12 @@ public class MCRSolrQueryResolver implements URIResolver {
 
     public static final String CORE_GROUP_NAME = "core";
 
+    // not allowed chars for cores are / \ and : according to
+    // https://stackoverflow.com/questions/29977519/what-makes-an-invalid-core-name
+    // assume they are the same for the requestHandler
     private static final Pattern URI_PATTERN = Pattern
-        .compile("\\Asolr:((?!" + REQUEST_HANDLER_QUALIFIER + ")(?<" + CORE_GROUP_NAME + ">[a-zA-Z0-9-]+):)?("
-            + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[a-zA-Z0-9-]+):)?(?<"
+        .compile("\\Asolr:((?!" + REQUEST_HANDLER_QUALIFIER + ")(?<" + CORE_GROUP_NAME + ">[^/:\\\\]+):)?("
+            + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[^/:\\\\]+):)?(?<"
             + QUERY_GROUP_NAME + ">.+)\\z");
 
     @Override
