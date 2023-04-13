@@ -18,6 +18,7 @@
 
 package org.mycore.common.xml;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -249,6 +250,60 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
+     * Tries to calculate the resource uri to the directory of the stylesheet that includes the given file.
+     * @param base the base uri of the stylesheet that includes the given file
+     * @return the resource uri to the directory of the stylesheet that includes the given file.
+     */
+    static String getParentDirectoryResourceURI(String base) {
+        if (base == null) {
+            // the file was not included from another file, so we need to use the default resource directory
+            return "resource:xsl/";
+        } else {
+            String resolvingBase = null;
+
+            String configurationResourceDir
+                = MCRConfigurationDir.getConfigurationDirectory().toPath()
+                    .toAbsolutePath()
+                    .normalize()
+                    .resolve("resources")
+                    .toFile()
+                    .toURI()
+                    .toString();
+
+            String webappPath = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString() : null;
+
+            if (base.contains(".jar!")) {
+                // in this case the file is in a jar file e.G.
+                // /root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl
+                resolvingBase = base.lastIndexOf(".jar!") > 0
+                    ? base.substring(base.lastIndexOf(".jar!") + ".jar!".length()) : base;
+            } else if (base.startsWith(configurationResourceDir)) {
+                // in this case the file is in the configuration directory e.G.
+                // file:/root/.mycore/dev-mir/resources/xsl/mir-accesskey-utils.xsl
+                resolvingBase = base.substring(configurationResourceDir.length());
+            } else if(webappPath!=null && base.startsWith(webappPath)) {
+                // in this case the file is in the webapp directory e.G.
+                // file:/workspace/mir/mir-webapp/target/catalina-base/webapps/mir/WEB-INF/classes/xsl/mir-accesskey-utils.xsl
+                resolvingBase = base.substring(webappPath.length());
+            }
+
+            if(resolvingBase != null){
+                resolvingBase = resolvingBase.startsWith("/") ? resolvingBase.substring(1) : resolvingBase;
+                resolvingBase = "resource:" + resolvingBase;
+            } else {
+                resolvingBase = base;
+            }
+
+            if (!resolvingBase.endsWith("/")) {
+                if (resolvingBase.lastIndexOf('/') > 0) {
+                    resolvingBase = resolvingBase.substring(0, resolvingBase.lastIndexOf('/') + 1);
+                }
+            }
+            return resolvingBase;
+        }
+    }
+
+    /**
      * URI Resolver that resolves XSL document() or xsl:include calls.
      *
      * @see javax.xml.transform.URIResolver
@@ -265,6 +320,9 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
         if (!href.contains(":")) {
+            if (!href.endsWith(".xsl")) {
+                return null;
+            }
             return tryResolveXSL(href, base);
         }
 
@@ -295,12 +353,21 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private Source tryResolveXSL(String href, String base) throws TransformerException {
-        if (href.endsWith(".xsl")) {
-            final String uri = "resource:xsl/" + href;
-            LOGGER.debug("Trying to resolve {} from uri {}", href, uri);
-            return SUPPORTED_SCHEMES.get("resource").resolve(uri, base);
+        String baseURI = getParentDirectoryResourceURI(base);
+        final String uri = baseURI + href;
+        LOGGER.debug("Trying to resolve {} from uri {}", href, uri);
+        Source newResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve(uri, base);
+        if (newResolveMethodResult != null) {
+            return newResolveMethodResult;
         }
-        return null;
+
+        // new relative include did not work, now fall back to old behaviour and print a warning if it works
+        Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve("resource:xsl/" + href, base);
+        if (oldResolveMethodResult != null) {
+            LOGGER.warn("The Stylesheet {} has include {} which only works with an old absolute include " +
+                "mechanism. Please change the include to relative!", base, href);
+        }
+        return oldResolveMethodResult;
     }
 
     private void addDebugInfo(String href, String base) {
