@@ -270,7 +270,8 @@ public final class MCRURIResolver implements URIResolver {
                     .toURI()
                     .toString();
 
-            String webappPath = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString() : null;
+            String webappPath
+                = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString() : null;
 
             if (base.contains(".jar!")) {
                 // in this case the file is in a jar file e.G.
@@ -281,23 +282,21 @@ public final class MCRURIResolver implements URIResolver {
                 // in this case the file is in the configuration directory e.G.
                 // file:/root/.mycore/dev-mir/resources/xsl/mir-accesskey-utils.xsl
                 resolvingBase = base.substring(configurationResourceDir.length());
-            } else if(webappPath!=null && base.startsWith(webappPath)) {
+            } else if (webappPath != null && base.startsWith(webappPath)) {
                 // in this case the file is in the webapp directory e.G.
-                // file:/workspace/mir/mir-webapp/target/catalina-base/webapps/mir/WEB-INF/classes/xsl/mir-accesskey-utils.xsl
+                // file:/../mir/mir-webapp/target/catalina-base/webapps/mir/WEB-INF/classes/xsl/mir-accesskey-utils.xsl
                 resolvingBase = base.substring(webappPath.length());
             }
 
-            if(resolvingBase != null){
+            if (resolvingBase != null) {
                 resolvingBase = resolvingBase.startsWith("/") ? resolvingBase.substring(1) : resolvingBase;
                 resolvingBase = "resource:" + resolvingBase;
             } else {
                 resolvingBase = base;
             }
 
-            if (!resolvingBase.endsWith("/")) {
-                if (resolvingBase.lastIndexOf('/') > 0) {
-                    resolvingBase = resolvingBase.substring(0, resolvingBase.lastIndexOf('/') + 1);
-                }
+            if (!resolvingBase.endsWith("/") && resolvingBase.lastIndexOf('/') > 0) {
+                resolvingBase = resolvingBase.substring(0, resolvingBase.lastIndexOf('/') + 1);
             }
             return resolvingBase;
         }

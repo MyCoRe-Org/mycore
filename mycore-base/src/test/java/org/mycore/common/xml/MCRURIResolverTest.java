@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.config.MCRConfigurationDir;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
