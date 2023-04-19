@@ -20,6 +20,7 @@ package org.mycore.iiif.image.model;
 
 import java.util.Locale;
 
+//TODO: replace with record
 public class MCRIIIFImageSourceRegion {
 
     private final int x1,
@@ -52,11 +53,11 @@ public class MCRIIIFImageSourceRegion {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof MCRIIIFImageSourceRegion)
-            && ((MCRIIIFImageSourceRegion) obj).getX2() == getX2()
-            && ((MCRIIIFImageSourceRegion) obj).getY2() == getY2()
-            && ((MCRIIIFImageSourceRegion) obj).getX1() == getX1()
-            && ((MCRIIIFImageSourceRegion) obj).getY1() == getY1();
+        return (obj instanceof MCRIIIFImageSourceRegion sourceRegion)
+            && sourceRegion.getX2() == getX2()
+            && sourceRegion.getY2() == getY2()
+            && sourceRegion.getX1() == getX1()
+            && sourceRegion.getY1() == getY1();
     }
 
     @Override

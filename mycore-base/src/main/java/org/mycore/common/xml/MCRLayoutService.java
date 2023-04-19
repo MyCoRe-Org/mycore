@@ -195,8 +195,7 @@ public class MCRLayoutService {
             long start = System.currentTimeMillis();
             try {
                 ByteArrayOutputStream bout = new ByteArrayOutputStream(INITIAL_BUFFER_SIZE);
-                if (transformer instanceof MCRParameterizedTransformer) {
-                    MCRParameterizedTransformer paramTransformer = (MCRParameterizedTransformer) transformer;
+                if (transformer instanceof MCRParameterizedTransformer paramTransformer) {
                     paramTransformer.transform(source, bout, parameter);
                 } else {
                     transformer.transform(source, bout);
@@ -212,12 +211,12 @@ public class MCRLayoutService {
         } catch (Exception e) {
             Throwable cause = e.getCause();
             while (cause != null) {
-                if (cause instanceof TransformerException) {
-                    throw (TransformerException) cause;
-                } else if (cause instanceof SAXException) {
-                    throw (SAXException) cause;
-                } else if (cause instanceof IOException) {
-                    throw (IOException) cause;
+                if (cause instanceof TransformerException te) {
+                    throw te;
+                } else if (cause instanceof SAXException se) {
+                    throw se;
+                } else if (cause instanceof IOException ioe) {
+                    throw ioe;
                 }
                 cause = cause.getCause();
             }
@@ -230,8 +229,7 @@ public class MCRLayoutService {
         LOGGER.debug("MCRLayoutService starts to output {}", getMimeType(transformer));
         long start = System.currentTimeMillis();
         try {
-            if (transformer instanceof MCRParameterizedTransformer) {
-                MCRParameterizedTransformer paramTransformer = (MCRParameterizedTransformer) transformer;
+            if (transformer instanceof MCRParameterizedTransformer paramTransformer) {
                 return paramTransformer.transform(source, parameter);
             } else {
                 return transformer.transform(source);

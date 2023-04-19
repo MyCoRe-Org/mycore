@@ -33,7 +33,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDDestinationOrAction;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mycore.common.content.MCRContent;
@@ -144,15 +143,11 @@ public class MCRPDFTools implements AutoCloseable {
     private static PDPage resolveOpenActionPage(PDDocument pdf) throws IOException {
         PDDestinationOrAction openAction = pdf.getDocumentCatalog().getOpenAction();
 
-        if (openAction instanceof PDActionGoTo) {
-            final PDDestination destination = ((PDActionGoTo) openAction).getDestination();
-            if (destination instanceof PDPageDestination) {
-                openAction = destination;
-            }
+        if (openAction instanceof PDActionGoTo goTo && goTo.getDestination() instanceof PDPageDestination destination) {
+            openAction = destination;
         }
 
-        if (openAction instanceof PDPageDestination) {
-            final PDPageDestination namedDestination = (PDPageDestination) openAction;
+        if (openAction instanceof PDPageDestination namedDestination) {
             final PDPage pdPage = namedDestination.getPage();
             if (pdPage != null) {
                 return pdPage;

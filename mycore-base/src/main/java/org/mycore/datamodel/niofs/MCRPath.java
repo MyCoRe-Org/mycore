@@ -263,10 +263,9 @@ public abstract class MCRPath implements Path {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRPath)) {
+        if (!(obj instanceof MCRPath that)) {
             return false;
         }
-        final MCRPath that = (MCRPath) obj;
         if (!getFileSystem().equals(that.getFileSystem())) {
             return false;
         }
@@ -693,8 +692,8 @@ public abstract class MCRPath implements Path {
     public Path toPhysicalPath() throws IOException {
         if (isAbsolute()) {
             for (FileStore fs : getFileSystem().getFileStores()) {
-                if (fs instanceof MCRAbstractFileStore) {
-                    Path physicalPath = ((MCRAbstractFileStore) fs).getPhysicalPath(this);
+                if (fs instanceof MCRAbstractFileStore mcrfs) {
+                    Path physicalPath = mcrfs.getPhysicalPath(this);
                     if (physicalPath != null) {
                         return physicalPath;
                     }

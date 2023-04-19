@@ -76,8 +76,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
         int position = -1;
-        if (category instanceof MCRCategoryImpl) {
-            position = ((MCRCategoryImpl) category).getPositionInParent();
+        if (category instanceof MCRCategoryImpl catImpl) {
+            position = catImpl.getPositionInParent();
         }
         return addCategory(parentID, category, position);
     }
@@ -595,11 +595,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         newCateg.setRoot(category.getRoot());
         newCateg.setURI(category.getURI());
         newCateg.setLevel(category.getLevel());
-        if (category instanceof MCRCategoryImpl) {
+        if (category instanceof MCRCategoryImpl catImpl) {
             //to allow optimized hasChildren() to work without db query
-            newCateg.setLeft(((MCRCategoryImpl) category).getLeft());
-            newCateg.setRight(((MCRCategoryImpl) category).getRight());
-            newCateg.setInternalID(((MCRCategoryImpl) category).getInternalID());
+            newCateg.setLeft(catImpl.getLeft());
+            newCateg.setRight(catImpl.getRight());
+            newCateg.setInternalID(catImpl.getInternalID());
         }
         if (childAmount > 0) {
             for (MCRCategory child : category.getChildren()) {

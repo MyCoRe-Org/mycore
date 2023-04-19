@@ -263,9 +263,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void addFile(Path path, BasicFileAttributes attrs) {
-        if (path instanceof MCRPath) {
+        if (path instanceof MCRPath mcrPath) {
             // check if the derivate is marked for deletion
-            MCRPath mcrPath = (MCRPath) path;
             String owner = mcrPath.getOwner();
             if (MCRObjectID.isValid(owner)) {
                 MCRObjectID mcrObjectID = MCRObjectID.getInstance(owner);

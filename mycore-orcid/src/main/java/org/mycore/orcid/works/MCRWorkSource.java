@@ -57,7 +57,7 @@ public class MCRWorkSource {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof MCRWorkSource) && sourceID.equals(((MCRWorkSource) obj).sourceID);
+        return (obj instanceof MCRWorkSource workSource) && sourceID.equals(workSource.sourceID);
     }
 
     @Override

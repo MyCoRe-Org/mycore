@@ -39,7 +39,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaLink;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -459,15 +458,15 @@ public class MCRLinkTableManager {
         //use Set for category collection to remove duplicates if there are any
         Collection<MCRCategoryID> categories = new HashSet<>();
         meta.stream().flatMap(MCRMetaElement::stream).forEach(inf -> {
-            if (inf instanceof MCRMetaClassification) {
-                String classId = ((MCRMetaClassification) inf).getClassId();
-                String categId = ((MCRMetaClassification) inf).getCategId();
+            if (inf instanceof MCRMetaClassification classification) {
+                String classId = classification.getClassId();
+                String categId = classification.getCategId();
                 categories.add(new MCRCategoryID(classId, categId));
-            } else if (inf instanceof MCRMetaLinkID) {
-                addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+            } else if (inf instanceof MCRMetaLinkID linkID) {
+                addReferenceLink(mcrId.toString(), linkID.getXLinkHref(),
                     MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
-            } else if (inf instanceof MCRMetaDerivateLink) {
-                addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+            } else if (inf instanceof MCRMetaDerivateLink derLink) {
+                addReferenceLink(mcrId.toString(), derLink.getXLinkHref(),
                     MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK, "");
             }
         });

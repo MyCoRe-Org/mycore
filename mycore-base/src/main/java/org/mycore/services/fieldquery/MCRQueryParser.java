@@ -183,8 +183,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
     public static MCRCondition<Void> normalizeCondition(MCRCondition<Void> cond) {
         if (cond == null) {
             return null;
-        } else if (cond instanceof MCRSetCondition) {
-            MCRSetCondition<Void> sc = (MCRSetCondition<Void>) cond;
+        } else if (cond instanceof MCRSetCondition<Void> sc) {
             List<MCRCondition<Void>> children = sc.getChildren();
             sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
             for (MCRCondition<Void> child : children) {
@@ -207,8 +206,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             } else {
                 return sc;
             }
-        } else if (cond instanceof MCRNotCondition) {
-            MCRNotCondition<Void> nc = (MCRNotCondition<Void>) cond;
+        } else if (cond instanceof MCRNotCondition<Void> nc) {
             MCRCondition<Void> child = normalizeCondition(nc.getChild());
             if (child == null) {
                 return null; // Remove empty NOT
@@ -217,8 +215,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             } else {
                 return new MCRNotCondition<>(child);
             }
-        } else if (cond instanceof MCRQueryCondition) {
-            MCRQueryCondition qc = (MCRQueryCondition) cond;
+        } else if (cond instanceof MCRQueryCondition qc) {
 
             if (!qc.getOperator().equals("contains")) {
                 return qc;

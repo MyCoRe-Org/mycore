@@ -64,8 +64,7 @@ public class MCRJSONSimpleModelConverter {
         List<MCRMetsLink> metsLinks = sectionPageLinkList
             .stream()
             .map((link) -> {
-                if (link instanceof MCRMetsLinkPlaceholder) {
-                    MCRMetsLinkPlaceholder placeholder = (MCRMetsLinkPlaceholder) link;
+                if (link instanceof MCRMetsLinkPlaceholder placeholder) {
                     MCRMetsSection metsSection = idSectionMap.get(placeholder.getFromString());
                     MCRMetsPage metsPage = idPageMap.get(placeholder.getToString());
                     return new MCRMetsLink(metsSection, metsPage);
@@ -94,8 +93,7 @@ public class MCRJSONSimpleModelConverter {
         idSectionTable.put(current.getId(), current);
 
         final List<MCRMetsAltoLink> altoLinks = current.getAltoLinks().stream().map(altoLink -> {
-            if (altoLink instanceof MCRAltoLinkPlaceHolder) {
-                MCRAltoLinkPlaceHolder ph = (MCRAltoLinkPlaceHolder) altoLink;
+            if (altoLink instanceof MCRAltoLinkPlaceHolder ph) {
                 if (!idFileMap.containsKey(ph.getFileID())) {
                     throw new MCRException(
                         "Could not parse link from section to alto! (FileID of alto not found in file list)");

@@ -522,11 +522,12 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "fixes all left and right values in the given classification",
         order = 130)
     public static void repairLeftRightValue(String classID) {
-        if (!(DAO instanceof MCRCategoryDAOImpl)) {
+        if (DAO instanceof MCRCategoryDAOImpl categoryDAO) {
+            categoryDAO.repairLeftRightValue(classID);
+        } else {
             LOGGER.error("Command not compatible with {}", DAO.getClass().getName());
             return;
         }
-        ((MCRCategoryDAOImpl) DAO).repairLeftRightValue(classID);
     }
 
     @MCRCommand(syntax = "check all classifications",

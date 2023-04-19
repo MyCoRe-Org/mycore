@@ -334,8 +334,8 @@ public class MCRIView2Tools {
         MCRPath mcrPath = MCRPath.getPath(derID, derPath);
         Path physicalPath = mcrPath.toPhysicalPath();
         for (FileStore fs : mcrPath.getFileSystem().getFileStores()) {
-            if (fs instanceof MCRAbstractFileStore) {
-                Path basePath = ((MCRAbstractFileStore) fs).getBaseDirectory();
+            if (fs instanceof MCRAbstractFileStore mcrFileStore) {
+                Path basePath = mcrFileStore.getBaseDirectory();
                 if (physicalPath.startsWith(basePath)) {
                     return basePath.relativize(physicalPath).toString();
                 }

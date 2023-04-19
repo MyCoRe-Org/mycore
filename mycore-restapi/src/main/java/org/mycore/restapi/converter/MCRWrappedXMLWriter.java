@@ -64,11 +64,9 @@ public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
     }
 
     private static boolean verifyGenericType(Type genericType) {
-        if (!(genericType instanceof ParameterizedType)) {
+        if (!(genericType instanceof ParameterizedType pt)) {
             return false;
         }
-
-        final ParameterizedType pt = (ParameterizedType) genericType;
 
         if (pt.getActualTypeArguments().length > 1) {
             return false;
@@ -76,33 +74,30 @@ public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
 
         final Type ta = pt.getActualTypeArguments()[0];
 
-        if (ta instanceof ParameterizedType) {
-            ParameterizedType lpt = (ParameterizedType) ta;
-            return (lpt.getRawType() instanceof Class)
-                && JAXBElement.class.isAssignableFrom((Class) lpt.getRawType());
+        if (ta instanceof ParameterizedType lpt) {
+            return (lpt.getRawType() instanceof Class rawType)
+                && JAXBElement.class.isAssignableFrom(rawType);
         }
 
-        if (!(pt.getActualTypeArguments()[0] instanceof Class)) {
+        if (!(pt.getActualTypeArguments()[0] instanceof Class listClass)) {
             return false;
         }
-
-        final Class listClass = (Class) pt.getActualTypeArguments()[0];
 
         return JAXB_CHECKER.test(listClass);
     }
 
     private static Class getElementClass(Class<?> type, Type genericType) {
         Type ta;
-        if (genericType instanceof ParameterizedType) {
-            ta = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        } else if (genericType instanceof GenericArrayType) {
-            ta = ((GenericArrayType) genericType).getGenericComponentType();
+        if (genericType instanceof ParameterizedType parameterizedType) {
+            ta = parameterizedType.getActualTypeArguments()[0];
+        } else if (genericType instanceof GenericArrayType arrayType) {
+            ta = arrayType.getGenericComponentType();
         } else {
             ta = type.getComponentType();
         }
-        if (ta instanceof ParameterizedType) {
+        if (ta instanceof ParameterizedType parameterizedType) {
             //JAXBElement
-            ta = ((ParameterizedType) ta).getActualTypeArguments()[0];
+            ta = parameterizedType.getActualTypeArguments()[0];
         }
         return (Class) ta;
     }

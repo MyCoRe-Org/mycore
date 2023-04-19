@@ -138,13 +138,11 @@ public abstract class MCRProcessableFactory {
             MCRProcessableSupplier<R> supplier = MCRProcessableSupplier.of(callable, this.executor, priority);
             if (this.collection != null) {
                 MCRProcessable processable = supplier;
-                if (callable instanceof MCRProcessable) {
-                    processable = (MCRProcessable) callable;
-                } else if (callable instanceof RunnableProgressableAdapter) {
-                    Runnable task = ((RunnableProgressableAdapter) callable).get();
-                    if (task instanceof MCRProcessable) {
-                        processable = (MCRProcessable) task;
-                    }
+                if (callable instanceof MCRProcessable p1) {
+                    processable = p1;
+                } else if (callable instanceof RunnableProgressableAdapter adapter
+                    && adapter.get() instanceof MCRProcessable p2) {
+                    processable = p2;
                 }
                 this.collection.add(processable);
                 supplier.getFuture().whenComplete((result, throwable) -> {
@@ -183,31 +181,31 @@ public abstract class MCRProcessableFactory {
 
         @Override
         public Integer getProgress() {
-            if (task instanceof MCRProgressable) {
-                return ((MCRProgressable) task).getProgress();
+            if (task instanceof MCRProgressable progressable) {
+                return progressable.getProgress();
             }
             return null;
         }
 
         @Override
         public String getProgressText() {
-            if (task instanceof MCRProgressable) {
-                return ((MCRProgressable) task).getProgressText();
+            if (task instanceof MCRProgressable progressable) {
+                return progressable.getProgressText();
             }
             return null;
         }
 
         @Override
         public void addProgressListener(MCRProgressableListener listener) {
-            if (task instanceof MCRListenableProgressable) {
-                ((MCRListenableProgressable) task).addProgressListener(listener);
+            if (task instanceof MCRListenableProgressable listenableProgressable) {
+                listenableProgressable.addProgressListener(listener);
             }
         }
 
         @Override
         public void removeProgressListener(MCRProgressableListener listener) {
-            if (task instanceof MCRListenableProgressable) {
-                ((MCRListenableProgressable) task).removeProgressListener(listener);
+            if (task instanceof MCRListenableProgressable listenableProgressable) {
+                listenableProgressable.removeProgressListener(listener);
             }
         }
 

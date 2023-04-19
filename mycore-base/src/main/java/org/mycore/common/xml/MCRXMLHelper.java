@@ -152,11 +152,11 @@ public class MCRXMLHelper {
             return MCRURIResolver.instance().resolve(schemaURI, null);
         } catch (TransformerException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
+            if (cause instanceof IOException ioe) {
+                throw ioe;
             }
-            if (cause instanceof SAXException) {
-                throw (SAXException) cause;
+            if (cause instanceof SAXException se) {
+                throw se;
             }
             throw new IOException(e);
         }
@@ -226,13 +226,13 @@ public class MCRXMLHelper {
         }
     }
 
-    private static Element canonicalElement(Parent e) throws IOException, SAXParseException {
+    private static Element canonicalElement(Parent p) throws IOException, SAXParseException {
         XMLOutputter xout = new XMLOutputter(Format.getCompactFormat());
         MCRByteArrayOutputStream bout = new MCRByteArrayOutputStream();
-        if (e instanceof Element) {
-            xout.output((Element) e, bout);
+        if (p instanceof Element e) {
+            xout.output(e, bout);
         } else {
-            xout.output((Document) e, bout);
+            xout.output((Document) p, bout);
         }
         Document xml = MCRXMLParserFactory.getNonValidatingParser()
             .parseXML(new MCRByteContent(bout.getBuffer(), 0, bout.size()));
@@ -325,16 +325,16 @@ public class MCRXMLHelper {
             while (result && i1.hasNext() && i2.hasNext()) {
                 Object o1 = i1.next();
                 Object o2 = i2.next();
-                if (o1 instanceof Element && o2 instanceof Element) {
-                    result = equivalent((Element) o1, (Element) o2);
-                } else if (o1 instanceof Text && o2 instanceof Text) {
-                    result = equivalent((Text) o1, (Text) o2);
-                } else if (o1 instanceof Comment && o2 instanceof Comment) {
-                    result = equivalent((Comment) o1, (Comment) o2);
-                } else if (o1 instanceof ProcessingInstruction && o2 instanceof ProcessingInstruction) {
-                    result = equivalent((ProcessingInstruction) o1, (ProcessingInstruction) o2);
-                } else if (o1 instanceof DocType && o2 instanceof DocType) {
-                    result = equivalent((DocType) o1, (DocType) o2);
+                if (o1 instanceof Element e1 && o2 instanceof Element e2) {
+                    result = equivalent(e1, e2);
+                } else if (o1 instanceof Text t1 && o2 instanceof Text t2) {
+                    result = equivalent(t1, t2);
+                } else if (o1 instanceof Comment c1 && o2 instanceof Comment c2) {
+                    result = equivalent(c1, c2);
+                } else if (o1 instanceof ProcessingInstruction p1 && o2 instanceof ProcessingInstruction p2) {
+                    result = equivalent(p1, p2);
+                } else if (o1 instanceof DocType d1 && o2 instanceof DocType d2) {
+                    result = equivalent(d1, d2);
                 } else {
                     result = false;
                 }
@@ -399,11 +399,11 @@ public class MCRXMLHelper {
          * @return the serialized content, or null if the type is not supported
          */
         public static JsonElement serialize(Content content) {
-            if (content instanceof Element) {
-                return serializeElement((Element) content);
+            if (content instanceof Element element) {
+                return serializeElement(element);
             }
-            if (content instanceof Text) {
-                return serializeText((Text) content);
+            if (content instanceof Text text) {
+                return serializeText(text);
             }
             return null;
         }

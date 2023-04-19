@@ -143,8 +143,8 @@ public class MCRBinding {
 
     public void removeBoundNode(int index) {
         Object node = boundNodes.remove(index);
-        if (node instanceof Element) {
-            track(MCRRemoveElement.remove((Element) node));
+        if (node instanceof Element element) {
+            track(MCRRemoveElement.remove(element));
         } else {
             track(MCRRemoveAttribute.remove((Attribute) node));
         }
@@ -162,8 +162,7 @@ public class MCRBinding {
     }
 
     private void trackNodeCreated(Object node) {
-        if (node instanceof Element) {
-            Element element = (Element) node;
+        if (node instanceof Element element) {
             MCRChangeTracker.removeChangeTracking(element);
             track(MCRAddedElement.added(element));
         } else {
@@ -198,8 +197,8 @@ public class MCRBinding {
     }
 
     public static String getValue(Object node) {
-        if (node instanceof Element) {
-            return ((Element) node).getTextTrim();
+        if (node instanceof Element element) {
+            return element.getTextTrim();
         } else {
             return ((Attribute) node).getValue();
         }
@@ -233,8 +232,8 @@ public class MCRBinding {
         if (value.equals(getValue(node))) {
             return;
         }
-        if (node instanceof Attribute) {
-            track(MCRSetAttributeValue.setValue((Attribute) node, value));
+        if (node instanceof Attribute attribute) {
+            track(MCRSetAttributeValue.setValue(attribute, value));
         } else {
             track(MCRSetElementText.setText((Element) node, value));
         }

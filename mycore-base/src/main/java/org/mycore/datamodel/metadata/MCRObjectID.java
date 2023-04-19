@@ -414,8 +414,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     @Override
     public boolean equals(Object in) {
-        if (in instanceof MCRObjectID) {
-            return equals((MCRObjectID) in);
+        if (in instanceof MCRObjectID objectID) {
+            return equals(objectID);
         }
         return false;
     }

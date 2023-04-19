@@ -107,8 +107,8 @@ public class MCRXPathEvaluator {
         Object result = evaluateFirst(xPathExpression);
         if (result == null) {
             return false;
-        } else if (result instanceof Boolean) {
-            return (Boolean) result;
+        } else if (result instanceof Boolean b) {
+            return b;
         } else {
             return true;
         }

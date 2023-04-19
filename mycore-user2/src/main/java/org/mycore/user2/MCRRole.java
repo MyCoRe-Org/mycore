@@ -119,11 +119,7 @@ public class MCRRole {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRRole) {
-            return ((MCRRole) obj).getName().equals(this.getName());
-        } else {
-            return false;
-        }
+        return obj instanceof MCRRole role && role.getName().equals(this.getName());
     }
 
     @Override

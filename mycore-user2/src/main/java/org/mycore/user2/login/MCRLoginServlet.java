@@ -238,7 +238,7 @@ public class MCRLoginServlet extends MCRServlet {
     static void addCurrentUserInfo(Element rootElement) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         rootElement.setAttribute("user", userInfo.getUserID());
-        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
+        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
             : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
         if (realmId == null) {
             realmId = MCRRealmFactory.getLocalRealm().getLabel();
@@ -249,7 +249,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     static void addCurrentUserInfo(MCRLogin login) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
-        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
+        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
             : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
         if (realmId == null) {
             realmId = MCRRealmFactory.getLocalRealm().getLabel();

@@ -247,12 +247,12 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
                     MCRConstants.getStandardNamespaces());
                 final Object content = expr.evaluateFirst(mcrBase.createXML());
 
-                if (content instanceof Text) {
-                    return ((Text) content).getTextNormalize();
-                } else if (content instanceof Attribute) {
-                    return ((Attribute) content).getValue();
-                } else if (content instanceof Element) {
-                    return ((Element) content).getTextNormalize();
+                if (content instanceof Text text) {
+                    return text.getTextNormalize();
+                } else if (content instanceof Attribute attribute) {
+                    return attribute.getValue();
+                } else if (content instanceof Element element) {
+                    return element.getTextNormalize();
                 } else {
                     return content.toString();
                 }

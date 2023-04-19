@@ -86,8 +86,8 @@ abstract class MCRPersistenceServlet extends MCRServlet {
                 job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
                 return;
             }
-            if (ex instanceof MCRActiveLinkException) {
-                String msg = ((MCRActiveLinkException) ex)
+            if (ex instanceof MCRActiveLinkException linkException) {
+                String msg = linkException
                     .getActiveLinks()
                     .values()
                     .iterator()

@@ -46,8 +46,8 @@ class MCRObjectIDPool {
             return objectIDCache.getUnchecked(id);
         } catch (UncheckedExecutionException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof MCRException) {
-                throw (MCRException) cause;
+            if (cause instanceof MCRException mcre) {
+                throw mcre;
             }
             throw e;
         }

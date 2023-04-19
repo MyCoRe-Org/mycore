@@ -44,8 +44,7 @@ class MCRBibTeXFileTransformer {
         MCRBibTeXEntryTransformer transformer = new MCRBibTeXEntryTransformer();
 
         for (Object obj : file.getEntries()) {
-            if (obj instanceof BibtexEntry) {
-                BibtexEntry entry = (BibtexEntry) obj;
+            if (obj instanceof BibtexEntry entry) {
                 if (entry.getFields().isEmpty()) {
                     MCRMessageLogger.logMessage("Skipping entry of type " + entry.getEntryType() + ", has no fields",
                         collection);

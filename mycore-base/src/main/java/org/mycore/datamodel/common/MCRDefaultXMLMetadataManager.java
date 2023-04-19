@@ -311,9 +311,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
     public void verifyStore(String base) {
         MCRMetadataStore store = getStore(base);
-        if (store instanceof MCRVersioningMetadataStore) {
+        if (store instanceof MCRVersioningMetadataStore versioningMetadataStore) {
             LOGGER.info("Verifying SVN history of {}.", base);
-            ((MCRVersioningMetadataStore) (getStore(base))).verify();
+            versioningMetadataStore.verify();
         } else {
             LOGGER.warn("Cannot verify unversioned store {}!", base);
         }
@@ -478,10 +478,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             return null;
         }
         MCRMetadataStore metadataStore = getStore(id, true);
-        if (!(metadataStore instanceof MCRVersioningMetadataStore)) {
+        if (!(metadataStore instanceof MCRVersioningMetadataStore verStore)) {
             return null;
         }
-        MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
         return verStore.retrieve(id.getNumberAsInteger());
     }
 

@@ -111,8 +111,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         throws MCRAccessException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, filePath);
 
-        if (obj instanceof MCRDerivate) {
-            MCRDerivate derivate = (MCRDerivate) obj;
+        if (obj instanceof MCRDerivate derivate) {
             return registerURN(derivate, filePath);
         } else {
             throw new MCRPersistentIdentifierException("Object " + obj.getId() + " is not a MCRDerivate!");

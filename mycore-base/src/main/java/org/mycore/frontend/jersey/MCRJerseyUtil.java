@@ -70,8 +70,8 @@ public abstract class MCRJerseyUtil {
         MCRContent result;
         MCRJDOMContent source = new MCRJDOMContent(document);
         MCRContentTransformer transformer = MCRLayoutService.getContentTransformer(source.getDocType(), parameter);
-        if (transformer instanceof MCRParameterizedTransformer) {
-            result = ((MCRParameterizedTransformer) transformer).transform(source, parameter);
+        if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
+            result = parameterizedTransformer.transform(source, parameter);
         } else {
             result = transformer.transform(source);
         }

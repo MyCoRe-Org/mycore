@@ -302,10 +302,9 @@ public class MCRAccessKey {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof MCRAccessKey)) {
+        if (!(o instanceof MCRAccessKey other)) {
             return false;
         }
-        MCRAccessKey other = (MCRAccessKey) o;
         return this.id == other.getId() && this.type.equals(other.getType())
             && this.secret.equals(other.getSecret());
     }

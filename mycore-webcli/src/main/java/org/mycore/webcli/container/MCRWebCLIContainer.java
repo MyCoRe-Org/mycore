@@ -545,8 +545,8 @@ public class MCRWebCLIContainer {
         @Override
         public void stop() {
             while (publisher.estimateMaximumLag() > 0) {
-                if (publisher.getExecutor() instanceof ForkJoinPool) {
-                    ((ForkJoinPool) publisher.getExecutor()).awaitQuiescence(1, TimeUnit.SECONDS);
+                if (publisher.getExecutor() instanceof ForkJoinPool forkJoinPool) {
+                    forkJoinPool.awaitQuiescence(1, TimeUnit.SECONDS);
                 } else {
                     Thread.yield();
                 }

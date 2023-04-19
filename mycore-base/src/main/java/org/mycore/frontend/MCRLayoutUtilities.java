@@ -442,8 +442,8 @@ public class MCRLayoutUtilities {
 
     public static boolean hasRule(String permission, String webpageID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
-        if (am instanceof MCRRuleAccessInterface) {
-            return ((MCRRuleAccessInterface) am).hasRule(getWebpageACLID(webpageID), permission);
+        if (am instanceof MCRRuleAccessInterface ruleAccessInterface) {
+            return ruleAccessInterface.hasRule(getWebpageACLID(webpageID), permission);
         } else {
             return true;
         }
@@ -458,8 +458,8 @@ public class MCRLayoutUtilities {
     public static String getRuleDescr(String permission, String webpageID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String ruleDes = null;
-        if (am instanceof MCRRuleAccessInterface) {
-            ruleDes = ((MCRRuleAccessInterface) am).getRuleDescription(getWebpageACLID(webpageID), permission);
+        if (am instanceof MCRRuleAccessInterface ruleAccessInterface) {
+            ruleDes = ruleAccessInterface.getRuleDescription(getWebpageACLID(webpageID), permission);
         }
         return Objects.requireNonNullElse(ruleDes, "");
     }

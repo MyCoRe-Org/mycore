@@ -45,17 +45,17 @@ public class MCRIIIFMetadata {
     }
 
     public Optional<MCRIIIFMetadataValue> getValue() {
-        if (!(this.value instanceof MCRIIIFMetadataValue)) {
-            return Optional.empty();
+        if (this.value instanceof MCRIIIFMetadataValue metadataValue) {
+            return Optional.of(metadataValue);
         }
-        return Optional.of((MCRIIIFMetadataValue) this.value);
+        return Optional.empty();
     }
 
     public Optional<String> getStringValue() {
-        if (!(this.value instanceof String)) {
-            return Optional.empty();
+        if (this.value instanceof String s) {
+            return Optional.of(s);
         }
-        return Optional.of((String) this.value);
+        return Optional.empty();
     }
 
 }

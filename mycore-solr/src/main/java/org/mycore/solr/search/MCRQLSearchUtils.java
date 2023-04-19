@@ -127,11 +127,7 @@ public class MCRQLSearchUtils {
             }
         } else if (element.getName().startsWith("boolean")) {
             element.setName("boolean");
-            for (Object child : element.getChildren()) {
-                if (child instanceof Element) {
-                    renameElements((Element) child);
-                }
-            }
+            element.getChildren().forEach(MCRQLSearchUtils::renameElements);
         }
     }
 

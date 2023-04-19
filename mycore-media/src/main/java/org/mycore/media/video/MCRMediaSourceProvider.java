@@ -67,13 +67,11 @@ public class MCRMediaSourceProvider {
                     parameterSupplier.get()));
         } catch (RuntimeException e) {
             Throwable cause = e.getCause();
-            if (cause != null) {
-                if (cause instanceof IOException) {
-                    throw (IOException) cause;
-                }
-                if (cause instanceof URISyntaxException) {
-                    throw (URISyntaxException) cause;
-                }
+            if (cause instanceof IOException ioe) {
+                throw ioe;
+            }
+            if (cause instanceof URISyntaxException use) {
+                throw use;
             }
             throw e;
         }

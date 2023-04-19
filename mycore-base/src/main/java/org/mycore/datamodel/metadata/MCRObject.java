@@ -301,9 +301,9 @@ public final class MCRObject extends MCRBase {
             MCRMetaElement elm = getMetadata().getMetadataElement(i);
             for (int j = 0; j < elm.size(); j++) {
                 MCRMetaInterface inf = elm.getElement(j);
-                if (inf instanceof MCRMetaClassification) {
-                    String classID = ((MCRMetaClassification) inf).getClassId();
-                    String categID = ((MCRMetaClassification) inf).getCategId();
+                if (inf instanceof MCRMetaClassification classification) {
+                    String classID = classification.getClassId();
+                    String categID = classification.getCategId();
                     boolean exists = MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classID, categID));
                     if (exists) {
                         continue;
@@ -315,8 +315,8 @@ public final class MCRObject extends MCRBase {
                     // throw activeLink;
                     // TODO: should trigger undo-Event
                 }
-                if (inf instanceof MCRMetaLinkID) {
-                    MCRObjectID destination = ((MCRMetaLinkID) inf).getXLinkHrefID();
+                if (inf instanceof MCRMetaLinkID linkID) {
+                    MCRObjectID destination = linkID.getXLinkHrefID();
                     if (MCRMetadataManager.exists(destination)) {
                         continue;
                     }

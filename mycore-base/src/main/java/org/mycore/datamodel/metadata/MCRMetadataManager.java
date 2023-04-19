@@ -609,10 +609,10 @@ public final class MCRMetadataManager {
      * 
      */
     public static void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
-        if (mcrBaseObj instanceof MCRDerivate) {
-            MCRMetadataManager.fireRepairEvent((MCRDerivate) mcrBaseObj);
-        } else if (mcrBaseObj instanceof MCRObject) {
-            MCRMetadataManager.fireRepairEvent((MCRObject) mcrBaseObj);
+        if (mcrBaseObj instanceof MCRDerivate derivate) {
+            MCRMetadataManager.fireRepairEvent(derivate);
+        } else if (mcrBaseObj instanceof MCRObject object) {
+            MCRMetadataManager.fireRepairEvent(object);
         }
     }
 
@@ -715,10 +715,10 @@ public final class MCRMetadataManager {
      */
     public static void update(final MCRBase base)
         throws MCRPersistenceException, MCRAccessException {
-        if (base instanceof MCRObject) {
-            MCRMetadataManager.update((MCRObject) base);
-        } else if (base instanceof MCRDerivate) {
-            MCRMetadataManager.update((MCRDerivate) base);
+        if (base instanceof MCRObject object) {
+            MCRMetadataManager.update(object);
+        } else if (base instanceof MCRDerivate derivate) {
+            MCRMetadataManager.update(derivate);
         } else {
             throw new IllegalArgumentException("Type is unsupported " + base.getId());
         }

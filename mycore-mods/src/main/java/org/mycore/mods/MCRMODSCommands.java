@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -38,9 +37,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -204,17 +202,12 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     protected static void setDefaultPermissions(MCRObjectID derivateID) {
-        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
-            MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
-            if (ai instanceof MCRRuleAccessInterface) {
-                Collection<String> configuredPermissions = ((MCRRuleAccessInterface) ai)
-                    .getAccessPermissionsFromConfiguration();
-                for (String permission : configuredPermissions) {
-                    MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
-                        "default derivate rule");
-                }
-            }
-
+        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)
+            && MCRAccessManager.getAccessImpl() instanceof MCRRuleAccessInterface ruleAccess) {
+            ruleAccess
+                .getAccessPermissionsFromConfiguration()
+                .forEach(p -> MCRAccessManager.addRule(derivateID, p, MCRAccessManager.getTrueRule(),
+                    "default derivate rule"));
         }
     }
 }

@@ -285,8 +285,8 @@ public abstract class MCRObjectUtils {
                 mcrBase.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE, new Date());
                 MCRMetadataManager.update(mcrBase);
             } else {
-                if (mcrBase instanceof MCRObject) {
-                    MCRMetadataManager.create((MCRObject) mcrBase);
+                if (mcrBase instanceof MCRObject object) {
+                    MCRMetadataManager.create(object);
                 } else {
                     MCRMetadataManager.create((MCRDerivate) mcrBase);
                 }

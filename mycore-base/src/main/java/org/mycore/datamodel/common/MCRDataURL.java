@@ -544,10 +544,9 @@ public class MCRDataURL implements Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRDataURL)) {
+        if (!(obj instanceof MCRDataURL other)) {
             return false;
         }
-        MCRDataURL other = (MCRDataURL) obj;
         if (charset == null) {
             if (other.charset != null) {
                 return false;

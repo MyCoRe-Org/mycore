@@ -523,10 +523,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             obj.getDerivate().getInternals().setSourcePath(nid);
             LOGGER.info("New Internal Path ====>{}", nid);
             // add ACL's
-            if (ACCESS_IMPL instanceof MCRRuleAccessInterface) {
-                Collection<String> l = ((MCRRuleAccessInterface) ACCESS_IMPL).getPermissionsForID(nid);
+            if (ACCESS_IMPL instanceof MCRRuleAccessInterface ruleAccessInterface) {
+                Collection<String> l = ruleAccessInterface.getPermissionsForID(nid);
                 for (String permission : l) {
-                    Element rule = ((MCRRuleAccessInterface) ACCESS_IMPL).getRule(nid, permission);
+                    Element rule = ruleAccessInterface.getRule(nid, permission);
                     obj.getService().addRule(permission, rule);
                 }
             }

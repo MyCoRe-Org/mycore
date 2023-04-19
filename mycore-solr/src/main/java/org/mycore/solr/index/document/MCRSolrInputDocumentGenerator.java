@@ -60,8 +60,7 @@ public class MCRSolrInputDocumentGenerator {
         SolrInputDocument doc = new SolrInputDocument();
         HashSet<MCRSolrInputField> duplicateFilter = new HashSet<>();
         for (Object o : jaxbDoc.getFieldOrDoc()) {
-            if (o instanceof MCRSolrInputField) {
-                MCRSolrInputField field = (MCRSolrInputField) o;
+            if (o instanceof MCRSolrInputField field) {
                 if (field.getValue().isEmpty() || duplicateFilter.contains(field)) {
                     continue;
                 }
@@ -70,8 +69,7 @@ public class MCRSolrInputDocumentGenerator {
                 }
                 duplicateFilter.add(field);
                 doc.addField(field.getName(), field.getValue());
-            } else if (o instanceof MCRSolrInputDocument) {
-                MCRSolrInputDocument child = (MCRSolrInputDocument) o;
+            } else if (o instanceof MCRSolrInputDocument child) {
                 SolrInputDocument solrChild = getSolrInputDocument(child);
                 doc.addChildDocument(solrChild);
             }

@@ -106,10 +106,9 @@ public class MCRACCESSRULE {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRACCESSRULE)) {
+        if (!(obj instanceof MCRACCESSRULE other)) {
             return false;
         }
-        final MCRACCESSRULE other = (MCRACCESSRULE) obj;
         if (creationdate == null) {
             if (other.getCreationdate() != null) {
                 return false;

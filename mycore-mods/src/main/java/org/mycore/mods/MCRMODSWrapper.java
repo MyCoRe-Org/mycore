@@ -144,8 +144,8 @@ public class MCRMODSWrapper {
         try {
             MCRMetaXML mx = (MCRMetaXML) (object.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElement(0));
             for (Content content : mx.getContent()) {
-                if (content instanceof Element) {
-                    return (Element) content;
+                if (content instanceof Element element) {
+                    return element;
                 }
             }
         } catch (NullPointerException | IndexOutOfBoundsException e) {

@@ -84,9 +84,9 @@ class MCRCategoryChildList extends ArrayList<MCRCategory> {
      * @param category
      */
     private void removeAncestorReferences(MCRCategory category) {
-        if (category instanceof MCRAbstractCategoryImpl) {
-            ((MCRAbstractCategoryImpl) category).parent = null;
-            ((MCRAbstractCategoryImpl) category).root = null;
+        if (category instanceof MCRAbstractCategoryImpl catImpl) {
+            catImpl.parent = null;
+            catImpl.root = null;
         }
     }
 

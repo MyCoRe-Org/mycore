@@ -27,12 +27,8 @@ final class MCRConverterUtils {
     }
 
     static boolean isType(Type genericType, Class<?> targetType) {
-        if (genericType instanceof ParameterizedType) {
-            Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-            if (type instanceof Class) {
-                return targetType.isAssignableFrom((Class) type);
-            }
-        }
-        return false;
+        return genericType instanceof ParameterizedType parameterizedType
+            && parameterizedType.getActualTypeArguments()[0] instanceof Class type
+            && targetType.isAssignableFrom(type);
     }
 }

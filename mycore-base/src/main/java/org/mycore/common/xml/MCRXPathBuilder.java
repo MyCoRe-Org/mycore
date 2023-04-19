@@ -43,10 +43,10 @@ public class MCRXPathBuilder {
      * @return absolute XPath of that object. In case there is a root Document, it will begin with a "/".
      */
     public static String buildXPath(Object object) {
-        if (object instanceof Element) {
-            return buildXPath((Element) object);
-        } else if (object instanceof Attribute) {
-            return buildXPath((Attribute) object);
+        if (object instanceof Element element) {
+            return buildXPath(element);
+        } else if (object instanceof Attribute attribute) {
+            return buildXPath(attribute);
         } else {
             return "";
         }

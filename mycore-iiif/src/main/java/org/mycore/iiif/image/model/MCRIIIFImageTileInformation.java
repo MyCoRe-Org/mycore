@@ -18,20 +18,30 @@
 
 package org.mycore.iiif.image.model;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+//TODO: replace with record?, handling scaleFactors?
 public class MCRIIIFImageTileInformation {
 
     public final int width;
 
     public final int height;
 
-    public List<Integer> scaleFactors = new ArrayList<>();
+    public final List<Integer> scaleFactors;
 
-    public MCRIIIFImageTileInformation(int width, int height) {
+    public MCRIIIFImageTileInformation(int width, int height, List<Integer> scaleFactors) {
         this.width = width;
         this.height = height;
+        this.scaleFactors = List.copyOf(scaleFactors);
+    }
+
+    public static List<Integer> scaleFactorsAsPowersOfTwo(int n) {
+        return IntStream.range(0, n)
+            .map(i -> (int) Math.pow(2, i))
+            .boxed()
+            .collect(Collectors.toUnmodifiableList());
     }
 
 }

@@ -169,10 +169,9 @@ public class MCRSolrInputField {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRSolrInputField)) {
+        if (!(obj instanceof MCRSolrInputField other)) {
             return false;
         }
-        MCRSolrInputField other = (MCRSolrInputField) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;

@@ -160,16 +160,15 @@ public class MCRServlet extends HttpServlet {
     }
 
     private void throwIOException(Exception e) throws IOException {
-        if (e instanceof IOException) {
-            throw (IOException) e;
+        if (e instanceof IOException ioe) {
+            throw ioe;
         }
-        if (e instanceof TransformerException) {
-            TransformerException te = MCRErrorListener.unwrapException((TransformerException) e);
+        if (e instanceof TransformerException tfe) {
+            TransformerException te = MCRErrorListener.unwrapException(tfe);
             String myMessageAndLocation = MCRErrorListener.getMyMessageAndLocation(te);
             throw new IOException("Error while XSL Transformation: " + myMessageAndLocation, e);
         }
-        if (e instanceof SAXParseException) {
-            SAXParseException spe = (SAXParseException) e;
+        if (e instanceof SAXParseException spe) {
             String id = spe.getSystemId() != null ? spe.getSystemId() : spe.getPublicId();
             int line = spe.getLineNumber();
             int column = spe.getColumnNumber();
@@ -336,16 +335,16 @@ public class MCRServlet extends HttpServlet {
             } else {
                 LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
             }
-            if (ex instanceof ServletException) {
-                throw (ServletException) ex;
-            } else if (ex instanceof IOException) {
-                throw (IOException) ex;
-            } else if (ex instanceof SAXException) {
-                throw (SAXException) ex;
-            } else if (ex instanceof TransformerException) {
-                throw (TransformerException) ex;
-            } else if (ex instanceof RuntimeException) {
-                throw (RuntimeException) ex;
+            if (ex instanceof ServletException se) {
+                throw se;
+            } else if (ex instanceof IOException ioe) {
+                throw ioe;
+            } else if (ex instanceof SAXException se) {
+                throw se;
+            } else if (ex instanceof TransformerException te) {
+                throw te;
+            } else if (ex instanceof RuntimeException rte) {
+                throw rte;
             } else {
                 throw new RuntimeException(ex);
             }

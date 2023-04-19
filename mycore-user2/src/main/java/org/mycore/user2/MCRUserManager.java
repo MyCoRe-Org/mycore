@@ -212,8 +212,8 @@ public class MCRUserManager {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
 
-        if (user instanceof MCRTransientUser) {
-            createUser((MCRTransientUser) user);
+        if (user instanceof MCRTransientUser transientUser) {
+            createUser(transientUser);
             return;
         }
 
@@ -578,8 +578,8 @@ public class MCRUserManager {
      */
     public static MCRUser getCurrentUser() {
         MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
-        if (userInformation instanceof MCRUser) {
-            return (MCRUser) userInformation;
+        if (userInformation instanceof MCRUser mcrUser) {
+            return mcrUser;
         } else {
             return new MCRTransientUser(userInformation);
         }

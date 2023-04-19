@@ -35,11 +35,9 @@ public class MCRRelatedItemMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRRelatedItemMerger)) {
-            return false;
-        } else {
-            return isRelatedItemTypeHost() && ((MCRRelatedItemMerger) other).isRelatedItemTypeHost();
-        }
+        return other instanceof MCRRelatedItemMerger relatedItemMerger
+            && isRelatedItemTypeHost()
+            && relatedItemMerger.isRelatedItemTypeHost();
     }
 
     private boolean isRelatedItemTypeHost() {

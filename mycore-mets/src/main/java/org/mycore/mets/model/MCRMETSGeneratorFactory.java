@@ -87,8 +87,7 @@ public abstract class MCRMETSGeneratorFactory {
      */
     public static MCRMETSGenerator create(MCRPath derivatePath, Set<MCRPath> ignorePaths) throws MCRException {
         MCRMETSGenerator generator = GENERATOR_SELECTOR.get(derivatePath);
-        if (generator instanceof MCRMETSAbstractGenerator) {
-            MCRMETSAbstractGenerator abstractGenerator = (MCRMETSAbstractGenerator) generator;
+        if (generator instanceof MCRMETSAbstractGenerator abstractGenerator) {
             abstractGenerator.setDerivatePath(derivatePath);
             if (IGNORE_METS_XML) {
                 ignorePaths.add(MCRPath.toMCRPath(derivatePath.resolve("mets.xml")));

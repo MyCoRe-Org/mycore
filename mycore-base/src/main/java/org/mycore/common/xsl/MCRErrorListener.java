@@ -108,11 +108,11 @@ public class MCRErrorListener implements ErrorListener {
     public static TransformerException unwrapException(TransformerException exception) {
         Throwable cause = exception.getCause();
         while (cause != null) {
-            if (cause instanceof TransformerException) {
-                return unwrapException((TransformerException) cause);
+            if (cause instanceof TransformerException te) {
+                return unwrapException(te);
             }
-            if (cause instanceof WrappedRuntimeException) {
-                cause = ((WrappedRuntimeException) cause).getException();
+            if (cause instanceof WrappedRuntimeException wrte) {
+                cause = wrte.getException();
             } else {
                 cause = cause.getCause();
             }

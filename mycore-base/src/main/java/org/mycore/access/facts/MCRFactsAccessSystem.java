@@ -96,12 +96,11 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
 
     @SuppressWarnings("unchecked")
     private void collectComputers(MCRCondition coll, Map<String, MCRFactComputable<MCRFact<?>>> computers) {
-        if (coll instanceof MCRFactComputable<?>
-            && !computers.containsKey(((MCRFactComputable<?>) coll).getFactName())) {
-            computers.put(((MCRFactComputable<?>) coll).getFactName(), (MCRFactComputable<MCRFact<?>>) coll);
+        if (coll instanceof MCRFactComputable<?> factComp && !computers.containsKey(factComp.getFactName())) {
+            computers.put(factComp.getFactName(), (MCRFactComputable<MCRFact<?>>) factComp);
         }
-        if (coll instanceof MCRCombinedCondition) {
-            ((MCRCombinedCondition) coll).getChildConditions().forEach(c -> collectComputers(c, computers));
+        if (coll instanceof MCRCombinedCondition combCond) {
+            combCond.getChildConditions().forEach(c -> collectComputers(c, computers));
         }
     }
 

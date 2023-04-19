@@ -157,11 +157,9 @@ public class MCRNameMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger e) {
-        if (!(e instanceof MCRNameMerger)) {
+        if (!(e instanceof MCRNameMerger other)) {
             return false;
         }
-
-        MCRNameMerger other = (MCRNameMerger) e;
 
         if (this.allNames.equals(other.allNames)) {
             return true;

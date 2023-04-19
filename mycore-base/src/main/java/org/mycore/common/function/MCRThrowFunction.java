@@ -113,8 +113,8 @@ public interface MCRThrowFunction<T, R, E extends Throwable> {
      */
     default Function<T, R> toFunction() {
         return toFunction((t, e) -> {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
+            if (e instanceof RuntimeException rte) {
+                throw rte;
             }
             throw new RuntimeException(e);
         }, Throwable.class);

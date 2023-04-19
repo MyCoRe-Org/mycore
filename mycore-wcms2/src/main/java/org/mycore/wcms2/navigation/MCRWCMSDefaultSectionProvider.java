@@ -122,8 +122,8 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
         XMLOutputter out = new XMLOutputter();
         StringWriter writer = new StringWriter();
         for (Content child : element.getContent()) {
-            if (child instanceof Element) {
-                out.output((Element) child, writer);
+            if (child instanceof Element childElement) {
+                out.output(childElement, writer);
             } else if (child instanceof Text text) {
                 String trimmedText = text.getTextTrim();
                 if (!"".equals(trimmedText)) {

@@ -183,8 +183,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
         for (int i = 0; i < namedList.size(); i++) {
             String name = namedList.getName(i);
             Object val = namedList.getVal(i);
-            if (val instanceof String[]) {
-                MultiMapSolrParams.addParam(name, (String[]) val, parameters);
+            if (val instanceof String[] strings) {
+                MultiMapSolrParams.addParam(name, strings, parameters);
             } else {
                 MultiMapSolrParams.addParam(name, val.toString(), parameters);
             }

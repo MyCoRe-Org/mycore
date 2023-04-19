@@ -100,8 +100,8 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
             Iterator<Content> iterator = transformResult.iterator();
             while (iterator.hasNext()) {
                 Content content = iterator.next();
-                if (content instanceof Text) {
-                    String trimmedText = ((Text) content).getTextTrim();
+                if (content instanceof Text text) {
+                    String trimmedText = text.getTextTrim();
                     if (trimmedText.length() == 0) {
                         iterator.remove();
                     }

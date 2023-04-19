@@ -189,8 +189,8 @@ public class MCRPathXML {
             catEl.setAttribute("id", category.toString());
             root.addContent(catEl);
         }
-        if (!attrs.isDirectory() && attrs instanceof MCRFileAttributes<?>) {
-            addAttributes(root, (MCRFileAttributes<?>) attrs, path);
+        if (!attrs.isDirectory() && attrs instanceof MCRFileAttributes<?> fAttrs) {
+            addAttributes(root, fAttrs, path);
         } else {
             addBasicAttributes(root, attrs, path);
         }

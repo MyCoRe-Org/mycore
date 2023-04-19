@@ -56,10 +56,9 @@ class MCRPermissionHandle {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRPermissionHandle)) {
+        if (!(obj instanceof MCRPermissionHandle other)) {
             return false;
         }
-        MCRPermissionHandle other = (MCRPermissionHandle) obj;
         if (id == null) {
             if (other.id != null) {
                 return false;

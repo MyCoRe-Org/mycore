@@ -86,14 +86,13 @@ public class MCRXEditorTransformer {
         editorSession.getSubmission().clear();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
-        if (transformer instanceof MCRParameterizedTransformer) {
+        if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
             transformationParameters.setParameter("transformer", this);
-            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource,
-                transformationParameters);
-            if (result instanceof MCRWrappedContent
+            MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
+            if (result instanceof MCRWrappedContent wrappedContent
                 && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
                 //lazy transformation make JUnit tests fail
-                result = ((MCRWrappedContent) result).getBaseContent();
+                result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
             return result;

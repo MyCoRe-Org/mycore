@@ -328,10 +328,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             addFlagToObject(obj, databaseEntry);
 
             if (updateObject) {
-                if (obj instanceof MCRObject) {
-                    MCRMetadataManager.update((MCRObject) obj);
-                } else if (obj instanceof MCRDerivate) {
-                    MCRMetadataManager.update((MCRDerivate) obj);
+                if (obj instanceof MCRObject object) {
+                    MCRMetadataManager.update(object);
+                } else if (obj instanceof MCRDerivate derivate) {
+                    MCRMetadataManager.update(derivate);
                 }
             }
 
@@ -341,8 +341,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         try {
             return REGISTER_POOL.submit(createPICallable).get();
         } catch (ExecutionException e) {
-            if (e.getCause() != null && e.getCause() instanceof MCRPersistentIdentifierException) {
-                throw (MCRPersistentIdentifierException) e.getCause();
+            if (e.getCause() instanceof MCRPersistentIdentifierException pie) {
+                throw pie;
             }
             throw e;
         }

@@ -71,8 +71,8 @@ public class MCRMerger {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRMerger) {
-            return MCRXMLHelper.deepEqual(this.element, ((MCRMerger) obj).element);
+        if (obj instanceof MCRMerger merger) {
+            return MCRXMLHelper.deepEqual(this.element, merger.element);
         } else {
             return super.equals(obj);
         }

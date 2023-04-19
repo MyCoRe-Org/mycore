@@ -217,8 +217,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRStoredNode node = MCRFileSystemUtils.resolvePath(mcrPath);
-        if (node instanceof MCRDirectory) {
-            return MCRDirectoryStreamHelper.getInstance((MCRDirectory) node, mcrPath);
+        if (node instanceof MCRDirectory mcrDirectory) {
+            return MCRDirectoryStreamHelper.getInstance(mcrDirectory, mcrPath);
         }
         throw new NotDirectoryException(dir.toString());
     }
@@ -305,7 +305,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         MCRPath tgt = MCRFileSystemUtils.checkPathAbsolute(target);
         MCRStoredNode srcNode = MCRFileSystemUtils.resolvePath(src);
         //checkParent of target;
-        if (tgt.getNameCount() == 0 && srcNode instanceof MCRDirectory) {
+        if (tgt.getNameCount() == 0 && srcNode instanceof MCRDirectory srcDir) {
             MCRDirectory tgtDir = MCRFileSystemUtils.getFileCollection(tgt.getOwner());
             if (tgtDir != null) {
                 if (tgtDir.hasChildren() && copyOptions.contains(StandardCopyOption.REPLACE_EXISTING)) {
@@ -316,15 +316,15 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 org.mycore.datamodel.ifs2.MCRFileStore store = MCRFileSystemUtils.getStore(tgtDerId.getBase());
                 MCRFileCollection tgtCollection = store.create(tgtDerId.getNumberAsInteger());
                 if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
-                    copyDirectoryAttributes((MCRDirectory) srcNode, tgtCollection);
+                    copyDirectoryAttributes(srcDir, tgtCollection);
                 }
             }
             return; //created new root component
         }
-        if (srcNode instanceof MCRFile) {
-            copyFile((MCRFile) srcNode, tgt, copyOptions, createNew);
-        } else if (srcNode instanceof MCRDirectory) {
-            copyDirectory((MCRDirectory) srcNode, tgt, copyOptions);
+        if (srcNode instanceof MCRFile srcFile) {
+            copyFile(srcFile, tgt, copyOptions, createNew);
+        } else if (srcNode instanceof MCRDirectory srcDir) {
+            copyDirectory(srcDir, tgt, copyOptions);
         }
     }
 

@@ -81,10 +81,10 @@ public class MCRNodeBuilder {
     }
 
     private Object buildExpression(Expr expression, String value, Parent parent) throws JaxenException {
-        if (expression instanceof EqualityExpr) {
-            return buildEqualityExpression((EqualityExpr) expression, parent);
-        } else if (expression instanceof LocationPath) {
-            return buildLocationPath((LocationPath) expression, value, parent);
+        if (expression instanceof EqualityExpr equalityExpr) {
+            return buildEqualityExpression(equalityExpr, parent);
+        } else if (expression instanceof LocationPath locationPathExpr) {
+            return buildLocationPath(locationPathExpr, value, parent);
         } else {
             return canNotBuild(expression);
         }
@@ -100,11 +100,11 @@ public class MCRNodeBuilder {
             String xPath = buildXPath(steps.subList(0, i + 1));
             existingNode = evaluateFirst(xPath, parent);
 
-            if (existingNode instanceof Element) {
+            if (existingNode instanceof Element existingElement) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("element already existing");
                 }
-                parent = (Element) existingNode;
+                parent = existingElement;
                 break;
             } else if (existingNode instanceof Attribute) {
                 if (LOGGER.isDebugEnabled()) {
@@ -148,8 +148,8 @@ public class MCRNodeBuilder {
                 firstNodeBuilt = built;
             }
 
-            if (built instanceof Parent) {
-                parent = (Parent) built;
+            if (built instanceof Parent newParent) {
+                parent = newParent;
             }
         }
 
@@ -157,8 +157,8 @@ public class MCRNodeBuilder {
     }
 
     private Object buildStep(Step step, String value, Parent parent) throws JaxenException {
-        if (step instanceof NameStep) {
-            return buildNameStep((NameStep) step, value, parent);
+        if (step instanceof NameStep nameStep) {
+            return buildNameStep(nameStep, value, parent);
         } else {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("ignoring step, can not be built: {} {}", step.getClass().getName(),
@@ -175,8 +175,8 @@ public class MCRNodeBuilder {
         Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRConstants.getStandardNamespace(prefix);
 
         if (nameStep.getAxis() == Axis.CHILD) {
-            if (parent instanceof Document) {
-                return buildPredicates(nameStep.getPredicates(), ((Document) parent).getRootElement());
+            if (parent instanceof Document parentDoc) {
+                return buildPredicates(nameStep.getPredicates(), parentDoc.getRootElement());
             } else {
                 return buildPredicates(nameStep.getPredicates(), buildElement(ns, name, value, (Element) parent));
             }
@@ -200,10 +200,10 @@ public class MCRNodeBuilder {
 
     private Object buildEqualityExpression(EqualityExpr ee, Parent parent) throws JaxenException {
         if (ee.getOperator().equals("=")) {
-            if ((ee.getLHS() instanceof LocationPath) && (ee.getRHS() instanceof LiteralExpr)) {
-                return assignLiteral(ee.getLHS(), (LiteralExpr) (ee.getRHS()), parent);
-            } else if ((ee.getRHS() instanceof LocationPath) && (ee.getLHS() instanceof LiteralExpr)) {
-                return assignLiteral(ee.getRHS(), (LiteralExpr) (ee.getLHS()), parent);
+            if ((ee.getLHS() instanceof LocationPath) && (ee.getRHS() instanceof LiteralExpr rLiteral)) {
+                return assignLiteral(ee.getLHS(), rLiteral, parent);
+            } else if ((ee.getRHS() instanceof LocationPath) && (ee.getLHS() instanceof LiteralExpr lLiteral)) {
+                return assignLiteral(ee.getRHS(), lLiteral, parent);
             } else if (ee.getLHS() instanceof LocationPath) {
                 String value = getValueOf(ee.getRHS().getText(), parent);
                 if (value != null) {
@@ -224,12 +224,12 @@ public class MCRNodeBuilder {
     public String getValueOf(String xPath, Parent parent) {
         Object result = evaluateFirst(xPath, parent);
 
-        if (result instanceof String) {
-            return (String) result;
-        } else if (result instanceof Element) {
-            return ((Element) result).getText();
-        } else if (result instanceof Attribute) {
-            return ((Attribute) result).getValue();
+        if (result instanceof String s) {
+            return s;
+        } else if (result instanceof Element e) {
+            return e.getText();
+        } else if (result instanceof Attribute a) {
+            return a.getValue();
         } else {
             return null;
         }

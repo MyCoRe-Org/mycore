@@ -1196,8 +1196,8 @@ public final class MCRURIResolver implements URIResolver {
             } catch (IOException e) {
                 Throwable cause = e.getCause();
                 while (cause != null) {
-                    if (cause instanceof TransformerException) {
-                        throw (TransformerException) cause;
+                    if (cause instanceof TransformerException te) {
+                        throw te;
                     }
                     cause = cause.getCause();
                 }
@@ -1252,10 +1252,10 @@ public final class MCRURIResolver implements URIResolver {
                         .orElseGet(MCRLayoutTransformerFactory::new);
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
-                    if (transformer instanceof MCRParameterizedTransformer) {
+                    if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
                         MCRParameterCollector paramcollector = MCRParameterCollector.getInstanceFromUserSession();
                         paramcollector.setParameters(params);
-                        result = ((MCRParameterizedTransformer) transformer).transform(content, paramcollector);
+                        result = parameterizedTransformer.transform(content, paramcollector);
                     } else {
                         result = transformer.transform(content);
                     }
@@ -1265,13 +1265,13 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(new Element("null"));
                 }
             } catch (Exception e) {
-                if (e instanceof TransformerException) {
-                    throw (TransformerException) e;
+                if (e instanceof TransformerException te) {
+                    throw te;
                 }
                 Throwable cause = e.getCause();
                 while (cause != null) {
-                    if (cause instanceof TransformerException) {
-                        throw (TransformerException) cause;
+                    if (cause instanceof TransformerException te) {
+                        throw te;
                     }
                     cause = cause.getCause();
                 }

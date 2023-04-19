@@ -246,10 +246,9 @@ public class MCRComponent implements Comparable<MCRComponent> {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRComponent)) {
+        if (!(obj instanceof MCRComponent other)) {
             return false;
         }
-        MCRComponent other = (MCRComponent) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;

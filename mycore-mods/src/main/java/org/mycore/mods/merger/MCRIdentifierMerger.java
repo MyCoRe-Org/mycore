@@ -49,11 +49,10 @@ public class MCRIdentifierMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRIdentifierMerger)) {
+        if (!(other instanceof MCRIdentifierMerger oid)) {
             return false;
         }
 
-        MCRIdentifierMerger oid = (MCRIdentifierMerger) other;
         return this.getType().equals(oid.getType())
             && this.getSimplifiedID().equals(oid.getSimplifiedID());
     }

@@ -52,11 +52,10 @@ public class MCRCategoryMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRCategoryMerger)) {
+        if (!(other instanceof MCRCategoryMerger cmOther)) {
             return false;
         }
 
-        MCRCategoryMerger cmOther = (MCRCategoryMerger) other;
         if (!MCRClassMapper.supportsClassification(this.element)
             || !MCRClassMapper.supportsClassification(cmOther.element)) {
             return false;

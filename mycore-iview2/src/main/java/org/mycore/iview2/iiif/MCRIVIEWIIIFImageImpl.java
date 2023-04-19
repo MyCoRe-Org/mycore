@@ -239,10 +239,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
                 buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight(),
                 Files.getLastModifiedTime(tileFilePath).toMillis());
 
-            MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256);
-            for (int i = 0; i < tiledPictureProps.getZoomlevel(); i++) {
-                tileInformation.scaleFactors.add((int) Math.pow(2, i));
-            }
+            MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256,
+                MCRIIIFImageTileInformation.scaleFactorsAsPowersOfTwo(tiledPictureProps.getZoomlevel()));
 
             imageInformation.tiles.add(tileInformation);
 

@@ -55,8 +55,8 @@ final class ContentUtils {
 
     static long copyChannel(final ReadableByteChannel src, final WritableByteChannel dest, final int bufferSize)
         throws IOException {
-        if (src instanceof FileChannel) {
-            return copyFileChannel((FileChannel) src, dest, bufferSize);
+        if (src instanceof FileChannel fileChannel) {
+            return copyFileChannel(fileChannel, dest, bufferSize);
         }
         long bytes = 0;
         final ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
@@ -112,8 +112,8 @@ final class ContentUtils {
         final int outputBufferSize) throws IOException {
         final long bytesCopied;
         long length = content.length();
-        if (content instanceof MCRSeekableChannelContent) {
-            try (SeekableByteChannel byteChannel = ((MCRSeekableChannelContent) content).getSeekableByteChannel();
+        if (content instanceof MCRSeekableChannelContent seekableContent) {
+            try (SeekableByteChannel byteChannel = seekableContent.getSeekableByteChannel();
                 WritableByteChannel nout = Channels.newChannel(out)) {
                 endCurrentTransaction();
                 bytesCopied = copyChannel(byteChannel, nout, outputBufferSize);
@@ -204,9 +204,8 @@ final class ContentUtils {
         final int inputBufferSize, final int outputBufferSize) throws IOException {
         if (content.isReusable()) {
             try (ReadableByteChannel readableByteChannel = content.getReadableByteChannel()) {
-                if (readableByteChannel instanceof SeekableByteChannel) {
+                if (readableByteChannel instanceof SeekableByteChannel seekableByteChannel) {
                     endCurrentTransaction();
-                    SeekableByteChannel seekableByteChannel = (SeekableByteChannel) readableByteChannel;
                     seekableByteChannel.position(range.start);
                     long bytesToCopy = range.end - range.start + 1;
                     while (bytesToCopy > 0) {

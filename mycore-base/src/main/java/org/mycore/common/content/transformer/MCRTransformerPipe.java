@@ -100,8 +100,8 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
     @Override
     public MCRContent transform(MCRContent source, MCRParameterCollector parameter) throws IOException {
         for (MCRContentTransformer transformer : transformers) {
-            if (transformer instanceof MCRParameterizedTransformer) {
-                source = ((MCRParameterizedTransformer) transformer).transform(source, parameter);
+            if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
+                source = parameterizedTransformer.transform(source, parameter);
             } else {
                 source = transformer.transform(source);
             }

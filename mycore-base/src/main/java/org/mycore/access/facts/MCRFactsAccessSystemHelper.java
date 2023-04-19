@@ -50,9 +50,8 @@ public class MCRFactsAccessSystemHelper {
         }
 
         MCRCondition condition = optCondition.get();
-        if (MCRFactsAccessSystem.LOGGER.isDebugEnabled()
-            && condition instanceof MCRCombinedCondition) {
-            ((MCRCombinedCondition) condition).setDebug(true);
+        if (MCRFactsAccessSystem.LOGGER.isDebugEnabled() && condition instanceof MCRCombinedCondition combCond) {
+            combCond.setDebug(true);
         }
 
         return condition;

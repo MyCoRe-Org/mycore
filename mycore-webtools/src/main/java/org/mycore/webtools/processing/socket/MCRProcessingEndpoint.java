@@ -137,8 +137,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
             if (isClosed()) {
                 return;
             }
-            if (source instanceof MCRProcessable) {
-                this.sender.updateProcessable(session, (MCRProcessable) source);
+            if (source instanceof MCRProcessable processable) {
+                this.sender.updateProcessable(session, processable);
             }
         }
 
@@ -148,8 +148,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
                 return;
             }
 
-            if (source instanceof MCRProcessable) {
-                this.sender.updateProcessable(session, (MCRProcessable) source);
+            if (source instanceof MCRProcessable processable) {
+                this.sender.updateProcessable(session, processable);
             }
         }
 

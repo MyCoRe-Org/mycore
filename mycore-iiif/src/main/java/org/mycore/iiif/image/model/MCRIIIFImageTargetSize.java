@@ -20,6 +20,8 @@ package org.mycore.iiif.image.model;
 
 import java.util.Locale;
 
+//TODO: replace with record
+
 public class MCRIIIFImageTargetSize {
 
     private final int width;

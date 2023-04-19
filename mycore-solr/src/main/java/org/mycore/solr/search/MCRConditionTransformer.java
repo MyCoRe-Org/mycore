@@ -75,16 +75,14 @@ public class MCRConditionTransformer {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static StringBuilder toSolrQueryString(MCRCondition condition, Set<String> usedFields,
         boolean subCondition) {
-        if (condition instanceof MCRQueryCondition) {
-            MCRQueryCondition qCond = (MCRQueryCondition) condition;
+        if (condition instanceof MCRQueryCondition qCond) {
             return handleQueryCondition(qCond, usedFields);
         }
         if (condition instanceof MCRSetCondition) {
             MCRSetCondition<MCRCondition> setCond = (MCRSetCondition<MCRCondition>) condition;
             return handleSetCondition(setCond, usedFields, subCondition);
         }
-        if (condition instanceof MCRNotCondition) {
-            MCRNotCondition notCond = (MCRNotCondition) condition;
+        if (condition instanceof MCRNotCondition notCond) {
             return handleNotCondition(notCond, usedFields);
         }
         throw new MCRException("Cannot handle MCRCondition class: " + condition.getClass().getCanonicalName());
@@ -374,8 +372,7 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     private static String getIndex(MCRCondition cond) {
-        if (cond instanceof MCRQueryCondition) {
-            MCRQueryCondition queryCondition = ((MCRQueryCondition) cond);
+        if (cond instanceof MCRQueryCondition queryCondition) {
             String fieldName = queryCondition.getFieldName();
             return getIndex(fieldName);
         } else if (cond instanceof MCRNotCondition) {

@@ -77,10 +77,9 @@ public class MCRUserAttribute implements Comparable<MCRUserAttribute> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof MCRUserAttribute)) {
+        if (!(o instanceof MCRUserAttribute that)) {
             return false;
         }
-        MCRUserAttribute that = (MCRUserAttribute) o;
         return name.equals(that.name) &&
             Objects.equals(value, that.value);
     }

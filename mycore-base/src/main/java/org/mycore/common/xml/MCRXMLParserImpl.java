@@ -82,12 +82,12 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             InputSource source = content.getInputSource();
             return builder.build(source);
         } catch (Exception ex) {
-            if (ex instanceof SAXParseException) {
-                throw (SAXParseException) ex;
+            if (ex instanceof SAXParseException spe) {
+                throw spe;
             }
             Throwable cause = ex.getCause();
-            if (cause instanceof SAXParseException) {
-                throw (SAXParseException) cause;
+            if (cause instanceof SAXParseException spe) {
+                throw spe;
             }
             throw new MCRException(MSG, ex);
         }
@@ -100,11 +100,11 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         } catch (JDOMException e) {
             Throwable cause = e.getCause();
             if (e != null) {
-                if (cause instanceof SAXException) {
-                    throw (SAXException) cause;
+                if (cause instanceof SAXException se) {
+                    throw se;
                 }
-                if (cause instanceof ParserConfigurationException) {
-                    throw (ParserConfigurationException) cause;
+                if (cause instanceof ParserConfigurationException pce) {
+                    throw pce;
                 }
             }
             throw new MCRException(e);

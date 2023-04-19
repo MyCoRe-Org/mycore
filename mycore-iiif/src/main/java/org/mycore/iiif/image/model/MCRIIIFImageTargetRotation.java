@@ -18,6 +18,7 @@
 
 package org.mycore.iiif.image.model;
 
+//TODO: replace with record
 public class MCRIIIFImageTargetRotation {
 
     private final boolean mirrored;

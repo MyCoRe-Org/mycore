@@ -469,10 +469,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRUser)) {
+        if (!(obj instanceof MCRUser other)) {
             return false;
         }
-        MCRUser other = (MCRUser) obj;
         if (realmID == null) {
             if (other.realmID != null) {
                 return false;

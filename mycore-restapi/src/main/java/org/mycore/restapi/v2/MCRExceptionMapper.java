@@ -46,9 +46,7 @@ public class MCRExceptionMapper implements ExceptionMapper<Exception> {
     public Response toResponse(Exception exception) {
         return Optional.ofNullable(request.selectVariant(SUPPORTED_VARIANTS))
             .map(v -> fromException(exception))
-            .orElseGet(() -> (exception instanceof WebApplicationException)
-                ? ((WebApplicationException) exception).getResponse()
-                : null);
+            .orElseGet(() -> (exception instanceof WebApplicationException wae) ? wae.getResponse() : null);
     }
 
     public static Response fromWebApplicationException(WebApplicationException wae) {
@@ -63,8 +61,8 @@ public class MCRExceptionMapper implements ExceptionMapper<Exception> {
     }
 
     public static Response fromException(Exception e) {
-        if (e instanceof WebApplicationException) {
-            return fromWebApplicationException((WebApplicationException) e);
+        if (e instanceof WebApplicationException wae) {
+            return fromWebApplicationException(wae);
         }
         return getResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }

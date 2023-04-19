@@ -171,10 +171,9 @@ public class MCRCategoryLinkImpl implements MCRCategoryLink {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRCategoryLinkImpl)) {
+        if (!(obj instanceof MCRCategoryLinkImpl other)) {
             return false;
         }
-        final MCRCategoryLinkImpl other = (MCRCategoryLinkImpl) obj;
         if (category == null) {
             if (other.category != null) {
                 return false;

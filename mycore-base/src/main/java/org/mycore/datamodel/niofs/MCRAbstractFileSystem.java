@@ -124,10 +124,9 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     public boolean verifies(MCRPath path) throws NoSuchFileException {
         try {
             return verifies(path, Files.readAttributes(path, MCRFileAttributes.class));
+        } catch (NoSuchFileException nsfe) {
+            throw nsfe;
         } catch (IOException e) {
-            if (e instanceof NoSuchFileException) {
-                throw (NoSuchFileException) e;
-            }
             return false;
         }
     }
