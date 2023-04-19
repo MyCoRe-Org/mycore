@@ -123,6 +123,7 @@ public class MCRPandocAPI {
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.environment().put("LUA_PATH", LUA_PATH);
         Process p;
+        byte[] output;
         try {
             p = pb.start();
             p.getOutputStream().write(input);
@@ -132,7 +133,16 @@ public class MCRPandocAPI {
             throw new MCRPandocException(msg, ex);
         }
         try {
-            p.waitFor(TIMEOUT, TimeUnit.SECONDS);
+            output = readPandocOutput(p.getInputStream());
+        } catch(IOException ex) {
+            String msg = "Exception reading output from Pandoc " + String.join(" ", args);
+            throw new MCRPandocException(msg, ex);
+        }
+        try {
+            if(!p.waitFor(TIMEOUT, TimeUnit.SECONDS)) {
+                p.destroy();
+                throw new InterruptedException();
+            }
         } catch(InterruptedException ex) {
             String msg = "Pandoc process " + String.join(" ", args) + " was terminated after reaching a timeout of "
                 + TIMEOUT + " seconds";
@@ -150,12 +160,7 @@ public class MCRPandocAPI {
             }
             throw new MCRPandocException(msg);
         }
-        try {
-            return readPandocOutput(p.getInputStream());
-        } catch(IOException ex) {
-            String msg = "Exception reading output from Pandoc " + String.join(" ", args);
-            throw new MCRPandocException(msg, ex);
-        }
+        return output;
     }
 
     private static byte[] readPandocOutput(InputStream s) throws IOException {
