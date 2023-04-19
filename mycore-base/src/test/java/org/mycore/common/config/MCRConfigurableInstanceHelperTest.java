@@ -20,141 +20,434 @@ package org.mycore.common.config;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
 
-    private static final String TEST_KEY = "TestKey";
+    public static final String INSTANCE_NAME_PREFIX = "MCR.CI.";
 
-    private static final String TEST_ANNOT_KEY = "AnnotTestKey";
+    private static final String INSTANCE_1_NAME = INSTANCE_NAME_PREFIX + "Test1";
 
-    private static final String TEST_ANNOT_KEY2 = "AnnotTestKey2";
+    private static final String INSTANCE_2_NAME = INSTANCE_NAME_PREFIX + "Test2";
 
-    private static final Integer TEST_ANNOT_VALUE_CONVERTED = 5;
+    private static final String DEFAULT_KEY = "DefaultKey";
 
-    private static final String INVALID_TEST_KEY = "InvalidKey";
+    private static final String DEFAULT_VALUE = "DefaultValue";
 
-    private static final String TEST_KEY_VAL = "TestValue";
+    private static final String ASSIGNED_KEY = "AssignedKey";
 
-    private static final String ANNOT_TEST_KEY_VAL1 = "TestValue1";
+    private static final String ASSIGNED_VALUE = "AssignedValue";
 
-    private static final String ANNOT_TEST_KEY_VAL2 = "5";
+    private static final String UNASSIGNED_KEY = "UnassignedKey";
 
-    private static final String INSTANCE_NAME = "MCR.CI.Test";
+    private static final String KEY_REQUIRED_FIELD = "KeyRequiredField";
 
-    private static final String INSTANCE_2_NAME = "MCR.CI.Test2";
+    private static final String VALUE_REQUIRED_FIELD = "ValueRequiredField";
 
-    public static final String INSTANCE_2_NAME_W_CLASS = INSTANCE_2_NAME + ".Class";
+    private static final String KEY_REQUIRED_FIELD_WITH_DEFAULT = "KeyRequiredFieldWithDefault";
+
+    private static final String KEY_ABSENT_OPTIONAL_FIELD = "KeyAbsentOptionalField";
+
+    private static final String KEY_PRESENT_OPTIONAL_FIELD = "KeyPresentOptionalField";
+
+    private static final String VALUE_PRESENT_OPTIONAL_FIELD = "ValuePresentOptionalField";
+
+    private static final String KEY_ABSENT_OPTIONAL_FIELD_WITH_DEFAULT = "KeyAbsentOptionalFieldWithDefault";
+
+    private static final String KEY_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT = "KeyPresentOptionalFieldWithDefault";
+
+    private static final String VALUE_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT = "ValuePresentOptionalFieldWithDefault";
+
+    private static final String KEY_ABSOLUTE_FIELD = "KeyAbsoluteField";
+
+    private static final String VALUE_ABSOLUTE_FIELD = "ValueAbsoluteField";
+
+    private static final String KEY_REQUIRED_METHOD = "KeyRequiredMethod";
+
+    private static final String VALUE_REQUIRED_METHOD = "ValueRequiredMethod";
+
+    private static final String KEY_REQUIRED_METHOD_WITH_DEFAULT = "KeyRequiredMethodWithDefault";
+
+    private static final String KEY_ABSENT_OPTIONAL_METHOD = "KeyAbsentOptionalMethod";
+
+    private static final String KEY_PRESENT_OPTIONAL_METHOD = "KeyPresentOptionalMethod";
+
+    private static final String VALUE_PRESENT_OPTIONAL_METHOD = "ValuePresentOptionalMethod";
+
+    private static final String KEY_ABSENT_OPTIONAL_METHOD_WITH_DEFAULT = "KeyAbsentOptionalMethodWithDefault";
+
+    private static final String KEY_PRESENT_OPTIONAL_METHOD_DEFAULT = "KeyPresentOptionalMethodWithDefault";
+
+    private static final String VALUE_PRESENT_OPTIONAL_METHOD_DEFAULT = "ValuePresentOptionalMethodWithDefault";
+
+    private static final String KEY_ABSOLUTE_METHOD = "KeyAbsoluteMethod";
+
+    private static final String VALUE_ABSOLUTE_METHOD = "ValueAbsoluteMethod";
+
+    private static final String KEY_CONVERTING_METHOD = "KeyConvertingMethod";
+
+    private static final String VALUE_CONVERTING_METHOD = "ValueConvertingMethod";
+
+    private static final String KEY_ORDERED_METHOD = "KeyOrderedMethod";
+
+    private static final String VALUE_ORDERED_METHOD = "ValueOrderedMethod";
+
+    private static final String KEY_ORDERED_METHOD_1 = "KeyOrderedMethod1";
+
+    private static final String VALUE_ORDERED_METHOD_1 = "ValueOrderedMethod1";
+
+    private static final String KEY_ORDERED_METHOD_2 = "KeyOrderedMethod2";
+
+    private static final String VALUE_ORDERED_METHOD_2 = "ValueOrderedMethod2";
+
+    public static final List<String> VALUES_ORDERED_METHOD = Arrays.asList(
+        VALUE_ORDERED_METHOD,
+        VALUE_ORDERED_METHOD_1,
+        VALUE_ORDERED_METHOD_2
+    );
+
+    private static final String VALUE_ORDERED_POST_CONSTRUCTION = "ValueOrderedPostConstruction";
+
+    private static final String VALUE_ORDERED_POST_CONSTRUCTION_1 = "ValueOrderedPostConstruction1";
+
+    private static final String VALUE_ORDERED_POST_CONSTRUCTION_2 = "ValueOrderedPostConstruction2";
+
+    public static final List<String> VALUES_ORDERED_POST_CONSTRUCTION = Arrays.asList(
+        VALUE_ORDERED_POST_CONSTRUCTION,
+        VALUE_ORDERED_POST_CONSTRUCTION_1,
+        VALUE_ORDERED_POST_CONSTRUCTION_2
+    );
 
     @Test
     public void test() {
-        Optional<ConfigurableTestInstance> instance1 = MCRConfigurableInstanceHelper.getInstance(INSTANCE_NAME);
-        Optional<ConfigurableTestInstance> instance2 = MCRConfigurableInstanceHelper
-            .getInstance(INSTANCE_2_NAME_W_CLASS);
 
-        Assert.assertTrue("Test instance should be present", instance1.isPresent());
-        Assert.assertTrue("Test instance 2 should be present", instance2.isPresent());
-
-        validate(instance1.get());
-        validate(instance2.get());
-
-        List<String> list = MCRConfiguration2.getInstantiatablePropertyKeys("MCR.CI.").collect(Collectors.toList());
-        Assert.assertTrue("Properties should contain " + INSTANCE_NAME, list.contains(INSTANCE_NAME));
-        Assert.assertTrue("Properties should contain " + INSTANCE_2_NAME_W_CLASS,
-            list.contains(INSTANCE_2_NAME_W_CLASS));
-
-        Map<String, Callable<ConfigurableTestInstance>> instances = MCRConfiguration2.getInstances("MCR.CI.");
+        Map<String, ?> instances = MCRConfiguration2.getInstances(INSTANCE_NAME_PREFIX);
         Assert.assertEquals("Except two instances!", 2, instances.size());
-        instances.values().forEach(v -> {
-            try {
-                ConfigurableTestInstance cti = v.call();
-                validate(cti);
-            } catch (Exception e) {
-                throw new MCRException(e);
-            }
-        });
+
+        testInstance(INSTANCE_1_NAME, false);
+        testInstance(INSTANCE_2_NAME, true);
+
     }
 
-    void validate(ConfigurableTestInstance instance) {
-        Assert.assertTrue("The instance should contain the Test key!", instance.getProperties().containsKey(TEST_KEY));
-        Assert.assertEquals(TEST_KEY_VAL, instance.getProperties().get(TEST_KEY));
+    private void testInstance(String instanceName, boolean withClassSuffix) {
 
-        Assert.assertFalse("the property should not be present",
-            instance.getProperties().containsKey(INVALID_TEST_KEY));
+        String fullInstanceName = withClassSuffix(instanceName, withClassSuffix);
 
-        Assert.assertEquals("Annotated field should match!", ANNOT_TEST_KEY_VAL1, instance.getMyAnnotatedProp());
+        List<String> list = MCRConfiguration2.getInstantiatablePropertyKeys(fullInstanceName).toList();
+        Assert.assertTrue("Properties should contain " + instanceName, list.contains(fullInstanceName));
 
-        Assert.assertEquals("Annotated method should put int to the count field!", TEST_ANNOT_VALUE_CONVERTED,
-            instance.getCount());
+        Optional<ConfigurableTestInstance> instance = MCRConfigurableInstanceHelper.getInstance(fullInstanceName);
+        Assert.assertTrue("Test " + fullInstanceName + " should be present", instance.isPresent());
 
-        Assert.assertTrue("Post construction should have been executed", instance.postConstructionCalled);
+        validateFields(instance.get());
+        validateMethods(instance.get());
+        validatePostConstruction(instance.get(), fullInstanceName);
+
+    }
+
+    void validateFields(ConfigurableTestInstance instance) {
+
+        Assert.assertTrue("The map field should contain the assigned test key",
+            instance.map.containsKey(ASSIGNED_KEY));
+
+        Assert.assertEquals("The assigned test property should be present in map field",
+            ASSIGNED_VALUE, instance.map.get(ASSIGNED_KEY));
+
+        Assert.assertFalse("The unassigned test property should not be present in map field",
+            instance.map.containsKey(UNASSIGNED_KEY));
+
+        Assert.assertEquals("The required field should match",
+            VALUE_REQUIRED_FIELD, instance.required);
+
+        Assert.assertEquals("The required field with default should match",
+            DEFAULT_VALUE, instance.requiredWithDefault);
+
+        Assert.assertNull("The absent optional field should be null",
+            instance.absentOptional);
+
+        Assert.assertEquals("The present optional field should match",
+            VALUE_PRESENT_OPTIONAL_FIELD, instance.presentOptional);
+
+        Assert.assertEquals("The absent optional field with default should match",
+            DEFAULT_VALUE, instance.absentOptionalWithDefault);
+
+        Assert.assertEquals("The present optional field with default should match",
+            VALUE_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT, instance.presentOptionalWithDefault);
+
+        Assert.assertEquals("The absolute field should match",
+            VALUE_ABSOLUTE_FIELD, instance.absolute);
+
+    }
+
+    void validateMethods(ConfigurableTestInstance instance) {
+
+        Assert.assertTrue("The map method value should contain the assigned test key",
+            instance.getMap().containsKey(ASSIGNED_KEY));
+
+        Assert.assertEquals("The assigned test property should be present in map method value",
+            ASSIGNED_VALUE, instance.getMap().get(ASSIGNED_KEY));
+
+        Assert.assertFalse("The unassigned test property should not be present in map method value",
+            instance.getMap().containsKey(UNASSIGNED_KEY));
+
+        Assert.assertEquals("The required method value should match",
+            VALUE_REQUIRED_METHOD, instance.getRequired());
+
+        Assert.assertEquals("The required method value with default should match",
+            DEFAULT_VALUE, instance.getRequiredWithDefault());
+
+        Assert.assertNull("The absent optional method value should be null",
+            instance.getAbsentOptional());
+
+        Assert.assertEquals("The present optional method value should match",
+            VALUE_PRESENT_OPTIONAL_METHOD, instance.getPresentOptional());
+
+        Assert.assertEquals("The absent optional method value with default should match",
+            DEFAULT_VALUE, instance.getAbsentOptionalWithDefault());
+
+        Assert.assertEquals("The present optional method value with default should match",
+            VALUE_PRESENT_OPTIONAL_METHOD_DEFAULT, instance.getPresentOptionalWithDefault());
+
+        Assert.assertEquals("The absolute method value should match",
+            VALUE_ABSOLUTE_METHOD, instance.getAbsolute());
+
+        Assert.assertEquals("The converting method value should match",
+            VALUE_CONVERTING_METHOD.length(), instance.getConverting());
+
+        Assert.assertEquals("The ordered method values should match",
+            VALUES_ORDERED_METHOD, instance.getOrderedMethodValues());
+
+    }
+
+    void validatePostConstruction(ConfigurableTestInstance instance, String fullInstanceName) {
+
+        Assert.assertEquals("Post construction value should match",
+            fullInstanceName, instance.postConstructionProperty);
+
+        Assert.assertEquals("The ordered post construction values should match",
+            VALUES_ORDERED_POST_CONSTRUCTION, instance.getOrderedPostConstructionValues());
+
     }
 
     @Override
     protected Map<String, String> getTestProperties() {
+
         final Map<String, String> testProperties = super.getTestProperties();
 
-        testProperties.put(INSTANCE_NAME, ConfigurableTestInstance.class.getName());
-        testProperties.put(INSTANCE_NAME + "." + TEST_KEY, TEST_KEY_VAL);
-        testProperties.put(INSTANCE_NAME + "." + TEST_ANNOT_KEY, ANNOT_TEST_KEY_VAL1);
-        testProperties.put(INSTANCE_NAME + "." + TEST_ANNOT_KEY2, ANNOT_TEST_KEY_VAL2);
+        testProperties.put(DEFAULT_KEY, DEFAULT_VALUE);
+        testProperties.put(KEY_ABSOLUTE_FIELD, VALUE_ABSOLUTE_FIELD);
+        testProperties.put(KEY_ABSOLUTE_METHOD, VALUE_ABSOLUTE_METHOD);
 
-        testProperties.put(INSTANCE_2_NAME_W_CLASS, ConfigurableTestInstance.class.getName());
-        testProperties.put(INSTANCE_2_NAME + "." + TEST_KEY, TEST_KEY_VAL);
-        testProperties.put(INSTANCE_2_NAME + "." + TEST_ANNOT_KEY, ANNOT_TEST_KEY_VAL1);
-        testProperties.put(INSTANCE_2_NAME + "." + TEST_ANNOT_KEY2, ANNOT_TEST_KEY_VAL2);
+        configureInstance(testProperties, INSTANCE_1_NAME, false);
+        configureInstance(testProperties, INSTANCE_2_NAME, true);
 
         return testProperties;
+    }
+
+    private void configureInstance(Map<String, String> testProperties, String instanceName, boolean withClassSuffix) {
+        String fullInstanceName = withClassSuffix(instanceName, withClassSuffix);
+        testProperties.put(fullInstanceName, ConfigurableTestInstance.class.getName());
+        testProperties.put(instanceName + "." + ASSIGNED_KEY, ASSIGNED_VALUE);
+        testProperties.put(instanceName + "." + KEY_REQUIRED_FIELD, VALUE_REQUIRED_FIELD);
+        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD, VALUE_PRESENT_OPTIONAL_FIELD);
+        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT,
+            VALUE_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT);
+        testProperties.put(instanceName + "." + KEY_REQUIRED_METHOD, VALUE_REQUIRED_METHOD);
+        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_METHOD, VALUE_PRESENT_OPTIONAL_METHOD);
+        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_METHOD_DEFAULT,
+            VALUE_PRESENT_OPTIONAL_METHOD_DEFAULT);
+        testProperties.put(instanceName + "." + KEY_CONVERTING_METHOD, VALUE_CONVERTING_METHOD);
+        testProperties.put(instanceName + "." + KEY_ORDERED_METHOD, VALUE_ORDERED_METHOD);
+        testProperties.put(instanceName + "." + KEY_ORDERED_METHOD_1, VALUE_ORDERED_METHOD_1);
+        testProperties.put(instanceName + "." + KEY_ORDERED_METHOD_2, VALUE_ORDERED_METHOD_2);
+    }
+
+    private String withClassSuffix(String instanceName, boolean withClassSuffix) {
+        return instanceName + (withClassSuffix ? ".Class" : "");
     }
 
     public static class ConfigurableTestInstance {
 
         @MCRProperty(name = "*")
-        public Map<String, String> properties;
+        public Map<String, String> map;
 
-        @MCRProperty(name = TEST_ANNOT_KEY)
-        public String myAnnotatedProp;
+        @MCRProperty(name = KEY_REQUIRED_FIELD)
+        public String required;
 
-        @MCRProperty(name = "Optional", required = false)
-        public String myOptionalProp;
+        @MCRProperty(name = KEY_REQUIRED_FIELD_WITH_DEFAULT, defaultName = DEFAULT_KEY)
+        public String requiredWithDefault;
 
-        public boolean postConstructionCalled = false;
+        @MCRProperty(name = KEY_ABSENT_OPTIONAL_FIELD, required = false)
+        public String absentOptional;
 
-        protected Integer count;
+        @MCRProperty(name = KEY_PRESENT_OPTIONAL_FIELD, required = false)
+        public String presentOptional;
 
-        public Integer getCount() {
-            return count;
+        @MCRProperty(name = KEY_ABSENT_OPTIONAL_FIELD_WITH_DEFAULT, defaultName = DEFAULT_KEY, required = false)
+        public String absentOptionalWithDefault;
+
+        @MCRProperty(name = KEY_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT, defaultName = DEFAULT_KEY, required = false)
+        public String presentOptionalWithDefault;
+
+        @MCRProperty(name = KEY_ABSOLUTE_FIELD, absolute = true)
+        public String absolute;
+
+        private Map<String, String> mapMethodValue;
+
+        private String requiredMethodValue;
+
+        private String requiredMethodValueWithDefault;
+
+        private String absentOptionalMethodValue;
+
+        private String presentOptionalMethodValue;
+
+        private String absentOptionalMethodValueWithDefault;
+
+        private String presentOptionalMethodValueWithDefault;
+
+        private String absoluteMethodValue;
+
+        private int convertingMethodValue;
+
+        private final List<String> orderedMethodValues = new ArrayList<>(3);
+
+        public String postConstructionProperty;
+
+        private final List<String> orderedPostConstructionValues = new ArrayList<>(3);
+
+        public Map<String, String> getMap() {
+            return mapMethodValue;
         }
 
-        public void setCount(Integer count) {
-            this.count = count;
+        @MCRProperty(name = "*")
+        public void setMap(Map<String, String> mapValue) {
+            this.mapMethodValue = mapValue;
         }
 
-        @MCRProperty(name = TEST_ANNOT_KEY2)
-        public void setCount(String count) {
-            this.count = Integer.parseInt(count);
+        public String getRequired() {
+            return requiredMethodValue;
         }
 
-        public String getMyAnnotatedProp() {
-            return myAnnotatedProp;
+        @MCRProperty(name = KEY_REQUIRED_METHOD)
+        public void setRequired(String requiredValue) {
+            this.requiredMethodValue = requiredValue;
+        }
+
+        public String getRequiredWithDefault() {
+            return requiredMethodValueWithDefault;
+        }
+
+        @MCRProperty(name = KEY_REQUIRED_METHOD_WITH_DEFAULT, defaultName = DEFAULT_KEY)
+        public void setRequiredWithDefault(String requiredValueWithDefault) {
+            this.requiredMethodValueWithDefault = requiredValueWithDefault;
+        }
+
+        public String getAbsentOptional() {
+            return absentOptionalMethodValue;
+        }
+
+        @MCRProperty(name = KEY_ABSENT_OPTIONAL_METHOD, required = false)
+        public void setAbsentOptional(String absentOptionalValue) {
+            this.absentOptionalMethodValue = absentOptionalValue;
+        }
+
+        public String getPresentOptional() {
+            return presentOptionalMethodValue;
+        }
+
+        @MCRProperty(name = KEY_PRESENT_OPTIONAL_METHOD, required = false)
+        public void setOPresentOptional(String presentOptionalValue) {
+            this.presentOptionalMethodValue = presentOptionalValue;
+        }
+
+        public String getAbsentOptionalWithDefault() {
+            return absentOptionalMethodValueWithDefault;
+        }
+
+        @MCRProperty(name = KEY_ABSENT_OPTIONAL_METHOD_WITH_DEFAULT, defaultName = DEFAULT_KEY, required = false)
+        public void setAbsentOptionalWithDefault(String absentOptionalValueWithDefault) {
+            this.absentOptionalMethodValueWithDefault = absentOptionalValueWithDefault;
+        }
+
+
+        public String getPresentOptionalWithDefault() {
+            return presentOptionalMethodValueWithDefault;
+        }
+
+        @MCRProperty(name = KEY_PRESENT_OPTIONAL_METHOD_DEFAULT, defaultName = DEFAULT_KEY, required = false)
+        public void setPresentOptionalWithDefault(String presentOptionalValueWithDefault) {
+            this.presentOptionalMethodValueWithDefault = presentOptionalValueWithDefault;
+        }
+
+        public String getAbsolute() {
+            return absoluteMethodValue;
+        }
+
+        @MCRProperty(name = KEY_ABSOLUTE_METHOD, absolute = true)
+        public void setAbsolute(String absoluteValue) {
+            this.absoluteMethodValue = absoluteValue;
+        }
+
+        public int getConverting() {
+            return convertingMethodValue;
+        }
+
+        @MCRProperty(name = KEY_CONVERTING_METHOD)
+        public void setConverting(String convertingValue) {
+            this.convertingMethodValue = convertingValue.length();
+        }
+
+        @MCRProperty(name = KEY_ORDERED_METHOD_2, order = 2)
+        public void setOrdered2(String orderedValue) {
+            this.orderedMethodValues.add(orderedValue);
+        }
+
+        @MCRProperty(name = KEY_ORDERED_METHOD_1, order = 1)
+        public void setOrdered1(String orderedValue) {
+            this.orderedMethodValues.add(orderedValue);
+        }
+
+        @MCRProperty(name = KEY_ORDERED_METHOD)
+        public void setOrdered(String orderedValue) {
+            this.orderedMethodValues.add(orderedValue);
+        }
+
+        public List<String> getOrderedMethodValues() {
+            return orderedMethodValues;
         }
 
         @MCRPostConstruction
-        public void checkConfiguration(String prop) throws MCRConfigurationException {
-            postConstructionCalled = true;
+        public void callPostConstruction(String property) throws MCRConfigurationException {
+            postConstructionProperty = property;
         }
 
-        public Map<String, String> getProperties() {
-            return properties;
+        @MCRPostConstruction(order = 2)
+        public void callPostConstructionOrdered2() {
+            this.orderedPostConstructionValues.add(VALUE_ORDERED_POST_CONSTRUCTION_2);
         }
+
+        @MCRPostConstruction(order = 1)
+        public void callPostConstructionOrdered1() {
+            this.orderedPostConstructionValues.add(VALUE_ORDERED_POST_CONSTRUCTION_1);
+        }
+
+        @MCRPostConstruction
+        public void callPostConstructionOrdered() {
+            this.orderedPostConstructionValues.add(VALUE_ORDERED_POST_CONSTRUCTION);
+        }
+
+        public List<String> getOrderedPostConstructionValues() {
+            return orderedPostConstructionValues;
+        }
+
     }
 }

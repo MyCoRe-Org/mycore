@@ -79,9 +79,9 @@ import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -109,7 +109,7 @@ public class MCRRestDerivates {
     @PathParam(PARAM_MCRID)
     MCRObjectID mcrId;
 
-    private static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
+    public static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
         MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 1, TimeUnit.DAYS);
         if (objectId != null && !mcrId.equals(objectId)) {
             objectId = MCRMetadataManager.getObjectId(derId, 0, TimeUnit.SECONDS);
@@ -137,6 +137,7 @@ public class MCRRestDerivates {
         summary = "Lists all derivates in the given object",
         responses = {
             @ApiResponse(
+                description = "List of derivates (file collections) attached to the given metadata object",
                 content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRMetaLinkID.class)))),
             @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID,
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID),
@@ -304,7 +305,11 @@ public class MCRRestDerivates {
     @Operation(
         summary = "Adds a new derivate (with defaults for 'display-enabled', 'main-doc', 'label') in the given object",
         responses = @ApiResponse(responseCode = "201",
-            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
+            headers = @Header(name = HttpHeaders.LOCATION,
+                schema = @Schema(
+                    type = "string",
+                    format = "uri"),
+                description = "URL of the new derivate")),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
@@ -316,7 +321,10 @@ public class MCRRestDerivates {
     @Operation(
         summary = "Adds a new derivate in the given object",
         responses = @ApiResponse(responseCode = "201",
-            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
+            description = "Derivate successfully created",
+            headers = @Header(name = HttpHeaders.LOCATION,
+                schema = @Schema(type = "string", format = "uri"),
+                description = "URL of the new derivate")),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @RequestBody(required = true,

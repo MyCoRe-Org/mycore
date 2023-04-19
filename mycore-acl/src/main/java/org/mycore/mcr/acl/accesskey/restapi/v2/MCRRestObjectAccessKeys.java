@@ -67,7 +67,9 @@ public class MCRRestObjectAccessKeys {
     @Operation(
         summary = "Lists all access keys for an object",
         responses = {
-            @ApiResponse(responseCode = "200", content = { @Content(mediaType = MediaType.APPLICATION_JSON,
+            @ApiResponse(responseCode = "200",
+                description = "List of access keys attached to this metadata object",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON,
                 array = @ArraySchema(schema = @Schema(implementation = MCRAccessKey.class))) }),
             @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
@@ -91,7 +93,9 @@ public class MCRRestObjectAccessKeys {
     @Operation(
         summary = "Gets access key for an object",
         responses = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON,
+            @ApiResponse(responseCode = "200",
+                description = "Information about a specific access key",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON,
                 schema = @Schema(implementation = MCRAccessKey.class))),
             @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
@@ -115,7 +119,9 @@ public class MCRRestObjectAccessKeys {
         summary = "Creates an access key for an object",
         responses = {
             @ApiResponse(responseCode = "201", description = "Access key was successfully created",
-                headers = @Header(name = HttpHeaders.LOCATION)),
+                headers = @Header(name = HttpHeaders.LOCATION,
+                    schema = @Schema(type = "string", format = "uri"),
+                    description = "Location of the new access keyO")),
             @ApiResponse(responseCode = "400", description = "Invalid ID or invalid access key",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = "401",

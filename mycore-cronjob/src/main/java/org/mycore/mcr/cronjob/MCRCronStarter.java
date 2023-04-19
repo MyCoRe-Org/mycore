@@ -37,7 +37,7 @@ public class MCRCronStarter implements MCRStartupHandler.AutoExecutable {
     @Override
     public void startUp(ServletContext servletContext) {
         if (servletContext != null) {
-            MCRCronjobManager.getInstance().startUp();
+            MCRCronjobManager.getInstance().startUp(servletContext);
         }
     }
 

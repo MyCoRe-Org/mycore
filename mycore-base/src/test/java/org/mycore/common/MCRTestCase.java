@@ -23,20 +23,33 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.mycore.common.config.MCRConfigurationException;
 
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
 public class MCRTestCase {
 
     @ClassRule
     public static TemporaryFolder junitFolder = new TemporaryFolder();
+
+    @Rule
+    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher =
+        new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
 
     @BeforeClass
     public static void initBaseDir() throws IOException {
@@ -44,26 +57,96 @@ public class MCRTestCase {
     }
 
     /**
-     * initializes MCRConfiguration with an empty property file. This can be used to test MyCoRe classes without any
-     * propties set, using default. You may want to set Properties per TestCase with the set() method of
-     * <code>MCRConfiguration2</code>
-     *
-     * @see org.mycore.common.config.MCRConfiguration2#set(String, String)
+     * Initializes {@link org.mycore.common.config.MCRConfiguration2} with an empty property file.
+     * This can be used to test MyCoRe classes without any properties set, using default. You may set specific
+     * properties for a test case by, in this order of precedence:
+     * <ol>
+     *     <li>
+     *         Annotating the test class (or its superclasses) with {{@link MCRTestConfiguration}}.
+     *     </li>
+     *     <li>
+     *         Overwriting  {@link MCRTestCase#getTestProperties()} in the test class.
+     *     </li>
+     *     <li>
+     *         Annotating the test method with {{@link MCRTestConfiguration}}.
+     *     </li>
+     *     <li>
+     *         Calling {@link org.mycore.common.config.MCRConfiguration2#set(String, String)} inside of the test method.
+     *     </li>
+     * </ol>
      */
     @Before
     public void setUp() throws Exception {
-        initProperties();
-        MCRTestCaseHelper.before(getTestProperties());
+        initSystemProperties();
+        Map<String, String> testProperties = getCombinedTestProperties();
+        MCRTestCaseHelper.before(testProperties);
     }
+
+    private Map<String, String> getCombinedTestProperties() {
+        Map<String, String> testProperties = new HashMap<>();
+        getClassLevelTestConfigurations().forEach(
+            testConfiguration -> extendTestProperties(testProperties, testConfiguration)
+        );
+        testProperties.putAll(getTestProperties());
+        getMethodLevelTestConfiguration().ifPresent(
+            testConfiguration -> extendTestProperties(testProperties, testConfiguration)
+        );
+        return testProperties;
+    }
+
+    private List<MCRTestConfiguration> getClassLevelTestConfigurations() {
+        List<MCRTestConfiguration> testConfigurations = new LinkedList<>();
+        Class<?> testClass = this.getClass();
+        while (testClass != Object.class) {
+            MCRTestConfiguration testConfiguration = testClass.getAnnotation(MCRTestConfiguration.class);
+            if (testConfiguration != null) {
+                testConfigurations.add(0, testConfiguration);
+            }
+            testClass = testClass.getSuperclass();
+        }
+        return testConfigurations;
+    }
+
+    protected Map<String, String> getTestProperties() {
+        return new HashMap<>();
+    }
+
+    private Optional<MCRTestConfiguration> getMethodLevelTestConfiguration() {
+        return configurationTestWatcher.getAnnotation();
+    }
+
+    private void extendTestProperties(Map<String, String> testProperties, MCRTestConfiguration testConfiguration) {
+        Arrays.stream(testConfiguration.properties()).forEach(testProperty ->
+            extendTestProperties(testProperties, testProperty)
+        );
+    }
+
+    private static void extendTestProperties(Map<String, String> testProperties, MCRTestProperty testProperty) {
+
+        String stringValue = testProperty.string();
+        boolean nonDefaultString = !"".equals(stringValue);
+
+        Class<?> classNameOfValue = testProperty.classNameOf();
+        boolean nonDefaultClassNameOf = Void.class != classNameOfValue;
+
+        if (nonDefaultString && nonDefaultClassNameOf) {
+            throw new MCRConfigurationException("MCRTestProperty can have either a string- or a classNameOf-value");
+        } else if (nonDefaultString) {
+            testProperties.put(testProperty.key(), stringValue);
+        } else if (nonDefaultClassNameOf) {
+            testProperties.put(testProperty.key(), classNameOfValue.getName());
+        } else {
+            throw new MCRConfigurationException("MCRTestProperty must have either a string- or a classNameOf-value");
+        }
+
+    }
+
 
     @After
     public void tearDown() throws Exception {
         MCRTestCaseHelper.after();
     }
 
-    protected Map<String, String> getTestProperties() {
-        return new HashMap<>();
-    }
 
     /**
      * Creates a temporary properties file if the system variable MCR.Configuration.File is not set.
@@ -72,7 +155,7 @@ public class MCRTestCase {
      *             Thrown if the creation of the temporary properties file failed.
      * @author Marcel Heusinger &lt;marcel.heusinger[at]uni-due.de&gt;
      */
-    protected void initProperties() throws IOException {
+    protected void initSystemProperties() throws IOException {
         String currentComponent = getCurrentComponentName();
         System.setProperty("MCRRuntimeComponentDetector.underTesting", currentComponent);
     }

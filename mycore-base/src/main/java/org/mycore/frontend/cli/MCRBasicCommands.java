@@ -116,6 +116,13 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.output("");
     }
 
+    @MCRCommand(syntax = "process resource {0}",
+        help = "Execute the commands listed in the resource file {0}.",
+        order = 20)
+    public static List<String> readCommandsResource(String resource) throws IOException {
+        return MCRCommandLineInterface.readCommandsRessource(resource);
+    }
+
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.", order = 30)
     public static List<String> readCommandsFile(String file) throws IOException {
         return MCRCommandLineInterface.readCommandsFile(file);

@@ -18,87 +18,82 @@
 
 package org.mycore.pi.condition;
 
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
 
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
 public class MCRPIAndPredicateTest extends MCRTestCase {
 
-    private static final String MOCK_SERVICE_1 = "MOCK1";
+    private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
 
-    private static final String MOCK_SERVICE_2 = "MOCK2";
+    private static final String KEY_CREATION_PREDICATE_1 = KEY_CREATION_PREDICATE + ".1";
 
-    private static final String MOCK_SERVICE_3 = "MOCK3";
+    private static final String KEY_CREATION_PREDICATE_1_1 = KEY_CREATION_PREDICATE + ".1.1";
 
-    private static final String MOCK_SERVICE_4 = "MOCK4";
+    private static final String KEY_CREATION_PREDICATE_1_2 = KEY_CREATION_PREDICATE + ".1.2";
+
+    private static final String KEY_CREATION_PREDICATE_2 = KEY_CREATION_PREDICATE + ".2";
 
     @Test
-    public void test() {
-        final MCRBase emptyBase = new MCRBase() {
-            @Override
-            protected String getRootTagName() {
-                return "null";
-            }
-        };
-        final boolean mock1Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_1 + ".CreationPredicate").test(emptyBase);
-        final boolean mock2Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate").test(emptyBase);
-        final boolean mock3Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate").test(emptyBase);
-        final boolean mock4Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate").test(emptyBase);
-
-        Assert.assertTrue(mock1Result);
-        Assert.assertFalse(mock2Result);
-        Assert.assertTrue(mock3Result);
-        Assert.assertFalse(mock4Result);
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIAndPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRTruePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRTruePredicate.class)
+    })
+    public void testTrueAndTrue() {
+        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> testProperties = super.getTestProperties();
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_1 + ".CreationPredicate", MCRPIAndPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_1 + ".CreationPredicate.1", MCRTruePredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_1 + ".CreationPredicate.2", MCRTruePredicate.class.getName());
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate", MCRPIAndPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate.1", MCRTruePredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate.2", MCRFalsePredicate.class.getName());
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate", MCRPIAndPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate.1", MCRPIAndPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate.1.1", MCRTruePredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate.1.2", MCRTruePredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate.2", MCRTruePredicate.class.getName());
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate", MCRPIAndPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate.1", MCRPIAndPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate.1.1", MCRFalsePredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate.1.2", MCRTruePredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate.2", MCRTruePredicate.class.getName());
-
-        return testProperties;
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIAndPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRTruePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRFalsePredicate.class)
+    })
+    public void testTrueAndFalse() {
+        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIAndPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRPIAndPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_1, classNameOf = MCRTruePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2, classNameOf = MCRTruePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRTruePredicate.class)
+    })
+    public void testNestedTrueAndTrue() {
+        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIAndPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRPIAndPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_1, classNameOf = MCRTruePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2, classNameOf = MCRFalsePredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRFalsePredicate.class)
+    })
+    public void testNestedTrueAndFalse() {
+        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    }
+
+    private static MCRObject getTestObject() {
+
+        MCRObject mcrObject = new MCRObject();
+        mcrObject.setSchema("test");
+        mcrObject.setId(MCRObjectID.getInstance("mcr_test_00000001"));
+
+        return mcrObject;
+
+    }
+
 }

@@ -29,11 +29,11 @@ import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-
-import java.util.Map;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -379,6 +379,10 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.Pattern.Alphabetic", string = "[a-z]+"),
+        @MCRTestProperty(key = "MCR.Pattern.Numeric", string = "[0-9]+")
+    })
     public void testEnableReplacementsRule() throws JDOMException, JaxenException {
 
         MCREditorSession session;
@@ -426,6 +430,9 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.Pattern.Dollar", string = "\\$")
+    })
     public void testReplacementProcessor() throws JDOMException, JaxenException {
 
         MCREditorSession session;
@@ -435,15 +442,6 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertTrue(session.getValidator().isValid());
         checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
 
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Pattern.Alphabetic", "[a-z]+");
-        testProperties.put("MCR.Pattern.Numeric", "[0-9]+");
-        testProperties.put("MCR.Pattern.Dollar", "\\$");
-        return testProperties;
     }
 
     public static boolean nameStartsWithJ(String name) {
@@ -457,4 +455,5 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
             return "John".equals(author.getChildText("first")) && "Doe".equals(author.getChildText("last"));
         }
     }
+
 }
