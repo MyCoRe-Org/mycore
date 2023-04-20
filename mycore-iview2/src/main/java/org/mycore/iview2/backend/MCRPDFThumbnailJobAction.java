@@ -29,8 +29,7 @@ import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -44,12 +43,6 @@ import org.mycore.services.queuedjob.MCRJobAction;
 public class MCRPDFThumbnailJobAction extends MCRJobAction {
 
     public static final String DERIVATE_PARAMETER = "derivate";
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    public MCRPDFThumbnailJobAction() {
-    }
-
     public MCRPDFThumbnailJobAction(MCRJob job) {
         super(job);
     }
@@ -65,7 +58,7 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
     }
 
     @Override
-    public void execute() {
+    public void execute()  {
         final String derivateIDString = this.job.getParameter(DERIVATE_PARAMETER);
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDString);
         if (!MCRMetadataManager.exists(derivateID)) {
@@ -97,7 +90,7 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                     }
                 }
             } catch (IOException e) {
-                LOGGER.error("Error creating thumbnail for PDF", e);
+                throw new MCRException("Error creating thumbnail for PDF", e);
             }
         }
     }

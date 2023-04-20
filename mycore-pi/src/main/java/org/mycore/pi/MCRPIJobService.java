@@ -41,6 +41,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
 import org.mycore.services.queuedjob.MCRJobQueue;
+import org.mycore.services.queuedjob.MCRJobQueueManager;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -61,15 +62,13 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRJobQueue REGISTER_JOB_QUEUE = initializeJobQueue();
 
     public MCRPIJobService(String identType) {
         super(identType);
     }
 
-    private static MCRJobQueue initializeJobQueue() {
-        LOGGER.info("Initializing jobQueue for PIRegistration!");
-        return MCRJobQueue.getInstance(MCRPIRegisterJobAction.class);
+    private static MCRJobQueue getJobQueue() {
+        return MCRJobQueueManager.getInstance().getJobQueue(MCRPIRegisterJobAction.class);
     }
 
     protected abstract void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException;
@@ -119,7 +118,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      */
     protected void addDeleteJob(Map<String, String> contextParameters) {
         MCRJob job = createJob(contextParameters, PiJobAction.DELETE);
-        REGISTER_JOB_QUEUE.offer(job);
+        getJobQueue().offer(job);
     }
 
     /**
@@ -127,7 +126,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      */
     protected void addUpdateJob(Map<String, String> contextParameters) {
         MCRJob job = createJob(contextParameters, PiJobAction.UPDATE);
-        REGISTER_JOB_QUEUE.offer(job);
+        getJobQueue().offer(job);
     }
 
     /**
@@ -139,7 +138,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      */
     protected void addRegisterJob(Map<String, String> contextParameters) {
         MCRJob job = createJob(contextParameters, PiJobAction.REGISTER);
-        REGISTER_JOB_QUEUE.offer(job);
+        getJobQueue().offer(job);
     }
 
     /**

@@ -1,0 +1,22 @@
+<web-fragment version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
+  metadata-complete="true">
+
+  <name>mycore_packer</name>
+  <ordering>
+    <after>
+      <name>mycore</name>
+    </after>
+  </ordering>
+
+  <servlet>
+    <servlet-name>MCRPackerServlet</servlet-name>
+    <servlet-class>org.mycore.services.packaging.MCRPackerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRPackerServlet</servlet-name>
+    <url-pattern>/servlets/MCRPackerServlet</url-pattern>
+  </servlet-mapping>
+
+</web-fragment>

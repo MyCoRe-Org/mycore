@@ -1176,6 +1176,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-iiif</module>
     <module>mycore-impex</module>
     <module>mycore-iview2</module>
+    <module>mycore-jobqueue</module>
+    <module>mycore-packer</module>
     <module>mycore-lod</module>
     <module>mycore-media</module>
     <module>mycore-meta</module>

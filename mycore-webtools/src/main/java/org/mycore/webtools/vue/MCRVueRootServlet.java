@@ -76,7 +76,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * })
  * </code>
  * <p>The String "handbuecher/" is the location of the vue app below the java application context.</p>
- * <p>To change the output destination of the vue compiler process you need to change the vue.config.js</p>
+ * <p>To change the output destination of the vue compiler process you need to change the vue.config.js,
+ * if you use vue-cli</p>
  * <code>
  * const { defineConfig } = require('@vue/cli-service')<br>
  * module.exports = defineConfig({<br>
@@ -84,6 +85,20 @@ import jakarta.servlet.http.HttpServletResponse;
  * &nbsp;&nbsp;outputDir: "../../../../target/classes/META-INF/resources/handbuecher",<br>
  * &nbsp;&nbsp;publicPath: "./"<br>
  * });<br>
+ * </code>
+ *
+ * <p>If you use vite you have to change the vite.config.ts, to change the output destination of the vite compiler
+ * process</p>
+ * <code>
+ * ... <br>
+ * // https://vitejs.dev/config/ <br>
+ * export default defineConfig({ <br>
+ * ... <br>
+ * build: { <br>
+ * outDir: "../../../../target/classes/META-INF/resources/handbuecher", <br>
+ * }, <br>
+ * base: "./" <br>
+ *}); <br>
  * </code>
  */
 public class MCRVueRootServlet extends MCRContentServlet {
