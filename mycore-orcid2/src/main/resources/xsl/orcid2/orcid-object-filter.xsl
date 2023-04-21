@@ -10,14 +10,4 @@
     <xsl:apply-templates />
   </xsl:template>
 
-  <xsl:template match="mods:mods">
-    <xsl:choose>
-      <xsl:when test="../../../../service/servstates/servstate/@categid!='published'">
-        <mods:mods />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
 </xsl:stylesheet>
