@@ -183,7 +183,7 @@ public abstract class MCRCronjob implements Runnable {
 
         WEBAPP,
 
-        CLI;
+        CLI
 
     }
 

@@ -74,7 +74,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMarkManager {
 
-    private static MCRMarkManager INSTANCE = null;
+    private static volatile MCRMarkManager INSTANCE = null;
 
     public enum Operation {
         DELETE, IMPORT

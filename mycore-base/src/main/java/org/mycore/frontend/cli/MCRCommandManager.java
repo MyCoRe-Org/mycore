@@ -40,7 +40,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 /**
  * Manages all commands for the Command Line Interface and WebCLI.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Robert Stephan
  */
 public class MCRCommandManager {

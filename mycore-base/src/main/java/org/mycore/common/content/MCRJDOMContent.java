@@ -31,7 +31,7 @@ import org.jdom2.transform.JDOMSource;
 /**
  * Reads MCRContent from a JDOM XML document.
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public class MCRJDOMContent extends MCRXMLContent {
 

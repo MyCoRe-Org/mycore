@@ -47,7 +47,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * See https://members.orcid.org/api/oauth/3legged-oauth
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCROAuthServlet extends MCRServlet {
 

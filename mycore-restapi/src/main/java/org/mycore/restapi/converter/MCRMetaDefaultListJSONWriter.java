@@ -63,7 +63,7 @@ public class MCRMetaDefaultListJSONWriter implements MessageBodyWriter<List<? ex
         mcrMetaDefaults.stream()
             .map(MCRMetaDefault::createJSON)
             .forEach(array::add);
-        try (OutputStreamWriter streamWriter = new OutputStreamWriter(entityStream, StandardCharsets.UTF_8);) {
+        try (OutputStreamWriter streamWriter = new OutputStreamWriter(entityStream, StandardCharsets.UTF_8)) {
             Gson gson = new Gson();
             gson.toJson(array, streamWriter);
         }

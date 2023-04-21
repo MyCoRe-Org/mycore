@@ -31,7 +31,7 @@ import org.jdom2.Element;
  * @see MCREnricher#setDebugger(MCREnrichmentDebugger)
  * @see MCRToXMLEnrichmentDebugger#getDebugXML()
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRToXMLEnrichmentDebugger implements MCREnrichmentDebugger {
 

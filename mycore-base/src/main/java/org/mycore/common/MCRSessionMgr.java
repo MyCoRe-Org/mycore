@@ -44,7 +44,6 @@ import org.mycore.util.concurrent.MCRReadWriteGuard;
  * 
  * @author Detlev Degenhardt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRSessionMgr {
 
@@ -238,7 +237,7 @@ public class MCRSessionMgr {
     public static void close() {
         listenersGuard.write(() -> {
             Collection<MCRSession> var = sessions.values();
-            for (MCRSession session : var.toArray(new MCRSession[var.size()])) {
+            for (MCRSession session : var.toArray(MCRSession[]::new)) {
                 session.close();
             }
             LogManager.getLogger(MCRSessionMgr.class).info("Removing thread locals...");

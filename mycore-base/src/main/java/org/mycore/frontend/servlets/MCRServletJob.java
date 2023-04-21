@@ -32,7 +32,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * get-methods to return the objects set while constructing the job object.
  * 
  * @author Detlev Degenhardt
- * @version $Revision$ $Date$
  */
 public class MCRServletJob {
     /** The HttpServletRequest object */

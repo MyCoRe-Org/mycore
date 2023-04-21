@@ -309,8 +309,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param style
      *            the style attribute for the transformer stylesheet
      * @return the transformer
-     * @throws TransformerFactoryConfigurationError
-     * @throws TransformerConfigurationException
      */
     private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
         TransformerConfigurationException {

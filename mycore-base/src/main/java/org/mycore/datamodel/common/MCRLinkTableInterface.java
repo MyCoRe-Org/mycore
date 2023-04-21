@@ -25,7 +25,6 @@ import java.util.Map;
  * This interface is designed to choose the persistence for the link tables.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public interface MCRLinkTableInterface {
 

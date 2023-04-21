@@ -246,12 +246,6 @@ public class MCRObjectDerivate {
         return getOrCreateFileMetadata(path, urn, handle);
     }
 
-    /**
-     * @param path
-     * @param urn
-     * @param handle
-     * @return
-     */
     private MCRFileMetadata getOrCreateFileMetadata(String path, String urn, String handle) {
         if (path == null) {
             throw new NullPointerException("path may not be null");
@@ -286,12 +280,6 @@ public class MCRObjectDerivate {
         return getOrCreateFileMetadata(file, null, null);
     }
 
-    /**
-     * @param path
-     * @param urn
-     * @param handle
-     * @return
-     */
     private MCRFileMetadata createFileMetadata(String path, String urn, String handle) {
         MCRPath mcrFile = MCRPath.getPath(derivateID.toString(), path);
         if (!Files.exists(mcrFile)) {

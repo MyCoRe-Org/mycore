@@ -28,7 +28,7 @@ import org.mycore.mods.merger.MCRMergeTool;
  * Represents a group of works as the activities:group element returned in the ORCID response to fetch work summaries.
  * ORCID groups multiple works from different sources that are assumed to represent the same publication.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRGroupOfWorks {
 

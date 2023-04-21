@@ -32,7 +32,7 @@ import org.xml.sax.XMLReader;
  * 
  * Implementations of this interface are not thread safe.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public interface MCRXMLParser {

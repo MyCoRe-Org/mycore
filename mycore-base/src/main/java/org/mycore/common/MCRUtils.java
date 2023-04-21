@@ -79,7 +79,6 @@ import jakarta.xml.bind.DatatypeConverter;
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRUtils {
     // public constant data

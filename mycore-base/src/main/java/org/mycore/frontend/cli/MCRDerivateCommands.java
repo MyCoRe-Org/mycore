@@ -19,7 +19,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -49,10 +48,10 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRRuleAccessInterface;
+import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
@@ -241,7 +240,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
-     * @throws MCRPersistenceException
      */
     public static boolean loadFromFile(String file, boolean importMode)
         throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
@@ -254,7 +252,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param file
      *            the location of the xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
-     * @throws MCRPersistenceException
      */
 
     @MCRCommand(syntax = "update derivate from file {0}",
@@ -289,9 +286,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, derivate will be updated, else derivate is created
      * @param importMode
      *            if true, servdates are taken from xml file
-     * @throws SAXParseException
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
-     * @throws MCRPersistenceException
      */
     private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException,
         IOException, MCRPersistenceException, MCRAccessException {
@@ -501,12 +496,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * @param dir
-     * @param trans
-     * @param nid
-     * @throws FileNotFoundException
-     * @throws TransformerException
-     * @throws IOException
      */
     private static void exportDerivate(File dir, Transformer trans, String nid)
         throws TransformerException, IOException {

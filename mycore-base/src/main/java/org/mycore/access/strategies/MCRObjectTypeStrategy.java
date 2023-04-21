@@ -39,7 +39,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  */
 public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_[0-9]*");

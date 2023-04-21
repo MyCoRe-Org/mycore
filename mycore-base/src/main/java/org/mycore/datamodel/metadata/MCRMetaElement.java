@@ -46,7 +46,6 @@ import com.google.gson.JsonObject;
  * 
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
- * @version $Revision$ $Date$
  */
 public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // common data

@@ -25,7 +25,7 @@ import org.mycore.common.config.MCRConfiguration2;
 /**
  * Creates and returns MCRContentTransformer instances by their ID.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRContentTransformerFactory {
 

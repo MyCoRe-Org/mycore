@@ -27,7 +27,7 @@ import org.apache.xml.utils.WrappedRuntimeException;
  * those exceptions that wrap other exceptions, recursively.
  * The exception at the bottom of the stack is returned.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRExceptionCauseFinder {
 

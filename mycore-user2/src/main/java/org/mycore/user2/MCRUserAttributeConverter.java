@@ -20,7 +20,7 @@ package org.mycore.user2;
 import java.util.Map;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public interface MCRUserAttributeConverter<ValueType, BoundType> {

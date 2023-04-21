@@ -39,7 +39,6 @@ public interface MCRCondition {
 
     /**
      * the type of the rule
-     * @return
      */
     String getType();
 

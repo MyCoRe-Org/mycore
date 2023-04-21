@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
  * WEB-INF/lib/*.jar or WEB-INF/classes/xsl/ or in {@link MCRConfigurationDir}, outputs the
  * dependencies (import/include) and contained templates.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public final class MCRXSLInfoServlet extends MCRServlet {
 

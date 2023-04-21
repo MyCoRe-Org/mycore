@@ -40,7 +40,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * 
  * @see MCRDataSource
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRDataSourceFactory {
 

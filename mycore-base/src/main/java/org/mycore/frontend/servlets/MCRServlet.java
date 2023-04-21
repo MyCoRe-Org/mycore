@@ -71,7 +71,6 @@ import jakarta.servlet.http.HttpSession;
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
     public static final String ATTR_MYCORE_SESSION = "mycore.session";
@@ -359,7 +358,6 @@ public class MCRServlet extends HttpServlet {
      * 
      * @param req - the HTTP request
      * @param servletName - the servletName
-     * @throws IOException
      */
     public static void initializeMCRSession(HttpServletRequest req, String servletName) throws IOException {
         // Try to set encoding of form values

@@ -102,7 +102,7 @@ public class MCRRole {
 
     @XmlElement(name = "label")
     private MCRLabel[] getLabelsArray() {
-        return labels.values().toArray(new MCRLabel[labels.size()]);
+        return labels.values().toArray(MCRLabel[]::new);
     }
 
     @SuppressWarnings("unused")

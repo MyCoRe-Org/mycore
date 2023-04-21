@@ -55,7 +55,7 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
 
     /**
      * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)} with added collision resistance
-     * for {@link SingletonKeys} to allow changes to the map during computation.
+     * for {@link SingletonKey}s to allow changes to the map during computation.
      * In case of collision, the key is automatically remapped via {@link RemappedKey}.
      * It is a wrapper to modify the hashcode of the given SingletonKey to assign a different bucket
      * within the internal table, in an attempt to resolve the collision.

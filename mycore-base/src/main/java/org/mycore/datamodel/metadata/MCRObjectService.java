@@ -71,7 +71,6 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  * @author Matthias Eichner
  * @author Robert Stephan
- * @version $Revision$ $Date$
  */
 public class MCRObjectService {
 

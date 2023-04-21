@@ -296,7 +296,7 @@ public class MCRCategoryTransformer {
         }
 
         private void sort(List<Element> list, Comparator<Element> c) {
-            Element[] a = list.toArray(new Element[list.size()]);
+            Element[] a = list.toArray(Element[]::new);
             Arrays.sort(a, c);
             for (Element element : a) {
                 element.detach();

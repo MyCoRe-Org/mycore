@@ -50,7 +50,8 @@ public class MCRIIIFImageInformation extends MCRIIIFBase {
 
     /**
      * Required!
-     * A array of profiles, first entry is always a <i>compliance level URI</i> like http://iiif.io/api/image/2/level2.json.
+     * A array of profiles, first entry is always a <i>compliance level URI</i> like
+     * <a href="http://iiif.io/api/image/2/level2.json">http://iiif.io/api/image/2/level2.json</a>.
      */
     public List<Object> profile;
 

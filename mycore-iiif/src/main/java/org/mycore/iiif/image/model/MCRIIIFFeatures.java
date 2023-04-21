@@ -42,7 +42,7 @@ public enum MCRIIIFFeatures {
     sizeByW("sizeByW"),
     sizeByWh("sizeByWh");
 
-    private String featureName;
+    private final String featureName;
 
     MCRIIIFFeatures(String featureName) {
         this.featureName = featureName;

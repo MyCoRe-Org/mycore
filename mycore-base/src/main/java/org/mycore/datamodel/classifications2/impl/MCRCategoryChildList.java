@@ -80,9 +80,6 @@ class MCRCategoryChildList extends ArrayList<MCRCategory> {
         return removed;
     }
 
-    /**
-     * @param category
-     */
     private void removeAncestorReferences(MCRCategory category) {
         if (category instanceof MCRAbstractCategoryImpl catImpl) {
             catImpl.parent = null;

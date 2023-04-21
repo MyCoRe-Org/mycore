@@ -25,7 +25,7 @@ import java.util.Date;
  * Date values are specified by one or more SimpleDateFormat patterns separated by ";".
  * Example: &lt;xed:validate type="date" format="yyyy-MM" max="2017-12" ... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMaxDateValidator extends MCRDateValidator {
 

@@ -120,9 +120,6 @@ public class MCRModsClassificationURIResolver implements URIResolver {
                     authInfo = new MCRTypeOfResource(decodedPathSegments[1]);
                 }
             }
-            default -> {
-                authInfo = null;
-            }
         }
         LOGGER.debug("authinfo {}", authInfo);
         return Optional.ofNullable(authInfo);

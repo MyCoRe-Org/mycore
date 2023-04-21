@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates text values to be "below" (in java.lang.String#compare order) a given maximum. 
  * Example: &lt;xed:validate type="string" max="ZZZ" ... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMaxStringValidator extends MCRValidator {
 

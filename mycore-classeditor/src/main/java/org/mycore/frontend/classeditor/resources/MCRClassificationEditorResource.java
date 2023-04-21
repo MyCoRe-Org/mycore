@@ -121,7 +121,6 @@ public class MCRClassificationEditorResource {
     /**
      * @param rootidStr
      *            rootID.categID
-     * @return
      */
     @GET
     @Path("{rootidStr}")
@@ -138,7 +137,6 @@ public class MCRClassificationEditorResource {
     /**
      * @param rootidStr
      *            rootID.categID
-     * @return
      */
     @GET
     @Path("{rootidStr}/{categidStr}")
@@ -444,7 +442,7 @@ public class MCRClassificationEditorResource {
         void run();
     }
 
-    private class DeleteOp implements OperationInSession {
+    private static class DeleteOp implements OperationInSession {
 
         private MCRJSONCategory category;
 

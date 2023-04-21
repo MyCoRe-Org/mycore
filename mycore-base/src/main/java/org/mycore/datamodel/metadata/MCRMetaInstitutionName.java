@@ -32,7 +32,6 @@ import com.google.gson.JsonObject;
  * class represents a name of an institution or corporation.
  * 
  * @author J. Kupferschmidt
- * @version $Revision$ $Date$
  */
 public final class MCRMetaInstitutionName extends MCRMetaDefault {
     // data

@@ -27,7 +27,7 @@ import org.mycore.orcid.oauth.MCROAuthClient;
  * Represents the source application that generated the work entry in the ORCID profile.
  * This may be another ORCID, another client application or THIS, our MyCoRe application.
  *
- * @author Frank L\u00FCtzenkirchen *
+ * @author Frank Lützenkirchen *
  */
 public class MCRWorkSource {
 

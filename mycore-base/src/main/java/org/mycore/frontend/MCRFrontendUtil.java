@@ -326,8 +326,7 @@ public class MCRFrontendUtil {
     /**
      * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The IP address of the local host is
      * automatically added to this list.
-     * 
-     * @return
+     *
      */
     private static TreeSet<String> getTrustedProxies() {
         // Always trust the local host
@@ -386,7 +385,6 @@ public class MCRFrontendUtil {
      *
      * @param lastIP IP address from former request
      * @param newIP IP address from current request
-     * @return
      * @throws UnknownHostException if <code>lastIP</code> or <code>newIP</code> are not valid IP addresses.
      */
     public static boolean isIPAddrAllowed(String lastIP, String newIP) throws UnknownHostException {

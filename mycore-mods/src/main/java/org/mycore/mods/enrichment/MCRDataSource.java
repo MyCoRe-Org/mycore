@@ -42,7 +42,7 @@ import java.util.List;
  *   
  * @see MCRIdentifierResolver
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRDataSource {
 

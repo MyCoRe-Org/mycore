@@ -28,7 +28,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs2.MCRFile;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMD5InputStreamTest {
 

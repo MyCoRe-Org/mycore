@@ -36,7 +36,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * Extracts occurences of mods:relatedItem and stores them as separate MCRObjects. For mods:relatedItem/@type='host',
  * sets the extracted object as parent. Always, sets @xlink:href of mods:relatedItem to the extracted object's ID.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
@@ -167,7 +167,6 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
     /**
      * Checks if the given related item is if type host and contains a valid MCRObjectID from an existing object.
      *
-     * @param relatedItem
      * @return true if @type='host' and MCRObjectID in @href contains is valid and this MCRObject exists
      */
     private boolean isParentExists(Element relatedItem) {

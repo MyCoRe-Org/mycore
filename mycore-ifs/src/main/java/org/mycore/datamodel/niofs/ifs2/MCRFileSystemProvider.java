@@ -90,7 +90,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
-    private static MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
+    private static volatile MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
 
     /**
      * set of supported copy options

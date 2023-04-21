@@ -42,7 +42,7 @@ import org.xml.sax.XMLReader;
  * templates file.
  * 
  * @author Thomas Scheffler (yagee) 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRTemplatesSource {
 

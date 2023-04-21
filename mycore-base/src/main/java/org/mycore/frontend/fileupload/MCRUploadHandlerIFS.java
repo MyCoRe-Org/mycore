@@ -59,8 +59,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * handles uploads and store files directly into the IFS.
  *
  * @author Thomas Scheffler (yagee)
- * @author Frank L\u00FCtzenkirchen
- * @version $Revision$ $Date$
+ * @author Frank Lützenkirchen
  * @see MCRUploadHandler
  */
 public class MCRUploadHandlerIFS extends MCRUploadHandler {

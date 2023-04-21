@@ -30,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
  * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  * 
  * @see RuntimeException
  */

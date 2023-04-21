@@ -63,7 +63,6 @@ import jakarta.persistence.UniqueConstraint;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  * @since 2.0
  */
 @Entity
@@ -226,7 +225,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return super.getURI();
     }
 
-    @ManyToOne(optional = true, targetEntity = MCRCategoryImpl.class)
+    @ManyToOne(targetEntity = MCRCategoryImpl.class)
     @JoinColumn(name = "parentID")
     @Access(AccessType.FIELD)
     public MCRCategory getParent() {

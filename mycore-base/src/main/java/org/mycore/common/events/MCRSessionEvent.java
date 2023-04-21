@@ -24,7 +24,6 @@ import org.mycore.common.MCRSession;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class MCRSessionEvent {

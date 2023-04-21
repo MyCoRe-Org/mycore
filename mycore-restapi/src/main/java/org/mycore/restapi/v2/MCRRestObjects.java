@@ -499,7 +499,7 @@ public class MCRRestObjects {
                     Date lastModifiedDate = new Date(lastModified.toMillis());
                     Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModifiedDate);
                     return cachedResponse.orElseGet(() -> {
-                        Optional<BufferedImage> thumbnail = null;
+                        Optional<BufferedImage> thumbnail;
                         try {
                             thumbnail = thumbnailGenerator.get().getThumbnail(mainDoc, size);
                         } catch (IOException e) {

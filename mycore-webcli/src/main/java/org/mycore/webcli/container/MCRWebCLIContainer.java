@@ -317,7 +317,6 @@ public class MCRWebCLIContainer {
         /**
          * method mainly copied from CLI class
          *
-         * @param command
          * @return true if command processed successfully
          */
         private boolean processCommand(String command) {
@@ -398,7 +397,7 @@ public class MCRWebCLIContainer {
             LOGGER.info("Writing unprocessed commands to file {}", file.getAbsolutePath());
 
             try {
-                PrintWriter pw = new PrintWriter(file, Charset.defaultCharset().name());
+                PrintWriter pw = new PrintWriter(file, Charset.defaultCharset());
                 if (lastCommand != null) {
                     pw.println(lastCommand);
                 }

@@ -83,7 +83,7 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  *
  * @see MCRDataSource
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREnricher {
 

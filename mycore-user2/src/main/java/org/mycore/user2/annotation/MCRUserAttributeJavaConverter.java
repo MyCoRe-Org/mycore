@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 import org.mycore.user2.MCRUserAttributeConverter;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 @Retention(RUNTIME)

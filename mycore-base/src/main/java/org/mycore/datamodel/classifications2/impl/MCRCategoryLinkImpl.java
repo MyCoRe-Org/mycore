@@ -40,7 +40,6 @@ import jakarta.persistence.UniqueConstraint;
 /**
  * @author Thomas Scheffler (yagee)
  *
- * @version $Revision$ $Date$
  * @since 2.0
  */
 @Entity

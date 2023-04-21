@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates values to be integer numbers not less than a given minimum value.
  * Example: &lt;xed:validate type="integer" min="100" ... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMinIntegerValidator extends MCRIntegerValidator {
 

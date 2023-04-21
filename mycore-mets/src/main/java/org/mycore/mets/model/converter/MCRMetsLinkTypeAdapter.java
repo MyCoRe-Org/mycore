@@ -58,7 +58,7 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         return ml;
     }
 
-    protected class MCRMetsLinkPlaceholder extends MCRMetsLink {
+    protected static class MCRMetsLinkPlaceholder extends MCRMetsLink {
         public static final String PLACEHOLDER_EXCEPTION_MESSAGE = "this is a placeholder class";
 
         private String fromString;

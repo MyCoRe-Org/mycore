@@ -29,7 +29,7 @@ import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXMLCleanerTest extends MCRTestCase {
 

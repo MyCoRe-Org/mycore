@@ -105,7 +105,6 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
     /**
      * returns ISO8601 formated string of when derivate was last modified
      *
-     * @param derivateID
      * @throws IOException
      *             thrown by {@link MCRCache.ModifiedHandle#getLastModified()}
      */

@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates text values to have a given minimum length 
  * Example: &lt;xed:validate minLength="10" ... /&gt;
  *  
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMinLengthValidator extends MCRValidator {
 

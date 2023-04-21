@@ -31,7 +31,7 @@ import org.jdom2.transform.JDOMSource;
 /**
  * Resolves languages by code. Syntax: language:{ISOCode}
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRLanguageResolver implements URIResolver {
 

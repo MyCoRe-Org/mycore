@@ -539,14 +539,11 @@ public abstract class MCRPath implements Path {
             return root == null ? other : MCRAbstractFileSystem.getPath(root, otherStr, getFileSystem());
         }
         final StringBuilder result = new StringBuilder(baseLength + 1 + childLength);
-        if (baseLength == 1 && path.charAt(0) == SEPARATOR) {
-            result.append(SEPARATOR);
-            result.append(otherStr);
-        } else {
+        if (baseLength != 1 || path.charAt(0) != SEPARATOR) {
             result.append(path);
-            result.append(SEPARATOR);
-            result.append(otherStr);
         }
+        result.append(SEPARATOR);
+        result.append(otherStr);
         return MCRAbstractFileSystem.getPath(root, result.toString(), getFileSystem());
     }
 

@@ -62,12 +62,11 @@ import org.mycore.solr.MCRSolrClientFactory;
  * <li>MCR.GoogleSitemap.NumberOfURLs - the number of URLs in one sitemap file, 10000 is default</li>
  * </ul>
  *
- * see http://www.sitemaps.org/de/protocol.html
+ * see <a href="http://www.sitemaps.org/de/protocol.html">http://www.sitemaps.org/de/protocol.html</a>
  *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  *
  */
 public final class MCRGoogleSitemapCommon {
@@ -127,8 +126,6 @@ public final class MCRGoogleSitemapCommon {
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;
 
-    /** The constructor 
-     * @throws NotDirectoryException */
     public MCRGoogleSitemapCommon(File baseDir) throws NotDirectoryException {
         if (!Objects.requireNonNull(baseDir, "baseDir may not be null.").isDirectory()) {
             throw new NotDirectoryException(baseDir.getAbsolutePath());

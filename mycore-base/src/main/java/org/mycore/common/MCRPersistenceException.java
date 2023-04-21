@@ -25,7 +25,6 @@ package org.mycore.common;
  * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRPersistenceException extends MCRException {
     /**

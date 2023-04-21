@@ -504,7 +504,7 @@ public final class MCRURIResolver implements URIResolver {
 
     private static class MCRRESTResolver implements URIResolver {
         private static final long MAX_OBJECT_SIZE = MCRConfiguration2.getLong(CONFIG_PREFIX + "REST.MaxObjectSize")
-            .orElse(128 * 1024l);
+            .orElse(128 * 1024L);
 
         private static final int MAX_CACHE_ENTRIES = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.MaxCacheEntries")
             .orElse(1000);
@@ -583,7 +583,7 @@ public final class MCRURIResolver implements URIResolver {
          *
          * @param href
          *            for example, "mcrobject:DocPortal_document_07910401"
-         * @returns XML representation from MCRXMLContainer
+         * @return XML representation from MCRXMLContainer
          */
         @Override
         public Source resolve(String href, String base) throws TransformerException {
@@ -1293,7 +1293,7 @@ public final class MCRURIResolver implements URIResolver {
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
      *
-     * @returns A xsl file with the includes as href.
+     * @return A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
         private static Logger LOGGER = LogManager.getLogger(MCRXslIncludeResolver.class);
@@ -1340,7 +1340,7 @@ public final class MCRURIResolver implements URIResolver {
      *  &lt;xsl:import href="xslImport:components:first.xsl"&gt;
      * </pre>
      *
-     * @returns A xsl file with the import as href.
+     * @return A xsl file with the import as href.
      */
     private static class MCRXslImportResolver implements URIResolver {
 
@@ -1749,7 +1749,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * @author Frank L\u00FCtzenkirchen
+     * @author Frank Lützenkirchen
      */
     private static class MCRCachingResolver implements URIResolver {
 

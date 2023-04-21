@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates values to be integer numbers not bigger than a given maximum value.
  * Example: &lt;xed:validate type="integer" max="200" ... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMaxIntegerValidator extends MCRIntegerValidator {
 

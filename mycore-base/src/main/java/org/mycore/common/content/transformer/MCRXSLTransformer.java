@@ -70,7 +70,7 @@ import org.xml.sax.XMLReader;
  * The default transformer factory implementation {@link org.apache.xalan.processor.TransformerFactoryImpl}
  * is configured with <code>MCR.LayoutService.TransformerFactoryClass</code>.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
@@ -86,7 +86,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         "MCRXSLTransformer instance cache");
 
     private static long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
-        .orElse(60000l);
+        .orElse(60000L);
 
     private static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
         .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")

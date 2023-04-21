@@ -22,7 +22,7 @@ import java.util.Map;
 import org.mycore.user2.MCRUserAttributeConverter;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRUserNameConverter implements MCRUserAttributeConverter<String, String> {

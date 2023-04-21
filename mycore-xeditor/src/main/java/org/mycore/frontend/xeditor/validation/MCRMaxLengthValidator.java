@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates text values to have a given maximum length 
  * Example: &lt;xed:validate maxLength="250" ... /&gt;
  *  
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMaxLengthValidator extends MCRValidator {
 

@@ -36,7 +36,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXPathEvaluator {
 

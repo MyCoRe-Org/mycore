@@ -35,7 +35,7 @@ import org.xml.sax.XMLReader;
 /**
  * Returns validating or non-validating XML parsers.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {

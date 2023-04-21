@@ -24,7 +24,7 @@ import org.jdom2.Namespace;
 /**
  * Helper class to map xml:lang and lang attributes in XML to MCRLanguage 
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRLanguageXML {
 

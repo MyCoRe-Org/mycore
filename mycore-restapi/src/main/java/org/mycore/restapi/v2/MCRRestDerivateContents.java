@@ -372,7 +372,6 @@ public class MCRRestDerivateContents {
             @Parameter(in = ParameterIn.HEADER,
                 name = HTTP_HEADER_IS_DIRECTORY,
                 description = "set to 'true' if a new directory should be created",
-                required = false,
                 schema = @Schema(type = "boolean")) },
         responses = {
             @ApiResponse(responseCode = "204", description = "if directory already exists or while was updated"),
@@ -476,10 +475,7 @@ public class MCRRestDerivateContents {
         EntityTag eTag = getETag(fileAttributes);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified,
             eTag);
-        if (cachedResponse.isPresent()) {
-            return cachedResponse.get();
-        }
-        return updateFile(contents, mcrPath);
+        return cachedResponse.orElseGet(() -> updateFile(contents, mcrPath));
     }
 
     private boolean isFile() {

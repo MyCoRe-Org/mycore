@@ -51,7 +51,6 @@ import org.mycore.datamodel.metadata.MCRObjectStructure;
  * holds all informations about links between MCRObjects/MCRClassifications.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRLinkTableManager {
     /** The list of entry types */
@@ -517,8 +516,7 @@ public class MCRLinkTableManager {
     }
 
     public void create(MCRDerivate der) {
-        Collection<MCRCategoryID> categoryList = new HashSet<>();
-        categoryList.addAll(der.getDerivate().getClassifications()
+        Collection<MCRCategoryID> categoryList = new HashSet<>(der.getDerivate().getClassifications()
             .stream()
             .map(this::metaClassToCategoryID)
             .collect(Collectors.toList()));

@@ -61,7 +61,7 @@ public class MCRDerivateServlet extends MCRServlet {
         if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"),
             getProperty(request, "file2"))) {
             String url = request.getParameter("url");
-            if (url != null && ("".equals(url))) {
+            if (("".equals(url))) {
                 response.sendError(HttpServletResponse.SC_NO_CONTENT, "Parameter 'url' is set but empty!");
                 return;
             }

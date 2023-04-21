@@ -104,7 +104,6 @@ public class MCRRestAPIUploadHelper {
      * @param uploadedInputStream - the inputstream from HTTP Post request
      * @param fileDetails - the file information from HTTP Post request
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
         FormDataContentDisposition fileDetails) throws MCRRestAPIException {
@@ -255,7 +254,6 @@ public class MCRRestAPIUploadHelper {
      * @param formParamMD5 - the MD5 sum of the uploaded file 
      * @param formParamSize - the size of the uploaded file
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
@@ -395,7 +393,6 @@ public class MCRRestAPIUploadHelper {
      * @param pathParamMcrObjID - the MyCoRe Object ID
      * @param pathParamMcrDerID - the MyCoRe Derivate ID
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException
      */
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {

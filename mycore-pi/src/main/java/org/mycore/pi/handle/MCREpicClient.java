@@ -46,7 +46,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import com.google.gson.Gson;
 
 /**
- * Implementation for this api https://doc.pidconsortium.eu/docs/
+ * Implementation for this api <a href="https://doc.pidconsortium.eu/docs/">https://doc.pidconsortium.eu/docs/</a>
  */
 public class MCREpicClient {
 

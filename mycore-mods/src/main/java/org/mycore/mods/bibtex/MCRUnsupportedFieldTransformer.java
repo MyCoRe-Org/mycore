@@ -31,7 +31,7 @@ import bibtex.dom.BibtexString;
 /**
  * Transforms any BibTeX field that can not be mapped to MODS to a mods:extension/field element.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRUnsupportedFieldTransformer extends MCRFieldTransformer {
 

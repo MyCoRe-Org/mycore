@@ -123,21 +123,19 @@ public class MCRTileServlet extends HttpServlet {
 
     /**
      * returns PathInfo from request including ";"
-     * @param request
-     * @return
      */
     private static String getPathInfo(final HttpServletRequest request) {
         return request.getPathInfo();
     }
 
     /**
-     * returns a {@link TileInfo} for this <code>pathInfo</code>.
+     * returns a {@link MCRTileInfo} for this <code>pathInfo</code>.
      * The format of <code>pathInfo</code> is
      * <code>/{derivateID}/{absoluteImagePath}/{tileCoordinate}</code>
      * where <code>tileCoordinate</code> is either {@value org.mycore.imagetiler.MCRTiledPictureProps#IMAGEINFO_XML}
      * or <code>{z}/{y}/{x}</code> as zoomLevel and x-y-coordinates.
      * @param pathInfo of the described format
-     * @return a {@link TileInfo} instance for <code>pathInfo</code>
+     * @return a {@link MCRTileInfo} instance for <code>pathInfo</code>
      */
     static MCRTileInfo getTileInfo(final String pathInfo) {
         LOGGER.debug("Starting MCRTileServlet: {}", pathInfo);

@@ -46,7 +46,7 @@ import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
 import org.xml.sax.SAXException;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREditorSession {
 

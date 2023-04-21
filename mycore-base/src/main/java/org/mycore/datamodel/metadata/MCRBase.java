@@ -44,7 +44,6 @@ import com.google.gson.JsonObject;
  * the frame to produce a full functionality object.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public abstract class MCRBase {
 

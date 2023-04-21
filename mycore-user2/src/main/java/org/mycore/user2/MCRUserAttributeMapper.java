@@ -76,7 +76,7 @@ import jakarta.xml.bind.annotation.XmlValue;
  * </code>
  * </pre>
  * 
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRUserAttributeMapper {

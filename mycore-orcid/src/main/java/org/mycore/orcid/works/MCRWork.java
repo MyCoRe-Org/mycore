@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  * Represents a single "work", that means a publication within the "works" section of an ORCID profile,
  * from a single source.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWork {
 

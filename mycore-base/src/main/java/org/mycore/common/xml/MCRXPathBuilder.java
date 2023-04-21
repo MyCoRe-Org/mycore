@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Builds an absolute XPath expression for a given element or attribute within a JDOM XML structure.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXPathBuilder {
 

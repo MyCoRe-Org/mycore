@@ -34,7 +34,7 @@ import org.mycore.component.fo.common.fo.MCRFoFormatterHelper;
  * 
  * @see org.mycore.component.fo.common.fo.MCRFoFormatterInterface
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRFopper extends MCRContentTransformer {
 

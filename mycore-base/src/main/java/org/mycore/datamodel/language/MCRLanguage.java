@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Represents a language in the datamodel, independent of the type of code used to encode it.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRLanguage {
 

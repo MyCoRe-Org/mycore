@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
 /**
  * Transforms xml content in pretty, UTF-8 encoded format.
  *  
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRToPrettyXML extends MCRContentTransformer {
 

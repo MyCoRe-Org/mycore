@@ -43,7 +43,7 @@ import jakarta.servlet.http.HttpSession;
  * Collects parameters used in XSL transformations, by copying them from
  * MCRConfiguration, from the HTTP and MyCoRe session, from request attributes etc. 
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRParameterCollector {
 
@@ -270,9 +270,7 @@ public class MCRParameterCollector {
     /**
      * Sets some parameters that must not be overwritten by the request, for example
      * the user ID and the URL of the web application.
-     * 
-     * @param session
-     * @param request 
+     *
      */
     private void setUnmodifyableParameters(MCRSession session, HttpServletRequest request) {
         parameters.put("CurrentUser", session.getUserInformation().getUserID());

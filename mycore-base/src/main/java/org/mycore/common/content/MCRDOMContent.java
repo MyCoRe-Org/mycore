@@ -31,7 +31,7 @@ import org.w3c.dom.Document;
 /**
  * Reads MCRContent from a W3C DOM XML document.
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public class MCRDOMContent extends MCRXMLContent {
 

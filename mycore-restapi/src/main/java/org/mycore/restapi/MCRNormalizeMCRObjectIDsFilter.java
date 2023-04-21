@@ -99,7 +99,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
                 } else {
                     MCRObjectID mcrObjID = MCRObjectID.getInstance(mcrid);
                     // set the properly formated mcrObjID back to URL
-                    pathParts[1] = mcrObjID.toString() + mcridExtension;
+                    pathParts[1] = mcrObjID + mcridExtension;
                 }
             } catch (MCRException ex) {
                 // ignore
@@ -124,7 +124,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
                     } else {
                         MCRObjectID mcrDerID = MCRObjectID.getInstance(derid);
                         // set the properly formated mcrObjID back to URL
-                        pathParts[3] = mcrDerID.toString() + deridExtension;
+                        pathParts[3] = mcrDerID + deridExtension;
                     }
                 } catch (MCRException ex) {
                     // ignore

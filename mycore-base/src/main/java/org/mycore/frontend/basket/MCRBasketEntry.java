@@ -31,7 +31,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * basket entry. This can be used by applications that wish
  * to edit XML in the basket itself.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasketEntry {
 

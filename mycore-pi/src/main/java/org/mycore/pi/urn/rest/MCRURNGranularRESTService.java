@@ -338,7 +338,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         }
     }
 
-    public class MCRPICreationException extends RuntimeException {
+    public static class MCRPICreationException extends RuntimeException {
         public MCRPICreationException(String message, Throwable cause) {
             super(message, cause);
         }

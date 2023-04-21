@@ -67,7 +67,6 @@ public class MCRDNBURNRestClient {
     /**
      * Creates a new operator with the given configuration.
      *
-     * @param bundleProvider
      */
     public MCRDNBURNRestClient(Function<MCRPIRegistrationInfo, MCRURNJsonBundle> bundleProvider) {
         this(bundleProvider, Optional.empty());
@@ -90,7 +89,7 @@ public class MCRDNBURNRestClient {
      * */
     @Deprecated
     protected String getBaseServiceURL(MCRPIRegistrationInfo urn) {
-        return this.getBaseServiceURL();
+        return getBaseServiceURL();
     }
 
     /**

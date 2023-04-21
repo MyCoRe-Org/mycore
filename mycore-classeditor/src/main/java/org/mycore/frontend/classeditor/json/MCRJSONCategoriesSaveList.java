@@ -41,7 +41,7 @@ public class MCRJSONCategoriesSaveList {
         }
     }
 
-    private class CategorySaveElement {
+    private static class CategorySaveElement {
         private MCRCategory categ;
 
         private MCRCategoryID parentID;

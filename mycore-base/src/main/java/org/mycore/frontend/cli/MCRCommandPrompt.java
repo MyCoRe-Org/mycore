@@ -26,7 +26,7 @@ import java.nio.charset.Charset;
 /**
  * Reads the next command entered at the stdin prompt.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRCommandPrompt {
 

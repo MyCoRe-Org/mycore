@@ -27,7 +27,6 @@ package org.mycore.common;
  * some way.
  * 
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  * 
  * @see java.lang.Exception
  */

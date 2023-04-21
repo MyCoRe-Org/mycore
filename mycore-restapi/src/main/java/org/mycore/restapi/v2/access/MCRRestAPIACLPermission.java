@@ -31,7 +31,7 @@ public enum MCRRestAPIACLPermission {
     READ(MCRAccessManager.PERMISSION_READ), WRITE(MCRAccessManager.PERMISSION_WRITE),
     DELETE(MCRAccessManager.PERMISSION_DELETE);
 
-    private String value;
+    private final String value;
 
     MCRRestAPIACLPermission(final String value) {
         this.value = value;

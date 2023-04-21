@@ -51,7 +51,7 @@ public class MCRAESCipher extends MCRCipher {
     private Cipher encryptCipher;
     private Cipher decryptCipher;
 
-    @MCRProperty(name = "KeyFile", required = true)
+    @MCRProperty(name = "KeyFile")
     public void setKeyFile(String path) {
         keyFile = path;
     }

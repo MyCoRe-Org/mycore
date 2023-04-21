@@ -36,7 +36,7 @@ import org.mycore.common.content.MCRContent;
  * 
  * MCR.ContentTransformer.{ID}.MIMEType
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public abstract class MCRContentTransformer {
 

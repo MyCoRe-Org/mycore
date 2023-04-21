@@ -107,13 +107,10 @@ class MCRPersistenceHelper {
      * creates a MCRObject instance on base of JDOM document
      * @param doc
      *  MyCoRe object as XML.
-     * @return
      * @throws JDOMException
      *  exception from underlying {@link MCREditorOutValidator}
      * @throws IOException
      *  exception from underlying {@link MCREditorOutValidator} or {@link XMLOutputter}
-     * @throws SAXParseException
-     * @throws MCRException
      */
     static MCRObject getMCRObject(Document doc) throws JDOMException, IOException, MCRException, SAXParseException {
         String id = doc.getRootElement().getAttributeValue("ID");

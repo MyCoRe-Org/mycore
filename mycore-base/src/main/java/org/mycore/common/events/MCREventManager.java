@@ -311,7 +311,7 @@ public class MCREventManager {
      * @author Huu Chi Vu
      *
      */
-    private class EventHandlerProperty {
+    private static class EventHandlerProperty {
 
         private String type;
 

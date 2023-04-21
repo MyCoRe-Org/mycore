@@ -62,10 +62,6 @@ public class MCRDOMUtils implements Closeable {
         LazyHolder.INSTANCE.builderQueue.add(documentBuilder);
     }
 
-    /**
-     * @param documentBuilder
-     * @return
-     */
     private static DocumentBuilder resetDocumentBuilder(DocumentBuilder documentBuilder) {
         documentBuilder.reset();
         documentBuilder.setEntityResolver(MCREntityResolver.instance());
@@ -89,10 +85,6 @@ public class MCRDOMUtils implements Closeable {
     @Override
     public int getPriority() {
         return 0;
-    }
-
-    @Override
-    public void prepareClose() {
     }
 
     private static class LazyHolder {

@@ -43,7 +43,7 @@ import org.jdom2.Parent;
 import org.mycore.common.MCRConstants;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRNodeBuilder {
 

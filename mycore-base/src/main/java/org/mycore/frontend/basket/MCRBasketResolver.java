@@ -30,7 +30,7 @@ import org.jdom2.transform.JDOMSource;
  * Resolves entries from a basket, for example to edit the data
  * in an editor form. Syntax: basket:{typeID}:{entryID}
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasketResolver implements URIResolver {
     public Source resolve(String href, String base) throws TransformerException {

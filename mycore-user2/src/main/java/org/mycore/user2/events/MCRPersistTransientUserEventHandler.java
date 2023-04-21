@@ -27,7 +27,7 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {

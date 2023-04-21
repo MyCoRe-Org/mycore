@@ -23,7 +23,7 @@ package org.mycore.frontend.xeditor.validation;
  * The number format is specified by a given locale ID.
  * Example: &lt;xed:validate type="decimal" locale="de" max="1.999,99"... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMaxDecimalValidator extends MCRDecimalValidator {
 

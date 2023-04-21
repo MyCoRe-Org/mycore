@@ -27,7 +27,7 @@ import org.mycore.common.config.MCRConfigurationException;
 /**
  * Represents a token request against the OAuth2 API of orcid.org.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Kai Brandhorst
  */
 public class MCRRevokeRequest extends MCRORCIDRequest {

@@ -150,7 +150,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                         + "a user which has the rights.",
                     MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(),
                     MCRAccessManager.PERMISSION_WRITE,
-                    id.toString(),
+                    id,
                     JOB_API_USER_PROPERTY));
         }
     }
@@ -310,7 +310,6 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * @return the registration predicate
      * 
      * @see MCRPIJobService
-     * @version 2020.06
      */
     @Deprecated
     protected Predicate<MCRBase> getRegistrationCondition() {

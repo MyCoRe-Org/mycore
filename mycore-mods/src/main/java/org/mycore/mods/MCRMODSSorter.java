@@ -35,7 +35,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * or by invoking
  * MCRMODSSorter.sort( [JDOM Element with mods:mods] );
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMODSSorter implements URIResolver {
 

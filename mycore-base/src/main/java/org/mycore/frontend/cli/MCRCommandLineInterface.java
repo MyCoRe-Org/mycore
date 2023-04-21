@@ -268,7 +268,7 @@ public class MCRCommandLineInterface {
 
     private static void saveCommandQueueToFile(final Vector<String> queue, String fname) {
         output("Writing unprocessed commands to file " + fname);
-        try (PrintWriter pw = new PrintWriter(new File(fname), Charset.defaultCharset().name())) {
+        try (PrintWriter pw = new PrintWriter(new File(fname), Charset.defaultCharset())) {
             for (String command : queue) {
                 pw.println(command);
             }

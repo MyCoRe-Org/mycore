@@ -56,7 +56,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
 
-    private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000l);
+    private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000L);
 
     private static DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<>();
 

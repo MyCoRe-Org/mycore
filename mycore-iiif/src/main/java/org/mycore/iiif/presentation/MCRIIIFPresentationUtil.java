@@ -34,13 +34,11 @@ import org.mycore.iiif.presentation.model.basic.MCRIIIFSequence;
 public class MCRIIIFPresentationUtil {
 
     /**
-     * The ids ({@link MCRIIIFBase#id}) are all local e.g. a canvas id is maybe abcdf.tiff then this methods
+     * The ids ({@link MCRIIIFBase#getId()}) are all local e.g. a canvas id is maybe abcdf.tiff then this methods
      *  replaces the id with a URI.
      * -&gt; http://my.repository.com/iiif/presentation/$impl/$identifier/canvas/abcdf.tiff
      * Works recursive
      * @param base where to start with replacing
-     * @param impl
-     * @param identifier
      */
     public static void correctIDs(MCRIIIFBase base, String impl, String identifier) {
         switch (base.getType()) {

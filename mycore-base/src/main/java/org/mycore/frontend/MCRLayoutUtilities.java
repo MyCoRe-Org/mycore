@@ -285,9 +285,6 @@ public class MCRLayoutUtilities {
 
     /**
      * Returns a Element presentation of an item[@href=$webpageID]
-     *
-     * @param webpageID
-     * @return Element
      */
     private static Element getItem(String webpageID) {
         Element item = itemStore.get(webpageID);

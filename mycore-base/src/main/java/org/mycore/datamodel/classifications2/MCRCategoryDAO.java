@@ -27,7 +27,6 @@ import java.util.SortedSet;
  * Interface of the Data Access Object for Classifications.
  * 
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public interface MCRCategoryDAO {

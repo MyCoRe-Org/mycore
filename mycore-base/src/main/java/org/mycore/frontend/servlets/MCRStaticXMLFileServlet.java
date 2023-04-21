@@ -42,7 +42,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * This servlet displays static *.xml files stored in the web application by sending them to MCRLayoutService.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
 

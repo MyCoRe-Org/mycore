@@ -108,7 +108,6 @@ public class MCRSassCompilerManager {
      *
      * @param name the name of the file (with .min.css or .css ending)
      * @return the compiled css
-     * @throws CompilationException
      */
     private String compile(String name, List<Importer> importer) throws CompilationException {
         Options options = new Options();

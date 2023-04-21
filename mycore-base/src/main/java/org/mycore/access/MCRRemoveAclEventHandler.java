@@ -33,7 +33,6 @@ import org.mycore.datamodel.metadata.MCRObject;
  * 
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
 

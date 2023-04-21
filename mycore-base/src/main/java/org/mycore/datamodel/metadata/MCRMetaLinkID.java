@@ -42,7 +42,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * &lt;/tag&gt; <br>
  *
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 @JsonClassDescription("Links to other objects or derivates")
 public class MCRMetaLinkID extends MCRMetaLink {

@@ -28,7 +28,7 @@ import org.mycore.common.MCRConstants;
 /**
  * Reads MCRContent from a String's text.
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public class MCRStringContent extends MCRContent {
 

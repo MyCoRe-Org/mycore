@@ -247,7 +247,6 @@ public abstract class MCRContent {
 
     /**
      * Returns content as "data:" URL.
-     * @throws IOException
      */
     public MCRDataURL asDataURL() throws IOException {
         return new MCRDataURL(asByteArray(), getDataURLEncoding(), getMimeType(), getSafeEncoding());

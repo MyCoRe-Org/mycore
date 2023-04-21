@@ -29,7 +29,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import jakarta.servlet.ServletContext;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRLayoutServiceTarget implements MCREditorTarget {
 

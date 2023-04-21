@@ -108,7 +108,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            containing all the values for the field
      * @param fieldName
      *            the name of the field
-     * @throws ServletException
      */
     private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType)
         throws ServletException {
@@ -173,11 +172,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
         return queryParameterMap;
     }
 
-    /**
-     *
-     * @param sortParameters
-     * @return
-     */
     private String buildSolrSortParameter(Map<String, String[]> sortParameters) {
         Set<Entry<String, String[]>> sortParameterEntrys = sortParameters.entrySet();
         Map<Integer, String> positionOrderMap = new HashMap<>();
@@ -199,9 +193,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
         }
 
-        ArrayList<Integer> sortedPositions = new ArrayList<>();
-
-        sortedPositions.addAll(positionFieldMap.keySet());
+        ArrayList<Integer> sortedPositions = new ArrayList<>(positionFieldMap.keySet());
         Collections.sort(sortedPositions);
 
         StringBuilder sortBuilder = new StringBuilder();
@@ -228,8 +220,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * This method is used to create a map wich contains all fields as key and
      * the type of the field as value.
      *
-     * @param typeParameters
-     * @return
      */
     private HashMap<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
         HashMap<String, String> fieldTypeMap = new HashMap<>();
@@ -320,7 +310,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
     /**
      * @param filterQueryMap
      *            a map wich contains all {@link StringBuilder}
-     * @param fieldType
      * @return a {@link StringBuilder} for the specific fieldType
      */
     private StringBuilder getFilterQueryBuilder(HashMap<String, StringBuilder> filterQueryMap, String fieldType) {

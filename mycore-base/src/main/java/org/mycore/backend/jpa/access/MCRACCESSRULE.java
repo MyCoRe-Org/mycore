@@ -42,7 +42,7 @@ public class MCRACCESSRULE {
     @Column(name = "RULE", length = 2048000, nullable = false)
     private String rule;
 
-    @Column(name = "DESCRIPTION", length = 255, nullable = false)
+    @Column(name = "DESCRIPTION", nullable = false)
     private String description;
 
     public Timestamp getCreationdate() {

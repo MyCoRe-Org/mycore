@@ -20,13 +20,13 @@ package org.mycore.pi.urn.rest;
 
 import java.net.URL;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.mycore.pi.MCRPIRegistrationInfo;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 /**
- * Class wraps the urn/url in json as needed by the dnb urn service api. Supersedes the now deprecated class
- * {@link MCREpicurLite}.
+ * Class wraps the urn/url in json as needed by the dnb urn service api.
  *
  * @see <a href="https://wiki.dnb.de/display/URNSERVDOK/URN-Service+API">URN-Service API</a>
  *

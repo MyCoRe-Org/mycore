@@ -32,10 +32,6 @@ public class MCRCryptKeyNoPermissionException extends MCRCatchException {
         this.errorCode = errorCode;
     }
 
-    /*public MCRCryptKeyNoPermissionException(Throwable cause) {
-        super(cause);
-    }*/
-
     public MCRCryptKeyNoPermissionException(String message, Throwable cause) {
         super(message, cause);
     }

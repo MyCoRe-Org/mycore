@@ -41,7 +41,6 @@ import com.google.gson.JsonObject;
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author Johannes B\u00fchler
- * @version $Revision$ $Date$
  */
 public class MCRMetaXML extends MCRMetaDefault {
     List<Content> content;

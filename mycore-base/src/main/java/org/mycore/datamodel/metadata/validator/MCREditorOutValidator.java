@@ -306,11 +306,6 @@ public class MCREditorOutValidator {
         return errorlog;
     }
 
-    /**
-     * @throws IOException
-     * @throws JDOMException
-     *
-     */
     private void checkObject() throws JDOMException, IOException {
         // add the namespaces (this is a workaround)
         Element root = input.getRootElement();
@@ -342,9 +337,6 @@ public class MCREditorOutValidator {
         checkObjectService(root, service);
     }
 
-    /**
-     * @param datatag
-     */
     private boolean checkMetaTags(Element datatag) {
         String mcrclass = datatag.getAttributeValue("class");
         List<Element> datataglist = datatag.getChildren();
@@ -377,11 +369,6 @@ public class MCREditorOutValidator {
         return datatag.getChildren().size() != 0;
     }
 
-    /**
-     * @param service
-     * @throws IOException
-     * @throws JDOMException
-     */
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
         if (service == null) {
             service = new Element("service");
@@ -404,9 +391,6 @@ public class MCREditorOutValidator {
     /**
      * The method add a default ACL-block.
      *
-     * @param service
-     * @throws IOException
-     * @throws JDOMException
      */
     private void setDefaultObjectACLs(Element service) throws JDOMException, IOException {
         if (!MCRConfiguration2.getBoolean("MCR.Access.AddObjectDefaultRule").orElse(true)) {
@@ -474,9 +458,6 @@ public class MCREditorOutValidator {
         service.addContent(acls.detach());
     }
 
-    /**
-     * @param metadata
-     */
     private void checkObjectMetadata(Element metadata) {
         if (metadata.getAttribute("lang") != null) {
             metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);

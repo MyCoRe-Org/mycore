@@ -34,7 +34,7 @@ import org.mycore.user2.utils.MCRRolesConverter;
 
 /**
  * 
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  */
 public class MCRShibbolethUserInformation implements MCRUserInformation {
     private String userId;

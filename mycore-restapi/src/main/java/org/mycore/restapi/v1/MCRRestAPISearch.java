@@ -146,7 +146,7 @@ public class MCRRestAPISearch {
         }
 
         try (InputStream is = new URL(url.toString()).openStream()) {
-            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
+            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
                 String text = scanner.useDelimiter("\\A").next();
 
                 String contentType = switch (wt) {

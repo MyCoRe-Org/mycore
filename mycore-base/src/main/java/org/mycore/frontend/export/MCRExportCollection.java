@@ -34,7 +34,7 @@ import org.mycore.frontend.basket.MCRBasketXMLBuilder;
  * The collected XML data is wrapped by a root element 
  * thats name and namespace can be set.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRExportCollection {
 

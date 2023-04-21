@@ -27,7 +27,7 @@ import java.util.Locale;
 /**
  * Helper for decimal validators to convert string input into a decimal value for a given locale.
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  */
 public class MCRDecimalConverter {
 

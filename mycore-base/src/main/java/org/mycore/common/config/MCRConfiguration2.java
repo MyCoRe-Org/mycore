@@ -269,7 +269,6 @@ public class MCRConfiguration2 {
     }
 
     /**
-     * @param prefix
      * @return a list of properties which represent a configurable class
      */
     public static Stream<String> getInstantiatablePropertyKeys(String prefix) {
@@ -292,8 +291,6 @@ public class MCRConfiguration2 {
 
     /**
      * Gets a list of properties which represent a configurable class and turns them in to a map.
-     * @param prefix
-     * @param <T>
      * @return a map where the key is a String describing the configurable instance value
      */
     public static <T> Map<String, Callable<T>> getInstances(String prefix) {

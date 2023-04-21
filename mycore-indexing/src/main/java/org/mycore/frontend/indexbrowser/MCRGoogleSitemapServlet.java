@@ -33,13 +33,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This class builds a google sitemap containing links to all documents. The
- * web.xml file should contain a mapping to /sitemap.xml See
- * http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
- * 
+ * web.xml file should contain a mapping to /sitemap.xml
+ *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public final class MCRGoogleSitemapServlet extends MCRServlet {
 

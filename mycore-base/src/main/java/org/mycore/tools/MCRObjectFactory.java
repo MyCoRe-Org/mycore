@@ -82,9 +82,6 @@ public class MCRObjectFactory {
         return "derivate".equals(id.getTypeId()) ? new Element("derivate") : new Element("metadata");
     }
 
-    /**
-     * @param id
-     */
     private static Element createRootElement(MCRObjectID id) {
         String rootTag = "derivate".equals(id.getTypeId()) ? "mycorederivate" : "mycoreobject";
         Element root = new Element(rootTag);
@@ -103,7 +100,6 @@ public class MCRObjectFactory {
     }
 
     /**
-     * @param id
      * @return the name of the xsd schema depending on the given object id
      */
     private static String getXSD(MCRObjectID id) {

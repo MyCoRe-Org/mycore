@@ -54,7 +54,7 @@ public class MCRJWPlayerResource {
     @GET
     @Path("{derivateId}/{path: .+}/sources.js")
     @Produces({ "application/javascript" })
-    @JSONP(callback = "callback", queryParam = "callback")
+    @JSONP(queryParam = "callback")
     public String getSourcesAsJSONP(@PathParam("derivateId") String derivateId, @PathParam("path") String path)
         throws URISyntaxException, IOException {
         // TODO: FIX THIS: https://jersey.java.net/documentation/latest/user-guide.html#d0e8837

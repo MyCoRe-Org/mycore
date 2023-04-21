@@ -36,7 +36,7 @@ import org.mycore.user2.login.MCRShibbolethUserInformation;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRUserAttributeMapperTest extends MCRUserTestCase {

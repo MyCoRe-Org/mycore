@@ -37,7 +37,6 @@ import org.mycore.datamodel.metadata.MCRObject;
  * simple workflow.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRAccessEventHandler extends MCREventHandlerBase {
 

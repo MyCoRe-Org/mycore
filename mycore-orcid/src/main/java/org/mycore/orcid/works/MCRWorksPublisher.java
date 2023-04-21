@@ -48,7 +48,7 @@ import jakarta.ws.rs.core.Response.StatusType;
 /**
  * Provides functionality to create, update and delete works in the remote ORCID profile
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWorksPublisher {
 

@@ -92,8 +92,6 @@ public class MCRErrorServlet extends HttpServlet {
 
     /**
      * Returns true if Accept header allows sending html pages
-     * @param req
-     * @return
      */
     private boolean acceptWebPage(HttpServletRequest req) {
         Enumeration<String> acceptHeader = req.getHeaders("Accept");

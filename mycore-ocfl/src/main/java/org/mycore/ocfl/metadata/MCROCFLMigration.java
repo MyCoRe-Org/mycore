@@ -76,17 +76,6 @@ public class MCROCFLMigration {
         return failed;
     }
 
-    /*
-    public void start() {
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
-        List<String> ids = instance.listIDs();
-    
-        for (String id : ids) {
-            LOGGER.info("Migrate {}", id);
-            migrateID(id);
-        }
-    } */
-
     public void start() {
         MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
         for (String baseId : instance.getObjectBaseIds()) {

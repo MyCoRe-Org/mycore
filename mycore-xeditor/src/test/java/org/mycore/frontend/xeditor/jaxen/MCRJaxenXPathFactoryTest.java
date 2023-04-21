@@ -35,7 +35,7 @@ import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRJaxenXPathFactoryTest extends MCRTestCase {
 

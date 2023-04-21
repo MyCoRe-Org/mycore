@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates values to be integer numbers.
  * Example: &lt;xed:validate type="integer" ... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRIntegerValidator extends MCRValidator {
 

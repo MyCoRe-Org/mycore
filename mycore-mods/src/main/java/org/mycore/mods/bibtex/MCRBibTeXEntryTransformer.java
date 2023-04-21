@@ -29,7 +29,7 @@ import bibtex.dom.BibtexEntry;
 /**
  * Transforms a single BibTeX entry to a JDOM mods:mods element.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRBibTeXEntryTransformer {
 

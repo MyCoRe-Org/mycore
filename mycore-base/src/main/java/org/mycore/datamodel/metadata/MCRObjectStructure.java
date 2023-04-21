@@ -214,9 +214,6 @@ public class MCRObjectStructure {
 
     /**
      * Removes a MCRMetaLinkID instance by it MCRObjectID.
-     * @param list
-     * @param href
-     * @return
      */
     private boolean removeMetaLink(List<? extends MCRMetaLinkID> list, MCRObjectID href) {
         final List<MCRMetaLink> toRemove = list.stream()

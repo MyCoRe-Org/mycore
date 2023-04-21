@@ -22,7 +22,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREditorSessionStoreUtils {
 

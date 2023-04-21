@@ -35,7 +35,7 @@ import org.mycore.common.xsl.MCRParameterCollector;
  * 
  * MCR.ContentTransformer.{ID}.Steps=ID2 ID3
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRTransformerPipe extends MCRParameterizedTransformer {
 

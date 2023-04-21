@@ -36,7 +36,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREditorSubmissionTest extends MCRTestCase {
 

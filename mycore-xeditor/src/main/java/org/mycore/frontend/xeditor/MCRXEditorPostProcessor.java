@@ -34,9 +34,6 @@ public interface MCRXEditorPostProcessor {
      * Do the post processing.
      * @param xml the document which has to be post processed
      * @return the post processed document
-     * @throws IOException
-     * @throws JDOMException
-     * @throws SAXException
      */
     Document process(Document xml) throws IOException, JDOMException, SAXException;
 

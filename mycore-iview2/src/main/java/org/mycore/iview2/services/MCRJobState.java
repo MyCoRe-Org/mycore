@@ -48,7 +48,7 @@ public enum MCRJobState {
 
     private static final Set<MCRJobState> COMPLETE_STATES = Set.of(MCRJobState.FINISHED);
 
-    private char status;
+    private final char status;
 
     public static Set<MCRJobState> notCompleteStates() {
         return NOT_COMPLETE_STATES;

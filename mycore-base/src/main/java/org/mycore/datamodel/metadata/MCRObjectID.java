@@ -48,7 +48,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  *
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 @JsonClassDescription("MyCoRe ObjectID in form {project}_{type}_{int32}, "
     + "where project is a namespace and type defines the datamodel")
@@ -301,7 +300,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
             return false;
         }
         try {
-            Integer numberPart = Integer.parseInt(idParts[2]);
+            int numberPart = Integer.parseInt(idParts[2]);
             if (numberPart < 0) {
                 return false;
             }

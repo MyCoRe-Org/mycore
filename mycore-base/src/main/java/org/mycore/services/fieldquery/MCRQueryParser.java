@@ -75,7 +75,6 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
      *            the condition operator
      * @param value
      *            the condition value
-     * @return
      */
     private MCRCondition<Void> buildConditions(String field, String oper, String value) {
         if (field.contains(",")) { // Multiple fields in one condition, combine with OR
@@ -115,7 +114,6 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
      *            the condition operator
      * @param value
      *            the condition value
-     * @return
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value) {
         if ("TODAY".equals(value)) {

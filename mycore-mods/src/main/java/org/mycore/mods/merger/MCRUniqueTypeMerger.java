@@ -25,7 +25,7 @@ import org.jdom2.Element;
  * So if they have the same name and the same type attribute value,
  * they are regarded to represent the same information.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRUniqueTypeMerger extends MCRMerger {
 

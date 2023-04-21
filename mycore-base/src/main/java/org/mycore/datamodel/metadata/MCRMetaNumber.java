@@ -62,7 +62,6 @@ import org.mycore.common.config.MCRConfiguration2;
  * </pre>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public final class MCRMetaNumber extends MCRMetaDefault {
 

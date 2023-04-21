@@ -36,7 +36,6 @@ public class MCRIIIFImageUtil {
 
     /**
      * Encodes image identidier so it can be used in an URI
-     * @param imageIdentifier
      * @see <a href="https://iiif.io/api/image/2.1/#uri-encoding-and-decoding">URI encoding of image identifier</a>
      */
     public static String encodeImageIdentifier(String imageIdentifier) {

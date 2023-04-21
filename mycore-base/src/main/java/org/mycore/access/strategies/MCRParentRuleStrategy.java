@@ -42,7 +42,6 @@ import org.xml.sax.SAXException;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  */
 public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
 

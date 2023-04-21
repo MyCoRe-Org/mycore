@@ -109,9 +109,6 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
      *  from {@link MCRPersistenceHelper#getMCRObject(Document)}
      * @throws IOException
      *  from {@link MCRPersistenceHelper#getMCRObject(Document)}
-     * @throws SAXParseException
-     * @throws MCRException
-     * @throws MCRAccessException 
      */
     private MCRObjectID createObject(Document doc)
         throws JDOMException, IOException, MCRException, SAXParseException, MCRAccessException {

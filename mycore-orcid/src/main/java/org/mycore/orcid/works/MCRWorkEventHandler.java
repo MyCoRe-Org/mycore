@@ -43,7 +43,7 @@ import org.mycore.user2.MCRUserManager;
  * and have authorized us to update their profile as trusted party,
  * and then creates/updates the publication in the works section of that profile.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWorkEventHandler extends MCREventHandlerBase {
 

@@ -105,7 +105,7 @@ import jakarta.activation.MimetypesFileTypeMap;
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author shermann
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  */
 public class MCRXMLFunctions {
     private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
@@ -225,10 +225,7 @@ public class MCRXMLFunctions {
         if (fieldName == null || fieldName.trim().length() == 0) {
             return "";
         }
-        boolean useLastValue = false;
-        if ("bis".equals(fieldName)) {
-            useLastValue = true;
-        }
+        boolean useLastValue = "bis".equals(fieldName);
         return MCRCalendar.getISODateToFormattedString(date, useLastValue, calendarName);
     }
 
@@ -375,7 +372,7 @@ public class MCRXMLFunctions {
      */
     public static boolean isWorldReadableComplete(String objId) {
         LOGGER.info("World completely readable: {}", objId);
-        if (objId == null || !MCRObjectID.isValid(objId)) {
+        if (!MCRObjectID.isValid(objId)) {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
@@ -407,7 +404,7 @@ public class MCRXMLFunctions {
      * @param objId MCRObjectID as String
      */
     public static boolean isWorldReadable(String objId) {
-        if (objId == null || !MCRObjectID.isValid(objId)) {
+        if (!MCRObjectID.isValid(objId)) {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
@@ -642,11 +639,6 @@ public class MCRXMLFunctions {
         return !categID.isRootID() && MCRCategoryDAOFactory.getInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
-    /**
-     * @param classificationId
-     * @param categoryId
-     * @return
-     */
     public static String getDisplayName(String classificationId, String categoryId) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
@@ -665,11 +657,6 @@ public class MCRXMLFunctions {
         }
     }
 
-    /**
-     * @param classificationId
-     * @param categoryId
-     * @return
-     */
     public static boolean isCategoryID(String classificationId, String categoryId) {
         MCRCategory category = null;
         try {
@@ -888,7 +875,6 @@ public class MCRXMLFunctions {
 
     /**
      * This only works with text nodes
-     * @param nodes
      * @return the order of nodes maybe changes
      */
     public static NodeList distinctValues(NodeList nodes) {

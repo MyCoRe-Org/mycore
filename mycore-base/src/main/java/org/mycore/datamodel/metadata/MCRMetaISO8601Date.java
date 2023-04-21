@@ -41,7 +41,6 @@ import com.google.gson.JsonObject;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  * @since 1.3
  */
 public final class MCRMetaISO8601Date extends MCRMetaDefault {

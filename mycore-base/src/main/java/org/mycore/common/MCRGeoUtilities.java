@@ -99,10 +99,6 @@ public class MCRGeoUtilities {
                 strings[0] });
     }
 
-    /**
-     * @param picaValue
-     * @return
-     */
     private static boolean isValid(String picaValue) {
         String regex = "[EWSN]{1}\\s[0-9]{3}\\s[0-9]{2}(\\s[0-9]*)*";
         return picaValue.matches(regex);

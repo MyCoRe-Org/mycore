@@ -39,7 +39,6 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * from mycore.properties.access
  * 
  * @author Arne Seifert
- * @version $Revision$ $Date$
  */
 public abstract class MCRAccessStore {
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);

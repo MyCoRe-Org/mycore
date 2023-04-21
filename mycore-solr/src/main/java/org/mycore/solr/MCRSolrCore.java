@@ -120,10 +120,6 @@ public class MCRSolrCore {
         MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
 
             @Override
-            public void prepareClose() {
-            }
-
-            @Override
             public int getPriority() {
                 return Integer.MIN_VALUE + 5;
             }

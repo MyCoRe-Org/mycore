@@ -48,7 +48,7 @@ public class MCREvent {
         USER("MCRUser"),
         CUSTOM("MCREvent");
 
-        private String className;
+        private final String className;
 
         ObjectType(String className) {
             this.className = className;

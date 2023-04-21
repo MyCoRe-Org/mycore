@@ -94,7 +94,6 @@ public class MCRRestAPIObjects {
      *     * sortorder = asc | desc
      *
      * @return a Jersey response object
-     * @throws MCRRestAPIException    
      */
 
     @GET
@@ -122,7 +121,6 @@ public class MCRRestAPIObjects {
      *     * sortorder = asc | desc
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
 
     @GET
@@ -149,7 +147,6 @@ public class MCRRestAPIObjects {
      * derivate details will be integrated into the output.
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     @GET
     @Produces(MediaType.TEXT_XML)
@@ -174,7 +171,6 @@ public class MCRRestAPIObjects {
      * allowed values are "derivatedetails" to integrate derivate details into the output.
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     @GET
     @Produces(MediaType.TEXT_XML)
@@ -206,7 +202,6 @@ public class MCRRestAPIObjects {
      * @param depth - the level of subdirectories that should be returned
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
 
     @GET
@@ -231,7 +226,6 @@ public class MCRRestAPIObjects {
      * "mcr" is the default prefix for MyCoRe IDs.
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @GET
@@ -268,7 +262,6 @@ public class MCRRestAPIObjects {
      * @param fileDetails - file metadata from HTTP Post
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @POST
@@ -294,7 +287,6 @@ public class MCRRestAPIObjects {
      * @param overwrite - if true, return an existing derivate (with same label)
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
 
@@ -328,7 +320,6 @@ public class MCRRestAPIObjects {
      * @param md5 - the md5 sum of the uploaded file
      * @param size - the size of the uploaded file
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     @POST
     @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
@@ -358,7 +349,6 @@ public class MCRRestAPIObjects {
      * @param mcrDerID - a MyCoRe Derivate ID
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @DELETE
@@ -381,7 +371,6 @@ public class MCRRestAPIObjects {
      * @param mcrDerID - a MyCoRe Derivate ID
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @DELETE

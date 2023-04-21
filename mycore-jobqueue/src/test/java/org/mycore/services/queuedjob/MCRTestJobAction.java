@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRTestJobAction extends MCRJobAction {

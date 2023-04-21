@@ -114,7 +114,6 @@ import jakarta.persistence.TypedQuery;
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Robert Stephan
- * @version $Revision$ $Date$
  */
 @MCRCommandGroup(name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
@@ -793,8 +792,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param nid
      *            the MCRObjectID
      * @return true if the store was okay (see description), else return false
-     * @throws IOException
-     * @throws MCRException
      */
     private static boolean exportMCRObject(File dir, String extension,
         FailableBiConsumer<MCRContent, OutputStream, Exception> trans,

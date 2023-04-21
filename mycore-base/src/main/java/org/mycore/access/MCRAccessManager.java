@@ -41,7 +41,6 @@ import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 /**
  * @author Thomas Scheffler
- * @version $Revision$ $Date$
  */
 public class MCRAccessManager {
 

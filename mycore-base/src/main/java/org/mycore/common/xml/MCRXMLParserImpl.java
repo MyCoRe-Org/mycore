@@ -41,7 +41,7 @@ import org.xml.sax.ext.EntityResolver2;
 /**
  * Parses XML content using specified {@link XMLReaderJDOMFactory}.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserImpl implements MCRXMLParser {

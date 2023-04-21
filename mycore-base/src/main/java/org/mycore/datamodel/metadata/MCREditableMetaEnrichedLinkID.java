@@ -46,7 +46,7 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
 
     public void setTitles(List<MCRMetaLangText> titles) {
         elementsWithNameFromContentList(TITLE_ELEMENT_NAME).forEach(getContentList()::remove);
-        titles.stream().map(title -> title.createXML()).forEach(getContentList()::add);
+        titles.stream().map(MCRMetaLangText::createXML).forEach(getContentList()::add);
     }
 
     public void setOrCreateElement(String elementName, String textContent) {

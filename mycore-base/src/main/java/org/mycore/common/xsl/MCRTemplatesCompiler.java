@@ -39,7 +39,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * Compiles XSL sources, reports compile errors and returns transformer
  * instances for compiled templates.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRTemplatesCompiler {
 

@@ -22,7 +22,7 @@ public enum MCRMetadataHistoryEventType {
 
     Create('c'), Delete('d');
 
-    private char abbr;
+    private final char abbr;
 
     MCRMetadataHistoryEventType(char abbr) {
         this.abbr = abbr;

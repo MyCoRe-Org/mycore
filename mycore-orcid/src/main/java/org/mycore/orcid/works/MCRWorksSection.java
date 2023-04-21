@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 /**
  * Represents the "works" section of an ORCID profile with grouped works
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWorksSection {
 

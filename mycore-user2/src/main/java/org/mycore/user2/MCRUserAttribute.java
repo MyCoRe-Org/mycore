@@ -61,7 +61,7 @@ public class MCRUserAttribute implements Comparable<MCRUserAttribute> {
         this.name = Objects.requireNonNull(name);
     }
 
-    @Column(name = "value", length = 255, nullable = false)
+    @Column(name = "value", nullable = false)
     @XmlAttribute
     public String getValue() {
         return value;

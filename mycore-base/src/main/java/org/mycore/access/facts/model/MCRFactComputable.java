@@ -40,7 +40,6 @@ public interface MCRFactComputable<F extends MCRFact<?>> extends MCRCondition {
      * if applicable
      * 
      * @param facts - the facts holder containing already retrieved facts
-     * @return
      */
     Optional<F> computeFact(MCRFactsHolder facts);
 }

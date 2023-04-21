@@ -24,7 +24,7 @@ import org.jdom2.Element;
 /**
  * Parses XML representations of baskets and their entries.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasketXMLParser {
 

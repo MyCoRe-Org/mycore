@@ -26,7 +26,7 @@ import bibtex.dom.BibtexString;
 /**
  * Generic implementation that transforms a single BibTeX field to a given MODS structure expressed as XPath .
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRField2XPathTransformer extends MCRFieldTransformer {
 

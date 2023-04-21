@@ -61,11 +61,6 @@ public class MCRSAXContent extends MCRXMLContent {
     }
 
     @Override
-    public MCRContent ensureXML() {
-        return this;
-    }
-
-    @Override
     public Document asXML() throws IOException, SAXException {
         SAXHandler jdomContentHandler = new SAXHandler();
         xmlReader.setContentHandler(jdomContentHandler);

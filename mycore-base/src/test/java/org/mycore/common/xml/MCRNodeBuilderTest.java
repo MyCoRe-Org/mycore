@@ -35,7 +35,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRNodeBuilderTest extends MCRTestCase {
 

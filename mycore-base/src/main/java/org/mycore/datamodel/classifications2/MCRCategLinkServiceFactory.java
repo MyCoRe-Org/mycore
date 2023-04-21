@@ -24,7 +24,6 @@ import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
 /**
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class MCRCategLinkServiceFactory {

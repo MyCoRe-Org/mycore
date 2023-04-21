@@ -82,7 +82,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 "You dont have the right to read from the derivate!");
         }
 
-        if (requestFilePath != null && isValidFilePath(requestFilePath)) {
+        if (isValidFilePath(requestFilePath)) {
             final MCRPath path = MCRPath.getPath(derivateID, requestFilePath);
             checkFile(path);
 

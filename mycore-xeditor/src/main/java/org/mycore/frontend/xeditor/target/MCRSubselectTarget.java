@@ -31,7 +31,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.xml.bind.DatatypeConverter;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRSubselectTarget implements MCREditorTarget {
 

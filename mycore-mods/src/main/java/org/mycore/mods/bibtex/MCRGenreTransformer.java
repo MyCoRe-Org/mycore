@@ -31,7 +31,7 @@ import bibtex.dom.BibtexEntry;
 /**
  * Transforms the BibTeX entry type to mods:genre element(s).
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRGenreTransformer {
 

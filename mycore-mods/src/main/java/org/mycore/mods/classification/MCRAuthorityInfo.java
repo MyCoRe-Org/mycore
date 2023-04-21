@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  * be mapped to a MCRCategory in MyCoRe.
  * 
  * @see <a href="http://www.loc.gov/standards/mods/userguide/classification.html">MODS classification guidelines</a>
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 abstract class MCRAuthorityInfo {
 

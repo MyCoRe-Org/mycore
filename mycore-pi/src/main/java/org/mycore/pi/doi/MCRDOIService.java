@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -406,13 +405,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         return parseIdentifier(doiString)
             .orElseThrow(
                 () -> new MCRPersistentIdentifierException("The String " + doiString + " can not be parsed to a DOI!"));
-    }
-
-    @Override
-    protected Optional<String> getJobInformation(Map<String, String> contextParameters) {
-        String pattern = "{0} DOI: {1} for object: {2}";
-        return Optional.of(String.format(Locale.ROOT, pattern, getAction(contextParameters).toString(),
-            contextParameters.get(CONTEXT_DOI), contextParameters.get(CONTEXT_OBJ)));
     }
 
 }

@@ -175,11 +175,7 @@ public class MCRURIResolverFilter implements Filter {
                 return output.toString(getCharacterEncoding());
             } catch (UnsupportedEncodingException e) {
                 LOGGER.error("Fall back to DEFAULT encoding.");
-                try {
-                    return output.toString(Charset.defaultCharset().name());
-                } catch (UnsupportedEncodingException neverThrown) {
-                    throw new RuntimeException(neverThrown);
-                }
+                return output.toString(Charset.defaultCharset());
             }
         }
 

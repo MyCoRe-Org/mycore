@@ -29,7 +29,7 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
 import jakarta.servlet.ServletContext;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
 

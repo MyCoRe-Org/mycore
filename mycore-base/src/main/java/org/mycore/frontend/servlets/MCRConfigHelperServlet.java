@@ -102,7 +102,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
         JsonObject obj = new JsonObject();
         propertiesMap.forEach(obj::addProperty);
 
-        try (StringWriter sw = new StringWriter();) {
+        try (StringWriter sw = new StringWriter()) {
             new Gson().toJson(obj, sw);
             return sw.toString();
         }

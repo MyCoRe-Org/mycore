@@ -40,7 +40,6 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public final class MCRObject extends MCRBase {
 

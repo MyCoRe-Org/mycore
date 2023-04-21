@@ -252,7 +252,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     /**
      * Validates if an object can get an Identifier assigned from this service! <b>Better call super when overwrite!</b>
      *
-     * @param obj
      * @throws MCRPersistentIdentifierException
      * see {@link org.mycore.pi.exceptions}
      * @throws MCRAccessException
@@ -399,7 +398,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *
      * @param identifier the Identifier
      * @param obj        the deleted object
-     * @param additional
      * @throws MCRPersistentIdentifierException
      * to abort deletion of the object or if something went wrong, (e.g. {@link MCRDOIService} throws if not a superuser
      * tries to delete the object)
@@ -413,7 +411,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *
      * @param identifier the Identifier
      * @param obj        the deleted object
-     * @param additional
      * @throws MCRPersistentIdentifierException to abort update of the object or if something went wrong.
      */
     protected abstract void update(T identifier, MCRBase obj, String additional)

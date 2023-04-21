@@ -121,7 +121,6 @@ public interface MCRXMLMetadataManagerAdapter {
      *            the id of the object to be retrieved
      * @return a {@link MCRContent} representing the {@link MCRObject} or
      *         <code>null</code> if there is no such object
-     * @throws IOException
      */
     MCRContent retrieveContent(MCRObjectID mcrid) throws IOException;
 
@@ -136,7 +135,6 @@ public interface MCRXMLMetadataManagerAdapter {
      * @return a {@link MCRContent} representing the {@link MCRObject} of the
      *         given revision or <code>null</code> if there is no such object
      *         with the given revision
-     * @throws IOException
      */
     MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException;
 
@@ -221,7 +219,6 @@ public interface MCRXMLMetadataManagerAdapter {
      * Returns an enhanced list of object ids and their last modified date
      *
      * @param ids MCRObject ids
-     * @throws IOException
      */
     List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException;
 
@@ -235,13 +232,5 @@ public interface MCRXMLMetadataManagerAdapter {
      */
     long getLastModified(MCRObjectID id) throws IOException;
 
-    /**
-     *
-     *
-     * @param id
-     * @param expire
-     * @param unit
-     * @return
-     */
     MCRCache.ModifiedHandle getLastModifiedHandle(MCRObjectID id, long expire, TimeUnit unit);
 }

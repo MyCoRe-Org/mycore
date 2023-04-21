@@ -229,7 +229,7 @@ public abstract class MCRSolrClassificationUtil {
             MCRCategory category = dao.getCategory(categoryId, 0);
             categoryList.add(category);
         }
-        reindex(categoryList.toArray(new MCRCategory[categoryList.size()]));
+        reindex(categoryList.toArray(MCRCategory[]::new));
     }
 
     /**

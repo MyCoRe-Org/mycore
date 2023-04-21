@@ -89,10 +89,10 @@ public class MCRIIIFRegionParser {
 
     private MCRIIIFImageSourceRegion parseAbsoluteImageRegion() {
         List<Double> doubles = parseNumbers();
-        Double x1 = doubles.get(0);
-        Double y1 = doubles.get(1);
-        Double x2 = doubles.get(2) + x1;
-        Double y2 = doubles.get(3) + y1;
+        double x1 = doubles.get(0);
+        double y1 = doubles.get(1);
+        double x2 = doubles.get(2) + x1;
+        double y2 = doubles.get(3) + y1;
         return parseImageRegion((int) Math.round(x1), (int) Math.round(y1), (int) Math.round(x2), (int) Math.round(y2));
     }
 

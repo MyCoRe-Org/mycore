@@ -188,9 +188,6 @@ public class MCRMetsSave {
      *
      * @param derivateID the derivate identifier
      * @return the mets.xml as JDOM document
-     * @throws JDOMException
-     * @throws IOException
-     * @throws SAXException
      */
     private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
         MCRPath metsFile = getMetsFile(derivateID);
@@ -417,7 +414,6 @@ public class MCRMetsSave {
      * @param mets the mets file to search
      * @param path the path to the alto file (e.g. "alto/alto_file.xml" when searching in DEFAULT_FILE_GROUP_USE or
      *             "image_file.jpg" when searchin in ALTO_FILE_GROUP_USE)
-     * @param searchFileGroup
      * @return the id of the matching file or null if there is no matching file
      */
     private static String searchFileInGroup(Document mets, String path, String searchFileGroup) {
@@ -560,11 +556,6 @@ public class MCRMetsSave {
         }
     }
 
-    /**
-     * @param mets
-     * @param file
-     * @return
-     */
     private static Document updateOnFileDelete(Document mets, MCRPath file) {
         Mets modifiedMets;
         try {
@@ -658,11 +649,6 @@ public class MCRMetsSave {
         return modifiedMets.asDocument();
     }
 
-    /**
-     *
-     * @param logDiv
-     * @param mets
-     */
     private static void handleParents(LogicalDiv logDiv, Mets mets) {
         LogicalDiv parent = logDiv.getParent();
 

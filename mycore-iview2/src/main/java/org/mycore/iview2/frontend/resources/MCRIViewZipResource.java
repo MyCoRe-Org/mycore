@@ -111,7 +111,7 @@ public class MCRIViewZipResource {
                                 return super.visitFile(iviewFile, attrs);
                             }
                             MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
-                            Integer zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps
+                            int zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps
                                 .getZoomlevel() : zoom;
                             BufferedImage image = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
                             ZipArchiveEntry entry = new ZipArchiveEntry(file.getFileName() + ".jpg");

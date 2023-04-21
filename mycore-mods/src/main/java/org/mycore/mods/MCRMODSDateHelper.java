@@ -34,7 +34,7 @@ import org.mycore.common.MCRException;
  * Helper class to parse and build MODS date elements, see
  * http://www.loc.gov/standards/mods/userguide/generalapp.html#encoding
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMODSDateHelper {
 

@@ -25,7 +25,7 @@ import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRFunctionTranslate implements org.jaxen.Function {
 

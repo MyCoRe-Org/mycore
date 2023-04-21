@@ -27,7 +27,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 import jakarta.servlet.ServletContext;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * 
  * Implements the "cancel" target to redirect when cancel button is clicked.
  * The target URL is set by <code>&lt;xed:cancel url="..." /&gt;</code> 

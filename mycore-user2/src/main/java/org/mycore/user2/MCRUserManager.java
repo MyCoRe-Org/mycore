@@ -380,11 +380,11 @@ public class MCRUserManager {
             if (1 == searchPredicates.size()) {
                 predicates.add(searchPredicates.get(0));
             } else {
-                predicates.add(cb.or(searchPredicates.toArray(new Predicate[searchPredicates.size()])));
+                predicates.add(cb.or(searchPredicates.toArray(Predicate[]::new)));
             }
         }
 
-        return predicates.toArray(new Predicate[predicates.size()]);
+        return predicates.toArray(Predicate[]::new);
     }
 
     private static void addEqualsPredicate(CriteriaBuilder cb, Root<MCRUser> root,

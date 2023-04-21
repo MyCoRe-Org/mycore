@@ -42,7 +42,7 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXEditorTransformerTest extends MCRTestCase {
 

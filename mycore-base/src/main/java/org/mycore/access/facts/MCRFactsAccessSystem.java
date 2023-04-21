@@ -174,7 +174,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                         facts.add(new MCRObjectIDFact("objid", checkID, mcrId));
                     }
                 } else {
-                    LOGGER.debug("There is no object or derivate with id " + mcrId.toString() + " in metadata store");
+                    LOGGER.debug("There is no object or derivate with id " + mcrId + " in metadata store");
                 }
             } else if (checkID.startsWith("webpage")) {
                 target = "webpage";

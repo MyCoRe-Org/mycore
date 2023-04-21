@@ -98,8 +98,6 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
      *  MyCoRe derivate as XML
      * @return
      *  MCRObjectID of the MyCoRe object
-     * @throws SAXParseException
-     * @throws MCRAccessException 
      */
     private MCRObjectID updateDerivateXML(Document editorSubmission)
         throws SAXParseException, IOException, MCRAccessException {
@@ -126,8 +124,6 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
      * If the "objectid" parameter is given, upload form is presented.
      * If not than the user is redirected to the title change form.
      *
-     * @throws IOException
-     * @throws ServletException 
      */
     private void redirectToUpdateDerivate(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {

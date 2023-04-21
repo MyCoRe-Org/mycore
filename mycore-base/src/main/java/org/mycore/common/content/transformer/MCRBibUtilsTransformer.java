@@ -30,15 +30,14 @@ import org.mycore.frontend.cli.MCRExternalProcess;
 
 /**
  * Transforms MCRContent by invoking an external BibUtils command.
- * See http://www.scripps.edu/~cdputnam/software/bibutils/
  * The BibUtils commands provide functionality to convert between
  * RIS, Endnote, BibTeX, ISI web of science, Word 2007 bibliography format
  * and MODS. For each transformer instance, the command must be specified,
  * for example
- * 
+ *
  * MCR.ContentTransformer.{ID}.Command=cmd.exe /c C:\\Java\\bibutils_4.12\\xml2bib.exe -b -w 
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBibUtilsTransformer extends MCRContentTransformer {
 

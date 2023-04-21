@@ -149,7 +149,7 @@ public class MCRJob implements Cloneable {
     /**
      * Returns the adding date of job.
      */
-    @Column(name = "added", nullable = true)
+    @Column(name = "added")
     public Date getAdded() {
         return added;
     }
@@ -165,7 +165,7 @@ public class MCRJob implements Cloneable {
     /**
      * Returns the starting date of execution.
      */
-    @Column(name = "start", nullable = true)
+    @Column(name = "start")
     public Date getStart() {
         return start;
     }
@@ -182,7 +182,7 @@ public class MCRJob implements Cloneable {
     /**
      * Returns the finishing date of execution.
      */
-    @Column(name = "finished", nullable = true)
+    @Column(name = "finished")
     public Date getFinished() {
         return finished;
     }
@@ -237,7 +237,7 @@ public class MCRJob implements Cloneable {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "MCRJobParameter", joinColumns = @JoinColumn(name = "jobID"))
     @MapKeyColumn(name = "paramKey", length = 128)
-    @Column(name = "paramValue", length = 255)
+    @Column(name = "paramValue")
     public Map<String, String> getParameters() {
         return parameters;
     }

@@ -29,7 +29,6 @@ import jakarta.persistence.Embeddable;
  * 
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 @Embeddable
 public class MCRLINKHREFPK implements Serializable {

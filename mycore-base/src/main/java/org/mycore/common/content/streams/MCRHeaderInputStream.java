@@ -28,7 +28,7 @@ import org.mycore.common.MCRException;
  * This may be useful for content type detection purposes.
  * Immediately after stream construction, getHeader() can be called.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRHeaderInputStream extends MCRBlockingInputStream {
 

@@ -32,7 +32,7 @@ import org.mycore.common.MCRConstants;
 /**
  * Compares and merges mods:name elements
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRNameMerger extends MCRMerger {
 

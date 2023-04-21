@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates text values to be "after" (in java.lang.String#compare order) a given minimum. 
  * Example: &lt;xed:validate type="string" min="AAA" ... /&gt;
  *  
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMinStringValidator extends MCRValidator {
 

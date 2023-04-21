@@ -53,7 +53,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @see MCRExportCollection
  * @see MCRContentTransformer
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRExportServlet extends MCRServlet {
 

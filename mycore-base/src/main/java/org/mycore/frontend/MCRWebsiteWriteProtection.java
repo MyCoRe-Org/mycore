@@ -132,9 +132,6 @@ public final class MCRWebsiteWriteProtection {
         updateCache(configXML);
     }
 
-    /**
-     * @param configXML
-     */
     private static void updateCache(Element configXML) {
         configCache = configXML;
         cacheInitTime = System.currentTimeMillis();

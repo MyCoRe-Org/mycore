@@ -129,11 +129,6 @@ public class MCRJMXBridge implements Closeable {
         SINGLETON.clear();
     }
 
-    @Override
-    public int getPriority() {
-        return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
-    }
-
     public static ObjectInstance getMBean(String type, String component)
         throws MalformedObjectNameException, InstanceNotFoundException {
         ObjectName name = getObjectName(type, component);

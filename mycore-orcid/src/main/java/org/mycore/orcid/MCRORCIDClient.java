@@ -29,7 +29,7 @@ import jakarta.ws.rs.client.WebTarget;
  * By setting MCR.ORCID.BaseURL, application can choose to work
  * against the production registry or the sandbox of orcid.org.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRORCIDClient {
 

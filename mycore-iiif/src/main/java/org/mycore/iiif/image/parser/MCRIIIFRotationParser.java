@@ -32,7 +32,7 @@ public class MCRIIIFRotationParser {
         boolean mirror = this.rotation.startsWith("!");
 
         String rotationNumberString = mirror ? this.rotation.substring(1) : this.rotation;
-        Double rotationNumber;
+        double rotationNumber;
         try {
             rotationNumber = Double.parseDouble(rotationNumberString);
         } catch (NumberFormatException e) {

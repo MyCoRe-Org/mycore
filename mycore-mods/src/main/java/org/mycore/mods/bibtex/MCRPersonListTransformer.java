@@ -31,7 +31,7 @@ import bibtex.dom.BibtexPersonList;
 /**
  * Transforms a BibTeX field containing author/editor names to multiple JDOM mods:name elements.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRPersonListTransformer extends MCRFieldTransformer {
 

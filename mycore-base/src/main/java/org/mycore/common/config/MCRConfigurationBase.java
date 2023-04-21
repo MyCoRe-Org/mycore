@@ -220,7 +220,7 @@ public final class MCRConfigurationBase {
         if (Objects.requireNonNull(name, "MyCoRe property name must not be null.").trim().isEmpty()) {
             throw new MCRConfigurationException("MyCoRe property name must not be empty.");
         }
-        if (name.trim() != name) {
+        if (!name.trim().equals(name)) {
             throw new MCRConfigurationException(
                 "MyCoRe property name must not contain trailing or leading whitespaces: '" + name + "'");
         }

@@ -43,7 +43,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * createTypedContent() and createTextSearch() are abstract methods.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY,

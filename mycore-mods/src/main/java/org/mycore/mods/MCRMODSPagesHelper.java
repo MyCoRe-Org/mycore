@@ -40,7 +40,7 @@ import org.mycore.common.MCRConstants;
  * Third, incomplete end page numbers are completed, e.g. S. 3845 - 53 will result in 
  * mods:end=3853.
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  **/
 public class MCRMODSPagesHelper {
 
@@ -70,7 +70,7 @@ public class MCRMODSPagesHelper {
 /**
  * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.  
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  **/
 class HyphenNormalizer {
 
@@ -93,7 +93,7 @@ class HyphenNormalizer {
  * "3845 - 53" meaning end page is 3853. This class completes the value of mods:end if start and end page
  * are both numbers.    
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  **/
 class EndPageCompleter {
 
@@ -116,7 +116,7 @@ class EndPageCompleter {
  * pages information as some textual input. For example, the input "pp. 3-4" will generate mods:start and
  * mods:end elements. 
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  **/
 class ExtentPagesBuilder {
 
@@ -217,7 +217,7 @@ class ExtentPagesBuilder {
  * between matching groups in pattern and the corresponding MODS elements, e.g. 
  * mods:start and mods:end.
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  **/
 class PagesPattern {
 
@@ -260,7 +260,7 @@ class PagesPattern {
  * Represents a matcher for a given input text containing pages information,
  * associated with a PagesPattern that possibly matches the text.
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  **/
 class PagesMatcher {
 

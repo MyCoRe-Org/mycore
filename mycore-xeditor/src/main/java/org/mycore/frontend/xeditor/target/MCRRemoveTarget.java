@@ -25,7 +25,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 import jakarta.servlet.ServletContext;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRRemoveTarget extends MCRRepeaterControl {
 

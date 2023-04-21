@@ -30,7 +30,7 @@ import org.mycore.common.MCRException;
 /**
  * Helper for date validators to convert string input into a date value.
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  */
 public class MCRDateConverter {
 

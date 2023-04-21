@@ -33,7 +33,7 @@ import com.google.common.cache.LoadingCache;
 
 /**
  * 
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRCreatorCache {

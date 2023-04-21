@@ -51,7 +51,7 @@ import org.w3c.dom.NodeList;
 /**
  * Represents the data URL scheme (<a href="https://tools.ietf.org/html/rfc2397">RFC2397</a>).
  *
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRDataURL implements Serializable {
@@ -91,8 +91,6 @@ public class MCRDataURL implements Serializable {
      * @param mimeType the mime-type
      * @param charset the charset
      * @return a string with "data" URL
-     * @throws TransformerException
-     * @throws MalformedURLException
      */
     public static String build(final Document document, final String encoding, final String mimeType,
         final String charset) throws TransformerException, MalformedURLException {
@@ -108,8 +106,6 @@ public class MCRDataURL implements Serializable {
      * @param mimeType the mime-type
      * @param charset the charset
      * @return a string with "data" URL
-     * @throws TransformerException
-     * @throws MalformedURLException
      */
     public static String build(final NodeList nodeList, final String encoding, final String mimeType,
         final String charset) throws TransformerException, MalformedURLException {
@@ -171,7 +167,6 @@ public class MCRDataURL implements Serializable {
      * @param mimeType the mime-type
      * @param charset the charset
      * @return a string with "data" URL
-     * @throws MalformedURLException
      */
     public static String build(final String str, final String encoding, final String mimeType, final String charset)
         throws MalformedURLException {
@@ -199,8 +194,6 @@ public class MCRDataURL implements Serializable {
      * @param document the document
      * @param mimeType the mime-type
      * @return a string with "data" URL
-     * @throws TransformerException
-     * @throws MalformedURLException
      */
     public static String build(final Document document, final String mimeType)
         throws TransformerException, MalformedURLException {
@@ -213,8 +206,6 @@ public class MCRDataURL implements Serializable {
      * @param nodeList the node list
      * @param mimeType the mime-type
      * @return a string with "data" URL
-     * @throws TransformerException
-     * @throws MalformedURLException
      */
     public static String build(final NodeList nodeList, final String mimeType)
         throws TransformerException, MalformedURLException {
@@ -227,7 +218,6 @@ public class MCRDataURL implements Serializable {
      * @param str the string
      * @param mimeType the mime-type
      * @return a string with "data" URL
-     * @throws MalformedURLException
      */
     public static String build(final String str, final String mimeType)
         throws MalformedURLException {
@@ -240,8 +230,6 @@ public class MCRDataURL implements Serializable {
      *
      * @param document the document
      * @return a string with "data" URL
-     * @throws TransformerException
-     * @throws MalformedURLException
      */
     public static String build(final Document document) throws TransformerException, MalformedURLException {
         return build(document, null, "text/xml", "UTF-8");
@@ -253,8 +241,6 @@ public class MCRDataURL implements Serializable {
      *
      * @param nodeList the node list
      * @return a string with "data" URL
-     * @throws TransformerException
-     * @throws MalformedURLException
      */
     public static String build(final NodeList nodeList) throws TransformerException, MalformedURLException {
         return build(nodeList, null, "text/xml", "UTF-8");
@@ -266,7 +252,6 @@ public class MCRDataURL implements Serializable {
      *
      * @param str the node list
      * @return a string with "data" URL
-     * @throws MalformedURLException
      */
     public static String build(final String str) throws MalformedURLException {
         return build(str, null, "text/palin", "UTF-8");
@@ -277,7 +262,6 @@ public class MCRDataURL implements Serializable {
      *
      * @param dataURL the data url string
      * @return a {@link MCRDataURL} object
-     * @throws MalformedURLException
      */
     public static MCRDataURL parse(final String dataURL) throws MalformedURLException {
         final String url = dataURL.trim();
@@ -339,7 +323,6 @@ public class MCRDataURL implements Serializable {
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param parameters a list of paramters of data url
-     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
         final Map<String, String> parameters) throws MalformedURLException {
@@ -375,7 +358,6 @@ public class MCRDataURL implements Serializable {
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param charset the charset of data url
-     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
         final Charset charset) throws MalformedURLException {
@@ -398,7 +380,6 @@ public class MCRDataURL implements Serializable {
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param charset the charset of data url
-     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType, final String charset)
         throws MalformedURLException {
@@ -411,7 +392,6 @@ public class MCRDataURL implements Serializable {
      * @param data the data
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
-     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType)
         throws MalformedURLException {
@@ -423,7 +403,6 @@ public class MCRDataURL implements Serializable {
      *
      * @param data the data of data url
      * @param encoding the encoding of data url
-     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding) throws MalformedURLException {
         this(data, encoding, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
@@ -433,7 +412,6 @@ public class MCRDataURL implements Serializable {
      * Constructs a new {@link MCRDataURL}.
      *
      * @param data the data of data url
-     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data) throws MalformedURLException {
         this(data, MCRDataURLEncoding.URL, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
@@ -478,7 +456,6 @@ public class MCRDataURL implements Serializable {
      * Returns a {@link String} of a {@link MCRDataURL} object .
      *
      * @return the data url as string
-     * @throws RuntimeException
      */
     @Override
     public String toString() {
@@ -579,10 +556,10 @@ public class MCRDataURL implements Serializable {
     }
 
     private static String encode(final String str, final Charset charset) throws UnsupportedEncodingException {
-        return URLEncoder.encode(str, charset.name()).replace("+", "%20");
+        return URLEncoder.encode(str, charset).replace("+", "%20");
     }
 
     private static String decode(final String str, final Charset charset) throws UnsupportedEncodingException {
-        return URLDecoder.decode(str.replace("%20", "+"), charset.name());
+        return URLDecoder.decode(str.replace("%20", "+"), charset);
     }
 }

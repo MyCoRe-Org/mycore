@@ -38,7 +38,6 @@ public class MCRFunctions {
     /**
      * converts a Glob pattern into a regex pattern.
      * @param globPattern a pattern like <code>"/foo/*{@literal}/bar/*.txt"</code>
-     * @return 
      * @see FileSystem#getPathMatcher(String) "glob" style
      */
     public static String convertGlobToRegex(final String globPattern) {

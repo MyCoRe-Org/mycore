@@ -40,7 +40,7 @@ import org.jdom2.Element;
  * 
  * @see MCRDataSource
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRDataSourceCall implements Callable<Boolean> {
 
@@ -93,7 +93,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
     }
 
     private boolean isFinished() {
-        return ds.shouldStopOnFirstResult() ? wasSuccessful() : false;
+        return ds.shouldStopOnFirstResult() && wasSuccessful();
     }
 
     List<Element> getResults() {

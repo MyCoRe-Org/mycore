@@ -79,7 +79,6 @@ public class MCRObjectQuery {
     /**
      * modifies this query to only return object ids after lastId
      * should not be used together with the {@link #sort(SortBy, SortOrder)} method
-     * @param lastId
      * @return this
      */
     public MCRObjectQuery afterId(MCRObjectID lastId) {

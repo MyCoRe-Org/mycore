@@ -164,10 +164,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
     /**
      * Returns the mets document wrapped in a {@link MCRContent} object.
-     * 
-     * @param job
-     * @param useExistingMets
-     * @return
+     *
      */
     private static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) {
 

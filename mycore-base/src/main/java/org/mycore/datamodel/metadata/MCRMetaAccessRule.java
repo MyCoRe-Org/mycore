@@ -29,7 +29,6 @@ import org.mycore.common.MCRException;
  * which hold an ACL condition for a defined permission.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRMetaAccessRule extends MCRMetaDefault {
     // MCRMetaAccessRule data

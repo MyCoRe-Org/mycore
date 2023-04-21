@@ -75,7 +75,6 @@ public class MCRPDFTools implements AutoCloseable {
      *                      height) will be returned
      * @return a BufferedImage as thumbnail
      *
-     * @throws IOException
      */
     public static BufferedImage getThumbnail(int thumbnailSize, Path pdfFile, boolean centered) throws IOException {
         InputStream fileIS = Files.newInputStream(pdfFile);
@@ -135,9 +134,6 @@ public class MCRPDFTools implements AutoCloseable {
     /**
      *
      * @param pdf - the pdf document
-     * @return
-     * @throws IOException
-     *
      * @see org.mycore.media.services.MCRPdfThumbnailGenerator
      */
     private static PDPage resolveOpenActionPage(PDDocument pdf) throws IOException {

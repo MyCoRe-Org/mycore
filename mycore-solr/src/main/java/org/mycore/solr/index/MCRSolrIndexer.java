@@ -528,7 +528,7 @@ public class MCRSolrIndexer {
         }
         if (!toRemove.isEmpty()) {
             LOGGER.info("remove {} zombie objects from solr", toRemove.size());
-            deleteById(client, toRemove.toArray(new String[toRemove.size()]));
+            deleteById(client, toRemove.toArray(String[]::new));
         }
         deleteOrphanedNestedDocuments(client);
         // documents to add

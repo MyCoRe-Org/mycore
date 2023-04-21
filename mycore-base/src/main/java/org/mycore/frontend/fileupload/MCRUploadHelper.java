@@ -102,8 +102,6 @@ public abstract class MCRUploadHelper {
 
     /**
      * see {@link #checkPathName(String, boolean)} checkFilePattern=true
-     * @param path
-     * @throws MCRException
      */
     public static void checkPathName(String path) throws MCRException {
         checkPathName(path, true);

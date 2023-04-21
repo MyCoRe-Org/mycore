@@ -143,7 +143,7 @@ public class MCRRoleManager {
      */
     public static Collection<MCRRole> getRoles(Collection<String> names) {
         loadSystemRoles();
-        String[] namesArr = names.toArray(new String[names.size()]);
+        String[] namesArr = names.toArray(String[]::new);
         MCRRole[] roles = getRoles(namesArr);
         return Arrays.asList(roles);
     }

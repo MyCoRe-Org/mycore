@@ -45,7 +45,6 @@ import org.mycore.common.config.MCRConfigurationException;
  * @see MCRCommandLineInterface
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRCommand {
 

@@ -37,7 +37,7 @@ import bibtex.parser.ParseException;
  * Transforms BibTeX source code to JDOM MODS elements.
  * Output is a mods:modsCollection.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
 

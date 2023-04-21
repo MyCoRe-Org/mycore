@@ -24,7 +24,7 @@ import org.jdom2.Element;
 /**
  * Builds xml representations of a basket and its entries.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasketXMLBuilder {
 

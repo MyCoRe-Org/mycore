@@ -58,7 +58,7 @@ public class MCRCommandUtils {
      *     If no type was given or the type could not be found.
      *     Not thrown if type exists but has no values.
      */
-    public static final Stream<String> getIdsForType(final String type) throws MCRUsageException {
+    public static Stream<String> getIdsForType(final String type) throws MCRUsageException {
         if (type == null || type.length() == 0) {
             throw new MCRUsageException("Type required to enumerate IDs!");
         }
@@ -81,7 +81,7 @@ public class MCRCommandUtils {
      *     If no project was given, no type was given or the base (${project}_${base}) could not be found.
      *     Not thrown if the base exists but has no values.
      */
-    public static final Stream<String> getIdsForProjectAndType(final String project, final String type)
+    public static Stream<String> getIdsForProjectAndType(final String project, final String type)
         throws MCRUsageException {
         if (project == null || project.length() == 0) {
             throw new MCRUsageException("Project required to enumerate IDs!");
@@ -102,7 +102,7 @@ public class MCRCommandUtils {
      *     If no base was given or the base could not be found.
      *     Not thrown if the base exists but has no values.
      */
-    public static final Stream<String> getIdsForBaseId(final String base) throws MCRUsageException {
+    public static Stream<String> getIdsForBaseId(final String base) throws MCRUsageException {
         if (MCRObjectID.getIDParts(base).length != 2) {
             throw new MCRUsageException("Base ID ({project}_{type}) required to enumerate IDs!");
         }
@@ -127,7 +127,7 @@ public class MCRCommandUtils {
      *     yet exist a store for this base.
      *     Not thrown if the base exists but has no values.
      */
-    public static final Stream<String> getIdsFromIdToId(final String startId, final String endId)
+    public static Stream<String> getIdsFromIdToId(final String startId, final String endId)
         throws MCRUsageException {
         if (startId == null || startId.length() == 0) {
             throw new MCRUsageException("Start-ID required to enumerate IDs!");
@@ -172,7 +172,7 @@ public class MCRCommandUtils {
      *            The transformer cache to be used.
      * @return the transformer
      */
-    public static final Transformer getTransformer(String style, String defaultStyle, Map<String, Transformer> cache) {
+    public static Transformer getTransformer(String style, String defaultStyle, Map<String, Transformer> cache) {
         String xslFilePath = defaultStyle;
         if (style != null && style.trim().length() != 0) {
             xslFilePath = style.trim() + ".xsl";

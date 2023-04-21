@@ -35,7 +35,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
  * This class represents a label of a MCRCategory.
  * 
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  * @since 2.0
  */
 @XmlRootElement(
@@ -117,7 +116,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
         this.text = text;
     }
 
-    @Column(length = 4096, nullable = true)
+    @Column(length = 4096)
     public String getDescription() {
         if (description == null) {
             return "";

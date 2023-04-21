@@ -299,7 +299,6 @@ public abstract class MCRStore {
              * 
              * @param dir
              *            the directory thats children should be added
-             * @throws IOException
              */
             private void addChildren(final Path dir) throws IOException {
                 if (Files.isDirectory(dir)) {

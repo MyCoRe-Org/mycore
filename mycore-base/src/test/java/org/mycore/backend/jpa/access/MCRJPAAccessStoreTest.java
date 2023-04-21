@@ -37,7 +37,6 @@ import org.mycore.common.MCRJPATestCase;
 /**
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  */
 public class MCRJPAAccessStoreTest extends MCRJPATestCase {
 

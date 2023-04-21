@@ -68,8 +68,6 @@ public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
      * use this instead of {@link CompletableFuture#supplyAsync(Supplier, Executor)}
      * 
      * This method keep the priority
-     * @param es
-     * @return
      */
     public CompletableFuture<T> runAsync(ExecutorService es) {
         CompletableFuture<T> result = new CompletableFuture<>();

@@ -60,7 +60,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXEditorTransformer {
 

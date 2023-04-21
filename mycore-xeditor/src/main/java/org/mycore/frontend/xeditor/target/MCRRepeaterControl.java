@@ -24,7 +24,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 import jakarta.servlet.ServletContext;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public abstract class MCRRepeaterControl implements MCREditorTarget {
 

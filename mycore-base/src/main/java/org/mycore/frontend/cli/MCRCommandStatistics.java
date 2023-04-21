@@ -27,7 +27,7 @@ import java.util.Map.Entry;
  * 
  * @see org.mycore.frontend.cli.MCRBasicCommands for integration in MyCoRe CLI
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRCommandStatistics {
 

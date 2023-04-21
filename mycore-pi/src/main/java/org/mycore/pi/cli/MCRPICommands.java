@@ -79,14 +79,14 @@ public class MCRPICommands {
         MCRBase base = MCRMetadataManager.retrieve(objectID);
         final List<MCRPIRegistrationInfo> pi = MCRPIManager.getInstance().getRegistered(base);
 
-        final boolean addedAFlag = pi.stream().filter(registrationInfo -> {
+        final boolean addedAFlag = pi.stream().anyMatch(registrationInfo -> {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
                 LOGGER.info("Add PI-Flag to " + mycoreIDString);
                 MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
                 return true;
             }
             return false;
-        }).count() > 0;
+        });
 
         if (addedAFlag) {
             try {

@@ -32,14 +32,6 @@ public class MCRCryptKeyFileNotFoundException extends FileNotFoundException {
         this.errorCode = errorCode;
     }
 
-    /*public MCRCryptKeyFileNotFoundException(Throwable cause) {
-        super(cause);
-    }*/
-
-    /*public MCRCryptKeyFileNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }*/
-
     public String getErrorCode() {
         return errorCode;
     }

@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * Authority information that is represented by authority ID and code value. Such authority info comes from a
  * standardized vocabulary registered at the Library of Congress.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();

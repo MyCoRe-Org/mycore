@@ -207,8 +207,6 @@ public class MCRRestAPIObjectsHelper {
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
         }
 
-        // return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "Unexepected program flow termination.",
-        //       "Please contact a developer!").createHttpResponse();
     }
 
     private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth, UriInfo info,
@@ -266,7 +264,7 @@ public class MCRRestAPIObjectsHelper {
                     int pos = uri.lastIndexOf(":/");
                     String subPath = uri.substring(pos + 2);
                     while (subPath.startsWith("/")) {
-                        subPath = path.substring(1);
+                        subPath = subPath.substring(1);
                     }
                     e.setAttribute("href", baseURL + subPath);
                 }
@@ -307,8 +305,6 @@ public class MCRRestAPIObjectsHelper {
      * @param sort - the sort criteria
      *
      * @return a Jersey response object
-     * @throws MCRRestAPIException    
-     * 
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
      * 
      */
@@ -419,8 +415,7 @@ public class MCRRestAPIObjectsHelper {
         }
 
         //Filter by modifiedBefore and modifiedAfter
-        List<String> l = new ArrayList<>();
-        l.addAll(mcrIDs);
+        List<String> l = new ArrayList<>(mcrIDs);
         List<MCRObjectIDDate> objIdDates = new ArrayList<>();
         try {
             objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(l);
@@ -516,9 +511,6 @@ public class MCRRestAPIObjectsHelper {
      * @param sort - the sort criteria
      *
      * @return a Jersey response object
-     * @throws MCRRestAPIException    
-     * 
-     * 
      * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
     public static Response listDerivates(UriInfo info, String mcrObjID, String format,
@@ -568,7 +560,7 @@ public class MCRRestAPIObjectsHelper {
                 public Date getLastModified() {
                     return new Date(lastModified);
                 }
-            }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
+            }).sorted(new MCRRestAPISortObjectComparator(sortObj)).collect(Collectors.toList());
 
         //output as XML
         if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
@@ -659,7 +651,6 @@ public class MCRRestAPIObjectsHelper {
      * @param path - the sub path of a directory inside the derivate
      * @param depth - the level of subdirectories to be returned
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response listContents(UriInfo info, Application app, Request request, String mcrObjID,
         String mcrDerID, String format, String path, int depth) throws MCRRestAPIException {
@@ -748,7 +739,6 @@ public class MCRRestAPIObjectsHelper {
 
     /**
      * validates the given String if it matches the UTC syntax or the beginning of it
-     * @param test
      * @return true, if it is valid
      */
     private static boolean validateDateInput(String test) {
@@ -812,8 +802,6 @@ public class MCRRestAPIObjectsHelper {
                 idString = URLDecoder.decode(idString, StandardCharsets.UTF_8);
                 //ToDo - Shall we restrict the key set with a property?
 
-                //throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST,
-                //        "The ID is not valid.", "The prefix is unkown. Only 'mcr' is allowed."));
             }
         }
         if (key.equals("mcr")) {

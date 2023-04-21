@@ -28,7 +28,7 @@ import org.mycore.common.content.MCRContent;
  * Does not really transform content, instead logs the current contents.
  * This can be useful when multiple transformers are combined in a pipe. 
  *  
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRDebuggingTransformer extends MCRContentTransformer {
 

@@ -41,7 +41,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * For further details,
  * @see MCREnricher
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREnrichmentResolver implements URIResolver {
 

@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXPathEvaluatorTest extends MCRTestCase {
 

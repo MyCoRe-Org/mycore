@@ -75,11 +75,10 @@ import jakarta.xml.bind.annotation.XmlValue;
  * This class provides methods to send emails from within a MyCoRe application.
  * 
  * @author Marc Schluepmann
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Werner Greßhoff
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  * 
- * @version $Revision$ $Date$
  */
 public class MCRMailer extends MCRServlet {
 
@@ -279,7 +278,6 @@ public class MCRMailer extends MCRServlet {
      * </pre>
      * @param email the email as JDOM element.
      * @param allowException allow to throw exceptions if set to <code>true</code>
-     * @throws Exception 
      */
     public static void send(Element email, Boolean allowException) throws Exception {
         EMail mail = EMail.parseXML(email);
@@ -385,18 +383,18 @@ public class MCRMailer extends MCRServlet {
 
         Optional<List<InternetAddress>> toList = EMail.buildAddressList(mail.to);
         if (toList.isPresent()) {
-            msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(new InternetAddress[toList.get().size()]));
+            msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(InternetAddress[]::new));
         }
 
         Optional<List<InternetAddress>> replyToList = EMail.buildAddressList(mail.replyTo);
         if (replyToList.isPresent()) {
-            msg.setReplyTo((replyToList.get().toArray(new InternetAddress[replyToList.get().size()])));
+            msg.setReplyTo((replyToList.get().toArray(InternetAddress[]::new)));
         }
 
         Optional<List<InternetAddress>> bccList = EMail.buildAddressList(mail.bcc);
         if (bccList.isPresent()) {
             msg.addRecipients(Message.RecipientType.BCC,
-                bccList.get().toArray(new InternetAddress[bccList.get().size()]));
+                bccList.get().toArray(InternetAddress[]::new));
         }
 
         msg.setSentDate(new Date());

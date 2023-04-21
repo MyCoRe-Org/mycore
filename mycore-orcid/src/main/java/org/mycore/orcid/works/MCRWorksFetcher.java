@@ -49,7 +49,7 @@ import jakarta.ws.rs.core.Response;
  * Provides functionality to fetch work groups, work summaries and work details
  * from a remote ORCID profile
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWorksFetcher {
 

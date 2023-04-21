@@ -57,7 +57,6 @@ import jakarta.persistence.criteria.Root;
  *
  * @author Thomas Scheffler (yagee)
  *
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {

@@ -30,7 +30,7 @@ import org.mycore.common.config.MCRConfigurationException;
 /**
  * Represents a request against the OAuth2 API of orcid.org.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Kai Brandhorst
  */
 class MCRORCIDRequest {

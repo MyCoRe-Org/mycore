@@ -57,7 +57,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author A.Schaar
  * @author Robert Stephan
  * 
- * @version $Revision$ $Date$
  */
 public class MCRFileNodeServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
@@ -164,8 +163,6 @@ public class MCRFileNodeServlet extends MCRContentServlet {
 
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
-     * @throws SAXException 
-     * @throws TransformerException 
      */
     private MCRContent sendDirectory(HttpServletRequest request, HttpServletResponse response, MCRPath mcrPath)
         throws IOException, TransformerException, SAXException {

@@ -62,7 +62,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRSession implements Cloneable {
 

@@ -44,7 +44,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * ISO 639-1 code as category ID, where ISO 639-2 codes can be added by extra labels x-term and x-bibl
  * for the category. Unknown languages are created by code as required, but a warning is logged.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRLanguageFactory {
     private static final Logger LOGGER = LogManager.getLogger();

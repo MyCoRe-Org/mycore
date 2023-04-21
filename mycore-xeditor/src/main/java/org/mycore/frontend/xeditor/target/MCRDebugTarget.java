@@ -38,7 +38,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import jakarta.servlet.ServletContext;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRDebugTarget implements MCREditorTarget {
 
@@ -103,7 +103,7 @@ public class MCRDebugTarget implements MCREditorTarget {
         out.println("</pre></p>");
     }
 
-    class Step {
+    static class Step {
 
         private String label;
 

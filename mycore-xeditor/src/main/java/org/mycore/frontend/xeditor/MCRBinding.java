@@ -48,7 +48,7 @@ import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
 import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBinding {
 
@@ -262,8 +262,7 @@ public class MCRBinding {
     }
 
     public Map<String, Object> buildXPathVariables() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.putAll(getVariables());
+        Map<String, Object> variables = new HashMap<>(getVariables());
 
         for (MCRBinding ancestor : getAncestorsAndSelf()) {
             for (MCRBinding child : ancestor.getChildren()) {

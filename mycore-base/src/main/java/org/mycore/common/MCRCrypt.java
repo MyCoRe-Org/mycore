@@ -20,19 +20,19 @@ package org.mycore.common;
 
 /**
  * Java-based implementation of the unix crypt(3) command
- * 
+ *
  * Based upon C source code written by Eric Young, eay@psych.uq.oz.au Java
  * conversion by John F. Dumas, jdumas@zgs.com
- * 
- * Found at http://locutus.kingwoodcable.com/jfd/crypt.html Minor optimizations
- * by Wes Biggs, wes@cacas.org Adaption and extension for the MyCoRe Open Source
+ *
+ * Found at
+ * <a href="http://locutus.kingwoodcable.com/jfd/crypt.html">http://locutus.kingwoodcable.com/jfd/crypt.html</a>
+ * Minor optimizations by Wes Biggs, wes@cacas.org Adaption and extension for the MyCoRe Open Source
  * System by Detlev Degenhardt, Detlev.Degenhardt@rz.uni-freiburg.de
- * 
+ *
  * Eric's original code is licensed under the BSD license. As this is
  * derivative, the same license applies.
- * 
+ *
  * @author Detlev Degenhardt
- * @version $Revision$ $Date$
  */
 public class MCRCrypt {
 

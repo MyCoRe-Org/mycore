@@ -95,9 +95,7 @@ public class MCRProperties extends Properties {
      */
     public static MCRProperties copy(Properties properties) {
         MCRProperties p = new MCRProperties();
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            p.put(entry.getKey(), entry.getValue());
-        }
+        p.putAll(properties);
         return p;
     }
 

@@ -55,7 +55,7 @@ import jakarta.servlet.ServletContext;
  * This StartupHandler deploys web resources and register filters/servlets to web container server,
  *  for with <code>MCR-Auto-Deploy = true</code> marked JARs.
  * 
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {

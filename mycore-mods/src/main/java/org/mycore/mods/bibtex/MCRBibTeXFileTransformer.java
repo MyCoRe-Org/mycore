@@ -32,7 +32,7 @@ import bibtex.expansions.PersonListExpander;
 /**
  * Transforms a BibTeX file to a JDOM mods:modsCollection.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRBibTeXFileTransformer {
 
