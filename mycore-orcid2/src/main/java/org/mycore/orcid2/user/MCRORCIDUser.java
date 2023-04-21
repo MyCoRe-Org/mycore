@@ -117,7 +117,7 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        return user.getAttributes().stream().filter(a -> a.getName().startsWith(ATTR_ORCID_ID))
+        return user.getAttributes().stream().filter(a -> ATTR_ORCID_ID.equals(a.getName()))
             .map(MCRUserAttribute::getValue).collect(Collectors.toSet());
     }
 
