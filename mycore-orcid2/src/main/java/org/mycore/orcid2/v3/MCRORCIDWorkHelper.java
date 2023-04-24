@@ -283,7 +283,7 @@ public class MCRORCIDWorkHelper {
                     return;
                 } catch (MCRORCIDRequestException e) {
                     // skip 404
-                    if (Objects.equals(e.getResponse().getStatus(), Response.Status.NOT_FOUND)) {
+                    if (Objects.equals(e.getResponse().getStatus(), Response.Status.NOT_FOUND.getStatusCode())) {
                         LOGGER.info("Work of user {} with put code {} not found.", orcid, ownPutCode);
                     } else {
                         throw e;
