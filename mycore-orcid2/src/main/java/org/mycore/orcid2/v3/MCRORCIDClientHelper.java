@@ -79,16 +79,6 @@ public class MCRORCIDClientHelper {
     }
 
     /**
-     * Returns OrcidError from MCRORCIDRequestException.
-     * 
-     * @param exception the MCRORICDException
-     * @return OrcidError
-     */
-    public static OrcidError getORCIDErrorFromException(MCRORCIDRequestException exception) {
-        return exception.getResponse().readEntity(OrcidError.class);
-    }
-
-    /**
      * Returns debug string for OrcidError.
      * 
      * @param error the OrcidError
