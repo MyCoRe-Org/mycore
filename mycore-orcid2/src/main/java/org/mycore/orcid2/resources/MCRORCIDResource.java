@@ -73,7 +73,7 @@ public class MCRORCIDResource {
      * @throws WebApplicationException if orcid is null, user is guest or revoke fails
      */
     @GET
-    @Path("revoke")
+    @Path("revoke/{orcid}")
     public Response revoke(@PathParam("orcid") String orcid) {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
