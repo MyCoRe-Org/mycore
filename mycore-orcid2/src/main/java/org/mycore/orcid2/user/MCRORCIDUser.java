@@ -199,6 +199,7 @@ public class MCRORCIDUser {
     public Map<String, MCRORCIDCredential> getCredentials() {
         try {
             return user.getAttributes().stream()
+                .filter(a -> a.getName().startsWith(ATTR_ORCID_CREDENTIAL))
                 .collect(Collectors.toMap(a -> a.getName().substring(ATTR_ORCID_CREDENTIAL.length()),
                     a -> deserializeCredential(a.getValue())));
         } catch (IllegalArgumentException e) {
