@@ -31,6 +31,7 @@ import jakarta.ws.rs.core.Response.Status;
 
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
@@ -83,10 +84,10 @@ public class MCRORCIDResource {
         }
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         try {
-            MCRORCIDUserUtils.revokeCredentialsByORCID(orcidUser, orcid);
+            MCRORCIDUserUtils.revokeCredentialByORCID(orcidUser, orcid);
             return Response.ok().build();
-        } catch (Exception e) {
-            throw new WebApplicationException(Status.BAD_REQUEST);
+        } catch (MCRORCIDException e) {
+            throw new WebApplicationException(e, Status.BAD_REQUEST);
         }
     }
 

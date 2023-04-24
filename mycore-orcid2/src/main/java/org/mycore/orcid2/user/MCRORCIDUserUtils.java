@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.client.MCRORCIDCredential;
+import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.user2.MCRUser;
@@ -79,12 +80,16 @@ public class MCRORCIDUserUtils {
      * 
      * @param orcidUser the MCRORCIDUser
      * @param orcid the ORCID iD
-     * @throws MCRORCIDException if revoke request fails
+     * @throws MCRORCIDException if credential does not exist or revoke request fails
      */
-    public static void revokeCredentialsByORCID(MCRORCIDUser orcidUser, String orcid) {
+    public static void revokeCredentialByORCID(MCRORCIDUser orcidUser, String orcid) {
         final MCRORCIDCredential credential = Optional.ofNullable(getCredentialsByORCID(orcid))
             .orElseThrow(() -> new MCRORCIDException("Credentials do not exist"));
-        MCRORCIDOAuthClient.getInstance().revokeToken(credential.getAccessToken());
-        orcidUser.removeCredentialByORCID(orcid);
+        try {
+            MCRORCIDOAuthClient.getInstance().revokeToken(credential.getAccessToken());
+            orcidUser.removeCredentialByORCID(orcid);
+        } catch (MCRORCIDRequestException e) {
+            throw new MCRORCIDException("Revoke failed", e);
+        }
     }
 }
