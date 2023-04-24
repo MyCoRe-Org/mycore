@@ -31,7 +31,19 @@ public class MCRORCIDClientErrorHandlerImpl implements MCRORCIDClientErrorHandle
 
     @Override
     public void handleErrorResponse(Response response) {
-        final OrcidError error = response.readEntity(OrcidError.class);
-        throw new MCRORCIDRequestException(error.getDeveloperMessage(), response);
+        if (response.hasEntity()) {
+            try {
+                final OrcidError error = response.readEntity(OrcidError.class);
+                throw new MCRORCIDRequestException(error.getDeveloperMessage(), response);
+            } catch (Exception e) {
+                try {
+                    final String error = response.readEntity(String.class);
+                    throw new MCRORCIDRequestException(error, response);
+                } catch (Exception f) {
+                    // ignore
+                }
+            }
+        }
+        throw new MCRORCIDRequestException("Unknown error", response);
     }
 }
