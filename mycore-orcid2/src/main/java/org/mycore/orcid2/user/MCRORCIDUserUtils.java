@@ -42,7 +42,7 @@ public class MCRORCIDUserUtils {
      * @return MCRORCIDCredential or null
      * @throws MCRORCIDException if the credential is corrupt or there is more than one user
      */
-    public static MCRORCIDCredential getCredentialsByORCID(String orcid) {
+    public static MCRORCIDCredential getCredentialByORCID(String orcid) {
         return Optional.ofNullable(getORCIDUserByORCID(orcid)).map(u -> u.getCredentialByORCID(orcid)).orElse(null);
     }
 
@@ -83,7 +83,7 @@ public class MCRORCIDUserUtils {
      * @throws MCRORCIDException if credential does not exist or revoke request fails
      */
     public static void revokeCredentialByORCID(MCRORCIDUser orcidUser, String orcid) {
-        final MCRORCIDCredential credential = Optional.ofNullable(getCredentialsByORCID(orcid))
+        final MCRORCIDCredential credential = Optional.ofNullable(getCredentialByORCID(orcid))
             .orElseThrow(() -> new MCRORCIDException("Credentials do not exist"));
         try {
             MCRORCIDOAuthClient.getInstance().revokeToken(credential.getAccessToken());

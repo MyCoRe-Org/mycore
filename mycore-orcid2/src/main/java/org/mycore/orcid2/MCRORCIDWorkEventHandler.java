@@ -108,7 +108,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                 MCRORCIDCredential credential = null;
                 if (orcid != null) {
                     // save because of uniqueness check
-                    credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
+                    credential = MCRORCIDUserUtils.getCredentialByORCID(orcid);
                 } else {
                     // try to fetch orcid user
                     final MCRORCIDUser orcidUser = new MCRORCIDUser(user);

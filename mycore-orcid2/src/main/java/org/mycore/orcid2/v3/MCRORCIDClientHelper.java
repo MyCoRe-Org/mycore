@@ -25,6 +25,7 @@ import jakarta.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.client.MCRORCIDClientFactory;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -55,21 +56,23 @@ public class MCRORCIDClientHelper {
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
         long... putCodes) {
         if (getClientFactory().checkMemberMode()) {
-            final MCRORCIDCredential credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid); // TODO exception
-            if (credential != null) {
-                try {
+            try {
+                final MCRORCIDCredential credential = MCRORCIDUserUtils.getCredentialByORCID(orcid);
+                if (credential != null) {
                     return getClientFactory().createUserClient(orcid, credential).fetch(section, valueType, putCodes);
-                } catch (MCRORCIDRequestException e) {
-                    final Response response = e.getResponse();
-                    if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
-                        LOGGER.info(
-                            "Request with credential for orcid {} has failed with status code {}."
-                                + " Token has probably expired. Trying to use read client as fallback...",
-                            orcid, response.getStatus());
-                    } else {
-                        throw e;
-                    }
                 }
+            } catch (MCRORCIDRequestException e) {
+                final Response response = e.getResponse();
+                if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
+                    LOGGER.info(
+                        "Request with credential for orcid {} has failed with status code {}."
+                            + " Token has probably expired. Trying to use read client as fallback...",
+                        orcid, response.getStatus());
+                } else {
+                    throw e;
+                }
+            } catch (MCRORCIDException e) {
+                LOGGER.warn("Error with credential for {}. Trying to use read client as fallback...", orcid, e);
             }
         }
         return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
