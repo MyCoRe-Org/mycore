@@ -60,7 +60,7 @@ public class MCRORCIDResource {
         }
         final MCRORCIDUser user = MCRORCIDSessionUtils.getCurrentUser();
         final String[] orcids = user.getORCIDs().toArray(String[]::new);
-        final String[] credentials = user.getCredentials().entrySet().stream().map(Map.Entry::getValue)
+        final String[] credentials = user.getCredentials().entrySet().stream().map(Map.Entry::getKey)
             .toArray(String[]::new);
         return new MCRORCIDUserStatus(orcids, credentials);
     }
