@@ -18,50 +18,5 @@
 
 package org.mycore.iiif.image.model;
 
-import java.util.Locale;
-
-//TODO: replace with record
-public class MCRIIIFImageSourceRegion {
-
-    private final int x1,
-        y1,
-        x2,
-        y2;
-
-    public MCRIIIFImageSourceRegion(int x1, int y1, int x2, int y2) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
-    }
-
-    public int getX1() {
-        return x1;
-    }
-
-    public int getY1() {
-        return y1;
-    }
-
-    public int getX2() {
-        return x2;
-    }
-
-    public int getY2() {
-        return y2;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return (obj instanceof MCRIIIFImageSourceRegion sourceRegion)
-            && sourceRegion.getX2() == getX2()
-            && sourceRegion.getY2() == getY2()
-            && sourceRegion.getX1() == getX1()
-            && sourceRegion.getY1() == getY1();
-    }
-
-    @Override
-    public String toString() {
-        return String.format(Locale.ROOT, "[%d,%d,%d,%d]", x1, y1, x2, y2);
-    }
+public record MCRIIIFImageSourceRegion(int x1, int y1, int x2, int y2) {
 }

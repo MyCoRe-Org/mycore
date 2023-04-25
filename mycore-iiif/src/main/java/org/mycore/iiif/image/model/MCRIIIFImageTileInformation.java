@@ -22,20 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-//TODO: replace with record?, handling scaleFactors?
-public class MCRIIIFImageTileInformation {
-
-    public final int width;
-
-    public final int height;
-
-    public final List<Integer> scaleFactors;
-
-    public MCRIIIFImageTileInformation(int width, int height, List<Integer> scaleFactors) {
-        this.width = width;
-        this.height = height;
-        this.scaleFactors = List.copyOf(scaleFactors);
-    }
+public record MCRIIIFImageTileInformation(int width, int height, List<Integer> scaleFactors) {
 
     public static List<Integer> scaleFactorsAsPowersOfTwo(int n) {
         return IntStream.range(0, n)

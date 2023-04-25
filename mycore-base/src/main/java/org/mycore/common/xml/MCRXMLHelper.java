@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -479,33 +478,7 @@ public class MCRXMLHelper {
                 .orElse(namespace.getPrefix());
         }
 
-        private static class Pair<X, Y> {
-            public final X x;
-
-            public final Y y;
-
-            Pair(X x, Y y) {
-                this.x = x;
-                this.y = y;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (o == null || getClass() != o.getClass()) {
-                    return false;
-                }
-                Pair<?, ?> pair = (Pair<?, ?>) o;
-                return Objects.equals(x, pair.x) &&
-                    Objects.equals(y, pair.y);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(x, y);
-            }
+        private record Pair<X, Y>(X x, Y y) {
         }
 
     }

@@ -165,13 +165,8 @@ public abstract class MCRProcessableFactory {
     /**
      * A callable that runs given task and returns given result
      */
-    private static final class RunnableProgressableAdapter<T>
+    private record RunnableProgressableAdapter<T>(Runnable task)
         implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
-        final Runnable task;
-
-        RunnableProgressableAdapter(Runnable task) {
-            this.task = task;
-        }
 
         @Override
         public T call() {
@@ -218,7 +213,5 @@ public abstract class MCRProcessableFactory {
         public String toString() {
             return task.toString();
         }
-
     }
-
 }

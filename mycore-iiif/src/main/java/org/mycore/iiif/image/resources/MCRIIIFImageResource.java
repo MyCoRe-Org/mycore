@@ -158,8 +158,8 @@ public class MCRIIIFImageResource {
             MCRIIIFRegionParser rp = new MCRIIIFRegionParser(region, information.width, information.height);
             MCRIIIFImageSourceRegion sourceRegion = rp.parseImageRegion();
 
-            MCRIIIFScaleParser sp = new MCRIIIFScaleParser(size, sourceRegion.getX2() - sourceRegion.getX1(),
-                sourceRegion.getY2() - sourceRegion.getY1());
+            MCRIIIFScaleParser sp = new MCRIIIFScaleParser(size, sourceRegion.x2() - sourceRegion.x1(),
+                sourceRegion.y2() - sourceRegion.y1());
             MCRIIIFImageTargetSize targetSize = sp.parseTargetScale();
 
             MCRIIIFRotationParser rotationParser = new MCRIIIFRotationParser(rotation);

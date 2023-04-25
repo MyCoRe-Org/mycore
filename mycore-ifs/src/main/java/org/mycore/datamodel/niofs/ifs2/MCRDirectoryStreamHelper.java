@@ -337,18 +337,8 @@ class MCRDirectoryStreamHelper {
         }
     }
 
-    private static class MD5FileAttributeViewImpl implements
-        MCRMD5AttributeView {
-
-        private final BasicFileAttributeView baseAttrView;
-
-        private final MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier;
-
-        MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
-            MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) {
-            this.baseAttrView = baseAttrView;
-            this.nodeSupplier = nodeSupplier;
-        }
+    private record MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
+        MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) implements MCRMD5AttributeView {
 
         @Override
         public String name() {
