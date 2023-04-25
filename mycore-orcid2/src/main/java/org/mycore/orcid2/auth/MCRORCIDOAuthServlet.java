@@ -18,34 +18,27 @@
 
 package org.mycore.orcid2.auth;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.core.UriBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.orcid2.MCRORCIDConstants;
+import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
-import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -71,11 +64,6 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
 
     private static final String USER_SERVLET_PATH = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "User.Servlet");
 
-    private static final String SCOPE = MCRConfiguration2.getString(CONFIG_PREFIX + "Scope").orElse(null);
-
-    private static final boolean IS_PREFILL_REGISTRATION_FORM = MCRConfiguration2
-        .getOrThrow(MCRORCIDConstants.CONFIG_PREFIX + "PreFillRegistrationForm", Boolean::parseBoolean);
-
     /**
      * Servlet url.
      */
@@ -99,38 +87,38 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         userProfileURL = MCRServlet.getServletBaseURL() + USER_SERVLET_PATH;
         final String action = job.getRequest().getParameter("action");
         if (job.getRequest().getParameter("code") != null) {
-            handleCode(req, res);
-        } else if (action != null) {
-            if ("auth".equalsIgnoreCase(action)) {
-                handleAuth(req, res);
-            } else {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown action");
+            final String userID = MCRUserManager.getCurrentUser().getUserID();
+            final String state = MCRORCIDUtils.hashString(userID);
+            if (!state.equals(job.getRequest().getParameter("state"))) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "State is invalid");
             }
+            final String code = job.getRequest().getParameter("code").trim();
+            if (code.isEmpty()) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Code is empty");
+            }
+            try {
+                handleCode(code);
+                res.sendRedirect(userProfileURL);
+            } catch (MCRORCIDException e) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            }
+        } else if (job.getRequest().getParameter("error") != null) {
+            final String error = job.getRequest().getParameter("error");
+            LOGGER.error(error);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ORCID was unable to process the request"); // TODO
         } else {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "An action must be specified");
         }
     }
 
-    private void handleCode(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        final String code = req.getParameter("code");
-        final String error = req.getParameter("error");
-        if ((error != null) && !error.trim().isEmpty()) {
-            res.sendRedirect(userProfileURL + "&XSL.error=" + error); // TODO check
-        } else if (code != null && !code.trim().isEmpty()) {
-            final String state = req.getParameter("state");
-            if (!buildStateParam().equals(state)) {
-                String msg = "Invalid state, possibly cross-site request forgery?";
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, msg);
-            }
-            try {
-                final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
-                    = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
-                final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
-                MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
-                res.sendRedirect(userProfileURL);
-            } catch (MCRORCIDRequestException e) {
-                LOGGER.error("Cannot exchange token.", e);
-            }
+    private void handleCode(String code) {
+        try {
+            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
+                = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
+            final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
+            MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
+        } catch (MCRORCIDRequestException e) {
+            throw new MCRORCIDException("Cannot exchange token");
         }
     }
 
@@ -144,107 +132,5 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         credential.setExpiration(expireDate);
         credential.setScope(response.getScope());
         return credential;
-    }
-
-    private void handleAuth(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        final String scopeParam = req.getParameter("scope");
-        String langCode = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        if (!MCRORCIDConstants.SUPPORTED_LANGUAGE_CODES.contains(langCode)) {
-            // use english as fallback
-            langCode = "en";
-        }
-        if (scopeParam != null) {
-            res.sendRedirect(buildRequestCodeURL(scopeParam, langCode).toString());
-        } else if (SCOPE != null) {
-            LOGGER.info("No scope param, using default scope ({}) as fallback.", SCOPE);
-            res.sendRedirect(buildRequestCodeURL(SCOPE, langCode).toString());
-        } else {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Scope is required");
-        }
-    }
-
-    /**
-     * Builds the URL where to redirect the user's browser to initiate a three-way
-     * authorization and request permission to access the given scopes. If
-     * 
-     * MCR.ORCID2.PreFillRegistrationForm=true
-     * 
-     * submits the current user's email address, first and last name to the ORCID
-     * registration form to simplify registration. May be disabled for more data
-     * privacy.
-     * 
-     * @param scope not encoded scope string
-     * @param langCode language code
-     * @return url to request authorization code
-     * @throws URISyntaxException if BaseURL is malformed
-     * @throws MalformedURLException if BaseURL is malformed
-     */
-    private URL buildRequestCodeURL(String scope, String langCode) throws URISyntaxException, MalformedURLException {
-        UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
-        builder.path("oauth/authorize");
-        builder.queryParam("redirect_uri", redirectURI);
-        builder.queryParam("client_id", MCRORCIDOAuthClient.CLIENT_ID);
-        builder.queryParam("response_type", "code");
-        builder.queryParam("scope", scope);
-        builder.queryParam("prompt", "login");
-        builder.queryParam("lang", langCode);
-        builder.queryParam("state", buildStateParam());
-        if (IS_PREFILL_REGISTRATION_FORM) {
-            preFillRegistrationForm(builder);
-        }
-        return builder.build().toURL();
-    }
-
-    /**
-     *
-     * Adds current user's email address, first and last name as params to URIBuilder.
-     *
-     * @param builder the builder
-     * See <a href="https://members.orcid.org/api/resources/customize">ORCID documentation</a>
-     */
-    private static void preFillRegistrationForm(UriBuilder builder) {
-        MCRUser user = MCRUserManager.getCurrentUser();
-        String email = user.getEMailAddress();
-        if (email != null) {
-            builder.queryParam("email", email);
-        }
-        String name = user.getRealName();
-        String firstName = null;
-        String lastName = name;
-        if (name.contains(",")) {
-            String[] nameParts = name.split(",");
-            if (nameParts.length == 2) {
-                firstName = nameParts[1].trim();
-                lastName = nameParts[0].trim();
-            }
-        } else if (name.contains(" ")) {
-            String[] nameParts = name.split(" ");
-            if (nameParts.length == 2) {
-                firstName = nameParts[0].trim();
-                lastName = nameParts[1].trim();
-            }
-        }
-        if (firstName != null) {
-            builder.queryParam("given_names", firstName);
-        }
-        if (lastName != null) {
-            builder.queryParam("family_names", lastName);
-        }
-    }
-
-    /**
-     * Builds a state parameter to be used with OAuth to defend against cross-site
-     * request forgery. Comparing state ensures the user is still the same that
-     * initiated the authorization process.
-     *
-     * @return current user's hashed user id
-     */
-    private static String buildStateParam() {
-        String userID = MCRUserManager.getCurrentUser().getUserID();
-        byte[] bytes = userID.getBytes(StandardCharsets.UTF_8);
-        MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
-        md5Digest.update(bytes);
-        byte[] digest = md5Digest.digest();
-        return MCRMD5InputStream.getMD5String(digest);
     }
 }

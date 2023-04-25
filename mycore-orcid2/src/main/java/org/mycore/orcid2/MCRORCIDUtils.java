@@ -19,6 +19,8 @@
 package org.mycore.orcid2;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -27,11 +29,12 @@ import java.util.stream.Collectors;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -55,6 +58,20 @@ public class MCRORCIDUtils {
     private static final List<String> PUBLISH_STATES
         = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "Work.PublishStates").stream()
         .flatMap(MCRConfiguration2::splitValue).toList();
+
+    /**
+     * MD5 hashes String.
+     *
+     * @param input the input
+     * @return hash as String
+     */
+    public static String hashString(String input) {
+        final byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
+        final MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
+        md5Digest.update(bytes);
+        final byte[] digest = md5Digest.digest();
+        return MCRMD5InputStream.getMD5String(digest);
+    }
 
     /**
      * Checks if MCRObjects' state is ready to publish.
