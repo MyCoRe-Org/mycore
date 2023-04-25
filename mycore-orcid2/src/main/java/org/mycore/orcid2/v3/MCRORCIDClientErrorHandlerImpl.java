@@ -19,6 +19,7 @@
 package org.mycore.orcid2.v3;
 
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ProcessingException;
 
 import org.mycore.orcid2.client.MCRORCIDClientErrorHandler;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
@@ -36,11 +37,11 @@ public class MCRORCIDClientErrorHandlerImpl implements MCRORCIDClientErrorHandle
             try {
                 final OrcidError error = response.readEntity(OrcidError.class);
                 throw new MCRORCIDRequestException(error.getDeveloperMessage(), response);
-            } catch (Exception e) {
+            } catch (ProcessingException e) {
                 try {
                     final String error = response.readEntity(String.class);
                     throw new MCRORCIDRequestException(error, response);
-                } catch (Exception f) {
+                } catch (ProcessingException f) {
                     // ignore
                 }
             }
