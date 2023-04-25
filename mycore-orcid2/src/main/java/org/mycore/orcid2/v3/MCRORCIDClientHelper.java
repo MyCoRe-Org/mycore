@@ -56,23 +56,26 @@ public class MCRORCIDClientHelper {
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
         long... putCodes) {
         if (getClientFactory().checkMemberMode()) {
+            MCRORCIDCredential credential = null;
             try {
-                final MCRORCIDCredential credential = MCRORCIDUserUtils.getCredentialByORCID(orcid);
-                if (credential != null) {
-                    return getClientFactory().createUserClient(orcid, credential).fetch(section, valueType, putCodes);
-                }
-            } catch (MCRORCIDRequestException e) {
-                final Response response = e.getResponse();
-                if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
-                    LOGGER.info(
-                        "Request with credential for orcid {} has failed with status code {} and error: {}\n"
-                            + "Token has probably expired. Trying to use read client as fallback...",
-                        orcid, response.getStatus(), e.getMessage());
-                } else {
-                    throw e;
-                }
+                credential = MCRORCIDUserUtils.getCredentialByORCID(orcid);
             } catch (MCRORCIDException e) {
                 LOGGER.warn("Error with credential for {}. Trying to use read client as fallback...", orcid, e);
+            }
+            if (credential != null) {
+                try {
+                    return getClientFactory().createUserClient(orcid, credential).fetch(section, valueType, putCodes);
+                } catch (MCRORCIDRequestException e) {
+                    final Response response = e.getResponse();
+                    if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
+                        LOGGER.info(
+                            "Request with credential for orcid {} has failed with status code {} and error: {}\n"
+                                + "Token has probably expired. Trying to use read client as fallback...",
+                            orcid, response.getStatus(), e.getMessage());
+                    } else {
+                        throw e;
+                    }
+                }
             }
         }
         return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
