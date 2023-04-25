@@ -19,7 +19,6 @@ package org.mycore.datamodel.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -302,7 +301,7 @@ public class MCRDataURL implements Serializable {
                 try {
                     data = encoding == MCRDataURLEncoding.BASE64 ? Base64.getDecoder().decode(parts[1])
                         : decode(parts[1], charset).getBytes(StandardCharsets.UTF_8);
-                } catch (IllegalArgumentException | UnsupportedEncodingException e) {
+                } catch (IllegalArgumentException e) {
                     throw new MalformedURLException("Error decoding the data. " + e.getMessage());
                 }
 
@@ -470,26 +469,17 @@ public class MCRDataURL implements Serializable {
         }
 
         parameters.forEach((key, value) -> {
-            try {
-                sb.append(TOKEN_SEPARATOR)
-                    .append(key)
-                    .append(PARAM_SEPARATOR)
-                    .append(encode(value, StandardCharsets.UTF_8));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(
-                    "Error encoding the parameter value \"" + value + "\". Error: " + e.getMessage());
-            }
+            sb.append(TOKEN_SEPARATOR)
+                .append(key)
+                .append(PARAM_SEPARATOR)
+                .append(encode(value, StandardCharsets.UTF_8));
         });
 
         if (encoding == MCRDataURLEncoding.BASE64) {
             sb.append(TOKEN_SEPARATOR).append(encoding.value());
             sb.append(DATA_SEPARATOR).append(Base64.getEncoder().withoutPadding().encodeToString(data));
         } else {
-            try {
-                sb.append(DATA_SEPARATOR).append(encode(new String(data, charset), charset));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Error encoding the data. Error: " + e.getMessage());
-            }
+            sb.append(DATA_SEPARATOR).append(encode(new String(data, charset), charset));
         }
 
         return sb.toString();
@@ -555,11 +545,11 @@ public class MCRDataURL implements Serializable {
         }
     }
 
-    private static String encode(final String str, final Charset charset) throws UnsupportedEncodingException {
+    private static String encode(final String str, final Charset charset) {
         return URLEncoder.encode(str, charset).replace("+", "%20");
     }
 
-    private static String decode(final String str, final Charset charset) throws UnsupportedEncodingException {
+    private static String decode(final String str, final Charset charset) {
         return URLDecoder.decode(str.replace("%20", "+"), charset);
     }
 }

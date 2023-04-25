@@ -605,14 +605,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @throws IOException
      *             if output file can not be closed
      */
-    private static void saveToXMLFile(MCRUser mcrUser, FileOutputStream outFile) throws MCRException, IOException {
+    private static void saveToXMLFile(MCRUser mcrUser, FileOutputStream outFile) throws IOException {
         // Create the output
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
-
-        try (outFile) {
-            outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
-        } catch (Exception e) {
-            throw new MCRException("Error while save XML to file: " + e.getMessage());
-        }
+        outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
     }
 }

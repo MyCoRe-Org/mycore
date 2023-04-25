@@ -43,7 +43,6 @@ import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -124,7 +123,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     }
 
     @Override
-    protected void render(MCRServletJob job, Exception ex) throws IOException, JDOMException {
+    protected void render(MCRServletJob job, Exception ex) throws IOException {
         try {
             ThumnailInfo thumbnailInfo = getThumbnailInfo(job.getRequest().getPathInfo());
             Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,

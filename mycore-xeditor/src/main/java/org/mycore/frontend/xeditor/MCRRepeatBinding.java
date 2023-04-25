@@ -27,7 +27,6 @@ import org.jaxen.expr.Expr;
 import org.jaxen.expr.LocationPath;
 import org.jaxen.expr.Step;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
@@ -45,8 +44,7 @@ public class MCRRepeatBinding extends MCRBinding {
     private String method = DEFAULT_METHOD; // build|clone
 
     public MCRRepeatBinding(String xPath, MCRBinding parent, int minRepeats, int maxRepeats, String method)
-        throws JaxenException,
-        JDOMException {
+        throws JaxenException {
         this(xPath, parent, method);
 
         while (getBoundNodes().size() < minRepeats) {

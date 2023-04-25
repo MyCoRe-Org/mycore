@@ -19,7 +19,6 @@
 package org.mycore.frontend.xeditor.target;
 
 import org.jaxen.JaxenException;
-import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
@@ -40,7 +39,7 @@ public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
         session.setBreakpoint("After handling target " + getClass().getName() + " " + param);
     }
 
-    public void handle(String swapParameter, MCRBinding root) throws JaxenException, JDOMException {
+    public void handle(String swapParameter, MCRBinding root) throws JaxenException {
         String[] tokens = swapParameter.split("\\|");
         String parentXPath = tokens[0];
         String posString = tokens[1];

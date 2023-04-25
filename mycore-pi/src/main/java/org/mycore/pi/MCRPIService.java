@@ -49,7 +49,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -286,13 +285,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @return the assigned Identifier
      * @throws MCRAccessException
      * the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException
-     * the {@link MCRPIMetadataService} lets
-     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
     public T register(MCRBase obj)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
         return this.register(obj, null);
     }

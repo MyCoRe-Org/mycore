@@ -222,7 +222,7 @@ public class MCRPICommands {
             + " with additional ({2}). Does nothing if the object already has a pi from the service {0}.",
         order = 90)
     public static void createPIForObjectIfNotExist(String serviceID, String objectIDString, String additional)
-        throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
+        throws MCRAccessException, ExecutionException, MCRPersistentIdentifierException,
         InterruptedException {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
 

@@ -157,8 +157,7 @@ public class MCRXMLFunctions {
         return Normalizer.normalize(arg0, Normalizer.Form.NFC);
     }
 
-    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language) {
         return formatISODate(isoDate, null, simpleFormat, iso639Language);
     }
 

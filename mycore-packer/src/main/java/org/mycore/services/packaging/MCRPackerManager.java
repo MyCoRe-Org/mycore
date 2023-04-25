@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -62,9 +61,8 @@ public class MCRPackerManager {
      * @param jobParameters the parameters which will be passed to the job. (Should include a packer)
      * @return the created MCRJob
      * @throws MCRUsageException if invalid parameters are passed to the packer
-     * @throws MCRAccessException if the current user doesn't have the rights to use the packer(on a specific  object).
      */
-    public static MCRJob startPacking(Map<String, String> jobParameters) throws MCRUsageException, MCRAccessException {
+    public static MCRJob startPacking(Map<String, String> jobParameters) throws MCRUsageException {
         String packer = jobParameters.get("packer");
         if (packer == null) {
             LOGGER.error("No Packer parameter found!");

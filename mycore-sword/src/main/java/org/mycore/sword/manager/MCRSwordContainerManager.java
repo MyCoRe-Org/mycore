@@ -101,7 +101,7 @@ public class MCRSwordContainerManager implements ContainerManager {
 
     @Override
     public DepositReceipt replaceMetadata(String editIRI, Deposit deposit, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) throws SwordError, SwordAuthException {
         IRI iri = new IRI(editIRI);
         String collection = MCRSwordUtil.ParseLinkUtil.EditIRI.getCollectionFromEditIRI(iri);
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
@@ -124,7 +124,7 @@ public class MCRSwordContainerManager implements ContainerManager {
     @Override
     public DepositReceipt replaceMetadataAndMediaResource(String editIRI, Deposit deposit,
         AuthCredentials authCredentials, SwordConfiguration swordConfiguration)
-        throws SwordError, SwordServerException, SwordAuthException {
+        throws SwordError, SwordAuthException {
         IRI iri = new IRI(editIRI);
         String collection = MCRSwordUtil.ParseLinkUtil.EditIRI.getCollectionFromEditIRI(iri);
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
@@ -146,7 +146,7 @@ public class MCRSwordContainerManager implements ContainerManager {
 
     @Override
     public DepositReceipt addResources(String editIRI, Deposit deposit, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) throws SwordError, SwordAuthException {
         IRI iri = new IRI(editIRI);
         String collection = MCRSwordUtil.ParseLinkUtil.EditIRI.getCollectionFromEditIRI(iri);
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);

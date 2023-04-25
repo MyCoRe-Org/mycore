@@ -68,12 +68,7 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
 
                 collectionProvider.getIDSupplier().get(start, MCRSwordConstants.MAX_ENTRYS_PER_PAGE).stream()
                     .map(id -> {
-                        try {
-                            return collectionProvider.getMetadataProvider().provideListMetadata(id);
-                        } catch (SwordError swordError) {
-                            LOGGER.warn("Error while creating feed for [{}]! (Will be removed from List)", id);
-                            return null;
-                        }
+                        return collectionProvider.getMetadataProvider().provideListMetadata(id);
                     }).filter(Objects::nonNull)
                     .forEach(feed::addEntry);
 
@@ -90,7 +85,7 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
 
     @Override
     public DepositReceipt createNew(String editIRI, Deposit deposit, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) throws SwordAuthException {
         LOGGER.info("createNew:{}", editIRI);
         String collection = MCRSwordUtil.ParseLinkUtil.CollectionIRI
             .getCollectionNameFromCollectionIRI(new IRI(editIRI));

@@ -211,7 +211,7 @@ public class MCREditorSession {
         setBreakpoint("Reading XML from " + uriRe);
     }
 
-    public MCRBinding getRootBinding() throws JDOMException {
+    public MCRBinding getRootBinding() {
         MCRBinding binding = new MCRBinding(editedXML, tracker);
         binding.setVariables(variables);
         return binding;

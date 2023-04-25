@@ -299,8 +299,7 @@ public class MCRRestAPIObjects {
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID, @FormDataParam("label") String label,
         @FormDataParam("classifications") String classifications,
-        @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite)
-        throws MCRRestAPIException {
+        @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite) {
         return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, classifications, overwrite);
     }
 
@@ -356,8 +355,7 @@ public class MCRRestAPIObjects {
     @MCRRequireTransaction
     public Response deleteFiles(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID,
-        @PathParam(PARAM_DERID) String mcrDerID)
-        throws MCRRestAPIException {
+        @PathParam(PARAM_DERID) String mcrDerID) {
         return MCRRestAPIUploadHelper.deleteAllFiles(info, request, mcrObjID, mcrDerID);
     }
 

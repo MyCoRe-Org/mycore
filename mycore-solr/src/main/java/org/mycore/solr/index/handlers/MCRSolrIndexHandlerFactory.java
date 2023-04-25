@@ -87,8 +87,7 @@ public abstract class MCRSolrIndexHandlerFactory {
         return MCRSolrIndexStrategyManager.checkFile(file, attrs);
     }
 
-    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient)
-        throws IOException {
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient) {
         return this.getIndexHandler(file, attrs, solrClient, checkFile(file, attrs));
     }
 
