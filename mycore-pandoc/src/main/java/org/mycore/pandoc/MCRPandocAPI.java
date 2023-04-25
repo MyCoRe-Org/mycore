@@ -120,10 +120,34 @@ public class MCRPandocAPI {
     }
 
     private static byte[] callPandoc(String[] args, byte[] input) {
+        class ThreadWrapper implements Runnable {
+
+            private volatile byte[] output;
+
+            private InputStream istream;
+
+            ThreadWrapper(InputStream is) {
+                istream = is;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    output = readPandocOutput(istream);
+                } catch(IOException ex) {
+                    String msg = "Exception reading output from Pandoc";
+                    throw new MCRPandocException(msg, ex);
+                }
+            }
+
+            public byte[] getOutput() {
+                return output;
+            }
+        }
+
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.environment().put("LUA_PATH", LUA_PATH);
         Process p;
-        byte[] output;
         try {
             p = pb.start();
             p.getOutputStream().write(input);
@@ -132,35 +156,31 @@ public class MCRPandocAPI {
             String msg = "Exception invoking Pandoc " + String.join(" ", args);
             throw new MCRPandocException(msg, ex);
         }
-        try {
-            output = readPandocOutput(p.getInputStream());
-        } catch(IOException ex) {
-            String msg = "Exception reading output from Pandoc " + String.join(" ", args);
-            throw new MCRPandocException(msg, ex);
-        }
+        ThreadWrapper outputThread = new ThreadWrapper(p.getInputStream());
+        ThreadWrapper errorThread = new ThreadWrapper(p.getErrorStream());
+        Thread oThread = new Thread(outputThread);
+        Thread eThread = new Thread(errorThread);
+        oThread.start();
+        eThread.start();
         try {
             if(!p.waitFor(TIMEOUT, TimeUnit.SECONDS)) {
                 p.destroy();
                 throw new InterruptedException();
             }
+            oThread.join();
+            eThread.join();
         } catch(InterruptedException ex) {
             String msg = "Pandoc process " + String.join(" ", args) + " was terminated after reaching a timeout of "
                 + TIMEOUT + " seconds";
             throw new MCRPandocException(msg, ex);
         }
         if(p.exitValue() != 0) {
-            String msg = "Pandoc process " + String.join(" ", args) + " terminated with error code " + p.exitValue();
-            try {
-                msg += " and error message \n"
-                    + new String(readPandocOutput(p.getErrorStream()), StandardCharsets.UTF_8);
-            } catch(IOException ex) {
-                throw new MCRPandocException(msg);
-            } finally {
-                p.destroy();
-            }
+            String msg = "Pandoc process " + String.join(" ", args) + " terminated with error code " + p.exitValue()
+                + " and error message \n" + new String(errorThread.getOutput(), StandardCharsets.UTF_8);
+            p.destroy();
             throw new MCRPandocException(msg);
         }
-        return output;
+        return outputThread.getOutput();
     }
 
     private static byte[] readPandocOutput(InputStream s) throws IOException {
