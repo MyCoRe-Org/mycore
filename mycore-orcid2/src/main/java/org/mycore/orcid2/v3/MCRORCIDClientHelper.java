@@ -65,9 +65,9 @@ public class MCRORCIDClientHelper {
                 final Response response = e.getResponse();
                 if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
                     LOGGER.info(
-                        "Request with credential for orcid {} has failed with status code {}."
-                            + " Token has probably expired. Trying to use read client as fallback...",
-                        orcid, response.getStatus());
+                        "Request with credential for orcid {} has failed with status code {} and error: {}\n"
+                            + "Token has probably expired. Trying to use read client as fallback...",
+                        orcid, response.getStatus(), e.getMessage());
                 } else {
                     throw e;
                 }
