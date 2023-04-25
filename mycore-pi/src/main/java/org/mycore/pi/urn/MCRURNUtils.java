@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
 
@@ -35,7 +36,7 @@ public class MCRURNUtils {
         try {
             return Optional.of(getDNBRegisterDate(dnburn.getIdentifier()));
         } catch (ParseException e) {
-            e.printStackTrace();
+            LogManager.getLogger().warn("Could not parse: " + dnburn.getIdentifier(), e);
         }
 
         return Optional.empty();

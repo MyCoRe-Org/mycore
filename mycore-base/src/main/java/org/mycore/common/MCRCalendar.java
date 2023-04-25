@@ -180,22 +180,20 @@ public class MCRCalendar {
             return out;
         }
 
-        //CSOFF: InnerAssignment
-        switch (calendarType) {
-            case Armenian -> out = getCalendarFromArmenianDate(dateString, last);
-            case Buddhist -> out = getCalendarFromBuddhistDate(dateString, last);
-            case Coptic -> out = getCalendarFromCopticDate(dateString, last);
-            case Egyptian -> out = getCalendarFromEgyptianDate(dateString, last);
-            case Ethiopic -> out = getCalendarFromEthiopicDate(dateString, last);
-            case Gregorian -> out = getCalendarFromGregorianDate(dateString, last);
-            case Hebrew -> out = getCalendarFromHebrewDate(dateString, last);
-            case Islamic -> out = getCalendarFromIslamicDate(dateString, last);
-            case Japanese -> out = getCalendarFromJapaneseDate(dateString, last);
-            case Julian -> out = getCalendarFromJulianDate(dateString, last);
-            case Persic -> out = getCalendarFromPersicDate(dateString, last);
+        out = switch (calendarType) {
+            case Armenian -> getCalendarFromArmenianDate(dateString, last);
+            case Buddhist -> getCalendarFromBuddhistDate(dateString, last);
+            case Coptic -> getCalendarFromCopticDate(dateString, last);
+            case Egyptian -> getCalendarFromEgyptianDate(dateString, last);
+            case Ethiopic -> getCalendarFromEthiopicDate(dateString, last);
+            case Gregorian -> getCalendarFromGregorianDate(dateString, last);
+            case Hebrew -> getCalendarFromHebrewDate(dateString, last);
+            case Islamic -> getCalendarFromIslamicDate(dateString, last);
+            case Japanese -> getCalendarFromJapaneseDate(dateString, last);
+            case Julian -> getCalendarFromJulianDate(dateString, last);
+            case Persic -> getCalendarFromPersicDate(dateString, last);
             default -> throw new MCRException("Calendar type " + calendarType + " not supported!");
-        }
-        //CSON: InnerAssignment
+        };
 
         LOGGER.debug("Output of getHistoryDateAsCalendar: {}", getCalendarDateToFormattedString(out));
         return out;

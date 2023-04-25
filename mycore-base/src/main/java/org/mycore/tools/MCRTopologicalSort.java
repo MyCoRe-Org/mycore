@@ -66,7 +66,7 @@ import com.google.common.collect.HashBiMap;
  *
  */
 public class MCRTopologicalSort<T> {
-    private static final Logger LOGGER = LogManager.getLogger(MCRTopologicalSort.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** 
      * store the edges as adjacent list
@@ -121,7 +121,7 @@ public class MCRTopologicalSort<T> {
                     xmlStreamReader.next();
                 }
             } catch (XMLStreamException | IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Error while reading: " + dir.resolve(file), e);
             }
         }
 

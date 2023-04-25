@@ -306,7 +306,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @throws MCRPersistentIdentifierException
      * see {@link org.mycore.pi.exceptions}
      */
-    public synchronized T register(MCRBase obj, String additional, boolean updateObject)
+    public T register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
 

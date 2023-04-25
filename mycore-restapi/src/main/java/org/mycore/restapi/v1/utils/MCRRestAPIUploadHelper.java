@@ -357,10 +357,6 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) {
 
-        SortedMap<String, String> parameter = new TreeMap<>();
-        parameter.put("mcrObjectID", pathParamMcrObjID);
-        parameter.put("mcrDerivateID", pathParamMcrDerID);
-
         MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
         MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
