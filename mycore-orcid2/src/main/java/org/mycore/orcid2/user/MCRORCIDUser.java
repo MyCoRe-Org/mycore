@@ -20,6 +20,7 @@ package org.mycore.orcid2.user;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -117,7 +118,8 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        return user.getAttributes().stream().filter(a -> ATTR_ORCID_ID.equals(a.getName()))
+        return user.getAttributes().stream()
+            .filter(a -> Objects.equals(a.getName(), ATTR_ORCID_ID))
             .map(MCRUserAttribute::getValue).collect(Collectors.toSet());
     }
 

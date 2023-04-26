@@ -64,46 +64,35 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
 
     private static final String USER_SERVLET_PATH = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "User.Servlet");
 
-    /**
-     * Servlet url.
-     */
-    private String redirectURI;
-
-    /**
-     * Current user's profile url.
-     */
-    private String userProfileURL;
-
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        if (MCRSystemUserInformation.getGuestInstance().getUserID()
-            .equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID())) {
-            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
         final HttpServletRequest req = job.getRequest();
         final HttpServletResponse res = job.getResponse();
-        redirectURI = MCRFrontendUtil.getBaseURL() + job.getRequest().getServletPath().substring(1);
-        userProfileURL = MCRServlet.getServletBaseURL() + USER_SERVLET_PATH;
-        final String action = job.getRequest().getParameter("action");
-        if (job.getRequest().getParameter("code") != null) {
+        if (MCRSystemUserInformation.getGuestInstance().getUserID()
+            .equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID())) {
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        if (req.getParameter("code") != null) {
             final String userID = MCRUserManager.getCurrentUser().getUserID();
             final String state = MCRORCIDUtils.hashString(userID);
-            if (!state.equals(job.getRequest().getParameter("state"))) {
+            if (!state.equals(req.getParameter("state"))) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "State is invalid");
             }
-            final String code = job.getRequest().getParameter("code").trim();
+            final String code = req.getParameter("code").trim();
             if (code.isEmpty()) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Code is empty");
             }
             try {
-                handleCode(code);
+                final String redirectURI = MCRFrontendUtil.getBaseURL() + req.getServletPath().substring(1);
+                handleCode(code, redirectURI);
+                final String userProfileURL = MCRServlet.getServletBaseURL() + USER_SERVLET_PATH;
                 res.sendRedirect(userProfileURL);
             } catch (MCRORCIDException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             }
-        } else if (job.getRequest().getParameter("error") != null) {
-            final String error = job.getRequest().getParameter("error");
+        } else if (req.getParameter("error") != null) {
+            final String error = req.getParameter("error");
             LOGGER.error(error);
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ORCID was unable to process the request"); // TODO
         } else {
@@ -111,7 +100,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         }
     }
 
-    private void handleCode(String code) {
+    private void handleCode(String code, String redirectURI) {
         try {
             final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
                 = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);

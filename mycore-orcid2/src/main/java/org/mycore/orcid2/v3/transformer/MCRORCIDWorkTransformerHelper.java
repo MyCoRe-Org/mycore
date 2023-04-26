@@ -19,6 +19,7 @@
 package org.mycore.orcid2.v3.transformer;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -101,7 +102,7 @@ public class MCRORCIDWorkTransformerHelper {
             throw new MCRORCIDTransformationException(e);
         }
         final Citation citation = work.getWorkCitation();
-        if (citation != null && CitationType.BIBTEX.equals(citation.getWorkCitationType())) {
+        if (citation != null && Objects.equals(citation.getWorkCitationType(), CitationType.BIBTEX)) {
             final Element modsBibTeX = MCRORCIDTransformerHelper.transformBibTeXToMODS(citation.getCitation());
             MCRMergeTool.merge(mods, modsBibTeX);
         }

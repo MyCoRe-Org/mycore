@@ -18,8 +18,6 @@
 
 package org.mycore.orcid2.resources;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URI;
 import java.util.Map;
 
@@ -152,12 +150,10 @@ public class MCRORCIDResource {
      * @param scope not encoded scope string
      * @param langCode language code
      * @return url to request authorization code
-     * @throws URISyntaxException if BaseURL is malformed
-     * @throws MalformedURLException if BaseURL is malformed
      */
     private URI buildRequestCodeURI(String scope, String state, String langCode) {
         final UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
-        final String redirectURI = MCRFrontendUtil.getBaseURL() + "orcid";
+        final String redirectURI = MCRFrontendUtil.getBaseURL() + "orcid"; // TODO derive servlet url
         builder.path("oauth/authorize");
         builder.queryParam("redirect_uri", redirectURI);
         builder.queryParam("client_id", MCRORCIDOAuthClient.CLIENT_ID);

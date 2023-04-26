@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -131,7 +132,7 @@ public class MCRORCIDUtils {
      * @return true if source path equals client id
      */
     public static boolean isCreatedByThisApplication(String sourcePath) {
-        return MCRORCIDOAuthClient.CLIENT_ID.equals(sourcePath);
+        return Objects.equals(sourcePath, MCRORCIDOAuthClient.CLIENT_ID);
     }
 
     /**
