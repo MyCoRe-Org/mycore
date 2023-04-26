@@ -7,7 +7,7 @@
   xmlns:mcrstring="http://www.mycore.de/xslt/stringutils"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   
-  exclude-result-prefixes="xlink mods fn">
+  exclude-result-prefixes="xlink mods fn mcri18n">
   
   <xsl:param name="CurrentUser" />
   <xsl:param name="CurrentLang" />

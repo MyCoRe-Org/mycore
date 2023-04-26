@@ -26,7 +26,7 @@
                 xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
                 xmlns:csl="http://purl.org/net/xbiblio/csl"
                 extension-element-prefixes="str"
-                exclude-result-prefixes="xsl xalan exslt i18n"
+                exclude-result-prefixes="xsl xalan exslt i18n csl"
 >
 
 
