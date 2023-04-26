@@ -25,15 +25,24 @@ import java.time.ZoneId;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.jdom2.Element;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJAXBContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
@@ -60,9 +69,8 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "OAuth.";
-
-    private static final String USER_SERVLET_PATH = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "User.Servlet");
+    private static final MCRContentTransformer T_AUTH2HTML
+        = MCRContentTransformerFactory.getTransformer("AuthResponse2HTML");
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -86,17 +94,15 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             try {
                 final String redirectURI = MCRFrontendUtil.getBaseURL() + req.getServletPath().substring(1);
                 handleCode(code, redirectURI);
-                final String userProfileURL = MCRServlet.getServletBaseURL() + USER_SERVLET_PATH;
-                res.sendRedirect(userProfileURL);
+                sendResponse(req, res, new MCRORCIDAuthResponse());
             } catch (MCRORCIDException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             }
         } else if (req.getParameter("error") != null) {
             final String error = req.getParameter("error");
+            final String errorDescription = req.getParameter("error_description");
             LOGGER.error(error);
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ORCID was unable to process the request"); // TODO
-        } else {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "An action must be specified");
+            sendResponse(req, res, new MCRORCIDAuthResponse(error, errorDescription));
         }
     }
 
@@ -121,5 +127,39 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         credential.setExpiration(expireDate);
         credential.setScope(response.getScope());
         return credential;
+    }
+
+    private void sendResponse(HttpServletRequest req, HttpServletResponse res, MCRORCIDAuthResponse authResponse)
+        throws Exception {
+        final Element responseElement = transformAuthResponseToElement(authResponse);
+        final MCRContent response = transformAuthResponse(responseElement);
+        MCRLayoutService.instance().doLayout(req, res, response);
+    }
+
+    private static Element transformAuthResponseToElement(MCRORCIDAuthResponse authResponse) throws Exception {
+        final JAXBContext context = JAXBContext.newInstance(MCRORCIDAuthResponse.class);
+        final MCRJAXBContent<MCRORCIDAuthResponse> content = new MCRJAXBContent(context, authResponse);
+        return content.asXML().detachRootElement();
+    }
+
+    private static MCRContent transformAuthResponse(Element authResponse) throws Exception {
+        return T_AUTH2HTML.transform(new MCRJDOMContent(authResponse));
+    }
+
+    @XmlRootElement(name = "AuthResponse")
+    static class MCRORCIDAuthResponse {
+
+        private final String error;
+
+        private final String errorDescription;
+
+        MCRORCIDAuthResponse() {
+            this(null, null);
+        }
+
+        MCRORCIDAuthResponse(String error, String errorDescription) {
+            this.error = error;
+            this.errorDescription = errorDescription;
+        }
     }
 }
