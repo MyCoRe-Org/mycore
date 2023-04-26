@@ -272,8 +272,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         MCRUserManager.updatePasswordHashToSHA256(mcrUser, mcrUser.getPassword());
 
-        FileOutputStream outFile = new FileOutputStream(newFile);
-        saveToXMLFile(mcrUser, outFile);
+        try (FileOutputStream outFile = new FileOutputStream(newFile)) {
+            saveToXMLFile(mcrUser, outFile);
+        }
     }
 
     /**
@@ -342,9 +343,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (user.getSystemRoleIDs().isEmpty()) {
             LOGGER.warn("User {} has not any system roles.", user.getUserID());
         }
-        FileOutputStream outFile = new FileOutputStream(filename);
-        LOGGER.info("Writing to file {} ...", filename);
-        saveToXMLFile(user, outFile);
+        try (FileOutputStream outFile = new FileOutputStream(filename)) {
+            LOGGER.info("Writing to file {} ...", filename);
+            saveToXMLFile(user, outFile);
+        }
     }
 
     @MCRCommand(
