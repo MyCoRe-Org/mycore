@@ -20,6 +20,7 @@ package org.mycore.iiif.presentation;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.mycore.frontend.MCRFrontendUtil;
@@ -89,7 +90,7 @@ public class MCRIIIFPresentationUtil {
     }
 
     private static String getImplBaseURL(String impl, String identifier) {
-        String impAndSlash = "".equals(impl) ? "" : impl + "/";
+        String impAndSlash = Objects.equals(impl, "") ? "" : impl + "/";
         return MCRFrontendUtil.getBaseURL() + "api/iiif/presentation/v2/" + impAndSlash + identifier + "/";
     }
 

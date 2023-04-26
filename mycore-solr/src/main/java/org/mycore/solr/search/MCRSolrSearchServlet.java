@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -185,9 +186,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
             String[] valueArray = sortParameterEntry.getValue();
             if (valueArray.length > 0) {
                 String value = valueArray[0];
-                if ("order".equals(type)) {
+                if (Objects.equals(type, "order")) {
                     positionOrderMap.put(position, value);
-                } else if ("field".equals(type)) {
+                } else if (Objects.equals(type, "field")) {
                     positionFieldMap.put(position, value);
                 }
             }

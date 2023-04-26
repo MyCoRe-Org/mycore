@@ -18,6 +18,8 @@
 
 package org.mycore.mods.classification;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -78,7 +80,7 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
             return null;
         }
 
-        if ("text".equals(type)) {
+        if (Objects.equals(type, "text")) {
             LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
             return null;
         }

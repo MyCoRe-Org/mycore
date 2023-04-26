@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -233,7 +234,7 @@ public class MCRWCMSFileBrowserResource {
             LOGGER.error("Error while saving {}", href + "/" + header.getFileName(), e);
             return "";
         }
-        if ("images".equals(type)) {
+        if (Objects.equals(type, "images")) {
             return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'"
                 + path.substring(path.lastIndexOf("/") + 1) + "', '');</script>";
         }
@@ -279,7 +280,7 @@ public class MCRWCMSFileBrowserResource {
 
     protected void getallowedPaths(Element element) {
         String pathString = element.getAttribute("dir");
-        if (!"".equals(pathString)) {
+        if (!Objects.equals(pathString, "")) {
             folderList.add(wcmsDataPath + pathString);
         }
         NodeList nodeList = element.getChildNodes();

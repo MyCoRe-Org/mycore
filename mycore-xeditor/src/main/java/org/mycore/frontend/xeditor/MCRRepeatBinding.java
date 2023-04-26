@@ -19,6 +19,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
@@ -57,7 +58,8 @@ public class MCRRepeatBinding extends MCRBinding {
 
     public MCRRepeatBinding(String xPath, MCRBinding parent, String method) throws JaxenException {
         super(xPath, true, parent);
-        this.method = "clone".equals(method) ? "clone" : "build".equals(method) ? "build" : DEFAULT_METHOD;
+        this.method = Objects.equals(method, "clone") ? "clone"
+            : Objects.equals(method, "build") ? "build" : DEFAULT_METHOD;
         this.maxRepeats = Integer.MAX_VALUE;
     }
 
@@ -100,7 +102,7 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public void insert(int pos) throws JaxenException {
-        if ("build".equals(method)) {
+        if (Objects.equals(method, "build")) {
             Element parentElement = getParentElement();
             Element precedingElement = (Element) (getBoundNodes().get(pos - 1));
             int posOfPrecedingInParent = parentElement.indexOf(precedingElement);

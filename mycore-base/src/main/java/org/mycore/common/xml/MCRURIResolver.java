@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -1005,12 +1006,12 @@ public final class MCRURIResolver implements URIResolver {
 
             String levelS = pst.nextToken();
             pst.nextToken(); // :
-            int levels = "all".equals(levelS) ? -1 : Integer.parseInt(levelS);
+            int levels = Objects.equals(levelS, "all") ? -1 : Integer.parseInt(levelS);
 
             String axis;
             String token = pst.nextToken();
             pst.nextToken(); // :
-            boolean emptyLeaves = !"noEmptyLeaves".equals(token);
+            boolean emptyLeaves = !Objects.equals(token, "noEmptyLeaves");
             if (!emptyLeaves) {
                 axis = pst.nextToken();
                 pst.nextToken(); // :

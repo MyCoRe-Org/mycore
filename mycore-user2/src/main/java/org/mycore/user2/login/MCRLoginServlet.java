@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -128,9 +129,9 @@ public class MCRLoginServlet extends MCRServlet {
         job.getResponse().setHeader("Pragma", "no-cache");
         job.getResponse().setHeader("Expires", "0");
 
-        if ("login".equals(action)) {
+        if (Objects.equals(action, "login")) {
             presentLoginForm(job);
-        } else if ("cancel".equals(action)) {
+        } else if (Objects.equals(action, "cancel")) {
             redirect(res);
         } else if (realm != null) {
             loginToRealm(req, res, req.getParameter(REALM_URL_PARAMETER));

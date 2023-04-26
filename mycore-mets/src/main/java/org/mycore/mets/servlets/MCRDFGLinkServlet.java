@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,7 +77,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         String filePath = request.getParameter("file") == null ? "" : request.getParameter("file");
         String derivateID = request.getParameter("deriv") == null ? "" : request.getParameter("deriv");
 
-        if ("".equals(derivateID)) {
+        if (Objects.equals(derivateID, "")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
         }
 

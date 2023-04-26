@@ -22,6 +22,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,7 +79,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
     }
 
     private boolean hasPermission(MCRCategoryID category, String state) {
-        if ("new".equals(state)) {
+        if (Objects.equals(state, "new")) {
             return MCRAccessManager.checkPermission(PERMISSION_CREATE);
         }
         return MCRAccessManager.checkPermission(category.getRootID(), PERMISSION_WRITE);

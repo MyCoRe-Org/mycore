@@ -224,7 +224,7 @@ public class MCRXMLFunctions {
         if (fieldName == null || fieldName.trim().length() == 0) {
             return "";
         }
-        boolean useLastValue = "bis".equals(fieldName);
+        boolean useLastValue = Objects.equals(fieldName, "bis");
         return MCRCalendar.getISODateToFormattedString(date, useLastValue, calendarName);
     }
 

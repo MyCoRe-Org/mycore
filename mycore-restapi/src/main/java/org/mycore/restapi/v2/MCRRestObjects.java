@@ -507,7 +507,7 @@ public class MCRRestObjects {
                         }
                         return thumbnail.map(b -> {
                             String type = "image/png";
-                            if ("jpg".equals(ext) || "jpeg".equals(ext)) {
+                            if (Objects.equals(ext, "jpg") || Objects.equals(ext, "jpeg")) {
                                 type = "image/jpeg";
                             }
                             return Response.ok(b)

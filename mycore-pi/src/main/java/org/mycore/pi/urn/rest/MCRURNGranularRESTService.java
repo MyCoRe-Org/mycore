@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -127,7 +128,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
             .size();
 
         int seed = Optional.of(filePath)
-            .filter(p -> !"".equals(p))
+            .filter(p -> !Objects.equals(p, ""))
             .map(countCreatedPI)
             .map(count -> count + 1)
             .orElse(1);
@@ -148,7 +149,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
             .collect(Collectors.toMap(generateURN, p -> p, (m1, m2) -> m1,
                 LinkedHashMap::new));
 
-        if (!"".equals(filePath) && urnPathMap.isEmpty()) {
+        if (!Objects.equals(filePath, "") && urnPathMap.isEmpty()) {
             String errMsg = new MessageFormat("File {0} does not exist in {1}.\n", Locale.ROOT)
                 .format(new Object[] { filePath, derivID.toString() })
                 + "Use absolute path of file without owner ID like /abs/path/to/file.\n";
@@ -276,7 +277,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         Gson gson = getGson();
 
         //just update flag for derivate, where additional is ""
-        if ("".equals(additional)) {
+        if (Objects.equals(additional, "")) {
             Iterator<String> flagsIter = flags.iterator();
             while (flagsIter.hasNext()) {
                 String flagStr = flagsIter.next();

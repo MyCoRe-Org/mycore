@@ -18,6 +18,8 @@
 
 package org.mycore.iiif.image.parser;
 
+import java.util.Objects;
+
 import org.mycore.iiif.image.model.MCRIIIFImageTargetSize;
 
 public class MCRIIIFScaleParser {
@@ -35,7 +37,7 @@ public class MCRIIIFScaleParser {
     }
 
     private boolean isFull() {
-        return "full".equals(targetScale) || "max".equals(targetScale);
+        return Objects.equals(targetScale, "full") || Objects.equals(targetScale, "max");
     }
 
     private boolean isPercent() {

@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -116,7 +117,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
      *            the condition value
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value) {
-        if ("TODAY".equals(value)) {
+        if (Objects.equals(value, "TODAY")) {
             value = getToday();
         }
         return new MCRQueryCondition(field, oper, value);

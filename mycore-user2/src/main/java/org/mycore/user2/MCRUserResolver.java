@@ -19,6 +19,7 @@
 package org.mycore.user2;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -51,9 +52,9 @@ public class MCRUserResolver implements URIResolver {
         String userID = hrefParts[1];
         MCRUser user = null;
         try {
-            if ("current".equals(userID)) {
+            if (Objects.equals(userID, "current")) {
                 user = MCRUserManager.getCurrentUser();
-            } else if ("getOwnedUsers".equals(userID)) {
+            } else if (Objects.equals(userID, "getOwnedUsers")) {
                 return getOwnedUsers(hrefParts[2]);
             } else {
                 user = MCRUserManager.getUser(userID);

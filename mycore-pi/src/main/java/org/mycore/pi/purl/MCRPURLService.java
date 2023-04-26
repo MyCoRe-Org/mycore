@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -143,7 +144,7 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     @Override
     protected void registerIdentifier(MCRBase obj, String additional, MCRPURL purl)
         throws MCRPersistentIdentifierException {
-        if (!"".equals(additional)) {
+        if (!Objects.equals(additional, "")) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }

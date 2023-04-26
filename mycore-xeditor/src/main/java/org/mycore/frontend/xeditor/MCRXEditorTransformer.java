@@ -21,6 +21,7 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -202,7 +203,7 @@ public class MCRXEditorTransformer {
 
     public void toggleWithinSelectElement(String attrMultiple) {
         withinSelectElement = !withinSelectElement;
-        withinSelectMultiple = "multiple".equals(attrMultiple);
+        withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
     }
 
     public boolean isWithinSelectElement() {
@@ -270,7 +271,7 @@ public class MCRXEditorTransformer {
     }
 
     public String getSwapParameter(String action) throws JaxenException {
-        boolean direction = "down".equals(action) ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
+        boolean direction = Objects.equals(action, "down") ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
         return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
     }
 
@@ -365,7 +366,7 @@ public class MCRXEditorTransformer {
     public void declareParameter(String name, String defaultValue) {
         Object currentValue = editorSession.getVariables().get(name);
 
-        if ((currentValue == null) || "".equals(currentValue)) {
+        if ((currentValue == null) || Objects.equals(currentValue, "")) {
             editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
         }
     }

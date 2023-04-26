@@ -35,6 +35,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -85,9 +86,9 @@ import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 
 /**
  * main utility class that handles REST requests
@@ -771,10 +772,10 @@ public class MCRRestAPIObjectsHelper {
                     "Allowed values are 'ID' and 'lastModified'."));
             }
 
-            if ("asc".equals(sortOrder)) {
+            if (Objects.equals(sortOrder, "asc")) {
                 result.setOrder(SortOrder.ASC);
             }
-            if ("desc".equals(sortOrder)) {
+            if (Objects.equals(sortOrder, "desc")) {
                 result.setOrder(SortOrder.DESC);
             }
             if (result.getOrder() == null) {
@@ -871,7 +872,7 @@ public class MCRRestAPIObjectsHelper {
         }
 
         String matchedDerID = null;
-        if ("mcr".equals(derKey) &&
+        if (Objects.equals(derKey, "mcr") &&
             MCRMetadataManager.getDerivateIds(parentObjId, 0, TimeUnit.SECONDS)
                 .stream()
                 .map(MCRObjectID::toString)

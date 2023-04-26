@@ -20,6 +20,7 @@ package org.mycore.common;
 
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author shermann
@@ -57,7 +58,7 @@ public class MCRGeoUtilities {
             seconds = Double.parseDouble(strings[3]);
         }
 
-        int factor = "W".equals(strings[0]) || "S".equals(strings[0]) ? -1 : 1;
+        int factor = Objects.equals(strings[0], "W") || Objects.equals(strings[0], "S") ? -1 : 1;
         return ((((seconds / 60) + minutes) / 60) + degree) * factor;
     }
 

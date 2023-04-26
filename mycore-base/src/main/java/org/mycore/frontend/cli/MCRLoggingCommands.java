@@ -18,6 +18,8 @@
 
 package org.mycore.frontend.cli;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,7 +56,7 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
             LOGGER.error("Unknown log level \"{}\"", logLevelToSet);
             return;
         }
-        Logger log = "ROOT".equals(name) ? LogManager.getRootLogger() : LogManager.getLogger(name);
+        Logger log = Objects.equals(name, "ROOT") ? LogManager.getRootLogger() : LogManager.getLogger(name);
         if (log == null) {
             LOGGER.error("Could not get logger for \"{}\"", name);
             return;

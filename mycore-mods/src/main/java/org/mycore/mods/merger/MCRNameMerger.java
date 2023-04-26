@@ -66,15 +66,15 @@ public class MCRNameMerger extends MCRMerger {
             String type = namePart.getAttributeValue("type");
             String nameFragment = namePart.getText().replaceAll("\\p{Zs}+", " ");
 
-            if ("family".equals(type)) {
+            if (Objects.equals(type, "family")) {
                 setFamilyName(nameFragment);
-            } else if ("given".equals(type)) {
+            } else if (Objects.equals(type, "given")) {
                 addGivenNames(nameFragment);
                 addInitials(nameFragment);
                 allNames.addAll(initials);
-            } else if ("date".equals(type)) {
+            } else if (Objects.equals(type, "date")) {
                 continue;
-            } else if ("termsOfAddress".equals(type)) {
+            } else if (Objects.equals(type, "termsOfAddress")) {
                 continue;
             } else if ("personal".equals(modsName.getAttributeValue("type"))) {
                 setFromCombinedName(nameFragment);

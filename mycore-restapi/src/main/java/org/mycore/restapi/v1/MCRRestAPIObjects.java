@@ -24,6 +24,7 @@ import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_MCRID;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -180,7 +181,8 @@ public class MCRRestAPIObjects {
         @PathParam(PARAM_DERID) String derid,
         @QueryParam("style") String style)
         throws MCRRestAPIException {
-        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, app, "derivatedetails".equals(style));
+        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, app,
+            Objects.equals(style, "derivatedetails"));
     }
 
     /** returns a list of derivates for a given MyCoRe Object 

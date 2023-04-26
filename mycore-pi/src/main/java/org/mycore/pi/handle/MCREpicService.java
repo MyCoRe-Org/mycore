@@ -24,6 +24,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -117,7 +118,7 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     @Override
     protected void registerIdentifier(MCRBase obj, String additional, MCRHandle pi)
         throws MCRPersistentIdentifierException {
-        if (!"".equals(additional)) {
+        if (!Objects.equals(additional, "")) {
             String className = this.getClass().getName();
             throw new MCRPersistentIdentifierException(
                 className + " doesn't support additional information! (" + additional + ")");

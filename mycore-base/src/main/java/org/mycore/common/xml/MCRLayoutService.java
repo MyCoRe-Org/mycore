@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -97,7 +98,7 @@ public class MCRLayoutService {
         } catch (MCRException ex) {
             // Check if it is an error page to suppress later recursively
             // generating an error page when there is an error in the stylesheet
-            if (!"mcr_error".equals(docType)) {
+            if (!Objects.equals(docType, "mcr_error")) {
                 throw ex;
             }
 
@@ -122,7 +123,7 @@ public class MCRLayoutService {
         } catch (MCRException ex) {
             // Check if it is an error page to suppress later recursively
             // generating an error page when there is an error in the stylesheet
-            if (!"mcr_error".equals(docType)) {
+            if (!Objects.equals(docType, "mcr_error")) {
                 throw ex;
             }
 

@@ -92,7 +92,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
         }
         Locale locale = Locale.forLanguageTag(lang);
         String languageTag = locale.toLanguageTag();
-        if ("und".equals(languageTag)) {
+        if (Objects.equals(languageTag, "und")) {
             throw new IllegalArgumentException("'lang' of label is not valid language tag (RFC4646):" + lang);
         }
         this.lang = languageTag;

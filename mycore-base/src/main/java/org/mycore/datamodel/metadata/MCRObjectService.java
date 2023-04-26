@@ -21,6 +21,7 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -143,7 +144,7 @@ public class MCRObjectService {
             List<Element> dateElements = datesElement.getChildren();
             for (Element dateElement : dateElements) {
                 String dateElementName = dateElement.getName();
-                if (!"servdate".equals(dateElementName)) {
+                if (!Objects.equals(dateElementName, "servdate")) {
                     continue;
                 }
                 MCRMetaISO8601Date date = new MCRMetaISO8601Date();

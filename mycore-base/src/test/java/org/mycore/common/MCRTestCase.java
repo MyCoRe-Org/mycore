@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.junit.After;
@@ -124,7 +125,7 @@ public class MCRTestCase {
     private static void extendTestProperties(Map<String, String> testProperties, MCRTestProperty testProperty) {
 
         String stringValue = testProperty.string();
-        boolean nonDefaultString = !"".equals(stringValue);
+        boolean nonDefaultString = !Objects.equals(stringValue, "");
 
         Class<?> classNameOfValue = testProperty.classNameOf();
         boolean nonDefaultClassNameOf = Void.class != classNameOfValue;

@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -80,8 +81,8 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 
 /**
  * This class is responsible for CRUD-operations of MCRCategories. It accepts
@@ -126,7 +127,7 @@ public class MCRClassificationEditorResource {
     @Path("{rootidStr}")
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@PathParam("rootidStr") String rootidStr) {
-        if (rootidStr == null || "".equals(rootidStr)) {
+        if (rootidStr == null || Objects.equals(rootidStr, "")) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
@@ -143,7 +144,8 @@ public class MCRClassificationEditorResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@PathParam("rootidStr") String rootidStr, @PathParam("categidStr") String categidStr) {
 
-        if (rootidStr == null || "".equals(rootidStr) || categidStr == null || "".equals(categidStr)) {
+        if (rootidStr == null || Objects.equals(rootidStr, "") || categidStr == null
+            || Objects.equals(categidStr, "")) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
@@ -172,7 +174,7 @@ public class MCRClassificationEditorResource {
     @Path("export/{rootidStr}")
     @Produces(MediaType.APPLICATION_XML)
     public String export(@PathParam("rootidStr") String rootidStr) {
-        if (rootidStr == null || "".equals(rootidStr)) {
+        if (rootidStr == null || Objects.equals(rootidStr, "")) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
         String classAsString = MCRClassificationUtils.asString(rootidStr);
@@ -224,9 +226,9 @@ public class MCRClassificationEditorResource {
                 String status = getStatus(jsonObject);
                 SaveElement categ = getCateg(jsonObject);
                 MCRJSONCategory parsedCateg = parseJson(categ.getJson());
-                if ("update".equals(status)) {
+                if (Objects.equals(status, "update")) {
                     new UpdateOp(parsedCateg, jsonObject).run();
-                } else if ("delete".equals(status)) {
+                } else if (Objects.equals(status, "delete")) {
                     deleteCateg(categ.getJson());
                 } else {
                     return Response.status(Status.BAD_REQUEST).build();

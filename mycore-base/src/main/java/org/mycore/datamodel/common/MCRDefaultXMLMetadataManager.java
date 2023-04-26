@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -350,7 +351,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
         MCRConfiguration2.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
         MCRConfiguration2.set(configPrefix + "ForceXML", String.valueOf(true));
-        String value = "derivate".equals(objectType) ? "mycorederivate" : "mycoreobject";
+        String value = Objects.equals(objectType, "derivate") ? "mycorederivate" : "mycoreobject";
         MCRConfiguration2.set(configPrefix + "ForceDocType", value);
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, clazz);

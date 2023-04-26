@@ -737,7 +737,7 @@ public class MCRMetsSave {
             .map(File::getFLocat).map(FLocat::getHref).collect(Collectors.toList());
         List<String> derivateFiles = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory))
             .map(MCRPath::toMCRPath).map(MCRPath::getOwnerRelativePath)
-            .map(path -> path.substring(1)).filter(href -> !"mets.xml".equals(href))
+            .map(path -> path.substring(1)).filter(href -> !Objects.equals(href, "mets.xml"))
             .collect(Collectors.toList());
 
         ArrayList<String> removedFiles = new ArrayList<>(metsFiles);

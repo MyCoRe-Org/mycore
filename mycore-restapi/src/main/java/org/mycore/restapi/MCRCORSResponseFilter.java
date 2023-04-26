@@ -20,6 +20,7 @@ package org.mycore.restapi;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -112,7 +113,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
                     exposedHeaders.stream().collect(Collectors.joining(",")));
             }
         }
-        if (!"*".equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN))) {
+        if (!Objects.equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN), "*")) {
             String vary = Stream
                 .concat(Stream.of(ORIGIN),
                     responseHeaders.getOrDefault(HttpHeaders.VARY, Collections.emptyList())

@@ -618,7 +618,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 if (!allowed.contains(attr)) {
                     throw new IllegalArgumentException("'" + attr + "' not recognized");
                 }
-                if ("*".equals(attr)) {
+                if (Objects.equals(attr, "*")) {
                     copyAll = true;
                 }
             }
@@ -649,7 +649,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
         public void setAttribute(String name, Object value) throws IOException {
             Set<String> allowed = getAllowedAttributes();
-            if ("*".equals(name) || !allowed.contains(name)) {
+            if (Objects.equals(name, "*") || !allowed.contains(name)) {
                 throw new IllegalArgumentException("'" + name + "' not recognized");
             }
             switch (name) {

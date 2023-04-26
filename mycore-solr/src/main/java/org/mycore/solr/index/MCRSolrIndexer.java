@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -465,7 +466,7 @@ public class MCRSolrIndexer {
     }
 
     public static void dropIndexByType(String type, SolrClient client) throws Exception {
-        if (!MCRObjectID.isValidType(type) || "data_file".equals(type)) {
+        if (!MCRObjectID.isValidType(type) || Objects.equals(type, "data_file")) {
             LOGGER.warn("The type {} is not a valid type in the actual environment", type);
             return;
         }

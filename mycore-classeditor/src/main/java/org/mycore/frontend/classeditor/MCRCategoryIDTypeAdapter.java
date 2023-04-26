@@ -22,6 +22,7 @@ import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_CA
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_ROOTID;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 import org.mycore.common.MCRJSONTypeAdapter;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -53,7 +54,7 @@ public class MCRCategoryIDTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryID> 
 
         JsonObject idJsonObj = new JsonObject();
         idJsonObj.addProperty(PROP_ROOTID, rootID);
-        if (categID != null && !"".equals(categID)) {
+        if (categID != null && !Objects.equals(categID, "")) {
             idJsonObj.addProperty(PROP_CATEGID, categID);
         }
 

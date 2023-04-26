@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -121,9 +122,9 @@ public class MCRMailer extends MCRServlet {
                 mailProperties.setProperty("mail.smtp.auth", "true");
             }
             String starttsl = MCRConfiguration2.getString("MCR.Mail.STARTTLS").orElse("disabled");
-            if ("enabled".equals(starttsl)) {
+            if (Objects.equals(starttsl, "enabled")) {
                 mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
-            } else if ("required".equals(starttsl)) {
+            } else if (Objects.equals(starttsl, "required")) {
                 mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
                 mailProperties.setProperty("mail.smtp.starttls.required", "true");
             }

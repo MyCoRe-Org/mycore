@@ -21,6 +21,7 @@ package org.mycore.iiif.image.parser;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.mycore.iiif.image.model.MCRIIIFImageSourceRegion;
@@ -123,11 +124,11 @@ public class MCRIIIFRegionParser {
     }
 
     private boolean isFull() {
-        return "full".equals(sourceRegion);
+        return Objects.equals(sourceRegion, "full");
     }
 
     private boolean isSquare() {
-        return "square".equals(sourceRegion);
+        return Objects.equals(sourceRegion, "square");
     }
 
     private List<Double> parseNumbers() {

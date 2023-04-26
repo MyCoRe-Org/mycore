@@ -20,6 +20,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.transform.TransformerFactory;
 
@@ -62,11 +63,11 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
         Class<? extends TransformerFactory> factoryClass = null;
         try {
-            if ("xalan".equals(transformer)) {
+            if (Objects.equals(transformer, "xalan")) {
                 factoryClass = MCRClassTools
                     .forName("org.apache.xalan.processor.TransformerFactoryImpl");
             }
-            if ("saxon".equals(transformer)) {
+            if (Objects.equals(transformer, "saxon")) {
                 factoryClass = MCRClassTools
                     .forName("net.sf.saxon.TransformerFactoryImpl");
             }

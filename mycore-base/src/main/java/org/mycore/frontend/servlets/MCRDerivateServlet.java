@@ -24,6 +24,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
@@ -35,10 +36,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.fileupload.MCRUploadHelper;
+import org.mycore.services.i18n.MCRTranslation;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee); Sebastian Röher
@@ -61,7 +62,7 @@ public class MCRDerivateServlet extends MCRServlet {
         if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"),
             getProperty(request, "file2"))) {
             String url = request.getParameter("url");
-            if (("".equals(url))) {
+            if ((Objects.equals(url, ""))) {
                 response.sendError(HttpServletResponse.SC_NO_CONTENT, "Parameter 'url' is set but empty!");
                 return;
             }

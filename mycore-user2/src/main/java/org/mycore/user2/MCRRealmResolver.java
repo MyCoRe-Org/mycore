@@ -19,6 +19,7 @@
 package org.mycore.user2;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
@@ -48,9 +49,9 @@ public class MCRRealmResolver implements URIResolver {
     @Override
     public Source resolve(final String href, final String base) {
         String realmID = href.split(":")[1];
-        if ("all".equals(realmID)) {
+        if (Objects.equals(realmID, "all")) {
             return MCRRealmFactory.getRealmsSource();
-        } else if ("local".equals(realmID)) {
+        } else if (Objects.equals(realmID, "local")) {
             realmID = MCRRealmFactory.getLocalRealm().getID();
         }
         return new JDOMSource(getElement(MCRRealmFactory.getRealm(realmID).getID()));

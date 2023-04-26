@@ -19,6 +19,7 @@
 package org.mycore.frontend.xeditor.target;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +44,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
         String baseXPath = getBaseXPathForSubselect(session);
         LOGGER.info("Returning from subselect for {}", baseXPath);
 
-        if ("cancel".equals(parameter)) {
+        if (Objects.equals(parameter, "cancel")) {
             session.setBreakpoint("After canceling subselect for " + baseXPath);
         } else {
             Map<String, String[]> submittedValues = MCRTargetUtils.getSubmittedValues(job, baseXPath);

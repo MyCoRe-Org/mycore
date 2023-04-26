@@ -19,6 +19,7 @@
 package org.mycore.mods.bibtex;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -42,7 +43,8 @@ class MCRGenreTransformer {
 
     static void fixHostGenre(BibtexEntry entry, Element mods) {
         String type = entry.getEntryType().toLowerCase(Locale.ROOT);
-        if ("incollection".equals(type) || "inproceedings".equals(type) || "inbook".equals(type)) {
+        if (Objects.equals(type, "incollection") || Objects.equals(type, "inproceedings")
+            || Objects.equals(type, "inbook")) {
             type = type.substring(2);
 
             Element genre = getHostGenre(mods);

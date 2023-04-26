@@ -18,10 +18,14 @@
 
 package org.mycore.wcms2.navigation;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import jakarta.ws.rs.WebApplicationException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -33,12 +37,11 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.tools.MyCoReWebPageProvider;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import jakarta.ws.rs.WebApplicationException;
 
 /**
  * The default implementation to convert MyCoRe Webpage sections
@@ -126,7 +129,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
                 out.output(childElement, writer);
             } else if (child instanceof Text text) {
                 String trimmedText = text.getTextTrim();
-                if (!"".equals(trimmedText)) {
+                if (!Objects.equals(trimmedText, "")) {
                     Text newText = new Text(trimmedText);
                     out.output(newText, writer);
                 }

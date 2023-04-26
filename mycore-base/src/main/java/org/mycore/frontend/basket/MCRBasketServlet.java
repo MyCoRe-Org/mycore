@@ -20,6 +20,7 @@ package org.mycore.frontend.basket;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -93,7 +94,7 @@ public class MCRBasketServlet extends MCRServlet {
 
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
 
-        if ("add".equals(action)) {
+        if (Objects.equals(action, "add")) {
             if (uris.length != ids.length) {
                 throw new MCRException("Amount of URIs must match amount of IDs");
             }
@@ -108,44 +109,44 @@ public class MCRBasketServlet extends MCRServlet {
                     entry.resolveContent();
                 }
             }
-        } else if ("remove".equals(action)) {
+        } else if (Objects.equals(action, "remove")) {
             for (String id : ids) {
                 basket.removeEntry(id);
             }
-        } else if ("up".equals(action)) {
+        } else if (Objects.equals(action, "up")) {
             for (String id : ids) {
                 basket.up(basket.get(id));
             }
-        } else if ("down".equals(action)) {
+        } else if (Objects.equals(action, "down")) {
             for (String id : ids) {
                 basket.down(basket.get(id));
             }
-        } else if ("clear".equals(action)) {
+        } else if (Objects.equals(action, "clear")) {
             basket.clear();
-        } else if ("create".equals(action)) {
+        } else if (Objects.equals(action, "create")) {
             String ownerID = req.getParameter("ownerID");
             MCRObjectID ownerOID = MCRObjectID.getInstance(ownerID);
             MCRBasketPersistence.createDerivateWithBasket(basket, ownerOID);
-        } else if ("update".equals(action)) {
+        } else if (Objects.equals(action, "update")) {
             MCRBasketPersistence.updateBasket(basket);
-        } else if ("retrieve".equals(action)) {
+        } else if (Objects.equals(action, "retrieve")) {
             String derivateID = req.getParameter("derivateID");
             basket = MCRBasketPersistence.retrieveBasket(derivateID);
             type = basket.getType();
             MCRBasketManager.setBasketInSession(basket);
-        } else if ("comment".equals(action)) {
+        } else if (Objects.equals(action, "comment")) {
             Document sub = (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
             String comment = sub.getRootElement().getChildTextTrim("comment");
             for (String id : ids) {
                 basket.get(id).setComment(comment);
             }
-        } else if ("show".equals(action)) {
+        } else if (Objects.equals(action, "show")) {
             req.setAttribute("XSL.Style", type);
             Document xml = new MCRBasketXMLBuilder(true).buildXML(basket);
             getLayoutService().doLayout(req, res, new MCRJDOMContent(xml));
             return;
         }
-        if (referer != null && "referer".equals(redirect)) {
+        if (referer != null && Objects.equals(redirect, "referer")) {
             res.sendRedirect(res.encodeRedirectURL(referer.toExternalForm()));
         } else if (redirect != null) {
             res.sendRedirect(res.encodeRedirectURL(redirect));

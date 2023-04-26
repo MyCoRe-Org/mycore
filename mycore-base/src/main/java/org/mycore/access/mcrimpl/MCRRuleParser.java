@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
@@ -86,7 +87,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         String field = e.getAttributeValue("field").toLowerCase(Locale.ROOT).trim();
         String operator = e.getAttributeValue("operator").trim();
         String value = e.getAttributeValue("value").trim();
-        boolean not = "!=".equals(operator);
+        boolean not = Objects.equals(operator, "!=");
 
         return switch (field) {
             case "group" -> new MCRGroupClause(value, not);

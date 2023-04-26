@@ -30,6 +30,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -139,7 +140,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             }
             String centerThumb = job.getRequest().getParameter("centerThumb");
             //defaults to "yes"
-            boolean centered = !"no".equals(centerThumb);
+            boolean centered = !Objects.equals(centerThumb, "no");
             BufferedImage thumbnail = getThumbnail(iviewFile, centered);
 
             if (thumbnail != null) {

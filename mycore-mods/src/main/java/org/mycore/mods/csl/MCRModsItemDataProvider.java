@@ -479,7 +479,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
         } else {
             String nameType = modsName.getAttributeValue("type");
-            if ("conference".equals(nameType)) {
+            if (Objects.equals(nameType, "conference")) {
                 roleNameMap.computeIfAbsent("conference-name", (s) -> new LinkedList<>()).add(cslName);
             }
         }
@@ -489,7 +489,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         final CSLNameBuilder nameBuilder = new CSLNameBuilder();
 
         String nameType = modsName.getAttributeValue("type");
-        final boolean isInstitution = "corporate".equals(nameType) || "conference".equals(nameType);
+        final boolean isInstitution = Objects.equals(nameType, "corporate") || Objects.equals(nameType, "conference");
         nameBuilder.isInstitution(isInstitution);
 
         if (!isInstitution) {
@@ -498,11 +498,13 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
                 final String type = namePart.getAttributeValue("type");
                 final String content = namePart.getTextNormalize();
-                if (("family".equals(type) || "given".equals(type)) && nonDroppingParticles.contains(content)) {
+                if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
+                    && nonDroppingParticles.contains(content)) {
                     final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
                         (t) -> new LinkedList<>());
                     contents.add(content);
-                } else if (("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
+                } else if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
+                    && droppingParticles.contains(content)) {
                     final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
                         (t) -> new LinkedList<>());
                     contents.add(content);

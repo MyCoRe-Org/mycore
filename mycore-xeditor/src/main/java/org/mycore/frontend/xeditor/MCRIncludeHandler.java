@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
@@ -148,9 +149,9 @@ public class MCRIncludeHandler {
 
             for (Element command : element.getChildren()) {
                 String commandType = command.getName();
-                if ("remove".equals(commandType)) {
+                if (Objects.equals(commandType, "remove")) {
                     handleRemove(container, command);
-                } else if ("include".equals(commandType)) {
+                } else if (Objects.equals(commandType, "include")) {
                     handleInclude(container, command);
                 }
             }
@@ -246,7 +247,7 @@ public class MCRIncludeHandler {
     }
 
     private Map<String, Element> chooseCacheLevel(String key, String sStatic) {
-        if ("true".equals(sStatic) || CACHE_AT_APPLICATION_LEVEL.containsKey(key)) {
+        if (Objects.equals(sStatic, "true") || CACHE_AT_APPLICATION_LEVEL.containsKey(key)) {
             return CACHE_AT_APPLICATION_LEVEL;
         } else {
             return cacheAtTransformationLevel;

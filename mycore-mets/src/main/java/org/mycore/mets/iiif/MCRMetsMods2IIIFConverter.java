@@ -158,7 +158,7 @@ public class MCRMetsMods2IIIFConverter {
             String label = Stream.of(order, orderLabel, contentIds)
                 .filter(o -> o != null && !o.isEmpty())
                 .collect(Collectors.joining(" - "));
-            label = ("".equals(label)) ? physicalSubDiv.getId() : label;
+            label = (Objects.equals(label, "")) ? physicalSubDiv.getId() : label;
 
             String identifier = this.physicalIdentifierMap.get(physicalSubDiv);
             try {

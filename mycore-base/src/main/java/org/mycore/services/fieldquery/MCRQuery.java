@@ -21,6 +21,7 @@ package org.mycore.services.fieldquery;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -334,7 +335,7 @@ public class MCRQuery {
                 String name = sortByChild.getAttributeValue("name");
                 String ad = sortByChild.getAttributeValue("order");
 
-                boolean direction = "ascending".equals(ad) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
+                boolean direction = Objects.equals(ad, "ascending") ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
                 sortBy.add(new MCRSortBy(name, direction));
             }
         }

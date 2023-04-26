@@ -21,6 +21,7 @@ package org.mycore.user2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -96,7 +97,7 @@ public class MCRRoleServlet extends MCRServlet {
         }
 
         String action = getProperty(request, "action");
-        if ("chooseCategory".equals(action) || !roleClassificationsDefined) {
+        if (Objects.equals(action, "chooseCategory") || !roleClassificationsDefined) {
             chooseCategory(request);
         } else {
             chooseRoleRoot(request);

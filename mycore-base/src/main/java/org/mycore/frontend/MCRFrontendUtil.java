@@ -148,7 +148,8 @@ public class MCRFrontendUtil {
         StringBuilder webappBase = new StringBuilder(scheme);
         webappBase.append("://");
         webappBase.append(host);
-        if (!("http".equals(scheme) && serverPort == 80 || "https".equals(scheme) && serverPort == 443)) {
+        if (!(Objects.equals(scheme, "http") && serverPort == 80
+            || Objects.equals(scheme, "https") && serverPort == 443)) {
             webappBase.append(':').append(serverPort);
         }
         webappBase.append(path);
