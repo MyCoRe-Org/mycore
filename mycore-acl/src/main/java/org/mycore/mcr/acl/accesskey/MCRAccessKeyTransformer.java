@@ -155,7 +155,7 @@ public class MCRAccessKeyTransformer {
      * Transforms servflag element to {@link MCRAccessKey} list
      *
      * @param objectId the linked {@link MCRObjectID}
-     * @param element servlag element {@link org.mycore.datamodel.metadata.MCRObjectService}
+     * @param element servflag element {@link org.mycore.datamodel.metadata.MCRObjectService}
      * @return the {@link MCRAccessKey} list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
