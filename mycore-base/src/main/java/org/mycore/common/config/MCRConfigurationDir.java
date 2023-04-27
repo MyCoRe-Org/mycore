@@ -25,12 +25,17 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRUtils;
@@ -39,9 +44,9 @@ import jakarta.servlet.ServletContext;
 
 /**
  * This helper class determines in which directory to look for addition configuration files.
- *
+ * <p>
  * The configuration directory can be set with the system property or environment variable <code>MCR.ConfigDir</code>.
- *
+ * <p>
  * The directory path is build this way:
  * <ol>
  *  <li>System property <code>MCR.Home</code> defined
@@ -83,6 +88,8 @@ import jakarta.servlet.ServletContext;
  * @since 2013.12
  */
 public class MCRConfigurationDir {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String DISABLE_CONFIG_DIR_PROPERTY = "MCR.DisableConfigDir";
 
@@ -246,51 +253,156 @@ public class MCRConfigurationDir {
             try {
                 return resolvedFile.toURI().toURL();
             } catch (MalformedURLException e) {
-                LogManager.getLogger(MCRConfigurationDir.class)
-                    .warn("Exception while returning URL for file: {}", resolvedFile, e);
+                LOGGER.warn("Exception while returning URL for file: {}", resolvedFile, e);
             }
         }
         return getClassPathResource(relativePath, classLoader == null ? MCRClassTools.getClassLoader() : classLoader);
     }
 
     private static URL getClassPathResource(String relativePath, ClassLoader classLoader) {
-        URL currentUrl = classLoader.getResource(relativePath);
-        if (SERVLET_CONTEXT != null && currentUrl != null) {
-            Enumeration<URL> resources = null;
-            try {
-                resources = classLoader.getResources(relativePath);
-            } catch (IOException e) {
-                LogManager.getLogger(MCRConfigurationDir.class)
-                    .error("Error while retrieving resource: {}", relativePath, e);
+
+        List<URL> possibleResourceUrls = getPossibleResources(relativePath, classLoader);
+        if (possibleResourceUrls.isEmpty()) {
+            return null;
+        } else if (possibleResourceUrls.size() == 1) {
+            return possibleResourceUrls.get(0);
+        }
+
+        //configuration directory always wins
+        File configDir = getConfigurationDirectory();
+        if (configDir != null) {
+            String configDirUrl = configDir.toURI().toString();
+            List<URL> configDirResourceUrls = possibleResourceUrls
+                .stream()
+                .filter(url -> url.toString().contains(configDirUrl))
+                .collect(Collectors.toList());
+            if (!configDirResourceUrls.isEmpty()) {
+                return getHighestPriorityResource(configDirResourceUrls);
             }
-            if (resources != null) {
-                File configDir = getConfigurationDirectory();
-                String configDirURL = configDir.toURI().toString();
-                @SuppressWarnings("unchecked")
-                List<String> libsOrder = (List<String>) SERVLET_CONTEXT.getAttribute(ServletContext.ORDERED_LIBS);
-                int pos = Integer.MAX_VALUE;
-                while (resources.hasMoreElements()) {
-                    URL testURL = resources.nextElement();
-                    String testURLStr = testURL.toString();
-                    if (testURLStr.contains(configDirURL)) {
-                        return testURL; //configuration directory always wins
-                    }
-                    if (testURLStr.startsWith("file:")) {
-                        //local files should generally win
-                        pos = -1;
-                        currentUrl = testURL;
-                    }
-                    if (pos > 0 && libsOrder != null /*if <absolute-ordering> present in web.xml */) {
-                        for (int i = 0; i < libsOrder.size(); i++) {
-                            if (testURLStr.contains(libsOrder.get(i)) && i < pos) {
-                                currentUrl = testURL;
-                                pos = i;
-                            }
-                        }
-                    }
+        }
+
+        // local files should generally win
+        URL localResourceUrl = possibleResourceUrls
+            .stream()
+            .filter(url -> url.toString().startsWith("file:"))
+            .findFirst()
+            .orElse(null);
+        if (localResourceUrl != null) {
+            return localResourceUrl;
+        }
+
+        return getHighestPriorityResource(possibleResourceUrls);
+
+    }
+
+    private static List<URL> getPossibleResources(String relativePath, ClassLoader classLoader) {
+        List<URL> urls = new LinkedList<>();
+        try {
+            Enumeration<URL> resourceUrls = classLoader.getResources(relativePath);
+            while (resourceUrls.hasMoreElements()) {
+                urls.add(resourceUrls.nextElement());
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while retrieving resource: {}", relativePath, e);
+        }
+        return urls;
+    }
+
+    private static URL getHighestPriorityResource(List<URL> resourceUrls) {
+        List<URL> highestModulePriorityResources = getHighestModulePriorityResources(resourceUrls);
+        if (!highestModulePriorityResources.isEmpty()) {
+            return highestModulePriorityResources.get(0);
+        }
+        Optional<URL> highestLibraryPriorityResource = getHighestLibraryPriorityResource(resourceUrls);
+        if (highestLibraryPriorityResource.isPresent()) {
+            return highestLibraryPriorityResource.get();
+        }
+        return resourceUrls.get(0);
+    }
+
+    /**
+     * Out of a list of possible resource URLs, this method returns the sub-list of resource URLs belonging
+     * to the set of components with the highest module priority, out of the components that contain any of the
+     * resource URLs.
+     * <p>
+     * Example:<br>
+     * component A with priority 90 doesn't contain any of the resource URLs<br>
+     * component B with priority 80 contains resource URL 3<br>
+     * component C with priority 80 contains resource URL 2<br>
+     * component D with priority 70 contains resource URL 1<br>
+     * component E with priority 70 doesn't contain any of the resource URLs<br>
+     * In this case, resource URLs 3 and 2, belonging to the components with priority 80, would be returned.
+     * <p>
+     * To facilitate this, the ordered list of components is iterated. For each component, the list of resource
+     * URIs is searched for a resource URI belonging to that component. As soon as the first component with a matching
+     * resource URI is found, the priority of that component is saved. From this pont on, only components with the same
+     * priority are considered. As soon as a component with a lower priority is encountered, further processing is
+     * aborted.
+     * <p>
+     * If no component contains any of the resource URIs, an empty list is returned.
+     *
+     * @param resourceUrls list of possible resource URLs
+     * @return list of resource URLs belonging to components with the highest module priority
+     */
+    private static List<URL> getHighestModulePriorityResources(List<URL> resourceUrls) {
+        int highestPriority = -1;
+        List<URL> unmatchedResourceUrls = new ArrayList<>(resourceUrls);
+        List<URL> highestPriorityModuleResourceUrls = new LinkedList<>();
+        for (MCRComponent component : componentsByModulePriority()) {
+            if (highestPriority != -1 && component.getPriority() != highestPriority) {
+                break;
+            }
+            String componentJarFileUri = component.getJarFile().toURI().toString();
+            for (URL resourceUrl : unmatchedResourceUrls) {
+                if (resourceUrl.toString().contains(componentJarFileUri)) {
+                    highestPriorityModuleResourceUrls.add(resourceUrl);
+                    unmatchedResourceUrls.remove(resourceUrl);
+                    highestPriority = component.getPriority();
+                    break;
                 }
             }
         }
-        return currentUrl;
+        return highestPriorityModuleResourceUrls;
     }
+
+    private static List<MCRComponent> componentsByModulePriority() {
+        List<MCRComponent> components = new ArrayList<>(MCRRuntimeComponentDetector.getAllComponents());
+        Collections.reverse(components);
+        return components;
+    }
+
+    /**
+     * Out of a list of possible resource URLs, this method returns the resource URL belonging
+     * to the library with the highest servlet context priority.
+     * <p>
+     * To facilitate this, the ordered list of libraries, if available, is iterated. For each library, the list of
+     * resource URIs is searched for a resource URI belonging to that library. As soon as the first library with a
+     * matching resource URI is found, that resource URI is returned.
+     * <p>
+     * If no library contains any of the resource URIs, empty is returned.
+     *
+     * @param resourceUrls list of possible resource URLs
+     * @return resource URLs belonging to library with the highest servlet context priority
+     */
+    private static Optional<URL> getHighestLibraryPriorityResource(List<URL> resourceUrls) {
+        for (String library : librariesByServletContextOrder()) {
+            for (URL resourceUrl : resourceUrls) {
+                if (resourceUrl.toString().contains(library)) {
+                    return Optional.of(resourceUrl);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> librariesByServletContextOrder() {
+        if (SERVLET_CONTEXT != null) {
+            return (List<String>) SERVLET_CONTEXT.getAttribute(ServletContext.ORDERED_LIBS);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+
 }

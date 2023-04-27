@@ -68,6 +68,8 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private File jarFile;
 
+    private int priority;
+
     private String sortCriteria;
 
     private String artifactId;
@@ -123,6 +125,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
         default:
             throw new MCRException("Do not support MCRComponenty of type: " + type);
         }
+        this.priority = priority;
         this.sortCriteria = PRIORITY_FORMAT.format(priority) + getName();
     }
 
@@ -198,7 +201,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     /**
      * Returns the jar file or <code>null</code> if nothing was set.
-     * 
+     *
      * @return the jar file
      */
     public File getJarFile() {
@@ -207,6 +210,19 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private void setJarFile(File jarFile) {
         this.jarFile = jarFile;
+    }
+
+    /**
+     * Returns the priority.
+     *
+     * @return the priority
+     */
+    public int getPriority() {
+        return this.priority;
+    }
+
+    private void setPriority(int priority) {
+        this.priority = priority;
     }
 
     /**
