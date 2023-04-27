@@ -86,7 +86,7 @@ public abstract class MCRContentServlet extends MCRServlet {
             MCRServletContentHelper.serveContent(content, request, response, getServletContext(), getConfig(),
                 serveContent);
         } catch (NoSuchFileException | FileNotFoundException e) {
-            LOGGER.info("Catched {}:", e.getClass().getSimpleName(), e);
+            LOGGER.info("Caught exception while serving content", e);
             response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
             return;
         }

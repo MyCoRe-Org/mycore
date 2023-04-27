@@ -31,9 +31,9 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.common.resource.MCRResourceHelper;
 
 /**
  * provides a cache for reading XML resources.
@@ -64,9 +64,7 @@ public class MCRXMLResource {
     }
 
     private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
-        LOGGER.debug("Reading xml from classpath resource {}", name);
-        URL url = MCRConfigurationDir.getConfigResource(name, classLoader);
-        LOGGER.debug("Resource URL:{}", url);
+        URL url = MCRResourceHelper.getResourceUrl(name, classLoader);
         if (url == null) {
             return null;
         }
@@ -82,10 +80,6 @@ public class MCRXMLResource {
             return;
         }
         con.getInputStream().close();
-    }
-
-    public URL getURL(String name) throws IOException {
-        return getURL(name, MCRClassTools.getClassLoader());
     }
 
     public URL getURL(String name, ClassLoader classLoader) throws IOException {
@@ -124,21 +118,19 @@ public class MCRXMLResource {
 
     /**
      * Returns MCRContent of resource.
-     *
+     * <p>
      * A cache is used to avoid reparsing if the source of the resource did not
      * change.
      *
      * @param name
      *            the resource name
-     * @param classLoader
-     *            a ClassLoader that should be used to locate the resource
      * @return a parsed Document of the resource or <code>null</code> if the
      *         resource is not found
      * @throws IOException
      *             if resource cannot be loaded
      */
     public MCRContent getResource(String name, ClassLoader classLoader) throws IOException {
-        ResourceModifiedHandle modifiedHandle = getModifiedHandle(name, classLoader, 10000);
+        ResourceModifiedHandle modifiedHandle = getModifiedHandle(name, classLoader,10000);
         CacheEntry entry = RESOURCE_CACHE.getIfUpToDate(name, modifiedHandle);
         URL resolvedURL = modifiedHandle.getURL();
         if (entry != null && (resolvedURL == null || entry.resourceURL.equals(resolvedURL))) {
@@ -226,8 +218,7 @@ public class MCRXMLResource {
         }
 
         public URL getURL() {
-            return this.resolvedURL == null ? MCRConfigurationDir.getConfigResource(name, classLoader)
-                : this.resolvedURL;
+            return this.resolvedURL == null ? MCRResourceHelper.getResourceUrl(name, classLoader) : this.resolvedURL;
         }
 
         @Override

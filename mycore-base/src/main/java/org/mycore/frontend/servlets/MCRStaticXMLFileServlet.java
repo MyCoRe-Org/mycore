@@ -22,15 +22,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -38,6 +35,7 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.common.resource.MCRResourceHelper;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.xml.sax.SAXException;
 
@@ -131,15 +129,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         String requestedPath = job.getRequest().getServletPath();
         LOGGER.info("MCRStaticXMLFileServlet {}", requestedPath);
 
-        if (MCRDeveloperTools.overrideActive()) {
-            final Optional<Path> overriddenFilePath = MCRDeveloperTools
-                .getOverriddenFilePath(requestedPath, true);
-            if (overriddenFilePath.isPresent()) {
-                return overriddenFilePath.get().toUri().toURL();
-            }
-        }
-
-        URL resource = getServletContext().getResource(requestedPath);
+        URL resource = MCRResourceHelper.getWebResourceUrl(requestedPath);
         if (resource != null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Resolved to {}", resource);

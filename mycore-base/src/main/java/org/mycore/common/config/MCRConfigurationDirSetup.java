@@ -44,6 +44,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 import org.mycore.common.log4j2.MCRSessionThreadContext;
+import org.mycore.common.resource.MCRResourceHelper;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -198,7 +199,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         String configFileKey = "log4j.configurationFile";
         URL log4j2ConfigURL = null;
         if (System.getProperty(configFileKey) == null) {
-            log4j2ConfigURL = MCRConfigurationDir.getConfigResource("log4j2.xml");
+            log4j2ConfigURL = MCRResourceHelper.getResourceUrl("log4j2.xml");
         }
         LoggerContext logCtx;
         if (log4j2ConfigURL == null) {

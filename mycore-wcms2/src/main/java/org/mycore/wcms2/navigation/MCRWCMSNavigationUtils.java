@@ -29,7 +29,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.wcms2.MCRWCMSUtil;
-import org.mycore.wcms2.MCRWebPagesSynchronizer;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 import org.mycore.wcms2.datamodel.MCRNavigationBaseItem;
 import org.mycore.wcms2.datamodel.MCRNavigationItem;
@@ -63,7 +62,7 @@ public class MCRWCMSNavigationUtils {
      * Saves the given navigation
      */
     public static void save(MCRNavigation navigation) throws IOException, JAXBException, JDOMException {
-        OutputStream out = MCRWebPagesSynchronizer.getOutputStream(MCRLayoutUtilities.NAV_RESOURCE);
+        OutputStream out = MCRWCMSUtil.getOutputStream(MCRLayoutUtilities.NAV_RESOURCE);
         MCRWCMSUtil.save(navigation, out);
         out.flush();
         out.close();
