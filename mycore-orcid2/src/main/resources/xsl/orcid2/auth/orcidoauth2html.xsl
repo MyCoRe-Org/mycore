@@ -3,7 +3,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
   exclude-result-prefixes="xsl">
 
-  <xsl:template match="/AuthResponse">
+  <xsl:template match="/ORCIDOAuthResponse">
     <xsl:choose>
       <xsl:when test="error">
         <div>ERROR</div>
