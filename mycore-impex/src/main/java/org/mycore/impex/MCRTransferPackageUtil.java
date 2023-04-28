@@ -125,11 +125,9 @@ public abstract class MCRTransferPackageUtil {
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
      * @throws URISyntaxException
      *                unable to transform the xml
-     * @throws SAXParseException
-     *                xml parsing went wrong
      */
     public static void importFromDirectory(Path targetDirectory) throws JDOMException, IOException,
-        MCRAccessException, SAXParseException, URISyntaxException {
+        MCRAccessException, URISyntaxException {
         // import classifications
         for (Path pathToClassification : getClassifications(targetDirectory)) {
             MCRClassificationUtils.fromPath(pathToClassification);

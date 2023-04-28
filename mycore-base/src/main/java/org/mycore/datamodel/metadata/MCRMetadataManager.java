@@ -55,7 +55,6 @@ import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
-import org.xml.sax.SAXException;
 
 import jakarta.persistence.PersistenceException;
 
@@ -663,7 +662,7 @@ public final class MCRMetadataManager {
                 throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id);
             }
             return new MCRDerivate(xml);
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id, e);
         }
     }
@@ -683,7 +682,7 @@ public final class MCRMetadataManager {
                 throw new MCRPersistenceException("Could not retrieve xml of object: " + id);
             }
             return new MCRObject(xml);
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRPersistenceException("Could not retrieve xml of object: " + id, e);
         }
     }

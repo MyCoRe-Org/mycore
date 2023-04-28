@@ -37,7 +37,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.xml.sax.SAXParseException;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -112,7 +111,7 @@ class MCRPersistenceHelper {
      * @throws IOException
      *  exception from underlying {@link MCREditorOutValidator} or {@link XMLOutputter}
      */
-    static MCRObject getMCRObject(Document doc) throws JDOMException, IOException, MCRException, SAXParseException {
+    static MCRObject getMCRObject(Document doc) throws JDOMException, IOException, MCRException {
         String id = doc.getRootElement().getAttributeValue("ID");
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCREditorOutValidator ev = new MCREditorOutValidator(doc, objectID);

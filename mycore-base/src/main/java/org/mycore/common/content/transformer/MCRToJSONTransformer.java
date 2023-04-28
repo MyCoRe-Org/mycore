@@ -26,7 +26,6 @@ import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.xml.sax.SAXException;
 
 import com.google.gson.JsonObject;
 
@@ -53,7 +52,7 @@ public class MCRToJSONTransformer extends MCRContentTransformer {
         try {
             Document xml = source.asXML();
             return MCRXMLHelper.jsonSerialize(xml.getRootElement());
-        } catch (JDOMException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException(
                 "Could not generate JSON from " + source.getClass().getSimpleName() + ": " + source.getSystemId(), e);
         }

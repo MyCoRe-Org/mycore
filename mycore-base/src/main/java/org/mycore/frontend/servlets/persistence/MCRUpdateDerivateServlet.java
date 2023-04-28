@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRJDOMContent;
@@ -34,7 +35,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.xml.sax.SAXParseException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,7 +54,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
-        ServletException, SAXParseException, IOException {
+        ServletException, JDOMException, IOException {
         Document editorSubmission = MCRPersistenceHelper.getEditorSubmission(request, false);
         if (editorSubmission != null) {
             MCRObjectID objectID = updateDerivateXML(editorSubmission);
@@ -100,7 +100,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
      *  MCRObjectID of the MyCoRe object
      */
     private MCRObjectID updateDerivateXML(Document editorSubmission)
-        throws SAXParseException, IOException, MCRAccessException {
+        throws JDOMException, IOException, MCRAccessException {
         Element root = editorSubmission.getRootElement();
         root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);

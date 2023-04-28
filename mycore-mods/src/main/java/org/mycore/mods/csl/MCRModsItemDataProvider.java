@@ -46,7 +46,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.classification.MCRClassMapper;
-import org.xml.sax.SAXException;
 
 import de.undercouch.citeproc.csl.CSLDateBuilder;
 import de.undercouch.citeproc.csl.CSLItemData;
@@ -592,7 +591,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     @Override
-    public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {
+    public void addContent(MCRContent content) throws IOException, JDOMException {
         final Document document = content.asXML();
         addContent(document);
     }

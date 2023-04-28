@@ -43,7 +43,6 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
-import org.xml.sax.SAXException;
 
 /**
  * @author Frank Lützenkirchen
@@ -199,7 +198,7 @@ public class MCREditorSession {
         }
     }
 
-    public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+    public void setEditedXML(String uri) throws JDOMException, IOException, TransformerException {
         String uriRe = replaceParameters(uri);
         if ((editedXML != null) || uriRe.contains("{")) {
             return;

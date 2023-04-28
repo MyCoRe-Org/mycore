@@ -189,7 +189,7 @@ public class MCRMetsSave {
      * @param derivateID the derivate identifier
      * @return the mets.xml as JDOM document
      */
-    private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
+    private static Document getCurrentMets(String derivateID) throws JDOMException, IOException {
         MCRPath metsFile = getMetsFile(derivateID);
         return metsFile == null ? null : new MCRPathContent(metsFile).asXML();
     }

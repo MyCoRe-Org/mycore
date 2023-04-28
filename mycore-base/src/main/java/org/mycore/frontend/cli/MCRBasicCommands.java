@@ -45,7 +45,6 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -55,7 +54,6 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class contains the basic commands for MyCoRe Command Line and WebCLI.
@@ -322,7 +320,7 @@ public class MCRBasicCommands {
      *            the location of the xml file
      */
     @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
-    public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException {
+    public static boolean checkXMLFile(String fileName) throws IOException, JDOMException {
         if (!fileName.endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", fileName);
 

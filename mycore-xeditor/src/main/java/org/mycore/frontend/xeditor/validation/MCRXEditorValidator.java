@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.jaxen.JaxenException;
-import org.jdom2.JDOMException;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.w3c.dom.Attr;
@@ -93,7 +92,7 @@ public class MCRXEditorValidator {
         validationRules.clear();
     }
 
-    public boolean isValid() throws JDOMException, JaxenException {
+    public boolean isValid() throws JaxenException {
         MCRBinding root = session.getRootBinding();
         for (MCRValidator rule : validationRules) {
             rule.validate(results, root);

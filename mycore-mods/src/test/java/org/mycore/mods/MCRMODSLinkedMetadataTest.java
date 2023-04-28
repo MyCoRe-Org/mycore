@@ -18,13 +18,10 @@
 
 package org.mycore.mods;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -48,8 +45,6 @@ import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 /**
  * Tests for MCR-910 (Link MODS documents to other MODS documents)
@@ -98,8 +93,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void testUpdate() throws IOException, URISyntaxException, MCRPersistenceException,
-        JDOMException, SAXException, MCRAccessException {
+    public void testUpdate() throws Exception {
         MCRObject seriesNew = new MCRObject(getResourceAsURL(seriesID + "-updated.xml").toURI());
         MCRMetadataManager.update(seriesNew);
         Document bookNew = MCRXMLMetadataManager.instance().retrieveXML(bookID);
@@ -117,7 +111,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
     }
 
     @Test(expected = MCRPersistenceException.class)
-    public void testHierarchyDirect() throws URISyntaxException, SAXParseException, IOException, MCRAccessException {
+    public void testHierarchyDirect() throws Exception {
         MCRObjectID book2ID = MCRObjectID.getInstance("junit_mods_00000003");
         MCRObject book2 = new MCRObject(getResourceAsURL(book2ID + ".xml").toURI());
         MCRMetadataManager.create(book2);
@@ -126,7 +120,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
     }
 
     @Test(expected = MCRPersistenceException.class)
-    public void testHierarchyIndirect() throws URISyntaxException, SAXParseException, IOException, MCRAccessException {
+    public void testHierarchyIndirect() throws Exception {
         MCRObjectID book2ID = MCRObjectID.getInstance("junit_mods_00000003");
         MCRObject book2 = new MCRObject(getResourceAsURL(book2ID + ".xml").toURI());
         MCRMetadataManager.create(book2);
@@ -138,8 +132,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
      * The tests check if the relatedItems with no inherited data are ignored by the hierarchy check of the ShareAgent
      */
     @Test(expected = Test.None.class)
-    public void testHierarchyNoInheritance() throws URISyntaxException, SAXParseException, IOException,
-            MCRAccessException {
+    public void testHierarchyNoInheritance() throws Exception {
         MCRObjectID book4ID = MCRObjectID.getInstance("junit_mods_00000004");
         MCRObject book2 = new MCRObject(getResourceAsURL(book4ID + ".xml").toURI());
         MCRMetadataManager.create(book2);

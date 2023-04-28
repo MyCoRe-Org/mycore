@@ -97,7 +97,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import jakarta.activation.MimetypesFileTypeMap;
 
@@ -126,7 +125,7 @@ public class MCRXMLFunctions {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
 
-    public static Node document(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+    public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
         if (sourceContent == null) {
             throw new TransformerException("Could not load document: " + uri);

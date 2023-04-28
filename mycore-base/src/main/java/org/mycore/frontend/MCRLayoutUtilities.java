@@ -53,8 +53,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.support.AbstractDOMOutputProcessor;
 import org.jdom2.output.support.FormatStack;
@@ -68,6 +66,7 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -484,7 +483,8 @@ public class MCRLayoutUtilities {
         private void parseDocument() throws JDOMException, IOException {
             lastModified = getLastModified();
             LOGGER.info("Parsing: {}", docURL);
-            parsedDocument = new SAXBuilder(XMLReaders.NONVALIDATING).build(docURL);
+            MCRURLContent urlContent = new MCRURLContent(docURL);
+            parsedDocument = urlContent.asXML();
         }
 
         private long getLastModified() throws IOException {

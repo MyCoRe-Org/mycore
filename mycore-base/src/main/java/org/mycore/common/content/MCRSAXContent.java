@@ -26,6 +26,7 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.jdom2.Document;
 import org.jdom2.input.sax.SAXHandler;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -61,10 +62,14 @@ public class MCRSAXContent extends MCRXMLContent {
     }
 
     @Override
-    public Document asXML() throws IOException, SAXException {
+    public Document asXML() throws IOException {
         SAXHandler jdomContentHandler = new SAXHandler();
         xmlReader.setContentHandler(jdomContentHandler);
-        xmlReader.parse(inputSource);
+        try {
+            MCRXMLHelper.asSecureXMLReader(xmlReader).parse(inputSource);
+        } catch (SAXException e) {
+            throw new IOException(e);
+        }
         return jdomContentHandler.getDocument();
     }
 

@@ -23,12 +23,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -40,7 +42,6 @@ import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -51,7 +52,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
      * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom2.Element, java.lang.String)}.
      */
     @Test
-    public void testWrapMODSDocument() throws SAXParseException {
+    public void testWrapMODSDocument() throws Exception {
         Document modsDoc = loadMODSDocument();
         MCRObject mcrObj = MCRMODSWrapper.wrapMODSDocument(modsDoc.getRootElement(), "JUnit");
         assertTrue("Generated MCRObject is not valid.", mcrObj.isValid());
@@ -64,13 +65,13 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
     }
 
-    private Document loadMODSDocument() throws SAXParseException {
+    private Document loadMODSDocument() throws IOException, JDOMException {
         URL worldClassUrl = this.getClass().getResource("/mods80700998.xml");
         return MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(worldClassUrl));
     }
 
     @Test
-    public void testSetMODS() throws SAXParseException {
+    public void testSetMODS() throws Exception {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         wrapper.setID("JUnit", 4711);
@@ -90,7 +91,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     }
 
     @Test
-    public void setElement() throws SAXParseException {
+    public void setElement() throws Exception {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         wrapper.setID("JUnit", 4711);
@@ -129,7 +130,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     }
 
     @Test
-    public void testGetLinkedRelatedItems() throws SAXParseException {
+    public void testGetLinkedRelatedItems() throws IOException, JDOMException {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
 

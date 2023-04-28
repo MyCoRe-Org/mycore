@@ -52,7 +52,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.util.concurrent.MCRTransactionableCallable;
-import org.xml.sax.SAXException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -278,7 +277,7 @@ public class MCRMetadataHistoryCommands {
                             revDate.plusMillis(timeOffset)));
                         exist = true;
                     }
-                } catch (JDOMException | SAXException e) {
+                } catch (JDOMException e) {
                     LogManager.getLogger()
                         .error("Error while reading revision {} of {}", version.getRevision(), derId, e);
                 }
@@ -319,7 +318,7 @@ public class MCRMetadataHistoryCommands {
                         items.add(create(objId, user, revDate.plusMillis(timeOffset)));
                         exist = true;
                     }
-                } catch (JDOMException | SAXException e) {
+                } catch (JDOMException e) {
                     LogManager.getLogger()
                         .error("Error while reading revision {} of {}", version.getRevision(), objId, e);
                 }

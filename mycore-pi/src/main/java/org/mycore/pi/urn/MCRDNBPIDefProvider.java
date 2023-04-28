@@ -25,11 +25,11 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
-import org.xml.sax.SAXParseException;
 
 public class MCRDNBPIDefProvider {
     private static final String RESOLVING_URL_TEMPLATE
@@ -46,7 +46,7 @@ public class MCRDNBPIDefProvider {
             HttpEntity entity = response.getEntity();
             MCRContent content = new MCRStreamContent(entity.getContent(), get.getURI().toString());
             return MCRXMLParserFactory.getNonValidatingParser().parseXML(content);
-        } catch (IOException | SAXParseException e) {
+        } catch (IOException | JDOMException e) {
             String message = "The identifier " + identifier + " is not resolvable!";
             throw new MCRIdentifierUnresolvableException(identifier, message, e);
         }

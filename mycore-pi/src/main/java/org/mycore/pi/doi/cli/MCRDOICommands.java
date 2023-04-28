@@ -281,7 +281,7 @@ public class MCRDOICommands {
         try {
             transform = contentTransformer.transform(new MCRBaseContent(mcrObject));
             document = transform.asXML();
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             LOGGER.error("Error while transforming document {} with transformer {}", e, mycoreIDString, transformer);
             return;
         }

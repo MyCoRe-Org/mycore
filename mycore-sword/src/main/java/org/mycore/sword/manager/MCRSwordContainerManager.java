@@ -88,7 +88,7 @@ public class MCRSwordContainerManager implements ContainerManager {
 
     @Override
     public DepositReceipt addMetadata(String editIRI, Deposit deposit, AuthCredentials authCredentials,
-        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+        SwordConfiguration swordConfiguration) throws SwordError, SwordAuthException {
         return this.replaceMetadata(editIRI, deposit, authCredentials, swordConfiguration);
     }
 

@@ -46,7 +46,6 @@ import org.mycore.iiif.presentation.impl.MCRIIIFPresentationImpl;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 import org.mycore.mets.model.MCRMETSGeneratorFactory;
 import org.mycore.mets.tools.MCRMetsSave;
-import org.xml.sax.SAXException;
 
 public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
 
@@ -67,7 +66,7 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
             Document metsDocument = getMets(id);
             LOGGER.debug(() -> new XMLOutputter(Format.getPrettyFormat()).outputString(metsDocument));
             return getConverter(id, metsDocument).convert();
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRException(e);
         }
     }
@@ -87,7 +86,7 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
         return transformer;
     }
 
-    public Document getMets(String id) throws IOException, JDOMException, SAXException {
+    public Document getMets(String id) throws IOException, JDOMException {
 
         String objectid = MCRLinkTableManager.instance().getSourceOf(id).iterator().next();
         MCRContentTransformer transformer = getTransformer();

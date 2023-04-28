@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.After;
@@ -537,7 +538,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void replaceCategory() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void replaceCategory() throws URISyntaxException, MCRException, IOException, JDOMException {
         loadWorldClassification2();
         addWorldClassification();
         DAO.replaceCategory(category2);
@@ -553,7 +554,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void replaceCategoryWithAdoption() throws URISyntaxException, MCRException, SAXParseException {
+    public void replaceCategoryWithAdoption() throws URISyntaxException, MCRException, IOException, JDOMException {
         MCRCategory gc1 = loadClassificationResource("/grandchild.xml");
         MCRCategory gc2 = loadClassificationResource("/grandchild2.xml");
         DAO.addCategory(null, gc1);
@@ -696,18 +697,18 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
      * @throws SAXParseException
      * @throws MCRException
      */
-    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, IOException, JDOMException {
         category = loadClassificationResource(WORLD_CLASS_RESOURCE_NAME);
     }
 
-    public static MCRCategory loadClassificationResource(String resourceName) throws SAXParseException,
-        URISyntaxException {
+    public static MCRCategory loadClassificationResource(String resourceName)
+        throws URISyntaxException, IOException, JDOMException {
         URL classResourceUrl = MCRCategoryDAOImplTest.class.getResource(resourceName);
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(classResourceUrl));
         return MCRXMLTransformer.getCategory(xml);
     }
 
-    private void loadWorldClassification2() throws URISyntaxException, MCRException, SAXParseException {
+    private void loadWorldClassification2() throws URISyntaxException, MCRException, IOException, JDOMException {
         category2 = loadClassificationResource(WORLD_CLASS2_RESOURCE_NAME);
     }
 

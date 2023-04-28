@@ -39,7 +39,6 @@ import org.mycore.viewer.configuration.MCRIviewDefaultACLProvider;
 import org.mycore.viewer.configuration.MCRViewerConfiguration;
 import org.mycore.viewer.configuration.MCRViewerConfigurationStrategy;
 import org.mycore.viewer.configuration.MCRViewerDefaultConfigurationStrategy;
-import org.xml.sax.SAXException;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
@@ -115,7 +114,7 @@ public class MCRViewerResource {
      * @return jdom configuration object
      */
     private static Document buildResponseDocument(MCRViewerConfiguration config)
-        throws JDOMException, IOException, SAXException, JAXBException {
+        throws JDOMException, IOException, JAXBException {
         String configJson = config.toJSON();
         Element startIviewClientElement = new Element("IViewConfig");
         Element configElement = new Element(JSON_CONFIG_ELEMENT_NAME);

@@ -36,7 +36,6 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.xml.sax.SAXException;
 
 /**
  * PostProcessor for MyCoRe editor framework
@@ -56,7 +55,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
     private String stylesheet;
 
-    public Document process(Document xml) throws IOException, JDOMException, SAXException {
+    public Document process(Document xml) throws IOException, JDOMException {
         if (stylesheet == null) {
             return xml.clone();
         }
@@ -108,7 +107,7 @@ class MCRNormalizeUnicodeTransformer extends MCRContentTransformer {
                 text.setText(MCRXMLFunctions.normalizeUnicode(text.getText()));
             }
             return new MCRJDOMContent(root);
-        } catch (JDOMException | SAXException ex) {
+        } catch (JDOMException ex) {
             throw new IOException(ex);
         }
     }

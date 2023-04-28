@@ -18,13 +18,14 @@
 
 package org.mycore.common.xml;
 
+import java.io.IOException;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Document;
-import org.mycore.common.MCRException;
+import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 /**
@@ -39,7 +40,7 @@ public interface MCRXMLParser {
 
     boolean isValidating();
 
-    Document parseXML(MCRContent content) throws MCRException, SAXParseException;
+    Document parseXML(MCRContent content) throws JDOMException, IOException;
 
     XMLReader getXMLReader() throws SAXException, ParserConfigurationException;
 }

@@ -36,11 +36,10 @@ import org.mycore.orcid.MCRORCIDConstants;
 import org.mycore.orcid.MCRORCIDException;
 import org.mycore.orcid.MCRORCIDProfile;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.StatusType;
@@ -82,7 +81,7 @@ public class MCRWorksPublisher {
         return work;
     }
 
-    void update(MCRWork work, MCRObjectID oid) throws IOException, SAXException {
+    void update(MCRWork work, MCRObjectID oid) throws IOException, JDOMException {
         WebTarget target = orcid.getWebTarget().path("work").path(work.getPutCode());
         Builder builder = buildInvocation(target);
 
@@ -109,7 +108,7 @@ public class MCRWorksPublisher {
     }
 
     /** Retrieves the MyCoRe object, transforms it to ORCID work xml and validates */
-    private Document buildWorkXMLFrom(MCRObjectID objectID) throws IOException, SAXParseException {
+    private Document buildWorkXMLFrom(MCRObjectID objectID) throws IOException, JDOMException {
         MCRContent mcrObject = MCRXMLMetadataManager.instance().retrieveContent(objectID);
         MCRContent workXML = T_MCR2WORK.transform(mcrObject);
         return MCRXMLParserFactory.getValidatingParser().parseXML(workXML);

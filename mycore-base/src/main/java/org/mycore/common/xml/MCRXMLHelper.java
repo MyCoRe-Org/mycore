@@ -41,6 +41,7 @@ import org.jdom2.Content;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.ProcessingInstruction;
@@ -56,7 +57,9 @@ import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -73,7 +76,38 @@ import com.google.gson.JsonPrimitive;
  */
 public class MCRXMLHelper {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    /**
+     * Protects XMLReader instance to XML External Entity (XXE) attacks.
+     *
+     * Try to set featues is this order
+     * <ol>
+     *     <li>{@link XMLConstants#FEATURE_SECURE_PROCESSING}</li>
+     *     <li>"http://apache.org/xml/features/disallow-doctype-decl"</li>
+     * </ol>
+     * @param reader a potential unprotected XMLReader
+     * @return the secured instance of <code>reader</code>
+     * @throws SAXNotSupportedException if setting any feature from above failes with this exception
+     * @throws SAXNotRecognizedException if setting any feature from above failes with this exception
+     */
+    public static XMLReader asSecureXMLReader(XMLReader reader)
+        throws SAXNotSupportedException, SAXNotRecognizedException {
+        //prevent https://find-sec-bugs.github.io/bugs.htm#XXE_XMLREADER
+        try {
+            reader.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+            LOGGER.warn(() -> "XML Parser feature " + XMLConstants.FEATURE_SECURE_PROCESSING
+                + " is not supported, try to disable XSD support instead.");
+            try {
+                reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            } catch (SAXNotRecognizedException | SAXNotSupportedException ex) {
+                ex.addSuppressed(e);
+                throw ex;
+            }
+        }
+        return reader;
+    }
 
     /**
      * Removes characters that are illegal in XML text nodes or attribute
@@ -225,7 +259,7 @@ public class MCRXMLHelper {
         }
     }
 
-    private static Element canonicalElement(Parent p) throws IOException, SAXParseException {
+    private static Element canonicalElement(Parent p) throws IOException, JDOMException {
         XMLOutputter xout = new XMLOutputter(Format.getCompactFormat());
         MCRByteArrayOutputStream bout = new MCRByteArrayOutputStream();
         if (p instanceof Element e) {

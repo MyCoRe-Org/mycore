@@ -289,7 +289,7 @@ public class MCRDOIService extends MCRDOIBaseService {
                     translatedInformation, ERR_CODE_1_2, e);
             }
             return dataciteDocument;
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRPersistentIdentifierException(
                 "Could not transform the content of " + id + " with the transformer " + getTransformerID(), e);
         }

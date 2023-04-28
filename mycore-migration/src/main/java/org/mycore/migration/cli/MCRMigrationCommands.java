@@ -283,7 +283,7 @@ public class MCRMigrationCommands {
     // 2017-> 2018
     @MCRCommand(syntax = "migrate tei entries in mets file of derivate {0}")
     public static void migrateTEIEntrysOfMetsFileOfDerivate(String derivateIdStr)
-        throws IOException, JDOMException, SAXException {
+        throws IOException, JDOMException {
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIdStr);
         if (!MCRMetadataManager.exists(derivateID)) {
             LOGGER.info("Derivate " + derivateIdStr + " does not exist!");

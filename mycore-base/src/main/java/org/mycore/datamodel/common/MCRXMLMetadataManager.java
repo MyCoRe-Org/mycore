@@ -34,7 +34,6 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXException;
 
 /**
  * Provides an adapter to communicate with the configured {@link MCRXMLMetadataManagerAdapter} implementation.
@@ -319,7 +318,7 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @return null if metadata is not present
      */
-    public Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException, SAXException {
+    public Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException {
         MCRContent metadata = retrieveContent(mcrid);
         return metadata == null ? null : metadata.asXML();
     }

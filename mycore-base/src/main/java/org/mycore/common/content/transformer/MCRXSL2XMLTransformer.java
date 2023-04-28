@@ -36,6 +36,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -80,7 +81,7 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         transformerHandler.setResult(result);
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
-        reader.parse(source.getInputSource());
+        MCRXMLHelper.asSecureXMLReader(reader).parse(source.getInputSource());
         Document resultDoc = getDocument(result);
         if (resultDoc == null) {
             throw new MCRConfigurationException("Stylesheets " + Arrays.asList(templateSources)

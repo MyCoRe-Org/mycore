@@ -38,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
@@ -53,7 +54,6 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.user2.utils.MCRRoleTransformer;
 import org.mycore.user2.utils.MCRUserTransformer;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class provides a set of commands for the org.mycore.user2 management which can be used by the command line
@@ -200,7 +200,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "import role from file {0}",
         help = "Imports a role from file, if that role does not exist",
         order = 90)
-    public static void addRole(String fileName) throws SAXParseException {
+    public static void addRole(String fileName) throws IOException, JDOMException {
         LOGGER.info("Reading file {} ...", fileName);
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
         MCRRole role = MCRRoleTransformer.buildMCRRole(doc.getRootElement());
@@ -255,7 +255,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "encrypt passwords in user xml file {0} to file {1}",
         help = "A migration tool to change old plain text password entries to encrpted entries.",
         order = 40)
-    public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws SAXParseException, IOException {
+    public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws IOException, JDOMException {
         File inputFile = getCheckedFile(oldFile);
         if (inputFile == null) {
             return;
@@ -409,7 +409,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "import user from file {0}",
         help = "Imports a user from file {0}.")
-    public static void importUserFromFile(String filename) throws SAXParseException {
+    public static void importUserFromFile(String filename) throws IOException, JDOMException {
         MCRUser user = getMCRUserFromFile(filename);
         if (MCRUserManager.exists(user.getUserName(), user.getRealmID())) {
             throw new MCRException("User already exists: " + user.getUserID());
@@ -521,7 +521,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param filename
      *            the filename of the user data input
      */
-    public static void createUserFromFile(String filename) throws SAXParseException {
+    public static void createUserFromFile(String filename) throws IOException, JDOMException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.createUser(user);
     }
@@ -531,19 +531,19 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *
      * @param filename
      *            the filename of the user data input
-     * @throws SAXParseException
+     * @throws JDOMException
      *             if file could not be parsed
      */
     @MCRCommand(
         syntax = "update user from file {0}",
         help = "Updates a user from file {0}.",
         order = 200)
-    public static void updateUserFromFile(String filename) throws SAXParseException {
+    public static void updateUserFromFile(String filename) throws IOException, JDOMException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.updateUser(user);
     }
 
-    private static MCRUser getMCRUserFromFile(String filename) throws SAXParseException {
+    private static MCRUser getMCRUserFromFile(String filename) throws IOException, JDOMException {
         File inputFile = getCheckedFile(filename);
         if (inputFile == null) {
             return null;

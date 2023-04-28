@@ -67,8 +67,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -433,10 +431,11 @@ public final class MCRURIResolver implements URIResolver {
      * @return the root element of the parsed input stream
      */
     protected Element parseStream(InputStream in) throws JDOMException, IOException {
-        SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
-        builder.setEntityResolver(MCREntityResolver.instance());
-
-        return builder.build(in).getRootElement();
+        final MCRStreamContent streamContent = new MCRStreamContent(in);
+        return MCRXMLParserFactory
+            .getNonValidatingParser()
+            .parseXML(streamContent)
+            .getRootElement();
     }
 
     /**

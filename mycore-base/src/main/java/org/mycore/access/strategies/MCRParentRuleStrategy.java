@@ -31,7 +31,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXException;
 
 /**
  * Use this class if you want to have a fallback to ancestor access rules.
@@ -68,7 +67,7 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
         Document parentDoc;
         try {
             parentDoc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(objectID));
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             LOGGER.error("Could not read object: {}", objectID, e);
             return null;
         }

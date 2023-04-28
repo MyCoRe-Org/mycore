@@ -64,7 +64,6 @@ import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
-import org.xml.sax.SAXException;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata.
@@ -438,7 +437,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 Document doc = content.asXML();
                 doc.getRootElement().setAttribute("rev", version.getRevision());
                 return new MCRJDOMContent(doc);
-            } catch (JDOMException | SAXException e) {
+            } catch (JDOMException e) {
                 throw new MCRPersistenceException("Could not parse XML from default store", e);
             }
         }

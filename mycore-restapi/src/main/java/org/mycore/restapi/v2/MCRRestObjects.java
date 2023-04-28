@@ -79,8 +79,6 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
@@ -383,7 +381,7 @@ public class MCRRestObjects {
             LOGGER.debug("Create new MyCoRe Object");
             MCRMetadataManager.create(mcrObj);
             return Response.created(uriInfo.getAbsolutePathBuilder().path(mcrObj.getId().toString()).build()).build();
-        } catch (MCRPersistenceException | SAXParseException | IOException e) {
+        } catch (MCRPersistenceException | JDOMException | IOException e) {
             throw new InternalServerErrorException(e);
         } catch (MCRAccessException e) {
             throw new ForbiddenException(e);
@@ -634,7 +632,7 @@ public class MCRRestObjects {
         try {
             updatedObject = new MCRObject(inputContent.asXML());
             updatedObject.validate();
-        } catch (JDOMException | SAXException | MCRException e) {
+        } catch (JDOMException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
                 .withMessage("MCRObject " + id + " is not valid")
@@ -702,7 +700,7 @@ public class MCRRestObjects {
             updatedObject = MCRMetadataManager.retrieveMCRObject(id);
             updatedObject.getMetadata().setFromDOM(inputContent.asXML().getRootElement().detach());
             updatedObject.validate();
-        } catch (JDOMException | SAXException | MCRException e) {
+        } catch (JDOMException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
                 .withMessage("MCRObject " + id + " is not valid")

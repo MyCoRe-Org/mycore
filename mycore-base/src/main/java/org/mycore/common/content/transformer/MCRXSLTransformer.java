@@ -55,6 +55,7 @@ import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
@@ -261,7 +262,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
         LOGGER.debug("Start transforming: {}", source.getSystemId() == null ? source.getName() : source.getSystemId());
-        reader.parse(source.getInputSource());
+        MCRXMLHelper.asSecureXMLReader(reader).parse(source.getInputSource());
         return new MCRByteContent(baos.getBuffer(), 0, baos.size());
     }
 

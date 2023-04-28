@@ -25,11 +25,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.xml.sax.SAXParseException;
 
 import com.google.gson.JsonObject;
 
@@ -79,7 +79,7 @@ public final class MCRObject extends MCRBase {
         mcrLabel = "";
     }
 
-    public MCRObject(byte[] bytes, boolean valid) throws SAXParseException {
+    public MCRObject(byte[] bytes, boolean valid) throws JDOMException {
         this();
         setFromXML(bytes, valid);
     }
@@ -89,7 +89,7 @@ public final class MCRObject extends MCRBase {
         setFromJDOM(doc);
     }
 
-    public MCRObject(URI uri) throws SAXParseException, IOException {
+    public MCRObject(URI uri) throws IOException, JDOMException {
         this();
         setFromURI(uri);
     }

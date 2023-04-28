@@ -78,7 +78,6 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.xml.sax.SAXException;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -168,7 +167,7 @@ public class MCRRestAPIObjectsHelper {
             } else {
                 outputter.output(doc, sw);
             }
-        } catch (SAXException | JDOMException e) {
+        } catch (JDOMException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
                 MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform MCRContent to XML document", e.getMessage()));
         } catch (IOException e) {

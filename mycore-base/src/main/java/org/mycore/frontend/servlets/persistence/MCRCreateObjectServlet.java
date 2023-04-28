@@ -111,7 +111,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
      *  from {@link MCRPersistenceHelper#getMCRObject(Document)}
      */
     private MCRObjectID createObject(Document doc)
-        throws JDOMException, IOException, MCRException, SAXParseException, MCRAccessException {
+        throws JDOMException, IOException, MCRException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
         //noinspection SynchronizeOnNonFinalField

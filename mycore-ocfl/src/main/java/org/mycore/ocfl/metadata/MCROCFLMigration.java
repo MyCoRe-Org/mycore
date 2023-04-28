@@ -34,7 +34,6 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXException;
 
 public class MCROCFLMigration {
 
@@ -139,7 +138,7 @@ public class MCROCFLMigration {
                 MCRContent mcrContent = instance.retrieveContent(objectID);
                 jdomContent = new MCRJDOMContent(mcrContent.asXML());
                 lastModified = instance.getLastModified(objectID);
-            } catch (IOException | JDOMException | SAXException e) {
+            } catch (IOException | JDOMException e) {
                 // can not even read the object
                 LOGGER.warn("Error while migrating " + id, e);
                 failed.add(id);
@@ -170,7 +169,7 @@ public class MCROCFLMigration {
 
         try {
             document = content.asXML();
-        } catch (JDOMException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException("Error while reading as as XML", e);
         }
         return new MCRJDOMContent(document);

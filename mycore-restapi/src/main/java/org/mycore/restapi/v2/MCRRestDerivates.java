@@ -60,7 +60,6 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -236,7 +235,7 @@ public class MCRRestDerivates {
         try {
             derivate = new MCRDerivate(inputContent.asXML());
             derivate.validate();
-        } catch (JDOMException | SAXException | MCRException e) {
+        } catch (JDOMException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID)
                 .withMessage("MCRDerivate " + derid + " is not valid")

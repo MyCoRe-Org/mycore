@@ -21,7 +21,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -43,6 +42,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
@@ -65,7 +65,6 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXParseException;
 
 import jakarta.persistence.EntityManager;
 
@@ -130,7 +129,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load classification from url {0}",
         help = "The command adds a new classification from URL {0} to the system.",
         order = 15)
-    public static void loadFromURL(String fileURL) throws SAXParseException, MalformedURLException, URISyntaxException {
+    public static void loadFromURL(String fileURL) throws IOException, URISyntaxException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
@@ -139,7 +138,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load classification from uri {0}",
         help = "The command adds a new classification from URI {0} to the system.",
         order = 17)
-    public static void loadFromURI(String fileURI) throws SAXParseException, URISyntaxException, TransformerException {
+    public static void loadFromURI(String fileURI)
+        throws URISyntaxException, TransformerException, IOException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
@@ -166,7 +166,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command updates a classification from URL {0} to the system.",
         order = 25)
     public static void updateFromURL(String fileURL)
-        throws SAXParseException, MalformedURLException, URISyntaxException {
+        throws IOException, URISyntaxException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
@@ -180,8 +180,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "update classification from uri {0}",
         help = "The command updates a classification from URI {0} to the system.",
         order = 27)
-    public static void updateFromURI(String fileURI) throws SAXParseException, URISyntaxException,
-        TransformerException {
+    public static void updateFromURI(String fileURI)
+        throws URISyntaxException, TransformerException, IOException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {

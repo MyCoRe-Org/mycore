@@ -41,7 +41,6 @@ import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.utils.MCRUserTransformer;
-import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
@@ -220,7 +219,7 @@ public class MCROCFLXMLUserManager {
         try (InputStream storedContentStream = repository.getObject(version).getFile(userId + ".xml").getStream()) {
             Document xml = new MCRStreamContent(storedContentStream).asXML();
             return MCRUserTransformer.buildMCRUser(xml.getRootElement());
-        } catch (JDOMException | IOException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }

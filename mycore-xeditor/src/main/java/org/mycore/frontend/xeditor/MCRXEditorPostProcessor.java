@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.xml.sax.SAXException;
 
 /**
  * If you implement this interface then you should have a default constructor if you want it to use with.
@@ -35,7 +34,7 @@ public interface MCRXEditorPostProcessor {
      * @param xml the document which has to be post processed
      * @return the post processed document
      */
-    Document process(Document xml) throws IOException, JDOMException, SAXException;
+    Document process(Document xml) throws IOException, JDOMException;
 
     /**
      * Will be called before {@link #process(Document)}.

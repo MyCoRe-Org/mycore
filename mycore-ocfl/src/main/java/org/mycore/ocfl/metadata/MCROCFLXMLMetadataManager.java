@@ -53,7 +53,6 @@ import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
-import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
@@ -221,7 +220,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         // "metadata/" +
         try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
             return new MCRJDOMContent(new MCRStreamContent(storedContentStream).asXML());
-        } catch (JDOMException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }
@@ -250,7 +249,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             Document xml = new MCRStreamContent(storedContentStream).asXML();
             xml.getRootElement().setAttribute("rev", revision); // bugfix: MCR-2510, PR #1373
             return new MCRJDOMContent(xml);
-        } catch (JDOMException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }

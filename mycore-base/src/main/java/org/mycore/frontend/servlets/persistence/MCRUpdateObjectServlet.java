@@ -80,7 +80,7 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
      *  from {@link MCRPersistenceHelper#getMCRObject(Document)}
      */
     private MCRObjectID updateObject(Document doc) throws JDOMException, IOException,
-        MCRException, SAXParseException, MCRAccessException {
+        MCRException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
         LogManager.getLogger().info("ID: {}", mcrObject.getId());
         try {

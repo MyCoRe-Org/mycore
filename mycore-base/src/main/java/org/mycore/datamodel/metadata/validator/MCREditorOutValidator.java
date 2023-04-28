@@ -69,7 +69,6 @@ import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -273,7 +272,7 @@ public class MCREditorOutValidator {
      *
      * @return MCRObject
      */
-    public Document generateValidMyCoReObject() throws SAXParseException, IOException {
+    public Document generateValidMyCoReObject() throws JDOMException, IOException {
         MCRObject obj;
         // load the JDOM object
         XPathFactory.instance()
@@ -283,7 +282,7 @@ public class MCREditorOutValidator {
         try {
             byte[] xml = new MCRJDOMContent(input).asByteArray();
             obj = new MCRObject(xml, true);
-        } catch (SAXParseException e) {
+        } catch (JDOMException e) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             LOGGER.warn("Failure while parsing document:\n{}", xout.outputString(input));
             throw e;

@@ -38,7 +38,6 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.util.concurrent.MCRReadWriteGuard;
-import org.xml.sax.SAXException;
 
 /**
  * Represents a set of files and directories belonging together, that are stored
@@ -125,7 +124,7 @@ public class MCRFileCollection extends MCRDirectory {
                 e.addContent(parsedContent);
                 new Document(e);
             });
-        } catch (JDOMException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException(e);
         }
     }

@@ -29,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -247,7 +246,7 @@ public class MCRPICommands {
             + " Does nothing if the object already has a pi from the service {0}.",
         order = 100)
     public static void createPIForObjectIfNotExist(String serviceID, String objectIDString)
-        throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
+        throws MCRAccessException, ExecutionException, MCRPersistentIdentifierException,
         InterruptedException {
         createPIForObjectIfNotExist(serviceID, objectIDString, "");
     }

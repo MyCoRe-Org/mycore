@@ -39,7 +39,6 @@ import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
-import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
@@ -153,7 +152,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
                 xml.getRootElement().setAttribute("rev", revision);
             }
             return new MCRJDOMContent(xml);
-        } catch (JDOMException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }

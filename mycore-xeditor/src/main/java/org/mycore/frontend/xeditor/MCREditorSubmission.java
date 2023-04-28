@@ -81,7 +81,7 @@ public class MCREditorSubmission {
         }
     }
 
-    public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
+    public void emptyNotResubmittedNodes() throws JaxenException {
         for (String xPath : xPaths2CheckResubmission) {
             MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
             if (!binding.getBoundNodes().isEmpty()) {
@@ -160,7 +160,7 @@ public class MCREditorSubmission {
         binding.detach();
     }
 
-    public void setDefaultValues() throws JDOMException, JaxenException {
+    public void setDefaultValues() throws JaxenException {
         MCRBinding rootBinding = session.getRootBinding();
         for (String xPath : xPath2DefaultValue.keySet()) {
             String defaultValue = xPath2DefaultValue.get(xPath);

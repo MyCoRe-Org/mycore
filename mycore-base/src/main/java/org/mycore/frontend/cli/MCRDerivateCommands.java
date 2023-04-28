@@ -78,8 +78,6 @@ import org.mycore.datamodel.niofs.utils.MCRDerivateUtil;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -228,7 +226,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             "If the numerical part of the provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 40)
     public static boolean loadFromFile(String file)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return loadFromFile(file, true);
     }
 
@@ -242,7 +240,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      */
     public static boolean loadFromFile(String file, boolean importMode)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -258,7 +256,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "The command update a derivate form the file {0} in the system.",
         order = 50)
     public static boolean updateFromFile(String file)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return updateFromFile(file, true);
     }
 
@@ -272,7 +270,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
      */
     public static boolean updateFromFile(String file, boolean importMode)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -288,8 +286,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
      */
-    private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException,
-        IOException, MCRPersistenceException, MCRAccessException {
+    private static boolean processFromFile(File file, boolean update, boolean importMode)
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", file);
             return false;
@@ -767,7 +765,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                             LOGGER.info("Result and Source is the same..");
                         }
 
-                    } catch (JDOMException | SAXException e) {
+                    } catch (JDOMException e) {
                         throw new IOException("Error while processing file : " + file, e);
                     }
 

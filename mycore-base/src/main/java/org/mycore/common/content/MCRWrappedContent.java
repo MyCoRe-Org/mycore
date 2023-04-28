@@ -34,7 +34,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -119,12 +118,12 @@ public abstract class MCRWrappedContent extends MCRContent {
     }
 
     @Override
-    public Document asXML() throws JDOMException, IOException, SAXException {
+    public Document asXML() throws JDOMException, IOException {
         return getBaseContent().asXML();
     }
 
     @Override
-    public MCRContent ensureXML() throws IOException, JDOMException, SAXException {
+    public MCRContent ensureXML() throws IOException, JDOMException {
         return getBaseContent().ensureXML();
     }
 

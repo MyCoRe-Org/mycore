@@ -143,7 +143,7 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
-    public void bind(String xPath, String initialValue, String name) throws JDOMException, JaxenException {
+    public void bind(String xPath, String initialValue, String name) throws JaxenException {
         if (editorSession.getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
         }
@@ -239,7 +239,7 @@ public class MCRXEditorTransformer {
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats, String method)
-        throws JDOMException, JaxenException {
+        throws JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());

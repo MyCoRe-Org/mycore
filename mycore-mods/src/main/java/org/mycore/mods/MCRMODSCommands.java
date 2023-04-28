@@ -34,8 +34,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.input.sax.XMLReaders;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
@@ -43,6 +41,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -97,8 +96,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         if (!modsFile.isFile()) {
             throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a file.", modsFile.getAbsolutePath()));
         }
-        SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
-        Document modsDoc = s.build(modsFile);
+        MCRPathContent pathContent = new MCRPathContent(modsFile.toPath());
+        Document modsDoc = pathContent.asXML();
         //force validation against MODS XSD
         MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
         Element modsRoot = modsDoc.getRootElement();
@@ -133,8 +132,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
                 String.format(Locale.ENGLISH, "Directory %s is not a directory.", fileDir.getAbsolutePath()));
         }
 
-        SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
-        Document modsDoc = s.build(modsFile);
+        MCRPathContent pathContent = new MCRPathContent(modsFile.toPath());
+        Document modsDoc = pathContent.asXML();
         //force validation against MODS XSD
         MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
         Element modsRoot = modsDoc.getRootElement();

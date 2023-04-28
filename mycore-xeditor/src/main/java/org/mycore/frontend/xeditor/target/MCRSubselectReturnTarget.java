@@ -64,7 +64,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
     }
 
     private boolean bindsFirstOrMoreThanOneElement(String xPath, MCREditorSession session)
-        throws JaxenException, JDOMException {
+        throws JaxenException {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         boolean result = (binding.getBoundNode() instanceof Element) && !xPath.endsWith("]");
         binding.detach();

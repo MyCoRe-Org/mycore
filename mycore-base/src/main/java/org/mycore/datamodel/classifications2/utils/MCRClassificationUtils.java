@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
@@ -38,7 +39,6 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class contains helper methods to handle mycore classifications.
@@ -84,12 +84,11 @@ public class MCRClassificationUtils {
      * @param pathToClassification path to the classification
      * @throws IOException could not read from file
      * @throws MCRException xml parsing went wrong
-     * @throws SAXParseException xml parsing went wrong
      * @throws URISyntaxException unable to transform the xml to a {@link MCRCategory}
      * @throws MCRAccessException you are not allowed to import the classification
      */
     public static void fromPath(Path pathToClassification)
-        throws IOException, MCRException, SAXParseException, MCRAccessException, URISyntaxException {
+        throws IOException, MCRException, MCRAccessException, URISyntaxException {
         InputStream inputStream = Files.newInputStream(pathToClassification);
         fromStream(inputStream);
     }
@@ -100,14 +99,18 @@ public class MCRClassificationUtils {
      * 
      * @param inputStream the classification stream
      * @throws MCRException xml parsing went wrong
-     * @throws SAXParseException xml parsing went wrong
      * @throws URISyntaxException unable to transform the xml to a {@link MCRCategory}
      * @throws MCRAccessException you are not allowed to import the classification
      */
     public static void fromStream(InputStream inputStream)
-        throws MCRException, SAXParseException, URISyntaxException, MCRAccessException {
+        throws MCRException, URISyntaxException, MCRAccessException, IOException {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
-        Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(inputStream));
+        Document jdom = null;
+        try {
+            jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(inputStream));
+        } catch (JDOMException e) {
+            throw new MCRException(e);
+        }
         MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
         if (categoryDAO.exist(classification.getId())) {
             if (!MCRAccessManager.checkPermission(classification.getId().getRootID(), PERMISSION_WRITE)) {
