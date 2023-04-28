@@ -1248,16 +1248,16 @@ public class MCRCalendar {
         if (StringUtils.contains(dateString, "N. CHR") || StringUtils.contains(dateString, "V. CHR")) {
             final int positionNChr = StringUtils.indexOf(dateString, "N. CHR");
             final int positionVChr = StringUtils.indexOf(dateString, "V. CHR");
-            if (-1 != positionNChr) {
-                if (0 == positionNChr) {
+            if (positionNChr != -1) {
+                if (positionNChr == 0) {
                     start = 7;
                     end = length;
                 } else {
                     start = 0;
                     end = positionNChr - 1;
                 }
-            } else if (-1 != positionVChr) {
-                if (0 == positionVChr) {
+            } else if (positionVChr != -1) {
+                if (positionVChr == 0) {
                     start = 7;
                     end = length;
                 } else {
@@ -1271,16 +1271,16 @@ public class MCRCalendar {
         } else if (StringUtils.contains(dateString, "AD") || StringUtils.contains(dateString, "BC")) {
             final int positionAD = StringUtils.indexOf(dateString, "AD");
             final int positionBC = StringUtils.indexOf(dateString, "BC");
-            if (-1 != positionAD) {
-                if (0 == positionAD) {
+            if (positionAD != -1) {
+                if (positionAD == 0) {
                     start = 2;
                     end = length;
                 } else {
                     start = 0;
                     end = positionAD - 1;
                 }
-            } else if (-1 != positionBC) {
-                if (0 == positionBC) {
+            } else if (positionBC != -1) {
+                if (positionBC == 0) {
                     start = 2;
                     end = length;
                 } else {

@@ -127,7 +127,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public MCRIFSFileSystem getFileSystem(URI uri) {
         if (FILE_SYSTEM_INSTANCE == null) {
-            synchronized (this) {
+            synchronized (FS_URI) {
                 if (FILE_SYSTEM_INSTANCE == null) {
                     FILE_SYSTEM_INSTANCE = new MCRIFSFileSystem(this);
                 }
@@ -328,9 +328,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
     }
 
-    private static void copyFile(MCRFile srcNode, MCRPath target, HashSet<CopyOption> copyOptions, boolean createNew)
+    private static void copyFile(MCRFile srcFile, MCRPath target, HashSet<CopyOption> copyOptions, boolean createNew)
         throws IOException {
-        MCRFile srcFile = srcNode;
         boolean fireCreateEvent = createNew || Files.notExists(target);
         MCRFile targetFile = MCRFileSystemUtils.getMCRFile(target, true, createNew, !fireCreateEvent);
         targetFile.setContent(srcFile.getContent());

@@ -377,7 +377,7 @@ public class MCRUserManager {
         }
 
         if (!searchPredicates.isEmpty()) {
-            if (1 == searchPredicates.size()) {
+            if (searchPredicates.size() == 1) {
                 predicates.add(searchPredicates.get(0));
             } else {
                 predicates.add(cb.or(searchPredicates.toArray(Predicate[]::new)));
