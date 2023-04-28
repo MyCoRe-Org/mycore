@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.auth;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -25,8 +26,10 @@ import java.time.ZoneId;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +47,7 @@ import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.user2.MCRUserManager;
+import org.xml.sax.SAXException;
 
 /**
  * Implements ORCID OAuth2 authorization.
@@ -85,27 +89,21 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             }
             try {
                 final String redirectURI = MCRFrontendUtil.getBaseURL() + req.getServletPath().substring(1);
-                handleCode(code, redirectURI);
-                sendResponse(req, res, new MCRORCIDOAuthResponse());
+                final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
+                    = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
+                final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
+                MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
+                sendResponse(req, res, new MCRORCIDOAuthResponse(credential.getScope()));
+            } catch (MCRORCIDRequestException e) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Cannot exchange token");
             } catch (MCRORCIDException e) {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Cannot set credential");
             }
         } else if (req.getParameter("error") != null) {
             final String error = req.getParameter("error");
             final String errorDescription = req.getParameter("error_description");
             LOGGER.error(error);
             sendResponse(req, res, new MCRORCIDOAuthResponse(error, errorDescription));
-        }
-    }
-
-    private void handleCode(String code, String redirectURI) {
-        try {
-            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
-                = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
-            final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
-            MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
-        } catch (MCRORCIDRequestException e) {
-            throw new MCRORCIDException("Cannot exchange token");
         }
     }
 
@@ -122,25 +120,46 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
     }
 
     private void sendResponse(HttpServletRequest req, HttpServletResponse res, MCRORCIDOAuthResponse authResponse)
-        throws Exception {
-        MCRLayoutService.instance().doLayout(req, res, marshalOAuthResponse(authResponse));
+        throws IOException {
+        try {
+            MCRLayoutService.instance().doLayout(req, res, marshalOAuthResponse(authResponse));
+        } catch (TransformerException | SAXException | IllegalArgumentException e) {
+            throw new IOException("Cannot create response");
+        }
     }
 
-    protected static MCRContent marshalOAuthResponse(MCRORCIDOAuthResponse authResponse) throws Exception {
-        return new MCRJAXBContent(JAXBContext.newInstance(MCRORCIDOAuthResponse.class), authResponse);
+    /**
+     * Marshals MCRORCIDOAuthResponse to MCRContent
+     * 
+     * @param authResponse the MCRORCIDOAuthResponse
+     * @return the MCRContent
+     * @throws IllegalArgumentException if operation fails
+     */
+    protected static MCRContent marshalOAuthResponse(MCRORCIDOAuthResponse authResponse) {
+        try {
+            return new MCRJAXBContent(JAXBContext.newInstance(MCRORCIDOAuthResponse.class), authResponse);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException("Invalid auth response");
+        }
     }
 
     @XmlRootElement(name = "ORCIDOAuthResponse")
     static class MCRORCIDOAuthResponse {
 
         @XmlElement(name = "error")
-        private final String error;
+        private String error;
 
         @XmlElement(name = "errorDescription")
-        private final String errorDescription;
+        private String errorDescription;
+
+        @XmlElement(name = "scope")
+        private String scope;
 
         MCRORCIDOAuthResponse() {
-            this(null, null);
+        }
+
+        MCRORCIDOAuthResponse(String scope) {
+            this.scope = scope;
         }
 
         MCRORCIDOAuthResponse(String error, String errorDescription) {
