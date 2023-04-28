@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -72,6 +74,16 @@ public class MCRORCIDUtils {
         md5Digest.update(bytes);
         final byte[] digest = md5Digest.digest();
         return MCRMD5InputStream.getMD5String(digest);
+    }
+
+    /**
+     * Checks if current user is guest.
+     * 
+     * @return true if current user is guest
+     */
+    public static boolean isCurrentUserGuest() {
+        return MCRSystemUserInformation.getGuestInstance().getUserID()
+            .equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 
     /**

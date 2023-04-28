@@ -33,7 +33,6 @@ import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
 
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.orcid2.MCRORCIDConstants;
@@ -73,7 +72,7 @@ public class MCRORCIDResource {
     @Path("userStatus")
     @Produces(MediaType.APPLICATION_JSON)
     public MCRORCIDUserStatus getUserStatus() {
-        if (isCurrentUserGuest()) {
+        if (MCRORCIDUtils.isCurrentUserGuest()) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         final MCRORCIDUser user = MCRORCIDSessionUtils.getCurrentUser();
@@ -96,7 +95,7 @@ public class MCRORCIDResource {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        if (isCurrentUserGuest()) {
+        if (MCRORCIDUtils.isCurrentUserGuest()) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
@@ -118,7 +117,7 @@ public class MCRORCIDResource {
     @GET
     @Path("auth")
     public Response handleAuth(@QueryParam("scope") String scope) {
-        if (isCurrentUserGuest()) {
+        if (MCRORCIDUtils.isCurrentUserGuest()) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         String langCode = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
@@ -153,7 +152,7 @@ public class MCRORCIDResource {
      */
     private URI buildRequestCodeURI(String scope, String state, String langCode) {
         final UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
-        final String redirectURI = MCRFrontendUtil.getBaseURL() + "orcid"; // TODO derive servlet url
+        final String redirectURI = MCRFrontendUtil.getBaseURL() + "rsc/orcid/oauth"; // TODO hard coded
         builder.path("oauth/authorize");
         builder.queryParam("redirect_uri", redirectURI);
         builder.queryParam("client_id", MCRORCIDOAuthClient.CLIENT_ID);
@@ -203,11 +202,6 @@ public class MCRORCIDResource {
         if (lastName != null) {
             builder.queryParam("family_names", lastName);
         }
-    }
-
-    private boolean isCurrentUserGuest() {
-        return MCRSystemUserInformation.getGuestInstance().getUserID()
-            .equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 
     static class MCRORCIDUserStatus {

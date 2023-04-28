@@ -33,25 +33,18 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ORCIDOAuthAccessTokenResponse")
 public class MCRORCIDOAuthAccessTokenResponse {
 
-    @XmlElement(name = "accessToken")
     private String accessToken;
 
-    @XmlElement(name = "tokenType")
     private String tokenType;
 
-    @XmlElement(name = "refreshToken")
     private String refreshToken;
 
-    @XmlElement(name = "expiresIn")
     private String expiresIn;
 
-    @XmlElement(name = "name")
     private String name;
 
-    @XmlElement(name = "scope")
     private String scope;
 
-    @XmlElement(name = "orcid")
     private String orcid;
 
     /**
@@ -66,6 +59,7 @@ public class MCRORCIDOAuthAccessTokenResponse {
      * @return access token
      */
     @JsonProperty("access_token")
+    @XmlElement(name = "accessToken")
     public String getAccessToken() {
         return accessToken;
     }
@@ -85,6 +79,7 @@ public class MCRORCIDOAuthAccessTokenResponse {
      * @return refresh token
      */
     @JsonProperty("refresh_token")
+    @XmlElement(name = "refreshToken")
     public String getRefreshToken() {
         return refreshToken;
     }
@@ -104,6 +99,7 @@ public class MCRORCIDOAuthAccessTokenResponse {
      * @return token type
      */
     @JsonProperty("token_type")
+    @XmlElement(name = "tokenType")
     public String getTokenType() {
         return tokenType;
     }
@@ -123,6 +119,7 @@ public class MCRORCIDOAuthAccessTokenResponse {
      * @return token life time
      */
     @JsonProperty("expires_in")
+    @XmlElement(name = "expiresIn")
     public String getExpiresIn() {
         return expiresIn;
     }
@@ -142,6 +139,7 @@ public class MCRORCIDOAuthAccessTokenResponse {
      * @return scope
      */
     @JsonProperty("scope")
+    @XmlElement(name = "scope")
     public String getScope() {
         return scope;
     }
@@ -161,6 +159,7 @@ public class MCRORCIDOAuthAccessTokenResponse {
      * @return name
      */
     @JsonProperty("name")
+    @XmlElement(name = "name")
     public String getName() {
         return name;
     }
@@ -180,6 +179,7 @@ public class MCRORCIDOAuthAccessTokenResponse {
      * @return ORCID iD
      */
     @JsonProperty("orcid")
+    @XmlElement(name = "orcid")
     public String getORCID() {
         return orcid;
     }
