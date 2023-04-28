@@ -93,7 +93,9 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
                     = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
                 final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
                 MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
-                sendResponse(req, res, new MCRORCIDOAuthResponse(credential.getScope()));
+                sendResponse(req, res, marshalOAuthAccessTokenResponse(accessTokenResponse));
+            } catch (IllegalArgumentException e) {
+                throw new IOException("Cannot create response");
             } catch (MCRORCIDRequestException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Cannot exchange token");
             } catch (MCRORCIDException e) {
@@ -103,7 +105,13 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             final String error = req.getParameter("error");
             final String errorDescription = req.getParameter("error_description");
             LOGGER.error(error);
-            sendResponse(req, res, new MCRORCIDOAuthResponse(error, errorDescription));
+            try {
+                final MCRContent content
+                    = marshalOAuthErrorResponse(new MCRORCIDOAuthErrorResponse(error, errorDescription));
+                sendResponse(req, res, content);
+            } catch (IllegalArgumentException e) {
+                throw new IOException("Cannot create response");
+            }
         }
     }
 
@@ -119,50 +127,41 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         return credential;
     }
 
-    private void sendResponse(HttpServletRequest req, HttpServletResponse res, MCRORCIDOAuthResponse authResponse)
+    private void sendResponse(HttpServletRequest req, HttpServletResponse res, MCRContent content)
         throws IOException {
         try {
-            MCRLayoutService.instance().doLayout(req, res, marshalOAuthResponse(authResponse));
-        } catch (TransformerException | SAXException | IllegalArgumentException e) {
+            MCRLayoutService.instance().doLayout(req, res, content);
+        } catch (TransformerException | SAXException e) {
             throw new IOException("Cannot create response");
         }
     }
 
-    /**
-     * Marshals MCRORCIDOAuthResponse to MCRContent
-     * 
-     * @param authResponse the MCRORCIDOAuthResponse
-     * @return the MCRContent
-     * @throws IllegalArgumentException if operation fails
-     */
-    protected static MCRContent marshalOAuthResponse(MCRORCIDOAuthResponse authResponse) {
+    private static MCRContent marshalOAuthErrorResponse(MCRORCIDOAuthErrorResponse errorResponse) {
         try {
-            return new MCRJAXBContent(JAXBContext.newInstance(MCRORCIDOAuthResponse.class), authResponse);
+            return new MCRJAXBContent(JAXBContext.newInstance(MCRORCIDOAuthErrorResponse.class), errorResponse);
         } catch (JAXBException e) {
             throw new IllegalArgumentException("Invalid auth response");
         }
     }
 
-    @XmlRootElement(name = "ORCIDOAuthResponse")
-    static class MCRORCIDOAuthResponse {
+    private static MCRContent marshalOAuthAccessTokenResponse(MCRORCIDOAuthAccessTokenResponse tokenResponse) {
+        try {
+            return new MCRJAXBContent(JAXBContext.newInstance(MCRORCIDOAuthAccessTokenResponse.class), tokenResponse);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException("Invalid token response");
+        }
+    }
+
+    @XmlRootElement(name = "ORCIDOAuthErrorResponse")
+    static class MCRORCIDOAuthErrorResponse {
 
         @XmlElement(name = "error")
-        private String error;
+        private final String error;
 
         @XmlElement(name = "errorDescription")
-        private String errorDescription;
+        private final String errorDescription;
 
-        @XmlElement(name = "scope")
-        private String scope;
-
-        MCRORCIDOAuthResponse() {
-        }
-
-        MCRORCIDOAuthResponse(String scope) {
-            this.scope = scope;
-        }
-
-        MCRORCIDOAuthResponse(String error, String errorDescription) {
+        MCRORCIDOAuthErrorResponse(String error, String errorDescription) {
             this.error = error;
             this.errorDescription = errorDescription;
         }

@@ -22,26 +22,43 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 /**
  * Represents the ORCID OAuth access token response.
  * 
  * See <a href="https://members.orcid.org/api/oauth/3legged-oauth">ORCID documentation</a>
  */
+@XmlRootElement(name = "ORCIDOAuthAccessTokenResponse")
 public class MCRORCIDOAuthAccessTokenResponse {
 
+    @XmlElement(name = "accessToken")
     private String accessToken;
 
+    @XmlElement(name = "tokenType")
     private String tokenType;
 
+    @XmlElement(name = "refreshToken")
     private String refreshToken;
 
+    @XmlElement(name = "expiresIn")
     private String expiresIn;
 
+    @XmlElement(name = "name")
     private String name;
 
+    @XmlElement(name = "scope")
     private String scope;
 
+    @XmlElement(name = "orcid")
     private String orcid;
+
+    /**
+     * Default constructor.
+     */
+    public MCRORCIDOAuthAccessTokenResponse() {
+    }
 
     /**
      * Returns the access token.
