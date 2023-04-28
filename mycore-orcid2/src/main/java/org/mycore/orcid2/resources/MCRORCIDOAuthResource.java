@@ -106,7 +106,7 @@ public class MCRORCIDOAuthResource {
 
     private MCRContent handleCode(String code) {
         try {
-            final String redirectURI = MCRFrontendUtil.getBaseURL(); // no matter
+            final String redirectURI = MCRFrontendUtil.getBaseURL() + "rsc/orcid/oauth";
             final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
                 = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
             final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
