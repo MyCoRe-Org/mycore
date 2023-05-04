@@ -18,17 +18,17 @@
 
 package org.mycore.access;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -114,8 +114,8 @@ class MCRAccessCacheManager implements MCRSessionListener {
     private void removePermissionFromCache(MCRCache<MCRPermissionHandle, Boolean> permissionCache, Set<String> ids) {
         final List<MCRPermissionHandle> handlesToRemove = permissionCache.keys()
             .stream()
-            .filter(hdl -> hdl.getId() != null)
-            .filter(hdl -> ids.contains(hdl.getId()))
+            .filter(hdl -> hdl.id() != null)
+            .filter(hdl -> ids.contains(hdl.id()))
             .collect(Collectors.toList());
         handlesToRemove.forEach(permissionCache::remove);
     }
@@ -130,4 +130,10 @@ class MCRAccessCacheManager implements MCRSessionListener {
         });
     }
 
+    private record MCRPermissionHandle(String id, String permission) {
+        private MCRPermissionHandle {
+            permission = permission.intern();
+        }
+
+    }
 }
