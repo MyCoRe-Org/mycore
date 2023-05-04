@@ -97,6 +97,7 @@ public class MCRTopologicalSort<T> {
         String file = null;
         Map<Integer, List<String>> parentNames = new HashMap<>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         for (int i = 0; i < files.length; i++) {
             file = files[i];
 
