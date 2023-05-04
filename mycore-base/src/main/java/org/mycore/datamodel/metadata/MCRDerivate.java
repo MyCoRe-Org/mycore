@@ -43,8 +43,6 @@ import com.google.gson.JsonObject;
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler
- * @version $Revision$ $Date: 2010-09-30 17:49:21 +0200 (Thu, 30 Sep
- *          2010) $
  */
 public final class MCRDerivate extends MCRBase {
 

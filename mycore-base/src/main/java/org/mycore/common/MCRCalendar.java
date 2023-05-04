@@ -44,7 +44,6 @@ import com.ibm.icu.util.ULocale;
  *
  * @author Jens Kupferschmidt
  * @author Thomas Junge
- * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
  * @see <a href="http://site.icu-project.org/home">http://site.icu-project.org/home</a>
  */
 public class MCRCalendar {

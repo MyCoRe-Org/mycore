@@ -38,8 +38,6 @@ import com.google.gson.JsonObject;
  * &lt;/tag&gt; <br>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2008-03-18 22:53:44 +0000 (Di, 18 Mrz
- *          2008) $
  */
 public class MCRMetaClassification extends MCRMetaDefault {
     private static final Logger LOGGER = LogManager.getLogger();

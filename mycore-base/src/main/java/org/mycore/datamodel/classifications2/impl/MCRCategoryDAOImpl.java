@@ -55,8 +55,6 @@ import jakarta.persistence.TypedQuery;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
- *          2008) $
  * @since 2.0
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {

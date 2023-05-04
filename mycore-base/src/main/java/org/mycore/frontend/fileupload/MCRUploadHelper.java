@@ -41,7 +41,6 @@ import jakarta.persistence.EntityTransaction;
  * 
  * @author Frank Lützenkirchen
  * 
- * @version $Revision: 34120 $ $Date: 2015-12-02 23:16:17 +0100 (Mi, 02 Dez 2015) $
  */
 public abstract class MCRUploadHelper {
 

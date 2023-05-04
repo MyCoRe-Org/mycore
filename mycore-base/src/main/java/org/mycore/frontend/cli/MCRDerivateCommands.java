@@ -85,8 +85,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date: 2010-10-29 15:17:03 +0200 (Fri, 29 Oct
- *          2010) $
  */
 @MCRCommandGroup(name = "Derivate Commands")
 public class MCRDerivateCommands extends MCRAbstractCommands {
@@ -493,8 +491,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
-    /**
-     */
+
     private static void exportDerivate(File dir, Transformer trans, String nid)
         throws TransformerException, IOException {
         // store the XML file

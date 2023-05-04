@@ -150,9 +150,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         }
     }
 
-    /**
-     *
-     */
+
     void detachFromParent() {
         if (parent != null) {
             // remove this from current parent

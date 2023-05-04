@@ -42,8 +42,6 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  *
  * @author Thomas Scheffler (yagee)
  *
- * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
- *          2008) $
  */
 public class MCRCategoryTransformer {
 

@@ -49,7 +49,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * 
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
- * @version $Revision: 1.11 $ $Date: 2008/11/27 07:58:28 $
  */
 
 @MCRCommandGroup(name = "Access Commands")

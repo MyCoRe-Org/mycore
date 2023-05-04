@@ -62,7 +62,6 @@ import com.google.common.collect.HashBiMap;
  * http://en.wikipedia.org/wiki/Topological_sorting
  *
  * @author Robert Stephan
- * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Mi, 18 Dez 2013) $
  *
  */
 public class MCRTopologicalSort<T> {

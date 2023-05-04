@@ -55,8 +55,6 @@ import com.google.gson.JsonObject;
  * 
  * @author Mathias Hegner
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb
- *          2008) $
  */
 public class MCRObjectStructure {
 

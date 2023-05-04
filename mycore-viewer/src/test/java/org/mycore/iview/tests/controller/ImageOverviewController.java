@@ -16,9 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * 
- */
+
 package org.mycore.iview.tests.controller;
 
 import java.util.Locale;

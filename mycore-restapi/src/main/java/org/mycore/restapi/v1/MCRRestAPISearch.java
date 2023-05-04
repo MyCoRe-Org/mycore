@@ -46,7 +46,6 @@ import jakarta.ws.rs.core.UriInfo;
  *
  * @author Robert Stephan
  *
- * @version $Revision: $ $Date: $
  */
 @Path("/search")
 public class MCRRestAPISearch {

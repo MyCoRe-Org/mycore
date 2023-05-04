@@ -49,7 +49,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Wed, 18 Dec 2013) $
  */
 public class MCRPathXML {
 

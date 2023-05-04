@@ -74,9 +74,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
         this.lastAccessTime = lastAccessTime == null ? EPOCHE_TIME : lastAccessTime;
     }
 
-    /**
-     *
-     */
+
     public static <T> MCRFileAttributes<T> directory(final T filekey, final long size, final FileTime lastModified) {
         return new MCRFileAttributes<>(FileType.directory, size, filekey, null, null, lastModified, null);
     }

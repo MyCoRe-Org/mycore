@@ -25,8 +25,6 @@ import java.util.ArrayList;
  * MyCoRe commandline system.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2009-07-28 11:32:04 +0200 (Tue, 28 Jul
- *          2009) $
  */
 public abstract class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The array holding all known commands */

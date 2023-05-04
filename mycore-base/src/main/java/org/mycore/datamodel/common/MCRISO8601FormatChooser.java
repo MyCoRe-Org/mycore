@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
  * or methods get removed.
  *
  * @author Thomas Scheffler (yagee)
- * @version $Revision: 18729 $ $Date: 2010-09-21 12:33:45 +0200 (Di, 21. Sep 2010) $
  * @since 1.3
  */
 public final class MCRISO8601FormatChooser {

@@ -103,7 +103,6 @@ import jakarta.ws.rs.core.UriInfo;
  * @author Robert Stephan
  * @author Christoph Neidahl
  * 
- * @version $Revision: $ $Date: $
  */
 public class MCRRestAPIObjectsHelper {
 

@@ -36,8 +36,6 @@ import org.mycore.datamodel.niofs.MCRPath;
  * This class implements all methode for handling one derivate data.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06. Feb
- *          2008) $
  */
 public class MCRObjectDerivate {
 

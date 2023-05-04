@@ -111,9 +111,7 @@ public class MCRRealmFactory {
         loadRealms();
     }
 
-    /**
-     * 
-     */
+
     private static void loadRealms() {
         Element root;
         try {

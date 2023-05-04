@@ -34,9 +34,7 @@ public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, Jso
 
     String JSON_DATA = "data";
 
-    /**
-     * 
-     */
+
     @Override
     Element fromJSON(JsonArray jsonSection);
 

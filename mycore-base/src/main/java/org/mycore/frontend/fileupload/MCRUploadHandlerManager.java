@@ -33,7 +33,6 @@ import org.mycore.common.processing.MCRProcessableRegistry;
  * @author Harald Richter
  * @author Jens Kupferschmidt
  * 
- * @version $Revision$
  */
 public class MCRUploadHandlerManager {
 

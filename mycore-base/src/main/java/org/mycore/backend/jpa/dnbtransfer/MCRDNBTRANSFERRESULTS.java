@@ -31,9 +31,7 @@ import jakarta.persistence.Id;
 @Entity
 public class MCRDNBTRANSFERRESULTS implements Serializable {
 
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = -5543608475323581768L;
 
     private int id;

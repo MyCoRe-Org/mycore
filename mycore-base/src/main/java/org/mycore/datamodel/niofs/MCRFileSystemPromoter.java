@@ -46,9 +46,7 @@ public class MCRFileSystemPromoter implements AutoExecutable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRFileSystemPromoter.class);
 
-    /**
-     * 
-     */
+
     public MCRFileSystemPromoter() {
     }
 

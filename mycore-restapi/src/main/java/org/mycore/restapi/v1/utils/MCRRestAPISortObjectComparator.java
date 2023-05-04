@@ -31,7 +31,6 @@ import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision: $ $Date: $
  */
 public class MCRRestAPISortObjectComparator implements Comparator<MCRObjectIDDate> {
     private MCRRestAPISortObject sortObj = null;

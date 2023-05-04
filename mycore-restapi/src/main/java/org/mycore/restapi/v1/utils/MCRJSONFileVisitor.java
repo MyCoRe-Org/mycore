@@ -16,9 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * 
- */
+
 package org.mycore.restapi.v1.utils;
 
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;

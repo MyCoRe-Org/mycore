@@ -47,9 +47,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 abstract class MCRPersistenceServlet extends MCRServlet {
-    /**
-     * 
-     */
+
+
     private static final long serialVersionUID = -6776941436009193613L;
 
     protected static final String OBJECT_ID_KEY = MCRPersistenceServlet.class.getCanonicalName() + ".MCRObjectID";

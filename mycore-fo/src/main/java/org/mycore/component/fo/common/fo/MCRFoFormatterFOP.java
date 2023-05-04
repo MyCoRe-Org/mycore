@@ -66,7 +66,6 @@ import org.mycore.common.xsl.MCRErrorListener;
  * 
  * @author Jens Kupferschmidt
  * @author René Adler (eagle)
- * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
  */
 public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 

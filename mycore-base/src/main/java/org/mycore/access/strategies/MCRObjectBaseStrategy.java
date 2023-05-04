@@ -40,7 +40,6 @@ import org.mycore.access.MCRAccessManager;
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * 
- * @version $Revision: 26482 $ $Date: 2013-03-13 10:16:11 +0100 (Mi, 13. Mär 2013) $
  */
 public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectBaseStrategy.class);

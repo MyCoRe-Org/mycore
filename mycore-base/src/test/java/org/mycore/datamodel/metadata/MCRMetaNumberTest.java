@@ -43,7 +43,6 @@ import org.mycore.common.xml.MCRXMLHelper;
  * It tests again the ENGLISH Locale
  * 
  * @author Jens Kupferschmidt
- * @version $Revision: 28698 $ $Date: 2013-12-19 15:22:40 +0100 (Do, 19. Dez 2013) $
  *
  */
 public class MCRMetaNumberTest extends MCRTestCase {

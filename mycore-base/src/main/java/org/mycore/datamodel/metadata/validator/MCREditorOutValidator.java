@@ -72,7 +72,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @version $Revision: 1 $ $Date: 08.05.2009 15:51:37 $
  */
 public class MCREditorOutValidator {
 

@@ -47,7 +47,6 @@ import jakarta.servlet.http.Part;
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  *
- * @version $Revision: 34120 $ $Date: 2015-12-02 23:16:17 +0100 (Mi, 02 Dez 2015) $
  *
  * @see MCRUploadHandler
  * @see MCRUploadServletDeployer

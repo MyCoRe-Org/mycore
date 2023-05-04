@@ -59,7 +59,6 @@ import jakarta.ws.rs.core.UriInfo;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision: $ $Date: $
  */
 @Path("/objects")
 public class MCRRestAPIObjects {
