@@ -94,27 +94,16 @@ public class MCRConditionTransformer {
         String value = qCond.getValue();
         String operator = qCond.getOperator();
         usedFields.add(field);
-        switch (operator) {
-            case "like", "contains" -> {
-                return getTermQuery(field, value.trim());
-            }
-            case "=", "phrase" -> {
-                return getPhraseQuery(field, value);
-            }
-            case "<" -> {
-                return getLTQuery(field, value);
-            }
-            case "<=" -> {
-                return getLTEQuery(field, value);
-            }
-            case ">" -> {
-                return getGTQuery(field, value);
-            }
-            case ">=" -> {
-                return getGTEQuery(field, value);
-            }
-        }
-        throw new UnsupportedOperationException("Do not know how to handle operator: " + operator);
+        return switch (operator) {
+            case "like", "contains" -> getTermQuery(field, value.trim());
+            case "=", "phrase" -> getPhraseQuery(field, value);
+            case "<" -> getLTQuery(field, value);
+            case "<=" -> getLTEQuery(field, value);
+            case ">" -> getGTQuery(field, value);
+            case ">=" -> getGTEQuery(field, value);
+            default -> throw new UnsupportedOperationException("Do not know how to handle operator: " + operator);
+        };
+
     }
 
     @SuppressWarnings("rawtypes")

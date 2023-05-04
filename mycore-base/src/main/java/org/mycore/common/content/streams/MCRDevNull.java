@@ -30,6 +30,7 @@ public class MCRDevNull extends OutputStream {
      */
     @Override
     public void write(int arg0) {
+        //intentionally does nothing
     }
 
 }
