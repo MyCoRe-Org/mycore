@@ -151,8 +151,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
     }
 
     /**
-     * adds {@link MCRJob} to queue and starts {@link MCRJobThreadStarter} if
-     * <code>"MCR.QueuedJob.autostart"</code> is set <code>true</code>.
+     * adds {@link MCRJob} to queue and starts {@link MCRJobThreadStarter} if the queue is activated.
      * alters date added to current time and status of job to {@link MCRJobStatus#NEW}
      * @param job the job to add
      * @return <code>true</code> if job was added

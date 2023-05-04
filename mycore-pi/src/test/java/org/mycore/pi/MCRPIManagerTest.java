@@ -197,7 +197,6 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
             MCRMockIdentifierParser.class.getName());
 
         configuration.put("MCR.QueuedJob.activated", "true");
-        configuration.put("MCR.QueuedJob.autostart", "true");
         configuration.put("MCR.QueuedJob.JobThreads", "2");
         configuration.put("MCR.QueuedJob.TimeTillReset", "10");
         configuration.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());

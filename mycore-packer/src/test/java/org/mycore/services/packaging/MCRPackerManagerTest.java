@@ -49,7 +49,6 @@ public class MCRPackerManagerTest extends MCRJPATestCase {
         testProperties.put(testPackerPrefix + "Class", MCRPackerMock.class.getName());
         testProperties.put(testPackerPrefix + MCRPackerMock.TEST_CONFIGURATION_KEY, MCRPackerMock.TEST_VALUE);
         testProperties.put("MCR.QueuedJob.activated", "true");
-        testProperties.put("MCR.QueuedJob.autostart", "true");
         testProperties.put("MCR.QueuedJob.JobThreads", "2");
         testProperties.put("MCR.QueuedJob.TimeTillReset", "10");
         testProperties.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
