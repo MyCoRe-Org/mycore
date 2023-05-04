@@ -43,7 +43,7 @@ import org.mycore.util.concurrent.MCRFixedUserCallable;
  */
 public final class MCRURNGranularRESTRegistrationTask extends TimerTask implements Closeable {
 
-    public final int BATCH_SIZE;
+    public final int batchSize;
 
     protected static final Logger LOGGER = LogManager.getLogger(MCRURNGranularRESTRegistrationTask.class);
 
@@ -51,7 +51,7 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
 
     public MCRURNGranularRESTRegistrationTask(MCRDNBURNRestClient client) {
         this.dnburnClient = client;
-        this.BATCH_SIZE = MCRConfiguration2.getInt("MCR.PI.GranularRESTRegistrationTask.batchSize").orElse(10);
+        this.batchSize = MCRConfiguration2.getInt("MCR.PI.GranularRESTRegistrationTask.batchSize").orElse(10);
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
         LOGGER.info("Check for unregistered URNs .. ");
          try {
              List<MCRPI> unregisteredURNs = MCRPIManager.getInstance()
-                 .getUnregisteredIdentifiers(MCRDNBURN.TYPE, BATCH_SIZE);
+                 .getUnregisteredIdentifiers(MCRDNBURN.TYPE, batchSize);
 
              for (MCRPI urn : unregisteredURNs) {
                  dnburnClient.register(urn).ifPresent(date -> setRegisterDate(urn, date));
