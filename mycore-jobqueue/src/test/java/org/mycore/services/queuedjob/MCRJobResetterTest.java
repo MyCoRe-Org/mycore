@@ -13,10 +13,6 @@ import java.util.Queue;
 
 public class MCRJobResetterTest extends MCRJPATestCase {
 
-    public MCRJobResetterTest() {
-        super();
-    }
-
     @Test
     public void testResetJobsWithAction() {
         MCRMockJobDAO mockDAO = new MCRMockJobDAO();
@@ -36,8 +32,10 @@ public class MCRJobResetterTest extends MCRJPATestCase {
             case "MCRTestJobAction2" -> {
                 return reset2;
             }
+            default -> {
+                return null;
             }
-            return null;
+            }
         }, config);
 
         long elevenMinutesAgo = new Date().getTime() - 60 * 1000 * 11;

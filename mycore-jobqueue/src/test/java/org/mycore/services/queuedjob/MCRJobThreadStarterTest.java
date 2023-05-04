@@ -17,10 +17,6 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRJobThreadStarterTest() {
-        super();
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();
