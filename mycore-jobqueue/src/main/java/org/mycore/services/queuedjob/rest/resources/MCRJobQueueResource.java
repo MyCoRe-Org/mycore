@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.services.queuedjob.rest.resources;
 
 import java.net.URLDecoder;
@@ -53,15 +54,19 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlValue;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
- *
+ * REST resource for job queues. Requires {@link MCRJobQueuePermission} to access.
+ * @author René Adler (eagle)
  */
 @Path("/")
 @Singleton
 public class MCRJobQueueResource {
 
-    protected static final String X_TOTAL_COUNT_HEADER = "X-Total-Count";
+    private static final String X_TOTAL_COUNT_HEADER = "X-Total-Count";
 
+    /**
+     * REST resource to receive all job queues.
+     * @return a list of all job queues as JSON or XML
+     */
     @GET()
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @MCRRestrictedAccess(MCRJobQueuePermission.class)
@@ -82,11 +87,19 @@ public class MCRJobQueueResource {
             .build();
     }
 
+    /**
+     * REST resource for a specific job queue.
+     * @param name the name of the job queue
+     * @param status a filter for status of the jobs to return (optional)
+     * @param parameters a filter for parameters of the jobs to return (optional)
+     * @param offset the start index of the jobs to return (optional)
+     * @param limit the maximum number of jobs to return (optional)
+     * @return response with the jobs as JSON or XML
+     */
     @GET()
     @Path("{name:.+}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @MCRRestrictedAccess(MCRJobQueuePermission.class)
-    // add count header
     @MCRAccessControlExposeHeaders(X_TOTAL_COUNT_HEADER)
     @MCRRequireTransaction()
     public Response queueJSON(@PathParam("name") String name,

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.services.queuedjob;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
@@ -31,11 +32,14 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
- *
+ * The MCRJobQueuePermission class checks if the user is allowed to access the job queue rest api.
+ * @author René Adler (eagle)
  */
 public class MCRJobQueuePermission implements MCRResourceAccessChecker {
 
+    /**
+     * the string representation of the permission to list all job queues
+     */
     public static final String PERMISSION_LIST = "list-jobqueues";
 
     private static Logger LOGGER = LogManager.getLogger(MCRJobQueuePermission.class);

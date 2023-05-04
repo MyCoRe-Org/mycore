@@ -19,20 +19,28 @@
 package org.mycore.services.queuedjob;
 
 /**
- * Possible states of the job can be:
- * <dl>
- *   <dt>{@link #NEW}</dt>
- *   <dd>job added to queue</dd>
- *   <dt>{@link #PROCESSING}</dt>
- *   <dd>job currently on processing</dd>
- *   <dt>{@link #FINISHED}</dt>
- *   <dd>job processing is finished</dd>
- *   <dt>{@link #MAX_TRIES}</dt>
- *   <dd>job processing failed and reached maximum tries</dd>
- *   <dt>{@link #ERROR}</dt>
- *   <dd>job processing failed</dd>
- * </dl>  
+ * Possible status of a job.
+ * @author René Adler
  */
 public enum MCRJobStatus {
-    NEW, PROCESSING, FINISHED, MAX_TRIES, ERROR
+    /**
+     * job added to queue
+     */
+    NEW,
+    /**
+     * job currently on processing
+     */
+    PROCESSING,
+    /**
+     * job processing is finished successfully
+     */
+    FINISHED,
+    /**
+     * job processing failed and reached maximum tries
+     */
+    MAX_TRIES,
+    /**
+     * job processing failed, but can be resetted
+     */
+    ERROR
 }

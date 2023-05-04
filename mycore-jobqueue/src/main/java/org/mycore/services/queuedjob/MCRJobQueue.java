@@ -51,6 +51,12 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
     private final List<MCRJobQueueEventListener> listeners;
     private boolean running;
 
+    /**
+     * Creates a new JobQueue instance.
+     * @param action the {@link MCRJobAction} the action this queue is responsible for
+     * @param config the {@link MCRJobConfig} which is used to determine if the queue is running
+     * @param dao the {@link MCRJobDAO} which is used to retrieve jobs
+     */
     protected MCRJobQueue(Class<? extends MCRJobAction> action, MCRJobConfig config, MCRJobDAO dao) {
         this.config = config;
         this.dao = dao;
@@ -213,6 +219,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
 
     /**
      * Builds iterator for jobs with given {@link MCRJobStatus} or <code>null</code> for all jobs.
+     * @param status the status or <code>null</code>
+     * @return the iterator
      */
     public Iterator<MCRJob> iterator(MCRJobStatus status) {
         if (!running) {
@@ -352,6 +360,10 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
         listeners.remove(listener);
     }
 
+    /**
+     * Returns the action class of this queue.
+     * @return the action class
+     */
     public Class<? extends MCRJobAction> getAction() {
         return action;
     }

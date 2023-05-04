@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.services.queuedjob;
 
 import org.mycore.common.MCRClassTools;
@@ -24,7 +25,7 @@ import jakarta.persistence.Converter;
 import jakarta.persistence.PersistenceException;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  */
 @Converter
 public class MCRJobActionConverter implements AttributeConverter<Object, String> {

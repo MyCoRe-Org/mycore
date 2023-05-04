@@ -23,15 +23,19 @@ import java.util.concurrent.ExecutionException;
 /**
  * <code>MCRJobAction</code> must be extended to do some work for given {@link MCRJob}.
  * 
- * @author Ren\u00E9 Adler
+ * @author René Adler
  *
  */
 public abstract class MCRJobAction {
 
+    /**
+     * The job holding the parameters for the action.
+     */
     protected final MCRJob job;
 
     /**
      * The constructor of the job action with specific {@link MCRJob}.
+     * @param job the job holding the parameters for the action
      */
     public MCRJobAction(MCRJob job) {
         this.job = job;
@@ -53,6 +57,7 @@ public abstract class MCRJobAction {
 
     /**
      * Does the work for given {@link MCRJob}.
+     * @throws ExecutionException if an error occurs during execution
      */
     public abstract void execute() throws ExecutionException;
 

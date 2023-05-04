@@ -46,7 +46,7 @@ import jakarta.persistence.Transient;
 /**
  * Container class handled by hibernate to store and retrieve job information.
  * 
- * @author Ren\u00E9 Adler
+ * @author René Adler
  */
 @Entity
 @NamedQueries({
@@ -72,11 +72,21 @@ public class MCRJob implements Cloneable {
 
     private Map<String, String> parameters;
 
+    /**
+     * The maximum length of the exception message, which is stored in the database.
+     */
     public static final int EXCEPTION_MAX_LENGTH = 9999;
 
+    /**
+     * Creates an empty job.
+     */
     protected MCRJob() {
     }
 
+    /**
+     * Creates an empty job for the given action class.
+     * @param actionClass the action class
+     */
     public MCRJob(Class<? extends MCRJobAction> actionClass) {
         action = actionClass;
     }
@@ -123,8 +133,7 @@ public class MCRJob implements Cloneable {
     }
 
     /**
-     * Returns the current state ({@link MCRJobStatus}) of the job.
-     * 
+     * @return the current state ({@link MCRJobStatus}) of the job.
      */
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -153,7 +162,7 @@ public class MCRJob implements Cloneable {
 
     /**
      * Set the adding date.
-     * 
+     * @param added the date when the job was added to the queue
      */
     public void setAdded(Date added) {
         this.added = added;
@@ -216,11 +225,19 @@ public class MCRJob implements Cloneable {
         this.tries = retries;
     }
 
+    /**
+     * Returns the exception message. Which was thrown during last execution.
+     * @return the exception message or null if no exception was thrown
+     */
     @Column(name = "exception", length = EXCEPTION_MAX_LENGTH)
     public String getException() {
         return exception;
     }
 
+    /**
+     * Set the exception message. Which was thrown during last execution.
+     * @param exception the exception message
+     */
     public void setException(String exception) {
         this.exception = exception;
     }

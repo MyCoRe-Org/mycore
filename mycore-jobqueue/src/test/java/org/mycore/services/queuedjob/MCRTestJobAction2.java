@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.services.queuedjob;
 
 import java.util.concurrent.ExecutionException;

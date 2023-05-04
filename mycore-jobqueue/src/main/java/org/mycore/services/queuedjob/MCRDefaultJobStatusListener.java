@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
  * */
 public class MCRDefaultJobStatusListener implements MCRJobStatusListener {
 
-    protected static Logger LOGGER = LogManager.getLogger(MCRDefaultJobStatusListener.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void onProcessing(MCRJob job) {

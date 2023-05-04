@@ -31,12 +31,10 @@ import org.mycore.mcr.cronjob.MCRCronjob;
 
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
-
 /**
- * Resets jobs that took to long to perform action.
- * Set property <code>MCR.QueuedJob.TimeTillReset</code> to alter grace period.
- * 
- * @author Ren\u00E9 Adler
+ * Resets jobs that are in {@link MCRJobStatus#ERROR} for minimum the time defined in the job config.
+ *
+ * @author René Adler
  */
 public class MCRJobResetter extends MCRCronjob {
     private static Logger LOGGER = LogManager.getLogger(MCRJobResetter.class);
@@ -46,12 +44,22 @@ public class MCRJobResetter extends MCRCronjob {
     private final MCRJobConfig config;
     private Function<Class, Queue<MCRJob>> queueResolver;
 
-
+    /**
+     * Creates a new instance of {@link MCRJobResetter}. Uses {@link MCRJobQueueManager} to resolve dependencies. 
+     * Used by the Cronjob system.
+     */
     public MCRJobResetter() {
         this(MCRJobQueueManager.getInstance().getJobDAO(), MCRJobQueueManager.getInstance()::getJobQueue,
             MCRJobQueueManager.getInstance().getJobConfig());
     }
 
+    /**
+     * Creates a new instance of {@link MCRJobResetter}.
+     * @param dao the job dao to receive jobs from
+     * @param queueResolver the queue resolver to resolve the queue for a job action, which will be used add the
+     *                      resetted jobs to.
+     * @param config the job config to determine the time till reset
+     */
     MCRJobResetter(MCRJobDAO dao, Function<Class, Queue<MCRJob>> queueResolver, MCRJobConfig config) {
         this.dao = dao;
         this.queueResolver = queueResolver;
@@ -81,6 +89,10 @@ public class MCRJobResetter extends MCRCronjob {
             .count();
     }
 
+    /**
+     * Resets jobs to {@link MCRJobStatus#NEW} that are in {@link MCRJobStatus#ERROR} for minimum the time defined
+     * @param action the action to reset jobs for
+     */
     protected void resetJobsWithAction(Class<? extends MCRJobAction> action) {
         resetJobsWithAction(action, config, dao, queueResolver.apply(action), MCRJobStatus.ERROR);
     }

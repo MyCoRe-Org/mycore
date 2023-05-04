@@ -28,9 +28,21 @@ package org.mycore.services.queuedjob;
  * @author shermann
  * */
 public interface MCRJobStatusListener {
+    /**
+     * Will be called when the job has failed.
+     * @param job the job that failed
+     */
     void onError(MCRJob job);
 
+    /**
+     * Will be called when the job has finished successfully.
+     * @param job the job that finished
+     */
     void onSuccess(MCRJob job);
 
+    /**
+     * Will be called when the job has started processing.
+     * @param job the job that started processing
+     */
     void onProcessing(MCRJob job);
 }

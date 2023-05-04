@@ -48,11 +48,12 @@ import jakarta.persistence.RollbackException;
 /**
  * Pulls {@link MCRJob}s from Database and starts {@link MCRJobRunnable}s.
  * 
- * @author Ren\u00E9 Adler
+ * @author René Adler
+ * @author Sebastian Hofmann
  */
 public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusListener {
 
-    public static final long ONE_MINUTE_IN_MS = TimeUnit.MINUTES.toMillis(1);
+    private static final long ONE_MINUTE_IN_MS = TimeUnit.MINUTES.toMillis(1);
     private static final Logger LOGGER = LogManager.getLogger(MCRJobThreadStarter.class);
 
     private final MCRJobQueue jobQueue;
@@ -96,7 +97,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusLis
         maxJobThreadCount = config.maxJobThreadCount(action).orElseGet(config::maxJobThreadCount);
 
         jobExecutor = new ThreadPoolExecutor(maxJobThreadCount, maxJobThreadCount, 1, TimeUnit.DAYS, workQueue,
-            (r) -> new Thread(r, getPreLabel() + "Worker#" + tNum.incrementAndGet())) {
+            (r) -> new Thread(r, getSimpleActionName() + "Worker#" + tNum.incrementAndGet())) {
                 @Override
                 protected void afterExecute(Runnable r, Throwable t) {
                     super.afterExecute(r, t);
@@ -224,7 +225,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusLis
         return activeThreads.get() < getMaxJobThreadCount();
     }
 
-    public int getMaxJobThreadCount() {
+    private int getMaxJobThreadCount() {
         return maxJobThreadCount;
     }
 
@@ -278,17 +279,17 @@ public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusLis
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY - 1;
     }
 
-    protected String getPreLabel() {
+    private String getSimpleActionName() {
         return action.getSimpleName();
     }
 
     /**
      * Returns the name of this job manager.
      * 
-     * @return
+     * @return the name
      */
     public String getName() {
-        return getPreLabel() + " Manager";
+        return getSimpleActionName() + " Manager";
     }
 
     /**

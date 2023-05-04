@@ -27,6 +27,10 @@ import org.mycore.common.events.MCRStartupHandler;
 import jakarta.servlet.ServletContext;
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
+/**
+ * Initializes the job queue on startup.
+ * @author Sebastian Hofmann
+ */
 public class MCRJobQueueInitializer implements MCRStartupHandler.AutoExecutable {
 
     private static final Logger LOGGER = LogManager.getLogger();

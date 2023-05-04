@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.services.queuedjob.config2;
 
 import org.apache.logging.log4j.LogManager;
@@ -13,18 +31,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Reads the configuration for the job queue from mycore.properties using the {@link MCRConfiguration2} class.
+ * @author Sebastian Hofmann
+ */
 public class MCRConfiguration2JobConfig implements MCRJobConfig {
 
-    public static final String CONFIG_MAX_TRY = "MaxTry";
+    private static final String CONFIG_MAX_TRY = "MaxTry";
 
-    public static final String CONFIG_TIME_TILL_RESET = "TimeTillReset";
+    private static final String CONFIG_TIME_TILL_RESET = "TimeTillReset";
 
-    public static final String CONFIG_JOB_THREADS = "JobThreads";
+    private static final String CONFIG_JOB_THREADS = "JobThreads";
 
-    public static final String CONFIG_AUTOSTART = "autostart";
     private static final String CONFIG_ACTIVATED = "activated";
 
-    protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
+    private static final String CONFIG_PREFIX = "MCR.QueuedJob.";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -47,10 +68,6 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
         return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_JOB_THREADS);
     }
 
-    @Override
-    public Optional<Boolean> autostart(Class<? extends MCRJobAction> action) {
-        return MCRConfiguration2.getBoolean(CONFIG_PREFIX + CONFIG_AUTOSTART);
-    }
 
     @Override
     public Optional<Boolean> activated(Class<? extends MCRJobAction> action){
@@ -74,13 +91,6 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     public Integer maxTryCount() {
         String property = CONFIG_PREFIX + CONFIG_MAX_TRY;
         return MCRConfiguration2.getInt(property)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
-    }
-
-    @Override
-    public Boolean autostart() {
-        String property = MCRConfiguration2JobConfig.CONFIG_PREFIX + MCRConfiguration2JobConfig.CONFIG_AUTOSTART;
-        return MCRConfiguration2.getBoolean(property)
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
 

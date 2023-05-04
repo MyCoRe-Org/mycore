@@ -37,6 +37,9 @@ import org.mycore.restapi.MCRTransactionFilter;
 @ApplicationPath("/api/jobqueue")
 public class MCRJobQueueApp extends ResourceConfig {
 
+    /**
+     * Creates the Jersey application for the MyCoRe JobQueue-API
+     */
     public MCRJobQueueApp() {
         super();
         initAppName();
@@ -51,15 +54,24 @@ public class MCRJobQueueApp extends ResourceConfig {
         register(MCRIgnoreClientAbortInterceptor.class);
     }
 
+    /**
+     * Sets the application name for the Jersey application
+     */
     protected void initAppName() {
         setApplicationName("MyCoRe JobQueue-API " + getVersion());
         LogManager.getLogger().info("Initiialize {}", getApplicationName());
     }
 
+    /**
+     * @return the version of the JobQueue-API
+     */
     protected String getVersion() {
         return "1.0";
     }
 
+    /**
+     * @return the packages to scan for REST resources
+     */
     protected String[] getRestPackages() {
         return MCRConfiguration2.getOrThrow("MCR.JobQueue.API.Resource.Packages", MCRConfiguration2::splitValue)
             .toArray(String[]::new);

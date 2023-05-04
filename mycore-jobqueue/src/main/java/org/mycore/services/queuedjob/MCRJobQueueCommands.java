@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.services.queuedjob;
 
 import jakarta.persistence.EntityManager;
@@ -10,6 +28,10 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
 import java.util.List;
 
+/**
+ * Provides commands to manage the job queue.
+ * @author Sebastian Hofmann
+ */
 @MCRCommandGroup(name = "Job Queue Commands")
 public class MCRJobQueueCommands {
 
@@ -17,9 +39,13 @@ public class MCRJobQueueCommands {
 
     static MCRJobDAOJPAImpl dao = new MCRJobDAOJPAImpl();
 
+    /**
+     * Starts a specific number of test jobs which will fail 50% of the time.
+     * @param number the number of jobs to start
+     */
     @MCRCommand(
         syntax = "start test jobs {0}",
-        help = "Starts {0} test jobs",
+        help = "Starts {0} test jobs which will fail 50% of the time.",
         order = 0)
     public static void startTestJobs(String number) {
         int i = Integer.parseInt(number);
@@ -33,6 +59,9 @@ public class MCRJobQueueCommands {
         }
     }
 
+    /**
+     * Lists all jobs with status MAX_TRIES.
+     */
     @MCRCommand(
         syntax = "list max try jobs",
         help = "List all jobs with status MAX_TRIES",
@@ -50,9 +79,12 @@ public class MCRJobQueueCommands {
         });
     }
 
+    /**
+     * Resets all jobs with status MAX_TRIES to status NEW.
+     */
     @MCRCommand(
         syntax = "reset max try jobs",
-        help = "Reset all jobs with status MAX_TRIES",
+        help = "Reset all jobs with status MAX_TRIES to status NEW",
         order = 20)
     public static void resetMaxTryJobs() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
@@ -66,9 +98,13 @@ public class MCRJobQueueCommands {
         LOGGER.info("Reset {} jobs", count);
     }
 
+    /**
+     * Resets all jobs with status MAX_TRIES and action {0} to status NEW.
+     * @param action the action to reset
+     */
     @MCRCommand(
         syntax = "reset max try jobs with action {0}",
-        help = "Reset all jobs with status MAX_TRIES and action {0}",
+        help = "Reset all jobs with status MAX_TRIES and action {0} to status NEW",
         order = 30)
     public static void resetMaxTryJobsWithAction(String action) {
         if(action == null || action.isEmpty()) {
@@ -87,9 +123,13 @@ public class MCRJobQueueCommands {
         LOGGER.info("Reset {} jobs", count);
     }
 
+    /**
+     * Resets all jobs with status MAX_TRIES and id {0} to status NEW.
+     * @param id the id to reset
+     */
     @MCRCommand(
         syntax = "reset max try jobs with id {0}",
-        help = "reset all jobs with status MAX_TRIES and id {0}",
+        help = "reset all jobs with status MAX_TRIES and id {0} to status NEW",
         order = 40)
     public static void resetMaxTryJobsWithId(String id) {
         if(id == null || id.isEmpty()) {

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.services.queuedjob;
 
 import java.util.Comparator;
@@ -27,10 +28,6 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
 
-/**
- * @author Sebastian Hofmann
- *
- */
 public class MCRJobQueueTest extends MCRTestCase {
 
     private MCRMockJobDAO mockDAO;

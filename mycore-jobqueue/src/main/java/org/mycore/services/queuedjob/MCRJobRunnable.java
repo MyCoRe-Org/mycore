@@ -39,13 +39,16 @@ import org.mycore.common.processing.MCRProcessableStatus;
  * This class execute the specified action for {@link MCRJob} and performs {@link MCRJobAction#rollback()}
  * if an error occurs. 
  *
- * @author Ren\u00E9 Adler
+ * @author René Adler
  *
  */
 public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRJobRunnable.class);
 
+    /**
+     * The job to execute.
+     */
     protected final MCRJob job;
     private final MCRJobConfig config;
 
@@ -53,6 +56,13 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
 
     private final MCRJobAction actionInstance;
 
+    /**
+     * Creates a new instance of {@link MCRJobRunnable}.
+     * @param job the job to execute
+     * @param config the job config to read the listeners from and retrieve the max retries
+     * @param additionalListeners additional listeners to add to the list of listeners
+     * @param actionInstance the action instance to execute
+     */
     public MCRJobRunnable(MCRJob job,
                           MCRJobConfig config,
                           List<MCRJobStatusListener> additionalListeners,
