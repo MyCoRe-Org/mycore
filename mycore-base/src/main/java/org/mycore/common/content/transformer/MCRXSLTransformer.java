@@ -119,7 +119,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         setTransformerFactory(tfClass.getName());
     }
 
-    public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
+    /**
+     * Sets the class name for {@link TransformerFactory} used by this transformer.
+     *
+     * Must be called for thread safety before this instance is shared to other threads.
+     */
+    private void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
         TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
             .map(c -> TransformerFactory.newInstance(c, MCRClassTools.getClassLoader()))
             .orElseGet(TransformerFactory::newInstance);
