@@ -82,7 +82,7 @@ public class MCRSolrQueryResolver implements URIResolver {
             Optional<String> query = Optional.ofNullable(matcher.group(QUERY_GROUP_NAME));
 
             if (!newMatcher.matches()) {
-                printMismatchWarning(href, base);
+                printMismatchWarning(href);
             } else {
                 String newCore = newMatcher.group(CORE_GROUP_NAME);
                 String newRequestHandler = newMatcher.group(REQUEST_HANDLER_GROUP_NAME);
@@ -90,7 +90,7 @@ public class MCRSolrQueryResolver implements URIResolver {
                 if (!Objects.equals(core.orElse(null), newCore) ||
                     !Objects.equals(requestHandler.orElse(null), newRequestHandler) ||
                     !Objects.equals(query.orElse(null), newQuery)) {
-                    printMismatchWarning(href, base);
+                    printMismatchWarning(href);
                 }
             }
 
@@ -113,7 +113,7 @@ public class MCRSolrQueryResolver implements URIResolver {
         throw new IllegalArgumentException("Did not understand uri: " + href);
     }
 
-    private void printMismatchWarning(String href, String base) {
+    private void printMismatchWarning(String href) {
         LOGGER.warn("The uri {} is probably not encoded correctly. See (MCR-2872)", href);
     }
 }
