@@ -29,10 +29,10 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.ProviderMismatchException;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -210,7 +210,7 @@ abstract class MCRFileSystemUtils {
                 throw new IOException(relativePath + " is absolute does not fit to " + toPath(baseDir));
             }
         }
-        Deque<MCRStoredNode> created = new LinkedList<>();
+        Deque<MCRStoredNode> created = new ArrayDeque<>();
         MCRFile file;
         try {
             file = (MCRFile) baseDir.getNodeByPath(ifsPath.toString());

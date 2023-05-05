@@ -18,8 +18,8 @@
 
 package org.mycore.parsers.bool;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,7 +36,7 @@ public abstract class MCRSetCondition<T> implements MCRCondition<T> {
 
     protected String operator;
 
-    protected List<MCRCondition<T>> children = new LinkedList<>();
+    protected List<MCRCondition<T>> children = new ArrayList<>();
 
     protected MCRSetCondition(String operator) {
         this.operator = operator;

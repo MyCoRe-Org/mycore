@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -389,7 +389,7 @@ public class MCRLinkTableManager {
             LOGGER.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
-        LinkedList<String> ll = new LinkedList<>();
+        Collection<String> ll = new ArrayList<>();
         try {
             for (String singleTo : to) {
                 ll.addAll(linkTableInstance.getSourcesOf(singleTo, type));

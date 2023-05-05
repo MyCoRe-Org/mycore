@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -71,7 +70,7 @@ public class MCRTransferPackageCommands {
         if (!(Files.exists(dir) || Files.isDirectory(dir))) {
             throw new FileNotFoundException(directory + " does not exist or is not a directory.");
         }
-        List<String> importStatements = new LinkedList<>();
+        List<String> importStatements = new ArrayList<>();
         try (Stream<Path> stream = Files.find(dir, 0,
             (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
             stream.map(Path::toAbsolutePath).map(Path::toString).forEach(path -> {

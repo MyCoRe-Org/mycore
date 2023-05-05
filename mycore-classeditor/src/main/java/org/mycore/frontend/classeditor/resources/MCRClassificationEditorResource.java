@@ -27,7 +27,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -188,7 +187,7 @@ public class MCRClassificationEditorResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getClassification() {
         Gson gson = MCRJSONManager.instance().createGson();
-        List<MCRCategory> rootCategories = new LinkedList<>(CATEGORY_DAO.getRootCategories());
+        List<MCRCategory> rootCategories = new ArrayList<>(CATEGORY_DAO.getRootCategories());
         rootCategories.removeIf(
             category -> !MCRAccessManager.checkPermission(category.getId().getRootID(), PERMISSION_WRITE));
         if (rootCategories.isEmpty()

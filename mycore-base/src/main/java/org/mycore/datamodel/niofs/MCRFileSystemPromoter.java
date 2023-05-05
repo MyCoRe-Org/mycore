@@ -20,8 +20,8 @@ package org.mycore.datamodel.niofs;
 
 import java.nio.file.FileSystem;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -80,7 +80,7 @@ public class MCRFileSystemPromoter implements AutoExecutable {
                 .getClassLoader());
             promoteFileSystemProvider(StreamSupport.stream(sl.spliterator(), false)
                 .filter(p -> !installedSchemes.contains(p.getScheme()))
-                .collect(Collectors.toCollection(LinkedList::new)));
+                .collect(Collectors.toCollection(ArrayList::new)));
         }
     }
 

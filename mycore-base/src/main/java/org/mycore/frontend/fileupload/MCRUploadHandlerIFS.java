@@ -29,8 +29,8 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -39,10 +39,10 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRRuleAccessInterface;
+import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.MCRProcessableStatus;
@@ -213,7 +213,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
         this.setProgressText(path);
 
-        List<Path> tempFiles = new LinkedList<>();
+        List<Path> tempFiles = new ArrayList<>();
         Supplier<Path> tempFileSupplier = () -> {
             try {
                 Path tempFile = Files.createTempFile(derivateID + "-" + path.hashCode(), ".upload");

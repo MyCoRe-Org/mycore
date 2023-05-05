@@ -33,7 +33,7 @@ import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -238,7 +238,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
         private List<EventRegisterEntry> entries;
 
         EventRegister() {
-            entries = new LinkedList<>();
+            entries = new ArrayList<>();
         }
 
         @Override

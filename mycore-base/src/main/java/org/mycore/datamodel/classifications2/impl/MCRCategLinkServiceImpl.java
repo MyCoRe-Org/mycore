@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -141,14 +141,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
         HashMap<String, Collection<String>> typeMap = new HashMap<>();
         //prepare
-        Collection<String> objectIds = new LinkedList<>();
+        Collection<String> objectIds = new ArrayList<>();
         String currentType = ids.iterator().next().getType();
         typeMap.put(currentType, objectIds);
         //collect per type
         for (MCRCategLinkReference ref : ids) {
             if (!currentType.equals(ref.getType())) {
                 currentType = ref.getType();
-                objectIds = typeMap.computeIfAbsent(ref.getType(), k -> new LinkedList<>());
+                objectIds = typeMap.computeIfAbsent(ref.getType(), k -> new ArrayList<>());
             }
             objectIds.add(ref.getObjectID());
         }

@@ -21,9 +21,9 @@ package org.mycore.mods.csl;
 import static org.mycore.common.MCRConstants.MODS_NAMESPACE;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -473,13 +473,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             final List<Element> roleTerms = roleElement.getChildren("roleTerm", MODS_NAMESPACE);
             for (Element roleTermElement : roleTerms) {
                 final String role = roleTermElement.getTextNormalize();
-                final List<CSLName> cslNames = roleNameMap.computeIfAbsent(role, (s) -> new LinkedList<>());
-                cslNames.add(cslName);
+                roleNameMap.computeIfAbsent(role, s -> new ArrayList<>()).add(cslName);
             }
         } else {
             String nameType = modsName.getAttributeValue("type");
             if (Objects.equals(nameType, "conference")) {
-                roleNameMap.computeIfAbsent("conference-name", (s) -> new LinkedList<>()).add(cslName);
+                roleNameMap.computeIfAbsent("conference-name", s -> new ArrayList<>()).add(cslName);
             }
         }
     }
@@ -499,18 +498,15 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 final String content = namePart.getTextNormalize();
                 if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
                     && nonDroppingParticles.contains(content)) {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                        (t) -> new LinkedList<>());
-                    contents.add(content);
+                    typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE, t -> new ArrayList<>())
+                        .add(content);
                 } else if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
                     && droppingParticles.contains(content)) {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                        (t) -> new LinkedList<>());
-                    contents.add(content);
+                    typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE, t -> new ArrayList<>())
+                        .add(content);
                 } else {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(Optional.ofNullable(type)
-                        .orElse(NONE_TYPE), (t) -> new LinkedList<>());
-                    contents.add(content);
+                    typeContentsMap.computeIfAbsent(Optional.ofNullable(type).orElse(NONE_TYPE), t -> new ArrayList<>())
+                        .add(content);
                 }
             });
 

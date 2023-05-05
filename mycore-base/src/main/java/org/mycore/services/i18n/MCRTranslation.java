@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -291,7 +291,7 @@ public class MCRTranslation {
     }
 
     static String[] getStringArray(String masked) {
-        List<String> a = new LinkedList<>();
+        List<String> a = new ArrayList<>();
         boolean mask = false;
         StringBuilder buf = new StringBuilder();
         if (masked == null) {

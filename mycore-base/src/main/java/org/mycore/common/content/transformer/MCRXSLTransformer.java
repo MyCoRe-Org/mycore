@@ -21,9 +21,10 @@ package org.mycore.common.content.transformer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -209,9 +210,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     @Override
     public MCRContent transform(MCRContent source, MCRParameterCollector parameter) throws IOException {
         try {
-            LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
-            XMLReader reader = getXMLReader(transformHandlerList);
-            TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+            Deque<TransformerHandler> transformHandlers = getTransformHandlers(parameter);
+            XMLReader reader = getXMLReader(transformHandlers);
+            TransformerHandler lastTransformerHandler = transformHandlers.getLast();
             return transform(source, reader, lastTransformerHandler, parameter);
         } catch (TransformerException | SAXException | ParserConfigurationException e) {
             throw new IOException(e);
@@ -227,9 +228,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     public void transform(MCRContent source, OutputStream out, MCRParameterCollector parameter) throws IOException {
         MCRErrorListener el = null;
         try {
-            LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
-            XMLReader reader = getXMLReader(transformHandlerList);
-            TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+            Deque<TransformerHandler> transformHandlers = getTransformHandlers(parameter);
+            XMLReader reader = getXMLReader(transformHandlers);
+            TransformerHandler lastTransformerHandler = transformHandlers.getLast();
             el = (MCRErrorListener) lastTransformerHandler.getTransformer().getErrorListener();
             StreamResult result = new StreamResult(out);
             lastTransformerHandler.setResult(result);
@@ -288,10 +289,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return lastModified;
     }
 
-    protected LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
+    protected Deque<TransformerHandler> getTransformHandlers(MCRParameterCollector parameterCollector)
         throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         checkTemplateUptodate();
-        LinkedList<TransformerHandler> xslSteps = new LinkedList<>();
+        Deque<TransformerHandler> xslSteps = new ArrayDeque<>();
         //every transformhandler shares the same ErrorListener instance
         MCRErrorListener errorListener = MCRErrorListener.getInstance();
         for (Templates template : templates) {
@@ -307,7 +308,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return xslSteps;
     }
 
-    protected XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList)
+    protected XMLReader getXMLReader(Deque<TransformerHandler> transformHandlerList)
         throws SAXException, ParserConfigurationException {
         XMLReader reader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         reader.setEntityResolver(ENTITY_RESOLVER);

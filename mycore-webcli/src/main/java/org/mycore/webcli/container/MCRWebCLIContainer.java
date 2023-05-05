@@ -24,11 +24,12 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -382,7 +383,7 @@ public class MCRWebCLIContainer {
             return commandsReturned;
         }
 
-        protected void saveQueue(String lastCommand, LinkedList<String> failedQueue) {
+        protected void saveQueue(String lastCommand, Queue<String> failedQueue) {
             // lastCommand is null if work is not stopped at first error
             if (lastCommand == null) {
                 LOGGER.error("Some commands failed.");
@@ -419,7 +420,7 @@ public class MCRWebCLIContainer {
         protected boolean processCommands() throws IOException {
             final LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
             final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
-            LinkedList<String> failedQueue = new LinkedList<>();
+            Queue<String> failedQueue = new ArrayDeque<>();
             logGrabber.grabCurrentThread();
             // start grabbing logs of this thread
             logConf.getRootLogger().addAppender(logGrabber, logConf.getRootLogger().getLevel(), null);

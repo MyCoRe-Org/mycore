@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -112,7 +111,7 @@ public class MCRConfigurationInputStream extends InputStream {
 
     private Enumeration<? extends InputStream> getPropertyInputStreams(String filename, InputStream initStream)
         throws IOException {
-        LinkedList<InputStream> cList = new LinkedList<>();
+        List<InputStream> cList = new ArrayList<>();
         if (initStream != null) {
             empty = false;
             cList.add(initStream);

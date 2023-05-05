@@ -18,11 +18,12 @@
 
 package org.mycore.common.xml;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Can be used to write test against the {@link MCRURIResolver}.
@@ -31,7 +32,7 @@ import java.util.List;
  */
 public class MCRMockResolver implements URIResolver {
 
-    private static final List<MCRMockResolverCall> CALLS = new LinkedList<>();
+    private static final List<MCRMockResolverCall> CALLS = new ArrayList<>();
 
     private static Source resultSource = null;
 

@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -218,7 +217,7 @@ public abstract class MCRTransferPackageUtil {
         }
         mcr.setImportMode(true);
 
-        List<String> derivates = new LinkedList<>();
+        List<String> derivates = new ArrayList<>();
         // one must copy the ids before updating the mcr objects
         for (MCRMetaLinkID id : mcr.getStructure().getDerivates()) {
             derivates.add(id.getXLinkHref());

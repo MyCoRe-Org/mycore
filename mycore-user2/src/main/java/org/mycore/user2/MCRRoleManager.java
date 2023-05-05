@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -173,7 +172,7 @@ public class MCRRoleManager {
      */
     static void storeRoleAssignments(MCRUser user) {
         MCRCategLinkReference ref = getLinkID(user);
-        LinkedList<MCRCategoryID> categories = new LinkedList<>();
+        List<MCRCategoryID> categories = new ArrayList<>();
         for (String roleID : user.getSystemRoleIDs()) {
             MCRCategoryID categID = new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), roleID);
             categories.add(categID);

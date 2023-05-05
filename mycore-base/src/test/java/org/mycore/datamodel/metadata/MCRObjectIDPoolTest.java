@@ -25,8 +25,8 @@ import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -52,7 +52,7 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
     @Test
     public void getInstance() {
         Duration maxGCTime = Duration.ofSeconds(30);
-        runGarbageCollection(new LinkedList<>(Arrays.asList(false, false, true))::poll, maxGCTime);
+        runGarbageCollection(new ArrayDeque<>(Arrays.asList(false, false, true))::poll, maxGCTime);
         long before = MCRObjectIDPool.getSize();
         int intPart = Year.now().getValue();
         String id = MCRObjectID.formatID("MyCoRe_test", intPart);

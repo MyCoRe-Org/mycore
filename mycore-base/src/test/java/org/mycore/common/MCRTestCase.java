@@ -23,10 +23,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -85,7 +85,7 @@ public class MCRTestCase {
 
     private Map<String, String> getCombinedTestProperties() {
         Map<String, String> testProperties = new HashMap<>();
-        getClassLevelTestConfigurations().forEach(
+        getClassLevelTestConfigurations().descendingIterator().forEachRemaining(
             testConfiguration -> extendTestProperties(testProperties, testConfiguration)
         );
         testProperties.putAll(getTestProperties());
@@ -95,15 +95,11 @@ public class MCRTestCase {
         return testProperties;
     }
 
-    private List<MCRTestConfiguration> getClassLevelTestConfigurations() {
-        List<MCRTestConfiguration> testConfigurations = new LinkedList<>();
-        Class<?> testClass = this.getClass();
-        while (testClass != Object.class) {
-            MCRTestConfiguration testConfiguration = testClass.getAnnotation(MCRTestConfiguration.class);
-            if (testConfiguration != null) {
-                testConfigurations.add(0, testConfiguration);
-            }
-            testClass = testClass.getSuperclass();
+    private Deque<MCRTestConfiguration> getClassLevelTestConfigurations() {
+        Deque<MCRTestConfiguration> testConfigurations = new ArrayDeque<>();
+        for (Class<?> t = this.getClass(); t != Object.class; t = t.getSuperclass()) {
+            Optional.ofNullable(t.getAnnotation(MCRTestConfiguration.class))
+                .ifPresent(testConfigurations::add);
         }
         return testConfigurations;
     }

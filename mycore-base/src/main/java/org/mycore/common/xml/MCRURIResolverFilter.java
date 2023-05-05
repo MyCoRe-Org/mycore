@@ -24,7 +24,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -49,7 +49,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 public class MCRURIResolverFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
-    static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(MyLinkedList::new);
+    static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(ArrayList::new);
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
@@ -82,8 +82,15 @@ public class MCRURIResolverFilter implements Filter {
             if (!uriList.get().isEmpty() && origOutput.length() > 0
                 && (response.getContentType().contains("text/html")
                     || response.getContentType().contains("text/xml"))) {
-                final String insertString = "\n<!-- \n" + uriList.get() + "\n-->";
-                final byte[] insertBytes = insertString.getBytes(characterEncoding);
+                final StringBuilder buf
+                    = new StringBuilder("\n<!-- \nThe following includes where resolved by MCRURIResolver:\n\n");
+                for (String obj : uriList.get()) {
+                    buf.append(obj);
+                    buf.append('\n');
+                }
+                buf.deleteCharAt(buf.length() - 1);
+                buf.append("\n-->");
+                final byte[] insertBytes = buf.toString().getBytes(characterEncoding);
                 response.setContentLength(origOutput.getBytes(characterEncoding).length + insertBytes.length);
                 int pos = getInsertPosition(origOutput);
                 try (ServletOutputStream out = response.getOutputStream()) {
@@ -137,28 +144,6 @@ public class MCRURIResolverFilter implements Filter {
      */
     public void init(FilterConfig arg0) {
         // no inititalization parameters required so far
-    }
-
-    /**
-     * LinkedList with overwritten toString() method.
-     * 
-     * @author Thomas Scheffler (yagee)
-     */
-    private static class MyLinkedList extends LinkedList<String> {
-
-        private static final long serialVersionUID = -2602420461572432380L;
-
-        @Override
-        public String toString() {
-            StringBuilder buf = new StringBuilder("The following includes where resolved by MCRURIResolver:\n\n");
-            for (String obj : this) {
-                buf.append(obj);
-                buf.append('\n');
-            }
-            buf.deleteCharAt(buf.length() - 1);
-            return buf.toString();
-        }
-
     }
 
     /**
