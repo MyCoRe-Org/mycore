@@ -134,12 +134,12 @@ public class MCRORCIDClientFactory {
         MCRORCIDReadClientImpl client = null;
         if (checkMemberMode()) {
             if (READ_PUBLIC_TOKEN == null) {
-                throw new MCRORCIDException("MCR.ORCID2.ReadPublicToken is not set");
+                throw new MCRORCIDException("MCR.ORCID2.Client.ReadPublicToken is not set");
             }
             client = new MCRORCIDReadClientImpl(memberAPI, READ_PUBLIC_TOKEN);
         } else {
             if (READ_PUBLIC_TOKEN == null) {
-                LOGGER.info("MCR.ORCID2.ReadPublicToken is not set.");
+                LOGGER.info("MCR.ORCID2.Client.ReadPublicToken is not set.");
             }
             client = new MCRORCIDReadClientImpl(publicAPI, READ_PUBLIC_TOKEN);
         }
