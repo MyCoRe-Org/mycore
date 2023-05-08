@@ -50,7 +50,9 @@ public class MCRORCIDOAuthAccessTokenResponse {
     /**
      * Default constructor.
      */
+    @SuppressWarnings("PMD.UnnecessaryConstructor")
     public MCRORCIDOAuthAccessTokenResponse() {
+        // This explicit constructor is required by JAXB
     }
 
     /**
