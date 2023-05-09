@@ -104,7 +104,7 @@
   <xsl:template name="externalIDs">
     <common:external-ids>
       <xsl:apply-templates select="//mods:identifier" />
-      <xsl:if test="not(mods:identifier[@type='doi' or @type='scopus' or @type='isbn' or @type='issn' or @type='urn' or @type='pubmed' or @type='pubmedcentral'])">
+      <xsl:if test="not(//mods:identifier[@type='doi' or @type='scopus' or @type='isbn' or @type='issn' or @type='urn' or @type='pubmed' or @type='pubmedcentral'])">
         <xsl:call-template name="source-work-id" />
       </xsl:if>
     </common:external-ids>
@@ -120,7 +120,7 @@
       </common:external-id-value>
       <common:external-id-url>
         <xsl:value-of select="$MCR.ORCID2.Works.SourceURL" />
-        <xsl:value-of select="." />
+        <xsl:value-of select="ancestor::mycoreobject/@ID" />
       </common:external-id-url>
       <common:external-id-relationship>self</common:external-id-relationship>
     </common:external-id>
