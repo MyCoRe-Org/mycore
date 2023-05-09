@@ -695,7 +695,7 @@ public class MCRMailer extends MCRServlet {
                 builder.append("parts=");
                 builder.append(parts.subList(0, Math.min(parts.size(), maxLen)));
             }
-            builder.append("]");
+            builder.append(']');
             return builder.toString();
         }
 
@@ -737,7 +737,7 @@ public class MCRMailer extends MCRServlet {
                     builder.append("message=");
                     builder.append(message, 0, Math.min(message.length(), maxLen));
                 }
-                builder.append("]");
+                builder.append(']');
                 return builder.toString();
             }
         }

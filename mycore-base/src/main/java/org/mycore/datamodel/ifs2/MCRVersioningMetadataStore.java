@@ -175,10 +175,12 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
                 @Override
                 public void checkCancelled() {
+                    //run till the end
                 }
 
                 @Override
                 public void handleEvent(SVNEvent event, double progress) {
+                    //we do nothing, just browsing the history
                 }
 
                 @Override

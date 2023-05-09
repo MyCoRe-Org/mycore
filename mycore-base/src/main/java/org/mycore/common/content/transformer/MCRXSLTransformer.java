@@ -365,7 +365,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0)
                 ? Math.max(transformerLastModified, source.lastModified())
                 : -1;
-            this.eTag = generateETag(source, lastModified, parameter.hashCode());
+            this.eTag = generateETag(lastModified, parameter.hashCode());
             this.name = fileName;
             this.mimeType = mimeType;
             this.encoding = encoding;
@@ -382,7 +382,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             return name;
         }
 
-        private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode) {
+        private String generateETag(final long lastModified, final int parameterHashCode) {
             //parameterHashCode is stable for this session and current request URL
             long systemLastModified = MCRConfigurationBase.getSystemLastModified();
             StringBuilder b = new StringBuilder("\"");

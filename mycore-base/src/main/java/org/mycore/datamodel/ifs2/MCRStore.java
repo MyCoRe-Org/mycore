@@ -422,7 +422,7 @@ public abstract class MCRStore {
         for (int i = 0; i < paths.length - 1; i++) {
             path.append(paddedId, offset, offset + slotLength[i]);
             paths[i] = path.toString();
-            path.append("/");
+            path.append('/');
             offset += slotLength[i];
         }
         path.append(prefix).append(paddedId).append(suffix);

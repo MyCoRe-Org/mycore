@@ -313,7 +313,7 @@ public class MCRParameterCollector {
 
         String queryString = request.getQueryString();
         if (queryString != null && queryString.length() > 0) {
-            buffer.append("?").append(queryString);
+            buffer.append('?').append(queryString);
         }
 
         String url = buffer.toString();

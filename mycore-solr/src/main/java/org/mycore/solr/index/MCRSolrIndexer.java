@@ -269,10 +269,10 @@ public class MCRSolrIndexer {
             LOGGER.debug("Deleting derivate \"{}\" from solr", id);
             UpdateRequest req = new UpdateRequest();
             StringBuilder deleteQuery = new StringBuilder();
-            deleteQuery.append("id:").append(id).append(" ");
+            deleteQuery.append("id:").append(id).append(' ');
             deleteQuery.append("derivateID:").append(id);
             if (MCRSolrUtils.useNestedDocuments()) {
-                deleteQuery.append(" ").append("_root_:").append(id);
+                deleteQuery.append(' ').append("_root_:").append(id);
             }
             req.deleteByQuery(deleteQuery.toString());
             updateResponse = req.process(solrClient);

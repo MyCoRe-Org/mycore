@@ -138,7 +138,7 @@ public class MCRLockServlet extends MCRServlet {
                         hasQueryParameter = true;
                     }
                     sb.append(parameter.getKey());
-                    sb.append("=");
+                    sb.append('=');
                     sb.append(value);
                 }
             }

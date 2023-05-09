@@ -124,7 +124,7 @@ public class MCRConditionTransformer {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("(");
+        sb.append('(');
         Iterator<MCRCondition<MCRCondition>> iterator = children.iterator();
         StringBuilder subSb = toSolrQueryString(iterator.next(), usedFields, true);
         sb.append(subSb);
@@ -133,7 +133,7 @@ public class MCRConditionTransformer {
             subSb = toSolrQueryString(iterator.next(), usedFields, true);
             sb.append(subSb);
         }
-        sb.append(")");
+        sb.append(')');
         return sb;
     }
 
@@ -163,12 +163,12 @@ public class MCRConditionTransformer {
         StringBuilder subSb = toSolrQueryString(iterator.next(), usedFields, true);
         sb.append(stripPlus ? stripPlus(subSb) : subSb);
         while (iterator.hasNext()) {
-            sb.append(" ");
+            sb.append(' ');
             subSb = toSolrQueryString(iterator.next(), usedFields, true);
             sb.append(stripPlus ? stripPlus(subSb) : subSb);
         }
         if (groupRequired) {
-            sb.append(")");
+            sb.append(')');
         }
         return sb;
     }
@@ -177,7 +177,7 @@ public class MCRConditionTransformer {
     private static StringBuilder handleNotCondition(MCRNotCondition notCond, Set<String> usedFields) {
         MCRCondition child = notCond.getChild();
         StringBuilder sb = new StringBuilder();
-        sb.append("-");
+        sb.append('-');
         StringBuilder solrQueryString = toSolrQueryString(child, usedFields, true);
         if (!explicitAndOrMapping()) {
             stripPlus(solrQueryString);
@@ -194,7 +194,7 @@ public class MCRConditionTransformer {
         StringBuilder sb = new StringBuilder();
         sb.append('+');
         sb.append(field);
-        sb.append(":");
+        sb.append(':');
         sb.append(includeLower ? '[' : '{');
         sb.append(
             lowerTerm != null ? (Objects.equals(lowerTerm, "*") ? "\\*" : MCRSolrUtils.escapeSearchValue(lowerTerm))
@@ -232,14 +232,14 @@ public class MCRConditionTransformer {
             sb.append('+');
         }
         sb.append(field);
-        sb.append(":");
+        sb.append(':');
         String replaced = value.replaceAll("\\s+", " AND ");
         if (value.length() == replaced.length()) {
             sb.append(MCRSolrUtils.escapeSearchValue(value));
         } else {
-            sb.append("(");
+            sb.append('(');
             sb.append(MCRSolrUtils.escapeSearchValue(replaced));
-            sb.append(")");
+            sb.append(')');
         }
         return sb;
     }
@@ -250,7 +250,7 @@ public class MCRConditionTransformer {
             sb.append('+');
         }
         sb.append(field);
-        sb.append(":");
+        sb.append(':');
         sb.append('"');
         sb.append(MCRSolrUtils.escapeSearchValue(value));
         sb.append('"');

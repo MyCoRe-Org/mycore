@@ -146,7 +146,7 @@ public class MCRRequestDebugFilter implements Filter {
             MCRStreamUtils
                 .asStream(session.getAttributeNames())
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .forEachOrdered(attrName -> sb.append(" ")
+                .forEachOrdered(attrName -> sb.append(' ')
                     .append(attrName)
                     .append(": ")
                     .append(getValue(attrName,

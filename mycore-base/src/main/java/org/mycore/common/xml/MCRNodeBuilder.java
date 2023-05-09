@@ -130,7 +130,7 @@ public class MCRNodeBuilder {
     private String buildXPath(List<Step> steps) {
         StringBuilder path = new StringBuilder();
         for (Step step : steps) {
-            path.append("/").append(step.getText());
+            path.append('/').append(step.getText());
         }
         return simplify(path.substring(1));
     }

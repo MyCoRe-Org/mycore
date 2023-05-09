@@ -124,9 +124,9 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
             String parameterName = entry.getKey();
             if (parameterName.startsWith("XSL.")) {
                 for (String parameterValue : entry.getValue()) {
-                    sb.append("&");
+                    sb.append('&');
                     sb.append(parameterName);
-                    sb.append("=");
+                    sb.append('=');
                     sb.append(parameterValue);
                 }
             }

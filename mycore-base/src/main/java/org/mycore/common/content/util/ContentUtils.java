@@ -171,8 +171,8 @@ final class ContentUtils {
                         .append(contentType)
                         .append(endOfLine);
                 }
-                mimeHeader.append("Content-Range: bytes ").append(currentRange.start).append("-")
-                    .append(currentRange.end).append("/").append(currentRange.length)
+                mimeHeader.append("Content-Range: bytes ").append(currentRange.start).append('-')
+                    .append(currentRange.end).append('/').append(currentRange.length)
                     .append(endOfLine)
                     .append(endOfLine);
                 out.write(mimeHeader.toString().getBytes(StandardCharsets.US_ASCII));

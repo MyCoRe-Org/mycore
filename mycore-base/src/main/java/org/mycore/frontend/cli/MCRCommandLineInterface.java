@@ -164,7 +164,7 @@ public class MCRCommandLineInterface {
     private static String readLineFromArguments(String[] args) {
         StringBuilder sb = new StringBuilder();
         for (String arg : args) {
-            sb.append(arg).append(" ");
+            sb.append(arg).append(' ');
         }
         return sb.toString();
     }

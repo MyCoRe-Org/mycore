@@ -138,7 +138,7 @@ public class MCRErrorListener implements ErrorListener {
                     msg.append(',');
                     msg.append(col);
                 }
-                msg.append("]");
+                msg.append(']');
             }
         }
         msg.append(": ");

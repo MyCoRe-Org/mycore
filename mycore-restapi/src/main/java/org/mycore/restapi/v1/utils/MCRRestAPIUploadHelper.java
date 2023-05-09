@@ -415,10 +415,10 @@ public class MCRRestAPIUploadHelper {
      */
     public static String generateMessagesFromProperties(SortedMap<String, String> data) {
         StringWriter sw = new StringWriter();
-        sw.append("{");
+        sw.append('{');
         for (String key : data.keySet()) {
-            sw.append("\"").append(key).append("\"").append(":").append("\"").append(data.get(key)).append("\"")
-                .append(",");
+            sw.append("\"").append(key).append("\"").append(':').append("\"").append(data.get(key)).append("\"")
+                .append(',');
         }
         String result = sw.toString();
         if (result.length() > 1) {

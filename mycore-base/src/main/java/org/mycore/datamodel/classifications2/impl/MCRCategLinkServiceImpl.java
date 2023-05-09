@@ -212,7 +212,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                     MCRCategory linkedCategory = link.getCategory();
                     StringBuilder debugMessage = new StringBuilder("Adding Link from ").append(linkedCategory.getId());
                     if (linkedCategory instanceof MCRCategoryImpl) {
-                        debugMessage.append("(").append(((MCRCategoryImpl) linkedCategory).getInternalID())
+                        debugMessage.append('(').append(((MCRCategoryImpl) linkedCategory).getInternalID())
                             .append(") ");
                     }
                     debugMessage.append("to ").append(objectReference);

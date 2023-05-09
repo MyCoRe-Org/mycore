@@ -423,7 +423,7 @@ public class MCRObjectService {
         StringBuilder sb = new StringBuilder();
 
         for (MCRMetaLangText flag : flags) {
-            sb.append(flag.getText()).append(" ");
+            sb.append(flag.getText()).append(' ');
         }
 
         return sb.toString();

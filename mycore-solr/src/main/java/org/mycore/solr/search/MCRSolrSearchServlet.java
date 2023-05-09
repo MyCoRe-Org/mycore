@@ -199,10 +199,10 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
         StringBuilder sortBuilder = new StringBuilder();
         for (Integer position : sortedPositions) {
-            sortBuilder.append(",");
+            sortBuilder.append(',');
             sortBuilder.append(positionFieldMap.get(position));
             String order = positionOrderMap.get(position);
-            sortBuilder.append(" ");
+            sortBuilder.append(' ');
             if (order == null) {
                 order = "asc";
                 LOGGER.warn("No sort order found for field with number ''{}'' use default value : ''{}''", position,

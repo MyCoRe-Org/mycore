@@ -873,7 +873,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         StringBuilder out = new StringBuilder();
         for (String id : getSelectedObjectIDs()) {
-            out.append(id).append(" ");
+            out.append(id).append(' ');
         }
         LOGGER.info(out.toString());
     }
@@ -896,9 +896,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             List<? extends MCRAbstractMetadataVersion<?>> revisions = MCRXMLMetadataManager.instance()
                 .listRevisions(mcrId);
             for (MCRAbstractMetadataVersion<?> revision : revisions) {
-                log.append(revision.getRevision()).append(" ");
-                log.append(revision.getType()).append(" ");
-                log.append(sdf.format(revision.getDate())).append(" ");
+                log.append(revision.getRevision()).append(' ');
+                log.append(revision.getType()).append(' ');
+                log.append(sdf.format(revision.getDate())).append(' ');
                 log.append(revision.getUser());
                 log.append("\n");
             }

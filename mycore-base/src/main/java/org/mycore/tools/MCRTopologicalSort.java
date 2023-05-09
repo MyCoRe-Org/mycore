@@ -116,6 +116,9 @@ public class MCRTopologicalSort<T> {
                                     dependencyList.add(href);
                                 }
                             }
+                            default -> {
+                                //nothing to be done
+                            }
                         }
                     }
                     xmlStreamReader.next();

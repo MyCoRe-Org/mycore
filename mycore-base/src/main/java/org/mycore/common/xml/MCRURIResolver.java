@@ -1267,9 +1267,6 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(new Element("null"));
                 }
             } catch (Exception e) {
-                if (e instanceof TransformerException te) {
-                    throw te;
-                }
                 Throwable cause = e.getCause();
                 while (cause != null) {
                     if (cause instanceof TransformerException te) {

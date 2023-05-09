@@ -539,17 +539,17 @@ public class MCRServlet extends HttpServlet {
         boolean first = true;
         for (Enumeration<?> e = parameters.keys(); e.hasMoreElements();) {
             if (first) {
-                redirectURL.append("?");
+                redirectURL.append('?');
                 first = false;
             } else {
-                redirectURL.append("&");
+                redirectURL.append('&');
             }
 
             String name = (String) e.nextElement();
             String value = null;
             value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
 
-            redirectURL.append(name).append("=").append(value);
+            redirectURL.append(name).append('=').append(value);
         }
         LOGGER.debug("Sending redirect to {}", redirectURL);
         return redirectURL.toString();
