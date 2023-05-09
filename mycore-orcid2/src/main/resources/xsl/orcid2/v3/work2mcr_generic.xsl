@@ -143,7 +143,7 @@
     </mods:role>
   </xsl:template>
 
-  <xsl:template match="common:contributor-orcid[@common:path]">
+  <xsl:template match="common:contributor-orcid[common:path]">
     <mods:nameIdentifier type="orcid">
       <xsl:value-of select="common:path" />
     </mods:nameIdentifier>
