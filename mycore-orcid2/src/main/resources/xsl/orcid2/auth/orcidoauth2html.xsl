@@ -11,6 +11,7 @@
     <xsl:template match="/">
         <html lang="{$CurrentLang}">
             <head>
+                <title><xsl:value-of select="document('i18n:component.orcid2.oauth.title')"/></title>
                 <script type="text/javascript" src="{$WebApplicationBaseURL}modules/orcid2/js/orcid-popup.js"></script>
             </head>
             <body>
@@ -44,12 +45,13 @@
                 <li><xsl:value-of select="document('i18n:component.orcid2.oauth.message.person_update')"/></li>
             </xsl:if>
         </ul>
-        <p><xsl:value-of select="document('i18n:component.orcid2.oauth.message.revoke.pt1')"/>
+        <p>
+            <span><xsl:value-of select="concat(document('i18n:component.orcid2.oauth.message.revoke.pt1'), ' ')"/></span>
             <a href="https://sandbox.orcid.org/trusted-parties" target="_blank">
                 <xsl:value-of select="document('i18n:component.orcid2.oauth.message.profile')"/>
                 <img src="{$WebApplicationBaseURL}modules/orcid2/images/orcid_icon.svg" style="height:.8em;vertical-align:baseline" alt="ORCID logo"/>
             </a>
-            <xsl:value-of select="concat(document('i18n:component.orcid2.oauth.message.revoke.pt2'), '.')"/>
+            <span><xsl:value-of select="concat(' ', document('i18n:component.orcid2.oauth.message.revoke.pt2'))"/></span>
         </p>
         <button onclick="window.close()">
             <xsl:value-of select="document('i18n:component.orcid2.oauth.button.window.close')"/>
@@ -63,7 +65,7 @@
         </h2>
         <xsl:choose>
             <xsl:when test="error/text()='access_denied'">
-                <p><xsl:value-of select="concat(document('i18n:component.orcid2.oauth.message.access_denied'), '.')"/></p>
+                <p><xsl:value-of select="document('i18n:component.orcid2.oauth.message.access_denied')"/></p>
             </xsl:when>
             <xsl:otherwise>
                 <p><xsl:value-of select="concat(document('i18n:component.orcid2.oauth.message.error'), ':')"/></p>
