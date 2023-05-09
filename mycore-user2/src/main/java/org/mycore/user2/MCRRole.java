@@ -101,6 +101,7 @@ public class MCRRole {
     }
 
     @XmlElement(name = "label")
+    @SuppressWarnings("unused")
     private MCRLabel[] getLabelsArray() {
         return labels.values().toArray(MCRLabel[]::new);
     }

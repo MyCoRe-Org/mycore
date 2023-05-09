@@ -415,6 +415,7 @@ public final class MCRURIResolver implements URIResolver {
         return null;
     }
 
+    @Deprecated
     URIResolver getResolver(String scheme) {
         if (SUPPORTED_SCHEMES.containsKey(scheme)) {
             return SUPPORTED_SCHEMES.get(scheme);
@@ -430,6 +431,7 @@ public final class MCRURIResolver implements URIResolver {
      *            the InputStream that contains the XML document
      * @return the root element of the parsed input stream
      */
+    @Deprecated
     protected Element parseStream(InputStream in) throws JDOMException, IOException {
         final MCRStreamContent streamContent = new MCRStreamContent(in);
         return MCRXMLParserFactory

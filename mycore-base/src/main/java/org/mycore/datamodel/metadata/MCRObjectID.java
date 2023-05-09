@@ -79,9 +79,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     // data of the ID
-    private String projectId, objectType, combinedId;
+    private final String projectId, objectType, combinedId;
 
-    private int numberPart;
+    private final int numberPart;
 
     /**
      * The constructor for MCRObjectID from a given string.
@@ -90,10 +90,15 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *                if the given string is not valid.
      */
     MCRObjectID(String id) throws MCRException {
-        if (!setID(id)) {
+        if (!isValid(id)) {
             throw new MCRException("The ID is not valid: " + id
                 + " , it should match the pattern String_String_Integer");
         }
+        String[] idParts = getIDParts(id.trim());
+        projectId = idParts[0].intern();
+        objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
+        numberPart = Integer.parseInt(idParts[2]);
+        this.combinedId = formatID(projectId, objectType, numberPart);
     }
 
     /**
@@ -321,8 +326,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     /**
-     * This method gets the string with <em>type_id</em>. If the ID is not
-     * valid, an empty string will be returned.
+     * This method gets the string with <em>type_id</em>.
      *
      * @return the string of the type id
      */
@@ -331,8 +335,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     /**
-     * This method gets the string with <em>number</em>. If the ID is not valid,
-     * an empty string will be returned.
+     * This method gets the string with <em>number</em>.
      *
      * @return the string of the number
      */
@@ -341,8 +344,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     /**
-     * This method gets the integer with <em>number</em>. If the ID is not
-     * valid, -1 will be returned.
+     * This method gets the integer with <em>number</em>.
      *
      * @return the number as integer
      */
@@ -352,42 +354,12 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     /**
      * This method gets the basic string with <em>project_id</em>_
-     * <em>type_id</em>. If the Id is not valid, an empty string will be
-     * returned.
+     * <em>type_id</em>.
      *
      * @return the string of the schema name
      */
     public String getBase() {
         return projectId + "_" + objectType;
-    }
-
-    /**
-     * This method return the validation value of a MCRObjectId and store the
-     * components in this class. The <em>type_id</em> was set to lower case. The
-     * MCRObjectID is valid if:
-     * <ul>
-     * <li>The argument is not null.
-     * <li>The syntax of the ID is <em>project_id</em>_<em>type_id</em>_
-     * <em>number</em> as <em>String_String_Integer</em>.
-     * <li>The ID is not longer as MAX_LENGTH.
-     * <li>The ID has only characters, they must not encoded.
-     * </ul>
-     *
-     * @param id
-     *            the MCRObjectID
-     * @return the validation value, true if the MCRObjectID is correct,
-     *         otherwise return false
-     */
-    private boolean setID(String id) {
-        if (!isValid(id)) {
-            return false;
-        }
-        String[] idParts = getIDParts(id.trim());
-        projectId = idParts[0].intern();
-        objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        numberPart = Integer.parseInt(idParts[2]);
-        this.combinedId = formatID(projectId, objectType, numberPart);
-        return true;
     }
 
     /**

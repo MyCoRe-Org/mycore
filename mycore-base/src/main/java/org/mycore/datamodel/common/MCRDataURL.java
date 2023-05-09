@@ -394,7 +394,7 @@ public class MCRDataURL implements Serializable {
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType)
         throws MalformedURLException {
-        this(data, encoding, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
+        this(data, encoding, mimeType, StandardCharsets.US_ASCII);
     }
 
     /**
@@ -458,7 +458,7 @@ public class MCRDataURL implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(SCHEME);
+        StringBuilder sb = new StringBuilder(SCHEME);
 
         if (!DEFAULT_MIMETYPE.equals(mimeType) || charset != StandardCharsets.US_ASCII) {
             sb.append(mimeType);

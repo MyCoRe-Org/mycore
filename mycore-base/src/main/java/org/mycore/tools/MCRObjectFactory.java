@@ -79,11 +79,11 @@ public class MCRObjectFactory {
 
     /***/
     private static Element createMetadataElement(MCRObjectID id) {
-        return "derivate".equals(id.getTypeId()) ? new Element("derivate") : new Element("metadata");
+        return id.getTypeId().equals("derivate") ? new Element("derivate") : new Element("metadata");
     }
 
     private static Element createRootElement(MCRObjectID id) {
-        String rootTag = "derivate".equals(id.getTypeId()) ? "mycorederivate" : "mycoreobject";
+        String rootTag = id.getTypeId().equals("derivate") ? "mycorederivate" : "mycoreobject";
         Element root = new Element(rootTag);
         root.setAttribute("ID", id.toString());
         root.setAttribute("label", id.toString());
