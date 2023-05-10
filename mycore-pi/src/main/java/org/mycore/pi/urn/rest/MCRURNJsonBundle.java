@@ -33,6 +33,10 @@ public class MCRURNJsonBundle {
         return new MCRURNJsonBundle(urn, url);
     }
 
+    public MCRPIRegistrationInfo getUrn() {
+        return this.urn;
+    }
+
     public URL getUrl() {
         return this.url;
     }
@@ -54,7 +58,7 @@ public class MCRURNJsonBundle {
     private String getUpdateJson() {
         JsonArray urls = new JsonArray();
         JsonObject url = new JsonObject();
-        url.addProperty("url", this.url.toString());
+        url.addProperty("url", getURLString());
         url.addProperty("priority", String.valueOf(1));
         urls.add(url);
 
@@ -67,15 +71,31 @@ public class MCRURNJsonBundle {
     private String getRegisterJson() {
         JsonObject json = new JsonObject();
 
-        json.addProperty("urn", this.urn.getIdentifier());
+        json.addProperty("urn", getURNString());
         JsonArray urls = new JsonArray();
         json.add("urls", urls);
 
         JsonObject url = new JsonObject();
-        url.addProperty("url", this.url.toString());
+        url.addProperty("url", getURLString());
         url.addProperty("priority", String.valueOf(1));
         urls.add(url);
 
         return json.toString();
+    }
+
+    private String getURLString() {
+        if (getUrl() == null) {
+            return "url not set";
+        }
+
+        return getUrl().toString();
+    }
+
+    private String getURNString() {
+        if (getUrn() == null) {
+            return "urn not set";
+        }
+
+        return getUrn().getIdentifier();
     }
 }
