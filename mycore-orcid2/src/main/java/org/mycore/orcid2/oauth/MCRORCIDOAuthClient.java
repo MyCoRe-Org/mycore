@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.auth;
+package org.mycore.orcid2.oauth;
 
 import java.util.Objects;
 

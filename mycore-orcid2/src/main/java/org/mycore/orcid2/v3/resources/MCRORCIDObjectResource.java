@@ -24,6 +24,7 @@ import java.util.Set;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
@@ -53,8 +54,8 @@ import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 /**
  * Basic resource for general methods.
  */
-@Path("orcid")
-public class MCRORCIDResource {
+@Path("/v1/")
+public class MCRORCIDObjectResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -71,7 +72,7 @@ public class MCRORCIDResource {
      * @throws WebApplicationException if request fails
      */
     @GET
-    @Path("objectStatus/{objectID}")
+    @Path("object-status/v3/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
     public MCRORCIDPublicationStatus getPublicationStatus(@PathParam("objectID") String objectIDString) {
         if (isCurrentUserGuest()) {
@@ -125,8 +126,8 @@ public class MCRORCIDResource {
      * @return the new publication status
      * @throws WebApplicationException if request fails
      */
-    @GET
-    @Path("publish/{objectID}")
+    @POST
+    @Path("publish/v3/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response publish(@PathParam("objectID") String objectIDString) {
         if (isCurrentUserGuest()) {
