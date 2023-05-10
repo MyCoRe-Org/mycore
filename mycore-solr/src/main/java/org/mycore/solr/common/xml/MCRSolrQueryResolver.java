@@ -19,6 +19,7 @@
 package org.mycore.solr.common.xml;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +28,9 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -47,14 +51,10 @@ import org.mycore.solr.search.MCRSolrURL;
  */
 public class MCRSolrQueryResolver implements URIResolver {
 
-    private static final String REQUEST_HANDLER_QUALIFIER = "requestHandler";
-
-    public static final String REQUEST_HANDLER_GROUP_NAME = REQUEST_HANDLER_QUALIFIER;
-
     public static final String QUERY_GROUP_NAME = "query";
-
     public static final String CORE_GROUP_NAME = "core";
-
+    private static final String REQUEST_HANDLER_QUALIFIER = "requestHandler";
+    public static final String REQUEST_HANDLER_GROUP_NAME = REQUEST_HANDLER_QUALIFIER;
     // not allowed chars for cores are / \ and : according to
     // https://stackoverflow.com/questions/29977519/what-makes-an-invalid-core-name
     // assume they are the same for the requestHandler
@@ -63,14 +63,36 @@ public class MCRSolrQueryResolver implements URIResolver {
             + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[^/:\\\\]+):)?(?<"
             + QUERY_GROUP_NAME + ">.+)\\z");
 
+    // TODO: remove this pattern in 2023.06 release
+    private static final Pattern OLD_URI_PATTERN = Pattern
+        .compile("\\Asolr:((?!" + REQUEST_HANDLER_QUALIFIER + ")(?<" + CORE_GROUP_NAME + ">[a-zA-Z0-9-_]+):)?("
+            + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[a-zA-Z0-9-_]+):)?(?<"
+            + QUERY_GROUP_NAME + ">.+)\\z");
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        Matcher matcher = URI_PATTERN.matcher(href);
+        Matcher matcher = OLD_URI_PATTERN.matcher(href);
+        Matcher newMatcher = URI_PATTERN.matcher(href);
 
         if (matcher.matches()) {
             Optional<String> core = Optional.ofNullable(matcher.group(CORE_GROUP_NAME));
             Optional<String> requestHandler = Optional.ofNullable(matcher.group(REQUEST_HANDLER_GROUP_NAME));
             Optional<String> query = Optional.ofNullable(matcher.group(QUERY_GROUP_NAME));
+
+            if (!newMatcher.matches()) {
+                printMismatchWarning(href);
+            } else {
+                String newCore = newMatcher.group(CORE_GROUP_NAME);
+                String newRequestHandler = newMatcher.group(REQUEST_HANDLER_GROUP_NAME);
+                String newQuery = newMatcher.group(QUERY_GROUP_NAME);
+                if (!Objects.equals(core.orElse(null), newCore) ||
+                    !Objects.equals(requestHandler.orElse(null), newRequestHandler) ||
+                    !Objects.equals(query.orElse(null), newQuery)) {
+                    printMismatchWarning(href);
+                }
+            }
 
             HttpSolrClient client = core.flatMap(MCRSolrClientFactory::get)
                 .map(MCRSolrCore::getClient)
@@ -87,6 +109,11 @@ public class MCRSolrQueryResolver implements URIResolver {
                 }
             }
         }
+
         throw new IllegalArgumentException("Did not understand uri: " + href);
+    }
+
+    private void printMismatchWarning(String href) {
+        LOGGER.warn("The uri {} is probably not encoded correctly. See (MCR-2872)", href);
     }
 }
