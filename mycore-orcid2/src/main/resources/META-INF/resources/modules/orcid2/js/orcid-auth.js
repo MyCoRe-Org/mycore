@@ -1,5 +1,5 @@
 async function orcidOAuth(scope) {
-    const oauthURI = fetchOAuthURI(scope);
+    const oauthURI = await fetchOAuthURI(scope);
     const width = 540;
     const height = 750;
     const left = (window.innerWidth/2)-(width/2);
@@ -14,11 +14,13 @@ async function orcidOAuth(scope) {
 
 async function fetchOAuthURI(scope) {
     const jwt = await fetchJWT();
-    let uri = `${webApplicationBaseURL}api/v1/oauth-uri`;
+    let uri = `${webApplicationBaseURL}api/orcid/v1/oauth-uri`;
     if(scope) {
-        resURI += `?scope=${scope}`;
+        uri += `?scope=${scope}`;
     }
-    const response = await fetch(uri);
+    const response = await fetch(uri, {
+        headers: { Authentication: `Bearer ${jwt}`}
+    });
     if (!response.ok) {
         throw new Error(`Cannot fetch OAuthURI: ${response.status}`);
     }
@@ -27,7 +29,10 @@ async function fetchOAuthURI(scope) {
 
 async function revokeORCID(orcid) {
     const jwt = await fetchJWT();
-    const revoke = fetch(`${webApplicationBaseURL}api/orcid/v1/revoke/${orcid}`);
+    const revoke = fetch(`${webApplicationBaseURL}api/orcid/v1/revoke/${orcid}`, {
+        method: 'POST',
+        headers: { Authentication: `Bearer ${jwt}`}
+    });
     if (!revoke.ok) {
         throw new Error("Revoke failed");
     }
