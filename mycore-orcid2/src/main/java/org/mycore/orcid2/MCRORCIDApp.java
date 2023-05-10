@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.restapi.MCRDropSessionFilter;
 import org.mycore.restapi.MCRJerseyRestApp;
-import org.mycore.restapi.v1.MCRRestAPIAuthentication;
+import org.mycore.restapi.MCRSessionFilter;
 import org.mycore.restapi.v2.MCRExceptionMapper;
 
 /**
@@ -35,8 +35,8 @@ public class MCRORCIDApp extends MCRJerseyRestApp {
 
     public MCRORCIDApp() {
         super();
-        register(MCRRestAPIAuthentication.class);
         register(MCRDropSessionFilter.class);
+        register(MCRSessionFilter.class);
         register(MCRExceptionMapper.class);
     }
 
