@@ -22,7 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -30,40 +29,21 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriBuilder;
 
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.orcid2.MCRORCIDUtils;
-import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserManager;
 
 /**
  * Base resource for orcid methods.
  */
 @Path("v1")
 public class MCRORCIDResource {
-
-    private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "OAuth.";
-
-    private static final String SCOPE = MCRConfiguration2.getString(CONFIG_PREFIX + "Scope").orElse(null);
-
-    private static final boolean IS_PREFILL_REGISTRATION_FORM = MCRConfiguration2
-        .getOrThrow(MCRORCIDConstants.CONFIG_PREFIX + "PreFillRegistrationForm", Boolean::parseBoolean);
-
-    @Context
-    HttpServletRequest req;
 
     /**
      * Returns the ORCID status of the current user as JSON, e.g.
@@ -124,104 +104,6 @@ public class MCRORCIDResource {
             return Response.seeOther(redirectURI).build();
         }
         return Response.ok().build();
-    }
-
-    /**
-     * Returns auth URI
-     * 
-     * @param scope the scope
-     * @return auth URI
-     * @throws WebApplicationException if scope is null
-     */
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("oauth-uri")
-    public String getOAuthURI(@QueryParam("scope") String scope) {
-        if (MCRORCIDUtils.isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
-        }
-        String langCode = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        if (!MCRORCIDConstants.SUPPORTED_LANGUAGE_CODES.contains(langCode)) {
-            // use english as fallback
-            langCode = "en";
-        }
-        final String userID = MCRUserManager.getCurrentUser().getUserID();
-        final String state = MCRORCIDUtils.hashString(userID);
-        if (scope != null) {
-            return buildRequestCodeURI(scope, state, langCode).toString();
-        } else if (SCOPE != null) {
-            return buildRequestCodeURI(SCOPE, state, langCode).toString();
-        } else {
-            throw new WebApplicationException("Scope is required", Status.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * Builds the URL where to redirect the user's browser to initiate a three-way
-     * authorization and request permission to access the given scopes. If
-     * 
-     * MCR.ORCID2.PreFillRegistrationForm=true
-     * 
-     * submits the current user's email address, first and last name to the ORCID
-     * registration form to simplify registration. May be disabled for more data
-     * privacy.
-     * 
-     * @param scope not encoded scope string
-     * @param langCode language code
-     * @return url to request authorization code
-     */
-    private URI buildRequestCodeURI(String scope, String state, String langCode) {
-        final UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
-        final String redirectURI = MCRFrontendUtil.getBaseURL(req) + "rsc/orcid/oauth";
-        builder.path("oauth/authorize");
-        builder.queryParam("redirect_uri", redirectURI);
-        builder.queryParam("client_id", MCRORCIDOAuthClient.CLIENT_ID);
-        builder.queryParam("response_type", "code");
-        builder.queryParam("scope", scope);
-        builder.queryParam("prompt", "login");
-        builder.queryParam("lang", langCode);
-        builder.queryParam("state", state);
-        if (IS_PREFILL_REGISTRATION_FORM) {
-            preFillRegistrationForm(builder);
-        }
-        return builder.build();
-    }
-
-    /**
-     *
-     * Adds current user's email address, first and last name as params to URIBuilder.
-     *
-     * @param builder the builder
-     * See <a href="https://members.orcid.org/api/resources/customize">ORCID documentation</a>
-     */
-    private static void preFillRegistrationForm(UriBuilder builder) {
-        MCRUser user = MCRUserManager.getCurrentUser();
-        String email = user.getEMailAddress();
-        if (email != null) {
-            builder.queryParam("email", email);
-        }
-        String name = user.getRealName();
-        String firstName = null;
-        String lastName = name;
-        if (name.contains(",")) {
-            String[] nameParts = name.split(",");
-            if (nameParts.length == 2) {
-                firstName = nameParts[1].trim();
-                lastName = nameParts[0].trim();
-            }
-        } else if (name.contains(" ")) {
-            String[] nameParts = name.split(" ");
-            if (nameParts.length == 2) {
-                firstName = nameParts[0].trim();
-                lastName = nameParts[1].trim();
-            }
-        }
-        if (firstName != null) {
-            builder.queryParam("given_names", firstName);
-        }
-        if (lastName != null) {
-            builder.queryParam("family_names", lastName);
-        }
     }
 
     static class MCRORCIDUserStatus {

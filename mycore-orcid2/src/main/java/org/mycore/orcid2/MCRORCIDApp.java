@@ -24,7 +24,6 @@ import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.restapi.MCRDropSessionFilter;
 import org.mycore.restapi.MCRJerseyRestApp;
-import org.mycore.restapi.MCRSessionFilter;
 import org.mycore.restapi.v2.MCRExceptionMapper;
 
 /**
@@ -33,10 +32,12 @@ import org.mycore.restapi.v2.MCRExceptionMapper;
 @ApplicationPath("/api/orcid")
 public class MCRORCIDApp extends MCRJerseyRestApp {
 
+    /**
+     * Creates ORCID API App.
+     */
     public MCRORCIDApp() {
         super();
         register(MCRDropSessionFilter.class);
-        register(MCRSessionFilter.class);
         register(MCRExceptionMapper.class);
     }
 
