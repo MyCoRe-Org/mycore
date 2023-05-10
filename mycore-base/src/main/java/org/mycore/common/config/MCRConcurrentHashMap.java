@@ -23,7 +23,9 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -71,13 +73,10 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
             try {
                 return super.computeIfAbsent(key, mappingFunction);
             } catch (IllegalStateException e) { // recursive update fix
-                if (key instanceof SingletonKey && "Recursive update".equals(e.getMessage())) {
-                    LogManager.getLogger().warn("collision detected, remapping key...");
-                    RemappedKey newKey = new RemappedKey(key);
-                    keyMap.put(key, newKey);
-                    return tryCompute(key, newKey, mappingFunction);
-                }
-                throw e;
+                LogManager.getLogger().warn("collision detected, remapping key...");
+                RemappedKey newKey = new RemappedKey(key);
+                keyMap.put(key, newKey);
+                return tryCompute(key, newKey, mappingFunction);
             }
         }
     }
@@ -89,22 +88,19 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
             LogManager.getLogger().warn("collision while remapping, regenerating seed...");
             keyMap.put(key, newKey.reGenSeed());
             return tryCompute(key, newKey, mappingFunction);
-        } catch (Exception exception) {
-            throw exception;
         }
     }
 
     /**
-     * Wrapper for {@link SingletonKey} to modify the HashCode value.
+     * Wrapper for {@link ConfigSingletonKey} to modify the HashCode value.
      */
-    private class RemappedKey extends SingletonKey {
+    private class RemappedKey implements SingletonKey {
         private K key;
         private int seed;
 
         RemappedKey(K key) {
-            super(null, null);
             this.key = key;
-            this.seed = (int) (Math.random() * Integer.SIZE + 1);
+            this.seed = ThreadLocalRandom.current().nextInt();
         }
 
         @Override
@@ -117,28 +113,30 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
          * @return {@code this} for chaining
          */
         public RemappedKey reGenSeed() {
-            this.seed = (int) (Math.random() * Integer.SIZE + 1) ^ (seed * 0x15);
+            final ThreadLocalRandom random = ThreadLocalRandom.current();
+            int newSeed;
+            do {
+                newSeed = random.nextInt();
+            } while (newSeed == seed);
+            this.seed = newSeed;
             return this;
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            } else if (this == obj) {
-                return true;
-            } else if (this.getClass() != obj.getClass()) {
-                return false;
-            } else {
-                try {
-                    RemappedKey keyObj = (RemappedKey) obj;
-                    return this.key.equals(keyObj.key)
-                        && this.seed == keyObj.seed
-                        && this.hashCode() == keyObj.hashCode();
-                } catch (ClassCastException e) {
-                    return false;
-                }
-            }
+            return (obj instanceof MCRConcurrentHashMap<?, ?>.RemappedKey that)
+                && this.seed == that.seed
+                && Objects.equals(this.key, that.key);
+        }
+
+        @Override
+        public String property() {
+            return key.property();
+        }
+
+        @Override
+        public String classname() {
+            return key.classname();
         }
     }
 }
