@@ -397,6 +397,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     @Column(name = "eMail")
+    @SuppressWarnings("unused")
     private String getEMail() {
         return eMail;
     }

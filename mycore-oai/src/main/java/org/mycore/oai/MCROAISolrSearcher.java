@@ -204,12 +204,12 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         String oaiId = objectManager.getOAIId(docId);
         Header header = new Header(oaiId, modified.toInstant());
 
-        setResolver.parallelStream()
-            .map(r -> r.getSets(docId))
-            .flatMap(Collection::stream)
-            .sorted(this::compare)
-            .sequential()
-            .forEachOrdered(header.getSetList()::add);
+        header.getSetList().addAll(
+            setResolver.parallelStream()
+                .map(r -> r.getSets(docId))
+                .flatMap(Collection::stream)
+                .sorted(this::compare)
+                .toList());
         return header;
     }
 

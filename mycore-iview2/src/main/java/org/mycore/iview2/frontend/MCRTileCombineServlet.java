@@ -27,8 +27,9 @@ import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -229,9 +230,9 @@ public class MCRTileCombineServlet extends MCRServlet {
         job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
         job.getResponse().setContentType("image/jpeg");
         job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
-        final Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-        LOGGER.info("Last-Modified: {}, expire on: {}", new Date(iviewFile.lastModified()), expires);
-        job.getResponse().setDateHeader("Expires", expires.getTime());
+        final Instant expires = Instant.now().plus(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS.toChronoUnit());
+        LOGGER.info("Last-Modified: {}, expire on: {}", Instant.ofEpochMilli(iviewFile.lastModified()), expires);
+        job.getResponse().setDateHeader("Expires", expires.toEpochMilli());
 
         final ImageWriter curImgWriter = imageWriter.get();
         try (ServletOutputStream sout = job.getResponse().getOutputStream();

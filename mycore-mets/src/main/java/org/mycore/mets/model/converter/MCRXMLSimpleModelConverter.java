@@ -20,6 +20,7 @@ package org.mycore.mets.model.converter;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -161,7 +162,7 @@ public class MCRXMLSimpleModelConverter {
     }
 
     private static Map<String, MCRMetsFile> buildidFileMap(Mets mets) {
-        Map<String, MCRMetsFile> idMetsFileMap = new Hashtable<>();
+        Map<String, MCRMetsFile> idMetsFileMap = new HashMap<>();
         mets.getFileSec().getFileGroups().forEach((fileGroup) -> addFilesFromGroup(idMetsFileMap, fileGroup));
         return idMetsFileMap;
     }
