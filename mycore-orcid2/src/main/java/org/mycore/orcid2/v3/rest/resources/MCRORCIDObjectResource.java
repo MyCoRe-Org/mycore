@@ -47,6 +47,7 @@ import org.mycore.orcid2.v3.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
 import org.mycore.orcid2.v3.MCRORCIDWorkHelper;
 import org.mycore.orcid2.v3.MCRORCIDWorkSummaryUtils;
+import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 
@@ -75,15 +76,9 @@ public class MCRORCIDObjectResource {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestrictedAccess(MCRRequireLogin.class)
     public MCRORCIDPublicationStatus getPublicationStatus(@PathParam("objectID") MCRObjectID objectID) {
-        MCRObject object = null;
-        try {
-            object = MCRMetadataManager.retrieveMCRObject(objectID);
-        } catch(MCRPersistenceException e) {
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        final Set<String> orcids = MCRORCIDUtils.getORCIDs(object);
+        final MCRObject object = getObject(objectID);
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        orcids.retainAll(orcidUser.getORCIDs());
+        final Set<String> orcids = getMatchingORCIDs(object, orcidUser);
         if (orcids.isEmpty()) {
             // assumption that a publication cannot be in the profile, it is if not users.
             return new MCRORCIDPublicationStatus(false, false);
@@ -111,49 +106,91 @@ public class MCRORCIDObjectResource {
     }
 
     /**
-     * Publishes a work in the current user's ORCID profile, or
-     * updates an existing work there, given the object ID of the local MODS object.
-     *
-     * The request path must contain the MCRObjectID to publish.
-     * The current user must have an ORCID profile and must have authorized this application
-     * to add or updated works.
+     * Creates MCRObject in ORCID profil for given MCRORCIDCredential.
      *
      * @param objectID the MCRObjectID
-     * @return the new publication status
+     * @return the Response
      * @throws WebApplicationException if request fails
+     * @see MCRORCIDWorkHelper#createObjectAndUpdateWorkInfo
      */
     @POST
-    @Path("publish/v3/{objectID}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Path("create-object/v3/{objectID}")
     @MCRRestrictedAccess(MCRRequireLogin.class)
-    public Response publish(@PathParam("objectID") MCRObjectID objectID) {
-        if (!MCRMetadataManager.exists(objectID)) {
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        MCRObject object = null;
-        try {
-            object = MCRMetadataManager.retrieveMCRObject(objectID);
-        } catch(MCRPersistenceException e) {
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        final Set<String> orcids = MCRORCIDUtils.getORCIDs(object);
+    @MCRRequireTransaction
+    public Response createObject(@PathParam("objectID") MCRObjectID objectID) {
+        final MCRObject object = getObject(objectID);
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        orcids.retainAll(orcidUser.getORCIDs());
-        if (orcids.isEmpty() || orcids.size() > 1) {
+        final String orcid = getMatchingORCID(object, orcidUser);
+        final MCRORCIDCredential credential = getCredential(orcidUser, orcid);
+        try {
+            MCRORCIDWorkHelper.createObjectAndUpdateWorkInfo(object, orcid, credential);
+            return Response.ok().build();
+        } catch (Exception e) {
+            LOGGER.error("Error while creating: ", e);
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final String orcid = orcids.iterator().next();
+    }
+
+    /**
+     * Updates MCRObject in ORCID profil for given MCRORCIDCredential.
+     *
+     * @param objectID the MCRObjectID
+     * @return the Response
+     * @throws WebApplicationException if request fails
+     * @see MCRORCIDWorkHelper#updateObjectAndUpdateWorkInfo
+     */
+    @POST
+    @Path("update-object/v3/{objectID}")
+    @MCRRestrictedAccess(MCRRequireLogin.class)
+    @MCRRequireTransaction
+    public Response updateObject(@PathParam("objectID") MCRObjectID objectID) {
+        final MCRObject object = getObject(objectID);
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        final String orcid = getMatchingORCID(object, orcidUser);
+        final MCRORCIDCredential credential = getCredential(orcidUser, orcid);
+        try {
+            MCRORCIDWorkHelper.updateObjectAndUpdateWorkInfo(object, orcid, credential);
+            return Response.ok().build();
+        } catch (Exception e) {
+            LOGGER.error("Error while creating: ", e);
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+    }
+
+    private MCRORCIDCredential getCredential(MCRORCIDUser orcidUser, String orcid) {
         final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(orcid);
         if (credential == null || credential.getAccessToken() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
+        return credential;
+    }
+
+    private MCRObject getObject(MCRObjectID objectID) {
+        if (!MCRMetadataManager.exists(objectID)) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
         try {
-            MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, orcid, credential);
-            return Response.ok().build();
-        } catch (Exception e) {
-            LOGGER.error("Error while publishing: ", e);
+            return MCRMetadataManager.retrieveMCRObject(objectID);
+        } catch(MCRPersistenceException e) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
+    }
+
+    private String getMatchingORCID(MCRObject object, MCRORCIDUser orcidUser) {
+        final Set<String> orcids = getMatchingORCIDs(object, orcidUser);
+        if (orcids.isEmpty()) {
+            return null;
+        }
+        if (orcids.size() == 1) {
+            return orcids.iterator().next();
+        }
+        throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+
+    private Set<String> getMatchingORCIDs(MCRObject object, MCRORCIDUser orcidUser) {
+        final Set<String> orcids = MCRORCIDUtils.getORCIDs(object);
+        orcids.retainAll(orcidUser.getORCIDs());
+        return orcids;
     }
 
     static class MCRORCIDPublicationStatus {

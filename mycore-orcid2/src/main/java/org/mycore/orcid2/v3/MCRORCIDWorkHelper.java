@@ -34,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDConstants;
@@ -123,6 +124,96 @@ public class MCRORCIDWorkHelper {
             final Set<String> matchingORCIDs = new HashSet<>(getMatchingORCIDs(object));
             matchingORCIDs.removeAll(orcids);
             collectAndSaveOtherPutCodes(List.copyOf(matchingORCIDs), object);
+        }
+    }
+
+    /**
+     * Creates MCRObject in ORCID profil for given MCRORCIDCredential.
+     *
+     * Update and create strategies can be set via:
+     * 
+     * MCR.ORCID2.Work.AlwaysUpdatePutCodes=
+     * MCR.ORCID2.Work.CollectExternalPutCodes=
+     * 
+     * @param object the MCRObject
+     * @param orcid the ORCID iD
+     * @param credential the MCRORCIDCredential
+     * @throws MCRORCIDException if work transformation fails or cannot update flags
+     * @see MCRORCIDUtils#getTrustedIdentifiers
+     */
+    public static void createObjectAndUpdateWorkInfo(MCRObject object, String orcid, MCRORCIDCredential credential) {
+        if (!MCRORCIDUtils.checkPublishState(object)) {
+            throw new MCRORCIDException("Object has wrong state");
+        }
+        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+            throw new MCRORCIDException("Filtered MODS is empty.");
+        }
+        final Work work = MCRORCIDWorkTransformerHelper
+            .transformContent(new MCRJDOMContent(filteredObject.createXML()));
+        try {
+            final MCRORCIDUserInfo userInfo
+                = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                    .orElseGet(() -> new MCRORCIDUserInfo(orcid));
+            final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo();
+            retrieveWorkInfo(object, orcid, credential, userInfo);
+            if (userInfo.getWorkInfo().hasOwnPutCode()) {
+                throw new MCRORCIDException("Object already exists");
+            }
+            if (!Objects.equals(currentWorkInfo, userInfo.getWorkInfo())) {
+                // save is safe ;)
+                MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
+            }
+            createObject(work, orcid, credential);
+            MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
+            MCRMetadataManager.update(object);
+        } catch (Exception e) {
+            throw new MCRORCIDException("Cannot create object", e);
+        }
+    }
+
+    /**
+     * Updates MCRObject in ORCID profil for given MCRORCIDCredential.
+     *
+     * Update and create strategies can be set via:
+     * 
+     * MCR.ORCID2.Work.AlwaysUpdatePutCodes=
+     * MCR.ORCID2.Work.CollectExternalPutCodes=
+     * 
+     * @param object the MCRObject
+     * @param orcid the ORCID iD
+     * @param credential the MCRORCIDCredential
+     * @throws MCRORCIDException if work transformation fails or cannot update flags
+     * @see MCRORCIDUtils#getTrustedIdentifiers
+     */
+    public static void updateObjectAndUpdateWorkInfo(MCRObject object, String orcid, MCRORCIDCredential credential) {
+        if (!MCRORCIDUtils.checkPublishState(object)) {
+            throw new MCRORCIDException("Object has wrong state");
+        }
+        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+            throw new MCRORCIDException("Filtered MODS is empty.");
+        }
+        final Work work = MCRORCIDWorkTransformerHelper
+            .transformContent(new MCRJDOMContent(filteredObject.createXML()));
+        try {
+            final MCRORCIDUserInfo userInfo
+                = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                    .orElseGet(() -> new MCRORCIDUserInfo(orcid));
+            final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo();
+            retrieveWorkInfo(object, orcid, credential, userInfo);
+            if (!userInfo.getWorkInfo().hasOwnPutCode()) {
+                throw new MCRORCIDException("Object does not exist");
+            }
+            if (!Objects.equals(currentWorkInfo, userInfo.getWorkInfo())) {
+                // save is safe ;)
+                MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
+            }
+            updateObject(work, orcid, credential, userInfo.getWorkInfo().getOwnPutCode());
+            MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
+            MCRMetadataManager.update(object);
+        } catch (Exception e) {
+            throw new MCRORCIDException("Cannot update object", e);
         }
     }
 
@@ -260,8 +351,6 @@ public class MCRORCIDWorkHelper {
         if (scope.isPresent() && !scope.get().contains(ScopeConstants.ACTIVITIES_UPDATE)) {
             throw new MCRORCIDInvalidScopeException();
         }
-        final MCRORCIDUserClient memberClient
-            = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
         long ownPutCode = workInfo.getOwnPutCode();
         final long[] otherPutCodes = workInfo.getOtherPutCodes();
         // matching work should exists in profile
@@ -269,15 +358,16 @@ public class MCRORCIDWorkHelper {
             if (ownPutCode > 0) {
                 try {
                     if (ALWAYS_UPDATE_OWN_WORK) {
-                        final Work remoteWork =
-                            memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, ownPutCode);
+                        final MCRORCIDUserClient memberClient
+                            = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
+                        final Work remoteWork
+                            = memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, ownPutCode);
                         // check if update is required
                         if (!MCRORCIDWorkUtils.checkWorkEquality(work, remoteWork)) {
-                            work.setPutCode(ownPutCode);
-                            memberClient.update(MCRORCIDSectionImpl.WORK, ownPutCode, work);
+                            updateObject(work, orcid, credential, ownPutCode);
                             LOGGER.info("Updated work of user {} with put code {}.", orcid, ownPutCode);
                         } else {
-                          LOGGER.info("Update of work of user {} with put code {} not required.", orcid, ownPutCode);
+                            LOGGER.info("Update of work of user {} with put code {} not required.", orcid, ownPutCode);
                         }
                     }
                     return;
@@ -293,15 +383,33 @@ public class MCRORCIDWorkHelper {
             // clean up own put code
             ownPutCode = 0;
             if (ALWAYS_CREATE_OWN_WORK) {
-                ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
+                ownPutCode = createObject(work, orcid, credential);
                 LOGGER.info("Created work of user {} with put code {}.", orcid, ownPutCode);
             }
             workInfo.setOwnPutCode(ownPutCode);
         } else {
-            ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
+            final long putCode = createObject(work, orcid, credential);
             LOGGER.info("Created work of user {} with put code {}.", orcid, ownPutCode);
-            workInfo.setOwnPutCode(ownPutCode);
+            workInfo.setOwnPutCode(putCode);
         }
+    }
+
+    private static long createObject(Work work, String orcid, MCRORCIDCredential credential) {
+        final MCRORCIDUserClient memberClient
+            = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
+        try {
+            final long putCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
+            return putCode;
+        } catch (MCRORCIDRequestException e) {
+            throw new MCRORCIDException("Create failed", e);
+        }
+    }
+
+    private static void updateObject(Work work, String orcid, MCRORCIDCredential credential, long putCode) {
+        final MCRORCIDUserClient memberClient
+            = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
+        work.setPutCode(putCode);
+        memberClient.update(MCRORCIDSectionImpl.WORK, putCode, work);
     }
 
     private static List<String> getMatchingORCIDs(MCRObject object) {
