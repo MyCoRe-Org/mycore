@@ -33,7 +33,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-import org.mycore.orcid2.MCRORCIDUtils;
+import org.mycore.frontend.jersey.access.MCRRequireLogin;
+import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
@@ -59,10 +60,8 @@ public class MCRORCIDResource {
     @GET
     @Path("user-status")
     @Produces(MediaType.APPLICATION_JSON)
+    @MCRRestrictedAccess(MCRRequireLogin.class)
     public MCRORCIDUserStatus getUserStatus() {
-        if (MCRORCIDUtils.isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
-        }
         final MCRORCIDUser user = MCRORCIDSessionUtils.getCurrentUser();
         final String[] orcids = user.getORCIDs().toArray(String[]::new);
         final String[] credentials = user.getCredentials().entrySet().stream().map(Map.Entry::getKey)
@@ -81,12 +80,10 @@ public class MCRORCIDResource {
     @POST
     @Path("revoke/{orcid}")
     @MCRRequireTransaction
+    @MCRRestrictedAccess(MCRRequireLogin.class)
     public Response revoke(@PathParam("orcid") String orcid, @QueryParam("redirect_uri") String redirectString) {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        if (MCRORCIDUtils.isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         URI redirectURI = null;
         if (redirectString != null) {

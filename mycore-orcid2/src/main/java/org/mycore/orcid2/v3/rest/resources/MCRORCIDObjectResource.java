@@ -34,12 +34,11 @@ import jakarta.ws.rs.core.Response.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.frontend.jersey.access.MCRRequireLogin;
+import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
@@ -67,18 +66,15 @@ public class MCRORCIDObjectResource {
      *   "isInORCIDProfile": true,
      * }
      *
-     * @param objectIDString the MCRObjectID as String
+     * @param objectID the MCRObjectID
      * @return the publication status
      * @throws WebApplicationException if request fails
      */
     @GET
     @Path("object-status/v3/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public MCRORCIDPublicationStatus getPublicationStatus(@PathParam("objectID") String objectIDString) {
-        if (isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
-        }
-        final MCRObjectID objectID = MCRJerseyUtil.getID(objectIDString);
+    @MCRRestrictedAccess(MCRRequireLogin.class)
+    public MCRORCIDPublicationStatus getPublicationStatus(@PathParam("objectID") MCRObjectID objectID) {
         MCRObject object = null;
         try {
             object = MCRMetadataManager.retrieveMCRObject(objectID);
@@ -122,18 +118,15 @@ public class MCRORCIDObjectResource {
      * The current user must have an ORCID profile and must have authorized this application
      * to add or updated works.
      *
-     * @param objectIDString the MCRObjectID as String
+     * @param objectID the MCRObjectID
      * @return the new publication status
      * @throws WebApplicationException if request fails
      */
     @POST
     @Path("publish/v3/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response publish(@PathParam("objectID") String objectIDString) {
-        if (isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
-        }
-        final MCRObjectID objectID = MCRJerseyUtil.getID(objectIDString);
+    @MCRRestrictedAccess(MCRRequireLogin.class)
+    public Response publish(@PathParam("objectID") MCRObjectID objectID) {
         if (!MCRMetadataManager.exists(objectID)) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
@@ -161,11 +154,6 @@ public class MCRORCIDObjectResource {
             LOGGER.error("Error while publishing: ", e);
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-    }
-
-    private boolean isCurrentUserGuest() {
-        return MCRSystemUserInformation.getGuestInstance().getUserID()
-            .equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 
     static class MCRORCIDPublicationStatus {

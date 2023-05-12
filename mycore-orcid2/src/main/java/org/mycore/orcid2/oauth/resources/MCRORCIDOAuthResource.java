@@ -49,6 +49,8 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.frontend.jersey.access.MCRRequireLogin;
+import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -92,11 +94,9 @@ public class MCRORCIDOAuthResource {
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
+    @MCRRestrictedAccess(MCRRequireLogin.class)
     public InputStream handleCodeRequest(@QueryParam("code") String code, @QueryParam("state") String state,
         @QueryParam("error") String error, @QueryParam("error_description") String errorDescription) {
-        if (MCRORCIDUtils.isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
-        }
         try {
             MCRContent result = null;
             if (code != null) {
@@ -129,10 +129,8 @@ public class MCRORCIDOAuthResource {
      */
     @GET
     @Path("init")
+    @MCRRestrictedAccess(MCRRequireLogin.class)
     public Response getOAuthURI(@QueryParam("scope") String scope) {
-        if (MCRORCIDUtils.isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
-        }
         String langCode = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         if (!MCRORCIDConstants.SUPPORTED_LANGUAGE_CODES.contains(langCode)) {
             // use english as fallback

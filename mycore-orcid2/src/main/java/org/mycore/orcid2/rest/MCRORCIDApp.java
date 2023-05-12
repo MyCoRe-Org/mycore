@@ -29,6 +29,7 @@ import org.mycore.restapi.MCRIgnoreClientAbortInterceptor;
 import jakarta.ws.rs.ApplicationPath;
 import org.mycore.restapi.MCRSessionFilter;
 import org.mycore.restapi.MCRTransactionFilter;
+import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 
 /**
  * ORCID API REST app.
@@ -48,6 +49,7 @@ public class MCRORCIDApp extends ResourceConfig {
         register(MCRSessionFilter.class);
         register(MCRTransactionFilter.class);
         register(MCRORCIDFeature.class);
+        register(MCRObjectIDParamConverterProvider.class);
         register(MCRCORSResponseFilter.class);
         register(MCRRequestScopeACLFilter.class);
         register(MCRIgnoreClientAbortInterceptor.class);
