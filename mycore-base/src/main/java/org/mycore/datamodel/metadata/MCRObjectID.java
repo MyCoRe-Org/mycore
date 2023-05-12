@@ -79,7 +79,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     // data of the ID
-    private final String projectId, objectType, combinedId;
+    private final String projectId;
+    private final String objectType;
+    private final String combinedId;
 
     private final int numberPart;
 

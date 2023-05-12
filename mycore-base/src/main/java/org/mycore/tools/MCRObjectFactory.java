@@ -48,7 +48,6 @@ public class MCRObjectFactory {
         return xml;
     }
 
-    /***/
     private static Element createServiceElement() {
         Element service = new Element("service");
         Element servDates = new Element("servdates");
@@ -77,7 +76,6 @@ public class MCRObjectFactory {
         return isoDate.getISOString();
     }
 
-    /***/
     private static Element createMetadataElement(MCRObjectID id) {
         return id.getTypeId().equals("derivate") ? new Element("derivate") : new Element("metadata");
     }
