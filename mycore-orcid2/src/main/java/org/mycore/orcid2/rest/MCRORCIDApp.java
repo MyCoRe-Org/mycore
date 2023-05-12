@@ -16,44 +16,53 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2;
-
-import jakarta.ws.rs.ApplicationPath;
+package org.mycore.orcid2.rest;
 
 import org.apache.logging.log4j.LogManager;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.restapi.MCRDropSessionFilter;
-import org.mycore.restapi.MCRJerseyRestApp;
-import org.mycore.restapi.v2.MCRExceptionMapper;
+import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
+import org.mycore.restapi.MCRCORSResponseFilter;
+import org.mycore.restapi.MCRIgnoreClientAbortInterceptor;
+
+import jakarta.ws.rs.ApplicationPath;
+import org.mycore.restapi.MCRSessionFilter;
+import org.mycore.restapi.MCRTransactionFilter;
 
 /**
  * ORCID API REST app.
  */
 @ApplicationPath("/api/orcid")
-public class MCRORCIDApp extends MCRJerseyRestApp {
+public class MCRORCIDApp extends ResourceConfig {
 
     /**
      * Creates ORCID API App.
      */
     public MCRORCIDApp() {
         super();
-        register(MCRDropSessionFilter.class);
-        register(MCRExceptionMapper.class);
+        initAppName();
+        property(ServerProperties.APPLICATION_NAME, getApplicationName());
+        packages(getRestPackages());
+        property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
+        register(MCRSessionFilter.class);
+        register(MCRTransactionFilter.class);
+        register(MCRORCIDFeature.class);
+        register(MCRCORSResponseFilter.class);
+        register(MCRRequestScopeACLFilter.class);
+        register(MCRIgnoreClientAbortInterceptor.class);
     }
 
-    @Override
-    protected void initAppName() {
+    private void initAppName() {
         setApplicationName("MyCoRe ORCID-API " + getVersion());
         LogManager.getLogger().info("Initiialize {}", getApplicationName());
     }
 
-    @Override
-    protected String getVersion() {
+    private String getVersion() {
         return "1.0";
     }
 
-    @Override
-    protected String[] getRestPackages() {
+    private String[] getRestPackages() {
         return MCRConfiguration2.getOrThrow("MCR.ORCID2.API.Resource.Packages", MCRConfiguration2::splitValue)
             .toArray(String[]::new);
     }

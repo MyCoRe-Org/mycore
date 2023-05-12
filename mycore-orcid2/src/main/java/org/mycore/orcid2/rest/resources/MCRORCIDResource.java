@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.resources;
+package org.mycore.orcid2.rest.resources;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,6 +38,7 @@ import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
+import org.mycore.restapi.annotations.MCRRequireTransaction;
 
 /**
  * Base resource for orcid methods.
@@ -79,6 +80,7 @@ public class MCRORCIDResource {
      */
     @POST
     @Path("revoke/{orcid}")
+    @MCRRequireTransaction
     public Response revoke(@PathParam("orcid") String orcid, @QueryParam("redirect_uri") String redirectString) {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);

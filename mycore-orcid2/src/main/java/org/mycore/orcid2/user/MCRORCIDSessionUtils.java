@@ -37,7 +37,8 @@ public class MCRORCIDSessionUtils {
      */
     public static MCRORCIDUser getCurrentUser() {
         final MCRSession session = MCRSessionMgr.getCurrentSession();
-        final MCRUser user = MCRUserManager.getCurrentUser();
+        // refetch user because of rest issues
+        final MCRUser user = MCRUserManager.getUser(MCRUserManager.getCurrentUser().getUserID());
         MCRORCIDUser orcidUser = (MCRORCIDUser) session.get(KEY_ORCID_USER);
         if ((orcidUser == null) || !orcidUser.getUser().equals(user)) {
             orcidUser = new MCRORCIDUser(user);

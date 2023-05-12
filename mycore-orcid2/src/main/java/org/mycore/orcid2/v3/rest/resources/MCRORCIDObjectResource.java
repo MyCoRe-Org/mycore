@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.v3.resources;
+package org.mycore.orcid2.v3.rest.resources;
 
 import java.util.List;
 import java.util.Set;
