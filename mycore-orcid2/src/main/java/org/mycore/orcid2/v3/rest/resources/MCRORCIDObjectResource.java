@@ -34,6 +34,9 @@ import jakarta.ws.rs.core.Response.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -122,13 +125,14 @@ public class MCRORCIDObjectResource {
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         final String orcid = getMatchingORCID(object, orcidUser);
         final MCRORCIDCredential credential = getCredential(orcidUser, orcid);
+        switchToJanitor();
         try {
             MCRORCIDWorkHelper.createObjectAndUpdateWorkInfo(object, orcid, credential);
-            return Response.ok().build();
         } catch (Exception e) {
             LOGGER.error("Error while creating: ", e);
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
+        return Response.ok().build();
     }
 
     /**
@@ -148,13 +152,20 @@ public class MCRORCIDObjectResource {
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         final String orcid = getMatchingORCID(object, orcidUser);
         final MCRORCIDCredential credential = getCredential(orcidUser, orcid);
+        switchToJanitor();
         try {
             MCRORCIDWorkHelper.updateObjectAndUpdateWorkInfo(object, orcid, credential);
-            return Response.ok().build();
         } catch (Exception e) {
             LOGGER.error("Error while creating: ", e);
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
+        return Response.ok().build();
+    }
+
+    private void switchToJanitor() {
+        final MCRSession session = MCRSessionMgr.getCurrentSession();
+        session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+        session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
     }
 
     private MCRORCIDCredential getCredential(MCRORCIDUser orcidUser, String orcid) {
