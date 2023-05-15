@@ -315,6 +315,17 @@ public class MCRSolrIndexer {
     }
 
     /**
+     * Rebuilds solr's metadata index only for objects of the given base.
+     *
+     * @param base
+     *            of the objects to index
+     */
+    public static void rebuildMetadataIndexBased(String base, SolrClient solrClient) {
+        List<String> identfiersOfBase = MCRXMLMetadataManager.instance().listIDsForBase(base);
+        rebuildMetadataIndex(identfiersOfBase, solrClient);
+    }
+
+    /**
      * Rebuilds solr's metadata index.
      *
      * @param list
@@ -477,6 +488,20 @@ public class MCRSolrIndexer {
         LOGGER.info("Dropping solr index for type {}...done", type);
     }
 
+    public static void dropIndexByBase(String base, SolrClient client) throws Exception {
+        String type = base.split("_")[1];
+        if (!MCRObjectID.isValidType(type) || "data_file".equals(type)) {
+            LOGGER.warn("The type {} is not a valid type in the actual environment", type);
+            return;
+        }
+
+        LOGGER.info("Dropping solr index for base {}...", base);
+        String deleteQuery = new MessageFormat("objectType:{0} _root_:{1}_*", Locale.ROOT)
+            .format(new Object[] { type, base });
+        client.deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
+        LOGGER.info("Dropping solr index for base {}...done", base);
+    }
+
     /**
      * Sends a signal to the remote solr server to optimize its index.
      */
@@ -517,6 +542,40 @@ public class MCRSolrIndexer {
         // get ids from solr
         LOGGER.info("fetching solr...");
         List<String> solrList = MCRSolrSearchUtils.listIDs(client, "objectType:" + objectType);
+        LOGGER.info("there are {} solr objects", solrList.size());
+
+        // documents to remove
+        List<String> toRemove = new ArrayList<>(1000);
+        for (String id : solrList) {
+            if (!storeList.contains(id)) {
+                toRemove.add(id);
+            }
+        }
+        if (!toRemove.isEmpty()) {
+            LOGGER.info("remove {} zombie objects from solr", toRemove.size());
+            deleteById(client, toRemove.toArray(new String[toRemove.size()]));
+        }
+        deleteOrphanedNestedDocuments(client);
+        // documents to add
+        storeList.removeAll(solrList);
+        if (!storeList.isEmpty()) {
+            LOGGER.info("index {} mycore objects", storeList.size());
+            rebuildMetadataIndex(storeList, client);
+        }
+    }
+
+    public static void synchronizeMetadataIndexBased(SolrClient client, String objectBase)
+        throws IOException, SolrServerException {
+        LOGGER.info("synchronize {}", objectBase);
+        // get ids from store
+        LOGGER.info("fetching mycore store...");
+        List<String> storeList = MCRXMLMetadataManager.instance().listIDsForBase(objectBase);
+        LOGGER.info("there are {} mycore objects", storeList.size());
+        // get ids from solr
+        LOGGER.info("fetching solr...");
+        String query = new MessageFormat("objectType:{0} _root_:{1}_*", Locale.ROOT)
+            .format(new Object[] { objectBase.split("_")[1], objectBase });
+        List<String> solrList = MCRSolrSearchUtils.listIDs(client, query);
         LOGGER.info("there are {} solr objects", solrList.size());
 
         // documents to remove
