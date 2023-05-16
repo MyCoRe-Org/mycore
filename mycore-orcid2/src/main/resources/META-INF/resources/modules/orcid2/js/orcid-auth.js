@@ -29,8 +29,8 @@ async function fetchJWT() {
         throw new Error(`Cannot fetch JWT: ${response.status}`);
     }
     const result = await response.json();
-    if (result.login_success) {
-       return result.access_token;
+    if (!result.login_success) {
+        throw new Error("Login failed");
     }
-    throw new Error("Login failed");
+    return result.access_token;
 }
