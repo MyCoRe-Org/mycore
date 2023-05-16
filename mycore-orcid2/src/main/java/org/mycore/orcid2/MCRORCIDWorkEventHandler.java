@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -34,6 +36,9 @@ import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.user2.MCRUser;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
+import org.mycore.orcid2.metadata.MCRORCIDFlagContent;
+import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
+import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
@@ -48,6 +53,10 @@ import org.orcid.jaxb.model.message.ScopeConstants;
  * and then creates/updates the publication in the works section of that profile.
  */
 public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
+
+    public static final boolean UPDATE_ONLY_EXISTING
+        = MCRConfiguration2.getBoolean(MCRORCIDConstants.CONFIG_PREFIX + "WorkEventHandler.UpdateOnlyExisting")
+            .orElse(false);
 
     private static final Logger LOGGER = LogManager.getLogger();
     @Override
@@ -77,13 +86,45 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
             LOGGER.info("Object has wrong state. Skipping {}.", objectID);
             return;
         }
-        final Map<String, MCRORCIDCredential> credentials = listOrcidCredentials(object);
+        Map<String, MCRORCIDCredential> credentials = null;
+        if (UPDATE_ONLY_EXISTING) {
+            credentials = listOrcidsCredentialsFromFlag(object);
+        } else {
+            credentials = listOrcidCredentials(object);
+        }
         try {
-            publishObject(object, credentials);
+            if (!credentials.isEmpty()) {
+                publishObject(object, credentials);
+            }
             LOGGER.info("Finished publishing {} to ORCID.", objectID);
         } catch (Exception e) {
             LOGGER.warn("Error while publishing {} to ORCID:", objectID, e);
         }
+    }
+
+    private Map<String, MCRORCIDCredential> listOrcidsCredentialsFromFlag(MCRObject object) {
+        final MCRORCIDFlagContent flagContent = MCRORCIDMetadataUtils.getORCIDFlagContent(object);
+        if (flagContent == null) {
+            return Collections.emptyMap();
+        }
+        final List<MCRORCIDUserInfo> userInfos = flagContent.getUserInfos();
+        if (userInfos.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        final List<String> relevantORCIDs = userInfos.stream().filter(u -> u.getWorkInfo() != null)
+            .filter(u -> u.getWorkInfo().hasOwnPutCode()).map(MCRORCIDUserInfo::getORCID).toList();
+        if (relevantORCIDs.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        final Map<String, MCRORCIDCredential> credentials = new HashMap();
+        for (String orcid : relevantORCIDs) {
+            try {
+                credentials.put(orcid, MCRORCIDUserUtils.getCredentialByORCID(orcid));
+            } catch (MCRORCIDException e) {
+                // TODO ignore?
+            }
+        }
+        return credentials;
     }
 
     private Map<String, MCRORCIDCredential> listOrcidCredentials(MCRObject object) {
