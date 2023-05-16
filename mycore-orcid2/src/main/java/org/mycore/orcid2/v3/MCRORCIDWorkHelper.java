@@ -164,7 +164,8 @@ public class MCRORCIDWorkHelper {
                 // save is safe ;)
                 MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             }
-            createObject(work, orcid, credential);
+            final long putCode = createObject(work, orcid, credential);
+            userInfo.getWorkInfo().setOwnPutCode(putCode);
             MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             MCRMetadataManager.update(object);
         } catch (Exception e) {
