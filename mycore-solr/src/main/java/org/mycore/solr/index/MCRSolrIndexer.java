@@ -491,7 +491,7 @@ public class MCRSolrIndexer {
     public static void dropIndexByBase(String base, SolrClient client) throws Exception {
         String type = base.split("_")[1];
         if (!MCRObjectID.isValidType(type) || "data_file".equals(type)) {
-            LOGGER.warn("The type {} is not a valid type in the actual environment", type);
+            LOGGER.warn("The type {} of base {} is not a valid type in the actual environment", type, base);
             return;
         }
 
