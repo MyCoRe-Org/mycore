@@ -563,12 +563,18 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     public List<String> listIDs() {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(projectPath -> {
-                final String project = projectPath.getFileName().toString();
-                return list(projectPath).flatMap(typePath -> {
-                    final String type = typePath.getFileName().toString();
-                    final String base = getStoryKey(project, type);
-                    return listIDsForBase(base).stream();
-                });
+            	if (isProjectDirSane(projectPath)) {
+                    final String project = projectPath.getFileName().toString();
+                    return list(projectPath).flatMap(typePath -> {
+                    	if (isTypeDirSane(typePath)) {
+	                        final String type = typePath.getFileName().toString();
+	                        final String base = getStoryKey(project, type);
+	                        return listIDsForBase(base).stream();
+                    	}
+                    	return Stream.empty();
+                    });
+            	}
+            	return Stream.empty();
             }).collect(Collectors.toList());
         }
     }
@@ -592,7 +598,65 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 .collect(Collectors.toSet());
         }
     }
-
+    
+    /**
+     * 
+     * @param path
+     * @return true when usable project
+     */
+    private boolean isProjectDirSane(Object path) {
+    	return projectDirStatus(path) > 0;
+    }
+    
+    /**
+     * 
+     * @param path
+     * @return: 0 - not usable / no project
+  	 *			1 - clean
+     *			2 - dirty
+     *
+     */
+    //TODO: consider sanity checks like getObjectTypes() does. (performance penalty?)
+    private int projectDirStatus(Object path) {
+    	File p = new File(path.toString());
+    	if (!p.isDirectory()) {
+       		LOGGER.warn(
+    			"File '{}' spotted in data-directory where only subdirectories are expected.",
+    			p.getAbsolutePath()
+    		);
+    		return 0;
+    	}
+    	return 1;
+    }
+    
+    /**
+     * 
+     * @param path
+     * @return true when usable type directory (inside project)
+     */
+    private boolean isTypeDirSane(Object path) {
+    	return typeDirStatus(path) > 0;
+    }
+    
+    /**
+     * 
+     * @param path
+     * @return: 0 - not usable / no type dir
+  	 *			1 - clean
+     *			2 - dirty
+     */
+    private int typeDirStatus(Object path) {
+    	File p = new File(path.toString());
+    	if (!p.isDirectory()) {
+       		LOGGER.warn(
+    			"File '{}' spotted in data-directory where only subdirectories are expected.",
+    			p.getAbsolutePath()
+    		);
+    		return 0;
+    	}
+    	return 1;
+    }
+    
     /**
      * Returns the entries of the given path. Throws a MCRException if an I/O-Exceptions occur.
      *
