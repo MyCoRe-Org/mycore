@@ -257,7 +257,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         order = 220)
     public static void dropIndexByBase(String base, String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.dropIndexByType(base, core.getClient());
+        MCRSolrIndexer.dropIndexByBase(base, core.getClient());
     }
 
     @MCRCommand(
