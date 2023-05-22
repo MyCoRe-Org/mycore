@@ -38,6 +38,7 @@ import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.metadata.MCRORCIDFlagContent;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
+import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
@@ -54,11 +55,12 @@ import org.orcid.jaxb.model.message.ScopeConstants;
  */
 public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
 
-    public static final boolean UPDATE_ONLY_EXISTING
+    private static final boolean UPDATE_ONLY_EXISTING
         = MCRConfiguration2.getBoolean(MCRORCIDConstants.CONFIG_PREFIX + "WorkEventHandler.UpdateOnlyExisting")
             .orElse(false);
 
     private static final Logger LOGGER = LogManager.getLogger();
+
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {
         handlePublication(object);
@@ -67,6 +69,34 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject object) {
         handlePublication(object);
+    }
+
+    @Override
+    protected void handleObjectDeleted(MCREvent evt, MCRObject object) {
+        final MCRORCIDFlagContent flagContent = MCRORCIDMetadataUtils.getORCIDFlagContent(object);
+        if (flagContent == null) {
+            return;
+        }
+        final List<MCRORCIDUserInfo> userInfos = flagContent.getUserInfos();
+        if (userInfos.isEmpty()) {
+            return;
+        }
+        for (MCRORCIDUserInfo userInfo : userInfos) {
+            final MCRORCIDPutCodeInfo workInfo = userInfo.getWorkInfo();
+            if (workInfo != null && workInfo.hasOwnPutCode()) {
+                final String orcid = userInfo.getORCID();
+                try {
+                    final MCRORCIDCredential credential = MCRORCIDUserUtils.getCredentialByORCID(orcid);
+                    if (credential != null) {
+                        removeWork(orcid, credential, workInfo.getOwnPutCode());
+                    } else {
+                        LOGGER.info("Cannot remove work. There are no credentials for {}", orcid);
+                    }
+                } catch (MCRORCIDException e) {
+                    LOGGER.error("Cannot remove work for {}", orcid, e);
+                }
+            }
+        }
     }
 
     /**
@@ -180,7 +210,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * Publishes MCRObject in all orcid profiles specified by Map of MCRORCIDCredentials by ORCID iD.
+     * Publishes MCRObject in all ORCID profiles specified by Map of MCRORCIDCredentials by ORCID iD.
      * Creates a new record if no corresponding publication can be found in the profile.
      * Otherwise, the publication in the profile will be updated.
      * 
@@ -189,4 +219,13 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
      * @throws MCRORCIDException if Publish fails in general
      */
     abstract protected void publishObject(MCRObject object, Map<String, MCRORCIDCredential> credentials);
+
+    /**
+     * Remove Work in ORCID profile.
+     * 
+     * @param orcid the ORCID iD
+     * @param credential the MCRORCIDCredential
+     * @param putCode the putCode
+     */
+    abstract protected void removeWork(String orcid, MCRORCIDCredential credential, long putCode);
 }

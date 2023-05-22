@@ -164,7 +164,7 @@ public class MCRORCIDWorkHelper {
                 // save is safe ;)
                 MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             }
-            final long putCode = createObject(work, orcid, credential);
+            final long putCode = createWork(work, orcid, credential);
             userInfo.getWorkInfo().setOwnPutCode(putCode);
             MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             MCRMetadataManager.update(object);
@@ -210,7 +210,7 @@ public class MCRORCIDWorkHelper {
                 // save is safe ;)
                 MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             }
-            updateObject(work, orcid, credential, userInfo.getWorkInfo().getOwnPutCode());
+            updateWork(work, orcid, credential, userInfo.getWorkInfo().getOwnPutCode());
             MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             MCRMetadataManager.update(object);
         } catch (Exception e) {
@@ -365,7 +365,7 @@ public class MCRORCIDWorkHelper {
                             = memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, ownPutCode);
                         // check if update is required
                         if (!MCRORCIDWorkUtils.checkWorkEquality(work, remoteWork)) {
-                            updateObject(work, orcid, credential, ownPutCode);
+                            updateWork(work, orcid, credential, ownPutCode);
                             LOGGER.info("Updated work of user {} with put code {}.", orcid, ownPutCode);
                         } else {
                             LOGGER.info("Update of work of user {} with put code {} not required.", orcid, ownPutCode);
@@ -384,18 +384,18 @@ public class MCRORCIDWorkHelper {
             // clean up own put code
             ownPutCode = 0;
             if (ALWAYS_CREATE_OWN_WORK) {
-                ownPutCode = createObject(work, orcid, credential);
+                ownPutCode = createWork(work, orcid, credential);
                 LOGGER.info("Created work of user {} with put code {}.", orcid, ownPutCode);
             }
             workInfo.setOwnPutCode(ownPutCode);
         } else {
-            final long putCode = createObject(work, orcid, credential);
+            final long putCode = createWork(work, orcid, credential);
             LOGGER.info("Created work of user {} with put code {}.", orcid, ownPutCode);
             workInfo.setOwnPutCode(putCode);
         }
     }
 
-    private static long createObject(Work work, String orcid, MCRORCIDCredential credential) {
+    private static long createWork(Work work, String orcid, MCRORCIDCredential credential) {
         final MCRORCIDUserClient memberClient
             = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
         try {
@@ -406,7 +406,7 @@ public class MCRORCIDWorkHelper {
         }
     }
 
-    private static void updateObject(Work work, String orcid, MCRORCIDCredential credential, long putCode) {
+    private static void updateWork(Work work, String orcid, MCRORCIDCredential credential, long putCode) {
         final MCRORCIDUserClient memberClient
             = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
         work.setPutCode(putCode);

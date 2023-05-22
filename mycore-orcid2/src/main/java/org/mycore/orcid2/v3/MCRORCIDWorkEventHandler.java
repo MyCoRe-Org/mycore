@@ -32,4 +32,10 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
     protected void publishObject(MCRObject object, Map<String, MCRORCIDCredential> credentials) {
         MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credentials);
     }
+
+    @Override
+    protected void removeWork(String orcid, MCRORCIDCredential credential, long putCode) {
+        MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential)
+            .delete(MCRORCIDSectionImpl.WORK, putCode);
+    }
 }
