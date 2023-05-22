@@ -44,6 +44,7 @@ import org.mycore.frontend.jersey.MCRJWTUtil;
 import org.mycore.frontend.jersey.resources.MCRJWTResource;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.user2.MCRRealm;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -344,6 +345,12 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             }
             if (MCRUserInformation.ATT_EMAIL.equals(attribute)) {
                 return jwt.getClaim("email").asString();
+            }
+            if (MCRRealm.USER_INFORMATION_ATTR.equals(attribute)) {
+                if (getUserID().contains("@")) {
+                    return getUserID().substring(getUserID().lastIndexOf("@") + 1);
+                }
+                return null;
             }
             return jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).asString();
         }
