@@ -68,7 +68,7 @@ import org.mycore.user2.MCRUserManager;
 @Path("orcid/oauth")
 public class MCRORCIDOAuthResource {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MCRORCIDOAuthResource.class);
 
     private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "OAuth.";
 
@@ -157,8 +157,7 @@ public class MCRORCIDOAuthResource {
      * registration form to simplify registration. May be disabled for more data
      * privacy.
      * 
-     * @param scope not encoded scope string
-     * @param langCode language code
+     * @param code the code
      * @return url to request authorization code
      */
 
@@ -172,6 +171,7 @@ public class MCRORCIDOAuthResource {
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Cannot create response", e);
         } catch (MCRORCIDRequestException e) {
+            LOGGER.error("{}: {}", e.getMessage(), e.getResponse().readEntity(String.class));
             throw new MCRORCIDException("Cannot exchange token", e);
         }
     }
