@@ -171,8 +171,7 @@ public class MCRORCIDOAuthResource {
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Cannot create response", e);
         } catch (MCRORCIDRequestException e) {
-            LOGGER.error("{}: {}", e.getMessage(), e.getResponse().readEntity(String.class), e);
-            throw new MCRORCIDException("Cannot exchange token: " + e.getResponse().readEntity(String.class), e);
+            throw new MCRORCIDException("Cannot exchange token. Response was: " + e.getResponse().readEntity(String.class), e);
         }
     }
 
