@@ -84,7 +84,7 @@ public class MCRORCIDOAuthResource {
 
     /**
      * Handles ORCID code request.
-     * 
+     *
      * @param code the code
      * @param state the state
      * @param error the error
@@ -122,7 +122,7 @@ public class MCRORCIDOAuthResource {
 
     /**
      * Returns auth URI
-     * 
+     *
      * @param scope the scope
      * @return auth URI
      * @throws WebApplicationException if scope is null
@@ -150,13 +150,13 @@ public class MCRORCIDOAuthResource {
     /**
      * Builds the URL where to redirect the user's browser to initiate a three-way
      * authorization and request permission to access the given scopes. If
-     * 
+     *
      * MCR.ORCID2.PreFillRegistrationForm=true
-     * 
+     *
      * submits the current user's email address, first and last name to the ORCID
      * registration form to simplify registration. May be disabled for more data
      * privacy.
-     * 
+     *
      * @param code the code
      * @return url to request authorization code
      */
@@ -171,7 +171,8 @@ public class MCRORCIDOAuthResource {
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Cannot create response", e);
         } catch (MCRORCIDRequestException e) {
-            throw new MCRORCIDException("Cannot exchange token. Response was: " + e.getResponse().readEntity(String.class), e);
+            throw new MCRORCIDException(
+                "Cannot exchange token. Response was: " + e.getResponse().readEntity(String.class), e);
         }
     }
 
