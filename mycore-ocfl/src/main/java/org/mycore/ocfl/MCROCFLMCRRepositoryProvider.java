@@ -35,7 +35,7 @@ public class MCROCFLMCRRepositoryProvider extends org.mycore.ocfl.repository.MCR
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String DEP_WARN
-        = "\u001B[93m" + "Usage of the toplevel ocfl classes is deprecated and will be removed in future releases, " +
+        = "\u001b[31m" + "Usage of the toplevel ocfl classes is deprecated and will be removed in future releases, " +
             "please use 'org.mycore.ocfl.repository.MCROCFLMCRRepositoryProvider' instead." + "\u001B[0m";
 
     @Override
