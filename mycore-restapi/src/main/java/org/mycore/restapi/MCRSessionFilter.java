@@ -340,19 +340,17 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         @Override
         public String getUserAttribute(String attribute) {
-            if (MCRUserInformation.ATT_REAL_NAME.equals(attribute)) {
-                return jwt.getClaim("name").asString();
-            }
-            if (MCRUserInformation.ATT_EMAIL.equals(attribute)) {
-                return jwt.getClaim("email").asString();
-            }
-            if (MCRRealm.USER_INFORMATION_ATTR.equals(attribute)) {
-                if (getUserID().contains("@")) {
-                    return getUserID().substring(getUserID().lastIndexOf("@") + 1);
+            return switch (attribute) {
+                case MCRUserInformation.ATT_REAL_NAME -> jwt.getClaim("name").asString();
+                case MCRUserInformation.ATT_EMAIL -> jwt.getClaim("email").asString();
+                case MCRRealm.USER_INFORMATION_ATTR -> {
+                    if (getUserID().contains("@")) {
+                        yield getUserID().substring(getUserID().lastIndexOf("@") + 1);
+                    }
+                    yield null;
                 }
-                return null;
-            }
-            return jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).asString();
+                default -> jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).asString();
+            };
         }
     }
 
