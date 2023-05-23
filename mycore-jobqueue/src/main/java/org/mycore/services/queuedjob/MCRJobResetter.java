@@ -37,12 +37,12 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  * @author René Adler
  */
 public class MCRJobResetter extends MCRCronjob {
-    private static Logger LOGGER = LogManager.getLogger(MCRJobResetter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRJobResetter.class);
 
     private final MCRJobDAO dao;
 
     private final MCRJobConfig config;
-    private Function<Class, Queue<MCRJob>> queueResolver;
+    private Function<Class<? extends MCRJobAction>, Queue<MCRJob>> queueResolver;
 
     /**
      * Creates a new instance of {@link MCRJobResetter}. Uses {@link MCRJobQueueManager} to resolve dependencies. 
@@ -60,7 +60,8 @@ public class MCRJobResetter extends MCRCronjob {
      *                      resetted jobs to.
      * @param config the job config to determine the time till reset
      */
-    MCRJobResetter(MCRJobDAO dao, Function<Class, Queue<MCRJob>> queueResolver, MCRJobConfig config) {
+    MCRJobResetter(MCRJobDAO dao, Function<Class<? extends MCRJobAction>, Queue<MCRJob>> queueResolver,
+        MCRJobConfig config) {
         this.dao = dao;
         this.queueResolver = queueResolver;
         this.config = config;

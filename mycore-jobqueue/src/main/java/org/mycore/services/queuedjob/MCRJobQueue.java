@@ -223,8 +223,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
      */
     public Iterator<MCRJob> iterator(MCRJobStatus status) {
         if (!running) {
-            List<MCRJob> empty = Collections.emptyList();
-            return empty.iterator();
+            return Collections.emptyIterator();
         }
         List<MCRJob> jobs
             = dao.getJobs(action, Collections.emptyMap(), Stream.ofNullable(status).collect(Collectors.toList()), null,

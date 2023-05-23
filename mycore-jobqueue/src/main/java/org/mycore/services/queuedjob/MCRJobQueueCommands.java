@@ -39,25 +39,6 @@ public class MCRJobQueueCommands {
 
     static MCRJobDAOJPAImpl dao = new MCRJobDAOJPAImpl();
 
-    /**
-     * Starts a specific number of test jobs which will fail 50% of the time.
-     * @param number the number of jobs to start
-     */
-    @MCRCommand(
-        syntax = "start test jobs {0}",
-        help = "Starts {0} test jobs which will fail 50% of the time.",
-        order = 0)
-    public static void startTestJobs(String number) {
-        int i = Integer.parseInt(number);
-        for (int j = 0; j < i; j++) {
-            MCRJob job = new MCRJob();
-            job.setAction(MCRTestJobAction.class);
-            job.setParameter("count", String.valueOf(j));
-            MCRJobQueueManager.getInstance()
-                .getJobQueue(MCRTestJobAction.class)
-                .offer(job);
-        }
-    }
 
     /**
      * Lists all jobs with status MAX_TRIES.

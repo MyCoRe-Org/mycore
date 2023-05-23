@@ -99,33 +99,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
                 setStatus(MCRProcessableStatus.successful);
                 listeners.forEach(l -> l.onSuccess(job));
             } catch (Exception ex) {
-                LOGGER.error("Exception occured while try to start job. Perform rollback.", ex);
-                setError(ex);
-                actionInstance.rollback();
-                Integer tries = job.getTries();
-                if (tries == null) {
-                    tries = 0; // tries can be null, otherwise old database entries will fail or can not be migrated
-                }
-
-                job.setTries(++tries);
-
-                try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw);) {
-                    ex.printStackTrace(pw);
-                    String exception = sw.toString();
-                    if (exception.length() > MCRJob.EXCEPTION_MAX_LENGTH) {
-                        exception = exception.substring(0, MCRJob.EXCEPTION_MAX_LENGTH);
-                    }
-                    job.setException(exception);
-                } catch (Exception e) {
-                    LOGGER.error("Could not set exception for job {}", job.getId(), e);
-                }
-
-                if (tries >= config.maxTryCount(job.getAction()).orElseGet(config::maxTryCount)) {
-                    job.setStatus(MCRJobStatus.MAX_TRIES);
-                } else {
-                    job.setStatus(MCRJobStatus.ERROR);
-                }
-                listeners.forEach(l -> l.onError(job));
+                handleJobExecutionException(ex);
             }
             em.merge(job);
             transaction.commit();
@@ -138,6 +112,39 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
             em.close();
             MCRSessionMgr.releaseCurrentSession();
             mcrSession.close();
+        }
+    }
+
+    private void handleJobExecutionException(Exception ex) {
+        LOGGER.error("Exception occured while try to start job. Perform rollback.", ex);
+        setError(ex);
+        actionInstance.rollback();
+        Integer tries = job.getTries();
+        if (tries == null) {
+            tries = 0; // tries can be null, otherwise old database entries will fail or can not be migrated
+        }
+
+        job.setTries(++tries);
+        setExceptionInJob(ex);
+
+        if (tries >= config.maxTryCount(job.getAction()).orElseGet(config::maxTryCount)) {
+            job.setStatus(MCRJobStatus.MAX_TRIES);
+        } else {
+            job.setStatus(MCRJobStatus.ERROR);
+        }
+        listeners.forEach(l -> l.onError(job));
+    }
+
+    private void setExceptionInJob(Exception ex) {
+        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw);) {
+            ex.printStackTrace(pw);
+            String exception = sw.toString();
+            if (exception.length() > MCRJob.EXCEPTION_MAX_LENGTH) {
+                exception = exception.substring(0, MCRJob.EXCEPTION_MAX_LENGTH);
+            }
+            job.setException(exception);
+        } catch (Exception e) {
+            LOGGER.error("Could not set exception for job {}", job.getId(), e);
         }
     }
 

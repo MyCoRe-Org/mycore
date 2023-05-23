@@ -268,8 +268,8 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
     public void getNextJobs() {
         EntityManager em = getEntityManager().get();
 
-        allJobs.stream().forEach(em::persist);
-        xJobs.stream().forEach(em::persist);
+        allJobs.forEach(em::persist);
+        xJobs.forEach(em::persist);
 
         List<MCRJob> jobs = dao.getNextJobs(MCRTestJobAction.class, 1);
         assertAllPresent(List.of(job1), jobs);
@@ -293,8 +293,8 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
     public void remainingJobCount() {
         EntityManager em = getEntityManager().get();
 
-        allJobs.stream().forEach(em::persist);
-        xJobs.stream().forEach(em::persist);
+        allJobs.forEach(em::persist);
+        xJobs.forEach(em::persist);
 
         int jobs = dao.getRemainingJobCount(MCRTestJobAction.class);
         Assert.assertEquals("There should be 4 remaining jobs", 4, jobs);

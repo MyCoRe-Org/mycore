@@ -21,6 +21,7 @@ package org.mycore.services.queuedjob;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,13 +52,12 @@ import jakarta.persistence.RollbackException;
  * @author René Adler
  * @author Sebastian Hofmann
  */
-public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusListener {
+public class MCRJobThreadStarter implements Runnable, Closeable {
 
     private static final long ONE_MINUTE_IN_MS = TimeUnit.MINUTES.toMillis(1);
     private static final Logger LOGGER = LogManager.getLogger(MCRJobThreadStarter.class);
 
     private final MCRJobQueue jobQueue;
-    final AtomicInteger tNum = new AtomicInteger();
     private final ThreadPoolExecutor jobExecutor;
     private final Class<? extends MCRJobAction> action;
 
@@ -65,12 +65,12 @@ public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusLis
     private final MCRProcessableDefaultCollection processableCollection;
     private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
     private final ReentrantLock runLock;
-    private final MCRJobQueueEventListener listener;
+    private final ListenerNotifier listener;
     private MCRProcessableExecutor processableExecutor;
 
     private final AtomicInteger activeThreads = new AtomicInteger();
-    private int maxJobThreadCount;
-    private MCRJobConfig config;
+    private final int maxJobThreadCount;
+    private final MCRJobConfig config;
 
     MCRJobThreadStarter(Class<? extends MCRJobAction> action, MCRJobConfig config, MCRJobQueue jobQueue) {
         this.config = config;
@@ -81,35 +81,13 @@ public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusLis
         this.jobQueue = jobQueue;
 
         // listen for new jobs
-        listener = new MCRJobQueueEventListener() {
-            @Override
-            public void onJobAdded(MCRJob job) {
-                // a job was added to the queue, but the transaction is not yet committed, so we have to wait for it.
-                MCRSessionMgr.getCurrentSession().onCommit(() -> {
-                    synchronized (listener) {
-                        listener.notifyAll();
-                    }
-                });
-            }
-        };
+        listener = new ListenerNotifier();
         jobQueue.addListener(listener);
 
         maxJobThreadCount = config.maxJobThreadCount(action).orElseGet(config::maxJobThreadCount);
 
-        jobExecutor = new ThreadPoolExecutor(maxJobThreadCount, maxJobThreadCount, 1, TimeUnit.DAYS, workQueue,
-            (r) -> new Thread(r, getSimpleActionName() + "Worker#" + tNum.incrementAndGet())) {
-                @Override
-                protected void afterExecute(Runnable r, Throwable t) {
-                    super.afterExecute(r, t);
-                    activeThreads.decrementAndGet();
-                }
-
-                @Override
-                protected void beforeExecute(Thread t, Runnable r) {
-                    super.beforeExecute(t, r);
-                    activeThreads.incrementAndGet();
-                }
-            };
+        jobExecutor = new ActiveCountingThreadPoolExecutor(maxJobThreadCount, workQueue,
+            new JobThreadFactory(getSimpleActionName()), activeThreads);
 
         MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         processableCollection = new MCRProcessableDefaultCollection(getName());
@@ -200,19 +178,17 @@ public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusLis
                 transaction.commit();
             } catch (RollbackException e) {
                 LOGGER.error("Error while getting next job.", e);
-                if (transaction != null) {
-                    try {
-                        transaction.rollback();
-                    } catch (RuntimeException re) {
-                        LOGGER.warn("Could not rollback transaction.", re);
-                    }
+                try {
+                    transaction.rollback();
+                } catch (RuntimeException re) {
+                    LOGGER.warn("Could not rollback transaction.", re);
                 }
             } finally {
                 em.close();
             }
             if (job != null && action != null && action.isActivated() && !jobExecutor.isShutdown()) {
                 LOGGER.info("Creating:{}", job);
-                processableExecutor.submit(new MCRJobRunnable(job, config, List.of(this), action));
+                processableExecutor.submit(new MCRJobRunnable(job, config, List.of(listener), action));
                 return true;
             }
         } finally {
@@ -312,25 +288,90 @@ public class MCRJobThreadStarter implements Runnable, Closeable, MCRJobStatusLis
         return null;
     }
 
-    @Override
-    public void onError(MCRJob job) {
-        synchronized (listener) {
-            listener.notifyAll();
+    /**
+     * Notifies waiting threads when a job is set to error, success or processing. When a job is added to the queue, the
+     * Thread is notified after the session is committed.
+     */
+    private static final class ListenerNotifier implements MCRJobQueueEventListener, MCRJobStatusListener {
+
+        @Override
+        public void onJobAdded(MCRJob job) {
+            // a job was added to the queue, but the transaction is not yet committed, so we have to wait for it.
+            MCRSessionMgr.getCurrentSession().onCommit(() -> {
+                synchronized (this) {
+                    this.notifyAll();
+                }
+            });
+        }
+
+        @Override
+        public void onError(MCRJob job) {
+            synchronized (this) {
+                this.notifyAll();
+            }
+        }
+
+        @Override
+        public void onSuccess(MCRJob job) {
+            synchronized (this) {
+                this.notifyAll();
+            }
+        }
+
+        @Override
+        public void onProcessing(MCRJob job) {
+            synchronized (this) {
+                this.notifyAll();
+            }
         }
     }
 
-    @Override
-    public void onSuccess(MCRJob job) {
-        synchronized (listener) {
-            listener.notifyAll();
+    /**
+     * A {@link ThreadFactory} that creates threads with a given name prefix.
+     */
+    private static final class JobThreadFactory implements ThreadFactory {
+
+        private final String actionName;
+
+        private AtomicInteger tNum = new AtomicInteger(0);
+
+        JobThreadFactory(String simpleActionName) {
+            this.actionName = simpleActionName;
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, actionName + "Worker#" + tNum.incrementAndGet());
         }
     }
 
-    @Override
-    public void onProcessing(MCRJob job) {
-        synchronized (listener) {
-            listener.notifyAll();
+    /**
+     * A {@link ThreadPoolExecutor} that counts the number of active threads. (without iterating over the thread pool)
+     */
+    private static final class ActiveCountingThreadPoolExecutor extends ThreadPoolExecutor {
+
+        private final AtomicInteger activeThreads;
+
+        ActiveCountingThreadPoolExecutor(int maxJobThreadCount,
+            LinkedBlockingQueue<Runnable> workQueue,
+            JobThreadFactory jobThreadFactory,
+            AtomicInteger activeThreads) {
+            super(maxJobThreadCount, maxJobThreadCount, 1, TimeUnit.DAYS, workQueue, jobThreadFactory);
+            this.activeThreads = activeThreads;
         }
+
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            activeThreads.decrementAndGet();
+        }
+
+        @Override
+        protected void beforeExecute(Thread t, Runnable r) {
+            super.beforeExecute(t, r);
+            activeThreads.incrementAndGet();
+        }
+
     }
 
 }

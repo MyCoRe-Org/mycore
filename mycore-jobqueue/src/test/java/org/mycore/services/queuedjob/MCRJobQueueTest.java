@@ -45,12 +45,7 @@ public class MCRJobQueueTest extends MCRTestCase {
 
         MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, new MCRConfiguration2JobConfig(), mockDAO);
 
-        MCRJobQueueEventListener listener = new MCRJobQueueEventListener() {
-            @Override
-            public void onJobAdded(MCRJob job) {
-                notifiedJobs.add(job);
-            }
-        };
+        MCRJobQueueEventListener listener = notifiedJobs::add;
 
         queue.addListener(listener);
 

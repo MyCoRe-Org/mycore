@@ -42,7 +42,7 @@ public class MCRJobQueuePermission implements MCRResourceAccessChecker {
      */
     public static final String PERMISSION_LIST = "list-jobqueues";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRJobQueuePermission.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRJobQueuePermission.class);
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)
