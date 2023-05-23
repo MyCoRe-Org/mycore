@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -137,7 +138,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     public void delete(MCRObjectID mcrid, Date date, String user) throws MCRPersistenceException {
-        String prefix = "derivate".equals(mcrid.getTypeId()) ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE
+        String prefix = Objects.equals(mcrid.getTypeId(), "derivate") ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE
             : MCROCFLObjectIDPrefixHelper.MCROBJECT;
 
         if (MCROCFLDeleteUtils.checkPurgeObject(mcrid, prefix)) {
@@ -197,7 +198,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private String getOCFLObjectID(String mcrid) {
         String objectType = MCRObjectID.getInstance(mcrid).getTypeId();
-        return "derivate".equals(objectType) ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE + mcrid
+        return Objects.equals(objectType, "derivate") ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE + mcrid
             : MCROCFLObjectIDPrefixHelper.MCROBJECT + mcrid;
     }
 

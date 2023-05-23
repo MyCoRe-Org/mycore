@@ -104,6 +104,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         }
     }
 
+    @SuppressWarnings("JavaUtilDate")
     public void delete(MCRCategoryID mcrid) throws IOException {
         if (MCROCFLDeleteUtils.checkPurgeClass(mcrid)) {
             purge(mcrid);

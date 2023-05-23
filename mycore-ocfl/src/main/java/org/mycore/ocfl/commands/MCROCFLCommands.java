@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,7 @@ import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 
+@SuppressWarnings("JavaUtilDate")
 @MCRCommandGroup(name = "OCFL Commands")
 public class MCROCFLCommands {
 
@@ -217,7 +219,7 @@ public class MCROCFLCommands {
     }
 
     @MCRCommand(syntax = "restore object {0} from ocfl with version {1}",
-    help = "restore mcrobject {0} with version {1} to current store from ocfl history")
+        help = "restore mcrobject {0} with version {1} to current store from ocfl history")
     public static void restoreObjFromOCFLVersioned(String mcridString, String revision) throws IOException {
         MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
         MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
@@ -235,7 +237,7 @@ public class MCROCFLCommands {
     public static void restoreObjFromOCFL(String mcridString) throws IOException {
         restoreObjFromOCFLVersioned(mcridString, null);
     }
-    
+
     @MCRCommand(syntax = "purge object {0} from ocfl",
         help = "Permanently delete object {0} and its history from ocfl")
     public static void purgeObject(String mcridString) throws IOException {
@@ -300,8 +302,8 @@ public class MCROCFLCommands {
         repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.MCROBJECT)
                 || obj.startsWith(MCROCFLObjectIDPrefixHelper.MCRDERIVATE))
-            .filter(obj -> "Deleted".equals(repository.describeObject(obj)
-                .getHeadVersion().getVersionInfo().getMessage()))
+            .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
+                "Deleted"))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.MCROBJECT, ""))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.MCRDERIVATE, ""))
             .forEach(oId -> manager.purge(MCRObjectID.getInstance(oId), new Date(),
@@ -324,11 +326,11 @@ public class MCROCFLCommands {
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         MCROCFLXMLClassificationManager manager = MCRConfiguration2
-                    .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager").orElseThrow();
+            .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager").orElseThrow();
         repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
-            .filter(obj -> MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
-                .getHeadVersion().getVersionInfo().getMessage()))
+            .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
+                MCROCFLXMLClassificationManager.MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .forEach(cId -> manager.purge(MCRCategoryID.fromString(cId)));
         confirmPurgeMarked = false;
@@ -350,8 +352,8 @@ public class MCROCFLCommands {
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
-            .filter(obj -> MCROCFLXMLUserManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
-                .getHeadVersion().getVersionInfo().getMessage()))
+            .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
+                MCROCFLXMLUserManager.MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .forEach(u -> new MCROCFLXMLUserManager().purgeUser(u));
         confirmPurgeMarked = false;
@@ -365,8 +367,9 @@ public class MCROCFLCommands {
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
-            .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
-                .getHeadVersion().getVersionInfo().getMessage()))
+            .filter(
+                obj -> !Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
+                    MCROCFLXMLClassificationManager.MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .filter(Predicate.not(classDAOList::contains))
             .collect(Collectors.toList());
@@ -380,8 +383,9 @@ public class MCROCFLCommands {
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
-            .filter(obj -> !MCROCFLXMLUserManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
-                .getHeadVersion().getVersionInfo().getMessage()))
+            .filter(
+                obj -> !Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
+                    MCROCFLXMLUserManager.MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .filter(Predicate.not(userEMList::contains))
             .collect(Collectors.toList());
