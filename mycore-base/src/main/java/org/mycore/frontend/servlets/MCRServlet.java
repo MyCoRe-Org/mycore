@@ -38,6 +38,7 @@ import java.util.Properties;
 
 import javax.xml.transform.TransformerException;
 
+import jakarta.servlet.UnavailableException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -87,9 +88,6 @@ public class MCRServlet extends HttpServlet {
 
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration2.getBoolean("MCR.Servlet.BrowserCache.enable")
         .orElse(false);
-
-    private boolean disabled;
-
     private static MCRLayoutService LAYOUT_SERVICE;
 
     private static String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
@@ -110,11 +108,11 @@ public class MCRServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         String servletName = config.getServletName();
-        disabled = MCRConfiguration2.getBoolean("MCR.Servlet." + servletName + ".Disabled")
+        boolean disabled = MCRConfiguration2.getBoolean("MCR.Servlet." + servletName + ".Disabled")
             .orElse(false);
 
         if (disabled) {
-            LOGGER.info("Servlet {} is disabled", servletName);
+            throw new UnavailableException("Servlet " + servletName + " is disabled in configuration.");
         }
     }
 
@@ -304,10 +302,6 @@ public class MCRServlet extends HttpServlet {
      */
     private void doGetPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException,
         SAXException, TransformerException {
-        if (disabled) {
-            res.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "This servlet is disabled.");
-            return;
-        }
         initializeMCRSession(req, getServletName());
 
         if (SERVLET_URL == null) {
