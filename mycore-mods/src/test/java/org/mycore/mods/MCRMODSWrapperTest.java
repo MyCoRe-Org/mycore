@@ -131,19 +131,23 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertFalse("sthesle type should not be supported.", MCRMODSWrapper.isSupported(mycoreSthelse));
     }
 
+    @Test
     public void testGetLinkedRelatedItems() throws SAXParseException, IOException {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
 
         Element relatedItem = new Element("relatedItem", MCRConstants.MODS_NAMESPACE);
         relatedItem.setAttribute("href", "mir_test_00000001", MCRConstants.XLINK_NAMESPACE);
-        relatedItem.setAttribute("type", "series");
         mods.addContent(relatedItem);
-
         wrapper.setID("JUnit", 4711);
         wrapper.setMODS(mods);
+        assertEquals("There should be no related item!", 0, wrapper.getLinkedRelatedItems().size());
 
-        assertEquals("There should be one related item!", wrapper.getLinkedRelatedItems().size(), 1);
+        relatedItem.setAttribute("type", "");
+        assertEquals("There should be no related item!", 0, wrapper.getLinkedRelatedItems().size());
+
+        relatedItem.setAttribute("type", "series");
+        assertEquals("There should be one related item!", 1, wrapper.getLinkedRelatedItems().size());
     }
 
     @Override

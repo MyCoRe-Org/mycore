@@ -23,10 +23,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -57,8 +59,8 @@ public class MCRMODSWrapper {
         + " and ancestor::mycoreobject/structure/parents/parent or"
         + " string-length(substring-after(@xlink:href,'_')) > 0 and"
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
-        + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and" + " contains('"
-        + MCRMODSRelationshipType.xPathList() + "', @type)]";
+        + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and"
+        + " " + xPathRelationshipTypeTest() + "]";
 
     private static final String MODS_CONTAINER = "modsContainer";
 
@@ -355,5 +357,11 @@ public class MCRMODSWrapper {
         return getElements(
             "mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI)"
                 + " and not(ancestor::mods:relatedItem)]");
+    }
+
+    private static String xPathRelationshipTypeTest() {
+        return Stream.of(MCRMODSRelationshipType.values())
+            .map(s -> String.format(Locale.ROOT, "@type='%s'", s))
+            .collect(Collectors.joining(" or "));
     }
 }
