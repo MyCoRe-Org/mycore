@@ -18,23 +18,24 @@
 
 package org.mycore.pi.urn.rest;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.mcr.cronjob.MCRCronjob;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
+import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
-
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.RollbackException;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 /**
  * Check if created URNs are registered at the DNB
@@ -43,7 +44,7 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private int batchSize;
+    private int batchSize = 20;
 
     @MCRProperty(name = "BatchSize", defaultName = "MCR.CronJob.Default.URNGranularRESTRegistration.BatchSize")
     public void setBatchSize(String batchSize) {
@@ -58,7 +59,28 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
     @Override
     public void runJob() {
         MCRDNBURNRestClient client = new MCRDNBURNRestClient(getBundleProvider(), getUsernamePasswordCredentials());
-        setRegisteredDateForUnregisteredIdentifiers(client);
+
+        try {
+            List<MCRPI> unregisteredURNs
+                = MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, batchSize);
+
+            for (MCRPI urn : unregisteredURNs) {
+                client.register(urn).ifPresent(date -> setRegisterDate(urn, date));
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error occured while registering URNs!", e);
+        }
+    }
+
+    private void setRegisterDate(MCRPI mcrpi, Date registerDate) {
+        try {
+            new MCRFixedUserCallable<>(() -> {
+                mcrpi.setRegistered(registerDate);
+                return MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
+            }, MCRSystemUserInformation.getJanitorInstance()).call();
+        } catch (Exception e) {
+            LOGGER.error("Error while set registered date!", e);
+        }
     }
 
     private Function<MCRPIRegistrationInfo, MCRURNJsonBundle> getBundleProvider() {
@@ -74,58 +96,5 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
         }
         return Optional.of(new UsernamePasswordCredentials(username, password));
     }
-
-    private void setRegisteredDateForUnregisteredIdentifiers(MCRDNBURNRestClient dnburnClient) {
-
-        UnaryOperator<Integer> register = batchSize -> MCRPIManager.getInstance()
-            .setRegisteredDateForUnregisteredIdentifiers(MCRDNBURN.TYPE, dnburnClient::register, batchSize);
-
-        int numOfRegisteredObj = MCRTransactionExec.cute(register).apply(batchSize);
-        while (numOfRegisteredObj > 0) {
-            numOfRegisteredObj = MCRTransactionExec.cute(register).apply(batchSize);
-        }
-
-    }
-
-    private static class MCRTransactionExec {
-        public static <T, R> Function<T, R> cute(Function<T, R> function) {
-            return t -> {
-                EntityTransaction tx = beginTransaction();
-
-                try {
-                    return function.apply(t);
-                } finally {
-                    endTransaction(tx);
-                }
-            };
-        }
-
-        private static EntityTransaction beginTransaction() {
-            EntityTransaction tx = MCREntityManagerProvider
-                .getCurrentEntityManager()
-                .getTransaction();
-
-            tx.begin();
-            return tx;
-        }
-
-        private static void endTransaction(EntityTransaction tx) {
-            if (tx != null && tx.isActive()) {
-                if (tx.getRollbackOnly()) {
-                    tx.rollback();
-                } else {
-                    try {
-                        tx.commit();
-                    } catch (RollbackException e) {
-                        if (tx.isActive()) {
-                            tx.rollback();
-                        }
-                        throw e;
-                    }
-                }
-            }
-        }
-    }
-
 }
 

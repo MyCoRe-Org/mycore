@@ -37,6 +37,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -44,7 +45,6 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 /**
@@ -110,7 +110,7 @@ public class MCRDNBURNRestClient {
      * @return the request url
      * */
     protected String getBaseServiceCheckExistsURL(MCRPIRegistrationInfo urn) {
-        return getUpdateURL(urn);
+        return getBaseServiceURL() + "urn/" + urn.getIdentifier();
     }
 
     /**
@@ -157,6 +157,7 @@ public class MCRDNBURNRestClient {
             LOGGER.info("URN {} is not registered", identifier);
             return registerNew(urn);
         default:
+            LOGGER.error("Error while check if URN {} exists using url {}.", identifier, url);
             logFailure("", response, status, urn.getIdentifier(), bundle.getUrl());
             break;
         }
@@ -186,7 +187,8 @@ public class MCRDNBURNRestClient {
                 }
                 break;
             default:
-                MCRDNBURNRestClient.logFailure("", response, statusCode, identifier, url);
+                LOGGER.error("Error while get registration info for URN {} using url {}.", identifier, url);
+                logFailure("", response, statusCode, identifier, url);
                 break;
         }
         return Optional.empty();
@@ -229,6 +231,7 @@ public class MCRDNBURNRestClient {
                 .map(Instant::from)
                 .map(Date::from);
         default:
+            LOGGER.error("Error while register new URN {} using url {}.", identifier, url);
             logFailure(json, response, postStatus, identifier, url);
             break;
         }
@@ -270,6 +273,7 @@ public class MCRDNBURNRestClient {
                 .map(Instant::from)
                 .map(Date::from);
         default:
+            LOGGER.error("Error while update URN {} using url {}.", identifier, updateURL);
             logFailure(json, response, patchStatus, identifier, bundle.getUrl());
             break;
         }
@@ -282,17 +286,18 @@ public class MCRDNBURNRestClient {
         logFailure(json, response, postStatus, identifier, url.toString());
     }
 
-    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier,
+    public static void logFailure(String json, CloseableHttpResponse response, int status, String identifier,
         String url) {
-        try (Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)) {
-            JsonElement jsonElement = JsonParser.parseReader(reader);
-            LOGGER.error("{}: {} ({})", postStatus,
-                jsonElement.getAsJsonObject().get("developerMessage"), identifier);
-        } catch (IOException | JsonParseException e) {
-            LOGGER.error(
-                "Could not handle urn post request: status={}, " +
-                    "urn={}, url={} json={}",
-                postStatus, identifier, url, json);
+        HttpEntity entity = response.getEntity();
+        LOGGER.error(
+            "Could not handle urn http request: status={}, " +
+                "urn={}, url={} json={}",
+            status, identifier, url, json);
+        try {
+            String errBody = EntityUtils.toString(entity, "UTF-8");
+            LOGGER.error("Server error message: {}", errBody);
+        } catch (IOException e) {
+            LOGGER.error("Could not get error body from http request", e);
         }
     }
 }
