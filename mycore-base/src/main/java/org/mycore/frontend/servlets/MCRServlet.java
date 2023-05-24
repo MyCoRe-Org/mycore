@@ -38,6 +38,7 @@ import java.util.Properties;
 
 import javax.xml.transform.TransformerException;
 
+import jakarta.servlet.UnavailableException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -55,6 +56,7 @@ import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -86,7 +88,6 @@ public class MCRServlet extends HttpServlet {
 
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration2.getBoolean("MCR.Servlet.BrowserCache.enable")
         .orElse(false);
-
     private static MCRLayoutService LAYOUT_SERVICE;
 
     private static String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
@@ -100,6 +101,18 @@ public class MCRServlet extends HttpServlet {
         super.init();
         if (LAYOUT_SERVICE == null) {
             LAYOUT_SERVICE = MCRLayoutService.instance();
+        }
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        String servletName = config.getServletName();
+        boolean disabled = MCRConfiguration2.getBoolean("MCR.Servlet." + servletName + ".Disabled")
+            .orElse(false);
+
+        if (disabled) {
+            throw new UnavailableException("Servlet " + servletName + " is disabled in configuration.");
         }
     }
 
