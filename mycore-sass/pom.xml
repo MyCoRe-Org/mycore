@@ -38,8 +38,8 @@
       <artifactId>closure-stylesheets</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.bit3</groupId>
-      <artifactId>jsass</artifactId>
+      <groupId>de.larsgrefer.sass</groupId>
+      <artifactId>sass-embedded-host</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

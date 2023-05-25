@@ -19,8 +19,8 @@
 package org.mycore.sass;
 
 import java.io.IOException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -38,14 +38,12 @@ import com.google.common.css.compiler.ast.GssParserException;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.NullGssSourceMapGenerator;
 
-import io.bit3.jsass.CompilationException;
-import io.bit3.jsass.Compiler;
-import io.bit3.jsass.Options;
-import io.bit3.jsass.Output;
-import io.bit3.jsass.context.FileContext;
-import io.bit3.jsass.context.StringContext;
-import io.bit3.jsass.importer.Import;
-import io.bit3.jsass.importer.Importer;
+import de.larsgrefer.sass.embedded.SassCompilationFailedException;
+import de.larsgrefer.sass.embedded.SassCompiler;
+import de.larsgrefer.sass.embedded.SassCompilerFactory;
+import de.larsgrefer.sass.embedded.importer.CustomImporter;
+import de.larsgrefer.sass.embedded.importer.FileImporter;
+import de.larsgrefer.sass.embedded.importer.Importer;
 
 /**
  * Compiles .scss to .css or .min.css using different sources ({@link Importer}s)
@@ -81,7 +79,7 @@ public class MCRSassCompilerManager {
      * @throws IOException if {@link Compiler#compile(FileContext)} throws
      */
     public synchronized Optional<String> getCSSFile(String file, List<Importer> importer)
-        throws CompilationException, IOException {
+        throws IOException, SassCompilationFailedException {
         if (!isDeveloperMode() && fileCompiledContentMap.containsKey(file)) {
             return Optional.of(fileCompiledContentMap.get(file));
         } else {
@@ -112,33 +110,23 @@ public class MCRSassCompilerManager {
      * @return the compiled css
      * @throws CompilationException
      */
-    private String compile(String name, List<Importer> importer) throws CompilationException, IOException {
-        Options options = new Options();
-        Collection<Importer> importerList = options.getImporters();
-        importerList.addAll(importer);
-
-        String realFileName = name.replace(".min.css", ".scss").replace(".css", ".scss");
-
-        Optional<Import> importedStartStylesheet = importer.stream()
-            .map(i -> i.apply(realFileName, null))
-            .filter(Objects::nonNull)
-            .map(i -> i.stream().findFirst())
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
-
-        if (!importedStartStylesheet.isPresent()) {
-            return null;
+    private String compile(String name, List<Importer> importer) throws IOException, SassCompilationFailedException {
+        String css;
+        try (SassCompiler sassCompiler = SassCompilerFactory.bundled()) {
+            importer.forEach(i -> registerImporter(sassCompiler, i));
+            String realFileName = name.replace(".min.css", ".scss").replace(".css", ".scss");
+            URL resource = importer.stream()
+                .map(i -> toURL(i, realFileName))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseGet(() -> getClass().getResource("/" + name));
+            if (resource == null) {
+                return null;
+            }
+            var compileSuccess = sassCompiler.compile(resource);
+            css = compileSuccess.getCss();
         }
 
-        Import firstImport = importedStartStylesheet.get();
-
-        StringContext context = new StringContext(firstImport.getContents(), firstImport.getAbsoluteUri(),
-            firstImport.getAbsoluteUri(), options);
-        Compiler compiler = new Compiler();
-        Output output = compiler.compile(context);
-
-        String css = output.getCss();
         boolean compress = name.endsWith(".min.css");
         if (compress) {
             try {
@@ -163,6 +151,29 @@ public class MCRSassCompilerManager {
 
         return css;
 
+    }
+
+    private void registerImporter(SassCompiler sassCompiler, Importer importer) {
+        if (importer instanceof FileImporter fi) {
+            sassCompiler.registerImporter(fi);
+        }
+        if (importer instanceof CustomImporter ci) {
+            sassCompiler.registerImporter(ci);
+        }
+    }
+
+    private URL toURL(Importer importer, String name) {
+        try {
+            if (importer instanceof FileImporter fi) {
+                return fi.handleImport(name, false).toURI().toURL();
+            }
+            if (importer instanceof CustomImporter ci) {
+                return new URL(ci.canonicalize(name, false));
+            }
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
+        return null;
     }
 
     /**

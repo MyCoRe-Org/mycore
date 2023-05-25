@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,15 @@ public class MCRDeveloperTools {
      */
     public static boolean overrideActive() {
         return MCRConfiguration2.getString("MCR.Developer.Resource.Override").isPresent();
+    }
+
+    public static Stream<Path> getOverridePaths() {
+        if (!overrideActive()) {
+            return Stream.empty();
+        }
+        return MCRConfiguration2
+            .getOrThrow("MCR.Developer.Resource.Override", MCRConfiguration2::splitValue)
+            .map(Paths::get);
     }
 
     /**
