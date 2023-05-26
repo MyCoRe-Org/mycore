@@ -18,118 +18,76 @@
 
 package org.mycore.sass;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRDeveloperTools;
 
-import de.larsgrefer.sass.embedded.importer.CanonicalizationHelper;
-import de.larsgrefer.sass.embedded.importer.CustomUrlImporter;
+import de.larsgrefer.sass.embedded.importer.Servlet5ContextImporter;
 import jakarta.servlet.ServletContext;
 
 /**
  * Imports scss files using {@link ServletContext}.
  */
-public class MCRServletContextResourceImporter extends CustomUrlImporter {
+public class MCRServletContextResourceImporter extends Servlet5ContextImporter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ServletContext context;
+    private final URI baseURL;
+
     private final Path webappPath;
 
-    private final Deque<ResolvedUri> previousUris = new ArrayDeque<>();
-
-    private long resolvingTime = 0;
-    private int resolveCount = 0;
-
-    /**
-     * Initialize MCRServletContextResourceImporter
-     * @param context - the servlet context
-     */
-    public MCRServletContextResourceImporter(ServletContext context) {
-        this.context = context;
-        this.webappPath = Paths.get(context.getRealPath("/"));
-
+    public MCRServletContextResourceImporter(ServletContext servletContext, String baseURL) {
+        super(servletContext);
+        this.baseURL = URI.create(baseURL);
+        this.webappPath = Paths.get(servletContext.getRealPath("/"));
     }
 
     @Override
-    public URL canonicalizeUrl(String url) {
-        long start = System.currentTimeMillis();
-        /*
-         this mehod is called pre-order, so we can stack previous imports
-         addToDeque is used to keep the previousUris size small.
-         We assume that we do not need keep urls in it that were absulute URIs
-         This will reduce the candidate size drastically
-         */
-        boolean addToDeque = true;
-        try {
-            String modifiedURL = url;
-            Optional<URL> firstPossibleName;
-            if (previousUris.isEmpty()) {
-                //main sass file
-                firstPossibleName = tryResolve(url);
-            } else {
-                //this is only a heuristical try, as we have no base URI to resolve against
-                //it will work if `url` can only be resolved against ONE base URI of `previousUris` or
-                //if the lowest matching import node is the right one
-                modifiedURL = unResolve(modifiedURL); //strip prefix to web resource
-                addToDeque = modifiedURL.equals(url); //not for absoluteUris
-                ResolvedUri previous;
-                do {
-                    previous = previousUris.pollLast();
-                    LOGGER.debug("\nurl:{}\nmodified:{}\nprevious:{}", url, modifiedURL, previous);
-                    final String candidate = previous.modified.resolve(modifiedURL).toString();
-                    firstPossibleName = tryResolve(candidate);
-                    if (firstPossibleName.isPresent()) {
-                        modifiedURL = candidate;
-                    }
-                } while (firstPossibleName.isEmpty() && !previousUris.isEmpty());
-                //main sass up to the previous match should be kept for the next search
-                previousUris.add(previous);
-            }
-
-            if (firstPossibleName.isEmpty()) {
-                return null;
-            }
-            URL resource = firstPossibleName.get();
-
-            LOGGER.debug("Resolved {} to {}", url, resource);
-            if (addToDeque) {
-                previousUris.add(new ResolvedUri(url, URI.create(modifiedURL), resource));
-            }
-            return resource;
-        } finally {
-            resolvingTime += System.currentTimeMillis() - start;
-            resolveCount++;
-            LOGGER.debug("Accumulated resolving time: {} ms, deque size: {}, i: {}", resolvingTime, previousUris.size(),
-                resolveCount);
+    public String canonicalize(String url, boolean fromImport) throws Exception {
+        String modifiedUrl = getRelativePart(url);
+        URI resolveURI;
+        if (modifiedUrl.equals(url)) {
+            resolveURI = modifiedUrl.equals(baseURL.toString()) ? baseURL : baseURL.resolve(modifiedUrl);
+        } else {
+            resolveURI = URI.create(modifiedUrl);
         }
+        var filePath = MCRDeveloperTools.getOverriddenFilePath(resolveURI.toString(), true)
+            .filter(Files::isRegularFile); //needs to be a file not a directory
+        URL resource;
+        if (filePath.isPresent()) {
+            resource = filePath.get().toUri().toURL();
+        } else {
+            resource = super.canonicalizeUrl(resolveURI.toString());
+            if (resource != null && resource.getFile().endsWith("/")) {
+                //needs to be a file not a directory
+                resource = null;
+            }
+        }
+        LOGGER.debug("Resolved {} to {}", url, resource);
+        return resource == null ? null : resource.toString();
     }
 
-    private String unResolve(String modifiedURL) {
-        //unresolved urls must return String starting with "/"
+    private String getRelativePart(String modifiedURL) {
         if (modifiedURL.startsWith("jar:")) {
             final String webResourcePrefix = "!/META-INF/resources/";
-            return modifiedURL.substring(modifiedURL.indexOf(webResourcePrefix) + webResourcePrefix.length() - 1);
+            return modifiedURL.substring(modifiedURL.indexOf(webResourcePrefix) + webResourcePrefix.length());
         }
         if (modifiedURL.startsWith("file:")) {
             final Path localFile = Paths.get(URI.create(modifiedURL));
-            return Stream.concat(MCRDeveloperTools.getOverridePaths(), Stream.of(webappPath))
+            return Stream
+                .concat(MCRDeveloperTools.getOverridePaths().map(p -> p.resolve("META-INF").resolve("resources")),
+                    Stream.of(webappPath))
                 .filter(p -> localFile.startsWith(p))
                 .findAny()
                 .map(basePath -> basePath.relativize(localFile))
-                .map(p -> "/" + p.toString())
+                .map(Path::toString)
                 .orElseThrow();
         }
         if (!modifiedURL.contains(":")) {
@@ -140,32 +98,4 @@ public class MCRServletContextResourceImporter extends CustomUrlImporter {
         return modifiedURL;
     }
 
-    private Optional<URL> tryResolve(String url) {
-        String myUrl = url.startsWith("/") ? url.substring(1) : url;
-        List<String> possiblePaths = CanonicalizationHelper.resolvePossiblePaths(myUrl);
-
-        Optional<URL> firstPossibleName = possiblePaths.stream()
-            .map(possiblePath -> {
-                try {
-                    if (MCRDeveloperTools.overrideActive()) {
-                        final Optional<Path> overriddenFilePath
-                            = MCRDeveloperTools.getOverriddenFilePath(possiblePath, true);
-
-                        if (overriddenFilePath.isPresent()) {
-                            return overriddenFilePath.get().toUri().toURL();
-                        }
-                    }
-                    return context.getResource("/" + possiblePath);
-                } catch (MalformedURLException e) {
-                    // ignore exception because it seems to be a not valid name form
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
-            .findFirst();
-        return firstPossibleName;
-    }
-
-    private record ResolvedUri(String original, URI modified, URL resolved) {
-    }
 }

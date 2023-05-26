@@ -114,7 +114,7 @@ public class MCRSassCompilerManager {
         String css;
         try (SassCompiler sassCompiler = SassCompilerFactory.bundled()) {
             importer.forEach(i -> registerImporter(sassCompiler, i));
-            String realFileName = name.replace(".min.css", ".scss").replace(".css", ".scss");
+            String realFileName = getRealFileName(name);
             URL resource = importer.stream()
                 .map(i -> toURL(i, realFileName))
                 .filter(Objects::nonNull)
@@ -151,6 +151,10 @@ public class MCRSassCompilerManager {
 
         return css;
 
+    }
+
+    public static String getRealFileName(String name) {
+        return name.replace(".min.css", ".scss").replace(".css", ".scss");
     }
 
     private void registerImporter(SassCompiler sassCompiler, Importer importer) {

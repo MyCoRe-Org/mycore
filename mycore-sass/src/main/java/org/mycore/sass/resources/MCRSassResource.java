@@ -30,6 +30,7 @@ import org.mycore.sass.MCRSassCompilerManager;
 import org.mycore.sass.MCRServletContextResourceImporter;
 
 import de.larsgrefer.sass.embedded.SassCompilationFailedException;
+import de.larsgrefer.sass.embedded.importer.CustomImporter;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -65,7 +66,8 @@ public class MCRSassResource {
     @Produces("text/css")
     public Response getCSS(@PathParam("fileName") String name, @Context Request request) {
         try {
-            MCRServletContextResourceImporter importer = new MCRServletContextResourceImporter(context);
+            final String fileName = MCRSassCompilerManager.getRealFileName(name);
+            CustomImporter importer = new MCRServletContextResourceImporter(context, fileName).autoCanonicalize();
             Optional<String> cssFile = MCRSassCompilerManager.getInstance()
                 .getCSSFile(name, List.of(importer));
 
