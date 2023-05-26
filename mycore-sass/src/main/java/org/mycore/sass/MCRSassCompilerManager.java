@@ -39,8 +39,7 @@ import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.NullGssSourceMapGenerator;
 
 import de.larsgrefer.sass.embedded.SassCompilationFailedException;
-import de.larsgrefer.sass.embedded.SassCompiler;
-import de.larsgrefer.sass.embedded.SassCompilerFactory;
+import de.larsgrefer.sass.embedded.connection.ConnectionFactory;
 import de.larsgrefer.sass.embedded.importer.CustomImporter;
 import de.larsgrefer.sass.embedded.importer.FileImporter;
 import de.larsgrefer.sass.embedded.importer.Importer;
@@ -112,7 +111,7 @@ public class MCRSassCompilerManager {
      */
     private String compile(String name, List<Importer> importer) throws IOException, SassCompilationFailedException {
         String css;
-        try (SassCompiler sassCompiler = SassCompilerFactory.bundled()) {
+        try (MCRSassCompiler sassCompiler = new MCRSassCompiler(ConnectionFactory.bundled())) {
             importer.forEach(i -> registerImporter(sassCompiler, i));
             String realFileName = getRealFileName(name);
             URL resource = importer.stream()
@@ -157,7 +156,7 @@ public class MCRSassCompilerManager {
         return name.replace(".min.css", ".scss").replace(".css", ".scss");
     }
 
-    private void registerImporter(SassCompiler sassCompiler, Importer importer) {
+    private void registerImporter(MCRSassCompiler sassCompiler, Importer importer) {
         if (importer instanceof FileImporter fi) {
             sassCompiler.registerImporter(fi);
         }
