@@ -305,7 +305,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         }
 
         @Override
-        public void onError(MCRJob job) {
+        public void onError(MCRJob job, Exception e) {
             synchronized (this) {
                 this.notifyAll();
             }

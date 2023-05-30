@@ -31,8 +31,9 @@ public interface MCRJobStatusListener {
     /**
      * Will be called when the job has failed.
      * @param job the job that failed
+     * @param e the exception that caused the failure
      */
-    void onError(MCRJob job);
+    void onError(MCRJob job, Exception e);
 
     /**
      * Will be called when the job has finished successfully.

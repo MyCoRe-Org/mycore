@@ -18,14 +18,13 @@
 
 package org.mycore.services.queuedjob;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -34,6 +33,10 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.processing.MCRAbstractProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceException;
 
 /**
  * This class execute the specified action for {@link MCRJob} and performs {@link MCRJobAction#rollback()}
@@ -64,9 +67,9 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
      * @param actionInstance the action instance to execute
      */
     public MCRJobRunnable(MCRJob job,
-                          MCRJobConfig config,
-                          List<MCRJobStatusListener> additionalListeners,
-                          MCRJobAction actionInstance) {
+        MCRJobConfig config,
+        List<MCRJobStatusListener> additionalListeners,
+        MCRJobAction actionInstance) {
         this.job = job;
         this.config = config;
         this.actionInstance = actionInstance;
@@ -79,73 +82,113 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
     }
 
     public void run() {
+        //prepare environment
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         EntityManager em = MCREntityManagerProvider.getEntityManagerFactory().createEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
+            Exception executionException = null;
+            listeners.forEach(l -> l.onProcessing(job));
+            //prepare job
             transaction.begin();
-
+            MCRJob localJob;
+            setStatus(MCRProcessableStatus.processing);
+            job.setStart(new Date());
+            localJob = em.merge(job);
             try {
-                setStatus(MCRProcessableStatus.processing);
-                job.setStart(new Date());
-                listeners.forEach(l -> l.onProcessing(job));
-
-                actionInstance.execute();
-
-                job.setFinished(new Date());
-                job.setStatus(MCRJobStatus.FINISHED);
-                setStatus(MCRProcessableStatus.successful);
-                listeners.forEach(l -> l.onSuccess(job));
-            } catch (Exception ex) {
-                handleJobExecutionException(ex);
-            }
-            em.merge(job);
-            transaction.commit();
-        } catch (Exception e) {
-            LOGGER.error("Error while getting next job.", e);
-            if (transaction != null) {
+                transaction.commit();
+            } catch (PersistenceException e) {
+                executionException = e;
+                LOGGER.error("Could not start job {}", job.getId(), e);
                 transaction.rollback();
             }
+            if (executionException == null) {
+                //execute job
+                transaction.begin();
+                localJob = em.merge(localJob);
+                try {
+                    actionInstance.execute();
+                    transaction.commit();
+                } catch (Exception ex) {
+                    executionException = ex;
+                    transaction.rollback();
+                    try {
+                        actionInstance.rollback();
+                    } catch (RuntimeException e) {
+                        executionException.addSuppressed(e);
+                        LOGGER.error("Could not rollback job {}", job.getId(), e);
+                    }
+                }
+                //handle result
+                transaction.begin();
+                localJob = em.merge(localJob);
+                localJob.setFinished(new Date());
+                if (executionException == null) {
+                    handleSuccess(localJob);
+                } else {
+                    handleException(localJob, executionException);
+                }
+                try {
+                    transaction.commit();
+                } catch (PersistenceException e) {
+                    LOGGER.error("Could not save result to job {}", job.getId(), e);
+                    transaction.rollback();
+                    if (executionException == null) {
+                        executionException = e;
+                    } else {
+                        executionException.addSuppressed(e);
+                    }
+                }
+            }
+            //inform listeners
+            final Exception finalException = executionException;
+            listeners.forEach(l -> {
+                if (finalException == null) {
+                    l.onSuccess(job);
+                } else {
+                    l.onError(job, finalException);
+                }
+            });
         } finally {
+            //clean up
             em.close();
             MCRSessionMgr.releaseCurrentSession();
             mcrSession.close();
         }
     }
 
-    private void handleJobExecutionException(Exception ex) {
-        LOGGER.error("Exception occured while try to start job. Perform rollback.", ex);
-        setError(ex);
-        actionInstance.rollback();
-        Integer tries = job.getTries();
-        if (tries == null) {
-            tries = 0; // tries can be null, otherwise old database entries will fail or can not be migrated
-        }
-
-        job.setTries(++tries);
-        setExceptionInJob(ex);
-
-        if (tries >= config.maxTryCount(job.getAction()).orElseGet(config::maxTryCount)) {
-            job.setStatus(MCRJobStatus.MAX_TRIES);
-        } else {
-            job.setStatus(MCRJobStatus.ERROR);
-        }
-        listeners.forEach(l -> l.onError(job));
+    private void handleSuccess(MCRJob localJob) {
+        localJob.setStatus(MCRJobStatus.FINISHED);
+        setStatus(MCRProcessableStatus.successful);
     }
 
-    private void setExceptionInJob(Exception ex) {
+    private void handleException(MCRJob localJob, Exception executionException) {
         try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw);) {
-            ex.printStackTrace(pw);
+            executionException.printStackTrace(pw);
             String exception = sw.toString();
             if (exception.length() > MCRJob.EXCEPTION_MAX_LENGTH) {
                 exception = exception.substring(0, MCRJob.EXCEPTION_MAX_LENGTH);
             }
-            job.setException(exception);
-        } catch (Exception e) {
+            //TODO: check if changes to entities are reflected in database at next transaction or lost
+            localJob.setException(exception);
+        } catch (IOException e) {
             LOGGER.error("Could not set exception for job {}", job.getId(), e);
         }
-    }
 
+        Integer tries = localJob.getTries();
+        if (tries == null) {
+            tries = 0; // tries can be null, otherwise old database entries will fail or can not be migrated
+        }
+
+        localJob.setTries(++tries);
+
+        if (tries >= config.maxTryCount(job.getAction()).orElseGet(config::maxTryCount)) {
+            localJob.setStatus(MCRJobStatus.MAX_TRIES);
+        } else {
+            localJob.setStatus(MCRJobStatus.ERROR);
+        }
+        setError(executionException);
+    }
 }

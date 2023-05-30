@@ -41,7 +41,7 @@ public class MCRDefaultJobStatusListener implements MCRJobStatusListener {
     }
 
     @Override
-    public void onError(MCRJob job) {
-        LOGGER.debug("Error {}", job.getAction().getName());
+    public void onError(MCRJob job, Exception e) {
+        LOGGER.debug(() -> "Error " + job.getAction().getName(), e);
     }
 }

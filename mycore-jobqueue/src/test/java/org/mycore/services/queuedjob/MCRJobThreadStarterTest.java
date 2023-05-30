@@ -18,9 +18,12 @@
 
 package org.mycore.services.queuedjob;
 
+import jakarta.persistence.EntityTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRJPATestCase;
@@ -35,13 +38,18 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static List<MCRJob> getAllJobs(MCRJobDAOJPAImpl dao, Class<? extends MCRJobAction> action) {
+        return dao.getJobs(action, null, null, null, null);
+    }
+
     @Override
+    @Before
     public void setUp() throws Exception {
         super.setUp();
     }
 
-
     @Override
+    @After
     public void tearDown() throws Exception {
         super.tearDown();
     }
@@ -49,7 +57,8 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
     @Test
     public void testRun() {
         MCRConfiguration2JobConfig config = new MCRConfiguration2JobConfig();
-        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, config, new MCRMockJobDAO());
+        MCRJobDAOJPAImpl dao = new MCRJobDAOJPAImpl();
+        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, config, dao);
         MCRJobThreadStarter starter = new MCRJobThreadStarter(MCRTestJobAction.class, config, queue);
 
         Date baseTime = new Date();
@@ -70,31 +79,39 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
 
         MCRJob job3 = new MCRJob(MCRTestJobAction.class);
         job3.setParameter("count", "3");
-        job3.setParameter("error", "false");
+        job3.setParameter("error", "true");
         job3.setStatus(MCRJobStatus.NEW);
         job3.setAdded(new Date(baseTime.getTime() + 60));
         queue.offer(job3);
 
+        EntityTransaction transaction = getEntityManager().get().getTransaction();
+        transaction.commit();
+        transaction.begin();
+
         Thread thread = new Thread(starter);
         thread.start();
-
-        List<MCRJob> jobs = List.of(job1, job2, job3);
 
         try {
             int maxWait = 10000;
             int stepTime = 1000;
-            while(jobs.stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count() < 3 && maxWait > 0) {
+            while (getAllJobs(dao, job1.getAction()).stream()
+                .filter(j -> j.getStatus() == MCRJobStatus.FINISHED || j.getStatus() == MCRJobStatus.ERROR)
+                .count() < 3 && maxWait > 0) {
                 Thread.sleep(stepTime);
                 LOGGER.info("waiting for jobs to finish time left: {}", maxWait);
                 maxWait -= stepTime;
+                transaction.rollback();
+                transaction.begin();
             }
         } catch (InterruptedException e) {
             throw new MCRException(e);
         }
 
-        Assert.assertEquals("job1 should be finished", MCRJobStatus.FINISHED, job1.getStatus());
-        Assert.assertEquals("job2 should be finished", MCRJobStatus.FINISHED, job2.getStatus());
-        Assert.assertEquals("job3 should be finished", MCRJobStatus.FINISHED, job3.getStatus());
+        long finishedJobCount
+            = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count();
+        long errorJobCount    = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
+        Assert.assertEquals("Finished Job count should be 2", 2, finishedJobCount);
+        Assert.assertEquals("Error Job count should be 1", 1, errorJobCount);
     }
 
     @Override
