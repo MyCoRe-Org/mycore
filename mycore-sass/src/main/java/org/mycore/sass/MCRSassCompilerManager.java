@@ -75,8 +75,8 @@ public class MCRSassCompilerManager {
      *                 .scss file, then compiles and decides to minify or not).
      * @param importer a additional list of importers
      * @return Optional with the compiled css as string. Empty optional if the fileName is not valid.
-     * @throws CompilationException if {@link Compiler#compile(FileContext)} throws
-     * @throws IOException if {@link Compiler#compile(FileContext)} throws
+     * @throws SassCompilationFailedException if compiling sass input fails
+     * @throws IOException if communication with dart-sass or reading input fails
      */
     public synchronized Optional<String> getCSSFile(String file, List<Importer> importer)
         throws IOException, SassCompilationFailedException {
@@ -108,7 +108,8 @@ public class MCRSassCompilerManager {
      *
      * @param name the name of the file (with .min.css or .css ending)
      * @return the compiled css
-     * @throws CompilationException
+     * @throws SassCompilationFailedException if compiling sass input fails
+     * @throws IOException if communication with dart-sass or reading input fails
      */
     private String compile(String name, List<Importer> importer) throws IOException, SassCompilationFailedException {
         String css;
