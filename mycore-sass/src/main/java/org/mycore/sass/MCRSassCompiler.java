@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -158,7 +159,8 @@ class MCRSassCompiler implements Closeable {
         } else {
             EmbeddedSass.OutboundMessage.CompileResponse compileResponse = outboundMessage.getCompileResponse();
             if (compileResponse.getId() != compileRequest.getId()) {
-                throw new IllegalStateException(String.format("Compilation ID mismatch: expected %d, but got %d",
+                throw new IllegalStateException(
+                    String.format(Locale.ENGLISH, "Compilation ID mismatch: expected %d, but got %d",
                     compileRequest.getId(), compileResponse.getId()));
             } else if (compileResponse.hasSuccess()) {
                 return compileResponse.getSuccess();

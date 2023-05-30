@@ -154,6 +154,11 @@ public class MCRSassCompilerManager {
 
     }
 
+    /**
+     * Replaces {@code (.min).css} with {@code .scss}
+     * @param name filename a browser expects
+     * @return the filename available as a resource
+     */
     public static String getRealFileName(String name) {
         return name.replace(".min.css", ".scss").replace(".css", ".scss");
     }

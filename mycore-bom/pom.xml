@@ -121,6 +121,11 @@
         <version>31.1-jre</version>
       </dependency>
       <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>3.22.3</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.zxing</groupId>
         <artifactId>core</artifactId>
         <version>3.5.0</version>
@@ -193,6 +198,11 @@
       <dependency>
         <groupId>de.larsgrefer.sass</groupId>
         <artifactId>sass-embedded-host</artifactId>
+        <version>2.5.0</version>
+      </dependency>
+      <dependency>
+        <groupId>de.larsgrefer.sass</groupId>
+        <artifactId>sass-embedded-protocol</artifactId>
         <version>2.5.0</version>
       </dependency>
       <dependency>

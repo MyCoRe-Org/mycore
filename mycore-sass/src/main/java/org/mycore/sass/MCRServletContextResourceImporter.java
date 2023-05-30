@@ -43,6 +43,12 @@ public class MCRServletContextResourceImporter extends Servlet5ContextImporter {
 
     private final Path webappPath;
 
+    /**
+     * Constructs this importer with required properties
+     * @param servletContext to resolve web resources
+     * @param baseURL like "foo/layout.scss", used to resolve relative path against
+     * @see MCRSassCompilerManager#getRealFileName(String)
+     */
     public MCRServletContextResourceImporter(ServletContext servletContext, String baseURL) {
         super(servletContext);
         this.baseURL = URI.create(baseURL);
