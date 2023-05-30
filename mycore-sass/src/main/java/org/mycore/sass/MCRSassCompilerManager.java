@@ -18,6 +18,7 @@
 
 package org.mycore.sass;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -168,10 +169,16 @@ public class MCRSassCompilerManager {
     private URL toURL(Importer importer, String name) {
         try {
             if (importer instanceof FileImporter fi) {
-                return fi.handleImport(name, false).toURI().toURL();
+                final File file = fi.handleImport(name, false);
+                if (file != null) {
+                    return file.toURI().toURL();
+                }
             }
             if (importer instanceof CustomImporter ci) {
-                return new URL(ci.canonicalize(name, false));
+                final String canonicalized = ci.canonicalize(name, false);
+                if (canonicalized != null) {
+                    return new URL(canonicalized);
+                }
             }
         } catch (Exception e) {
             throw new MCRException(e);

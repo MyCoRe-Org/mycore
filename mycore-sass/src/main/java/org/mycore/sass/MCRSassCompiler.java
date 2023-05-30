@@ -13,7 +13,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +46,7 @@ class MCRSassCompiler implements Closeable {
     private boolean sourceMapIncludeSources;
     private boolean emitCharset;
     private final CompilerConnection connection;
-    private final Random compileRequestIds;
+    private static final AtomicInteger COMPILE_REQUEST_IDS = new AtomicInteger();
     private final Map<Integer, FileImporter> fileImporters;
     private final Map<Integer, CustomImporter> customImporters;
     private LoggingHandler loggingHandler;
@@ -60,7 +60,6 @@ class MCRSassCompiler implements Closeable {
         this.quietDeps = false;
         this.sourceMapIncludeSources = false;
         this.emitCharset = false;
-        this.compileRequestIds = new Random();
         this.fileImporters = new HashMap<>();
         this.customImporters = new HashMap<>();
         this.loggingHandler = new Log4jLoggingHandler(LOGGER);
@@ -79,7 +78,7 @@ class MCRSassCompiler implements Closeable {
         EmbeddedSass.InboundMessage.CompileRequest.Builder builder
             = EmbeddedSass.InboundMessage.CompileRequest.newBuilder();
 
-        builder.setId(Math.abs(compileRequestIds.nextInt()));
+        builder.setId(Math.abs(COMPILE_REQUEST_IDS.incrementAndGet()));
         builder.setStyle(outputStyle);
         builder.setSourceMap(generateSourceMaps);
 
