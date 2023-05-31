@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.mods.merger.MCRMergeTool;
+import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.util.MCRIdentifier;
@@ -74,6 +75,18 @@ public class MCRORCIDWorkUtils {
             }
         });
         return modsElements;
+    }
+
+    /**
+     * Lists identifiers as Set of MCRIdentifier.
+     * 
+     * @param work the Work
+     * @return Set of MCRIdentifier
+     */
+    public static Set<MCRIdentifier> listIdentifiers(Work work) {
+        return work.getExternalIdentifiers().getExternalIdentifier().stream()
+            .filter(i -> MCRORCIDUtils.checkTrustedIdentifier(i.getType()))
+            .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
     }
 
     /**

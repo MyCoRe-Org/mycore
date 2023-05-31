@@ -38,6 +38,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -47,10 +48,13 @@ import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
+import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
+import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkService;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkSummaryUtils;
+import org.mycore.orcid2.v3.work.MCRORCIDWorkUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
@@ -101,8 +105,9 @@ public class MCRORCIDObjectResource {
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-            final Work work = null; // TODO
-            final boolean result = MCRORCIDWorkSummaryUtils.findMatchingSummariesByIdentifiers(work, summaries)
+            final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
+            final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listIdentifiers(work);
+            final boolean result = MCRORCIDWorkSummaryUtils.findMatchingSummariesByIdentifiers(identifiers, summaries)
                 .findAny().isPresent();
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {

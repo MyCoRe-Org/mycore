@@ -22,11 +22,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
@@ -38,6 +40,7 @@ import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
+import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
@@ -104,6 +107,52 @@ public class MCRORCIDResource {
         }
         return Response.ok().build();
     }
+
+    /**
+     * Returns MCRORCIDUserProperties for ORCID iD.
+     * 
+     * @param orcid the ORCID iD
+     * @return the MCRORCIDUserProperties
+     * @throws WebApplicationException if orcid is null, user is guest
+     */
+    @GET
+    @Path("{orcid}/user-properties")
+    @Produces(MediaType.APPLICATION_JSON)
+    @MCRRestrictedAccess(MCRRequireLogin.class)
+    public MCRORCIDUserProperties setUserProperties(@PathParam("orcid") String orcid) {
+        if (orcid == null) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        return orcidUser.getUserPropertiesByORCID(orcid);
+    }
+
+    /**
+     * Updates MCRORCIDUserProperties for ORCID iD.
+     * 
+     * @param orcid the ORCID iD
+     * @param userProperties the MCRORCIDUserProperties
+     * @return Response
+     * @throws WebApplicationException if orcid is null, user is guest or set fails
+     */
+    @PUT
+    @Path("{orcid}/user-properties")
+    @MCRRequireTransaction
+    @Consumes(MediaType.APPLICATION_JSON)
+    @MCRRestrictedAccess(MCRRequireLogin.class)
+    public Response setUserProperties(@PathParam("orcid") String orcid, MCRORCIDUserProperties userProperties) {
+        if (orcid == null) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        try {
+            orcidUser.setUserProperties(orcid, userProperties);
+        } catch (MCRORCIDException e) {
+            throw new WebApplicationException(e, Status.BAD_REQUEST);
+        }
+        return Response.ok().build();
+    }
+
 
     static class MCRORCIDUserStatus {
 

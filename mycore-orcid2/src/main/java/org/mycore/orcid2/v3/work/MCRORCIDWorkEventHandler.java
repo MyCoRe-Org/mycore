@@ -18,10 +18,7 @@
 
 package org.mycore.orcid2.v3.work;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
@@ -31,8 +28,6 @@ import org.orcid.jaxb.model.v3.release.record.Work;
  * Work handler which publishes object to ORCID.
  */
 public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler<Work> {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void removeWork(MCRORCIDPutCodeInfo workInfo, String orcid, MCRORCIDCredential credential) {
@@ -56,7 +51,7 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
     }
 
     @Override
-    protected Work transformWork(MCRObject object) {
-        return MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
+    protected Work transformObject(MCRJDOMContent object) {
+        return MCRORCIDWorkTransformerHelper.transformContent(object);
     }
 }

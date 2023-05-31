@@ -203,9 +203,21 @@ public class MCRORCIDUser {
      * 
      * @return true if user has at least one MCRORCIDCredential
      */
-    public boolean hasCredential() {
+    public boolean hasCredentials() {
         return user.getAttributes().stream()
             .filter(attribute -> attribute.getName().startsWith(ATTR_ORCID_CREDENTIAL)).findAny().isPresent();
+    }
+
+    /**
+     * Checks if user MCRORCIDCredential for ORCID iD.
+     * 
+     * @param orcid the ORCID iD
+     * @return true if user has MCRORCIDCredential for ORCID iD
+     */
+    public boolean hasCredential(String orcid) {
+        return user.getAttributes().stream()
+            .filter(attribute -> attribute.getName().equals(getUserPropertiesAttributeNameByORCID(orcid)))
+            .findAny().isPresent();
     }
 
     /** 

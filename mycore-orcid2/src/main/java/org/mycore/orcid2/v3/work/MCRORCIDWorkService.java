@@ -233,7 +233,8 @@ public class MCRORCIDWorkService {
         } catch (MCRORCIDRequestException e) {
             throw new MCRORCIDException("Error during update", e);
         }
-        MCRORCIDWorkSummaryUtils.updateWorkInfoFromSummaries(work, summaries, workInfo);
+        MCRORCIDWorkSummaryUtils
+            .updateWorkInfoFromSummaries(MCRORCIDWorkUtils.listIdentifiers(work), summaries, workInfo);
     }
 
     private static Work fetchWork(long putCode, String orcid, MCRORCIDCredential credential) {

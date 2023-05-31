@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -170,14 +171,23 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
             throw new MCRORCIDException("Filtered MODS is empty.");
         }
-        final T work = transformWork(filteredObject);
+        final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
         for (Map.Entry<MCRORCIDUser, String> entry : userOrcidPair.entrySet()) {
             final MCRORCIDUser user = entry.getKey();
             final String orcid = entry.getValue();
             try {
                 final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
                     .orElse(new MCRORCIDUserInfo(orcid));
-                publish(work, user.getUserPropertiesByORCID(orcid), userInfo, user.getCredentialByORCID(orcid));
+                final MCRORCIDCredential credential = user.getCredentialByORCID(orcid);
+                if (credential == null) {
+                    continue;
+                }
+                final String scope = credential.getScope();
+                if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
+                    LOGGER.info("The scope is invalid. Skipping...");
+                    continue;
+                }
+                publish(work, user.getUserPropertiesByORCID(orcid), userInfo, credential);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (MCRORCIDNotFoundException e) {
                 // TODO handle recreate
@@ -189,10 +199,6 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private void publish(T work, MCRORCIDUserProperties userProperties, MCRORCIDUserInfo userInfo,
         MCRORCIDCredential credential) {
-        final String scope = credential.getScope();
-        if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
-            LOGGER.info("The scope is invalid. Skipping...");
-        }
         if (userInfo.getWorkInfo() == null) {
             final MCRORCIDPutCodeInfo workInfo = new MCRORCIDPutCodeInfo();
             userInfo.setWorkInfo(workInfo);
@@ -255,7 +261,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 final List<MCRORCIDUser> orcidUsers = new ArrayList();
                 for (MCRUser user : users) {
                     final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-                    if (orcidUser.hasCredential() && orcidUser.getCredentialByORCID(orcid) != null) {
+                    if (orcidUser.hasCredential(orcid)) {
                         orcidUsers.add(orcidUser);
                     }
                 }
@@ -304,6 +310,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * @param work the Work
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
+     * @throws MCRORCIDNotFoundException if specified Work does not exist
      */
     abstract protected void updateWork(long putCode, T work, String orcid, MCRORCIDCredential credential);
 
@@ -330,11 +337,11 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         MCRORCIDCredential credential);
 
     /**
-     * Transforms MCRObject to Work.
+     * Transforms MCRObject as MCRJDOMContent to Work.
      * 
      * @param object the MCRObject
      * @param <T> the work type
      * @return the Work
      */
-    abstract protected <T> T transformWork(MCRObject object);
+    abstract protected <T> T transformObject(MCRJDOMContent object);
 }
