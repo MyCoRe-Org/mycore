@@ -20,46 +20,19 @@ package org.mycore.orcid2.client.exception;
 
 import jakarta.ws.rs.core.Response;
 
-import org.mycore.orcid2.exception.MCRORCIDException;
-
 /**
- * This class is used if a request fails.
+ * This class is used if a resource was not found
  */
-public class MCRORCIDRequestException extends MCRORCIDException {
+public class MCRORCIDNotFoundException extends MCRORCIDRequestException {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * The response.
-    */
-    private final Response response;
 
     /**
      * Creates exception with response.
      *
      * @param response the response
      */
-    public MCRORCIDRequestException(Response response) {
-        this("Request failed", response);
-    }
-
-    /**
-     * Creates exception with message and response.
-     *
-     * @param message the message
-     * @param response the response
-     */
-    public MCRORCIDRequestException(String message, Response response) {
-        super(message);
-        this.response = response;
-    }
-
-    /**
-     * Returns the response.
-     * 
-     * @return the response
-     */
-    public Response getResponse() {
-        return response;
+    public MCRORCIDNotFoundException(Response response) {
+        super("Resource not found", response);
     }
 }

@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.v3;
+package org.mycore.orcid2.v3.work;
 
 import java.io.IOException;
 import java.util.ArrayList;

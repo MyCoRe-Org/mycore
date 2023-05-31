@@ -37,6 +37,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -48,9 +49,10 @@ import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.v3.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
-import org.mycore.orcid2.v3.MCRORCIDWorkHelper;
-import org.mycore.orcid2.v3.MCRORCIDWorkSummaryUtils;
+import org.mycore.orcid2.v3.work.MCRORCIDWorkService;
+import org.mycore.orcid2.v3.work.MCRORCIDWorkSummaryUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 
@@ -99,7 +101,8 @@ public class MCRORCIDObjectResource {
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-            final boolean result = MCRORCIDWorkSummaryUtils.findMatchingSummariesByIdentifiers(object, summaries)
+            final Work work = null; // TODO
+            final boolean result = MCRORCIDWorkSummaryUtils.findMatchingSummariesByIdentifiers(work, summaries)
                 .findAny().isPresent();
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {
@@ -114,7 +117,7 @@ public class MCRORCIDObjectResource {
      * @param objectID the MCRObjectID
      * @return the Response
      * @throws WebApplicationException if request fails
-     * @see MCRORCIDWorkHelper#createObjectAndUpdateWorkInfo
+     * @see MCRORCIDWorkService#createWork
      */
     @POST
     @Path("create-object/v3/{objectID}")
@@ -125,47 +128,21 @@ public class MCRORCIDObjectResource {
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         final String orcid = getMatchingORCID(object, orcidUser);
         final MCRORCIDCredential credential = getCredential(orcidUser, orcid);
-        switchToJanitor();
-        try {
-            MCRORCIDWorkHelper.createObjectAndUpdateWorkInfo(object, orcid, credential);
-        } catch (Exception e) {
-            LOGGER.error("Error while creating: ", e);
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        return Response.ok().build();
-    }
 
-    /**
-     * Updates MCRObject in ORCID profil for given MCRORCIDCredential.
-     *
-     * @param objectID the MCRObjectID
-     * @return the Response
-     * @throws WebApplicationException if request fails
-     * @see MCRORCIDWorkHelper#updateObjectAndUpdateWorkInfo
-     */
-    @POST
-    @Path("update-object/v3/{objectID}")
-    @MCRRestrictedAccess(MCRRequireLogin.class)
-    @MCRRequireTransaction
-    public Response updateObject(@PathParam("objectID") MCRObjectID objectID) {
-        final MCRObject object = getObject(objectID);
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final String orcid = getMatchingORCID(object, orcidUser);
-        final MCRORCIDCredential credential = getCredential(orcidUser, orcid);
-        switchToJanitor();
-        try {
-            MCRORCIDWorkHelper.updateObjectAndUpdateWorkInfo(object, orcid, credential);
-        } catch (Exception e) {
-            LOGGER.error("Error while creating: ", e);
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        return Response.ok().build();
-    }
-
-    private void switchToJanitor() {
         final MCRSession session = MCRSessionMgr.getCurrentSession();
+        final MCRUserInformation savedUserInformation = session.getUserInformation();
         session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
         session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
+        try {
+            new MCRORCIDWorkService(orcid, credential, orcidUser.getUserProperties()).createWork(object);
+        } catch (Exception e) {
+            LOGGER.error("Error while creating: ", e);
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        } finally {
+            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            session.setUserInformation(savedUserInformation);
+        }
+        return Response.ok().build();
     }
 
     private MCRORCIDCredential getCredential(MCRORCIDUser orcidUser, String orcid) {

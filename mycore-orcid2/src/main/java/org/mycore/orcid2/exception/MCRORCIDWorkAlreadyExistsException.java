@@ -16,26 +16,28 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.v3;
-
-import java.util.Map;
-
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.orcid2.client.MCRORCIDCredential;
+package org.mycore.orcid2.exception;
 
 /**
- * Work handler which publishes object to ORCID.
+ * This exception concerns errors when a work already exists in a ORCID profile.
  */
-public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler {
+public class MCRORCIDWorkAlreadyExistsException extends MCRORCIDException {
 
-    @Override
-    protected void publishObject(MCRObject object, Map<String, MCRORCIDCredential> credentials) {
-        MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credentials);
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Creates a new MCRORCIDWorkAlreadyExistsException with default message.
+     */
+    public MCRORCIDWorkAlreadyExistsException() {
+        super("Work already exists");
     }
 
-    @Override
-    protected void removeWork(String orcid, MCRORCIDCredential credential, long putCode) {
-        MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential)
-            .delete(MCRORCIDSectionImpl.WORK, putCode);
+    /**
+     * Creates a new MCRORCIDWorkAlreadyExistsException with default message and cause.
+     * 
+     * @param cause the cause
+     */
+    public MCRORCIDWorkAlreadyExistsException(Throwable cause) {
+        super("Work already exists", cause);
     }
 }

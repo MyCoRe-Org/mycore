@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.v3;
+package org.mycore.orcid2.v3.work;
 
 import java.util.function.Supplier;
 import java.io.IOException;
@@ -29,8 +29,6 @@ import java.util.stream.Stream;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
@@ -38,6 +36,7 @@ import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
+import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.xml.sax.SAXException;
 
@@ -66,30 +65,30 @@ public class MCRORCIDWorkSummaryUtils {
     }
 
     /**
-     * Returns a Stream of WorkSummaries matching the identifiers of the MCRObject.
+     * Returns a Stream of WorkSummaries matching the identifiers of the Work.
      *
-     * @param object the MCRObject
+     * @param work the Work
      * @param workSummaries List of WorkSummaries
      * @return Stream of matching WorkSummaries
-     * @see MCRORCIDUtils#getTrustedIdentifiers
+     * @see MCRORCIDUtils#checkTrustedIdentifier
      */
-    public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(MCRObject object,
-        List<WorkSummary> workSummaries) {
-        return findMatchingSummariesByIdentifiers(object, workSummaries.stream());
+    public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(Work work, List<WorkSummary> workSummaries) {
+        return findMatchingSummariesByIdentifiers(work, workSummaries.stream());
     }
 
     /**
-     * Returns a Stream of WorkSummaries matching the identifiers of the MCRObject.
+     * Returns a Stream of WorkSummaries matching the identifiers of the Work.
      *
-     * @param object the MCRObject
+     * @param work the Work
      * @param workSummaries Stream of WorkSummaries
      * @return Stream of matching WorkSummaries
-     * @see MCRORCIDUtils#getTrustedIdentifiers
+     * @see MCRORCIDUtils#checkTrustedIdentifier
      */
-    public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(MCRObject object,
-        Stream<WorkSummary> workSummaries) {
-        return findMatchingSummariesByIdentifiers(MCRORCIDUtils.getTrustedIdentifiers(new MCRMODSWrapper(object)),
-            workSummaries);
+    public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(Work work, Stream<WorkSummary> workSummaries) {
+        final Set<MCRIdentifier> trustedIdentifiers = work.getExternalIdentifiers().getExternalIdentifier().stream()
+            .filter(i -> MCRORCIDUtils.checkTrustedIdentifier(i.getType()))
+            .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
+        return findMatchingSummariesByIdentifiers(trustedIdentifiers, workSummaries);
     }
 
     // TODO ingnore case for identifiers/values
@@ -115,16 +114,16 @@ public class MCRORCIDWorkSummaryUtils {
     }
 
     /**
-     * Updates work info for MCRObject with List of matching WorkSummary as reference.
+     * Updates work info based on Work with List of matching WorkSummary as reference.
      * 
-     * @param object the MCRObject
+     * @param work the Work
      * @param summaries List of WorkSummary
      * @param workInfo the initial work info
      */
-    protected static void updateWorkInfoFromSummaries(MCRObject object, List<WorkSummary> summaries,
+    protected static void updateWorkInfoFromSummaries(Work work, List<WorkSummary> summaries,
         MCRORCIDPutCodeInfo workInfo) {
         final Supplier<Stream<WorkSummary>> matchingWorksSupplier
-            = () -> findMatchingSummariesByIdentifiers(object, summaries);
+            = () -> findMatchingSummariesByIdentifiers(work, summaries);
         long ownPutCode = workInfo.getOwnPutCode();
         // validate current own put code
         if (ownPutCode == 0 || !checkPutCodeExistsInSummaries(summaries, ownPutCode)) {

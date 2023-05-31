@@ -61,7 +61,7 @@ public class MCRORCIDUserUtils {
         } else if (users.size() == 1) {
             return new MCRORCIDUser(users.iterator().next());
         }
-        throw new MCRORCIDException("Found more than one user for given orcid");
+        throw new MCRORCIDException("Found more than one user for" + orcid);
     }
 
     /**

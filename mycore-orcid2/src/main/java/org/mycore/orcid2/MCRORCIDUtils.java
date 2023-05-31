@@ -192,34 +192,21 @@ public class MCRORCIDUtils {
     }
 
     /**
-     * Returns Set of MCRIdentifier based on mods:identifier for MCRMODSWrapper.
+     * Checks if identifier name is trusted.
      * Trusted identifier types can be defined as follows:
      *
      * MCR.ORCID2.Object.TrustedIdentifierTypes=
      *
-     * If empty, all identifiers will be returned.
-     * 
-     * @param wrapper the MCRMODSWrapper
-     * @return Set of MCRIdentifier
+     * If empty, identifier is trusted
+     *
+     * @param name identifier name
+     * @return true if identifier is trusted
      */
-    public static Set<MCRIdentifier> getTrustedIdentifiers(MCRMODSWrapper wrapper) {
-        Set<MCRIdentifier> identifiers = getIdentifiers(wrapper);
+    public static boolean checkTrustedIdentifier(String name) {
         if (TRUSTED_IDENTIFIER_TYPES.size() > 0) {
-            identifiers = identifiers.stream().filter(i -> TRUSTED_IDENTIFIER_TYPES.contains(i.getType()))
-                .collect(Collectors.toSet());
+            return TRUSTED_IDENTIFIER_TYPES.contains(name);
         }
-        return identifiers;
-    }
-
-    /**
-     * Returns List of MCRIdentifier based on mods:identifier.
-     * 
-     * @param wrapper the MCRMODSWrapper
-     * @return Set of MCRIdentifier
-     */
-    public static Set<MCRIdentifier> getIdentifiers(MCRMODSWrapper wrapper) {
-        return wrapper.getElements("mods:identifier").stream().map(e -> getIdentfierFromElement(e))
-            .collect(Collectors.toSet());
+        return true;
     }
 
     private static MCRIdentifier getIdentfierFromElement(Element element) {

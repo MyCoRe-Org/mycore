@@ -271,6 +271,16 @@ public class MCRORCIDUser {
     }
 
     /**
+     * Creates and returns MCRORCIDUserProperties.
+     * Takes system properties as fallback.
+     * 
+     * @return MCRORCIDUserProperties
+     */
+    public MCRORCIDUserProperties getUserProperties() {
+        return new MCRORCIDUserProperties(true, true, true); // TODO
+    }
+
+    /**
      * Serializes MCRORCIDCredential to String.
      * 
      * @param credential MCRORCIDCredential
