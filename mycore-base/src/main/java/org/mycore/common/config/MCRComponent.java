@@ -149,19 +149,15 @@ public class MCRComponent implements Comparable<MCRComponent> {
      * Returns resource base path to this components config resources.
      */
     public String getResourceBase() {
-        switch (type) {
-            case base -> {
-                return "config/";
+        return switch (type) {
+            case base -> "config/";
+            case component -> "components/" + getName() + "/config/";
+            case module -> "config/" + getName() + "/";
+            default -> {
+                LOGGER.debug("{}: there is no resource base for type {}", getName(), type);
+                yield null;
             }
-            case component -> {
-                return "components/" + getName() + "/config/";
-            }
-            case module -> {
-                return "config/" + getName() + "/";
-            }
-            default -> LOGGER.debug("{}: there is no resource base for type {}", getName(), type);
-        }
-        return null;
+        };
     }
 
     /**

@@ -23,6 +23,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -80,29 +83,15 @@ public final class MCRConfigurationBase {
      * signalize that the system state has changed. Call this method when ever you changed the persistency layer.
      */
     public static void systemModified() {
-        if (!lastModifiedFile.exists()) {
-            try {
+        try {
+            if (!lastModifiedFile.exists()) {
                 createLastModifiedFile();
-            } catch (IOException ioException) {
-                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(),
-                    ioException);
+            } else {
+                Files.setLastModifiedTime(lastModifiedFile.toPath(), FileTime.from(Instant.now()));
             }
-        } else if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
-            // a problem occurs, when a linux user other than the file owner
-            // tries to change the last modified date
-            // @see Java Bug:
-            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4466073
-            // fixable in Java7 with setTimes() method of new file system API
-            // workaround for now: try to recreate the file
-            // @author Robert Stephan
-            try {
-                try (FileOutputStream fout = new FileOutputStream(lastModifiedFile)) {
-                    fout.write(new byte[0]);
-                    lastModifiedFile.setWritable(true, false);
-                }
-            } catch (IOException e) {
-                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(), e);
-            }
+        } catch (IOException ioException) {
+            throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(),
+                ioException);
         }
     }
 
