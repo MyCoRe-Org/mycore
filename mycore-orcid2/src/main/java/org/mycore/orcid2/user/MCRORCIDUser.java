@@ -66,14 +66,30 @@ public class MCRORCIDUser {
     public static final String ATTR_ID_PREFIX = "id_";
 
     /**
-     * Prefix for orcid credential user attribute.
+     * Prefix for ORCID credential user attribute.
      */
     public static final String ATTR_ORCID_CREDENTIAL = "orcid_credential_";
+
+    /**
+     * Prefix for ORCID user properties user attribute.
+     */
+    public static final String ATTR_ORCID_USER_PROPERTIES = "orcid_user_properties_";
 
     /**
      * ORCID iD user attribute name.
      */
     public static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
+
+    private static final String WORK_PROPERTY_PREFIX = "MCR.ORCID2.Work.";
+
+    private static final boolean ALWAYS_UPDATE = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "AlwaysUpdateOwn")
+        .orElse(false);
+
+    private static final boolean CREATE_OWN = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "AlwaysCreateOwn")
+        .orElse(false);
+
+    private static final boolean CREATE_OWN_DUPLICATE
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "CreateOwnDuplicate").orElse(false);
 
     private final MCRUser user;
 
@@ -271,13 +287,37 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Creates and returns MCRORCIDUserProperties.
+     * Returns MCRORCIDUserProperties by ORCID iD.
      * Takes system properties as fallback.
      * 
+     * @param orcid the ORCID iD
      * @return MCRORCIDUserProperties
      */
-    public MCRORCIDUserProperties getUserProperties() {
-        return new MCRORCIDUserProperties(true, true, true); // TODO
+    public MCRORCIDUserProperties getUserPropertiesByORCID(String orcid) {
+        try {
+            return Optional.ofNullable(getUserPropertiesAttributeValueByORCID(orcid))
+                .map(p -> deserializeUserProperties(p))
+                .orElse(new MCRORCIDUserProperties(ALWAYS_UPDATE, CREATE_OWN_DUPLICATE, CREATE_OWN));
+        } catch (IllegalArgumentException e) {
+            throw new MCRORCIDException("Found corrupt user properites", e);
+        }
+    }
+
+    /**
+     * Sets MCRORCIDUserProperties for ORCID iD.
+     * 
+     * @param orcid the ORCID iD
+     * @param userProperties the MCRORCIDUserProperties
+     */ 
+    public void setUserProperties(String orcid, MCRORCIDUserProperties userProperties) {
+        String userPropertiesString = null;
+        try {
+            userPropertiesString = serializeUserProperties(userProperties);
+        } catch (IllegalArgumentException e) {
+            throw new MCRORCIDException("User properties are invalid");
+        }
+        user.setUserAttribute(getUserPropertiesAttributeNameByORCID(orcid), userPropertiesString);
+        MCRUserManager.updateUser(user);
     }
 
     /**
@@ -315,11 +355,40 @@ public class MCRORCIDUser {
         }
     }
 
+    private static String serializeUserProperties(MCRORCIDUserProperties userProperties) {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules();
+            mapper.setSerializationInclusion(Include.NON_NULL);
+            return mapper.writeValueAsString(userProperties);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static MCRORCIDUserProperties deserializeUserProperties(String userPropertiesString) {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules();
+            return mapper.readValue(userPropertiesString, MCRORCIDUserProperties.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     private String getCredentialAttributeValueByORCID(String orcid) {
         return user.getUserAttribute(getCredentialAttributeNameByORCID(orcid));
     }
 
     private static String getCredentialAttributeNameByORCID(String orcid) {
         return ATTR_ORCID_CREDENTIAL + orcid;
+    }
+
+    private String getUserPropertiesAttributeValueByORCID(String orcid) {
+        return user.getUserAttribute(getUserPropertiesAttributeNameByORCID(orcid));
+    }
+
+    private static String getUserPropertiesAttributeNameByORCID(String orcid) {
+        return ATTR_ORCID_USER_PROPERTIES + orcid;
     }
 }

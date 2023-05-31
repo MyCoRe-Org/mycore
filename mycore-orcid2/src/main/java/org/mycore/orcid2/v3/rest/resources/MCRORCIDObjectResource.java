@@ -134,7 +134,7 @@ public class MCRORCIDObjectResource {
         session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
         session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
         try {
-            new MCRORCIDWorkService(orcid, credential, orcidUser.getUserProperties()).createWork(object);
+            new MCRORCIDWorkService(orcid, credential, orcidUser.getUserPropertiesByORCID(orcid)).createWork(object);
         } catch (Exception e) {
             LOGGER.error("Error while creating: ", e);
             throw new WebApplicationException(Status.BAD_REQUEST);

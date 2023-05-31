@@ -177,7 +177,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             try {
                 final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
                     .orElse(new MCRORCIDUserInfo(orcid));
-                publish(work, user.getUserProperties(), userInfo, user.getCredentialByORCID(orcid));
+                publish(work, user.getUserPropertiesByORCID(orcid), userInfo, user.getCredentialByORCID(orcid));
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (MCRORCIDNotFoundException e) {
                 // TODO handle recreate

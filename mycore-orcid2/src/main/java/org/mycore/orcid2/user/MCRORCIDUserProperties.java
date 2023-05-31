@@ -23,11 +23,18 @@ package org.mycore.orcid2.user;
  */
 public class MCRORCIDUserProperties {
 
-    private final boolean alwaysUpdate;
+    private boolean alwaysUpdate;
 
-    private final boolean createOwnDuplicate;
+    private boolean createOwnDuplicate;
 
-    private final boolean createOwn;
+    private boolean createOwn;
+
+    /**
+     * Constructs new MCRORCIDUserProperties.
+     */
+    MCRORCIDUserProperties() {
+        this(false, false, false);
+    }
 
     /**
      * Constructs new MCRORCIDUserProperties.
@@ -52,6 +59,15 @@ public class MCRORCIDUserProperties {
     }
 
     /**
+     * Sets always update.
+     * 
+     * @param alwaysUpdate is always update
+     */
+    public void setAlwaysUpdate(boolean alwaysUpdate) {
+        this.alwaysUpdate = alwaysUpdate;
+    }
+
+    /**
      * Returns if create own duplicate.
      * 
      * @return true if create own duplicate
@@ -61,11 +77,29 @@ public class MCRORCIDUserProperties {
     }
 
     /**
+     * Sets is create own duplicate.
+     * 
+     * @param createOwnDuplicate is create own duplicate
+     */
+    public void setCreateOwnDuplicate(boolean createOwnDuplicate) {
+        this.createOwnDuplicate = createOwnDuplicate;
+    }
+
+    /**
      * Returns if create own.
      * 
      * @return true if create own
      */
     public boolean isCreateOwn() {
         return createOwn;
+    }
+
+    /**
+     * Sets is create own.
+     * 
+     * @param createOwn is create own
+     */
+    public void setCreateOwn(boolean createOwn) {
+        this.createOwn = createOwn;
     }
 }
