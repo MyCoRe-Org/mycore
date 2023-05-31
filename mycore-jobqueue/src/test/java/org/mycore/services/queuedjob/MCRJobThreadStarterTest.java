@@ -100,7 +100,7 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
                 Thread.sleep(stepTime);
                 LOGGER.info("waiting for jobs to finish time left: {}", maxWait);
                 maxWait -= stepTime;
-                transaction.rollback();
+                transaction.rollback(); // rollback to get new data in the next iteration
                 transaction.begin();
             }
         } catch (InterruptedException e) {
