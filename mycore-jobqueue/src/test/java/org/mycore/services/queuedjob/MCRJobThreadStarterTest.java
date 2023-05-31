@@ -109,7 +109,8 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
 
         long finishedJobCount
             = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count();
-        long errorJobCount    = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
+        long errorJobCount
+            = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
         Assert.assertEquals("Finished Job count should be 2", 2, finishedJobCount);
         Assert.assertEquals("Error Job count should be 1", 1, errorJobCount);
     }
