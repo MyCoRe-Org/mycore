@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.ws.rs.core.Response;
 
@@ -39,6 +40,7 @@ import org.mycore.orcid2.client.exception.MCRORCIDNotFoundException;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDWorkAlreadyExistsException;
+import org.mycore.orcid2.metadata.MCRORCIDFlagContent;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
@@ -46,13 +48,13 @@ import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
-// import org.mycore.orcid2.v3.MCRORCIDSearchImpl;
+import org.mycore.orcid2.v3.MCRORCIDSearchImpl;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.message.ScopeConstants;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
-// import org.orcid.jaxb.model.v3.release.search.Search;
+import org.orcid.jaxb.model.v3.release.search.Search;
 
 /**
  * Provies functionalties to create, update or delete works in ORCID profile.
@@ -218,23 +220,19 @@ public class MCRORCIDWorkService {
      */
     protected static void doUpdateWorkInfo(Work work, MCRORCIDPutCodeInfo workInfo, String orcid,
         MCRORCIDCredential credential) {
-        List<WorkSummary> summaries = null;
-        try {
-            Works works = null;
-            if (credential.getAccessToken() != null) {
-                works = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential)
-                    .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
-            } else {
-                // Use read client instead
-                works = MCRORCIDClientHelper.getClientFactory().createReadClient()
-                    .fetch(orcid, MCRORCIDSectionImpl.WORKS, Works.class);
+        if (credential.getAccessToken() != null) {
+            try {
+                final List<WorkSummary> summaries = MCRORCIDClientHelper.getClientFactory()
+                    .createUserClient(orcid, credential).fetch(MCRORCIDSectionImpl.WORKS, Works.class)
+                    .getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
+                MCRORCIDWorkSummaryUtils
+                    .updateWorkInfoFromSummaries(MCRORCIDWorkUtils.listIdentifiers(work), summaries, workInfo);
+            } catch (MCRORCIDRequestException e) {
+                throw new MCRORCIDException("Error during update", e);
             }
-            summaries = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-        } catch (MCRORCIDRequestException e) {
-            throw new MCRORCIDException("Error during update", e);
+        } else {
+            doUpdateWorkInfo(work, workInfo, orcid);
         }
-        MCRORCIDWorkSummaryUtils
-            .updateWorkInfoFromSummaries(MCRORCIDWorkUtils.listIdentifiers(work), summaries, workInfo);
     }
 
     private static Work fetchWork(long putCode, String orcid, MCRORCIDCredential credential) {
@@ -273,9 +271,9 @@ public class MCRORCIDWorkService {
             .getClientFactory().createUserClient(orcid, credential).delete(MCRORCIDSectionImpl.WORK, putCode);
     }
 
-/*
-    private static List<String> getMatchingORCIDs(MCRObject object) {
-        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getTrustedIdentifiers(new MCRMODSWrapper(object));
+    private static List<String> getMatchingORCIDs(Work work) {
+        final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listIdentifiers(work).stream()
+            .filter(i -> MCRORCIDUtils.checkTrustedIdentifier(i.getType())).collect(Collectors.toSet());
         final String query = buildORCIDIdentifierSearchQuery(identifiers);
         try {
             return MCRORCIDClientHelper.getClientFactory().createReadClient()
@@ -285,7 +283,6 @@ public class MCRORCIDWorkService {
             throw new MCRORCIDException("Error while finding matching ORCIDs", e);
         }
     }
-*/
 
     private static String buildORCIDIdentifierSearchQuery(Set<MCRIdentifier> identifiers) {
         String query = "";
@@ -300,25 +297,46 @@ public class MCRORCIDWorkService {
         return query;
     }
 
-    private static void collectOtherPutCodes(List<String> orcids, MCRObject object) {
+    private static void collectOtherPutCodes(Work work, List<String> orcids, MCRORCIDFlagContent flagContent) {
         orcids.forEach(orcid -> {
             try {
                 final MCRORCIDUserInfo userInfo
-                    = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                    = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
                         .orElseGet(() -> new MCRORCIDUserInfo(orcid));
-                final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo();
-                // retrieveWorkInfo(object, orcid, userInfo); TODO
+                if (userInfo.getWorkInfo() == null) {
+                    userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
+                }
+                doUpdateWorkInfo(work, userInfo.getWorkInfo(), orcid);
                 if (userInfo.getWorkInfo().getOwnPutCode() != 0) {
                     final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();
                     userInfo.getWorkInfo().addOtherPutCode(ownPutCode);
                     userInfo.getWorkInfo().setOwnPutCode(0);
                 }
-                if (!Objects.equals(currentWorkInfo, userInfo.getWorkInfo())) {
-                    MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
-                }
+                flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (MCRORCIDException e) {
-                LOGGER.warn("Could not collect put codes for {} and {}.", object.getId(), orcid);
+                LOGGER.warn("Could not collect put codes for {}.", orcid);
             }
         });
+    }
+
+    /**
+     * Updates work info with Work as reference.
+     * 
+     * @param work the Work
+     * @param workInfo the initial work info
+     * @param orcid the ORCID iD
+     * @throws MCRORCIDException look up request fails
+     * @see MCRORCIDUtils#checkTrustedIdentifier
+     */
+    protected static void doUpdateWorkInfo(Work work, MCRORCIDPutCodeInfo workInfo, String orcid) {
+        try {
+            final List<WorkSummary> summaries = MCRORCIDClientHelper.getClientFactory().createReadClient()
+                .fetch(orcid, MCRORCIDSectionImpl.WORKS, Works.class).getWorkGroup().stream()
+                .flatMap(g -> g.getWorkSummary().stream()).toList();
+            MCRORCIDWorkSummaryUtils
+                .updateWorkInfoFromSummaries(MCRORCIDWorkUtils.listIdentifiers(work), summaries, workInfo);
+        } catch (MCRORCIDRequestException e) {
+            throw new MCRORCIDException("Error during update", e);
+        }
     }
 }

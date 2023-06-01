@@ -153,7 +153,6 @@ public class MCRORCIDResource {
         return Response.ok().build();
     }
 
-
     static class MCRORCIDUserStatus {
 
         private String[] orcids;

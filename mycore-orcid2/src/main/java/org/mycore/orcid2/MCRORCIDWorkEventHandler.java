@@ -268,7 +268,6 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 if (orcidUsers.size() == 1) {
                     userOrcidPair.put(orcidUsers.get(0), orcid);
                 } else if (orcidUsers.size() > 1) {
-                    // TODO
                     LOGGER.warn("This case is not implemented");
                 }
             } else if (orcid == null && users.size() == 1) {
