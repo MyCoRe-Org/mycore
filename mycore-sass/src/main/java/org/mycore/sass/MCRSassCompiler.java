@@ -335,8 +335,10 @@ class MCRSassCompiler implements Closeable {
                     "Calling function " + functionCallRequest.getName() + " is not supported");
                 case FUNCTION_ID -> throw new UnsupportedOperationException("Calling functions by ID is not supported");
                 case IDENTIFIER_NOT_SET -> throw new IllegalArgumentException("FunctionCallRequest has no identifier");
+                default -> throw new UnsupportedOperationException(
+                    "Unsupported external function identifier case: " + functionCallRequest.getIdentifierCase());
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             LOGGER.debug("Failed to handle FunctionCallRequest", e);
             response.setError(getErrorMessage(e));
         }
