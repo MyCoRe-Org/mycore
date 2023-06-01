@@ -1,7 +1,5 @@
 package org.mycore.sass;
 
-import static de.larsgrefer.sass.embedded.util.ProtocolUtil.inboundMessage;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +32,70 @@ import de.larsgrefer.sass.embedded.util.SyntaxUtil;
 import sass.embedded_protocol.EmbeddedSass;
 
 /**
+ * A forked version of {@link de.larsgrefer.sass.embedded.SassCompiler} to support inputs from different artifacts.
+ *
  * @see <a href=”https://github.com/sass/embedded-protocol/issues/40#issuecomment-750500809">sass/embedded-protocol#40</a>
+ */
+/*
+Copy of original message for reference:
+
+The way the protocol handles relative imports is somewhat different than the way LibSass has historically done so (but
+more in line with how Ruby Sass did originally and Dart Sass does now). Rather than passing the previous import URL to
+the host and relying on the host to handle relative resolution in some custom way, the compiler relies on URLs' native
+notion of "relative resolution" handle relative imports consistently across all importers.
+
+To begin with, every Sass stylesheet loaded by @import, @use, etc has a "canonical URL", an absolute URL that uniquely
+identifies that stylesheet. Stylesheets loaded from the filesystem are effectively loaded using a built-in importer
+that canonicalizes to file: URLs and loads those URLs from the physical filesystem.
+
+To resolve an @import/@use/etc that appears within a given stylesheet, the compiler first resolves it relative to that
+stylesheet's canonical URL and checks whether the importer that loaded that stylesheet can load the new URL. If not,
+the compiler passes it to the full chain of importers and load paths to try to canonicalize it. If none of them can,
+the compiler throws an error.
+
+For example, let's say you tell the compiler to compile the file input.scss with contents @use "colors". Here's what
+happens:
+
+    The compiler canonicalizes the file using the built-in filesystem importer (that's what happens if you specify a
+path input). This importer converts input.scss to the canonical URL file:///path/to/working/directory/input.scss, then
+loads that URL from disk and returns the file's contents.
+
+    The compiler then sees @use "colors". It first checks if colors can be resolved relative to input.scss. The
+resolved URL is file:///path/to/working/directory/colors (by standard URL resolution), so it checks whether that can be
+canonicalized by the filesystem importer (because that's the importer that loaded input.scss). If so, the canonical URL
+is sent back as an ImportRequest and that's how the URL is loaded.
+
+    If the filesystem importer can't canonicalize file:///path/to/working/directory/colors (probably because no
+stylesheet exists with that name), the original unresolved URL colors is passed on to any other importers that are
+registered. These importers don't have access to the original stylesheet's URL because the way a URL is loaded
+shouldn't be sensitive to the context in which it appears, except for the specific case of relative URL resolution
+which is well-understood and consistent.
+
+For your use-case you can:
+
+    Use a CompileRequest with input.string.importer.importer_id set to your importer's ID and input.string.url set to
+the absolute file: URL of the entrypoint stylesheet. Doing this rather than using input.path will tell the compiler to
+use your custom importer rather than the default filesystem importer, so your importer will be called to handle
+relative URLs.
+
+    When you receive a CanonicalizeRequest with an absolute URL, slice off the union FS root of the url and check the
+relative result against all the roots, then return whichever one has a file that matches.
+
+    When you receive an ImportRequest, just load that file from the filesystem.
+
+You could also use a file_importer_id to avoid the extra round-trip of the ImportRequest, once embedded Dart Sass has
+implemented that.
+
+    I reckon there are a couple of host/compiler typos in that paragraph: it's describing for context how the compiler
+implements @import, I think it should read:
+
+        When loading a URL, the host compiler must first try resolving that URL relative to the canonical URL of the
+current file, and canonicalizing the result using the importer that loaded the current file. If this returns null, the
+host compiler must then try canonicalizing the original URL with each importer in order until one returns something
+other than null. That is the result of the import.
+
+    All we need in the host is the Url part -- same as the Sass_Importer_Fn url param if you're porting from libsass,
+except that one call is now split into two RPCs canonicalize + import.
  */
 class MCRSassCompiler implements Closeable {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -211,12 +272,12 @@ class MCRSassCompiler implements Closeable {
             if (file != null) {
                 fileImportResponse.setFileUrl(file.toURI().toURL().toString());
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             LOGGER.debug("Failed to execute FileImportRequest {}", fileImportRequest, t);
             fileImportResponse.setError(getErrorMessage(t));
         }
 
-        connection.sendMessage(inboundMessage(fileImportResponse.build()));
+        connection.sendMessage(ProtocolUtil.inboundMessage(fileImportResponse.build()));
     }
 
     private void handleImportRequest(EmbeddedSass.OutboundMessage.ImportRequest importRequest) throws IOException {
@@ -232,12 +293,12 @@ class MCRSassCompiler implements Closeable {
             if (success != null) {
                 importResponse.setSuccess(success);
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             LOGGER.debug("Failed to handle ImportRequest {}", importRequest, t);
             importResponse.setError(getErrorMessage(t));
         }
 
-        connection.sendMessage(inboundMessage(importResponse.build()));
+        connection.sendMessage(ProtocolUtil.inboundMessage(importResponse.build()));
     }
 
     private void handleCanonicalizeRequest(EmbeddedSass.OutboundMessage.CanonicalizeRequest canonicalizeRequest)
@@ -254,12 +315,12 @@ class MCRSassCompiler implements Closeable {
             if (canonicalize != null) {
                 canonicalizeResponse.setUrl(canonicalize);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             LOGGER.debug("Failed to handle CanonicalizeRequest {}", canonicalizeRequest, e);
             canonicalizeResponse.setError(getErrorMessage(e));
         }
 
-        connection.sendMessage(inboundMessage(canonicalizeResponse.build()));
+        connection.sendMessage(ProtocolUtil.inboundMessage(canonicalizeResponse.build()));
     }
 
     private void handleFunctionCallRequest(EmbeddedSass.OutboundMessage.FunctionCallRequest functionCallRequest)
@@ -280,7 +341,7 @@ class MCRSassCompiler implements Closeable {
             response.setError(getErrorMessage(e));
         }
 
-        connection.sendMessage(inboundMessage(response.build()));
+        connection.sendMessage(ProtocolUtil.inboundMessage(response.build()));
     }
 
     private String getErrorMessage(Throwable t) {
@@ -300,13 +361,12 @@ class MCRSassCompiler implements Closeable {
     private static class NullImporter extends CustomImporter {
 
         @Override
-        public String canonicalize(String url, boolean fromImport) throws Exception {
+        public String canonicalize(String url, boolean fromImport) {
             return null;
         }
 
         @Override
-        public EmbeddedSass.InboundMessage.ImportResponse.ImportSuccess handleImport(String url)
-            throws Exception {
+        public EmbeddedSass.InboundMessage.ImportResponse.ImportSuccess handleImport(String url) {
             return null;
         }
     }
