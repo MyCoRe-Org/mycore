@@ -18,6 +18,8 @@
 
 package org.mycore.mets.solr;
 
+import static org.mycore.common.MCRConstants.XPATH_FACTORY;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -37,8 +39,6 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
 
-import static org.mycore.common.MCRConstants.XPATH_FACTORY;
-
 /**
  * Class indexes label attributes in mets files.
  *
@@ -51,7 +51,8 @@ public class MCRMetsFileIndexAccumulator implements MCRSolrFileIndexAccumulator 
     protected static Logger LOGGER = LogManager.getLogger(MCRMetsFileIndexAccumulator.class);
 
     @Override
-    public void accumulate(SolrInputDocument solrInputDocument, Path path, BasicFileAttributes basicFileAttributes) {
+    public void accumulate(SolrInputDocument solrInputDocument, Path path, BasicFileAttributes basicFileAttributes)
+        throws IOException {
         if (!MCRConfiguration2.getString("MCR.Mets.Filename").get().equals(path.getFileName().toString())) {
             return;
         }
@@ -71,8 +72,8 @@ public class MCRMetsFileIndexAccumulator implements MCRSolrFileIndexAccumulator 
                     a.getValue());
             }
 
-        } catch (IOException | JDOMException e) {
-            LOGGER.error("Could not process {}", path.toString(), e);
+        } catch (JDOMException e) {
+            throw new IOException(e);
         }
     }
 }

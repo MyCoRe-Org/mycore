@@ -81,9 +81,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
      * @param parameters the parameters which was passed to {@link #addDeleteJob(Map)}
+     * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
+     *                                          wrong during rollback
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
-    protected void rollbackDeleteJob(Map<String, String> parameters) {
+    protected void rollbackDeleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         // can be used to rollback
     }
 
@@ -91,9 +93,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
      * @param parameters the parameters which was passed to {@link #updateJob(Map)}
+     * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
+     *                                          wrong during rollback
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
-    protected void rollbackUpdateJob(Map<String, String> parameters) {
+    protected void rollbackUpdateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         // can be used to rollback
     }
 
@@ -101,9 +105,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
      * @param parameters the parameters which was passed to {@link #addRegisterJob(Map)}
+     * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
+     *                                          wrong during rollback
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
-    protected void rollbackRegisterJob(Map<String, String> parameters) {
+    protected void rollbackRegisterJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         // can be used to rollback
     }
 

@@ -320,36 +320,36 @@ public class MCRServlet extends HttpServlet {
                 MCRTransactionHelper.rollbackTransaction();
             }
             throw error;
-        } catch (Exception ex) {
-            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
-                // current Servlet not called via RequestDispatcher
-                MCRTransactionHelper.rollbackTransaction();
-            }
-            if (isBrokenPipe(ex)) {
-                LOGGER.info("Ignore broken pipe.");
+        } catch (ServletException | IOException | SAXException | TransformerException | RuntimeException ex) {
+            if (isHandleExceptionComplete(req, ex)) {
                 return;
             }
-            if (ex.getMessage() == null) {
-                LOGGER.error("Exception while in rendering phase.", ex);
-            } else {
-                LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            if (isHandleExceptionComplete(req, ex)) {
+                return;
             }
-            if (ex instanceof ServletException se) {
-                throw se;
-            } else if (ex instanceof IOException ioe) {
-                throw ioe;
-            } else if (ex instanceof SAXException se) {
-                throw se;
-            } else if (ex instanceof TransformerException te) {
-                throw te;
-            } else if (ex instanceof RuntimeException rte) {
-                throw rte;
-            } else {
-                throw new RuntimeException(ex);
-            }
+            throw new RuntimeException(ex);
         } finally {
             cleanupMCRSession(req, getServletName());
         }
+    }
+
+    private boolean isHandleExceptionComplete(HttpServletRequest req, Exception ex) {
+        if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+            // current Servlet not called via RequestDispatcher
+            MCRTransactionHelper.rollbackTransaction();
+        }
+        if (isBrokenPipe(ex)) {
+            LOGGER.info("Ignore broken pipe.");
+            return true;
+        }
+        if (ex.getMessage() == null) {
+            LOGGER.error("Exception while in rendering phase.", ex);
+        } else {
+            LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
+        }
+        return false;
     }
 
     /**
