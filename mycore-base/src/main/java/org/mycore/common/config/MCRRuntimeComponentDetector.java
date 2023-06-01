@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
@@ -44,13 +45,13 @@ import com.google.common.collect.Sets;
  * On first access this class detects all components, that is either MyCoRe components or application modules, that are
  * available via the current ClassLoader. Every {@link Manifest} of the jar file requires to have a main attribute "POM"
  * and application modules also need to have a "MCR-Application-Module" main attribute present.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
 public class MCRRuntimeComponentDetector {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRRuntimeComponentDetector.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Name ATT_POM = new Name("POM");
 
@@ -58,18 +59,33 @@ public class MCRRuntimeComponentDetector {
 
     private static final Name ATT_MCR_ARTIFACT_ID = new Name("MCR-Artifact-Id");
 
-    private static SortedSet<MCRComponent> ALL_COMPONENTS = Collections
-        .unmodifiableSortedSet(getConfiguredComponents());
+    private static final SortedSet<MCRComponent> ALL_COMPONENTS_LOW_TO_HIGH =
+        Collections.unmodifiableSortedSet(getConfiguredComponents());
 
-    private static SortedSet<MCRComponent> MYCORE_COMPONENTS = Collections.unmodifiableSortedSet(
-        ALL_COMPONENTS.stream()
-            .filter(MCRComponent::isMyCoReComponent)
-            .collect(Collectors.toCollection(TreeSet::new)));
+    private static final SortedSet<MCRComponent> ALL_COMPONENTS_HIGH_TO_LOW =
+        reverseOf(ALL_COMPONENTS_LOW_TO_HIGH);
 
-    private static SortedSet<MCRComponent> APP_MODULES = Collections.unmodifiableSortedSet(
-        ALL_COMPONENTS.stream()
-            .filter(MCRComponent::isAppModule)
-            .collect(Collectors.toCollection(TreeSet::new)));
+    private static final SortedSet<MCRComponent> MYCORE_COMPONENTS_LOW_TO_HIGH =
+        subsetOf(ALL_COMPONENTS_LOW_TO_HIGH, MCRComponent::isMyCoReComponent);
+
+    private static final SortedSet<MCRComponent> MYCORE_COMPONENTS_HIGH_TO_LOW =
+        reverseOf(MYCORE_COMPONENTS_LOW_TO_HIGH);
+
+    private static final SortedSet<MCRComponent> APP_MODULES_LOW_TO_HIGH =
+        subsetOf(ALL_COMPONENTS_LOW_TO_HIGH, MCRComponent::isAppModule);
+
+    private static final SortedSet<MCRComponent> APP_MODULES_HIGH_TO_LOW =
+        reverseOf(APP_MODULES_LOW_TO_HIGH);
+
+    private static <T extends Comparable<T>> SortedSet<T> reverseOf(SortedSet<T> set) {
+        return Collections.unmodifiableSortedSet(
+            set.stream().collect(Collectors.toCollection(() -> new TreeSet<>(Collections.reverseOrder()))));
+    }
+
+    private static <T> SortedSet<T> subsetOf(SortedSet<T> set, Predicate<T> filter) {
+        return Collections.unmodifiableSortedSet(
+            set.stream().filter(filter).collect(Collectors.toCollection(TreeSet::new)));
+    }
 
     private static SortedSet<MCRComponent> getConfiguredComponents() {
         try {
@@ -160,29 +176,70 @@ public class MCRRuntimeComponentDetector {
 
     /**
      * Returns all components sorted via their natural ordering.
-     * 
+     *
      * @see MCRComponent#compareTo(MCRComponent)
      */
     public static SortedSet<MCRComponent> getAllComponents() {
-        return ALL_COMPONENTS;
+        return ALL_COMPONENTS_LOW_TO_HIGH;
+    }
+
+    /**
+     * Returns all components sorted via the given order
+     *
+     * @param order The order, defaults to {@link ComponentOrder#LOWEST_PRIORITY_FIRST}
+     * @see MCRComponent#compareTo(MCRComponent)
+     */
+    public static SortedSet<MCRComponent> getAllComponents(ComponentOrder order) {
+        return order == ComponentOrder.LOWEST_PRIORITY_FIRST ? ALL_COMPONENTS_LOW_TO_HIGH
+            : ALL_COMPONENTS_HIGH_TO_LOW;
     }
 
     /**
      * Returns only mycore components sorted via their natural ordering.
-     * 
+     *
      * @see MCRComponent#compareTo(MCRComponent)
      */
     public static SortedSet<MCRComponent> getMyCoReComponents() {
-        return MYCORE_COMPONENTS;
+        return MYCORE_COMPONENTS_LOW_TO_HIGH;
+    }
+
+    /**
+     * Returns only mycore components sorted via the given order.
+     *
+     * @param order The order, defaults to {@link ComponentOrder#LOWEST_PRIORITY_FIRST}
+     * @see MCRComponent#compareTo(MCRComponent)
+     */
+    public static SortedSet<MCRComponent> getMyCoReComponents(ComponentOrder order) {
+        return order == ComponentOrder.LOWEST_PRIORITY_FIRST ? MYCORE_COMPONENTS_LOW_TO_HIGH
+            : MYCORE_COMPONENTS_HIGH_TO_LOW;
     }
 
     /**
      * Returns only application modules sorted via their natural ordering.
-     * 
+     *
      * @see MCRComponent#compareTo(MCRComponent)
      */
     public static SortedSet<MCRComponent> getApplicationModules() {
-        return APP_MODULES;
+        return APP_MODULES_LOW_TO_HIGH;
+    }
+
+    /**
+     * Returns only application modules sorted via the given order.
+     *
+     * @param order The order, defaults to {@link ComponentOrder#LOWEST_PRIORITY_FIRST}
+     * @see MCRComponent#compareTo(MCRComponent)
+     */
+    public static SortedSet<MCRComponent> getApplicationModules(ComponentOrder order) {
+        return order == ComponentOrder.LOWEST_PRIORITY_FIRST ? APP_MODULES_LOW_TO_HIGH
+            : APP_MODULES_HIGH_TO_LOW;
+    }
+
+    public enum ComponentOrder {
+
+        LOWEST_PRIORITY_FIRST,
+
+        HIGHEST_PRIORITY_FIRST;
+
     }
 
 }
