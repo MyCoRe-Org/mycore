@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.datamodel.common.MCRMarkManager;
@@ -53,7 +54,7 @@ public class MCRTransferPackageCommands {
 
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
         syntax = "create transfer package for objects matching {0}")
-    public static void create(String query) {
+    public static void create(String query) throws MCRAccessException {
         List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getMainSolrClient(), query);
         for (String objectId : ids) {
             Map<String, String> parameters = new HashMap<>();
