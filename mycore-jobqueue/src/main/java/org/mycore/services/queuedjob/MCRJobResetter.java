@@ -18,10 +18,12 @@
 
 package org.mycore.services.queuedjob;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -78,16 +80,15 @@ public class MCRJobResetter extends MCRCronjob {
      */
     protected static long resetJobsWithAction(Class<? extends MCRJobAction> action, MCRJobConfig config, MCRJobDAO dao,
         Queue<MCRJob> queue, MCRJobStatus status) {
-        int maxTimeDiff = config.timeTillReset(action).orElseGet(config::timeTillReset);
+        Duration maxTimeDiff = config.timeTillReset(action).orElseGet(config::timeTillReset);
         List<MCRJob> jobs = dao.getJobs(action, Collections.emptyMap(), List.of(status), null, null);
-        long current = new Date(System.currentTimeMillis()).getTime() / 60000;
+        long current = System.currentTimeMillis();
 
         return jobs.stream().filter(job -> {
-            long start = job.getStart().getTime() / 60000;
-            boolean resetJob = current - start >= maxTimeDiff;
-            return resetJob;
-        }).peek(queue::offer)
-            .count();
+            long start = job.getStart().getTime();
+            Duration elapsedTime = Duration.ofMillis(current - start);
+            return maxTimeDiff.minus(elapsedTime).isNegative();
+        }).filter(queue::offer).count();
     }
 
     /**

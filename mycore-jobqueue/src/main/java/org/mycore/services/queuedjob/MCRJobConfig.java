@@ -18,6 +18,7 @@
 
 package org.mycore.services.queuedjob;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +32,9 @@ public interface MCRJobConfig {
      * The time in seconds after which a job with the given action is reset to {@link MCRJobStatus#NEW} if it is in
      * status {@link MCRJobStatus#ERROR} for this time.
      * @param action the action
-     * @return the time in seconds
+     * @return the time as duration
      */
-    Optional<Integer> timeTillReset(Class<? extends MCRJobAction> action);
+    Optional<Duration> timeTillReset(Class<? extends MCRJobAction> action);
 
     /**
      * The count of tries that are allowed for the given action. After this count is reached, the job will be marked as 
@@ -67,9 +68,9 @@ public interface MCRJobConfig {
     /**
      * The time in seconds after which a job is reset to {@link MCRJobStatus#NEW} if it is in status
      * {@link MCRJobStatus#ERROR} for this time.
-     * @return the time in seconds
+     * @return the time as duration
      */
-    Integer timeTillReset();
+    Duration timeTillReset();
 
     /**
      * The count of tries that are allowed for all actions. After this count is reached, the job will be marked as

@@ -26,9 +26,11 @@ import org.mycore.services.queuedjob.MCRJobAction;
 import org.mycore.services.queuedjob.MCRJobConfig;
 import org.mycore.services.queuedjob.MCRJobStatusListener;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -54,8 +56,9 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     }
 
     @Override
-    public Optional<Integer> timeTillReset(Class<? extends MCRJobAction> action) {
-        return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_TIME_TILL_RESET);
+    public Optional<Duration> timeTillReset(Class<? extends MCRJobAction> action) {
+        return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_TIME_TILL_RESET)
+                .map(Duration::ofMinutes);
     }
 
     @Override
@@ -81,9 +84,10 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
     @Override
-    public Integer timeTillReset()  {
+    public Duration timeTillReset()  {
         String property = CONFIG_PREFIX + CONFIG_TIME_TILL_RESET;
         return MCRConfiguration2.getInt(property)
+                .map(Duration::ofMinutes)
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
 

@@ -238,6 +238,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
     /**
      * Shuts down this thread and every local threads spawned by {@link #run()}.
      */
+    @Override
     public void close() {
         if (processableExecutor != null && !processableExecutor.getExecutor().isShutdown()) {
             LOGGER.info("We are in a hurry, closing service right now");
