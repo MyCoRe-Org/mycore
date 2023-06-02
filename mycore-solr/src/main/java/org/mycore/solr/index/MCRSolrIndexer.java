@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -268,10 +269,10 @@ public class MCRSolrIndexer {
             LOGGER.debug("Deleting derivate \"{}\" from solr", id);
             UpdateRequest req = new UpdateRequest();
             StringBuilder deleteQuery = new StringBuilder();
-            deleteQuery.append("id:").append(id).append(" ");
+            deleteQuery.append("id:").append(id).append(' ');
             deleteQuery.append("derivateID:").append(id);
             if (MCRSolrUtils.useNestedDocuments()) {
-                deleteQuery.append(" ").append("_root_:").append(id);
+                deleteQuery.append(' ').append("_root_:").append(id);
             }
             req.deleteByQuery(deleteQuery.toString());
             updateResponse = req.process(solrClient);
@@ -465,7 +466,7 @@ public class MCRSolrIndexer {
     }
 
     public static void dropIndexByType(String type, SolrClient client) throws Exception {
-        if (!MCRObjectID.isValidType(type) || "data_file".equals(type)) {
+        if (!MCRObjectID.isValidType(type) || Objects.equals(type, "data_file")) {
             LOGGER.warn("The type {} is not a valid type in the actual environment", type);
             return;
         }
@@ -528,7 +529,7 @@ public class MCRSolrIndexer {
         }
         if (!toRemove.isEmpty()) {
             LOGGER.info("remove {} zombie objects from solr", toRemove.size());
-            deleteById(client, toRemove.toArray(new String[toRemove.size()]));
+            deleteById(client, toRemove.toArray(String[]::new));
         }
         deleteOrphanedNestedDocuments(client);
         // documents to add

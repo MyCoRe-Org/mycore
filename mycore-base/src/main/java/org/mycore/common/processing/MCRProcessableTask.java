@@ -40,8 +40,8 @@ public abstract class MCRProcessableTask<T> extends MCRAbstractProcessable {
     }
 
     protected void delegateProgressable() {
-        if (this.task instanceof MCRListenableProgressable) {
-            ((MCRListenableProgressable) this.task).addProgressListener(new MCRProgressableListener() {
+        if (this.task instanceof MCRListenableProgressable progressableTask) {
+            progressableTask.addProgressListener(new MCRProgressableListener() {
                 @Override
                 public void onProgressTextChange(MCRProgressable source, String oldProgressText,
                     String newProgressText) {

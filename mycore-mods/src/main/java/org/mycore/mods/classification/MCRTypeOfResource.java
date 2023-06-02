@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  * Authority information that is a static mapping for mods:typeOfResource. This element is always mapped to a
  * classification with the ID typeOfResource.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRTypeOfResource extends MCRAuthorityInfo {
 

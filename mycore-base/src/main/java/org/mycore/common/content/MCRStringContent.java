@@ -28,7 +28,7 @@ import org.mycore.common.MCRConstants;
 /**
  * Reads MCRContent from a String's text.
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public class MCRStringContent extends MCRContent {
 
@@ -73,17 +73,17 @@ public class MCRStringContent extends MCRContent {
     }
 
     @Override
-    public long length() throws IOException {
+    public long length() {
         return bytes.length;
     }
 
     @Override
-    public long lastModified() throws IOException {
+    public long lastModified() {
         return -1;
     }
 
     @Override
-    public String getETag() throws IOException {
+    public String getETag() {
         String eTag = getSimpleWeakETag(getSystemId(), length(), lastModified());
         return eTag == null ? null : eTag.substring(2);
     }

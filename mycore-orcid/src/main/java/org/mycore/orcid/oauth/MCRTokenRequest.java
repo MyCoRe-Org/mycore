@@ -27,7 +27,7 @@ import jakarta.ws.rs.client.WebTarget;
 /**
  * Represents a token request against the OAuth2 API of orcid.org.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Kai Brandhorst
  */
 class MCRTokenRequest extends MCRORCIDRequest {

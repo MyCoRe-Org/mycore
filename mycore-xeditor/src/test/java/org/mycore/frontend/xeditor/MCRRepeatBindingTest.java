@@ -29,7 +29,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRRepeatBindingTest extends MCRTestCase {
 

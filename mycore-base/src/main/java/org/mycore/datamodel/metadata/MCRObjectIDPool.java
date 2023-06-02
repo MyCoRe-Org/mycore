@@ -34,9 +34,9 @@ class MCRObjectIDPool {
     private static LoadingCache<String, MCRObjectID> objectIDCache = CacheBuilder
         .newBuilder()
         .weakValues()
-        .build(new CacheLoader<String, MCRObjectID>() {
+        .build(new CacheLoader<>() {
             @Override
-            public MCRObjectID load(String id) throws Exception {
+            public MCRObjectID load(String id) {
                 return new MCRObjectID(id);
             }
         });
@@ -46,8 +46,8 @@ class MCRObjectIDPool {
             return objectIDCache.getUnchecked(id);
         } catch (UncheckedExecutionException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof MCRException) {
-                throw (MCRException) cause;
+            if (cause instanceof MCRException mcre) {
+                throw mcre;
             }
             throw e;
         }

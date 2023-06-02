@@ -67,13 +67,11 @@ public class MCRMediaSourceProvider {
                     parameterSupplier.get()));
         } catch (RuntimeException e) {
             Throwable cause = e.getCause();
-            if (cause != null) {
-                if (cause instanceof IOException) {
-                    throw (IOException) cause;
-                }
-                if (cause instanceof URISyntaxException) {
-                    throw (URISyntaxException) cause;
-                }
+            if (cause instanceof IOException ioe) {
+                throw ioe;
+            }
+            if (cause instanceof URISyntaxException use) {
+                throw use;
             }
             throw e;
         }
@@ -94,19 +92,15 @@ public class MCRMediaSourceProvider {
 
     public static void updateWowzaSettings(String propertyName, Optional<String> oldValue,
         Optional<String> newValue) {
+        //CSOFF: InnerAssignment
         switch (propertyName) {
-        case "MCR.Media.Wowza.BaseURL":
-            wowzaBaseURL = newValue;
-            break;
-        case "MCR.Media.Wowza.RTMPBaseURL":
-            wowzaRTMPBaseURL = newValue;
-            break;
-        case "MCR.Media.Wowza.HashParameter":
-            wowzaHashParameter = newValue.orElse("wowzatokenhash");
-            break;
-        default:
-            break;
+            case "MCR.Media.Wowza.BaseURL" -> wowzaBaseURL = newValue;
+            case "MCR.Media.Wowza.RTMPBaseURL" -> wowzaRTMPBaseURL = newValue;
+            case "MCR.Media.Wowza.HashParameter" -> wowzaHashParameter = newValue.orElse("wowzatokenhash");
+            default -> {
+            }
         }
+        //CSON: InnerAssignment
     }
 
     public List<MCRMediaSource> getSources() {

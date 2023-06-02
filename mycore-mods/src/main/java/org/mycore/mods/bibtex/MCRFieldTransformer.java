@@ -33,7 +33,7 @@ import bibtex.dom.BibtexEntry;
 /**
  * Transforms a single BibTeX field to a MODS element.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRFieldTransformer {
 

@@ -40,7 +40,6 @@ import org.mycore.common.xml.MCRXMLHelper;
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaXML.
  *
  * @author Thomas Scheffler
- * @version $Revision$ $Date$
  *
  */
 public class MCRMetaXMLTest extends MCRTestCase {

@@ -44,7 +44,6 @@ import org.mycore.datamodel.common.MCRISO8601Format;
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMeta8601Date.
  * 
  * @author Thomas Scheffler
- * @version $Revision$ $Date$
  *
  */
 public class MCRMetaISO8601DateTest extends MCRTestCase {

@@ -43,10 +43,9 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
-import org.xml.sax.SAXException;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREditorSession {
 
@@ -184,7 +183,7 @@ public class MCREditorSession {
         return editedXML;
     }
 
-    public void setEditedXML(Document editedXML) throws JDOMException {
+    public void setEditedXML(Document editedXML) {
         this.editedXML = editedXML;
         addNamespacesFrom(editedXML.getRootElement());
     }
@@ -199,7 +198,7 @@ public class MCREditorSession {
         }
     }
 
-    public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+    public void setEditedXML(String uri) throws JDOMException, IOException, TransformerException {
         String uriRe = replaceParameters(uri);
         if ((editedXML != null) || uriRe.contains("{")) {
             return;
@@ -211,7 +210,7 @@ public class MCREditorSession {
         setBreakpoint("Reading XML from " + uriRe);
     }
 
-    public MCRBinding getRootBinding() throws JDOMException {
+    public MCRBinding getRootBinding() {
         MCRBinding binding = new MCRBinding(editedXML, tracker);
         binding.setVariables(variables);
         return binding;

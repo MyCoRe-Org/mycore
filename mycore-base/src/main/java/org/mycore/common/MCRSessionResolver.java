@@ -64,8 +64,8 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
     @Override
     public void valueBound(HttpSessionBindingEvent hsbe) {
         Object obj = hsbe.getValue();
-        if (LOGGER.isDebugEnabled() && obj instanceof MCRSessionResolver) {
-            LOGGER.debug("Bound MCRSession {} to HttpSession {}", ((MCRSessionResolver) obj).getSessionID(),
+        if (LOGGER.isDebugEnabled() && obj instanceof MCRSessionResolver sessionResolver) {
+            LOGGER.debug("Bound MCRSession {} to HttpSession {}", sessionResolver.getSessionID(),
                 hsbe.getSession().getId());
         }
     }

@@ -74,7 +74,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMarkManager {
 
-    private static MCRMarkManager INSTANCE = null;
+    private static volatile MCRMarkManager INSTANCE = null;
 
     public enum Operation {
         DELETE, IMPORT
@@ -141,8 +141,7 @@ public class MCRMarkManager {
      * @return true if its marked
      */
     public boolean isMarked(MCRBase base) {
-        if (base instanceof MCRDerivate) {
-            MCRDerivate derivate = (MCRDerivate) base;
+        if (base instanceof MCRDerivate derivate) {
             return isMarked(derivate.getId()) || isMarked(derivate.getOwnerID());
         }
         return isMarked(base.getId());

@@ -27,7 +27,7 @@ import org.mycore.orcid.oauth.MCROAuthClient;
  * Represents the source application that generated the work entry in the ORCID profile.
  * This may be another ORCID, another client application or THIS, our MyCoRe application.
  *
- * @author Frank L\u00FCtzenkirchen *
+ * @author Frank Lützenkirchen *
  */
 public class MCRWorkSource {
 
@@ -57,7 +57,7 @@ public class MCRWorkSource {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof MCRWorkSource) && sourceID.equals(((MCRWorkSource) obj).sourceID);
+        return (obj instanceof MCRWorkSource workSource) && sourceID.equals(workSource.sourceID);
     }
 
     @Override

@@ -41,7 +41,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.xml.sax.SAXException;
 
 /**
  * Handles {@link MCRRealm} instantiation.
@@ -112,14 +111,12 @@ public class MCRRealmFactory {
         loadRealms();
     }
 
-    /**
-     * 
-     */
+
     private static void loadRealms() {
         Element root;
         try {
             root = getRealms().getRootElement();
-        } catch (SAXException | JDOMException | TransformerException | IOException e) {
+        } catch (JDOMException | TransformerException | IOException e) {
             throw new MCRException("Could not load realms from URI: " + realmsURI);
         }
         String localRealmID = root.getAttributeValue("local");
@@ -167,7 +164,7 @@ public class MCRRealmFactory {
         MCRRealmFactory.attributeMapper = attributeMapper;
     }
 
-    private static Document getRealms() throws JDOMException, TransformerException, SAXException, IOException {
+    private static Document getRealms() throws JDOMException, TransformerException, IOException {
         if (realmsFile == null) {
             return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
         }

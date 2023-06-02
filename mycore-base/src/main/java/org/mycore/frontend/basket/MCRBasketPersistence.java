@@ -40,7 +40,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * A basket can be saved to and loaded from a derivate. The persistent form
  * of a basket is a file "basket.xml" in a derivate.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasketPersistence {
 
@@ -81,7 +81,6 @@ public class MCRBasketPersistence {
      * @param basket the basket to store in a new file in a new derivate
      * @param ownerID the ID of the MCRObject owning the new derivate 
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
-     * @throws MCRPersistenceException 
      */
     public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID)
         throws IOException, MCRPersistenceException, MCRAccessException {
@@ -101,12 +100,10 @@ public class MCRBasketPersistence {
      * @param ownerID the ID of the object owning the new derivate
      * @param derivateOID a free derivate ID to use for the newly created derivate
      * @return the empty derivate that was created.
-     * @throws IOException 
-     * @throws MCRPersistenceException 
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      */
     private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID)
-        throws MCRPersistenceException, IOException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateOID);
         derivate.getDerivate().getTitles()
@@ -135,7 +132,6 @@ public class MCRBasketPersistence {
      * @param basket the basket to save.
      * @param derivate the derivate holding the file
      * @param basketFile the file holding the basket's data.
-     * @throws IOException 
      */
     private static void writeBasketToFile(MCRBasket basket, MCRDerivate derivate, MCRPath basketFile)
         throws IOException, MCRAccessException {

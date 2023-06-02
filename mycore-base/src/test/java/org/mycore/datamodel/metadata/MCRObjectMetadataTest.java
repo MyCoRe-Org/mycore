@@ -21,12 +21,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
 
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,7 +34,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler
@@ -202,8 +201,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         fail("Not yet implemented"); // TODO
     }
 
-    private static Document loadResourceDocument(String resource) throws URISyntaxException, MCRException,
-        SAXParseException, IOException {
+    private static Document loadResourceDocument(String resource) throws MCRException, IOException, JDOMException {
         URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
         return MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(mcrTestUrl));
     }

@@ -33,7 +33,6 @@ import org.mycore.common.config.MCRConfigurationException;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision$ $Date$
  */
 public class MCRClassificationAndSetMapper {
     private static final String PROP_CLASS_SUFFIX = ".Classification";

@@ -21,6 +21,7 @@ package org.mycore.frontend.acl2.resources;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Objects;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -107,7 +108,7 @@ public class MCRAclEditorResource {
             Element mainDiv = (Element) node;
             mainDiv.setAttribute("lang", lang);
             String bsPath = MCRConfiguration2.getString("MCR.bootstrap.path").orElse("");
-            if (!"".equals(bsPath)) {
+            if (!Objects.equals(bsPath, "")) {
                 bsPath = MCRFrontendUtil.getBaseURL() + bsPath;
                 Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet")
                     .setAttribute("type", "text/css");
@@ -158,7 +159,7 @@ public class MCRAclEditorResource {
         String accessPool = jsonObject.get(JSON_ACCESSPOOL).getAsString();
         String rule = jsonObject.get(JSON_RULE).getAsString();
 
-        if (RULE_STORE.existsRule(rule) && !"".equals(accessID) && !"".equals(accessPool)) {
+        if (RULE_STORE.existsRule(rule) && !Objects.equals(accessID, "") && !Objects.equals(accessPool, "")) {
             MCRRuleMapping accessRule = createRuleMap(accessID, accessPool, rule);
 
             if (!ACCESS_STORE.existsRule(accessID, accessPool)) {
@@ -213,7 +214,7 @@ public class MCRAclEditorResource {
 
         if (!ACCESS_STORE.existsRule(accessIDNew, accessPoolNew) || JSON_RULE.equals(mode)) {
             if (ACCESS_STORE.existsRule(accessIDOld, accessPoolOld) && RULE_STORE.existsRule(accessRuleNew)
-                && !"".equals(accessIDNew) && !"".equals(accessPoolNew)) {
+                && !Objects.equals(accessIDNew, "") && !Objects.equals(accessPoolNew, "")) {
                 MCRRuleMapping accessRule = createRuleMap(accessIDNew, accessPoolNew, accessRuleNew);
                 MCRRuleMapping oldAccessRule = ACCESS_STORE.getAccessDefinition(accessPoolOld, accessIDOld);
 

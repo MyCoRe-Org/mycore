@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
-import org.jdom2.JDOMException;
 import org.jdom2.input.DOMBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.w3c.dom.Document;
@@ -32,7 +31,7 @@ import org.w3c.dom.Document;
 /**
  * Reads MCRContent from a W3C DOM XML document.
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public class MCRDOMContent extends MCRXMLContent {
 
@@ -57,16 +56,12 @@ public class MCRDOMContent extends MCRXMLContent {
     @Override
     public void sendTo(OutputStream out) throws IOException {
         org.jdom2.Document jdom;
-        try {
-            jdom = asXML();
-        } catch (JDOMException ex) {
-            throw new IOException(ex);
-        }
+        jdom = asXML();
         new XMLOutputter(format).output(jdom, out);
     }
 
     @Override
-    public org.jdom2.Document asXML() throws JDOMException {
+    public org.jdom2.Document asXML() {
         return new DOMBuilder().build(dom);
     }
 }

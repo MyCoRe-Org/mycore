@@ -41,24 +41,18 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
             MCRCategory mcrCg = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
             LOGGER.debug("{} handling {} {}", getClass().getName(), mcrCg.getId(), evt.getEventType());
             switch (evt.getEventType()) {
-            case CREATE:
-                addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
-                break;
-            case UPDATE:
-                addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
-                break;
-            case DELETE:
-                if (mcrCg.getId().isRootID()) {
-                    // delete complete classification
-                    addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
-                } else {
-                    // update classification to new version
-                    addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                case CREATE -> addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
+                case UPDATE -> addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                case DELETE -> {
+                    if (mcrCg.getId().isRootID()) {
+                        // delete complete classification
+                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
+                    } else {
+                        // update classification to new version
+                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                    }
                 }
-                break;
-            default:
-                LOGGER.error("No Method available for {}", evt.getEventType());
-                break;
+                default -> LOGGER.error("No Method available for {}", evt.getEventType());
             }
         }
     }

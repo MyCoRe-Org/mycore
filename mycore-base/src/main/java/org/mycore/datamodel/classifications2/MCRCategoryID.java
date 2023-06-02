@@ -42,8 +42,6 @@ import jakarta.persistence.Transient;
  * associated MCRCategory instance is a root category (a classification).
  * 
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date: 2008-04-11 09:14:19 +0000 (Fr, 11 Apr
- *          2008) $
  * @since 2.0
  */
 /**

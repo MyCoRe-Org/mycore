@@ -85,9 +85,9 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
         if (ex != null) {
-            if (ex instanceof ServletException) {
+            if (ex instanceof ServletException se) {
                 //Login failed
-                presentLoginForm(req, res, (ServletException) ex);
+                presentLoginForm(req, res, se);
             } else {
                 throw ex;
             }

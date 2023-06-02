@@ -23,7 +23,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import javax.xml.transform.TransformerException;
@@ -43,7 +42,7 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXEditorTransformerTest extends MCRTestCase {
 
@@ -98,7 +97,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testBasicInputComponents() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testBasicInputComponents() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testBasicInputComponents-editor.xml", null, "testBasicInputComponents-transformed1.xml");
         testTransformation("testBasicInputComponents-editor.xml", "testBasicInputComponents-source.xml",
@@ -106,26 +105,26 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testIncludes() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testIncludes() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testIncludes-editor.xml", null, "testIncludes-transformed.xml");
     }
 
     @Test
-    public void testPreload() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testPreload() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testPreload-editor.xml", null, "testPreload-transformed.xml");
     }
 
     @Test
-    public void testRepeats() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testRepeats() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testRepeats-editor.xml", "testBasicInputComponents-source.xml",
             "testRepeats-transformed.xml");
     }
 
     @Test
-    public void testXPathSubstitution() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testXPathSubstitution() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         MCRSessionMgr.getCurrentSession().put("SomeUser", "John Doe");
         testTransformation("testXPathSubstitution-editor.xml", "testBasicInputComponents-source.xml",
@@ -133,13 +132,13 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testNamespaces() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testNamespaces() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testNamespaces-editor.xml", "testNamespaces-source.xml", "testNamespaces-transformed.xml");
     }
 
     @Test
-    public void testConditions() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testConditions() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         MCRSessionMgr.getCurrentSession().put("switch", "on");
         MCRSessionMgr.getCurrentSession().put("case", "2");
@@ -148,7 +147,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testI18N() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException,
+    public void testI18N() throws IOException, TransformerException, JDOMException, SAXException,
         JaxenException {
         MCRSessionMgr.getCurrentSession().setCurrentLanguage("en");
         testTransformation("testI18N-editor.xml", "testBasicInputComponents-source.xml", "testI18N-transformed-en.xml");
@@ -157,7 +156,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testLoadResources() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testLoadResources() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         MCRSessionMgr.getCurrentSession().put("genre", "article");
         MCRSessionMgr.getCurrentSession().put("host", "journal");
@@ -165,7 +164,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testValidation() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testValidation() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         MCREditorSession session = testTransformation("testValidation-editor.xml",
             "testBasicInputComponents-source.xml", "testValidation-transformed1.xml");
@@ -176,7 +175,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testDefaultValue() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testDefaultValue() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         MCREditorSession session = testTransformation("testDefaultValue-editor.xml", null,
             "testDefaultValue-transformed1.xml");
@@ -187,7 +186,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testSelect() throws IOException, URISyntaxException, TransformerException, JDOMException,
+    public void testSelect() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testSelect-editor.xml", "testSelect-source.xml", "testSelect-transformed.xml");
     }

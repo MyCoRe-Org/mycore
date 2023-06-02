@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -155,13 +156,13 @@ class MCRConfigurableInstanceHelper {
         final String defaultPropertyName = annotation.defaultName();
         final String propertyName = annotation.name();
 
-        if ("*".equals(propertyName)) {
+        if (Objects.equals(propertyName, "*")) {
             setFieldValue(object, field, Map.class, properties);
         } else {
             final Optional<String> value = getValue(properties, annotation);
             if (value.isPresent()) {
                 setFieldValue(object, field, String.class, value.get());
-            } else if (!"".equals(defaultPropertyName)) {
+            } else if (!Objects.equals(defaultPropertyName, "")) {
                 String defaultValue = MCRConfiguration2.getStringOrThrow(defaultPropertyName);
                 setFieldValue(object, field, String.class, defaultValue);
             } else if (annotation.required()) {
@@ -210,13 +211,13 @@ class MCRConfigurableInstanceHelper {
         final String defaultPropertyName = annotation.defaultName();
         final String propertyName = annotation.name();
 
-        if ("*".equals(propertyName)) {
+        if (Objects.equals(propertyName, "*")) {
             setMethodValue(object, method, Map.class, properties);
         } else {
             final Optional<String> value = getValue(properties, annotation);
             if (value.isPresent()) {
                 setMethodValue(object, method, String.class, value.get());
-            } else if (!"".equals(defaultPropertyName)) {
+            } else if (!Objects.equals(defaultPropertyName, "")) {
                 String defaultValue = MCRConfiguration2.getStringOrThrow(defaultPropertyName);
                 setMethodValue(object, method, String.class, defaultValue);
             } else if (annotation.required()) {

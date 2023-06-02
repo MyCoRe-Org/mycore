@@ -18,7 +18,6 @@
 
 package org.mycore.pi.cli;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -80,14 +78,14 @@ public class MCRPICommands {
         MCRBase base = MCRMetadataManager.retrieve(objectID);
         final List<MCRPIRegistrationInfo> pi = MCRPIManager.getInstance().getRegistered(base);
 
-        final boolean addedAFlag = pi.stream().filter(registrationInfo -> {
+        final boolean addedAFlag = pi.stream().anyMatch(registrationInfo -> {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
                 LOGGER.info("Add PI-Flag to " + mycoreIDString);
                 MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
                 return true;
             }
             return false;
-        }).count() > 0;
+        });
 
         if (addedAFlag) {
             try {
@@ -135,7 +133,7 @@ public class MCRPICommands {
             " If the service configuration is right then the pi is under control of MyCoRe.",
         order = 50)
     public static void controlObjectWithService(String objectIDString, String serviceID)
-        throws MCRAccessException, MCRActiveLinkException, IOException {
+        throws MCRAccessException {
         controlObjectWithServiceAndAdditional(objectIDString, serviceID, null);
     }
 
@@ -146,7 +144,7 @@ public class MCRPICommands {
         order = 40)
     public static void controlObjectWithServiceAndAdditional(String objectIDString, String serviceID,
         final String additional)
-        throws MCRAccessException, MCRActiveLinkException, IOException {
+        throws MCRAccessException {
 
         String trimAdditional = additional != null ? additional.trim() : null;
         MCRPIService<MCRPersistentIdentifier> service = MCRPIServiceManager
@@ -186,7 +184,7 @@ public class MCRPICommands {
             + "pi control from the object {0}(object id) with the serivce {1}(service id) and the additional {2}",
         order = 60)
     public static void removeControlFromObject(String objectIDString, String serviceID, String additional)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRPersistentIdentifierException {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
         MCRPI mcrpi = MCRPIManager.getInstance()
             .get(serviceID, objectIDString, additional != null ? additional.trim() : null);
@@ -205,7 +203,7 @@ public class MCRPICommands {
             + "pi control from the object {0}(object id) with the serivce {1}(service id)",
         order = 70)
     public static void removeControlFromObject(String objectIDString, String serviceID)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRPersistentIdentifierException {
         removeControlFromObject(objectIDString, serviceID, null);
     }
 
@@ -223,7 +221,7 @@ public class MCRPICommands {
             + " with additional ({2}). Does nothing if the object already has a pi from the service {0}.",
         order = 90)
     public static void createPIForObjectIfNotExist(String serviceID, String objectIDString, String additional)
-        throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
+        throws MCRAccessException, ExecutionException, MCRPersistentIdentifierException,
         InterruptedException {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
 
@@ -248,7 +246,7 @@ public class MCRPICommands {
             + " Does nothing if the object already has a pi from the service {0}.",
         order = 100)
     public static void createPIForObjectIfNotExist(String serviceID, String objectIDString)
-        throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
+        throws MCRAccessException, ExecutionException, MCRPersistentIdentifierException,
         InterruptedException {
         createPIForObjectIfNotExist(serviceID, objectIDString, "");
     }

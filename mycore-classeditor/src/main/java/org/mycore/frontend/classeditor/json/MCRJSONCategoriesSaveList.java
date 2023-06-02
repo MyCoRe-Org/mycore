@@ -19,6 +19,7 @@
 package org.mycore.frontend.classeditor.json;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -32,16 +33,16 @@ public class MCRJSONCategoriesSaveList {
 
     public void add(MCRCategory categ, MCRCategoryID parentID, int index, String status)
         throws WebApplicationException {
-        if ("updated".equals(status)) {
+        if (Objects.equals(status, "updated")) {
             updateList.add(new CategorySaveElement(categ, parentID, index));
-        } else if ("deleted".equals(status)) {
+        } else if (Objects.equals(status, "deleted")) {
             deleteList.add(new CategorySaveElement(categ, parentID, index));
         } else {
             throw new WebApplicationException("Unknown status.");
         }
     }
 
-    private class CategorySaveElement {
+    private static class CategorySaveElement {
         private MCRCategory categ;
 
         private MCRCategoryID parentID;

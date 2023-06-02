@@ -53,14 +53,6 @@ public class ControllerUtil {
      */
     public static void waitForPageReady(WebDriver driver) {
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-        //WebDriverWait webDriverWait = new WebDriverWait(driver, 10);
-        //webDriverWait.until(new Predicate<WebDriver>() {
-        //    @Override
-        //    public boolean apply(WebDriver webDriver) {
-        //        JavascriptExecutor js = (JavascriptExecutor) webDriver;
-        //        return js.executeScript("return document.readyState").equals("complete");
-        //    }
-        //});
     }
 
     /**
@@ -70,11 +62,10 @@ public class ControllerUtil {
      * @return screenshot
      */
     public static BufferedImage getScreenshot(WebDriver driver, String name) {
-        if (driver instanceof TakesScreenshot) {
+        if (driver instanceof TakesScreenshot screenshot) {
             try {
                 Thread.sleep(1000);
-                ByteArrayInputStream input = new ByteArrayInputStream(((TakesScreenshot) driver)
-                    .getScreenshotAs(OutputType.BYTES));
+                ByteArrayInputStream input = new ByteArrayInputStream(screenshot.getScreenshotAs(OutputType.BYTES));
                 byte[] imageBytes = IOUtils.toByteArray(input);
                 new File(SCREENSHOT_FOLDER).mkdirs();
                 IOUtils.copy(new ByteArrayInputStream(imageBytes),

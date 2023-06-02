@@ -42,7 +42,7 @@ import org.mycore.mods.classification.MCRClassMapper;
  * so the first element that occurs wins. 
  * Default is "true", meaning the classification is repeatable.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRCategoryMerger extends MCRMerger {
 
@@ -52,11 +52,10 @@ public class MCRCategoryMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRCategoryMerger)) {
+        if (!(other instanceof MCRCategoryMerger cmOther)) {
             return false;
         }
 
-        MCRCategoryMerger cmOther = (MCRCategoryMerger) other;
         if (!MCRClassMapper.supportsClassification(this.element)
             || !MCRClassMapper.supportsClassification(cmOther.element)) {
             return false;
@@ -89,8 +88,7 @@ public class MCRCategoryMerger extends MCRMerger {
     }
 
     private static List<MCRCategory> getAncestorsAndSelf(MCRCategoryID categoryID) {
-        List<MCRCategory> ancestorsAndSelf = new ArrayList<MCRCategory>();
-        ancestorsAndSelf.addAll(DAO.getParents(categoryID));
+        List<MCRCategory> ancestorsAndSelf = new ArrayList<>(DAO.getParents(categoryID));
         ancestorsAndSelf.remove(DAO.getRootCategory(categoryID, 0));
         ancestorsAndSelf.add(DAO.getCategory(categoryID, 0));
         return ancestorsAndSelf;

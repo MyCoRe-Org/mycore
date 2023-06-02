@@ -146,8 +146,8 @@ public class MCRRealm {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRRealm) {
-            return ((MCRRealm) obj).id.equals(id);
+        if (obj instanceof MCRRealm realm) {
+            return realm.id.equals(id);
         } else {
             return false;
         }

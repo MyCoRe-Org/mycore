@@ -32,9 +32,7 @@ public class MCRStringTransformer {
     }
 
     private static void printCatgory(MCRCategory category, StringBuilder sb) {
-        for (int i = 0; i < category.getLevel(); i++) {
-            sb.append(' ');
-        }
+        sb.append(" ".repeat(category.getLevel()));
         sb.append(category.getId());
         sb.append('[');
         printLabels(category.getLabels(), sb);

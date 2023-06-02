@@ -34,14 +34,13 @@ import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
  * Parses XML content using specified {@link XMLReaderJDOMFactory}.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserImpl implements MCRXMLParser {
@@ -77,20 +76,9 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         return validate;
     }
 
-    public Document parseXML(MCRContent content) throws SAXParseException {
-        try {
-            InputSource source = content.getInputSource();
-            return builder.build(source);
-        } catch (Exception ex) {
-            if (ex instanceof SAXParseException) {
-                throw (SAXParseException) ex;
-            }
-            Throwable cause = ex.getCause();
-            if (cause instanceof SAXParseException) {
-                throw (SAXParseException) cause;
-            }
-            throw new MCRException(MSG, ex);
-        }
+    public Document parseXML(MCRContent content) throws IOException, JDOMException {
+        InputSource source = content.getInputSource();
+        return builder.build(source);
     }
 
     @Override
@@ -100,11 +88,11 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         } catch (JDOMException e) {
             Throwable cause = e.getCause();
             if (e != null) {
-                if (cause instanceof SAXException) {
-                    throw (SAXException) cause;
+                if (cause instanceof SAXException se) {
+                    throw se;
                 }
-                if (cause instanceof ParserConfigurationException) {
-                    throw (ParserConfigurationException) cause;
+                if (cause instanceof ParserConfigurationException pce) {
+                    throw pce;
                 }
             }
             throw new MCRException(e);

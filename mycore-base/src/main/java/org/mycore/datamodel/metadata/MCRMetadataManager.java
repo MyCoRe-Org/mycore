@@ -55,7 +55,6 @@ import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
-import org.xml.sax.SAXException;
 
 import jakarta.persistence.PersistenceException;
 
@@ -609,10 +608,10 @@ public final class MCRMetadataManager {
      * 
      */
     public static void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
-        if (mcrBaseObj instanceof MCRDerivate) {
-            MCRMetadataManager.fireRepairEvent((MCRDerivate) mcrBaseObj);
-        } else if (mcrBaseObj instanceof MCRObject) {
-            MCRMetadataManager.fireRepairEvent((MCRObject) mcrBaseObj);
+        if (mcrBaseObj instanceof MCRDerivate derivate) {
+            MCRMetadataManager.fireRepairEvent(derivate);
+        } else if (mcrBaseObj instanceof MCRObject object) {
+            MCRMetadataManager.fireRepairEvent(object);
         }
     }
 
@@ -663,7 +662,7 @@ public final class MCRMetadataManager {
                 throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id);
             }
             return new MCRDerivate(xml);
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id, e);
         }
     }
@@ -683,7 +682,7 @@ public final class MCRMetadataManager {
                 throw new MCRPersistenceException("Could not retrieve xml of object: " + id);
             }
             return new MCRObject(xml);
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRPersistenceException("Could not retrieve xml of object: " + id, e);
         }
     }
@@ -715,10 +714,10 @@ public final class MCRMetadataManager {
      */
     public static void update(final MCRBase base)
         throws MCRPersistenceException, MCRAccessException {
-        if (base instanceof MCRObject) {
-            MCRMetadataManager.update((MCRObject) base);
-        } else if (base instanceof MCRDerivate) {
-            MCRMetadataManager.update((MCRDerivate) base);
+        if (base instanceof MCRObject object) {
+            MCRMetadataManager.update(object);
+        } else if (base instanceof MCRDerivate derivate) {
+            MCRMetadataManager.update(derivate);
         } else {
             throw new IllegalArgumentException("Type is unsupported " + base.getId());
         }

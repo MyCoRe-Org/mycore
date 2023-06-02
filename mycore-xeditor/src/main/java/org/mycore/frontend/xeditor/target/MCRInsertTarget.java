@@ -22,7 +22,7 @@ import org.jaxen.JaxenException;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRInsertTarget extends MCRSwapInsertTarget {
     @Override

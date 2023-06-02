@@ -18,7 +18,6 @@
 
 package org.mycore.sass;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Date;
@@ -78,10 +77,9 @@ public class MCRSassCompilerManager {
      * @param importer a additional list of importers
      * @return Optional with the compiled css as string. Empty optional if the fileName is not valid.
      * @throws CompilationException if {@link Compiler#compile(FileContext)} throws
-     * @throws IOException if {@link Compiler#compile(FileContext)} throws
      */
     public synchronized Optional<String> getCSSFile(String file, List<Importer> importer)
-        throws CompilationException, IOException {
+        throws CompilationException {
         if (!isDeveloperMode() && fileCompiledContentMap.containsKey(file)) {
             return Optional.of(fileCompiledContentMap.get(file));
         } else {
@@ -110,9 +108,8 @@ public class MCRSassCompilerManager {
      *
      * @param name the name of the file (with .min.css or .css ending)
      * @return the compiled css
-     * @throws CompilationException
      */
-    private String compile(String name, List<Importer> importer) throws CompilationException, IOException {
+    private String compile(String name, List<Importer> importer) throws CompilationException {
         Options options = new Options();
         Collection<Importer> importerList = options.getImporters();
         importerList.addAll(importer);

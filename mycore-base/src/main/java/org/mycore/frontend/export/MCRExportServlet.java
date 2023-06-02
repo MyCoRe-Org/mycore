@@ -53,7 +53,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @see MCRExportCollection
  * @see MCRContentTransformer
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRExportServlet extends MCRServlet {
 
@@ -82,7 +82,7 @@ public class MCRExportServlet extends MCRServlet {
     /**
      * Fills the collection with the XML data requested by URIs or basket ID.
      */
-    private void fillCollection(HttpServletRequest req, MCRExportCollection collection) throws Exception {
+    private void fillCollection(HttpServletRequest req, MCRExportCollection collection) {
         String basketID = req.getParameter("basket");
         if (basketID != null) {
             MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(basketID);

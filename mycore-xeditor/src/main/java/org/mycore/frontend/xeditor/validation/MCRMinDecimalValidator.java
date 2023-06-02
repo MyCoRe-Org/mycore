@@ -23,7 +23,7 @@ package org.mycore.frontend.xeditor.validation;
  * The number format is specified by a given locale ID.
  * Example: &lt;xed:validate type="decimal" locale="en" min="1,000.00"... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMinDecimalValidator extends MCRDecimalValidator {
 

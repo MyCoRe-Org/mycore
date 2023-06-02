@@ -102,7 +102,7 @@ public class MCRSword {
 
     public static List<String> getWorkspaces() {
         initConfig();
-        return Collections.unmodifiableList(workspaceCollectionTable.keySet().stream().collect(Collectors.toList()));
+        return workspaceCollectionTable.keySet().stream().collect(Collectors.toUnmodifiableList());
     }
 
     public static List<String> getCollectionsOfWorkspace(String workspace) {

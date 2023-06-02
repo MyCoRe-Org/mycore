@@ -28,7 +28,7 @@ import org.mycore.common.content.streams.MCRMD5InputStream;
 /**
  * Reads MCRContent from a byte[] array.
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public class MCRByteContent extends MCRContent {
 

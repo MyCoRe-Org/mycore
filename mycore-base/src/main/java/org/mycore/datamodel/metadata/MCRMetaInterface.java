@@ -28,7 +28,6 @@ import com.google.gson.JsonObject;
  * method set of all metadata classes.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public interface MCRMetaInterface extends Cloneable {
 

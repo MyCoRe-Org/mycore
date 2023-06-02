@@ -25,11 +25,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.xml.sax.SAXParseException;
 
 import com.google.gson.JsonObject;
 
@@ -40,7 +40,6 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public final class MCRObject extends MCRBase {
 
@@ -80,7 +79,7 @@ public final class MCRObject extends MCRBase {
         mcrLabel = "";
     }
 
-    public MCRObject(byte[] bytes, boolean valid) throws SAXParseException {
+    public MCRObject(byte[] bytes, boolean valid) throws JDOMException {
         this();
         setFromXML(bytes, valid);
     }
@@ -90,7 +89,7 @@ public final class MCRObject extends MCRBase {
         setFromJDOM(doc);
     }
 
-    public MCRObject(URI uri) throws SAXParseException, IOException {
+    public MCRObject(URI uri) throws IOException, JDOMException {
         this();
         setFromURI(uri);
     }
@@ -301,9 +300,9 @@ public final class MCRObject extends MCRBase {
             MCRMetaElement elm = getMetadata().getMetadataElement(i);
             for (int j = 0; j < elm.size(); j++) {
                 MCRMetaInterface inf = elm.getElement(j);
-                if (inf instanceof MCRMetaClassification) {
-                    String classID = ((MCRMetaClassification) inf).getClassId();
-                    String categID = ((MCRMetaClassification) inf).getCategId();
+                if (inf instanceof MCRMetaClassification classification) {
+                    String classID = classification.getClassId();
+                    String categID = classification.getCategId();
                     boolean exists = MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classID, categID));
                     if (exists) {
                         continue;
@@ -315,8 +314,8 @@ public final class MCRObject extends MCRBase {
                     // throw activeLink;
                     // TODO: should trigger undo-Event
                 }
-                if (inf instanceof MCRMetaLinkID) {
-                    MCRObjectID destination = ((MCRMetaLinkID) inf).getXLinkHrefID();
+                if (inf instanceof MCRMetaLinkID linkID) {
+                    MCRObjectID destination = linkID.getXLinkHrefID();
                     if (MCRMetadataManager.exists(destination)) {
                         continue;
                     }

@@ -159,7 +159,7 @@ public class MCRConfiguration2 {
      */
     public static <T> Optional<T> getSingleInstanceOf(String name) {
         return getString(name)
-            .map(className -> new SingletonKey(name, className))
+            .map(className -> new ConfigSingletonKey(name, className))
             .map(key -> (T) instanceHolder.computeIfAbsent(key,
                 k -> MCRConfigurableInstanceHelper.getInstance(name).orElse(null)));
     }
@@ -184,7 +184,7 @@ public class MCRConfiguration2 {
     public static <T> Optional<T> getSingleInstanceOf(String name, Class<? extends T> alternative) {
         return MCRConfiguration2.<T>getSingleInstanceOf(name)
             .or(() -> Optional.ofNullable(alternative)
-                .map(className -> new MCRConfiguration2.SingletonKey(name, className.getName()))
+                .map(className -> new ConfigSingletonKey(name, className.getName()))
                 .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
                     (k) -> MCRConfigurableInstanceHelper.getInstance(alternative, Collections.emptyMap(), null))));
     }
@@ -269,7 +269,6 @@ public class MCRConfiguration2 {
     }
 
     /**
-     * @param prefix
      * @return a list of properties which represent a configurable class
      */
     public static Stream<String> getInstantiatablePropertyKeys(String prefix) {
@@ -292,8 +291,6 @@ public class MCRConfiguration2 {
 
     /**
      * Gets a list of properties which represent a configurable class and turns them in to a map.
-     * @param prefix
-     * @param <T>
      * @return a map where the key is a String describing the configurable instance value
      */
     public static <T> Map<String, Callable<T>> getInstances(String prefix) {
@@ -454,49 +451,14 @@ public class MCRConfiguration2 {
 
     }
 
-    static class SingletonKey {
-        private String property, className;
+    interface SingletonKey{
+        String property();
 
-        SingletonKey(String property, String className) {
-            super();
-            this.property = property;
-            this.className = className;
-        }
+        String classname();
+    }
 
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((className == null) ? 0 : className.hashCode());
-            result = prime * result + ((property == null) ? 0 : property.hashCode());
-            return result;
-        }
+    record ConfigSingletonKey(String property, String classname) implements SingletonKey {
 
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            SingletonKey other = (SingletonKey) obj;
-            if (className == null) {
-                if (other.className != null) {
-                    return false;
-                }
-            } else if (!className.equals(other.className)) {
-                return false;
-            }
-            if (property == null) {
-                return other.property == null;
-            } else {
-                return property.equals(other.property);
-            }
-        }
     }
 
 }

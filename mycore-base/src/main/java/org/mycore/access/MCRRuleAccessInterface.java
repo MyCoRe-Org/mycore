@@ -27,7 +27,6 @@ import java.util.Collection;
  *
  * @author Thomas Scheffler (yagee)
  *
- * @version $Revision$ $Date$
  * @since 1.3
  */
 public interface MCRRuleAccessInterface extends MCRAccessInterface {

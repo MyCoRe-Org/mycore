@@ -18,8 +18,6 @@
 
 package org.mycore.pi.frontend;
 
-import java.util.Locale;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -78,7 +76,6 @@ public class MCRIdentifierXSLUtils {
      *
      * @param objectID the object
      * @return a Nodelist
-     * @throws JDOMException
      */
     public static NodeList getPIServiceInformation(String objectID) throws JDOMException {
         Element e = new Element("list");
@@ -105,10 +102,10 @@ public class MCRIdentifierXSLUtils {
 
                 // rights
                 String permission = "register-" + rs.getServiceID();
-                Boolean canRegister = MCRAccessManager.checkPermission(objectID, "writedb") &&
+                boolean canRegister = MCRAccessManager.checkPermission(objectID, "writedb") &&
                     MCRAccessManager.checkPermission(obj.getId(), permission);
 
-                service.setAttribute("permission", canRegister.toString().toLowerCase(Locale.ROOT));
+                service.setAttribute("permission", Boolean.toString(canRegister));
 
                 // add the type
                 service.setAttribute("type", rs.getType());

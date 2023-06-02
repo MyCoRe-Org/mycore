@@ -34,7 +34,6 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
  * @author Harald Richter
  * @author Frank Lützenkirchen
  * 
- * @version $Revision$ $Date$
  * 
  * @see MCRUploadHandlerManager
  */

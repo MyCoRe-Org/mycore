@@ -40,11 +40,11 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     protected static final String DERIVATE_TYPES = "Derivate.Types";
 
-    private static Set<String> derivateTypes;
+    private Set<String> derivateTypes;
 
     public MCRThumbnailImageImpl(String implName) {
         super(implName);
-        derivateTypes = new HashSet<String>();
+        derivateTypes = new HashSet<>();
         derivateTypes.addAll(Arrays.asList(getProperties().get(DERIVATE_TYPES).split(",")));
     }
 

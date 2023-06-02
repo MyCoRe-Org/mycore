@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -66,8 +67,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -121,7 +120,7 @@ import jakarta.servlet.ServletContext;
  * from URIs of type resource, webapp, file, session, query or mcrobject. MyCoRe editor include declarations can read
  * XML files from resource, webapp, file, session, http or https, query, or mcrobject URIs.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURIResolver implements URIResolver {
@@ -416,6 +415,7 @@ public final class MCRURIResolver implements URIResolver {
         return null;
     }
 
+    @Deprecated
     URIResolver getResolver(String scheme) {
         if (SUPPORTED_SCHEMES.containsKey(scheme)) {
             return SUPPORTED_SCHEMES.get(scheme);
@@ -431,11 +431,13 @@ public final class MCRURIResolver implements URIResolver {
      *            the InputStream that contains the XML document
      * @return the root element of the parsed input stream
      */
+    @Deprecated
     protected Element parseStream(InputStream in) throws JDOMException, IOException {
-        SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
-        builder.setEntityResolver(MCREntityResolver.instance());
-
-        return builder.build(in).getRootElement();
+        final MCRStreamContent streamContent = new MCRStreamContent(in);
+        return MCRXMLParserFactory
+            .getNonValidatingParser()
+            .parseXML(streamContent)
+            .getRootElement();
     }
 
     /**
@@ -504,7 +506,7 @@ public final class MCRURIResolver implements URIResolver {
 
     private static class MCRRESTResolver implements URIResolver {
         private static final long MAX_OBJECT_SIZE = MCRConfiguration2.getLong(CONFIG_PREFIX + "REST.MaxObjectSize")
-            .orElse(128 * 1024l);
+            .orElse(128 * 1024L);
 
         private static final int MAX_CACHE_ENTRIES = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.MaxCacheEntries")
             .orElse(1000);
@@ -549,14 +551,13 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 HttpCacheContext context = HttpCacheContext.create();
                 HttpGet get = new HttpGet(hrefURI);
-                CloseableHttpResponse response = restClient.execute(get, context);
-                logger.debug(() -> getCacheDebugMsg(hrefURI, context));
-                try (InputStream content = response.getEntity().getContent()) {
+                try (CloseableHttpResponse response = restClient.execute(get, context);
+                    InputStream content = response.getEntity().getContent()) {
+                    logger.debug(() -> getCacheDebugMsg(hrefURI, context));
                     final Source source = new MCRStreamContent(content).getReusableCopy().getSource();
                     source.setSystemId(hrefURI.toASCIIString());
                     return source;
                 } finally {
-                    response.close();
                     get.reset();
                 }
             } catch (IOException e) {
@@ -565,25 +566,14 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         private String getCacheDebugMsg(URI hrefURI, HttpCacheContext context) {
-            String msg = hrefURI.toASCIIString() + ": ";
+            return hrefURI.toASCIIString() + ": " +
             switch (context.getCacheResponseStatus()) {
-            case CACHE_HIT:
-                msg += "A response was generated from the cache with " +
-                    "no requests sent upstream";
-                break;
-            case CACHE_MODULE_RESPONSE:
-                msg += "The response was generated directly by the " +
-                    "caching module";
-                break;
-            case CACHE_MISS:
-                msg += "The response came from an upstream server";
-                break;
-            case VALIDATED:
-                msg += "The response was generated from the cache " +
-                    "after validating the entry with the origin server";
-                break;
-            }
-            return msg;
+                case CACHE_HIT -> "A response was generated from the cache with no requests sent upstream";
+                case CACHE_MODULE_RESPONSE -> "The response was generated directly by the caching module";
+                case CACHE_MISS -> "The response came from an upstream server";
+                case VALIDATED -> "The response was generated from the cache after validating the entry "
+                    + "with the origin server";
+                };
         }
 
     }
@@ -595,7 +585,7 @@ public final class MCRURIResolver implements URIResolver {
          *
          * @param href
          *            for example, "mcrobject:DocPortal_document_07910401"
-         * @returns XML representation from MCRXMLContainer
+         * @return XML representation from MCRXMLContainer
          */
         @Override
         public Source resolve(String href, String base) throws TransformerException {
@@ -709,7 +699,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String type = href.substring(href.indexOf(":") + 1);
             String path = "/templates/" + type + "/";
             LOGGER.debug("Reading templates from {}", path);
@@ -801,7 +791,7 @@ public final class MCRURIResolver implements URIResolver {
          * @return the root element of the xml document
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from session using key {}", key);
             Element value = (Element) MCRSessionMgr.getCurrentSession().get(key);
@@ -883,7 +873,7 @@ public final class MCRURIResolver implements URIResolver {
          * Returns access controll rules as XML
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from query result using key :{}", key);
 
@@ -986,7 +976,7 @@ public final class MCRURIResolver implements URIResolver {
          * @see MCRCategoryTransformer
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             LOGGER.debug("start resolving {}", href);
             String cacheKey = getCacheKey(href);
             Element returns = categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
@@ -1017,12 +1007,12 @@ public final class MCRURIResolver implements URIResolver {
 
             String levelS = pst.nextToken();
             pst.nextToken(); // :
-            int levels = "all".equals(levelS) ? -1 : Integer.parseInt(levelS);
+            int levels = Objects.equals(levelS, "all") ? -1 : Integer.parseInt(levelS);
 
             String axis;
             String token = pst.nextToken();
             pst.nextToken(); // :
-            boolean emptyLeaves = !"noEmptyLeaves".equals(token);
+            boolean emptyLeaves = !Objects.equals(token, "noEmptyLeaves");
             if (!emptyLeaves) {
                 axis = pst.nextToken();
                 pst.nextToken(); // :
@@ -1094,7 +1084,7 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRExceptionAsXMLResolver implements URIResolver {
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String target = href.substring(href.indexOf(":") + 1);
 
             try {
@@ -1131,7 +1121,7 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRNotNullResolver implements URIResolver {
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String target = href.substring(href.indexOf(":") + 1);
             // fixes exceptions if suburi is empty like "mcrobject:"
             String subUri = target.substring(target.indexOf(":") + 1);
@@ -1208,8 +1198,8 @@ public final class MCRURIResolver implements URIResolver {
             } catch (IOException e) {
                 Throwable cause = e.getCause();
                 while (cause != null) {
-                    if (cause instanceof TransformerException) {
-                        throw (TransformerException) cause;
+                    if (cause instanceof TransformerException te) {
+                        throw te;
                     }
                     cause = cause.getCause();
                 }
@@ -1264,10 +1254,10 @@ public final class MCRURIResolver implements URIResolver {
                         .orElseGet(MCRLayoutTransformerFactory::new);
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
-                    if (transformer instanceof MCRParameterizedTransformer) {
+                    if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
                         MCRParameterCollector paramcollector = MCRParameterCollector.getInstanceFromUserSession();
                         paramcollector.setParameters(params);
-                        result = ((MCRParameterizedTransformer) transformer).transform(content, paramcollector);
+                        result = parameterizedTransformer.transform(content, paramcollector);
                     } else {
                         result = transformer.transform(content);
                     }
@@ -1277,13 +1267,10 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(new Element("null"));
                 }
             } catch (Exception e) {
-                if (e instanceof TransformerException) {
-                    throw (TransformerException) e;
-                }
                 Throwable cause = e.getCause();
                 while (cause != null) {
-                    if (cause instanceof TransformerException) {
-                        throw (TransformerException) cause;
+                    if (cause instanceof TransformerException te) {
+                        throw te;
                     }
                     cause = cause.getCause();
                 }
@@ -1305,13 +1292,13 @@ public final class MCRURIResolver implements URIResolver {
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
      *
-     * @returns A xsl file with the includes as href.
+     * @return A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
         private static Logger LOGGER = LogManager.getLogger(MCRXslIncludeResolver.class);
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String includePart = href.substring(href.indexOf(":") + 1);
             Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
@@ -1352,7 +1339,7 @@ public final class MCRURIResolver implements URIResolver {
      *  &lt;xsl:import href="xslImport:components:first.xsl"&gt;
      * </pre>
      *
-     * @returns A xsl file with the import as href.
+     * @return A xsl file with the import as href.
      */
     private static class MCRXslImportResolver implements URIResolver {
 
@@ -1445,7 +1432,7 @@ public final class MCRURIResolver implements URIResolver {
          * Builds a simple xml node tree on basis of name value pair
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Building xml from {}", key);
 
@@ -1492,7 +1479,7 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-        private Source getSource(Instant lastModified) throws IOException {
+        private Source getSource(Instant lastModified) {
             Element e = new Element("versions");
             Element v = new Element("version");
             e.addContent(v);
@@ -1546,7 +1533,7 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRFileMetadataResolver implements URIResolver {
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String[] parts = href.split(":");
             String completePath = parts[1];
             String[] pathParts = completePath.split("/", 2);
@@ -1746,20 +1733,14 @@ public final class MCRURIResolver implements URIResolver {
          * @see javax.xml.transform.URIResolver
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             final String[] split = href.split(":");
-            boolean permission;
-            switch (split.length) {
-            case 2:
-                permission = MCRAccessManager.checkPermission(split[1]);
-                break;
-            case 3:
-                permission = MCRAccessManager.checkPermission(split[1], split[2]);
-                break;
-            default:
-                throw new IllegalArgumentException(
+            boolean permission = switch (split.length) {
+                case 2 -> MCRAccessManager.checkPermission(split[1]);
+                case 3 -> MCRAccessManager.checkPermission(split[1], split[2]);
+                default -> throw new IllegalArgumentException(
                     "Invalid format of uri for retrieval of checkPermission: " + href);
-            }
+            };
             Element root = new Element("boolean");
             root.setText(Boolean.toString(permission));
             return new JDOMSource(root);
@@ -1767,7 +1748,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * @author Frank L\u00FCtzenkirchen
+     * @author Frank Lützenkirchen
      */
     private static class MCRCachingResolver implements URIResolver {
 
@@ -1796,7 +1777,7 @@ public final class MCRURIResolver implements URIResolver {
          * The default capacity is 100.
          */
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public Source resolve(String href, String base) {
             String hrefToCache = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("resolving: " + hrefToCache);
 

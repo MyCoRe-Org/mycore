@@ -54,12 +54,12 @@ public class MCRURLContent extends MCRContent {
     }
 
     @Override
-    public Source getSource() throws IOException {
+    public Source getSource() {
         return new StreamSource(getSystemId());
     }
 
     @Override
-    public InputSource getInputSource() throws IOException {
+    public InputSource getInputSource() {
         return new InputSource(getSystemId());
     }
 

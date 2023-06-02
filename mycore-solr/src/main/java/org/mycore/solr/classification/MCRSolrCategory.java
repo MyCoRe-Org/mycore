@@ -18,7 +18,7 @@
 
 package org.mycore.solr.classification;
 
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.Set;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -36,7 +36,7 @@ public class MCRSolrCategory {
 
     public SolrInputDocument toSolrDocument() {
         SolrInputDocument doc = new SolrInputDocument();
-        LinkedList<MCRCategory> ancestors = MCRSolrClassificationUtil.getAncestors(category);
+        Deque<MCRCategory> ancestors = MCRSolrClassificationUtil.getAncestors(category);
         MCRCategory parent = !ancestors.isEmpty() ? ancestors.getLast() : null;
         // ids
         MCRCategoryID id = category.getId();

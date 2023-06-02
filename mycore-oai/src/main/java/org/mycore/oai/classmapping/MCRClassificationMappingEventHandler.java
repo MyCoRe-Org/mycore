@@ -44,7 +44,6 @@ import org.mycore.datamodel.metadata.MCRObject;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision$ $Date$
  */
 public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 

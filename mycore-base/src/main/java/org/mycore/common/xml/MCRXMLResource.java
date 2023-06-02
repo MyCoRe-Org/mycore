@@ -28,7 +28,6 @@ import java.net.URLConnection;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
@@ -108,7 +107,7 @@ public class MCRXMLResource {
      *            resource name
      * @see MCRXMLResource#getResource(String, ClassLoader)
      */
-    public MCRContent getResource(String name) throws IOException, JDOMException {
+    public MCRContent getResource(String name) throws IOException {
         return getResource(name, MCRClassTools.getClassLoader());
     }
 

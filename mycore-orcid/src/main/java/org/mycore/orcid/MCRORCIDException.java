@@ -29,7 +29,7 @@ import jakarta.ws.rs.core.Response.StatusType;
 /**
  * Represents the error information returned from ORCID's REST API in case request was not successful
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRORCIDException extends IOException {
 

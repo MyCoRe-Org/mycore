@@ -28,7 +28,6 @@ import org.mycore.access.MCRAccessManager;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  */
 public class MCRObjectIDStrategy implements MCRCombineableAccessCheckStrategy {
 

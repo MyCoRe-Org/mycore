@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -325,7 +326,7 @@ public abstract class MCRServletContentHelper {
 
             boolean conditionSatisfied = false;
 
-            if ("*".equals(headerValue)) {
+            if (Objects.equals(headerValue, "*")) {
                 conditionSatisfied = true;
             } else {
                 final StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");

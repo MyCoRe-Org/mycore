@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -63,7 +64,6 @@ import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
-import org.xml.sax.SAXException;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata.
@@ -311,9 +311,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
     public void verifyStore(String base) {
         MCRMetadataStore store = getStore(base);
-        if (store instanceof MCRVersioningMetadataStore) {
+        if (store instanceof MCRVersioningMetadataStore versioningMetadataStore) {
             LOGGER.info("Verifying SVN history of {}.", base);
-            ((MCRVersioningMetadataStore) (getStore(base))).verify();
+            versioningMetadataStore.verify();
         } else {
             LOGGER.warn("Cannot verify unversioned store {}!", base);
         }
@@ -350,7 +350,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
         MCRConfiguration2.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
         MCRConfiguration2.set(configPrefix + "ForceXML", String.valueOf(true));
-        String value = "derivate".equals(objectType) ? "mycorederivate" : "mycoreobject";
+        String value = Objects.equals(objectType, "derivate") ? "mycorederivate" : "mycoreobject";
         MCRConfiguration2.set(configPrefix + "ForceDocType", value);
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, clazz);
@@ -437,7 +437,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 Document doc = content.asXML();
                 doc.getRootElement().setAttribute("rev", version.getRevision());
                 return new MCRJDOMContent(doc);
-            } catch (JDOMException | SAXException e) {
+            } catch (JDOMException e) {
                 throw new MCRPersistenceException("Could not parse XML from default store", e);
             }
         }
@@ -478,10 +478,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             return null;
         }
         MCRMetadataStore metadataStore = getStore(id, true);
-        if (!(metadataStore instanceof MCRVersioningMetadataStore)) {
+        if (!(metadataStore instanceof MCRVersioningMetadataStore verStore)) {
             return null;
         }
-        MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
         return verStore.retrieve(id.getNumberAsInteger());
     }
 

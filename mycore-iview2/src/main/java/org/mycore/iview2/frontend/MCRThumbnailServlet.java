@@ -30,6 +30,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,7 +44,6 @@ import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -78,10 +78,10 @@ public class MCRThumbnailServlet extends MCRServlet {
 
     private int thumbnailSize = MCRImage.getTileSize();
 
-    private static transient LoadingCache<String, Long> modifiedCache = CacheBuilder.newBuilder().maximumSize(5000)
-        .expireAfterWrite(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS).weakKeys().build(new CacheLoader<String, Long>() {
+    private static LoadingCache<String, Long> modifiedCache = CacheBuilder.newBuilder().maximumSize(5000)
+        .expireAfterWrite(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS).weakKeys().build(new CacheLoader<>() {
             @Override
-            public Long load(String id) throws Exception {
+            public Long load(String id) {
                 ThumnailInfo thumbnailInfo = getThumbnailInfo(id);
                 Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
                     thumbnailInfo.imagePath);
@@ -124,7 +124,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     }
 
     @Override
-    protected void render(MCRServletJob job, Exception ex) throws IOException, JDOMException {
+    protected void render(MCRServletJob job, Exception ex) throws IOException {
         try {
             ThumnailInfo thumbnailInfo = getThumbnailInfo(job.getRequest().getPathInfo());
             Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
@@ -140,7 +140,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             }
             String centerThumb = job.getRequest().getParameter("centerThumb");
             //defaults to "yes"
-            boolean centered = !"no".equals(centerThumb);
+            boolean centered = !Objects.equals(centerThumb, "no");
             BufferedImage thumbnail = getThumbnail(iviewFile, centered);
 
             if (thumbnail != null) {
@@ -186,7 +186,7 @@ public class MCRThumbnailServlet extends MCRServlet {
         return new ThumnailInfo(derivate, imagePath);
     }
 
-    private BufferedImage getThumbnail(Path iviewFile, boolean centered) throws IOException, JDOMException {
+    private BufferedImage getThumbnail(Path iviewFile, boolean centered) throws IOException {
         BufferedImage level1Image;
         try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
             Path iviewFileRoot = fs.getRootDirectories().iterator().next();

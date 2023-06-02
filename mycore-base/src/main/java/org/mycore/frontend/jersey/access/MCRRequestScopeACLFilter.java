@@ -18,7 +18,6 @@
 
 package org.mycore.frontend.jersey.access;
 
-import java.io.IOException;
 import java.util.function.Supplier;
 
 import jakarta.annotation.Priority;
@@ -33,7 +32,7 @@ public class MCRRequestScopeACLFilter implements ContainerRequestFilter {
     private static final MCRRequestScopeACLFactory ACL_FACTORY = new MCRRequestScopeACLFactory();
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         requestContext.setProperty(ACL_INSTANT_KEY, (Supplier<MCRRequestScopeACL>) ACL_FACTORY::provide);
     }
 }

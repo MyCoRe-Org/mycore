@@ -79,8 +79,6 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
@@ -276,7 +274,7 @@ public class MCRRestObjects {
         @QueryParam(PARAM_DELETED_BY) String deletedBy,
         @QueryParam(PARAM_SORT_BY) @DefaultValue("id") MCRObjectQuery.SortBy sortBy,
         @QueryParam(PARAM_SORT_ORDER) @DefaultValue("asc") MCRObjectQuery.SortOrder sortOrder,
-        @QueryParam(PARAM_CATEGORIES) List<String> categories) throws IOException {
+        @QueryParam(PARAM_CATEGORIES) List<String> categories) {
 
         MCRObjectQuery query = new MCRObjectQuery();
         int limitInt = Optional.ofNullable(limit)
@@ -383,7 +381,7 @@ public class MCRRestObjects {
             LOGGER.debug("Create new MyCoRe Object");
             MCRMetadataManager.create(mcrObj);
             return Response.created(uriInfo.getAbsolutePathBuilder().path(mcrObj.getId().toString()).build()).build();
-        } catch (MCRPersistenceException | SAXParseException | IOException e) {
+        } catch (MCRPersistenceException | JDOMException | IOException e) {
             throw new InternalServerErrorException(e);
         } catch (MCRAccessException e) {
             throw new ForbiddenException(e);
@@ -499,7 +497,7 @@ public class MCRRestObjects {
                     Date lastModifiedDate = new Date(lastModified.toMillis());
                     Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModifiedDate);
                     return cachedResponse.orElseGet(() -> {
-                        Optional<BufferedImage> thumbnail = null;
+                        Optional<BufferedImage> thumbnail;
                         try {
                             thumbnail = thumbnailGenerator.get().getThumbnail(mainDoc, size);
                         } catch (IOException e) {
@@ -507,7 +505,7 @@ public class MCRRestObjects {
                         }
                         return thumbnail.map(b -> {
                             String type = "image/png";
-                            if ("jpg".equals(ext) || "jpeg".equals(ext)) {
+                            if (Objects.equals(ext, "jpg") || Objects.equals(ext, "jpeg")) {
                                 type = "image/jpeg";
                             }
                             return Response.ok(b)
@@ -634,7 +632,7 @@ public class MCRRestObjects {
         try {
             updatedObject = new MCRObject(inputContent.asXML());
             updatedObject.validate();
-        } catch (JDOMException | SAXException | MCRException e) {
+        } catch (JDOMException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
                 .withMessage("MCRObject " + id + " is not valid")
@@ -702,7 +700,7 @@ public class MCRRestObjects {
             updatedObject = MCRMetadataManager.retrieveMCRObject(id);
             updatedObject.getMetadata().setFromDOM(inputContent.asXML().getRootElement().detach());
             updatedObject.validate();
-        } catch (JDOMException | SAXException | MCRException e) {
+        } catch (JDOMException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
                 .withMessage("MCRObject " + id + " is not valid")
@@ -776,8 +774,7 @@ public class MCRRestObjects {
                 description = "You do not have write permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have write permission"),
         })
-    public Response testUpdateObject(@PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
+    public Response testUpdateObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
@@ -791,8 +788,7 @@ public class MCRRestObjects {
                 description = "You do not have delete permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
         })
-    public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id)
-        throws IOException {
+    public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 

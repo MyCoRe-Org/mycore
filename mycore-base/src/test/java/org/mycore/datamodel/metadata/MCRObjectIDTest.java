@@ -21,7 +21,6 @@ package org.mycore.datamodel.metadata;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -48,7 +47,7 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void setNextFreeIdString() throws IOException {
+    public void setNextFreeIdString() {
         MCRObjectID id1 = MCRObjectID.getNextFreeId(BASE_ID);
         assertEquals("First id should be int 1", 1, id1.getNumberAsInteger());
         MCRObjectID id2 = MCRObjectID.getNextFreeId(BASE_ID);

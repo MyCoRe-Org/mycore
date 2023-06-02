@@ -21,9 +21,10 @@ package org.mycore.common.content.transformer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -55,6 +56,7 @@ import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
@@ -70,7 +72,7 @@ import org.xml.sax.XMLReader;
  * The default transformer factory implementation {@link org.apache.xalan.processor.TransformerFactoryImpl}
  * is configured with <code>MCR.LayoutService.TransformerFactoryClass</code>.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
@@ -86,7 +88,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         "MCRXSLTransformer instance cache");
 
     private static long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
-        .orElse(60000l);
+        .orElse(60000L);
 
     private static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
         .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
@@ -117,7 +119,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         setTransformerFactory(tfClass.getName());
     }
 
-    public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
+    /**
+     * Sets the class name for {@link TransformerFactory} used by this transformer.
+     *
+     * Must be called for thread safety before this instance is shared to other threads.
+     */
+    private void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
         TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
             .map(c -> TransformerFactory.newInstance(c, MCRClassTools.getClassLoader()))
             .orElseGet(TransformerFactory::newInstance);
@@ -208,9 +215,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     @Override
     public MCRContent transform(MCRContent source, MCRParameterCollector parameter) throws IOException {
         try {
-            LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
-            XMLReader reader = getXMLReader(transformHandlerList);
-            TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+            Deque<TransformerHandler> transformHandlers = getTransformHandlers(parameter);
+            XMLReader reader = getXMLReader(transformHandlers);
+            TransformerHandler lastTransformerHandler = transformHandlers.getLast();
             return transform(source, reader, lastTransformerHandler, parameter);
         } catch (TransformerException | SAXException | ParserConfigurationException e) {
             throw new IOException(e);
@@ -226,9 +233,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     public void transform(MCRContent source, OutputStream out, MCRParameterCollector parameter) throws IOException {
         MCRErrorListener el = null;
         try {
-            LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
-            XMLReader reader = getXMLReader(transformHandlerList);
-            TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+            Deque<TransformerHandler> transformHandlers = getTransformHandlers(parameter);
+            XMLReader reader = getXMLReader(transformHandlers);
+            TransformerHandler lastTransformerHandler = transformHandlers.getLast();
             el = (MCRErrorListener) lastTransformerHandler.getTransformer().getErrorListener();
             StreamResult result = new StreamResult(out);
             lastTransformerHandler.setResult(result);
@@ -261,7 +268,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
         LOGGER.debug("Start transforming: {}", source.getSystemId() == null ? source.getName() : source.getSystemId());
-        reader.parse(source.getInputSource());
+        MCRXMLHelper.asSecureXMLReader(reader).parse(source.getInputSource());
         return new MCRByteContent(baos.getBuffer(), 0, baos.size());
     }
 
@@ -287,10 +294,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return lastModified;
     }
 
-    protected LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
+    protected Deque<TransformerHandler> getTransformHandlers(MCRParameterCollector parameterCollector)
         throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         checkTemplateUptodate();
-        LinkedList<TransformerHandler> xslSteps = new LinkedList<>();
+        Deque<TransformerHandler> xslSteps = new ArrayDeque<>();
         //every transformhandler shares the same ErrorListener instance
         MCRErrorListener errorListener = MCRErrorListener.getInstance();
         for (Templates template : templates) {
@@ -306,7 +313,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return xslSteps;
     }
 
-    protected XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList)
+    protected XMLReader getXMLReader(Deque<TransformerHandler> transformHandlerList)
         throws SAXException, ParserConfigurationException {
         XMLReader reader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         reader.setEntityResolver(ENTITY_RESOLVER);
@@ -358,7 +365,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0)
                 ? Math.max(transformerLastModified, source.lastModified())
                 : -1;
-            this.eTag = generateETag(source, lastModified, parameter.hashCode());
+            this.eTag = generateETag(lastModified, parameter.hashCode());
             this.name = fileName;
             this.mimeType = mimeType;
             this.encoding = encoding;
@@ -366,7 +373,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
 
         @Override
-        public String getMimeType() throws IOException {
+        public String getMimeType() {
             return mimeType;
         }
 
@@ -375,8 +382,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             return name;
         }
 
-        private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
-            throws IOException {
+        private String generateETag(final long lastModified, final int parameterHashCode) {
             //parameterHashCode is stable for this session and current request URL
             long systemLastModified = MCRConfigurationBase.getSystemLastModified();
             StringBuilder b = new StringBuilder("\"");
@@ -421,12 +427,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
 
         @Override
-        public long lastModified() throws IOException {
+        public long lastModified() {
             return lastModified;
         }
 
         @Override
-        public String getETag() throws IOException {
+        public String getETag() {
             return eTag;
         }
 

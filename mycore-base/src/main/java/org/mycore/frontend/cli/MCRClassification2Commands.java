@@ -21,7 +21,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -43,6 +42,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
@@ -63,10 +63,8 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXParseException;
 
 import jakarta.persistence.EntityManager;
 
@@ -122,7 +120,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load classification from file {0}",
         help = "The command adds a new classification from file {0} to the system.",
         order = 10)
-    public static List<String> loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
+    public static List<String> loadFromFile(String filename) throws MCRException,
         IOException {
         String fileURL = Paths.get(filename).toAbsolutePath().normalize().toUri().toURL().toString();
         return Collections.singletonList("load classification from url " + fileURL);
@@ -131,7 +129,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load classification from url {0}",
         help = "The command adds a new classification from URL {0} to the system.",
         order = 15)
-    public static void loadFromURL(String fileURL) throws SAXParseException, MalformedURLException, URISyntaxException {
+    public static void loadFromURL(String fileURL) throws IOException, URISyntaxException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
@@ -140,7 +138,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load classification from uri {0}",
         help = "The command adds a new classification from URI {0} to the system.",
         order = 17)
-    public static void loadFromURI(String fileURI) throws SAXParseException, URISyntaxException, TransformerException {
+    public static void loadFromURI(String fileURI)
+        throws URISyntaxException, TransformerException, IOException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
@@ -157,7 +156,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command updates a classification from file {0} to the system.",
         order = 20)
     public static List<String> updateFromFile(String filename)
-        throws URISyntaxException, MCRException, SAXParseException,
+        throws MCRException,
         IOException {
         String fileURL = Paths.get(filename).toAbsolutePath().normalize().toUri().toURL().toString();
         return Collections.singletonList("update classification from url " + fileURL);
@@ -167,7 +166,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command updates a classification from URL {0} to the system.",
         order = 25)
     public static void updateFromURL(String fileURL)
-        throws SAXParseException, MalformedURLException, URISyntaxException {
+        throws IOException, URISyntaxException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
@@ -181,8 +180,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "update classification from uri {0}",
         help = "The command updates a classification from URI {0} to the system.",
         order = 27)
-    public static void updateFromURI(String fileURI) throws SAXParseException, URISyntaxException,
-        TransformerException {
+    public static void updateFromURI(String fileURI)
+        throws URISyntaxException, TransformerException, IOException, JDOMException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
@@ -202,7 +201,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "load all classifications from directory {0}",
         help = "The command add all classifications in the directory {0} to the system.",
         order = 40)
-    public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(directory, false);
     }
 
@@ -215,7 +214,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "update all classifications from directory {0}",
         help = "The command update all classifications in the directory {0} to the system.",
         order = 50)
-    public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> updateFromDirectory(String directory) {
         return processFromDirectory(directory, true);
     }
 
@@ -227,9 +226,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param update
      *            if true, classification will be updated, else Classification
      *            is created
-     * @throws MCRActiveLinkException
      */
-    private static List<String> processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
+    private static List<String> processFromDirectory(String directory, boolean update) {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
@@ -311,8 +309,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param style
      *            the style attribute for the transformer stylesheet
      * @return the transformer
-     * @throws TransformerFactoryConfigurationError
-     * @throws TransformerConfigurationException
      */
     private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
         TransformerConfigurationException {
@@ -399,11 +395,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     private static void listCategory(MCRCategory categ) {
         int level = categ.getLevel();
-        StringBuilder sb = new StringBuilder(128);
-        for (int i = 0; i < level * 2; i++) {
-            sb.append(' ');
-        }
-        String space = sb.toString();
+        String space = " ".repeat(level * 2);
         if (categ.isCategory()) {
             LOGGER.info("{}  ID    : {}", space, categ.getId().getID());
         }
@@ -528,11 +520,12 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "fixes all left and right values in the given classification",
         order = 130)
     public static void repairLeftRightValue(String classID) {
-        if (!(DAO instanceof MCRCategoryDAOImpl)) {
+        if (DAO instanceof MCRCategoryDAOImpl categoryDAO) {
+            categoryDAO.repairLeftRightValue(classID);
+        } else {
             LOGGER.error("Command not compatible with {}", DAO.getClass().getName());
             return;
         }
-        ((MCRCategoryDAOImpl) DAO).repairLeftRightValue(classID);
     }
 
     @MCRCommand(syntax = "check all classifications",

@@ -30,7 +30,6 @@ import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
@@ -49,7 +48,7 @@ import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
 import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBinding {
 
@@ -69,11 +68,11 @@ public class MCRBinding {
 
     private Map<String, Object> staticVariables = null;
 
-    public MCRBinding(Document document) throws JDOMException {
+    public MCRBinding(Document document) {
         this.boundNodes.add(document);
     }
 
-    public MCRBinding(Document document, MCRChangeTracker tracker) throws JDOMException {
+    public MCRBinding(Document document, MCRChangeTracker tracker) {
         this(document);
         this.tracker = tracker;
 
@@ -84,13 +83,13 @@ public class MCRBinding {
         parent.children.add(this);
     }
 
-    public MCRBinding(String xPath, boolean buildIfNotExists, MCRBinding parent) throws JDOMException, JaxenException {
+    public MCRBinding(String xPath, boolean buildIfNotExists, MCRBinding parent) throws JaxenException {
         this(parent);
         bind(xPath, buildIfNotExists, null);
     }
 
     public MCRBinding(String xPath, String initialValue, String name, MCRBinding parent)
-        throws JDOMException, JaxenException {
+        throws JaxenException {
         this(parent);
         this.name = (name != null) && !name.isEmpty() ? name : null;
         bind(xPath, true, initialValue);
@@ -144,8 +143,8 @@ public class MCRBinding {
 
     public void removeBoundNode(int index) {
         Object node = boundNodes.remove(index);
-        if (node instanceof Element) {
-            track(MCRRemoveElement.remove((Element) node));
+        if (node instanceof Element element) {
+            track(MCRRemoveElement.remove(element));
         } else {
             track(MCRRemoveAttribute.remove((Attribute) node));
         }
@@ -163,8 +162,7 @@ public class MCRBinding {
     }
 
     private void trackNodeCreated(Object node) {
-        if (node instanceof Element) {
-            Element element = (Element) node;
+        if (node instanceof Element element) {
             MCRChangeTracker.removeChangeTracking(element);
             track(MCRAddedElement.added(element));
         } else {
@@ -199,8 +197,8 @@ public class MCRBinding {
     }
 
     public static String getValue(Object node) {
-        if (node instanceof Element) {
-            return ((Element) node).getTextTrim();
+        if (node instanceof Element element) {
+            return element.getTextTrim();
         } else {
             return ((Attribute) node).getValue();
         }
@@ -234,8 +232,8 @@ public class MCRBinding {
         if (value.equals(getValue(node))) {
             return;
         }
-        if (node instanceof Attribute) {
-            track(MCRSetAttributeValue.setValue((Attribute) node, value));
+        if (node instanceof Attribute attribute) {
+            track(MCRSetAttributeValue.setValue(attribute, value));
         } else {
             track(MCRSetElementText.setText((Element) node, value));
         }
@@ -264,8 +262,7 @@ public class MCRBinding {
     }
 
     public Map<String, Object> buildXPathVariables() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.putAll(getVariables());
+        Map<String, Object> variables = new HashMap<>(getVariables());
 
         for (MCRBinding ancestor : getAncestorsAndSelf()) {
             for (MCRBinding child : ancestor.getChildren()) {

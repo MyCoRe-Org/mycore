@@ -18,14 +18,12 @@
 
 package org.mycore.services.queuedjob;
 
-import java.util.concurrent.ExecutionException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRTestJobAction extends MCRJobAction {
@@ -60,7 +58,7 @@ public class MCRTestJobAction extends MCRJobAction {
      * @see org.mycore.services.queuedjob.MCRJobAction#execute()
      */
     @Override
-    public void execute() throws ExecutionException {
+    public void execute() {
         LOGGER.info("job num: {}", job.getParameter("count"));
         job.setParameter("done", "true");
 

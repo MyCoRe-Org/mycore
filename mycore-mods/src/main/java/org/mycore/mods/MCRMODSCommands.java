@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -35,18 +34,15 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.input.sax.XMLReaders;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -95,13 +91,13 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         help = "Load MODS document {0} as MyCoRe Object for project {1}",
         order = 20)
     public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException,
-        MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
+        SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a file.", modsFile.getAbsolutePath()));
         }
-        SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
-        Document modsDoc = s.build(modsFile);
+        MCRPathContent pathContent = new MCRPathContent(modsFile.toPath());
+        Document modsDoc = pathContent.asXML();
         //force validation against MODS XSD
         MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
         Element modsRoot = modsDoc.getRootElement();
@@ -124,7 +120,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         order = 10)
     public static void loadFromFileWithFiles(String modsFileName, String fileDirName, String projectID)
         throws JDOMException, IOException,
-        MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
+        SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a file.", modsFile.getAbsolutePath()));
@@ -136,8 +132,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
                 String.format(Locale.ENGLISH, "Directory %s is not a directory.", fileDir.getAbsolutePath()));
         }
 
-        SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
-        Document modsDoc = s.build(modsFile);
+        MCRPathContent pathContent = new MCRPathContent(modsFile.toPath());
+        Document modsDoc = pathContent.asXML();
         //force validation against MODS XSD
         MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
         Element modsRoot = modsDoc.getRootElement();
@@ -154,7 +150,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     private static MCRObjectID saveAsMyCoReObject(String projectID, Element modsRoot)
-        throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsRoot, projectID);
         mcrObject.setId(MCRObjectID.getNextFreeId(mcrObject.getId().getBase()));
         MCRMetadataManager.create(mcrObject);
@@ -205,17 +201,12 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     protected static void setDefaultPermissions(MCRObjectID derivateID) {
-        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
-            MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
-            if (ai instanceof MCRRuleAccessInterface) {
-                Collection<String> configuredPermissions = ((MCRRuleAccessInterface) ai)
-                    .getAccessPermissionsFromConfiguration();
-                for (String permission : configuredPermissions) {
-                    MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
-                        "default derivate rule");
-                }
-            }
-
+        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)
+            && MCRAccessManager.getAccessImpl() instanceof MCRRuleAccessInterface ruleAccess) {
+            ruleAccess
+                .getAccessPermissionsFromConfiguration()
+                .forEach(p -> MCRAccessManager.addRule(derivateID, p, MCRAccessManager.getTrueRule(),
+                    "default derivate rule"));
         }
     }
 }

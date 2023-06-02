@@ -37,16 +37,15 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersistentIdentifier> {
     @Override
-    public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional) {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         MCRNodeBuilder nb = new MCRNodeBuilder();
         try {
             nb.buildElement(xpath, identifier.asString(), xml);
-            if (obj instanceof MCRObject) {
+            if (obj instanceof MCRObject object) {
                 final Element metadata = xml.getRootElement().getChild("metadata");
-                ((MCRObject) obj).getMetadata().setFromDOM(metadata);
+                object.getMetadata().setFromDOM(metadata);
             } else {
                 throw new MCRPersistentIdentifierException(obj.getId() + " is no MCRObject!",
                     new OperationNotSupportedException(getClass().getName() + " only supports "

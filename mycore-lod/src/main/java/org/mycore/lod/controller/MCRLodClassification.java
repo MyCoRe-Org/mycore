@@ -104,7 +104,8 @@ public class MCRLodClassification {
         try {
             Document classRdfxml = createClassList();
             String rdfxmlString = new MCRJDOMContent(classRdfxml).asString();
-            List<String> mimeTypes = request.getAcceptableMediaTypes().parallelStream().map(x -> x.toString()).toList();
+            List<String> mimeTypes = request.getAcceptableMediaTypes().parallelStream().map(MediaType::toString)
+                .toList();
             URI uri = request.getUriInfo().getBaseUri();
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
@@ -180,7 +181,7 @@ public class MCRLodClassification {
         try {
             Document classRdfXml = MCRSkosTransformer.getSkosInRDFXML(classification, categId);
             String rdfxmlString = new MCRJDOMContent(classRdfXml).asString();
-            List<String> mimeTypes = acceptMediaTypes.parallelStream().map(x -> x.toString()).toList();
+            List<String> mimeTypes = acceptMediaTypes.parallelStream().map(MediaType::toString).toList();
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())

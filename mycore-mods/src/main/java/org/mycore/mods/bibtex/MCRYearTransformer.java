@@ -29,7 +29,7 @@ import bibtex.dom.BibtexString;
 /**
  * Transforms a BibTeX year field to a JDOM mods:dateIssued element.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRYearTransformer extends MCRField2XPathTransformer {
 

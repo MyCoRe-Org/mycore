@@ -44,11 +44,10 @@ import org.mycore.util.concurrent.MCRReadWriteGuard;
  * 
  * @author Detlev Degenhardt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRSessionMgr {
 
-    private static Map<String, MCRSession> sessions = Collections.synchronizedMap(new HashMap<String, MCRSession>());
+    private static Map<String, MCRSession> sessions = Collections.synchronizedMap(new HashMap<>());
 
     private static List<MCRSessionListener> listeners = new ArrayList<>();
 
@@ -66,12 +65,7 @@ public class MCRSessionMgr {
 
     private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
-    private static ThreadLocal<Boolean> isSessionCreationLocked = new ThreadLocal<>() {
-        @Override
-        protected Boolean initialValue() {
-            return Boolean.TRUE;
-        }
-    };
+    private static ThreadLocal<Boolean> isSessionCreationLocked = ThreadLocal.withInitial(() -> Boolean.TRUE);
 
     /**
      * This method returns the unique MyCoRe session object for the current Thread. The session object is initialized
@@ -243,7 +237,7 @@ public class MCRSessionMgr {
     public static void close() {
         listenersGuard.write(() -> {
             Collection<MCRSession> var = sessions.values();
-            for (MCRSession session : var.toArray(new MCRSession[var.size()])) {
+            for (MCRSession session : var.toArray(MCRSession[]::new)) {
                 session.close();
             }
             LogManager.getLogger(MCRSessionMgr.class).info("Removing thread locals...");

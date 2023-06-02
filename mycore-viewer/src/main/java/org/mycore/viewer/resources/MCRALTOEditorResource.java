@@ -18,7 +18,6 @@
 
 package org.mycore.viewer.resources;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class MCRALTOEditorResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/store")
-    public MCRAltoChangePID storeChangeSet(MCRAltoChangeSet changeSet) throws UnsupportedEncodingException {
+    public MCRAltoChangePID storeChangeSet(MCRAltoChangeSet changeSet) {
         MCRJerseyUtil.checkPermission(changeSet.getDerivateID(), MCRALTOUtil.EDIT_ALTO_PERMISSION);
         MCRStoredChangeSet storedChangeSet = changeSetStore.storeChangeSet(changeSet);
         return new MCRAltoChangePID(storedChangeSet.getPid());
@@ -67,8 +66,7 @@ public class MCRALTOEditorResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/update/{pid}")
-    public MCRAltoChangePID updateChangeSet(MCRAltoChangeSet changeSet, @PathParam("pid") String pid)
-        throws UnsupportedEncodingException {
+    public MCRAltoChangePID updateChangeSet(MCRAltoChangeSet changeSet, @PathParam("pid") String pid) {
 
         String currentSessionID = MCRSessionMgr.getCurrentSessionID();
         if (currentSessionID != null && !currentSessionID.equals(changeSetStore.get(pid).getSessionID())) {

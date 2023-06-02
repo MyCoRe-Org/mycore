@@ -36,7 +36,6 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
@@ -98,7 +97,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
 
     @Test
     public void testRegistrationService()
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
 
         MCRPIService<MCRMockIdentifier> registrationService = MCRPIServiceManager
@@ -150,7 +149,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
             mycoreID.toString(), null, MOCK_SERVICE, null);
     }
 
-    private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
+    private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) {
         MCRMockIdentifierGenerator mcruuidurnGenerator = (MCRMockIdentifierGenerator) MCRConfiguration2
             .getInstanceOf("MCR.PI.Generator." + MOCK_PID_GENERATOR).get();
         MCRObject mcrObject = new MCRObject();

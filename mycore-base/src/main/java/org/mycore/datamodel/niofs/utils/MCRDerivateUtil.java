@@ -46,14 +46,13 @@ public class MCRDerivateUtil {
      * @param pattern the RegEx pattern to find the wanted files
      * @param replacement the new name for the files
      * @return a Hashmap with the old name and the new name
-     * @throws IOException
      */
     public static Map<String, String> renameFiles(String derivate, String pattern, String replacement)
         throws IOException {
         MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
         Pattern patternObj = Pattern.compile(pattern);
         Map<String, String> resultMap = new HashMap<>();
-        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {

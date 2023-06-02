@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.sword.MCRSwordContainerHandler;
-import org.swordapp.server.SwordError;
 
 /**
  * Interface to tell the MyCoRe SwordV2 which MyCoRe Objects will be visible to sword and in which collections they are.
@@ -83,7 +82,7 @@ public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
 
     public abstract MCRSwordAuthHandler getAuthHandler();
 
-    public Stream<String> getDerivateIDsofObject(final String mcrObjectId) throws SwordError {
+    public Stream<String> getDerivateIDsofObject(final String mcrObjectId) {
         final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(mcrObjectId),
             10, TimeUnit.SECONDS);
         return derivateIds.stream().map(MCRObjectID::toString);

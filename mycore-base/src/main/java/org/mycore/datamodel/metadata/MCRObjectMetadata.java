@@ -43,7 +43,6 @@ import com.google.gson.JsonObject;
  * 
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
- * @version $Revision$ $Date$
  */
 public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     private static final Logger LOGGER = LogManager.getLogger();

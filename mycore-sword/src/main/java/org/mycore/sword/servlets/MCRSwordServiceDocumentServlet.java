@@ -36,7 +36,7 @@ public class MCRSwordServiceDocumentServlet extends MCRSwordServlet {
     private ServiceDocumentAPI api;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
         MCRSwordServiceDocumentManager sdMgr = new MCRSwordServiceDocumentManager();
         api = new ServiceDocumentAPI(sdMgr, swordConfiguration);

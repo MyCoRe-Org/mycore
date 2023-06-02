@@ -25,7 +25,7 @@ import org.jdom2.Element;
  * So if they have the same name and the same type attribute value,
  * they are regarded to represent the same information.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRUniqueTypeMerger extends MCRMerger {
 
@@ -39,10 +39,6 @@ public class MCRUniqueTypeMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRUniqueTypeMerger)) {
-            return false;
-        } else {
-            return this.getType().equals(((MCRUniqueTypeMerger) other).getType());
-        }
+        return other instanceof MCRUniqueTypeMerger typeMerger && this.getType().equals(typeMerger.getType());
     }
 }

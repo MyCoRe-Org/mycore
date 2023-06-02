@@ -41,7 +41,6 @@ import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.utils.MCRUserTransformer;
-import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
@@ -117,9 +116,7 @@ public class MCROCFLXMLUserManager {
         MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-                updater -> {
-                    updater.writeFile(userAsStream, user.getUserID() + ".xml", OcflOption.OVERWRITE);
-                });
+                updater -> updater.writeFile(userAsStream, user.getUserID() + ".xml", OcflOption.OVERWRITE));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to update user '" + ocflUserID + "'", e);
         }
@@ -146,9 +143,7 @@ public class MCROCFLXMLUserManager {
         MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-                updater -> {
-                    updater.writeFile(userAsStream, user.getUserID() + ".xml");
-                });
+                updater -> updater.writeFile(userAsStream, user.getUserID() + ".xml"));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to update user '" + ocflUserID + "'", e);
         }
@@ -181,9 +176,7 @@ public class MCROCFLXMLUserManager {
             .setCreated(OffsetDateTime.now(ZoneOffset.UTC))
             .setUser(currentUser.getUserName(), buildEmail(currentUser));
         repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-            updater -> {
-                updater.removeFile(userId + ".xml");
-            });
+            updater -> updater.removeFile(userId + ".xml"));
     }
 
     public void purgeUser(String userId) {
@@ -226,7 +219,7 @@ public class MCROCFLXMLUserManager {
         try (InputStream storedContentStream = repository.getObject(version).getFile(userId + ".xml").getStream()) {
             Document xml = new MCRStreamContent(storedContentStream).asXML();
             return MCRUserTransformer.buildMCRUser(xml.getRootElement());
-        } catch (JDOMException | IOException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }

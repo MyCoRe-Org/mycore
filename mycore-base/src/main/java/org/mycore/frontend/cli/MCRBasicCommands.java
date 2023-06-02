@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -44,7 +45,6 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -54,7 +54,6 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class contains the basic commands for MyCoRe Command Line and WebCLI.
@@ -92,7 +91,7 @@ public class MCRBasicCommands {
     public static void listKnownCommandsBeginningWithPrefix(String pattern) {
         TreeMap<String, List<org.mycore.frontend.cli.MCRCommand>> matchingCommands = MCRCommandManager
             .getKnownCommands().entrySet().stream()
-            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 .filter(cmd -> cmd.getSyntax().contains(pattern) || cmd.getHelpText().contains(pattern))
                 .collect(Collectors.toList()), (k, v) -> k, TreeMap::new));
 
@@ -321,7 +320,7 @@ public class MCRBasicCommands {
      *            the location of the xml file
      */
     @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
-    public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {
+    public static boolean checkXMLFile(String fileName) throws IOException, JDOMException {
         if (!fileName.endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", fileName);
 

@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  * that is not registered at the Library of Congress, but maintained by an external authority like the MyCoRe
  * application.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRAuthorityWithURI extends MCRAuthorityInfo {
     /** The attribute holding the authority URI in XML */

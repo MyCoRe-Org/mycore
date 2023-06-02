@@ -21,6 +21,7 @@ package org.mycore.mods.enrichment;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -83,7 +84,7 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  *
  * @see MCRDataSource
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREnricher {
 
@@ -177,9 +178,9 @@ public class MCREnricher {
             String token = st.nextToken(DELIMITERS).trim();
             if (token.isEmpty()) {
                 continue;
-            } else if ("(".equals(token)) {
+            } else if (Objects.equals(token, "(")) {
                 withinGroup = true;
-            } else if (")".equals(token)) {
+            } else if (Objects.equals(token, ")")) {
                 withinGroup = false;
             } else {
                 MCRDataSourceCall call = id2call.get(token);

@@ -25,12 +25,11 @@ import org.jdom2.output.Format;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRXMLContent;
-import org.xml.sax.SAXException;
 
 /**
  * Transforms xml content in pretty, UTF-8 encoded format.
  *  
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRToPrettyXML extends MCRContentTransformer {
 
@@ -39,7 +38,7 @@ public class MCRToPrettyXML extends MCRContentTransformer {
         MCRXMLContent content;
         try {
             content = (source instanceof MCRXMLContent ? (MCRXMLContent) source : new MCRJDOMContent(source.asXML()));
-        } catch (JDOMException | SAXException e) {
+        } catch (JDOMException e) {
             throw new IOException(e);
         }
         if (content != source) {
@@ -61,7 +60,7 @@ public class MCRToPrettyXML extends MCRContentTransformer {
     }
 
     @Override
-    public String getMimeType() throws Exception {
+    public String getMimeType() {
         return "text/xml";
     }
 }

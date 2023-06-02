@@ -24,11 +24,12 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -317,7 +318,6 @@ public class MCRWebCLIContainer {
         /**
          * method mainly copied from CLI class
          *
-         * @param command
          * @return true if command processed successfully
          */
         private boolean processCommand(String command) {
@@ -383,7 +383,7 @@ public class MCRWebCLIContainer {
             return commandsReturned;
         }
 
-        protected void saveQueue(String lastCommand, LinkedList<String> failedQueue) {
+        protected void saveQueue(String lastCommand, Queue<String> failedQueue) {
             // lastCommand is null if work is not stopped at first error
             if (lastCommand == null) {
                 LOGGER.error("Some commands failed.");
@@ -398,7 +398,7 @@ public class MCRWebCLIContainer {
             LOGGER.info("Writing unprocessed commands to file {}", file.getAbsolutePath());
 
             try {
-                PrintWriter pw = new PrintWriter(file, Charset.defaultCharset().name());
+                PrintWriter pw = new PrintWriter(file, Charset.defaultCharset());
                 if (lastCommand != null) {
                     pw.println(lastCommand);
                 }
@@ -420,7 +420,7 @@ public class MCRWebCLIContainer {
         protected boolean processCommands() throws IOException {
             final LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
             final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
-            LinkedList<String> failedQueue = new LinkedList<>();
+            Queue<String> failedQueue = new ArrayDeque<>();
             logGrabber.grabCurrentThread();
             // start grabbing logs of this thread
             logConf.getRootLogger().addAppender(logGrabber, logConf.getRootLogger().getLevel(), null);
@@ -545,8 +545,8 @@ public class MCRWebCLIContainer {
         @Override
         public void stop() {
             while (publisher.estimateMaximumLag() > 0) {
-                if (publisher.getExecutor() instanceof ForkJoinPool) {
-                    ((ForkJoinPool) publisher.getExecutor()).awaitQuiescence(1, TimeUnit.SECONDS);
+                if (publisher.getExecutor() instanceof ForkJoinPool forkJoinPool) {
+                    forkJoinPool.awaitQuiescence(1, TimeUnit.SECONDS);
                 } else {
                     Thread.yield();
                 }

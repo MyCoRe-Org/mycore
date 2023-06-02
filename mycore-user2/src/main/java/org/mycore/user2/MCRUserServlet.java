@@ -99,20 +99,14 @@ public class MCRUserServlet extends MCRServlet {
             user = MCRUserManager.getUser(uid);
         }
 
-        if ("show".equals(action)) {
-            showUser(req, res, user, uid);
-        } else if ("save".equals(action)) {
-            saveUser(req, res);
-        } else if ("saveCurrentUser".equals(action)) {
-            saveCurrentUser(req, res);
-        } else if ("changeMyPassword".equals(action)) {
-            redirectToPasswordChangePage(req, res);
-        } else if ("password".equals(action)) {
-            changePassword(req, res, user, uid);
-        } else if ("delete".equals(action)) {
-            deleteUser(req, res, user);
-        } else {
-            listUsers(req, res);
+        switch (action) {
+            case "show" -> showUser(req, res, user, uid);
+            case "save" -> saveCurrentUser(req, res);
+            case "saveCurrentUser" -> saveCurrentUser(req, res);
+            case "changeMyPassword" -> redirectToPasswordChangePage(req, res);
+            case "password" -> changePassword(req, res, user, uid);
+            case "delete" -> deleteUser(req, res, user);
+            default -> listUsers(req, res);
         }
     }
 

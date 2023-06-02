@@ -31,7 +31,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * basket entry. This can be used by applications that wish
  * to edit XML in the basket itself.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasketEntry {
 
@@ -111,8 +111,8 @@ public class MCRBasketEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRBasketEntry) {
-            return ((MCRBasketEntry) obj).id.equals(id);
+        if (obj instanceof MCRBasketEntry basketEntry) {
+            return basketEntry.id.equals(id);
         } else {
             return false;
         }

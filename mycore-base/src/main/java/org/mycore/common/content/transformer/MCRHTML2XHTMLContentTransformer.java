@@ -49,12 +49,12 @@ public class MCRHTML2XHTMLContentTransformer extends MCRContentTransformer {
     }
 
     @Override
-    public String getFileExtension() throws Exception {
+    public String getFileExtension() {
         return "html";
     }
 
     @Override
-    public String getMimeType() throws Exception {
+    public String getMimeType() {
         return "application/xhtml+xml";
     }
 

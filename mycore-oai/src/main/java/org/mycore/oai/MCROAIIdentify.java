@@ -122,7 +122,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         return new OAIIdentifierDescription(reposId, sampleId);
     }
 
-    class CustomDescription implements Description {
+    static class CustomDescription implements Description {
 
         private Element description;
 

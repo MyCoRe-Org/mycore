@@ -86,7 +86,7 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
         return xPath;
     }
 
-    class ExtensionFunction {
+    static class ExtensionFunction {
 
         String prefix;
 

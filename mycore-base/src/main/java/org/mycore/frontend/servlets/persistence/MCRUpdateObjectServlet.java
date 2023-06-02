@@ -25,7 +25,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -44,14 +43,12 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
 
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = -7507356414480350102L;
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
-        ServletException, MCRActiveLinkException, SAXParseException, JDOMException, IOException {
+        ServletException, SAXParseException, JDOMException, IOException {
         MCRObjectID objectID = updateObject(MCRPersistenceHelper.getEditorSubmission(request, true));
         request.setAttribute(OBJECT_ID_KEY, objectID);
     }
@@ -75,18 +72,13 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
      *  MyCoRe object as XML
      * @return
      *  MCRObjectID of the newly created object.
-     * @throws MCRActiveLinkException
-     *  If links from or to other objects will fail.
      * @throws JDOMException
      *  from {@link MCRPersistenceHelper#getMCRObject(Document)}
      * @throws IOException
      *  from {@link MCRPersistenceHelper#getMCRObject(Document)}
-     * @throws SAXParseException
-     * @throws MCRException
-     * @throws MCRAccessException 
      */
-    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException,
-        MCRException, SAXParseException, MCRAccessException {
+    private MCRObjectID updateObject(Document doc) throws JDOMException, IOException,
+        MCRException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
         LogManager.getLogger().info("ID: {}", mcrObject.getId());
         try {

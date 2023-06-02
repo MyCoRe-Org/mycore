@@ -29,7 +29,6 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
-import org.xml.sax.SAXException;
 
 /**
  * Represents an XML metadata document that is stored in MCRMetadataStore.
@@ -81,11 +80,7 @@ public class MCRStoredMetadata {
      */
     void create(MCRContent xml) throws IOException, JDOMException {
         if (store.shouldForceXML()) {
-            try {
-                xml = xml.ensureXML();
-            } catch (SAXException e) {
-                throw new IOException(e);
-            }
+            xml = xml.ensureXML();
         }
         if (!Files.exists(path.getParent())) {
             Files.createDirectories(path.getParent());
@@ -107,11 +102,7 @@ public class MCRStoredMetadata {
             throw new MCRUsageException(msg);
         }
         if (store.shouldForceXML()) {
-            try {
-                xml = xml.ensureXML();
-            } catch (SAXException e) {
-                throw new IOException(e);
-            }
+            xml = xml.ensureXML();
         }
         xml.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
     }
@@ -121,7 +112,7 @@ public class MCRStoredMetadata {
      *
      * @return the stored XML document
      */
-    public MCRContent getMetadata() throws IOException {
+    public MCRContent getMetadata() {
         MCRPathContent pathContent = new MCRPathContent(path);
         pathContent.setDocType(docType);
         return pathContent;
@@ -181,7 +172,7 @@ public class MCRStoredMetadata {
     /**
      * Returns true if this object is deleted
      */
-    public boolean isDeleted() throws IOException {
+    public boolean isDeleted() {
         return deleted;
     }
 }

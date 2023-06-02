@@ -125,7 +125,7 @@ public class DefaultNavigationProviderTest {
     }
 
     @Test
-    public void fromJSON() throws Exception {
+    public void fromJSON() {
         // TODO
 
     }

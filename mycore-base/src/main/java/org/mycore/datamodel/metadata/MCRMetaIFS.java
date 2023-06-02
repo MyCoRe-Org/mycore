@@ -36,7 +36,6 @@ import com.google.gson.JsonObject;
  * &lt;/tag&gt; <br>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public final class MCRMetaIFS extends MCRMetaDefault {
     // MCRMetaIFS data

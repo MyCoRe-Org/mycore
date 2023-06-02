@@ -40,7 +40,6 @@ import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid.MCRORCIDConstants;
 import org.mycore.orcid.MCRORCIDProfile;
 import org.mycore.orcid.oauth.MCRReadPublicTokenFactory;
-import org.xml.sax.SAXException;
 
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
@@ -49,7 +48,7 @@ import jakarta.ws.rs.core.Response;
  * Provides functionality to fetch work groups, work summaries and work details
  * from a remote ORCID profile
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWorksFetcher {
 
@@ -72,8 +71,7 @@ public class MCRWorksFetcher {
         this.orcid = orcid;
     }
 
-    List<MCRGroupOfWorks> fetchGroups(MCRWorksSection worksSection)
-        throws JDOMException, IOException, SAXException {
+    List<MCRGroupOfWorks> fetchGroups(MCRWorksSection worksSection) throws JDOMException, IOException {
         WebTarget target = orcid.getWebTarget().path("works");
         Element worksXML = fetchWorksXML(target);
 
@@ -95,7 +93,7 @@ public class MCRWorksFetcher {
         return groups;
     }
 
-    void fetchDetails(MCRWorksSection worksSection) throws IOException, JDOMException, SAXException {
+    void fetchDetails(MCRWorksSection worksSection) throws IOException, JDOMException {
         List<String> putCodes = new ArrayList<>();
         worksSection.getWorks().forEach(work -> putCodes.add(work.getPutCode()));
 
@@ -114,13 +112,13 @@ public class MCRWorksFetcher {
         }
     }
 
-    void fetchDetails(MCRWork work) throws JDOMException, IOException, SAXException {
+    void fetchDetails(MCRWork work) throws JDOMException, IOException {
         WebTarget target = orcid.getWebTarget().path("work").path(work.getPutCode());
         Element workXML = fetchWorksXML(target);
         setFromWorkXML(work, workXML);
     }
 
-    private Element fetchWorksXML(WebTarget target) throws JDOMException, IOException, SAXException {
+    private Element fetchWorksXML(WebTarget target) throws JDOMException, IOException {
         Response r = getResponse(target, orcid.getAccessToken() != null);
         MCRContent response = new MCRStreamContent(r.readEntity(InputStream.class));
         MCRContent transformed = T_WORK2MCR.transform(response);

@@ -73,32 +73,33 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
         String type = objectId.substring(0, objectId.indexOf(':') + 1);
         builder.append(type.substring(0, type.length() - 1)).append('/');
         switch (type) {
-        case MCROCFLObjectIDPrefixHelper.MCROBJECT:
-        case MCROCFLObjectIDPrefixHelper.MCRDERIVATE: {
-            String mcrid = objectId.replaceAll(".*:", "");
-            String[] idParts = mcrid.split("_");
-            builder.append(idParts[0]).append('/').append(idParts[1]).append('/');
-            String id = idParts[2];
-            String[] layers = config.getSlotLayout().split("-");
-            int position = 0;
-            for (int i = 0; i < layers.length; i++) {
-                if (i == layers.length - 1) {
-                    break;
+            case MCROCFLObjectIDPrefixHelper.MCROBJECT, MCROCFLObjectIDPrefixHelper.MCRDERIVATE -> {
+                String mcrid = objectId.replaceAll(".*:", "");
+                String[] idParts = mcrid.split("_");
+                builder.append(idParts[0]).append('/').append(idParts[1]).append('/');
+                String id = idParts[2];
+                String[] layers = config.getSlotLayout().split("-");
+                int position = 0;
+                for (int i = 0; i < layers.length; i++) {
+                    if (i == layers.length - 1) {
+                        break;
+                    }
+                    int layerNum = Integer.parseInt(layers[i]);
+                    if (layerNum <= 0) {
+                        continue;
+                    }
+                    String layerId = id.substring(position, position + layerNum);
+                    builder.append(layerId).append('/');
+                    position += layerNum;
                 }
-                int layerNum = Integer.parseInt(layers[i]);
-                if (layerNum <= 0) {
-                    continue;
-                }
-                String layerId = id.substring(position, position + layerNum);
-                builder.append(layerId).append('/');
-                position += layerNum;
+                builder.append(mcrid);
+                return builder.toString();
             }
-            builder.append(mcrid);
-            return builder.toString();
-        }
-        // add more switch cases for own type behaviour
-        default:
-            return type.substring(0, type.length() - 1) + "/" + objectId.replaceAll(".*:", "");
+
+            // add more switch cases for own type behaviour
+            default -> {
+                return type.substring(0, type.length() - 1) + "/" + objectId.replaceAll(".*:", "");
+            }
         }
     }
 }

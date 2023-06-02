@@ -78,8 +78,8 @@ public abstract class MCRSolrSearchUtils {
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
 
-        if (condition instanceof MCRSetCondition) {
-            table = MCRConditionTransformer.groupConditionsByIndex((MCRSetCondition) condition);
+        if (condition instanceof MCRSetCondition setCondition) {
+            table = MCRConditionTransformer.groupConditionsByIndex(setCondition);
         } else {
             // if there is only one condition its no set condition. we don't need to group
             LOGGER.warn("Condition is not SetCondition.");

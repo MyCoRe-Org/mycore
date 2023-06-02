@@ -53,7 +53,7 @@ public class MCRSimpleModelXMLConverterTest {
     }
 
     @Test
-    public void testToXML() throws Exception {
+    public void testToXML() {
         Document document = MCRSimpleModelXMLConverter.toXML(metsSimpleModel);
 
         XPathFactory xPathFactory = XPathFactory.instance();

@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -35,7 +33,6 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
-import org.xml.sax.SAXException;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -59,7 +56,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
     }
 
     @Override
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException, TransformerException, SAXException {
+    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String searchString = getReqParameter(request, "search", null);
@@ -127,9 +124,9 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
             String parameterName = entry.getKey();
             if (parameterName.startsWith("XSL.")) {
                 for (String parameterValue : entry.getValue()) {
-                    sb.append("&");
+                    sb.append('&');
                     sb.append(parameterName);
-                    sb.append("=");
+                    sb.append('=');
                     sb.append(parameterValue);
                 }
             }

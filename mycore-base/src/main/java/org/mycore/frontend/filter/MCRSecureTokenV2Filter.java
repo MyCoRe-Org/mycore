@@ -69,7 +69,7 @@ public class MCRSecureTokenV2Filter implements Filter {
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         filterEnabled = MCRSecureTokenV2FilterConfig.isFilterEnabled();
         hashParameter = MCRSecureTokenV2FilterConfig.getHashParameterName();
         sharedSecret = MCRSecureTokenV2FilterConfig.getSharedSecret();

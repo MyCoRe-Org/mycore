@@ -45,7 +45,6 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.doi.client.crossref.MCRCrossrefClient;
 import org.mycore.pi.doi.crossref.MCRCrossrefUtil;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.xml.sax.SAXException;
 
 public class MCRCrossrefService extends MCRDOIBaseService {
 
@@ -103,7 +102,7 @@ public class MCRCrossrefService extends MCRDOIBaseService {
         try {
             final MCRContent result = getTransformer().transform(new MCRBaseContent(obj));
             resultDocument = result.asXML();
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRConfigurationException(
                 String.format(Locale.ROOT, "Could not transform the object %s with the trasformer %s", obj.getId(),
                     getTransformerID()),
@@ -139,7 +138,7 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     }
 
     @Override
-    protected void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+    protected void deleteJob(Map<String, String> parameters) {
 
     }
 

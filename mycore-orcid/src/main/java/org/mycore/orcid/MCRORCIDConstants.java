@@ -28,7 +28,7 @@ import jakarta.ws.rs.core.MediaType;
 /**
  * Utility class to hold constants and namespace representation used in the XML of the ORCID API.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public abstract class MCRORCIDConstants {
 

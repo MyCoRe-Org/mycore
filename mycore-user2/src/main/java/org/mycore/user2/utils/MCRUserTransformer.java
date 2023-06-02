@@ -22,12 +22,10 @@ import java.util.Comparator;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.user2.MCRUser;
-import org.xml.sax.SAXParseException;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -60,7 +58,7 @@ public abstract class MCRUserTransformer {
             Document userXML = content.asXML();
             sortAttributes(userXML);
             return userXML;
-        } catch (SAXParseException | JDOMException | IOException e) {
+        } catch (IOException e) {
             throw new MCRException("Exception while transforming MCRUser " + user.getUserID() + " to JDOM document.",
                 e);
         }

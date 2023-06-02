@@ -18,7 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,66 +77,58 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
     HttpServletResponse response;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         UriInfo uriInfo = requestContext.getUriInfo();
         String path = uriInfo.getPath().toString();
         String[] pathParts = path.split("/", -1);
-        if (pathParts.length >= 2 && "objects".equals(pathParts[0])) {
-            String mcrid = pathParts[1];
+        final int mcrIdPos = 1;
+        final int derIdPos = 3;
+        if (pathParts.length <= mcrIdPos || !"objects".equals(pathParts[mcrIdPos - 1])) {
+            return;
+        }
+        String mcrid = pathParts[mcrIdPos];
+        String mcridExtension = getExtension(mcrid);
+        mcrid = mcrid.substring(0, mcrid.length() - mcridExtension.length());
+        try {
+            final boolean searchMcrId = !SEARCHKEYS_FOR_OBJECTS.isEmpty() && mcrid.contains(":");
+            pathParts[mcrIdPos] = MCRObjectID
+                .getInstance(searchMcrId ? retrieveMCRObjIDfromSOLR(mcrid) : mcrid)
+                .toString();
+            pathParts[mcrIdPos] += mcridExtension;
+        } catch (MCRException ex) {
+            // ignore
+        }
 
-            String mcridExtension = "";
-            if (mcrid.endsWith(".xml")) {
-                mcridExtension = ".xml";
-                mcrid = mcrid.substring(0, mcrid.length() - 4);
-            }
-            if (mcrid.endsWith(".json")) {
-                mcridExtension = ".json";
-                mcrid = mcrid.substring(0, mcrid.length() - 5);
-            }
+        if (pathParts.length > derIdPos && pathParts[derIdPos - 1].equals("derivates")) {
+            String derid = pathParts[derIdPos];
+            String deridExtension = getExtension(derid);
+            derid = derid.substring(0, mcrid.length() - deridExtension.length());
             try {
-                if (!SEARCHKEYS_FOR_OBJECTS.isEmpty() && mcrid.contains(":")) {
-                    pathParts[1] = retrieveMCRObjIDfromSOLR(mcrid) + mcridExtension;
-                } else {
-                    MCRObjectID mcrObjID = MCRObjectID.getInstance(mcrid);
-                    // set the properly formated mcrObjID back to URL
-                    pathParts[1] = mcrObjID.toString() + mcridExtension;
-                }
+                final boolean searchDerId = !SEARCHKEYS_FOR_DERIVATES.isEmpty() && derid.contains(":");
+                pathParts[derIdPos] = MCRObjectID
+                    .getInstance(searchDerId ? retrieveMCRDerIDfromSOLR(mcrid, derid) : derid)
+                    .toString();
+                pathParts[derIdPos] += deridExtension;
             } catch (MCRException ex) {
                 // ignore
-
-            }
-
-            if (pathParts.length >= 4 && pathParts[2].equals("derivates")) {
-                String derid = pathParts[3];
-
-                String deridExtension = "";
-                if (derid.endsWith(".xml")) {
-                    deridExtension = ".xml";
-                    derid = derid.substring(0, mcrid.length() - 4);
-                }
-                if (derid.endsWith(".json")) {
-                    deridExtension = ".json";
-                    derid = derid.substring(0, mcrid.length() - 5);
-                }
-                try {
-                    if (!SEARCHKEYS_FOR_DERIVATES.isEmpty() && derid.contains(":")) {
-                        pathParts[3] = retrieveMCRDerIDfromSOLR(mcrid, derid) + deridExtension;
-                    } else {
-                        MCRObjectID mcrDerID = MCRObjectID.getInstance(derid);
-                        // set the properly formated mcrObjID back to URL
-                        pathParts[3] = mcrDerID.toString() + deridExtension;
-                    }
-                } catch (MCRException ex) {
-                    // ignore
-                }
-            }
-            String newPath = StringUtils.join(pathParts, "/");
-            if (!newPath.equals(path)) {
-                String queryString = uriInfo.getRequestUri().getQuery();
-                URI uri = uriInfo.getBaseUri().resolve(queryString == null ? newPath : newPath + "?" + queryString);
-                requestContext.abortWith(Response.temporaryRedirect(uri).build());
             }
         }
+        String newPath = StringUtils.join(pathParts, "/");
+        if (!newPath.equals(path)) {
+            String queryString = uriInfo.getRequestUri().getQuery();
+            URI uri = uriInfo.getBaseUri().resolve(queryString == null ? newPath : newPath + "?" + queryString);
+            requestContext.abortWith(Response.temporaryRedirect(uri).build());
+        }
+    }
+
+    private static String getExtension(String mcrid) {
+        if (mcrid.endsWith(".xml")) {
+            return ".xml";
+        }
+        if (mcrid.endsWith(".json")) {
+            return ".json";
+        }
+        return "";
     }
 
     private String retrieveMCRDerIDfromSOLR(String mcrid, String derid) {

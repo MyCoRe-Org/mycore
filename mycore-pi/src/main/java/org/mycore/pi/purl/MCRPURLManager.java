@@ -280,7 +280,6 @@ public class MCRPURLManager {
     /**
      * deletes an existing PURL
      *
-     * @param purl
      * @return the HTTP Status Code of the request
      */
     public int deletePURL(String purl) {

@@ -27,7 +27,7 @@ import java.util.Locale;
 /**
  * Helper for decimal validators to convert string input into a decimal value for a given locale.
  * 
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  */
 public class MCRDecimalConverter {
 
@@ -40,7 +40,7 @@ public class MCRDecimalConverter {
     /**
      * Converts a given text string to a decimal number, using the given locale.
      * 
-     * @param value the text strin
+     * @param value the text string
      * @return null, if the text contains illegal chars or can not be parsed
      */
     public Double string2double(String value) {
@@ -49,7 +49,7 @@ public class MCRDecimalConverter {
         }
 
         NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        if ((nf instanceof DecimalFormat) && hasMultipleDecimalSeparators(value, (DecimalFormat) nf)) {
+        if (nf instanceof DecimalFormat decimalFormat && hasMultipleDecimalSeparators(value, decimalFormat)) {
             return null;
         }
 

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Represents the response on a request against the OAuth2 API of orcid.org.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Kai Brandhorst
  */
 public class MCRORCIDResponse {

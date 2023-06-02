@@ -15,8 +15,15 @@
     <property name="max" value="120"/>
     <property name="fileExtensions" value="java, xml, xsl"/>
   </module>
+  <module name="SuppressWarningsFilter"/>
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
+    <module name="SuppressWarningsHolder"/>
+    <module name="SuppressionCommentFilter">
+      <property name="offCommentFormat" value="CSOFF\: ([\w\|]+)"/>
+      <property name="onCommentFormat" value="CSON\: ([\w\|]+)"/>
+      <property name="checkFormat" value="$1"/>
+    </module>
     <module name="ModifiedControlVariable" />
     <module name="InnerTypeLast" />
     <module name="AvoidStarImport"/>

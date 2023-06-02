@@ -134,8 +134,8 @@ class MCRCleaningRule {
         Object found = xPathRelevancyTest.evaluateFirst(node);
         if (found == null) {
             return false;
-        } else if (found instanceof Boolean) {
-            return (Boolean) found;
+        } else if (found instanceof Boolean b) {
+            return b;
         } else {
             return true; // something matching found
         }
@@ -143,8 +143,8 @@ class MCRCleaningRule {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRCleaningRule) {
-            return xPathExprNodesToInspect.equals(((MCRCleaningRule) obj).xPathExprNodesToInspect);
+        if (obj instanceof MCRCleaningRule cleaningRule) {
+            return xPathExprNodesToInspect.equals(cleaningRule.xPathExprNodesToInspect);
         } else {
             return false;
         }

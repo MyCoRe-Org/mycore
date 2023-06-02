@@ -33,7 +33,7 @@ import org.mycore.common.config.MCRConfigurationException;
  * The token can be configured via MCR.ORCID.OAuth.ReadPublicToken.
  * In case that is not set, the token is directly requested from the OAuth2 API and logged.
  *
- * @author Frank L\u00FCtzenkirchen *
+ * @author Frank Lützenkirchen *
  */
 public class MCRReadPublicTokenFactory {
 

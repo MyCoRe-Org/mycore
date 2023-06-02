@@ -30,7 +30,7 @@ import java.io.InputStream;
  * must be prevented from calling close(). With this class, a ZipInputStream or any other
  * stream can be wrapped to regain control of closing.      
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRNotClosingInputStream extends FilterInputStream {
 
@@ -41,7 +41,7 @@ public class MCRNotClosingInputStream extends FilterInputStream {
     /** 
      * Does nothing. When you want to really close the stream, call reallyClose().
      */
-    public void close() throws IOException {
+    public void close() {
     }
 
     /**

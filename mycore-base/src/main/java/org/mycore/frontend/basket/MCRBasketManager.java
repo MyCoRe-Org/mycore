@@ -25,7 +25,7 @@ import org.mycore.common.MCRSessionMgr;
  * A session may store multiple baskets with different type IDs,
  * for example a basket for documents and another for an other type of entry.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasketManager {
 

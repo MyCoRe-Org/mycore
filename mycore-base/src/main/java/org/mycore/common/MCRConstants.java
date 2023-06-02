@@ -35,8 +35,6 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Thomas Scheffler (yagee)
  * @author Stefan Freitag (sasf)
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date: 2011-06-22 12:50:42 +0200 (Wed, 22 Jun
- *          2011) $
  */
 public final class MCRConstants {
 

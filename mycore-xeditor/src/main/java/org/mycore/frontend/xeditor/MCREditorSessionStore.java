@@ -24,7 +24,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREditorSessionStore {
 

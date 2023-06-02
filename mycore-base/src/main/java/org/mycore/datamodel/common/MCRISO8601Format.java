@@ -39,7 +39,7 @@ public enum MCRISO8601Format {
     COMPLETE_HH_MM_SS_SSS_ERA(
         "YYYY-MM-DDThh:mm:ss.sTZD");
 
-    private String format;
+    private final String format;
 
     MCRISO8601Format(String format) {
         this.format = format;

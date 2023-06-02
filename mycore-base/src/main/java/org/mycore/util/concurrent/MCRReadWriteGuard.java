@@ -62,7 +62,6 @@ public class MCRReadWriteGuard {
      * Executes the write operation while the write lock is locked.
      * This is an exclusive lock. So no other read or write operation
      * can be executed while <code>operation</code> is running.
-     * @param operation
      */
     public void write(Runnable operation) {
         writeLock.lock();

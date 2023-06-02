@@ -56,9 +56,9 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
 
-    private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000l);
+    private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000L);
 
-    private static DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<MCRDelayedRunnable>();
+    private static DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<>();
 
     private static ScheduledExecutorService SOLR_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
@@ -72,14 +72,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         //and its ShutdownHandler are registred
         MCRSolrIndexer.SOLR_EXECUTOR.submit(() -> null);
 
-        SOLR_TASK_EXECUTOR.scheduleWithFixedDelay(new Runnable() {
+        SOLR_TASK_EXECUTOR.scheduleWithFixedDelay(() -> {
+            LOGGER.debug("SOLR Task Executor invoked: " + SOLR_TASK_QUEUE.size() + " Documents to process");
+            processSolrTaskQueue();
 
-            @Override
-            public void run() {
-                LOGGER.debug("SOLR Task Executor invoked: " + SOLR_TASK_QUEUE.size() + " Documents to process");
-                processSolrTaskQueue();
-
-            }
         }, DELAY_IN_MS * 2, DELAY_IN_MS * 2, TimeUnit.MILLISECONDS);
 
         MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
@@ -193,10 +189,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             //MCR-2349 initialize solr client early enough
             final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
             putIntoTaskQueue(new MCRDelayedRunnable("updateDerivateFileIndex_" + derivate.getId().toString(),
-                DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
-                    MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
-                        mainSolrClient, MCRSolrIndexer.HIGH_PRIORITY);
-                })));
+                DELAY_IN_MS,
+                new MCRTransactionableRunnable(
+                    () -> MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
+                        mainSolrClient, MCRSolrIndexer.HIGH_PRIORITY))));
         });
     }
 
@@ -250,9 +246,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             //MCR-2349 initialize solr client early enough
             final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
-            putIntoTaskQueue(new MCRDelayedRunnable(id.toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
-                MCRSolrIndexer.deleteById(mainSolrClient, id.toString());
-            })));
+            putIntoTaskQueue(new MCRDelayedRunnable(id.toString(), DELAY_IN_MS,
+                new MCRTransactionableRunnable(() -> MCRSolrIndexer.deleteById(mainSolrClient, id.toString()))));
         });
     }
 
@@ -262,16 +257,14 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             //MCR-2349 initialize solr client early enough
             final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
             putIntoTaskQueue(new MCRDelayedRunnable(derivate.getId().toString(), DELAY_IN_MS,
-                new MCRTransactionableRunnable(() -> {
-                    MCRSolrIndexer.deleteDerivate(mainSolrClient, derivate.getId().toString());
-                })));
+                new MCRTransactionableRunnable(
+                    () -> MCRSolrIndexer.deleteDerivate(mainSolrClient, derivate.getId().toString()))));
         });
     }
 
     protected synchronized void addFile(Path path, BasicFileAttributes attrs) {
-        if (path instanceof MCRPath) {
+        if (path instanceof MCRPath mcrPath) {
             // check if the derivate is marked for deletion
-            MCRPath mcrPath = (MCRPath) path;
             String owner = mcrPath.getOwner();
             if (MCRObjectID.isValid(owner)) {
                 MCRObjectID mcrObjectID = MCRObjectID.getInstance(owner);

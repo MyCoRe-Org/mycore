@@ -30,7 +30,6 @@ import com.google.gson.JsonObject;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision: $ $Date: $
  */
 public class MCRRestAPIError {
     public static final String CODE_WRONG_PARAMETER = "WRONG_PARAMETER";

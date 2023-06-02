@@ -47,9 +47,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 abstract class MCRPersistenceServlet extends MCRServlet {
-    /**
-     * 
-     */
+
+
     private static final long serialVersionUID = -6776941436009193613L;
 
     protected static final String OBJECT_ID_KEY = MCRPersistenceServlet.class.getCanonicalName() + ".MCRObjectID";
@@ -86,8 +85,8 @@ abstract class MCRPersistenceServlet extends MCRServlet {
                 job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
                 return;
             }
-            if (ex instanceof MCRActiveLinkException) {
-                String msg = ((MCRActiveLinkException) ex)
+            if (ex instanceof MCRActiveLinkException linkException) {
+                String msg = linkException
                     .getActiveLinks()
                     .values()
                     .iterator()
@@ -112,7 +111,7 @@ abstract class MCRPersistenceServlet extends MCRServlet {
 
     protected void redirectToUploadForm(ServletContext context, HttpServletRequest request,
         HttpServletResponse response, String objectId, String derivateId)
-        throws ServletException, IOException {
+        throws IOException {
         MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(objectId, derivateId,
             MCRPersistenceHelper.getCancelUrl(request));
         String fuhid = fuh.getID();

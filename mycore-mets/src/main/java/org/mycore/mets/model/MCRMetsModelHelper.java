@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -70,7 +71,7 @@ public class MCRMetsModelHelper {
             return Optional.empty();
         }
         final String teiType = pathParts[1];
-        if ("transcription".equals(teiType)) {
+        if (Objects.equals(teiType, "transcription")) {
             return Optional.of(TRANSCRIPTION_USE);
         } else if (teiType.startsWith("translation.")) {
             final String translation = teiType.split("[.]", 2)[1];

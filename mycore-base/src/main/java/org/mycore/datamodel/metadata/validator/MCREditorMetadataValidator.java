@@ -24,7 +24,6 @@ import org.jdom2.Element;
  * Validates the output of the Editor framework.
  * Implementors have to be thread safe.
  * @author Thomas Scheffler (yagee)
- * @version $Revision: 1 $ $Date: 08.05.2009 11:51:35 $
  */
 public interface MCREditorMetadataValidator {
 

@@ -91,7 +91,7 @@ public abstract class MCRPathUtils {
      */
     public static long getSize(Path p) throws IOException {
         AtomicLong size = new AtomicLong();
-        Files.walkFileTree(p, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(p, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 size.addAndGet(attrs.size());

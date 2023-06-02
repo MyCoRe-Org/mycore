@@ -19,9 +19,10 @@
 package org.mycore.solr.classification;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -152,8 +153,8 @@ public abstract class MCRSolrClassificationUtil {
      *
      * @return list of ancestors
      */
-    public static LinkedList<MCRCategory> getAncestors(MCRCategory category) {
-        LinkedList<MCRCategory> ancestors = new LinkedList<>();
+    public static Deque<MCRCategory> getAncestors(MCRCategory category) {
+        Deque<MCRCategory> ancestors = new ArrayDeque<>();
         MCRCategory parent = category.getParent();
         while (parent != null) {
             ancestors.addFirst(parent);
@@ -229,7 +230,7 @@ public abstract class MCRSolrClassificationUtil {
             MCRCategory category = dao.getCategory(categoryId, 0);
             categoryList.add(category);
         }
-        reindex(categoryList.toArray(new MCRCategory[categoryList.size()]));
+        reindex(categoryList.toArray(MCRCategory[]::new));
     }
 
     /**

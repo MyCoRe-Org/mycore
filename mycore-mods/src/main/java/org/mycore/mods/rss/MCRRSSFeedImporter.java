@@ -87,7 +87,7 @@ import com.rometools.rome.io.XmlReader;
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].XSL2BuildNotificationMail=foo.xsl
  * is set, builds and sends a notification mail via MCRMailer.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRRSSFeedImporter {
 

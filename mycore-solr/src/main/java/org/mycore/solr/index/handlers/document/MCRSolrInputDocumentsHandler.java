@@ -18,7 +18,6 @@
 
 package org.mycore.solr.index.handlers.document;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -70,7 +68,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
      * @see org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler#index()
      */
     @Override
-    public void index() throws IOException, SolrServerException {
+    public void index() {
         if (documents == null || documents.isEmpty()) {
             LOGGER.warn("No input documents to index.");
             return;

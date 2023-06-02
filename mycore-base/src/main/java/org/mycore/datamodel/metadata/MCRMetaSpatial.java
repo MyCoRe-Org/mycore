@@ -145,7 +145,7 @@ public class MCRMetaSpatial extends MCRMetaDefault {
         }
         if (this.data.size() % 2 != 0) {
             throw new MCRException(
-                String.format(Locale.ROOT, "spatial list content '%s' is uneven", this.data.toString()));
+                String.format(Locale.ROOT, "spatial list content '%s' is uneven", this.data));
         }
     }
 

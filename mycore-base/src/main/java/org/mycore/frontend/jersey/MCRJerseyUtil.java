@@ -43,8 +43,8 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 
 /**
  * Contains some jersey utility methods.
@@ -70,8 +70,8 @@ public abstract class MCRJerseyUtil {
         MCRContent result;
         MCRJDOMContent source = new MCRJDOMContent(document);
         MCRContentTransformer transformer = MCRLayoutService.getContentTransformer(source.getDocType(), parameter);
-        if (transformer instanceof MCRParameterizedTransformer) {
-            result = ((MCRParameterizedTransformer) transformer).transform(source, parameter);
+        if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
+            result = parameterizedTransformer.transform(source, parameter);
         } else {
             result = transformer.transform(source);
         }
@@ -118,7 +118,7 @@ public abstract class MCRJerseyUtil {
      * 
      * @param id
      *            mycore object id
-     * @see MCRAccessManager#checkPermissionForReadingDerivate(String)
+     * @see MCRAccessManager#checkDerivateContentPermission(MCRObjectID, String)
      */
     public static void checkDerivateReadPermission(MCRObjectID id) {
         if (!MCRAccessManager.checkDerivateContentPermission(id, MCRAccessManager.PERMISSION_READ)) {

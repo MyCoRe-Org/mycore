@@ -23,7 +23,6 @@ import java.util.Objects;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -40,16 +39,14 @@ public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
      * @param mcrID      the mycore object for which the identifier is generated
      * @param additional additional information dedicated to the object like a mcrpath
      * @return a unique persistence identifier
-     * @throws MCRPersistentIdentifierException if something goes wrong while generating
      */
-    protected MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional)
-        throws MCRPersistentIdentifierException {
+    protected MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional) {
         Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
         return new MCRDNBURN(namespace, buildNISS(mcrID, additional));
     }
 
     @Override
-    public MCRDNBURN generate(MCRBase mcrObj, String additional) throws MCRPersistentIdentifierException {
+    public MCRDNBURN generate(MCRBase mcrObj, String additional) {
         return generate(getNamespace(), mcrObj.getId(), additional);
     }
 

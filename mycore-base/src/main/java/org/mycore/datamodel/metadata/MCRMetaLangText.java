@@ -34,7 +34,6 @@ import com.google.gson.JsonObject;
  * has triples of a text and his corresponding language and optional a type.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRMetaLangText extends MCRMetaDefault {
 

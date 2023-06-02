@@ -1,5 +1,12 @@
 package org.mycore.mods.csl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.junit.Before;
@@ -11,14 +18,6 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MCRMODSCSLTest extends MCRStoreTestCase {
 
@@ -30,7 +29,7 @@ public class MCRMODSCSLTest extends MCRStoreTestCase {
     protected static String getIDFromContent(MCRContent c) {
         try {
             return c.asXML().getRootElement().getAttributeValue("ID");
-        } catch (JDOMException | IOException | SAXException e) {
+        } catch (JDOMException | IOException e) {
             throw new MCRException(e);
         }
     }

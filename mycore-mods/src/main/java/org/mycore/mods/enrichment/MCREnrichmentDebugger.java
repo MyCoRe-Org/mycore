@@ -27,7 +27,7 @@ import org.jdom2.Element;
  * 
  * @see MCREnricher#setDebugger(MCREnrichmentDebugger)
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public interface MCREnrichmentDebugger {
 

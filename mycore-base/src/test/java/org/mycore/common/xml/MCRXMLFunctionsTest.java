@@ -64,7 +64,7 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
      * Test method for 'org.mycore.common.xml.MCRXMLFunctions.getISODateFromMCRHistoryDate(String, String, String)'
      */
     @Test
-    public void getISODateFromMCRHistoryDate() throws ParseException {
+    public void getISODateFromMCRHistoryDate() {
         assertEquals("1964-02-24T00:00:00.000Z",
             MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "gregorian"));
         assertEquals("1964-03-08T00:00:00.000Z",

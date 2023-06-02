@@ -72,12 +72,12 @@ public abstract class MCRJerseyTest extends JerseyTest {
     }
 
     @Before
-    public void mcrSetUp() throws Exception {
+    public void mcrSetUp() {
         MCRTestCaseHelper.before(getTestProperties());
     }
 
     @After
-    public void mcrTearDown() throws Exception {
+    public void mcrTearDown() {
         MCRTestCaseHelper.after();
     }
 

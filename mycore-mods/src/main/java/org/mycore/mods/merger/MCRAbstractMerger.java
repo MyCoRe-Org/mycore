@@ -31,7 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * MCR.MODS.Merger.AbstractMerger.MaxDistancePercent=[Maximum levenshtein distance in percent]
  * MCR.MODS.Merger.AbstractMerger.MaxCompareLength=[Maximum number of characters to compare from the two abstracts]
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRAbstractMerger extends MCRMerger {
 

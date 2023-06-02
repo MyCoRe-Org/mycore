@@ -71,7 +71,7 @@ public class MCREditorSubmission {
         return sb.toString().trim();
     }
 
-    public void setXPaths2CheckResubmission(String xPaths) throws JDOMException {
+    public void setXPaths2CheckResubmission(String xPaths) {
         xPaths2CheckResubmission.clear();
         String rootXPath = MCRXPathBuilder.buildXPath(session.getEditedXML().getRootElement()) + "/";
         if (xPaths != null) {
@@ -81,7 +81,7 @@ public class MCREditorSubmission {
         }
     }
 
-    public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
+    public void emptyNotResubmittedNodes() throws JaxenException {
         for (String xPath : xPaths2CheckResubmission) {
             MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
             if (!binding.getBoundNodes().isEmpty()) {
@@ -140,7 +140,7 @@ public class MCREditorSubmission {
         session.setBreakpoint("After setting submitted values");
     }
 
-    private void setSubmittedValues(MCRBinding binding, String[] values) throws JDOMException, JaxenException {
+    private void setSubmittedValues(MCRBinding binding, String[] values) {
         List<Object> boundNodes = binding.getBoundNodes();
 
         while (boundNodes.size() < values.length) {
@@ -160,7 +160,7 @@ public class MCREditorSubmission {
         binding.detach();
     }
 
-    public void setDefaultValues() throws JDOMException, JaxenException {
+    public void setDefaultValues() throws JaxenException {
         MCRBinding rootBinding = session.getRootBinding();
         for (String xPath : xPath2DefaultValue.keySet()) {
             String defaultValue = xPath2DefaultValue.get(xPath);

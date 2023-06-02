@@ -18,6 +18,7 @@
 
 package org.mycore.common.log4j2.lookups;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -62,7 +63,7 @@ public class MCRUserInformationLookup implements StrLookup {
         if (key == null || !MCRSessionMgr.hasCurrentSession()) {
             return null;
         }
-        if ("id".equals(key)) {
+        if (Objects.equals(key, "id")) {
             return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         } else if (key.startsWith(ROLE_PREFIX)) {
             Optional<String> firstMatchingRole = ROLE_SEPARATOR

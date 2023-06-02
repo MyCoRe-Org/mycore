@@ -32,7 +32,6 @@ import org.mycore.iview2.backend.MCRTileFileProvider;
 import org.mycore.iview2.backend.MCRTileInfo;
 import org.mycore.iview2.services.MCRIView2Tools;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,7 +62,7 @@ public class MCRTileServlet extends HttpServlet {
      * Also uses {@link #MAX_AGE} to tell the client how long it could cache the information.
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final MCRTileInfo tileInfo = getTileInfo(getPathInfo(req));
         Path iviewFile = TFP.getTileFile(tileInfo).orElse(null);
         if (iviewFile == null) {
@@ -124,21 +123,19 @@ public class MCRTileServlet extends HttpServlet {
 
     /**
      * returns PathInfo from request including ";"
-     * @param request
-     * @return
      */
     private static String getPathInfo(final HttpServletRequest request) {
         return request.getPathInfo();
     }
 
     /**
-     * returns a {@link TileInfo} for this <code>pathInfo</code>.
+     * returns a {@link MCRTileInfo} for this <code>pathInfo</code>.
      * The format of <code>pathInfo</code> is
      * <code>/{derivateID}/{absoluteImagePath}/{tileCoordinate}</code>
      * where <code>tileCoordinate</code> is either {@value org.mycore.imagetiler.MCRTiledPictureProps#IMAGEINFO_XML}
      * or <code>{z}/{y}/{x}</code> as zoomLevel and x-y-coordinates.
      * @param pathInfo of the described format
-     * @return a {@link TileInfo} instance for <code>pathInfo</code>
+     * @return a {@link MCRTileInfo} instance for <code>pathInfo</code>
      */
     static MCRTileInfo getTileInfo(final String pathInfo) {
         LOGGER.debug("Starting MCRTileServlet: {}", pathInfo);
@@ -153,11 +150,8 @@ public class MCRTileServlet extends HttpServlet {
             int pos = imagePath.length();
             int cnt = 0;
             while (--pos > 0 && cnt < 3) {
-                switch (imagePath.charAt(pos)) {
-                case '/':
+                if (imagePath.charAt(pos) == '/') {
                     cnt++;
-                    break;
-                default:
                 }
             }
             tile = imagePath.substring(pos + 2);

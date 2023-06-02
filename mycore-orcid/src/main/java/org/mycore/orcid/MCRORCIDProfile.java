@@ -31,7 +31,7 @@ import jakarta.ws.rs.client.WebTarget;
 /**
  * Represents the profile of a given ORCID ID.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRORCIDProfile {
 

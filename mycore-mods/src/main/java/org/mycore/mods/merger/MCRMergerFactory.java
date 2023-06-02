@@ -29,7 +29,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * MCR.MODS.Merger.default=[Default class to merge MODS, typically MCRMerger]
  * MCR.MODS.Merger.[elementName]=[Specific implementation by element name]
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMergerFactory {
 

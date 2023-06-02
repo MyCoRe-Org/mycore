@@ -34,7 +34,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
  *   
  * Example: &lt;xed:validate class="foo.bar.MyValidator" method="validateISBN" ... /&gt;
  *
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen 
  */
 public class MCRExternalValidator extends MCRValidator {
 

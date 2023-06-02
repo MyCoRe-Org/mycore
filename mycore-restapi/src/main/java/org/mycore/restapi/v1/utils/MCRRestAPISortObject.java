@@ -26,7 +26,6 @@ package org.mycore.restapi.v1.utils;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision: $ $Date: $
  */
 public class MCRRestAPISortObject {
     enum SortOrder {

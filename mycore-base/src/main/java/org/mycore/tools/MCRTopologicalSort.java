@@ -62,11 +62,10 @@ import com.google.common.collect.HashBiMap;
  * http://en.wikipedia.org/wiki/Topological_sorting
  *
  * @author Robert Stephan
- * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Mi, 18 Dez 2013) $
  *
  */
 public class MCRTopologicalSort<T> {
-    private static final Logger LOGGER = LogManager.getLogger(MCRTopologicalSort.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** 
      * store the edges as adjacent list
@@ -97,52 +96,35 @@ public class MCRTopologicalSort<T> {
         String file = null;
         Map<Integer, List<String>> parentNames = new HashMap<>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         for (int i = 0; i < files.length; i++) {
             file = files[i];
 
             try (BufferedReader br = Files.newBufferedReader(dir.resolve(file))) {
                 XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(br);
                 while (xmlStreamReader.hasNext()) {
-                    switch (xmlStreamReader.getEventType()) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        if (xmlStreamReader.getLocalName().equals("mycoreobject")) {
-                            ts.getNodes().forcePut(i, xmlStreamReader
-                                .getAttributeValue(null, "ID"));
-                        } else {
-                            String href = xmlStreamReader
-                                .getAttributeValue("http://www.w3.org/1999/xlink", "href");
-                            if (xmlStreamReader.getLocalName().equals("parent")) {
-                                List<String> dependencyList = parentNames.computeIfAbsent(i,
-                                    e -> new ArrayList<>());
-                                dependencyList.add(
-                                    href);
-                            } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
-                                if (MCRObjectID.isValid(
-                                    href)) {
-                                    List<String> dependencyList = parentNames
-                                        .computeIfAbsent(i, e -> new ArrayList<>());
-                                    dependencyList.add(
-                                        href);
+                    if (xmlStreamReader.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                        switch (xmlStreamReader.getLocalName()) {
+                            case "mycoreobject" -> ts.getNodes().forcePut(i,
+                                xmlStreamReader.getAttributeValue(null, "ID"));
+                            case "parent", "relatedItem" -> {
+                                String href = xmlStreamReader
+                                    .getAttributeValue("http://www.w3.org/1999/xlink", "href");
+                                if (MCRObjectID.isValid(href)) {
+                                    List<String> dependencyList = parentNames.computeIfAbsent(i,
+                                        e -> new ArrayList<>());
+                                    dependencyList.add(href);
                                 }
-                            } else if (xmlStreamReader.getLocalName().equals("metadata")) {
-                                break;
+                            }
+                            default -> {
+                                //nothing to be done
                             }
                         }
-                        break;
-
-                    case XMLStreamConstants.END_ELEMENT:
-                        if (xmlStreamReader.getLocalName().equals("parents")) {
-                            break;
-                        } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
-                            break;
-                        }
-                        break;
                     }
                     xmlStreamReader.next();
                 }
-
             } catch (XMLStreamException | IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Error while reading: " + dir.resolve(file), e);
             }
         }
 

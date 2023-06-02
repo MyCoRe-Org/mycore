@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -33,7 +34,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
@@ -47,7 +47,6 @@ import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.xml.sax.SAXParseException;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -77,11 +76,10 @@ import jakarta.xml.bind.annotation.XmlValue;
  * This class provides methods to send emails from within a MyCoRe application.
  * 
  * @author Marc Schluepmann
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Werner Greßhoff
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  * 
- * @version $Revision$ $Date$
  */
 public class MCRMailer extends MCRServlet {
 
@@ -124,9 +122,9 @@ public class MCRMailer extends MCRServlet {
                 mailProperties.setProperty("mail.smtp.auth", "true");
             }
             String starttsl = MCRConfiguration2.getString("MCR.Mail.STARTTLS").orElse("disabled");
-            if ("enabled".equals(starttsl)) {
+            if (Objects.equals(starttsl, "enabled")) {
                 mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
-            } else if ("required".equals(starttsl)) {
+            } else if (Objects.equals(starttsl, "required")) {
                 mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
                 mailProperties.setProperty("mail.smtp.starttls.required", "true");
             }
@@ -281,7 +279,6 @@ public class MCRMailer extends MCRServlet {
      * </pre>
      * @param email the email as JDOM element.
      * @param allowException allow to throw exceptions if set to <code>true</code>
-     * @throws Exception 
      */
     public static void send(Element email, Boolean allowException) throws Exception {
         EMail mail = EMail.parseXML(email);
@@ -387,18 +384,18 @@ public class MCRMailer extends MCRServlet {
 
         Optional<List<InternetAddress>> toList = EMail.buildAddressList(mail.to);
         if (toList.isPresent()) {
-            msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(new InternetAddress[toList.get().size()]));
+            msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(InternetAddress[]::new));
         }
 
         Optional<List<InternetAddress>> replyToList = EMail.buildAddressList(mail.replyTo);
         if (replyToList.isPresent()) {
-            msg.setReplyTo((replyToList.get().toArray(new InternetAddress[replyToList.get().size()])));
+            msg.setReplyTo((replyToList.get().toArray(InternetAddress[]::new)));
         }
 
         Optional<List<InternetAddress>> bccList = EMail.buildAddressList(mail.bcc);
         if (bccList.isPresent()) {
             msg.addRecipients(Message.RecipientType.BCC,
-                bccList.get().toArray(new InternetAddress[bccList.get().size()]));
+                bccList.get().toArray(InternetAddress[]::new));
         }
 
         msg.setSentDate(new Date());
@@ -651,7 +648,7 @@ public class MCRMailer extends MCRServlet {
             final MCRJAXBContent<EMail> content = new MCRJAXBContent<>(JAXB_CONTEXT, this);
             try {
                 return content.asXML();
-            } catch (final SAXParseException | JDOMException | IOException e) {
+            } catch (final IOException e) {
                 throw new MCRException("Exception while transforming EMail to JDOM document.", e);
             }
         }
@@ -698,7 +695,7 @@ public class MCRMailer extends MCRServlet {
                 builder.append("parts=");
                 builder.append(parts.subList(0, Math.min(parts.size(), maxLen)));
             }
-            builder.append("]");
+            builder.append(']');
             return builder.toString();
         }
 
@@ -740,7 +737,7 @@ public class MCRMailer extends MCRServlet {
                     builder.append("message=");
                     builder.append(message, 0, Math.min(message.length(), maxLen));
                 }
-                builder.append("]");
+                builder.append(']');
                 return builder.toString();
             }
         }

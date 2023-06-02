@@ -33,7 +33,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDDestinationOrAction;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mycore.common.content.MCRContent;
@@ -76,7 +75,6 @@ public class MCRPDFTools implements AutoCloseable {
      *                      height) will be returned
      * @return a BufferedImage as thumbnail
      *
-     * @throws IOException
      */
     public static BufferedImage getThumbnail(int thumbnailSize, Path pdfFile, boolean centered) throws IOException {
         InputStream fileIS = Files.newInputStream(pdfFile);
@@ -136,23 +134,16 @@ public class MCRPDFTools implements AutoCloseable {
     /**
      *
      * @param pdf - the pdf document
-     * @return
-     * @throws IOException
-     *
      * @see org.mycore.media.services.MCRPdfThumbnailGenerator
      */
     private static PDPage resolveOpenActionPage(PDDocument pdf) throws IOException {
         PDDestinationOrAction openAction = pdf.getDocumentCatalog().getOpenAction();
 
-        if (openAction instanceof PDActionGoTo) {
-            final PDDestination destination = ((PDActionGoTo) openAction).getDestination();
-            if (destination instanceof PDPageDestination) {
-                openAction = destination;
-            }
+        if (openAction instanceof PDActionGoTo goTo && goTo.getDestination() instanceof PDPageDestination destination) {
+            openAction = destination;
         }
 
-        if (openAction instanceof PDPageDestination) {
-            final PDPageDestination namedDestination = (PDPageDestination) openAction;
+        if (openAction instanceof PDPageDestination namedDestination) {
             final PDPage pdPage = namedDestination.getPage();
             if (pdPage != null) {
                 return pdPage;
@@ -177,7 +168,7 @@ public class MCRPDFTools implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         this.pngTools.close();
     }
 

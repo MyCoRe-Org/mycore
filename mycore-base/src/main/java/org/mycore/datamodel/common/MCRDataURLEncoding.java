@@ -18,7 +18,7 @@
 package org.mycore.datamodel.common;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public enum MCRDataURLEncoding {

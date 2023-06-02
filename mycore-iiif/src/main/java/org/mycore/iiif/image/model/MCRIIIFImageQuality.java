@@ -24,18 +24,13 @@ public enum MCRIIIFImageQuality {
     color, gray, bitonal;
 
     public static MCRIIIFImageQuality fromString(String str) {
-        switch (str.toLowerCase(Locale.ENGLISH)) {
-        case "color":
-        case "default":
-        case "native": //for backwards compatibility with IIIF Image API 1.0
-            return color;
-        case "gray":
-        case "grey": //for backwards compatibility with IIIF Image API 1.0
-            return gray;
-        case "bitonal":
-            return bitonal;
-        default:
-            throw new IllegalArgumentException(str + " is no valid ImageQuality!");
-        }
+        return switch (str.toLowerCase(Locale.ENGLISH)) {
+            case "color", "default", "native" -> //for backwards compatibility with IIIF Image API 1.0
+                color;
+            case "gray", "grey" -> //for backwards compatibility with IIIF Image API 1.0
+                gray;
+            case "bitonal" -> bitonal;
+            default -> throw new IllegalArgumentException(str + " is no valid ImageQuality!");
+        };
     }
 }

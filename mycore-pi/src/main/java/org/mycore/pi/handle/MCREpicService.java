@@ -24,6 +24,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -117,7 +118,7 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     @Override
     protected void registerIdentifier(MCRBase obj, String additional, MCRHandle pi)
         throws MCRPersistentIdentifierException {
-        if (!"".equals(additional)) {
+        if (!Objects.equals(additional, "")) {
             String className = this.getClass().getName();
             throw new MCRPersistentIdentifierException(
                 className + " doesn't support additional information! (" + additional + ")");
@@ -125,14 +126,12 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     @Override
-    protected void delete(MCRHandle identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void delete(MCRHandle identifier, MCRBase obj, String additional) {
         this.startDeleteJob(obj, identifier);
     }
 
     @Override
-    protected void update(MCRHandle identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void update(MCRHandle identifier, MCRBase obj, String additional) {
         if (!this.hasRegistrationStarted(obj.getId(), additional)) {
             Predicate<MCRBase> registrationCondition = this.getRegistrationPredicate();
             if (registrationCondition.test(obj)) {
@@ -230,21 +229,21 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     private void startUpdateJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<String, String>();
+        HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
         this.addUpdateJob(contextParameters);
     }
 
     private void startRegisterJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<String, String>();
+        HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
         this.addRegisterJob(contextParameters);
     }
 
     private void startDeleteJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<String, String>();
+        HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
         this.addDeleteJob(contextParameters);

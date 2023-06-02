@@ -36,8 +36,6 @@ import org.mycore.datamodel.niofs.MCRPath;
  * This class implements all methode for handling one derivate data.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06. Feb
- *          2008) $
  */
 public class MCRObjectDerivate {
 
@@ -246,12 +244,6 @@ public class MCRObjectDerivate {
         return getOrCreateFileMetadata(path, urn, handle);
     }
 
-    /**
-     * @param path
-     * @param urn
-     * @param handle
-     * @return
-     */
     private MCRFileMetadata getOrCreateFileMetadata(String path, String urn, String handle) {
         if (path == null) {
             throw new NullPointerException("path may not be null");
@@ -286,12 +278,6 @@ public class MCRObjectDerivate {
         return getOrCreateFileMetadata(file, null, null);
     }
 
-    /**
-     * @param path
-     * @param urn
-     * @param handle
-     * @return
-     */
     private MCRFileMetadata createFileMetadata(String path, String urn, String handle) {
         MCRPath mcrFile = MCRPath.getPath(derivateID.toString(), path);
         if (!Files.exists(mcrFile)) {

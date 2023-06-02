@@ -89,13 +89,8 @@ public class MCRLockServlet extends MCRServlet {
         }
         MCRObjectID objectID = MCRObjectID.getInstance(idValue);
         switch (action) {
-        case lock:
-            MCRObjectIDLockTable.lock(objectID);
-            break;
-
-        case unlock:
-            MCRObjectIDLockTable.unlock(objectID);
-            break;
+            case lock -> MCRObjectIDLockTable.lock(objectID);
+            case unlock -> MCRObjectIDLockTable.unlock(objectID);
         }
         job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
         job.getRequest().setAttribute(ACTION_KEY, action);
@@ -143,7 +138,7 @@ public class MCRLockServlet extends MCRServlet {
                         hasQueryParameter = true;
                     }
                     sb.append(parameter.getKey());
-                    sb.append("=");
+                    sb.append('=');
                     sb.append(value);
                 }
             }

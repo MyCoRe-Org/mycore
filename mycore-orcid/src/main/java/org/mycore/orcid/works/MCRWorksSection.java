@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 /**
  * Represents the "works" section of an ORCID profile with grouped works
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWorksSection {
 
@@ -120,7 +120,7 @@ public class MCRWorksSection {
      * Can be called to refresh information on grouping to find out how grouping of works
      * may have changed after adding or deleting works.
      */
-    public void refetchGroupsAndSummaries() throws JDOMException, IOException, SAXException {
+    public void refetchGroupsAndSummaries() throws JDOMException, IOException {
         groups = orcid.getFetcher().fetchGroups(this);
 
         // Now, rebuild putCode2Work and works list from groups list:
@@ -134,7 +134,7 @@ public class MCRWorksSection {
     }
 
     /** Fetches the work details for all work summaries from the ORCID profile. */
-    public void fetchDetails() throws IOException, JDOMException, SAXException {
+    public void fetchDetails() throws IOException, JDOMException {
         orcid.getFetcher().fetchDetails(this);
     }
 

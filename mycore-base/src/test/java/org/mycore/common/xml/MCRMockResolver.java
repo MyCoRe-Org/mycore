@@ -18,12 +18,12 @@
 
 package org.mycore.common.xml;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.URIResolver;
 
 /**
  * Can be used to write test against the {@link MCRURIResolver}.
@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class MCRMockResolver implements URIResolver {
 
-    private static final List<MCRMockResolverCall> CALLS = new LinkedList<>();
+    private static final List<MCRMockResolverCall> CALLS = new ArrayList<>();
 
     private static Source resultSource = null;
 
@@ -53,7 +53,7 @@ public class MCRMockResolver implements URIResolver {
     }
 
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         final MCRMockResolverCall mcrMockResolverCall = new MCRMockResolverCall(href, base);
         CALLS.add(mcrMockResolverCall);
         return getResultSource();

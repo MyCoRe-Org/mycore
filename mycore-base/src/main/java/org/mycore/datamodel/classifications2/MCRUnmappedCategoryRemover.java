@@ -67,11 +67,7 @@ public class MCRUnmappedCategoryRemover {
 
         LOGGER.info("Filter Category: {}", categoryID);
 
-        boolean hasMapping = false;
-
-        if (toFromMapping.containsKey(categoryID)) {
-            hasMapping = true;
-        }
+        boolean hasMapping = toFromMapping.containsKey(categoryID);
 
         final List<MCRCategory> children = category.getChildren();
         for (MCRCategory child : children) {

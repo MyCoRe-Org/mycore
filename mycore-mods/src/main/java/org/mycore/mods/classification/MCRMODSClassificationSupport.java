@@ -38,7 +38,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public final class MCRMODSClassificationSupport {
 

@@ -95,16 +95,14 @@ public class MCRConfigHelperServlet extends HttpServlet {
                 MCRConfiguration2.getSubPropertiesMap(prefix)
                     .forEach((key, value) -> propertiesMap.put(prefix + key, value));
             } else {
-                MCRConfiguration2.getString(property).ifPresent((p) -> {
-                    propertiesMap.put(property, p);
-                });
+                MCRConfiguration2.getString(property).ifPresent((p) -> propertiesMap.put(property, p));
             }
         }
 
         JsonObject obj = new JsonObject();
         propertiesMap.forEach(obj::addProperty);
 
-        try (StringWriter sw = new StringWriter();) {
+        try (StringWriter sw = new StringWriter()) {
             new Gson().toJson(obj, sw);
             return sw.toString();
         }
@@ -121,7 +119,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setHeader("Cache-Control", "public");
         resp.setHeader("Cache-Control", "max-age=120");
 

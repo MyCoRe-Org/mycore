@@ -24,7 +24,7 @@ import org.jdom2.Element;
  * Merges those MODS elements that must occur only oncy at a given level.
  * So if the elements have the same name, they are regarded to prepresent the same information.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRUniqueMerger extends MCRMerger {
 

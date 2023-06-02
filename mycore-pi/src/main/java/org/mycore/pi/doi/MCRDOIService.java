@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -142,7 +141,7 @@ public class MCRDOIService extends MCRDOIBaseService {
     private void init() {
         Map<String, String> properties = getProperties();
         useTestServer = Boolean
-            .valueOf(properties.getOrDefault(TEST_SERVER, properties.getOrDefault(TEST_PREFIX, "false")));
+            .parseBoolean(properties.getOrDefault(TEST_SERVER, properties.getOrDefault(TEST_PREFIX, "false")));
         registerURL = properties.get("RegisterBaseURL");
         nameSpace = Namespace.getNamespace("datacite", properties.getOrDefault("Namespace", KERNEL_3_NAMESPACE_URI));
 
@@ -290,15 +289,14 @@ public class MCRDOIService extends MCRDOIBaseService {
                     translatedInformation, ERR_CODE_1_2, e);
             }
             return dataciteDocument;
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRPersistentIdentifierException(
                 "Could not transform the content of " + id + " with the transformer " + getTransformerID(), e);
         }
     }
 
     @Override
-    public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional) {
         if (hasRegistrationStarted(obj.getId(), additional) || this.isRegistered(obj.getId(), additional)) {
             LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj.getId(),
                 doi.asString());
@@ -407,13 +405,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         return parseIdentifier(doiString)
             .orElseThrow(
                 () -> new MCRPersistentIdentifierException("The String " + doiString + " can not be parsed to a DOI!"));
-    }
-
-    @Override
-    protected Optional<String> getJobInformation(Map<String, String> contextParameters) {
-        String pattern = "{0} DOI: {1} for object: {2}";
-        return Optional.of(String.format(Locale.ROOT, pattern, getAction(contextParameters).toString(),
-            contextParameters.get(CONTEXT_DOI), contextParameters.get(CONTEXT_OBJ)));
     }
 
 }

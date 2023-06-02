@@ -23,7 +23,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
@@ -80,7 +79,7 @@ public class MCRStoreCenterTest {
     class FakeStoreConfig implements MCRStoreConfig {
         private final Path baseDir;
 
-        FakeStoreConfig(String id) throws IOException {
+        FakeStoreConfig(String id) {
             String fsName = MCRStoreCenterTest.class.getSimpleName() + "." + id;
             URI jimfsURI = URI.create("jimfs://" + fsName);
             FileSystem fileSystem;

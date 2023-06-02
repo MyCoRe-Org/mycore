@@ -87,13 +87,12 @@ public abstract class MCRSolrIndexHandlerFactory {
         return MCRSolrIndexStrategyManager.checkFile(file, attrs);
     }
 
-    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient)
-        throws IOException {
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient) {
         return this.getIndexHandler(file, attrs, solrClient, checkFile(file, attrs));
     }
 
     public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient,
-        boolean sendContent) throws IOException {
+        boolean sendContent) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: submitting file \"{} for indexing", file);
         }

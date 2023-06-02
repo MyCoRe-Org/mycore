@@ -24,8 +24,6 @@ import java.util.ArrayList;
  * This interface is designed to incude external application commands.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2009-07-30 15:41:24 +0200 (Thu, 30 Jul
- *          2009) $
  */
 public interface MCRExternalCommandInterface {
     /**

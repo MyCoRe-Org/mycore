@@ -53,7 +53,6 @@ import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -84,7 +83,7 @@ public class MCRDOICommands {
         help = "Use this method if a DOI is registered, but not inserted in the Database. {0} is the DOI and "
             + "{1} the registration service from configuration.")
     public static void repairIncompleteRegisteredDOI(String doiString, String serviceID)
-        throws MCRPersistentIdentifierException, MCRAccessException, MCRActiveLinkException {
+        throws MCRPersistentIdentifierException, MCRAccessException {
         MCRDOIService registrationService = (MCRDOIService) MCRConfiguration2
             .getInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID).get();
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
@@ -282,7 +281,7 @@ public class MCRDOICommands {
         try {
             transform = contentTransformer.transform(new MCRBaseContent(mcrObject));
             document = transform.asXML();
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             LOGGER.error("Error while transforming document {} with transformer {}", e, mycoreIDString, transformer);
             return;
         }

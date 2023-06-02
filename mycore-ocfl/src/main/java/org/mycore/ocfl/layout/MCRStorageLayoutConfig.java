@@ -32,7 +32,7 @@ public class MCRStorageLayoutConfig implements OcflExtensionConfig {
     public MCRStorageLayoutConfig() {
         slotLayout = MCRConfiguration2.getString("MCR.OCFL.MyCoReStorageLayout.SlotLayout").orElseGet(() -> {
             String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
-            return Integer.toString(pattern.length() - 4) + "-2-2";
+            return pattern.length() - 4 + "-2-2";
         });
     }
 

@@ -147,8 +147,8 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
      */
     @Override
     public Integer getProgress() {
-        if (task instanceof MCRProgressable) {
-            return ((MCRProgressable) task).getProgress();
+        if (task instanceof MCRProgressable progressable) {
+            return progressable.getProgress();
         }
         return super.getProgress();
     }
@@ -160,8 +160,8 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
      */
     @Override
     public String getProgressText() {
-        if (task instanceof MCRProgressable) {
-            return ((MCRProgressable) task).getProgressText();
+        if (task instanceof MCRProgressable progressable) {
+            return progressable.getProgressText();
         }
         return super.getProgressText();
     }
@@ -177,8 +177,8 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
         String name = super.getName();
         if (name == null) {
             return MCRDecorator.resolve(this.task).map(object -> {
-                if (object instanceof MCRProcessable) {
-                    return ((MCRProcessable) object).getName();
+                if (object instanceof MCRProcessable processable) {
+                    return processable.getName();
                 }
                 return object.toString();
             }).orElse(this.task.toString());

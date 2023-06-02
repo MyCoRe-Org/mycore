@@ -35,7 +35,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
  * This class represents a label of a MCRCategory.
  * 
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  * @since 2.0
  */
 @XmlRootElement(
@@ -93,7 +92,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
         }
         Locale locale = Locale.forLanguageTag(lang);
         String languageTag = locale.toLanguageTag();
-        if ("und".equals(languageTag)) {
+        if (Objects.equals(languageTag, "und")) {
             throw new IllegalArgumentException("'lang' of label is not valid language tag (RFC4646):" + lang);
         }
         this.lang = languageTag;
@@ -117,7 +116,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
         this.text = text;
     }
 
-    @Column(length = 4096, nullable = true)
+    @Column(length = 4096)
     public String getDescription() {
         if (description == null) {
             return "";

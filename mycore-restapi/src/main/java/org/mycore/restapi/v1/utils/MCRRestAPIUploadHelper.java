@@ -104,7 +104,6 @@ public class MCRRestAPIUploadHelper {
      * @param uploadedInputStream - the inputstream from HTTP Post request
      * @param fileDetails - the file information from HTTP Post request
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
         FormDataContentDisposition fileDetails) throws MCRRestAPIException {
@@ -157,10 +156,9 @@ public class MCRRestAPIUploadHelper {
      * @param overwriteOnExisting, if true, an existing MyCoRe derivate
      *        with the given label or classification will be returned 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID, String label,
-        String classifications, boolean overwriteOnExisting) throws MCRRestAPIException {
+        String classifications, boolean overwriteOnExisting) {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         //  File fXML = null;
@@ -256,7 +254,6 @@ public class MCRRestAPIUploadHelper {
      * @param formParamMD5 - the MD5 sum of the uploaded file 
      * @param formParamSize - the size of the uploaded file
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
@@ -356,14 +353,9 @@ public class MCRRestAPIUploadHelper {
      * @param pathParamMcrObjID - the MyCoRe Object ID
      * @param pathParamMcrDerID - the MyCoRe Derivate ID
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException
      */
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
-        String pathParamMcrDerID) throws MCRRestAPIException {
-
-        SortedMap<String, String> parameter = new TreeMap<>();
-        parameter.put("mcrObjectID", pathParamMcrObjID);
-        parameter.put("mcrDerivateID", pathParamMcrDerID);
+        String pathParamMcrDerID) {
 
         MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
         MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
@@ -397,7 +389,6 @@ public class MCRRestAPIUploadHelper {
      * @param pathParamMcrObjID - the MyCoRe Object ID
      * @param pathParamMcrDerID - the MyCoRe Derivate ID
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException
      */
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {
@@ -424,10 +415,10 @@ public class MCRRestAPIUploadHelper {
      */
     public static String generateMessagesFromProperties(SortedMap<String, String> data) {
         StringWriter sw = new StringWriter();
-        sw.append("{");
+        sw.append('{');
         for (String key : data.keySet()) {
-            sw.append("\"").append(key).append("\"").append(":").append("\"").append(data.get(key)).append("\"")
-                .append(",");
+            sw.append("\"").append(key).append("\"").append(':').append("\"").append(data.get(key)).append("\"")
+                .append(',');
         }
         String result = sw.toString();
         if (result.length() > 1) {

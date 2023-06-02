@@ -18,7 +18,6 @@
 
 package org.mycore.solr.index.handlers.content;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -70,7 +68,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
     }
 
     @Override
-    public void index() throws IOException, SolrServerException {
+    public void index() {
         int totalCount = contentMap.size();
         LOGGER.info("Handling {} documents", totalCount);
         //multithread processing will result in too many http request

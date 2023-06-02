@@ -38,8 +38,6 @@ public interface MCRMetadataShareAgent {
     /**
      * updates all recipients of shareable metadata from <code>holder</code>.
      * @param holder usually the parent object that can distrivute metadata
-     * @throws MCRAccessException 
-     * @throws MCRPersistenceException 
      */
     void distributeMetadata(MCRObject holder) throws MCRPersistenceException, MCRAccessException;
 

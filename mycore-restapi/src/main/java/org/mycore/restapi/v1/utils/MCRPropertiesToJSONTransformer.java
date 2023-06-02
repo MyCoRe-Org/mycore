@@ -86,19 +86,13 @@ public class MCRPropertiesToJSONTransformer implements MessageBodyWriter<Propert
             final JsonSerializationContext context) {
             final JsonObject resultJson = new JsonObject();
 
-            for (final String key : bundleMap.keySet()) {
-                try {
-                    createFromBundleKey(resultJson, key, bundleMap.get(key));
-                } catch (final IOException e) {
-                    LOGGER.error("Bundle map serialization exception: ", e);
-                }
-            }
+            bundleMap.forEach((key, value) -> createFromBundleKey(resultJson, key, value));
 
             return resultJson;
         }
 
-        public static JsonObject createFromBundleKey(final JsonObject resultJson, final String key, final String value)
-            throws IOException {
+        public static JsonObject createFromBundleKey(final JsonObject resultJson, final String key,
+            final String value) {
             if (!key.contains(".")) {
                 resultJson.addProperty(key, value);
 

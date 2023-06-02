@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +39,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaLink;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -52,7 +51,6 @@ import org.mycore.datamodel.metadata.MCRObjectStructure;
  * holds all informations about links between MCRObjects/MCRClassifications.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRLinkTableManager {
     /** The list of entry types */
@@ -391,7 +389,7 @@ public class MCRLinkTableManager {
             LOGGER.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
-        LinkedList<String> ll = new LinkedList<>();
+        Collection<String> ll = new ArrayList<>();
         try {
             for (String singleTo : to) {
                 ll.addAll(linkTableInstance.getSourcesOf(singleTo, type));
@@ -459,15 +457,15 @@ public class MCRLinkTableManager {
         //use Set for category collection to remove duplicates if there are any
         Collection<MCRCategoryID> categories = new HashSet<>();
         meta.stream().flatMap(MCRMetaElement::stream).forEach(inf -> {
-            if (inf instanceof MCRMetaClassification) {
-                String classId = ((MCRMetaClassification) inf).getClassId();
-                String categId = ((MCRMetaClassification) inf).getCategId();
+            if (inf instanceof MCRMetaClassification classification) {
+                String classId = classification.getClassId();
+                String categId = classification.getCategId();
                 categories.add(new MCRCategoryID(classId, categId));
-            } else if (inf instanceof MCRMetaLinkID) {
-                addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+            } else if (inf instanceof MCRMetaLinkID linkID) {
+                addReferenceLink(mcrId.toString(), linkID.getXLinkHref(),
                     MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
-            } else if (inf instanceof MCRMetaDerivateLink) {
-                addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+            } else if (inf instanceof MCRMetaDerivateLink derLink) {
+                addReferenceLink(mcrId.toString(), derLink.getXLinkHref(),
                     MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK, "");
             }
         });
@@ -518,8 +516,7 @@ public class MCRLinkTableManager {
     }
 
     public void create(MCRDerivate der) {
-        Collection<MCRCategoryID> categoryList = new HashSet<>();
-        categoryList.addAll(der.getDerivate().getClassifications()
+        Collection<MCRCategoryID> categoryList = new HashSet<>(der.getDerivate().getClassifications()
             .stream()
             .map(this::metaClassToCategoryID)
             .collect(Collectors.toList()));

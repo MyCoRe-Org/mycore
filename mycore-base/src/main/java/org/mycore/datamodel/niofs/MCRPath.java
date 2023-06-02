@@ -60,9 +60,7 @@ public abstract class MCRPath implements Path {
 
     private int[] offsets;
 
-    /**
-     *
-     */
+
     MCRPath(final String root, final String path) {
         this.root = root;
         this.path = normalizeAndCheck(Objects.requireNonNull(path, "path may not be null"));
@@ -263,10 +261,9 @@ public abstract class MCRPath implements Path {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRPath)) {
+        if (!(obj instanceof MCRPath that)) {
             return false;
         }
-        final MCRPath that = (MCRPath) obj;
         if (!getFileSystem().equals(that.getFileSystem())) {
             return false;
         }
@@ -475,7 +472,7 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#register(java.nio.file.WatchService, java.nio.file.WatchEvent.Kind[])
      */
     @Override
-    public WatchKey register(final WatchService watcher, final Kind<?>... events) throws IOException {
+    public WatchKey register(final WatchService watcher, final Kind<?>... events) {
         return register(watcher, events, new WatchEvent.Modifier[0]);
     }
 
@@ -483,8 +480,7 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#register(java.nio.file.WatchService, java.nio.file.WatchEvent.Kind[], java.nio.file.WatchEvent.Modifier[])
      */
     @Override
-    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers)
-        throws IOException {
+    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers) {
         throw new UnsupportedOperationException();
     }
 
@@ -541,14 +537,11 @@ public abstract class MCRPath implements Path {
             return root == null ? other : MCRAbstractFileSystem.getPath(root, otherStr, getFileSystem());
         }
         final StringBuilder result = new StringBuilder(baseLength + 1 + childLength);
-        if (baseLength == 1 && path.charAt(0) == SEPARATOR) {
-            result.append(SEPARATOR);
-            result.append(otherStr);
-        } else {
+        if (baseLength != 1 || path.charAt(0) != SEPARATOR) {
             result.append(path);
-            result.append(SEPARATOR);
-            result.append(otherStr);
         }
+        result.append(SEPARATOR);
+        result.append(otherStr);
         return MCRAbstractFileSystem.getPath(root, result.toString(), getFileSystem());
     }
 
@@ -694,8 +687,8 @@ public abstract class MCRPath implements Path {
     public Path toPhysicalPath() throws IOException {
         if (isAbsolute()) {
             for (FileStore fs : getFileSystem().getFileStores()) {
-                if (fs instanceof MCRAbstractFileStore) {
-                    Path physicalPath = ((MCRAbstractFileStore) fs).getPhysicalPath(this);
+                if (fs instanceof MCRAbstractFileStore mcrfs) {
+                    Path physicalPath = mcrfs.getPhysicalPath(this);
                     if (physicalPath != null) {
                         return physicalPath;
                     }

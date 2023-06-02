@@ -29,7 +29,7 @@ import org.mycore.common.config.MCRConfigurationException;
 /**
  * Builds an MD5 checksum String while content goes through this input stream.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMD5InputStream extends DigestInputStream {
 

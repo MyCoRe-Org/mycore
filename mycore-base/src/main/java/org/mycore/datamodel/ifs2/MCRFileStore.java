@@ -23,8 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.mycore.common.MCRException;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -46,7 +44,7 @@ public class MCRFileStore extends MCRStore {
     //MCR-1868: prevents parallel threads to read and write mcrmeta.xml concurrently on instantiation
     LoadingCache<Integer, MCRFileCollection> collectionLoadingCache = CacheBuilder.newBuilder()
         .weakValues()
-        .build(new CacheLoader<Integer, MCRFileCollection>() {
+        .build(new CacheLoader<>() {
             @Override
             public MCRFileCollection load(Integer key) throws Exception {
                 return new MCRFileCollection(thisInstance, key);
@@ -82,7 +80,7 @@ public class MCRFileStore extends MCRStore {
         Path path = getSlot(id);
         if (Files.exists(path)) {
             String msg = "FileCollection with ID " + id + " already exists";
-            throw new MCRException(msg);
+            throw new IOException(msg);
         }
         return collectionLoadingCache.getUnchecked(id);
     }
@@ -104,7 +102,7 @@ public class MCRFileStore extends MCRStore {
      *            the file collection's ID
      * @return the file collection with the given ID, or null
      */
-    public MCRFileCollection retrieve(int id) throws IOException {
+    public MCRFileCollection retrieve(int id) {
         Path path = getSlot(id);
         if (!Files.exists(path)) {
             return null;

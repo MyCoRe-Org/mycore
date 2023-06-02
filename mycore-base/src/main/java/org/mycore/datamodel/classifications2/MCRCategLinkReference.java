@@ -30,7 +30,6 @@ import jakarta.persistence.Embeddable;
 /**
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  * @since 2.0
  */
 @Embeddable

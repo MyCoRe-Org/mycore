@@ -21,7 +21,7 @@ package org.mycore.datamodel.language;
 /**
  * Represents a type of langauge code, currently the ISO 639-1 and ISO 639-2b and 2t code types.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public enum MCRLanguageCodeType {
 

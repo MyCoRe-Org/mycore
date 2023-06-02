@@ -35,7 +35,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXException;
 
 @MCRCommandGroup(name = "Object Info Commands")
 public class MCRObjectInfoCommands {
@@ -104,7 +103,7 @@ public class MCRObjectInfoCommands {
                         MCRObjectInfoEntityManager.delete(obj,
                             deleted.getDate().toInstant(), deleted.getUser());
                         LogManager.getLogger().info("objectinfo for object " + idStr + " created.");
-                    } catch (JDOMException | SAXException e) {
+                    } catch (JDOMException e) {
                         LOGGER.warn("Could not determine what happened to " + id, e);
                     }
                 }

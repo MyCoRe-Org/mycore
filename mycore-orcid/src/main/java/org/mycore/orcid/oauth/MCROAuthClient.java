@@ -43,7 +43,7 @@ import jakarta.ws.rs.client.ClientBuilder;
  * MCR.ORCID.OAuth.ClientID
  * MCR.ORCID.OAuth.ClientSecret
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCROAuthClient {
 

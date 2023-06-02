@@ -69,11 +69,9 @@ import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @version $Revision: 1 $ $Date: 08.05.2009 15:51:37 $
  */
 public class MCREditorOutValidator {
 
@@ -273,7 +271,7 @@ public class MCREditorOutValidator {
      *
      * @return MCRObject
      */
-    public Document generateValidMyCoReObject() throws JDOMException, SAXParseException, IOException {
+    public Document generateValidMyCoReObject() throws JDOMException, IOException {
         MCRObject obj;
         // load the JDOM object
         XPathFactory.instance()
@@ -283,7 +281,7 @@ public class MCREditorOutValidator {
         try {
             byte[] xml = new MCRJDOMContent(input).asByteArray();
             obj = new MCRObject(xml, true);
-        } catch (SAXParseException e) {
+        } catch (JDOMException e) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             LOGGER.warn("Failure while parsing document:\n{}", xout.outputString(input));
             throw e;
@@ -306,11 +304,6 @@ public class MCREditorOutValidator {
         return errorlog;
     }
 
-    /**
-     * @throws IOException
-     * @throws JDOMException
-     *
-     */
     private void checkObject() throws JDOMException, IOException {
         // add the namespaces (this is a workaround)
         Element root = input.getRootElement();
@@ -342,9 +335,6 @@ public class MCREditorOutValidator {
         checkObjectService(root, service);
     }
 
-    /**
-     * @param datatag
-     */
     private boolean checkMetaTags(Element datatag) {
         String mcrclass = datatag.getAttributeValue("class");
         List<Element> datataglist = datatag.getChildren();
@@ -377,11 +367,6 @@ public class MCREditorOutValidator {
         return datatag.getChildren().size() != 0;
     }
 
-    /**
-     * @param service
-     * @throws IOException
-     * @throws JDOMException
-     */
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
         if (service == null) {
             service = new Element("service");
@@ -404,9 +389,6 @@ public class MCREditorOutValidator {
     /**
      * The method add a default ACL-block.
      *
-     * @param service
-     * @throws IOException
-     * @throws JDOMException
      */
     private void setDefaultObjectACLs(Element service) throws JDOMException, IOException {
         if (!MCRConfiguration2.getBoolean("MCR.Access.AddObjectDefaultRule").orElse(true)) {
@@ -474,9 +456,6 @@ public class MCREditorOutValidator {
         service.addContent(acls.detach());
     }
 
-    /**
-     * @param metadata
-     */
     private void checkObjectMetadata(Element metadata) {
         if (metadata.getAttribute("lang") != null) {
             metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);
@@ -504,8 +483,7 @@ public class MCREditorOutValidator {
         public String checkDataSubTag(Element datasubtag) {
             Element[] children = datasubtag.getChildren("text").toArray(Element[]::new);
             int textCount = children.length;
-            for (int i = 0; i < children.length; i++) {
-                Element child = children[i];
+            for (Element child : children) {
                 String text = child.getTextTrim();
                 if (text == null || text.length() == 0) {
                     child.detach();

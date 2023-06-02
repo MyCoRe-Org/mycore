@@ -64,13 +64,8 @@ public class MCRTilingAction implements Runnable {
         tileJob.setStart(new Date());
         MCRImage image;
         Path tileDir = MCRIView2Tools.getTileDir();
-        try {
-            image = getMCRImage();
-            image.setTileDir(tileDir);
-        } catch (IOException e) {
-            LOGGER.error("Error while retrieving image for job: {}", tileJob, e);
-            return;
-        }
+        image = getMCRImage();
+        image.setTileDir(tileDir);
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
@@ -134,9 +129,8 @@ public class MCRTilingAction implements Runnable {
 
     /**
      * @return MCRImage instance based on the information provided by {@link #tileJob}
-     * @throws IOException thrown by {@link MCRImage#getInstance(Path, String, String)}
      */
-    protected MCRImage getMCRImage() throws IOException {
+    protected MCRImage getMCRImage() {
         MCRPath file = MCRPath.getPath(tileJob.getDerivate(), tileJob.getPath());
         return MCRImage.getInstance(file, file.getOwner(), file.getOwnerRelativePath());
     }

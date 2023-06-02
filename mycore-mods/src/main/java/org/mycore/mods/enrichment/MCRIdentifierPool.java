@@ -36,7 +36,7 @@ import org.jdom2.Element;
  * the DOI of the publication. So we keep a list to distinguish
  * newly found identifiers from already known and resolved identifiers.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRIdentifierPool {
 

@@ -37,7 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  */
 public class MCRShibbolethLoginServlet extends MCRServlet {
 

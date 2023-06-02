@@ -164,7 +164,7 @@ public class MCRCommandLineInterface {
     private static String readLineFromArguments(String[] args) {
         StringBuilder sb = new StringBuilder();
         for (String arg : args) {
-            sb.append(arg).append(" ");
+            sb.append(arg).append(' ');
         }
         return sb.toString();
     }
@@ -268,11 +268,10 @@ public class MCRCommandLineInterface {
 
     private static void saveCommandQueueToFile(final Vector<String> queue, String fname) {
         output("Writing unprocessed commands to file " + fname);
-        try (PrintWriter pw = new PrintWriter(new File(fname), Charset.defaultCharset().name())) {
+        try (PrintWriter pw = new PrintWriter(new File(fname), Charset.defaultCharset())) {
             for (String command : queue) {
                 pw.println(command);
             }
-            pw.close();
         } catch (IOException ex) {
             MCRCLIExceptionHandler.handleException(ex);
         }

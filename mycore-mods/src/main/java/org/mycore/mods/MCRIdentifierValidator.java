@@ -33,14 +33,11 @@ public class MCRIdentifierValidator {
             //do not check 'required' here
             return true;
         }
-        switch (type) {
-        case "isbn":
-            return checkISBN(value);
-        case "doi":
-            return checkDOI(value);
-        default:
-            return true;
-        }
+        return switch (type) {
+            case "isbn" -> checkISBN(value);
+            case "doi" -> checkDOI(value);
+            default -> true;
+        };
     }
 
     private static boolean checkDOI(String value) {

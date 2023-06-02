@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -288,7 +289,7 @@ public class MCREventManager {
     }
 
     public MCREventHandler getEventHandler(String mode, String propertyValue) {
-        if ("Class".equals(mode)) {
+        if (Objects.equals(mode, "Class")) {
             return MCRConfiguration2.<MCREventHandler>getSingleInstanceOf(propertyValue)
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(propertyValue));
         }
@@ -311,7 +312,7 @@ public class MCREventManager {
      * @author Huu Chi Vu
      *
      */
-    private class EventHandlerProperty {
+    private static class EventHandlerProperty {
 
         private String type;
 

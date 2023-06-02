@@ -95,28 +95,30 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
     private void handleMessage(Session session, JsonObject request) {
         LOGGER.info("WebSocket Request: {}", request::toString);
         String type = request.get("type").getAsString();
-        if ("run".equals(type)) {
-            String command = request.get("command").getAsString();
-            cliCont.addCommand(command);
-        } else if ("getKnownCommands".equals(type)) {
-            request.add("return", MCRWebCLIContainer.getKnownCommands());
-            try {
-                cliCont.getWebsocketLock().lock();
-                session.getBasicRemote().sendText(request.toString());
-            } catch (IOException ex) {
-                LOGGER.error("Cannot send message to client.", ex);
-            } finally {
-                cliCont.getWebsocketLock().unlock();
+        switch (type) {
+            case "run" -> {
+                String command = request.get("command").getAsString();
+                cliCont.addCommand(command);
             }
-        } else if ("stopLog".equals(type)) {
-            cliCont.stopLogging();
-        } else if ("startLog".equals(type)) {
-            cliCont.startLogging();
-        } else if ("continueIfOneFails".equals(type)) {
-            boolean value = request.get("value").getAsBoolean();
-            cliCont.setContinueIfOneFails(value);
-        } else if ("clearCommandList".equals(type)) {
-            cliCont.clearCommandList();
+            case "getKnownCommands" -> {
+                request.add("return", MCRWebCLIContainer.getKnownCommands());
+                try {
+                    cliCont.getWebsocketLock().lock();
+                    session.getBasicRemote().sendText(request.toString());
+                } catch (IOException ex) {
+                    LOGGER.error("Cannot send message to client.", ex);
+                } finally {
+                    cliCont.getWebsocketLock().unlock();
+                }
+            }
+            case "stopLog" -> cliCont.stopLogging();
+            case "startLog" -> cliCont.startLogging();
+            case "continueIfOneFails" -> {
+                boolean value = request.get("value").getAsBoolean();
+                cliCont.setContinueIfOneFails(value);
+            }
+            case "clearCommandList" -> cliCont.clearCommandList();
+            default -> LOGGER.warn("Cannot handle request type: " + type);
         }
     }
 

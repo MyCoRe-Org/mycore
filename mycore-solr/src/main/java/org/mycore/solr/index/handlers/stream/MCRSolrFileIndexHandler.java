@@ -87,7 +87,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         } //MCR-1911: close any open resource
     }
 
-    private ModifiableSolrParams getSolrParams(Path file, BasicFileAttributes attrs) throws IOException {
+    private ModifiableSolrParams getSolrParams(Path file, BasicFileAttributes attrs) {
         ModifiableSolrParams params = new ModifiableSolrParams();
         SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
         for (SolrInputField field : doc) {
@@ -107,17 +107,12 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         for (Object o : values) {
             strValues.add(o.toString());
         }
-        return strValues.toArray(new String[strValues.size()]);
+        return strValues.toArray(String[]::new);
     }
 
     @Override
     public MCRSolrIndexStatistic getStatistic() {
         return MCRSolrIndexStatisticCollector.FILE_TRANSFER;
-    }
-
-    @Override
-    public int getDocuments() {
-        return 1;
     }
 
     @Override

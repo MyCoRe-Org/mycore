@@ -114,7 +114,6 @@ import jakarta.persistence.TypedQuery;
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Robert Stephan
- * @version $Revision$ $Date$
  */
 @MCRCommandGroup(name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
@@ -150,7 +149,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
             " (this command may take a while, use with care in case of a large number of objects)",
         order = 10)
-    public static void selectObjectsWithXpath(String xPath) throws Exception {
+    public static void selectObjectsWithXpath(String xPath) {
 
         XPathExpression<Object> xPathExpression = XPathFactory
             .instance()
@@ -176,8 +175,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "select descendants of object {0}",
         help = "Selects MCRObjects that are descendants of {0} (children, grandchildren, ...) and {0} itself.",
         order = 15)
-    public static void selectDescendantObjects(String id) throws Exception {
-        List<String> descendants = new ArrayList<String>();
+    public static void selectDescendantObjects(String id) {
+        List<String> descendants = new ArrayList<>();
         if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
             fillWithDescendants(id, descendants);
         }
@@ -433,8 +432,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Loads an MCRObject from the file {0} to the system. " +
             "If the numerical part of the provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 60)
-    public static boolean loadFromFile(String file) throws MCRException, SAXParseException,
-        IOException, MCRAccessException {
+    public static boolean loadFromFile(String file) throws MCRException, IOException, MCRAccessException,
+        JDOMException {
         return loadFromFile(file, true);
     }
 
@@ -447,8 +446,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
-    public static boolean loadFromFile(String file, boolean importMode) throws MCRException,
-        SAXParseException, IOException, MCRAccessException {
+    public static boolean loadFromFile(String file, boolean importMode)
+        throws MCRException, IOException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -463,8 +462,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "update object from file {0}",
         help = "Updates a MCRObject from the file {0} in the system.",
         order = 80)
-    public static boolean updateFromFile(String file) throws MCRException, SAXParseException,
-        IOException, MCRAccessException {
+    public static boolean updateFromFile(String file)
+        throws MCRException, IOException, MCRAccessException, JDOMException {
         return updateFromFile(file, true);
     }
 
@@ -477,8 +476,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
-    public static boolean updateFromFile(String file, boolean importMode) throws MCRException,
-        SAXParseException, IOException, MCRAccessException {
+    public static boolean updateFromFile(String file, boolean importMode)
+        throws MCRException, IOException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -500,7 +499,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if write permission is missing
      */
     private static boolean processFromFile(File file, boolean update, boolean importMode)
-        throws MCRException, SAXParseException, IOException, MCRAccessException {
+        throws MCRException, IOException, MCRAccessException, JDOMException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", file);
             return false;
@@ -793,8 +792,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param nid
      *            the MCRObjectID
      * @return true if the store was okay (see description), else return false
-     * @throws IOException
-     * @throws MCRException
      */
     private static boolean exportMCRObject(File dir, String extension,
         FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
@@ -876,7 +873,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         StringBuilder out = new StringBuilder();
         for (String id : getSelectedObjectIDs()) {
-            out.append(id).append(" ");
+            out.append(id).append(' ');
         }
         LOGGER.info(out.toString());
     }
@@ -899,9 +896,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             List<? extends MCRAbstractMetadataVersion<?>> revisions = MCRXMLMetadataManager.instance()
                 .listRevisions(mcrId);
             for (MCRAbstractMetadataVersion<?> revision : revisions) {
-                log.append(revision.getRevision()).append(" ");
-                log.append(revision.getType()).append(" ");
-                log.append(sdf.format(revision.getDate())).append(" ");
+                log.append(revision.getRevision()).append(' ');
+                log.append(revision.getType()).append(' ');
+                log.append(sdf.format(revision.getDate())).append(' ');
                 log.append(revision.getUser());
                 log.append("\n");
             }
@@ -1052,15 +1049,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
         switch (resultName) {
-        case MCRObject.ROOT_NAME:
-            MCRMetadataManager.update(new MCRObject(resultDocument));
-            break;
-        case MCRDerivate.ROOT_NAME:
-            MCRMetadataManager.update(new MCRDerivate(resultDocument));
-            break;
-        default:
-            LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
-            break;
+            case MCRObject.ROOT_NAME -> MCRMetadataManager.update(new MCRObject(resultDocument));
+            case MCRDerivate.ROOT_NAME -> MCRMetadataManager.update(new MCRDerivate(resultDocument));
+            default ->
+                LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
         }
     }
 
@@ -1068,7 +1060,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Transforms the object with the id {0} using the transformer with the id {1} and" +
                 " updates the object with the result")
     public static void transformObject(String objectIDStr, String transformer)
-        throws IOException, JDOMException, SAXException, MCRAccessException {
+        throws IOException, JDOMException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
         if (!MCRMetadataManager.exists(objectID)) {
             LOGGER.error("The object {} does not exist!", objectID);
@@ -1275,7 +1267,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         Document doc;
         try {
             doc = mgr.retrieveXML(objID);
-        } catch (IOException | JDOMException | SAXException e) {
+        } catch (IOException | JDOMException e) {
             throw new MCRException(
                 "Object " + objID.toString() + " could not be retrieved, unable to validate against schema!", e);
         }
@@ -1310,7 +1302,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         try {
             MCRXMLParserFactory.getValidatingParser().parseXML(new MCRJDOMContent(doc));
-        } catch (MCRException | SAXException e) {
+        } catch (MCRException | JDOMException | IOException e) {
             throw new MCRException("Object " + objID.toString() + " failed to parse against its schema!", e);
         }
     }

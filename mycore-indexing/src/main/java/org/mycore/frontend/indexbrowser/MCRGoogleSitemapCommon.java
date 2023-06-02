@@ -62,12 +62,11 @@ import org.mycore.solr.MCRSolrClientFactory;
  * <li>MCR.GoogleSitemap.NumberOfURLs - the number of URLs in one sitemap file, 10000 is default</li>
  * </ul>
  *
- * see http://www.sitemaps.org/de/protocol.html
+ * see <a href="http://www.sitemaps.org/de/protocol.html">http://www.sitemaps.org/de/protocol.html</a>
  *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  *
  */
 public final class MCRGoogleSitemapCommon {
@@ -127,8 +126,6 @@ public final class MCRGoogleSitemapCommon {
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;
 
-    /** The constructor 
-     * @throws NotDirectoryException */
     public MCRGoogleSitemapCommon(File baseDir) throws NotDirectoryException {
         if (!Objects.requireNonNull(baseDir, "baseDir may not be null.").isDirectory()) {
             throw new NotDirectoryException(baseDir.getAbsolutePath());
@@ -224,7 +221,7 @@ public final class MCRGoogleSitemapCommon {
      *
      * @return The sitemap_google.xml as JDOM document
      */
-    protected Document buildSingleSitemap() throws Exception {
+    protected Document buildSingleSitemap() {
         LOGGER.debug("Build Google URL sitemap_google.xml for whole items.");
         // build document frame
         Element urlset = new Element("urlset", NS);
@@ -245,7 +242,7 @@ public final class MCRGoogleSitemapCommon {
      *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
      * @return The sitemap.xml as JDOM document
      */
-    protected Document buildPartSitemap(int number) throws Exception {
+    protected Document buildPartSitemap(int number) {
         LOGGER.debug("Build Google URL sitemap list number {}", Integer.toString(number));
         // build document frame
         Element urlset = new Element("urlset", NS);

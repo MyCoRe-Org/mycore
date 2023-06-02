@@ -67,14 +67,12 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        HashSet<MCRCategLinkReference> before = new HashSet<>();
-        before.addAll(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
+        HashSet<MCRCategLinkReference> before = new HashSet<>(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
 
         handleDerivateDeleted(evt, der);
         handleDerivateCreated(evt, der);
 
-        HashSet<MCRCategLinkReference> after = new HashSet<>();
-        after.addAll(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
+        HashSet<MCRCategLinkReference> after = new HashSet<>(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
         HashSet<MCRCategLinkReference> combined = new HashSet<>(before);
         combined.addAll(after);
         for (MCRCategLinkReference ref : combined) {

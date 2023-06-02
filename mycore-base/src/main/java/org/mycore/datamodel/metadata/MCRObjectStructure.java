@@ -55,8 +55,6 @@ import com.google.gson.JsonObject;
  * 
  * @author Mathias Hegner
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb
- *          2008) $
  */
 public class MCRObjectStructure {
 
@@ -214,9 +212,6 @@ public class MCRObjectStructure {
 
     /**
      * Removes a MCRMetaLinkID instance by it MCRObjectID.
-     * @param list
-     * @param href
-     * @return
      */
     private boolean removeMetaLink(List<? extends MCRMetaLinkID> list, MCRObjectID href) {
         final List<MCRMetaLink> toRemove = list.stream()

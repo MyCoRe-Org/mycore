@@ -37,8 +37,6 @@ import jakarta.persistence.EntityManagerFactory;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision: 33146 $ $Date: 2011-04-05 10:52:04 +0200 (Di, 05 Apr
- *          2011) $
  * @since 2016.03
  */
 class MCRSessionContext implements MCRSessionListener {

@@ -36,7 +36,6 @@ import org.apache.logging.log4j.Logger;
  * German, english, french, arabic, chinese, japanese, greek and hebrew are currently supported.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRLanguageDetector {
     private static Logger LOGGER = LogManager.getLogger(MCRLanguageDetector.class);

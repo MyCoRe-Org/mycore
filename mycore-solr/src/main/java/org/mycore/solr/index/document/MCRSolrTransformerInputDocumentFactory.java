@@ -112,7 +112,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
         }
     }
 
-    private Iterator<SolrInputDocument> getSolrInputDocuments(MCRContent result) throws IOException, SAXException,
+    private Iterator<SolrInputDocument> getSolrInputDocuments(MCRContent result) throws IOException,
         JDOMException {
         final Iterator<Element> delegate;
         delegate = result.asXML().getRootElement().getChildren("doc").iterator();
@@ -136,7 +136,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
         };
     }
 
-    private Document getMergedDocument(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException,
+    private Document getMergedDocument(Map<MCRObjectID, MCRContent> contentMap) throws IOException,
         JDOMException {
         Element rootElement = new Element("add");
         Document doc = new Document(rootElement);

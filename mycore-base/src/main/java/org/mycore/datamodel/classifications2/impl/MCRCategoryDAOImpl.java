@@ -55,8 +55,6 @@ import jakarta.persistence.TypedQuery;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
- *          2008) $
  * @since 2.0
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {
@@ -76,8 +74,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
         int position = -1;
-        if (category instanceof MCRCategoryImpl) {
-            position = ((MCRCategoryImpl) category).getPositionInParent();
+        if (category instanceof MCRCategoryImpl catImpl) {
+            position = catImpl.getPositionInParent();
         }
         return addCategory(parentID, category, position);
     }
@@ -595,11 +593,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         newCateg.setRoot(category.getRoot());
         newCateg.setURI(category.getURI());
         newCateg.setLevel(category.getLevel());
-        if (category instanceof MCRCategoryImpl) {
+        if (category instanceof MCRCategoryImpl catImpl) {
             //to allow optimized hasChildren() to work without db query
-            newCateg.setLeft(((MCRCategoryImpl) category).getLeft());
-            newCateg.setRight(((MCRCategoryImpl) category).getRight());
-            newCateg.setInternalID(((MCRCategoryImpl) category).getInternalID());
+            newCateg.setLeft(catImpl.getLeft());
+            newCateg.setRight(catImpl.getRight());
+            newCateg.setInternalID(catImpl.getInternalID());
         }
         if (childAmount > 0) {
             for (MCRCategory child : category.getChildren()) {

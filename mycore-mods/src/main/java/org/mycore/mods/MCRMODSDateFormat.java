@@ -56,11 +56,13 @@ public enum MCRMODSDateFormat {
 
     private static volatile Map<String, MCRMODSDateFormat> encodingToFormatMap;
 
-    private String encoding, attributeValue;
+    private final String encoding;
 
-    private String dateFormat;
+    private final String attributeValue;
 
-    boolean dateOnly;
+    private final String dateFormat;
+
+    final boolean dateOnly;
 
     static final TimeZone MODS_TIMEZONE = TimeZone.getTimeZone("UTC");
 

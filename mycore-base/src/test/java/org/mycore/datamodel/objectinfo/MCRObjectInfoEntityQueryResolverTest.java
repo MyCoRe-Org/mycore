@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.objectinfo;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +47,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXParseException;
 
 import jakarta.persistence.EntityManager;
 
@@ -84,7 +84,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
 
     private MCRObjectQueryResolver instance;
 
-    private static void initClassifications() throws SAXParseException, MalformedURLException, URISyntaxException {
+    private static void initClassifications() throws URISyntaxException, IOException, JDOMException {
         DAO = new MCRCategoryDAOImpl();
         CLS = MCRCategLinkServiceFactory.getInstance();
 

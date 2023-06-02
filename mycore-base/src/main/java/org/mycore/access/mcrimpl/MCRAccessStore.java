@@ -18,11 +18,13 @@
 
 package org.mycore.access.mcrimpl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,14 +33,13 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
- * The purpose of this interface is to make the choice of the persistence layer
+ * The purpose of this class is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
  * must implement this interface. Which database actually will be used can then
  * be configured by reading the value <code>MCR.Persistence.Access.Store.Class</code>
  * from mycore.properties.access
  * 
  * @author Arne Seifert
- * @version $Revision$ $Date$
  */
 public abstract class MCRAccessStore {
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);
@@ -113,7 +114,7 @@ public abstract class MCRAccessStore {
                 sqlDefinition.put(pool, MCRAccessStore.getInstance().getMappedObjectId(pool));
             }
 
-            Collection<MCRAccessDefinition> ret = new LinkedList<>();
+            Collection<MCRAccessDefinition> ret = new ArrayList<>();
             Collection<String> elements;
             MCRAccessDefinition def = null;
 
@@ -150,20 +151,13 @@ public abstract class MCRAccessStore {
             pools.removeAll(getPools());
             pools.addAll(getPools());
 
-            Collection<MCRAccessDefinition> ret = new LinkedList<>();
-            //List elements = new LinkedList();
             MCRAccessDefinition def = new MCRAccessDefinition();
             def.setObjID(objid);
             for (String pool : pools) {
                 String rule = getRuleID(objid, pool);
-                if (rule != null) {
-                    def.addPool(pool, rule);
-                } else {
-                    def.addPool(pool, " ");
-                }
+                def.addPool(pool, Objects.requireNonNullElse(rule, " "));
             }
-            ret.add(def);
-            return ret;
+            return List.of(def);
         } catch (Exception e) {
             LOGGER.error("definition loading failed: ");
             return null;

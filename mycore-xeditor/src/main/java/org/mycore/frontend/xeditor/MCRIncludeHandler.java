@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
@@ -39,7 +40,6 @@ import org.apache.xpath.XPathContext;
 import org.apache.xpath.objects.XNodeSet;
 import org.apache.xpath.objects.XNodeSetForDOM;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.transform.JDOMSource;
 import org.jdom2.util.IteratorIterable;
@@ -79,14 +79,14 @@ public class MCRIncludeHandler {
      *               otherwise reload at each XEditor form transformation
      */
     public void preloadFromURIs(String uris, String sStatic)
-        throws TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerFactoryConfigurationError {
         for (String uri : uris.split(",")) {
             preloadFromURI(uri, sStatic);
         }
     }
 
     private void preloadFromURI(String uri, String sStatic)
-        throws TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerFactoryConfigurationError {
         if (uri.trim().isEmpty()) {
             return;
         }
@@ -149,9 +149,9 @@ public class MCRIncludeHandler {
 
             for (Element command : element.getChildren()) {
                 String commandType = command.getName();
-                if ("remove".equals(commandType)) {
+                if (Objects.equals(commandType, "remove")) {
                     handleRemove(container, command);
-                } else if ("include".equals(commandType)) {
+                } else if (Objects.equals(commandType, "include")) {
                     handleInclude(container, command);
                 }
             }
@@ -162,7 +162,7 @@ public class MCRIncludeHandler {
     private void handleRemove(Element container, Element removeRule) {
         String id = removeRule.getAttributeValue(ATTR_REF);
         LOGGER.debug("removing " + id);
-        findDescendant(container, id).ifPresent(e -> e.detach());
+        findDescendant(container, id).ifPresent(Element::detach);
     }
 
     private Optional<Element> findDescendant(Element container, String id) {
@@ -210,7 +210,7 @@ public class MCRIncludeHandler {
         return refID != null;
     }
 
-    public XNodeSet resolve(ExpressionContext context, String ref) throws JDOMException, TransformerException {
+    public XNodeSet resolve(ExpressionContext context, String ref) throws TransformerException {
         LOGGER.debug("including component " + ref);
         Map<String, Element> cache = chooseCacheLevel(ref, Boolean.FALSE.toString());
         Element resolved = cache.get(ref);
@@ -218,7 +218,7 @@ public class MCRIncludeHandler {
     }
 
     public XNodeSet resolve(ExpressionContext context, String uri, String sStatic)
-        throws TransformerException, JDOMException {
+        throws TransformerException {
         LOGGER.debug("including xml " + uri);
 
         Element xml = resolve(uri, sStatic);
@@ -233,7 +233,7 @@ public class MCRIncludeHandler {
     }
 
     private Element resolve(String uri, String sStatic)
-        throws TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerFactoryConfigurationError {
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
 
         if (cache.containsKey(uri)) {
@@ -247,21 +247,21 @@ public class MCRIncludeHandler {
     }
 
     private Map<String, Element> chooseCacheLevel(String key, String sStatic) {
-        if ("true".equals(sStatic) || CACHE_AT_APPLICATION_LEVEL.containsKey(key)) {
+        if (Objects.equals(sStatic, "true") || CACHE_AT_APPLICATION_LEVEL.containsKey(key)) {
             return CACHE_AT_APPLICATION_LEVEL;
         } else {
             return cacheAtTransformationLevel;
         }
     }
 
-    private Node jdom2dom(Element element) throws TransformerException, JDOMException {
+    private Node jdom2dom(Element element) throws TransformerException {
         DOMResult result = new DOMResult();
         JDOMSource source = new JDOMSource(element);
         TransformerFactory.newInstance().newTransformer().transform(source, result);
         return result.getNode();
     }
 
-    private XNodeSet asNodeSet(ExpressionContext context, Node node) throws TransformerException, JDOMException {
+    private XNodeSet asNodeSet(ExpressionContext context, Node node) throws TransformerException {
         NodeSet nodeSet = new NodeSet();
         nodeSet.addNode(node);
         XPathContext xpc = context.getXPathContext();

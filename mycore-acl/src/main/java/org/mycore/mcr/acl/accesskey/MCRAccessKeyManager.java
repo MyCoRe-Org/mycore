@@ -109,23 +109,25 @@ public final class MCRAccessKeyManager {
      */
     public static String hashSecret(final String secret, final MCRObjectID objectId) throws MCRException {
         switch (SECRET_STORAGE_MODE) {
-        case "plain":
-            return secret;
-        case "crypt":
-            try {
-                final MCRCipher cipher = MCRCipherManager.getCipher("accesskey");
-                return cipher.encrypt(objectId.toString() + secret);
-            } catch (MCRCryptKeyFileNotFoundException | MCRCryptKeyNoPermissionException e) {
-                throw new MCRException(e);
+            case "plain" -> {
+                return secret;
             }
-        case "hash":
-            try {
-                return MCRUtils.asSHA256String(HASHING_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
-            } catch (NoSuchAlgorithmException e) {
-                throw new MCRException("Cannot hash secret.", e);
+            case "crypt" -> {
+                try {
+                    final MCRCipher cipher = MCRCipherManager.getCipher("accesskey");
+                    return cipher.encrypt(objectId.toString() + secret);
+                } catch (MCRCryptKeyFileNotFoundException | MCRCryptKeyNoPermissionException e) {
+                    throw new MCRException(e);
+                }
             }
-        default:
-            throw new MCRException("Please configure a valid storage mode for secret.");
+            case "hash" -> {
+                try {
+                    return MCRUtils.asSHA256String(HASHING_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
+                } catch (NoSuchAlgorithmException e) {
+                    throw new MCRException("Cannot hash secret.", e);
+                }
+            }
+            default -> throw new MCRException("Please configure a valid storage mode for secret.");
         }
     }
 

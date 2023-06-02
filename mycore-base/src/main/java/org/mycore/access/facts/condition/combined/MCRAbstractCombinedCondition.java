@@ -35,7 +35,7 @@ import org.mycore.access.facts.model.MCRCondition;
  */
 public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition implements MCRCombinedCondition {
 
-    protected Set<MCRCondition> conditions = new HashSet<MCRCondition>();
+    protected Set<MCRCondition> conditions = new HashSet<>();
 
     public void add(MCRCondition condition) {
         conditions.add(condition);

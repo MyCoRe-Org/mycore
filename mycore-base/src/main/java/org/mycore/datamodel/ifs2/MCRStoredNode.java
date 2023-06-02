@@ -161,20 +161,16 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the label in this language
      */
     public void setLabel(String lang, String label) throws IOException {
-        writeData(e -> {
-            e.getChildren(LABEL_ELEMENT)
-                .stream()
-                .filter(child -> lang.equals(
-                    child.getAttributeValue(LANG_ATT,
-                        Namespace.XML_NAMESPACE)))
-                .findAny()
-                .orElseGet(() -> {
-                    Element newLabel = new Element(LABEL_ELEMENT).setAttribute(LANG_ATT, lang, Namespace.XML_NAMESPACE);
-                    e.addContent(newLabel);
-                    return newLabel;
-                })
-                .setText(label);
-        });
+        writeData(e -> e.getChildren(LABEL_ELEMENT)
+            .stream()
+            .filter(child -> lang.equals(child.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE)))
+            .findAny()
+            .orElseGet(() -> {
+                Element newLabel = new Element(LABEL_ELEMENT).setAttribute(LANG_ATT, lang, Namespace.XML_NAMESPACE);
+                e.addContent(newLabel);
+                return newLabel;
+            })
+            .setText(label));
         getRoot().saveAdditionalData();
     }
 

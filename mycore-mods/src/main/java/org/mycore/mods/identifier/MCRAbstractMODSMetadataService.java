@@ -71,10 +71,10 @@ public class MCRAbstractMODSMetadataService
     }
 
     protected MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
-        if (!(base instanceof MCRObject)) {
-            throw new MCRPersistentIdentifierException(getClass().getName() + " does only support MyCoReObjects!");
+        if (base instanceof MCRObject object) {
+            return object;
         }
-        return (MCRObject) base;
+        throw new MCRPersistentIdentifierException(getClass().getName() + " does only support MyCoReObjects!");
     }
 
     @Override

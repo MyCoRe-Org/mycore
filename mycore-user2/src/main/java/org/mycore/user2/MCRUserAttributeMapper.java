@@ -76,7 +76,7 @@ import jakarta.xml.bind.annotation.XmlValue;
  * </code>
  * </pre>
  * 
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRUserAttributeMapper {
@@ -115,10 +115,10 @@ public class MCRUserAttributeMapper {
         for (Object annotated : getAnnotated(object)) {
             MCRUserAttribute attrAnno = null;
 
-            if (annotated instanceof Field) {
-                attrAnno = ((Field) annotated).getAnnotation(MCRUserAttribute.class);
-            } else if (annotated instanceof Method) {
-                attrAnno = ((Method) annotated).getAnnotation(MCRUserAttribute.class);
+            if (annotated instanceof Field field) {
+                attrAnno = field.getAnnotation(MCRUserAttribute.class);
+            } else if (annotated instanceof Method method) {
+                attrAnno = method.getAnnotation(MCRUserAttribute.class);
             }
 
             if (attrAnno != null) {
@@ -132,10 +132,10 @@ public class MCRUserAttributeMapper {
 
                             MCRUserAttributeJavaConverter aConv = null;
 
-                            if (annotated instanceof Field) {
-                                aConv = ((Field) annotated).getAnnotation(MCRUserAttributeJavaConverter.class);
-                            } else if (annotated instanceof Method) {
-                                aConv = ((Method) annotated).getAnnotation(MCRUserAttributeJavaConverter.class);
+                            if (annotated instanceof Field field) {
+                                aConv = field.getAnnotation(MCRUserAttributeJavaConverter.class);
+                            } else if (annotated instanceof Method method) {
+                                aConv = method.getAnnotation(MCRUserAttributeJavaConverter.class);
                             }
 
                             Class<? extends MCRUserAttributeConverter> convCls = null;
@@ -160,8 +160,7 @@ public class MCRUserAttributeMapper {
                                     continue;
                                 }
 
-                                if (annotated instanceof Field) {
-                                    final Field field = (Field) annotated;
+                                if (annotated instanceof Field field) {
 
                                     LOGGER.debug("map attribute \"{}\" with value \"{}\" to field \"{}\"",
                                         attribute.mapping, value, field.getName());
@@ -170,8 +169,7 @@ public class MCRUserAttributeMapper {
                                     field.set(object, value);
 
                                     changed = true;
-                                } else if (annotated instanceof Method) {
-                                    final Method method = (Method) annotated;
+                                } else if (annotated instanceof Method method) {
 
                                     LOGGER.debug("map attribute \"{}\" with value \"{}\" to method \"{}\"",
                                         attribute.mapping, value, method.getName());
@@ -236,10 +234,10 @@ public class MCRUserAttributeMapper {
     }
 
     private String getAttriutebName(final Object annotated) {
-        if (annotated instanceof Field) {
-            return ((Field) annotated).getName();
-        } else if (annotated instanceof Method) {
-            String name = ((Method) annotated).getName();
+        if (annotated instanceof Field field) {
+            return field.getName();
+        } else if (annotated instanceof Method method) {
+            String name = method.getName();
             if (name.startsWith("set")) {
                 name = name.substring(3);
             }
@@ -253,14 +251,13 @@ public class MCRUserAttributeMapper {
         IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
         Object value = null;
 
-        if (annotated instanceof Field) {
-            final Field field = (Field) annotated;
+        if (annotated instanceof Field field) {
 
             field.setAccessible(true);
             value = field.get(object);
-        } else if (annotated instanceof Method) {
+        } else if (annotated instanceof Method annMethod) {
             Method method = null;
-            String name = ((Method) annotated).getName();
+            String name = annMethod.getName();
             if (name.startsWith("get")) {
                 name = "s" + name.substring(1);
                 method = object.getClass().getMethod(name);

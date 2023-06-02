@@ -38,7 +38,7 @@ import org.mycore.common.MCRConstants;
  * Otherwise, the XPath must be configured, e.g.
  * MCR.MODS.EnrichmentResolver.IdentifierType.shelfmark=mods:location/mods:shelfLocator
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRIdentifierType {
 

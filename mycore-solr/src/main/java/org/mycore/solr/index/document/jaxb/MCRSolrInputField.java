@@ -61,7 +61,6 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * &lt;/complexType&gt;
  * </pre>
  * 
- * 
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(name = "MCRSolrInputField", propOrder = { "value" })
@@ -169,10 +168,9 @@ public class MCRSolrInputField {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRSolrInputField)) {
+        if (!(obj instanceof MCRSolrInputField other)) {
             return false;
         }
-        MCRSolrInputField other = (MCRSolrInputField) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;

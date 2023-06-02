@@ -156,7 +156,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                         + "a user which has the rights.",
                     MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(),
                     MCRAccessManager.PERMISSION_WRITE,
-                    id.toString(),
+                    id,
                     JOB_API_USER_PROPERTY));
         }
     }
@@ -287,17 +287,10 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     void delegateAction(final Map<String, String> contextParameters) throws MCRPersistentIdentifierException {
         runAsJobUser(() -> {
             switch (getAction(contextParameters)) {
-            case REGISTER:
-                registerJob(contextParameters);
-                break;
-            case UPDATE:
-                updateJob(contextParameters);
-                break;
-            case DELETE:
-                deleteJob(contextParameters);
-                break;
-            default:
-                throw new MCRPersistentIdentifierException("Unhandled action type!");
+                case REGISTER -> registerJob(contextParameters);
+                case UPDATE -> updateJob(contextParameters);
+                case DELETE -> deleteJob(contextParameters);
+                default -> throw new MCRPersistentIdentifierException("Unhandled action type!");
             }
         });
     }
@@ -305,17 +298,10 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     void delegateRollback(final Map<String, String> contextParameters) throws MCRPersistentIdentifierException {
         runAsJobUser(() -> {
             switch (getAction(contextParameters)) {
-            case REGISTER:
-                rollbackRegisterJob(contextParameters);
-                break;
-            case UPDATE:
-                rollbackUpdateJob(contextParameters);
-                break;
-            case DELETE:
-                rollbackDeleteJob(contextParameters);
-                break;
-            default:
-                throw new MCRPersistentIdentifierException("Unhandled action type!");
+                case REGISTER -> rollbackRegisterJob(contextParameters);
+                case UPDATE -> rollbackUpdateJob(contextParameters);
+                case DELETE -> rollbackDeleteJob(contextParameters);
+                default -> throw new MCRPersistentIdentifierException("Unhandled action type!");
             }
         });
     }
@@ -330,7 +316,6 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * @return the registration predicate
      * 
      * @see MCRPIJobService
-     * @version 2020.06
      */
     @Deprecated
     protected Predicate<MCRBase> getRegistrationCondition() {

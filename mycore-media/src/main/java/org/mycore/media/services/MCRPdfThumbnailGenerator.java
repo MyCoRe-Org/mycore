@@ -26,13 +26,12 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDDestinationOrAction;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -79,15 +78,11 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
     private PDPage resolveOpenActionPage(PDDocument pdf) throws IOException {
         PDDestinationOrAction openAction = pdf.getDocumentCatalog().getOpenAction();
 
-        if (openAction instanceof PDActionGoTo) {
-            final PDDestination destination = ((PDActionGoTo) openAction).getDestination();
-            if (destination instanceof PDPageDestination) {
-                openAction = destination;
-            }
+        if (openAction instanceof PDActionGoTo goTo && goTo.getDestination() instanceof PDPageDestination destination) {
+            openAction = destination;
         }
 
-        if (openAction instanceof PDPageDestination) {
-            final PDPageDestination namedDestination = (PDPageDestination) openAction;
+        if (openAction instanceof PDPageDestination namedDestination) {
             final PDPage pdPage = namedDestination.getPage();
             if (pdPage != null) {
                 return pdPage;

@@ -35,6 +35,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -371,7 +372,6 @@ public class MCRRestDerivateContents {
             @Parameter(in = ParameterIn.HEADER,
                 name = HTTP_HEADER_IS_DIRECTORY,
                 description = "set to 'true' if a new directory should be created",
-                required = false,
                 schema = @Schema(type = "boolean")) },
         responses = {
             @ApiResponse(responseCode = "204", description = "if directory already exists or while was updated"),
@@ -475,10 +475,7 @@ public class MCRRestDerivateContents {
         EntityTag eTag = getETag(fileAttributes);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified,
             eTag);
-        if (cachedResponse.isPresent()) {
-            return cachedResponse.get();
-        }
-        return updateFile(contents, mcrPath);
+        return cachedResponse.orElseGet(() -> updateFile(contents, mcrPath));
     }
 
     private boolean isFile() {
@@ -662,7 +659,7 @@ public class MCRRestDerivateContents {
                     }
                     return 1;
                 })
-                .compound((de1, de2) -> de1.getName().compareTo(de2.getName()))
+                .compound(Comparator.comparing(DirectoryEntry::getName))
                 .compare(this, o);
         }
     }

@@ -76,8 +76,10 @@ import org.jdom2.transform.JDOMSource;
  * 
  * @author Werner Gresshoff
  * 
- * @version $Revision: 1.0 $ $Date: 2003/02/03 14:57:25 $
+ * @deprecated use {@link org.mycore.common.xsl.MCRXSLTransformerFactory} or
+ * {@link org.mycore.common.content.transformer.MCRXSLTransformer} instead
  */
+@Deprecated
 public class MCRXSLTransformation {
     private static Logger LOGGER = LogManager.getLogger(MCRXSLTransformation.class);
 

@@ -24,10 +24,10 @@ import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -62,7 +62,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRSession implements Cloneable {
 
@@ -108,7 +107,7 @@ public class MCRSession implements Cloneable {
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
-    private ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(LinkedList::new);
+    private ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(ArrayDeque::new);
 
     private static ExecutorService COMMIT_SERVICE;
 

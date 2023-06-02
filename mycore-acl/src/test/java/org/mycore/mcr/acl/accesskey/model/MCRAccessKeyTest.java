@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 public class MCRAccessKeyTest extends MCRTestCase {
 

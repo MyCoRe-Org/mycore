@@ -68,9 +68,7 @@ public class MCRDeveloperCommands {
         if (values.isEmpty()) {
             LOGGER.info("Found no messages for key prefix {}", keyPrefix);
         } else {
-            values.forEach((key, value) -> {
-                LOGGER.info("Found message for key {}: {}", key, value);
-            });
+            values.forEach((key, value) -> LOGGER.info("Found message for key {}: {}", key, value));
         }
     }
 
@@ -83,9 +81,7 @@ public class MCRDeveloperCommands {
         if (values.isEmpty()) {
             LOGGER.info("Found no messages");
         } else {
-            values.forEach((key, value) -> {
-                LOGGER.info("Found message for key {}: {}", key, value);
-            });
+            values.forEach((key, value) -> LOGGER.info("Found message for key {}: {}", key, value));
         }
     }
 
@@ -111,9 +107,7 @@ public class MCRDeveloperCommands {
         if (values.isEmpty()) {
             LOGGER.info("Found no values for key prefix {}", keyPrefix);
         } else {
-            values.forEach((key, value) -> {
-                LOGGER.info("Found value for key {}: {}", keyPrefix + key, value);
-            });
+            values.forEach((key, value) -> LOGGER.info("Found value for key {}: {}", keyPrefix + key, value));
         }
     }
 
@@ -126,9 +120,7 @@ public class MCRDeveloperCommands {
         if (values.isEmpty()) {
             LOGGER.info("Found no values");
         } else {
-            values.forEach((key, value) -> {
-                LOGGER.info("Found value for key {}: {}", key, value);
-            });
+            values.forEach((key, value) -> LOGGER.info("Found value for key {}: {}", key, value));
         }
     }
 

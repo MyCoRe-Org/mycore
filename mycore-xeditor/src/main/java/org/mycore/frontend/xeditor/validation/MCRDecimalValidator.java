@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates input to be a decimal number. The number format is specified by a given locale ID.
  * Example: &lt;xed:validate type="decimal" locale="de" ... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRDecimalValidator extends MCRValidator {
 

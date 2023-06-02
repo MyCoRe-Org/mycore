@@ -21,7 +21,6 @@ package org.mycore.frontend.ws.common;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import jakarta.websocket.DecodeException;
 import jakarta.websocket.Decoder;
 import jakarta.websocket.EndpointConfig;
 
@@ -33,7 +32,7 @@ import jakarta.websocket.EndpointConfig;
 public class MCRWebsocketJSONDecoder implements Decoder.Text<JsonObject> {
 
     @Override
-    public JsonObject decode(String request) throws DecodeException {
+    public JsonObject decode(String request) {
         return JsonParser.parseString(request).getAsJsonObject();
     }
 

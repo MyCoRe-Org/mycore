@@ -197,8 +197,8 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         MCRContentTransformer contentTransformer = MCRLayoutService.getContentTransformer(content.getDocType(),
             parameters);
         ByteArrayOutputStream out = new ByteArrayOutputStream(32 * 1024);
-        if (contentTransformer instanceof MCRParameterizedTransformer) {
-            ((MCRParameterizedTransformer) contentTransformer).transform(content, out, parameters);
+        if (contentTransformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
+            parameterizedTransformer.transform(content, out, parameters);
         } else {
             contentTransformer.transform(content, out);
         }

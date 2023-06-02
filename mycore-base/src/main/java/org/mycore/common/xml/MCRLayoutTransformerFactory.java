@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -121,7 +122,7 @@ public class MCRLayoutTransformerFactory {
 
     protected boolean isXMLOutput(String outputMethod, MCRXSLTransformer transformerTest)
         throws ParserConfigurationException, TransformerException, SAXException {
-        return "xml".equals(outputMethod);
+        return Objects.equals(outputMethod, "xml");
     }
 
     private String getResourceName(String id) {

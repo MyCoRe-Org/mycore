@@ -31,7 +31,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 public class MCRInstantXMLAdapter extends XmlAdapter<String, Instant> {
 
     @Override
-    public Instant unmarshal(String v) throws Exception {
+    public Instant unmarshal(String v) {
         return Instant
             .from(DateTimeFormatter.ISO_INSTANT.parseBest(v,
                 ZonedDateTime::from,
@@ -42,7 +42,7 @@ public class MCRInstantXMLAdapter extends XmlAdapter<String, Instant> {
     }
 
     @Override
-    public String marshal(Instant v) throws Exception {
+    public String marshal(Instant v) {
         return v.toString();
     }
 }

@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -291,7 +291,7 @@ public class MCRTranslation {
     }
 
     static String[] getStringArray(String masked) {
-        List<String> a = new LinkedList<>();
+        List<String> a = new ArrayList<>();
         boolean mask = false;
         StringBuilder buf = new StringBuilder();
         if (masked == null) {
@@ -302,26 +302,24 @@ public class MCRTranslation {
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                case ';':
-                    if (mask) {
-                        buf.append(';');
-                        mask = false;
-                    } else {
-                        a.add(buf.toString());
-                        buf.setLength(0);
+                    case ';' -> {
+                        if (mask) {
+                            buf.append(';');
+                            mask = false;
+                        } else {
+                            a.add(buf.toString());
+                            buf.setLength(0);
+                        }
                     }
-                    break;
-                case '\\':
-                    if (mask) {
-                        buf.append('\\');
-                        mask = false;
-                    } else {
-                        mask = true;
+                    case '\\' -> {
+                        if (mask) {
+                            buf.append('\\');
+                            mask = false;
+                        } else {
+                            mask = true;
+                        }
                     }
-                    break;
-                default:
-                    buf.append(masked.charAt(i));
-                    break;
+                    default -> buf.append(masked.charAt(i));
                 }
             }
             a.add(buf.toString());
@@ -370,7 +368,7 @@ public class MCRTranslation {
         return MCRConfiguration2.getString("MCR.Metadata.Languages")
             .map(MCRConfiguration2::splitValue)
             .map(s -> s.collect(Collectors.toSet()))
-            .orElseGet(() -> loadLanguagesByMessagesBundle()); //all languages by available messages_*.properties
+            .orElseGet(MCRTranslation::loadLanguagesByMessagesBundle);//all languages by available messages_*.properties
     }
 
     static Set<String> loadLanguagesByMessagesBundle() {

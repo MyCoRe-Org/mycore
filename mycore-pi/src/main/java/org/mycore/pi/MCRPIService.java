@@ -49,7 +49,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -252,7 +251,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     /**
      * Validates if an object can get an Identifier assigned from this service! <b>Better call super when overwrite!</b>
      *
-     * @param obj
      * @throws MCRPersistentIdentifierException
      * see {@link org.mycore.pi.exceptions}
      * @throws MCRAccessException
@@ -273,7 +271,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * shorthand for {@link #register(MCRBase, String, boolean)} with update = true
      */
     public T register(MCRBase obj, String additional)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
         return register(obj, additional, true);
     }
@@ -287,13 +285,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @return the assigned Identifier
      * @throws MCRAccessException
      * the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException
-     * the {@link MCRPIMetadataService} lets
-     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
     public T register(MCRBase obj)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
         return this.register(obj, null);
     }
@@ -308,14 +303,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @return the assigned Identifier
      * @throws MCRAccessException
      * the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException
-     * the {@link MCRPIMetadataService} lets
-     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException
      * see {@link org.mycore.pi.exceptions}
      */
-    public synchronized T register(MCRBase obj, String additional, boolean updateObject)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+    public T register(MCRBase obj, String additional, boolean updateObject)
+        throws MCRAccessException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
 
         // There are many querys that require the current database state.
@@ -331,10 +323,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             addFlagToObject(obj, databaseEntry);
 
             if (updateObject) {
-                if (obj instanceof MCRObject) {
-                    MCRMetadataManager.update((MCRObject) obj);
-                } else if (obj instanceof MCRDerivate) {
-                    MCRMetadataManager.update((MCRDerivate) obj);
+                if (obj instanceof MCRObject object) {
+                    MCRMetadataManager.update(object);
+                } else if (obj instanceof MCRDerivate derivate) {
+                    MCRMetadataManager.update(derivate);
                 }
             }
 
@@ -344,8 +336,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         try {
             return REGISTER_POOL.submit(createPICallable).get();
         } catch (ExecutionException e) {
-            if (e.getCause() != null && e.getCause() instanceof MCRPersistentIdentifierException) {
-                throw (MCRPersistentIdentifierException) e.getCause();
+            if (e.getCause() instanceof MCRPersistentIdentifierException pie) {
+                throw pie;
             }
             throw e;
         }
@@ -402,7 +394,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *
      * @param identifier the Identifier
      * @param obj        the deleted object
-     * @param additional
      * @throws MCRPersistentIdentifierException
      * to abort deletion of the object or if something went wrong, (e.g. {@link MCRDOIService} throws if not a superuser
      * tries to delete the object)
@@ -416,7 +407,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *
      * @param identifier the Identifier
      * @param obj        the deleted object
-     * @param additional
      * @throws MCRPersistentIdentifierException to abort update of the object or if something went wrong.
      */
     protected abstract void update(T identifier, MCRBase obj, String additional)

@@ -21,6 +21,7 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.xml.transform.TransformerException;
 
@@ -41,7 +42,6 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,7 +63,7 @@ public class MCRErrorServlet extends HttpServlet {
      * @see jakarta.servlet.http.HttpServlet#service(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse)
      */
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // Retrieve the possible error attributes, some may be null
         Integer statusCode = (Integer) req.getAttribute("jakarta.servlet.error.status_code");
         String message = (String) req.getAttribute("jakarta.servlet.error.message");
@@ -92,8 +92,6 @@ public class MCRErrorServlet extends HttpServlet {
 
     /**
      * Returns true if Accept header allows sending html pages
-     * @param req
-     * @return
      */
     private boolean acceptWebPage(HttpServletRequest req) {
         Enumeration<String> acceptHeader = req.getHeaders("Accept");
@@ -211,11 +209,7 @@ public class MCRErrorServlet extends HttpServlet {
 
         final String requestAttr = "MCRErrorServlet.generateErrorPage";
         if (!response.isCommitted() && request.getAttribute(requestAttr) == null) {
-            if (statusCode != null) {
-                response.setStatus(statusCode);
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
+            response.setStatus(Objects.requireNonNullElse(statusCode, HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
             request.setAttribute(requestAttr, msg);
             boolean currentSessionActive = MCRSessionMgr.hasCurrentSession();
             boolean sessionFromRequest = setCurrentSession(request);

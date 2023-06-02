@@ -63,7 +63,6 @@ import jakarta.persistence.UniqueConstraint;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  * @since 2.0
  */
 @Entity
@@ -226,7 +225,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return super.getURI();
     }
 
-    @ManyToOne(optional = true, targetEntity = MCRCategoryImpl.class)
+    @ManyToOne(targetEntity = MCRCategoryImpl.class)
     @JoinColumn(name = "parentID")
     @Access(AccessType.FIELD)
     public MCRCategory getParent() {
@@ -340,12 +339,10 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     static MCRCategoryImpl wrapCategory(MCRCategory category, MCRCategory parent, MCRCategory root) {
-        MCRCategoryImpl catImpl;
         if (category.getParent() != null && category.getParent() != parent) {
             throw new MCRException("MCRCategory is already attached to a different parent.");
         }
-        if (category instanceof MCRCategoryImpl) {
-            catImpl = (MCRCategoryImpl) category;
+        if (category instanceof MCRCategoryImpl catImpl) {
             // don't use setParent() as it call add() from ChildList
             catImpl.parent = parent;
             if (root == null) {
@@ -368,7 +365,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             return catImpl;
         }
         LOGGER.debug("wrap Category: {}", category.getId());
-        catImpl = new MCRCategoryImpl();
+        MCRCategoryImpl catImpl = new MCRCategoryImpl();
         catImpl.setId(category.getId());
         catImpl.labels = category.getLabels();
         catImpl.parent = parent;

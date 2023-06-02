@@ -64,7 +64,7 @@ public class ImageOverviewIT extends ViewerTestBase {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void testImageOverview() throws IOException, InterruptedException {
+    public void testImageOverview() throws InterruptedException {
         this.setTestName(getClassname() + "-testImageOverview");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getTestDerivate());

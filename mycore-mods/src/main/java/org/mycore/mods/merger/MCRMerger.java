@@ -41,7 +41,7 @@ import org.mycore.common.xml.MCRXMLHelper;
  * If so, the text, elements and attributes are merged so that the "better" information/representation wins.
  * This is done recursively for all child elements, too.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMerger {
 
@@ -71,8 +71,8 @@ public class MCRMerger {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRMerger) {
-            return MCRXMLHelper.deepEqual(this.element, ((MCRMerger) obj).element);
+        if (obj instanceof MCRMerger merger) {
+            return MCRXMLHelper.deepEqual(this.element, merger.element);
         } else {
             return super.equals(obj);
         }

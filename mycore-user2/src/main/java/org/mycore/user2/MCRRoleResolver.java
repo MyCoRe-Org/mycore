@@ -20,6 +20,7 @@ package org.mycore.user2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -85,7 +86,7 @@ public class MCRRoleResolver implements URIResolver {
         final String[] part = target.split(":");
         final String method = part[0];
         try {
-            if ("getAssignableGroupsForUser".equals(method)) {
+            if (Objects.equals(method, "getAssignableGroupsForUser")) {
                 return new JDOMSource(getAssignableGroupsForUser());
             }
         } catch (final MCRAccessException exc) {

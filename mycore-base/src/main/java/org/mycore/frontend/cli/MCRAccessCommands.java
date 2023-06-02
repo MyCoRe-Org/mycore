@@ -49,7 +49,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * 
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
- * @version $Revision: 1.11 $ $Date: 2008/11/27 07:58:28 $
  */
 
 @MCRCommandGroup(name = "Access Commands")
@@ -137,7 +136,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "delete all permissions",
         help = "Remove all permission entries from the Access Control System.",
         order = 40)
-    public static void deleteAllPermissions() throws Exception {
+    public static void deleteAllPermissions() {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         for (String permission : accessImpl.getPermissions()) {
             accessImpl.removeRule(permission);
@@ -153,7 +152,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "delete permission {0}",
         help = "Remove a named permission entriy from the Access Control System.",
         order = 30)
-    public static void deletePermission(String permission) throws Exception {
+    public static void deletePermission(String permission) {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         accessImpl.removeRule(permission);
     }

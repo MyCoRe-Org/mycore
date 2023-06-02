@@ -29,7 +29,7 @@ import org.mycore.datamodel.ifs.MCRContentInputStream;
  * open input stream. Thus one has to invoke {@link MCRStreamContent#getInputStream()}.close() when 
  * finished with this object.
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public class MCRStreamContent extends MCRContent {
 

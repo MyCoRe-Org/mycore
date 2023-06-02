@@ -81,15 +81,10 @@ public class MCRSecureTokenV2 {
         hash = Base64.getEncoder()
             .encodeToString(sha256)
             .chars()
-            .map(x -> {
-                switch (x) {
-                case '+':
-                    return '-';
-                case '/':
-                    return '_';
-                default:
-                    return x;
-                }
+            .map(x -> switch (x) {
+                case '+' -> '-';
+                case '/' -> '_';
+                default -> x;
             })
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
             .toString();

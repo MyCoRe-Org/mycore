@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
@@ -70,7 +71,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getLeftSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getLeftSiblingOrOfAncestor() throws URISyntaxException, MCRException, IOException, JDOMException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -86,7 +87,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getLeftSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getLeftSiblingOrParent() throws URISyntaxException, MCRException, IOException, JDOMException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -98,7 +99,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getRightSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getRightSiblingOrOfAncestor() throws URISyntaxException, MCRException, IOException, JDOMException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -112,7 +113,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     }
 
     @Test
-    public void getRightSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    public void getRightSiblingOrParent() throws URISyntaxException, MCRException, IOException, JDOMException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -128,7 +129,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, IOException, JDOMException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(worlClassUrl));
         category = MCRCategoryImpl.wrapCategory(MCRXMLTransformer.getCategory(xml), null, null);

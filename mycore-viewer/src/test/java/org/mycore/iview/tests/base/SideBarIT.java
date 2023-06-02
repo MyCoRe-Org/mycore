@@ -40,7 +40,7 @@ public class SideBarIT extends ViewerTestBase {
     private static final Logger LOGGER = LogManager.getLogger(SideBarIT.class);
 
     @Test
-    public void testSideBarPresent() throws Exception {
+    public void testSideBarPresent() {
         this.setTestName(getClassname() + "-testSideBarPresent");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getTestDerivate());
@@ -62,7 +62,7 @@ public class SideBarIT extends ViewerTestBase {
     /**
      * Ignored because https://github.com/mozilla/geckodriver/issues/233
      */
-    public void testSideBarResize() throws Exception {
+    public void testSideBarResize() {
         this.setTestName(getClassname() + "-testSideBarResize");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getTestDerivate());

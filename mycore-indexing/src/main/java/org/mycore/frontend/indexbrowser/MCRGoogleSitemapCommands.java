@@ -33,13 +33,11 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * This class builds a google sitemap containing links to all documents and
  * store them to the webapps directory. This can be configured with property
  * variable MCR.GoogleSitemap.Directory. The web.xml file should contain a
- * mapping to /sitemap.xml See
- * http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
- * 
+ * mapping to /sitemap.xml
+ *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 @MCRCommandGroup(name = "Google Sitemap Commands")
 public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {

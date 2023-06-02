@@ -27,8 +27,9 @@ import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -43,7 +44,6 @@ import javax.imageio.stream.ImageOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -128,7 +128,7 @@ public class MCRTileCombineServlet extends MCRServlet {
      * See {@link #init()} how to attach a footer to every generated image.
      */
     @Override
-    protected void think(final MCRServletJob job) throws IOException, JDOMException, URISyntaxException {
+    protected void think(final MCRServletJob job) throws IOException, URISyntaxException {
         final HttpServletRequest request = job.getRequest();
         try {
             String pathInfo = request.getPathInfo();
@@ -147,31 +147,19 @@ public class MCRTileCombineServlet extends MCRServlet {
                 final int maxZoomLevel = pictureProps.getZoomlevel();
                 request.setAttribute(THUMBNAIL_KEY, iviewFile);
                 LOGGER.info("IView2 file: {}", iviewFile);
-                int zoomLevel = 0;
-                switch (zoomAlias) {
-                case "MIN":
-                    zoomLevel = 1;
-                    break;
-                case "MID":
-                    zoomLevel = 2;
-                    break;
-                case "MAX":
-                    zoomLevel = 3;
-                    break;
-                }
+                int zoomLevel = switch (zoomAlias) {
+                    case "MIN" -> 1;
+                    case "MID" -> 2;
+                    case "MAX" -> 3;
+                    default -> 0;
+                };
                 HttpServletResponse response = job.getResponse();
                 if (zoomLevel > maxZoomLevel) {
-                    switch (maxZoomLevel) {
-                    case 2:
-                        zoomAlias = "MID";
-                        break;
-                    case 1:
-                        zoomAlias = "MIN";
-                        break;
-                    default:
-                        zoomAlias = "THUMB";
-                        break;
-                    }
+                    zoomAlias = switch (maxZoomLevel) {
+                        case 2 -> "MID";
+                        case 1 -> "MIN";
+                        default -> "THUMB";
+                    };
                     if (!imagePath.startsWith("/")) {
                         imagePath = "/" + imagePath;
                     }
@@ -242,9 +230,9 @@ public class MCRTileCombineServlet extends MCRServlet {
         job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
         job.getResponse().setContentType("image/jpeg");
         job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
-        final Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-        LOGGER.info("Last-Modified: {}, expire on: {}", new Date(iviewFile.lastModified()), expires);
-        job.getResponse().setDateHeader("Expires", expires.getTime());
+        final Instant expires = Instant.now().plus(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS.toChronoUnit());
+        LOGGER.info("Last-Modified: {}, expire on: {}", Instant.ofEpochMilli(iviewFile.lastModified()), expires);
+        job.getResponse().setDateHeader("Expires", expires.toEpochMilli());
 
         final ImageWriter curImgWriter = imageWriter.get();
         try (ServletOutputStream sout = job.getResponse().getOutputStream();

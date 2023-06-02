@@ -86,7 +86,7 @@ public class MCRXMLTransformer {
 
     public static SortedSet<MCRLabel> getLabels(List<Element> elements)
         throws NullPointerException, IllegalArgumentException {
-        SortedSet<MCRLabel> labels = new TreeSet<MCRLabel>();
+        SortedSet<MCRLabel> labels = new TreeSet<>();
         for (Element labelElement : elements) {
             MCRLabel label = getLabel(labelElement);
             labels.add(label);

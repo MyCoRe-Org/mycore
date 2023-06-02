@@ -64,9 +64,9 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
 
     private void create(MCRNavigationBaseItem item, JsonArray hierarchy, JsonArray items) throws MCRException {
         JsonObject hierarchyObject = add(item, hierarchy, items);
-        if (item instanceof MCRNavigationItemContainer) {
+        if (item instanceof MCRNavigationItemContainer navigationItemContainer) {
             JsonArray childHierarchyArray = new JsonArray();
-            for (MCRNavigationBaseItem childItem : ((MCRNavigationItemContainer) item).getChildren()) {
+            for (MCRNavigationBaseItem childItem : navigationItemContainer.getChildren()) {
                 create(childItem, childHierarchyArray, items);
             }
             if (childHierarchyArray.size() > 0) {
@@ -82,15 +82,15 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         jsonItem.remove(JSON_CHILDREN);
         WCMSType type = null;
         String href = null;
-        if (item instanceof MCRNavigation) {
+        if (item instanceof MCRNavigation navigation) {
             type = WCMSType.root;
-            href = ((MCRNavigation) item).getHrefStartingPage();
-        } else if (item instanceof MCRNavigationMenuItem) {
+            href = navigation.getHrefStartingPage();
+        } else if (item instanceof MCRNavigationMenuItem menuItem) {
             type = WCMSType.menu;
-            href = ((MCRNavigationMenuItem) item).getDir();
-        } else if (item instanceof MCRNavigationItem) {
+            href = menuItem.getDir();
+        } else if (item instanceof MCRNavigationItem navigationItem) {
             type = WCMSType.item;
-            href = ((MCRNavigationItem) item).getHref();
+            href = navigationItem.getHref();
         } else if (item instanceof MCRNavigationInsertItem) {
             type = WCMSType.insert;
         } else if (item instanceof MCRNavigationGroup) {
@@ -116,9 +116,9 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         JsonArray hierarchy = navigationJSON.get(JSON_HIERARCHY).getAsJsonArray();
         if (hierarchy.size() > 0) {
             JsonObject root = hierarchy.get(0).getAsJsonObject();
-            MCRNavigationBaseItem navigation = createItem(root, items);
-            if (navigation instanceof MCRNavigation) {
-                return (MCRNavigation) navigation;
+            MCRNavigationBaseItem item = createItem(root, items);
+            if (item instanceof MCRNavigation navigation) {
+                return navigation;
             }
         }
         return null;
@@ -136,8 +136,7 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         }
 
         JsonElement children = hierarchyObject.get(JSON_CHILDREN);
-        if (children != null && children.isJsonArray() && item instanceof MCRNavigationItemContainer) {
-            MCRNavigationItemContainer itemAsContainer = (MCRNavigationItemContainer) item;
+        if (children != null && children.isJsonArray() && item instanceof MCRNavigationItemContainer itemAsContainer) {
             for (JsonElement child : children.getAsJsonArray()) {
                 if (child.isJsonObject()) {
                     MCRNavigationBaseItem childItem = createItem(child.getAsJsonObject(), items);

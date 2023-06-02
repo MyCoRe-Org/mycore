@@ -64,7 +64,7 @@ public class MCRORCIDResource {
     @GET
     @Path("status")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getUserStatus() throws JDOMException, IOException, SAXException {
+    public String getUserStatus() {
         MCRORCIDUser user = MCRORCIDSession.getCurrentUser();
         Gson gson = MCRJSONManager.instance().createGson();
         return gson.toJson(user.getStatus());
@@ -106,12 +106,12 @@ public class MCRORCIDResource {
      *
      * Returns the new publication status as by {@link #getPublicationStatus(String)}
      *
-     * @author Frank L\u00FCtzenkirchen
+     * @author Frank Lützenkirchen
      */
     @GET
     @Path("publish/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String publish(@PathParam("objectID") String objectID) throws JDOMException, IOException, SAXException {
+    public String publish(@PathParam("objectID") String objectID) {
         MCRObjectID oid = checkID(objectID);
         MCRORCIDUser user = MCRORCIDSession.getCurrentUser();
 
@@ -127,10 +127,10 @@ public class MCRORCIDResource {
 
             if (!status.isUsersPublication()) {
                 throw new WebApplicationException(Status.FORBIDDEN);
-            } else if (!status.isInORCIDProfile()) {
-                works.addWorkFrom(oid);
             } else if (status.isInORCIDProfile()) {
                 works.findWork(oid).get().update(oid);
+            } else {
+                works.addWorkFrom(oid);
             }
 
             return publicationStatus(oid, user);

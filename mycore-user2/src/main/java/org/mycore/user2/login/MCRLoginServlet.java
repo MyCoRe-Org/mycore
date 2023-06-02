@@ -19,10 +19,12 @@
 package org.mycore.user2.login;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -128,9 +130,9 @@ public class MCRLoginServlet extends MCRServlet {
         job.getResponse().setHeader("Pragma", "no-cache");
         job.getResponse().setHeader("Expires", "0");
 
-        if ("login".equals(action)) {
+        if (Objects.equals(action, "login")) {
             presentLoginForm(job);
-        } else if ("cancel".equals(action)) {
+        } else if (Objects.equals(action, "cancel")) {
             redirect(res);
         } else if (realm != null) {
             loginToRealm(req, res, req.getParameter(REALM_URL_PARAMETER));
@@ -238,7 +240,7 @@ public class MCRLoginServlet extends MCRServlet {
     static void addCurrentUserInfo(Element rootElement) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         rootElement.setAttribute("user", userInfo.getUserID());
-        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
+        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
             : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
         if (realmId == null) {
             realmId = MCRRealmFactory.getLocalRealm().getLabel();
@@ -249,7 +251,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     static void addCurrentUserInfo(MCRLogin login) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
-        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
+        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
             : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
         if (realmId == null) {
             realmId = MCRRealmFactory.getLocalRealm().getLabel();
@@ -285,7 +287,7 @@ public class MCRLoginServlet extends MCRServlet {
      * Stores the given url in MCRSession. When login is canceled, or after
      * successful login, the browser is redirected to that url. 
      */
-    private void storeURL(String url) throws Exception {
+    private void storeURL(String url) {
         if ((url == null) || (url.trim().length() == 0)) {
             url = MCRFrontendUtil.getBaseURL();
         } else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
@@ -296,7 +298,7 @@ public class MCRLoginServlet extends MCRServlet {
         MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, url);
     }
 
-    private String encodePath(String path) throws Exception {
+    private String encodePath(String path) {
         path = path.replace('\\', '/');
 
         StringBuilder result = new StringBuilder();
@@ -305,18 +307,9 @@ public class MCRLoginServlet extends MCRServlet {
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             switch (token) {
-            case " ":
-                result.append("%20");
-                break;
-            case "/":
-            case "?":
-            case "&":
-            case "=":
-                result.append(token);
-                break;
-            default:
-                result.append(java.net.URLEncoder.encode(token, StandardCharsets.UTF_8));
-                break;
+                case " " -> result.append("%20");
+                case "/", "?", "&", "=" -> result.append(token);
+                default -> result.append(URLEncoder.encode(token, StandardCharsets.UTF_8));
             }
         }
 

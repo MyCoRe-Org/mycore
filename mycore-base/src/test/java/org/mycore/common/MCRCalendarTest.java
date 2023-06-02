@@ -38,7 +38,6 @@ import com.ibm.icu.util.JapaneseCalendar;
  * This class is a JUnit test case for org.mycore.common.MCRCalendar.
  *
  * @author Jens Kupferschmidt
- * @version $Revision: 1.3 $ $Date: 2008/06/02 10:10:05 $
  */
 public class MCRCalendarTest extends MCRTestCase {
 

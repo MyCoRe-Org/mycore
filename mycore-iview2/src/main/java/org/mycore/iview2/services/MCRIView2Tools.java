@@ -45,7 +45,6 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
@@ -182,10 +181,8 @@ public class MCRIView2Tools {
      * @return a combined image
      * @throws IOException
      *             any IOException while reading tiles
-     * @throws JDOMException
-     *             if image properties could not be parsed.
      */
-    public static BufferedImage getZoomLevel(Path iviewFile, int zoomLevel) throws IOException, JDOMException {
+    public static BufferedImage getZoomLevel(Path iviewFile, int zoomLevel) throws IOException {
         ImageReader reader = getTileImageReader();
         try (FileSystem zipFileSystem = getFileSystem(iviewFile)) {
             Path iviewFileRoot = zipFileSystem.getRootDirectories().iterator().next();
@@ -212,11 +209,9 @@ public class MCRIView2Tools {
      * @return a combined image
      * @throws IOException
      *             any IOException while reading tiles
-     * @throws JDOMException
-     *             if image properties could not be parsed.
      */
     public static BufferedImage getZoomLevel(final Path iviewFileRoot, final MCRTiledPictureProps imageProperties,
-        final ImageReader reader, final int zoomLevel) throws IOException, JDOMException {
+        final ImageReader reader, final int zoomLevel) throws IOException {
         if (zoomLevel == 0) {
             return readTile(iviewFileRoot, reader, 0, 0, 0);
         }
@@ -339,8 +334,8 @@ public class MCRIView2Tools {
         MCRPath mcrPath = MCRPath.getPath(derID, derPath);
         Path physicalPath = mcrPath.toPhysicalPath();
         for (FileStore fs : mcrPath.getFileSystem().getFileStores()) {
-            if (fs instanceof MCRAbstractFileStore) {
-                Path basePath = ((MCRAbstractFileStore) fs).getBaseDirectory();
+            if (fs instanceof MCRAbstractFileStore mcrFileStore) {
+                Path basePath = mcrFileStore.getBaseDirectory();
                 if (physicalPath.startsWith(basePath)) {
                     return basePath.relativize(physicalPath).toString();
                 }

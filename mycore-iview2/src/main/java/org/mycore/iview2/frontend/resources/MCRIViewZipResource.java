@@ -33,7 +33,6 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
@@ -66,7 +65,7 @@ public class MCRIViewZipResource {
     @GET
     @Produces("application/zip")
     @Path("{derivateID}")
-    public Response zip(@PathParam("derivateID") String derivateID, @QueryParam("zoom") Integer zoom) throws Exception {
+    public Response zip(@PathParam("derivateID") String derivateID, @QueryParam("zoom") Integer zoom) {
         if (!MCRAccessManager.checkDerivateContentPermission(MCRObjectID.getInstance(derivateID),
             MCRAccessManager.PERMISSION_READ)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
@@ -92,7 +91,7 @@ public class MCRIViewZipResource {
         }
 
         @Override
-        public void write(OutputStream out) throws IOException, WebApplicationException {
+        public void write(OutputStream out) throws WebApplicationException {
             MCRSessionMgr.getCurrentSession();
             MCRTransactionHelper.beginTransaction();
             try {
@@ -111,17 +110,13 @@ public class MCRIViewZipResource {
                             if (!Files.exists(iviewFile)) {
                                 return super.visitFile(iviewFile, attrs);
                             }
-                            try {
-                                MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
-                                Integer zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps
-                                    .getZoomlevel() : zoom;
-                                BufferedImage image = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
-                                ZipArchiveEntry entry = new ZipArchiveEntry(file.getFileName() + ".jpg");
-                                zipStream.putArchiveEntry(entry);
-                                ImageIO.write(image, "jpg", zipStream);
-                            } catch (JDOMException e) {
-                                throw new WebApplicationException(e);
-                            }
+                            MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
+                            int zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps
+                                .getZoomlevel() : zoom;
+                            BufferedImage image = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
+                            ZipArchiveEntry entry = new ZipArchiveEntry(file.getFileName() + ".jpg");
+                            zipStream.putArchiveEntry(entry);
+                            ImageIO.write(image, "jpg", zipStream);
                             zipStream.closeArchiveEntry();
                         }
                         return FileVisitResult.CONTINUE;

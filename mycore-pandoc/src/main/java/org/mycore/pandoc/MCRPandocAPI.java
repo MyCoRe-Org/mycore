@@ -48,7 +48,7 @@ public class MCRPandocAPI {
     private static final String LUA_PATH = MCRConfiguration2.getString("MCR.Pandoc.LuaPath")
         .orElse(Thread.currentThread().getContextClassLoader().getResource("lua").getPath() + "?.lua");
 
-    private enum Action { Reader, Writer };
+    private enum Action { Reader, Writer }
 
     /**
      * Raw Pandoc command invocation

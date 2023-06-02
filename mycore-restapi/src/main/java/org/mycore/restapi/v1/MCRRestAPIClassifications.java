@@ -70,7 +70,6 @@ import jakarta.ws.rs.core.Response.Status;
  *
  * @author Robert Stephan
  *
- * @version $Revision: $ $Date: $
  */
 @Path("/classifications")
 public class MCRRestAPIClassifications {
@@ -93,7 +92,6 @@ public class MCRRestAPIClassifications {
      * @param eRoot - the root element
      * @param lang - the language which should be filtered or null for no filter
      * @return a string representation of the XML
-     * @throws IOException
      */
     private static String writeXML(Element eRoot, String lang) throws IOException {
         StringWriter sw = new StringWriter();
@@ -117,7 +115,6 @@ public class MCRRestAPIClassifications {
      * @param writer - the JSON writer
      * @param lang - the language to be filtered or null if all languages should be displayed
      *
-     * @throws IOException
      */
     private static void writeChildrenAsJSON(Element eParent, JsonWriter writer, String lang) throws IOException {
         if (eParent.getChildren("category").size() == 0) {
@@ -158,7 +155,6 @@ public class MCRRestAPIClassifications {
      * @param writer - the JSON writer
      * @param lang - the language to be filtered or null if all languages should be displayed
      *
-     * @throws IOException
      */
     private static void writeChildrenAsJSONCBTree(Element eParent, JsonWriter writer, String lang, boolean checked)
         throws IOException {
@@ -191,7 +187,6 @@ public class MCRRestAPIClassifications {
      * @param disabled - true, if all nodes should be disabled
      * @param selected - true, if all node should be selected
      *
-     * @throws IOException
      */
     private static void writeChildrenAsJSONJSTree(Element eParent, JsonWriter writer, String lang, boolean opened,
         boolean disabled, boolean selected) throws IOException {
@@ -429,7 +424,6 @@ public class MCRRestAPIClassifications {
      * @param lang - the language to be filtered for or null if all languages should be displayed
      * @param style - the style
      * @return a string representation of a JSON object
-     * @throws IOException
      */
     private String writeJSON(Element eRoot, String lang, String style) throws IOException {
         StringWriter sw = new StringWriter();

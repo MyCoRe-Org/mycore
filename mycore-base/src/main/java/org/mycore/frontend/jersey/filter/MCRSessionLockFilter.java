@@ -18,8 +18,6 @@
 
 package org.mycore.frontend.jersey.filter;
 
-import java.io.IOException;
-
 import org.mycore.common.MCRSessionMgr;
 
 import jakarta.annotation.Priority;
@@ -34,7 +32,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 public class MCRSessionLockFilter implements ContainerRequestFilter {
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         MCRSessionMgr.lock();
     }
 

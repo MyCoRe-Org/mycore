@@ -54,7 +54,6 @@ import jakarta.ws.rs.core.Response.Status;
  *  
  * @author Robert Stephan
  * 
- * @version $Revision: $ $Date: $
  */
 @Path("/messages")
 public class MCRRestAPIMessages {

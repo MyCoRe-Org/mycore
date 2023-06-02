@@ -20,6 +20,7 @@ package org.mycore.mets.model.converter;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -89,21 +90,22 @@ public class MCRXMLSimpleModelConverter {
         metsSection.setType(current.getType());
         metsSection.setParent(parent);
 
-        current.getFptrList().forEach(fptr -> fptr.getSeqList().forEach(seq -> {
-            seq.getAreaList().forEach(area -> {
-                String fileId = area.getFileId();
-                String begin = area.getBegin();
-                String end = area.getEnd();
+        current.getFptrList().forEach(
+            fptr -> fptr.getSeqList().forEach(
+                seq -> seq.getAreaList().forEach(
+                    area -> {
+                        String fileId = area.getFileId();
+                        String begin = area.getBegin();
+                        String end = area.getEnd();
 
-                if (!idFileMap.containsKey(fileId)) {
-                    throw new MCRException("No file with id " + fileId + " found!");
-                }
+                        if (!idFileMap.containsKey(fileId)) {
+                            throw new MCRException("No file with id " + fileId + " found!");
+                        }
 
-                MCRMetsFile file = idFileMap.get(fileId);
-                MCRMetsAltoLink e = new MCRMetsAltoLink(file, begin, end);
-                metsSection.addAltoLink(e);
-            });
-        }));
+                        MCRMetsFile file = idFileMap.get(fileId);
+                        MCRMetsAltoLink e = new MCRMetsAltoLink(file, begin, end);
+                        metsSection.addAltoLink(e);
+                    })));
 
         if (idSectionMap != null) {
             idSectionMap.put(current.getId(), metsSection);
@@ -125,7 +127,7 @@ public class MCRXMLSimpleModelConverter {
         List<MCRMetsPage> result = new ArrayList<>();
 
         physicalSubDivs.stream()
-            .map((physicalSubDiv) -> {
+            .map(physicalSubDiv -> {
                 // Convert PhysicalSubDiv to MetsPage
                 MCRMetsPage metsPage = new MCRMetsPage();
                 metsPage.setId(physicalSubDiv.getId());
@@ -141,7 +143,7 @@ public class MCRXMLSimpleModelConverter {
                 // return a entry of physicalSubDiv.id and MetsPage
                 return new AbstractMap.SimpleEntry<>(physicalSubDiv.getId(), metsPage);
             })
-            .forEachOrdered((entry) -> {
+            .forEachOrdered(entry -> {
                 // Put page to list
                 result.add(entry.getValue());
                 // Put that generated entry to a Hashtable
@@ -155,7 +157,7 @@ public class MCRXMLSimpleModelConverter {
         Map<String, MCRMetsPage> idPageMap, MCRMetsSimpleModel metsSimpleModel) {
         mets.getStructLink().getSmLinks().stream()
             .filter(smLink -> idSectionMap.containsKey(smLink.getFrom()) && idPageMap.containsKey(smLink.getTo()))
-            .map((smLink) -> {
+            .map(smLink -> {
                 MCRMetsSection metsSection = idSectionMap.get(smLink.getFrom());
                 MCRMetsPage metsPage = idPageMap.get(smLink.getTo());
                 return new MCRMetsLink(metsSection, metsPage);
@@ -163,17 +165,17 @@ public class MCRXMLSimpleModelConverter {
     }
 
     private static Map<String, MCRMetsFile> buildidFileMap(Mets mets) {
-        Map<String, MCRMetsFile> idMetsFileMap = new Hashtable<>();
-        mets.getFileSec().getFileGroups().forEach((fileGroup) -> addFilesFromGroup(idMetsFileMap, fileGroup));
+        Map<String, MCRMetsFile> idMetsFileMap = new HashMap<>();
+        mets.getFileSec().getFileGroups().forEach(
+            fileGroup -> addFilesFromGroup(idMetsFileMap, fileGroup));
         return idMetsFileMap;
     }
 
     private static void addFilesFromGroup(Map<String, MCRMetsFile> idPageMap, FileGrp fileGroup) {
         String fileGroupUse = fileGroup.getUse();
-        fileGroup.getFileList().forEach(file -> {
-            idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
-                file.getFLocat().getHref(), file.getMimeType(), fileGroupUse));
-        });
+        fileGroup.getFileList().forEach(
+            file -> idPageMap.put(file.getId(),
+                new MCRMetsFile(file.getId(), file.getFLocat().getHref(), file.getMimeType(), fileGroupUse)));
     }
 
 }

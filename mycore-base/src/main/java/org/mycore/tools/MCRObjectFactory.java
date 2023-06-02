@@ -48,7 +48,6 @@ public class MCRObjectFactory {
         return xml;
     }
 
-    /***/
     private static Element createServiceElement() {
         Element service = new Element("service");
         Element servDates = new Element("servdates");
@@ -77,16 +76,12 @@ public class MCRObjectFactory {
         return isoDate.getISOString();
     }
 
-    /***/
     private static Element createMetadataElement(MCRObjectID id) {
-        return "derivate".equals(id.getTypeId()) ? new Element("derivate") : new Element("metadata");
+        return id.getTypeId().equals("derivate") ? new Element("derivate") : new Element("metadata");
     }
 
-    /**
-     * @param id
-     */
     private static Element createRootElement(MCRObjectID id) {
-        String rootTag = "derivate".equals(id.getTypeId()) ? "mycorederivate" : "mycoreobject";
+        String rootTag = id.getTypeId().equals("derivate") ? "mycorederivate" : "mycoreobject";
         Element root = new Element(rootTag);
         root.setAttribute("ID", id.toString());
         root.setAttribute("label", id.toString());
@@ -103,7 +98,6 @@ public class MCRObjectFactory {
     }
 
     /**
-     * @param id
      * @return the name of the xsd schema depending on the given object id
      */
     private static String getXSD(MCRObjectID id) {

@@ -18,6 +18,8 @@
 
 package org.mycore.mods.classification;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -30,7 +32,7 @@ import org.w3c.dom.Element;
  * Authority information that is represented by authority ID and code value. Such authority info comes from a
  * standardized vocabulary registered at the Library of Congress.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
@@ -78,7 +80,7 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
             return null;
         }
 
-        if ("text".equals(type)) {
+        if (Objects.equals(type, "text")) {
             LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
             return null;
         }

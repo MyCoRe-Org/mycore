@@ -23,6 +23,7 @@ import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_LA
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_TEXT;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -62,7 +63,7 @@ public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrappe
         labelJsonObj.addProperty(PROP_LANG, label.getLang());
         labelJsonObj.addProperty(PROP_TEXT, label.getText());
         String description = label.getDescription();
-        if (description != null && !"".equals(description)) {
+        if (description != null && !Objects.equals(description, "")) {
             labelJsonObj.addProperty(PROP_DESCRIPTION, description);
         }
         return labelJsonObj;

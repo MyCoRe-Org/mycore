@@ -114,7 +114,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         String format) throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException,
         MCRIIIFUnsupportedFormatException, MCRAccessException {
 
-        long resultingSize = (long) targetSize.getHeight() * targetSize.getWidth()
+        long resultingSize = (long) targetSize.height() * targetSize.width()
             * (imageQuality.equals(MCRIIIFImageQuality.color) ? 3 : 1);
 
         long maxImageSize = Optional.ofNullable(getProperties().get(MAX_BYTES_PROPERTY)).map(Long::parseLong)
@@ -136,35 +136,27 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         checkTileFile(identifier, tileInfo, oTileFile.get());
         MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(oTileFile.get());
 
-        int sourceWidth = region.getX2() - region.getX1();
-        int sourceHeight = region.getY2() - region.getY1();
+        int sourceWidth = region.x2() - region.x1();
+        int sourceHeight = region.y2() - region.y1();
 
-        double targetWidth = targetSize.getWidth();
-        double targetHeight = targetSize.getHeight();
+        double targetWidth = targetSize.width();
+        double targetHeight = targetSize.height();
 
-        double rotatationRadians = Math.toRadians(rotation.getDegrees());
+        double rotatationRadians = Math.toRadians(rotation.degrees());
         double sinRotation = Math.sin(rotatationRadians);
         double cosRotation = Math.cos(rotatationRadians);
 
         final int height = (int) (Math.abs(targetWidth * sinRotation) + Math.abs(targetHeight * cosRotation));
         final int width = (int) (Math.abs(targetWidth * cosRotation) + Math.abs(targetHeight * sinRotation));
+        final int imageType = switch (imageQuality) {
+            case bitonal -> BufferedImage.TYPE_BYTE_BINARY;
+            case gray -> BufferedImage.TYPE_BYTE_GRAY;
+            //color is also default case
+            default
+                -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR : BufferedImage.TYPE_3BYTE_BGR;
+        };
 
-        BufferedImage targetImage;
-        switch (imageQuality) {
-        case bitonal:
-            targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-            break;
-        case gray:
-            targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-            break;
-        case color:
-        default:
-            if (transparentFormats.contains(format)) {
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-            } else {
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-            }
-        }
+        BufferedImage targetImage = new BufferedImage(width, height, imageType);
 
         // this value determines the zoom level!
         double largestScaling = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight);
@@ -182,10 +174,10 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             drawScaleY = (targetHeight / (sourceHeight * zoomLevelScale));
 
         // absolute region in zoom level this nearest zoom level
-        double x1 = region.getX1() * zoomLevelScale,
-            x2 = region.getX2() * zoomLevelScale,
-            y1 = region.getY1() * zoomLevelScale,
-            y2 = region.getY2() * zoomLevelScale;
+        double x1 = region.x1() * zoomLevelScale,
+            x2 = region.x2() * zoomLevelScale,
+            y1 = region.y1() * zoomLevelScale,
+            y2 = region.y2() * zoomLevelScale;
 
         // now we detect the tiles to draw!
         int x1Tile = (int) Math.floor(x1 / 256),
@@ -197,7 +189,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             Path rootPath = zipFileSystem.getPath("/");
 
             Graphics2D graphics = targetImage.createGraphics();
-            if (rotation.isMirrored()) {
+            if (rotation.mirrored()) {
                 graphics.scale(-1, 1);
                 graphics.translate(-width, 0);
             }
@@ -210,7 +202,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             graphics.translate(-x1, -y1);
 
             graphics.scale(zoomLevelScale, zoomLevelScale);
-            graphics.setClip(region.getX1(), region.getY1(), sourceWidth, sourceHeight);
+            graphics.setClip(region.x1(), region.y1(), sourceWidth, sourceHeight);
             graphics.scale(1 / zoomLevelScale, 1 / zoomLevelScale);
 
             LOGGER.info(String.format(Locale.ROOT, "Using zoom-level: %d and scales %s/%s!", sourceZoomLevel,
@@ -247,10 +239,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
                 buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight(),
                 Files.getLastModifiedTime(tileFilePath).toMillis());
 
-            MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256);
-            for (int i = 0; i < tiledPictureProps.getZoomlevel(); i++) {
-                tileInformation.scaleFactors.add((int) Math.pow(2, i));
-            }
+            MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256,
+                MCRIIIFImageTileInformation.scaleFactorsAsPowersOfTwo(tiledPictureProps.getZoomlevel()));
 
             imageInformation.tiles.add(tileInformation);
 
@@ -303,16 +293,11 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         String id = identifier.contains(":/") ? identifier.replaceFirst(":/", "/") : identifier;
         String separator = getProperties().getOrDefault(IDENTIFIER_SEPARATOR_PROPERTY, "/");
         String[] splittedIdentifier = id.split(separator, 2);
-        switch (splittedIdentifier.length) {
-        case 1:
-            tileInfo = new MCRTileInfo(null, identifier, null);
-            break;
-        case 2:
-            tileInfo = new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
-            break;
-        default:
-            throw new MCRIIIFImageNotFoundException(identifier);
-        }
+        tileInfo = switch (splittedIdentifier.length) {
+            case 1 -> new MCRTileInfo(null, identifier, null);
+            case 2 -> new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
+            default -> throw new MCRIIIFImageNotFoundException(identifier);
+        };
         return tileInfo;
     }
 

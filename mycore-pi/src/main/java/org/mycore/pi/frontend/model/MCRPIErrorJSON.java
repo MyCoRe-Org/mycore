@@ -40,8 +40,7 @@ public class MCRPIErrorJSON {
     public MCRPIErrorJSON(String message, Exception e) {
         this.message = message;
 
-        if (e instanceof MCRPersistentIdentifierException) {
-            MCRPersistentIdentifierException identifierException = (MCRPersistentIdentifierException) e;
+        if (e instanceof MCRPersistentIdentifierException identifierException) {
             identifierException.getCode().ifPresent(code -> this.code = Integer.toHexString(code));
             identifierException.getTranslatedAdditionalInformation()
                 .ifPresent(msg -> this.translatedAdditionalInformation = msg);

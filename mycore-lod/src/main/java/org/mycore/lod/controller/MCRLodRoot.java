@@ -38,6 +38,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 /**
@@ -68,7 +69,8 @@ public class MCRLodRoot {
             Document docRepository = createRepositoryInfo();
             String rdfxmlString = new MCRJDOMContent(docRepository).asString();
             URI uri = request.getUriInfo().getBaseUri();
-            List<String> mimeTypes = request.getAcceptableMediaTypes().parallelStream().map(x -> x.toString()).toList();
+            List<String> mimeTypes = request.getAcceptableMediaTypes().parallelStream().map(MediaType::toString)
+                .toList();
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())

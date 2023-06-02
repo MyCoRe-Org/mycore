@@ -29,7 +29,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * 
  * @see MCRFoFormatterInterface
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRFoFormatterHelper {
 

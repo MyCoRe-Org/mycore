@@ -37,7 +37,7 @@ import bibtex.parser.ParseException;
  * Transforms BibTeX source code to JDOM MODS elements.
  * Output is a mods:modsCollection.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
 
@@ -54,7 +54,7 @@ public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
     }
 
     private String fixMissingEntryKeys(String input) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 0;
 
         Matcher m = MISSING_KEYS_PATTERN.matcher(input);

@@ -109,13 +109,11 @@ public class MCRRestAPIAuthentication {
         ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
         return Optional.ofNullable(session)
             .map(MCRJWTUtil::getJWTBuilder)
-            .map(b -> {
-                return b.withAudience(AUDIENCE)
-                    .withClaim(MCRJWTUtil.JWT_CLAIM_IP, remoteIp)
-                    .withExpiresAt(Date.from(currentTime.plusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
-                    .withNotBefore(Date.from(currentTime.minusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
-                    .sign(MCRJWTUtil.getJWTAlgorithm());
-            });
+            .map(b -> b.withAudience(AUDIENCE)
+                .withClaim(MCRJWTUtil.JWT_CLAIM_IP, remoteIp)
+                .withExpiresAt(Date.from(currentTime.plusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
+                .withNotBefore(Date.from(currentTime.minusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
+                .sign(MCRJWTUtil.getJWTAlgorithm()));
     }
 
     @GET

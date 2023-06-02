@@ -44,7 +44,6 @@ import com.ibm.icu.util.ULocale;
  *
  * @author Jens Kupferschmidt
  * @author Thomas Junge
- * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
  * @see <a href="http://site.icu-project.org/home">http://site.icu-project.org/home</a>
  */
 public class MCRCalendar {
@@ -180,55 +179,20 @@ public class MCRCalendar {
             return out;
         }
 
-        switch (calendarType) {
-        case Armenian: {
-            out = getCalendarFromArmenianDate(dateString, last);
-            break;
-        }
-        case Buddhist: {
-            out = getCalendarFromBuddhistDate(dateString, last);
-            break;
-        }
-        case Coptic: {
-            out = getCalendarFromCopticDate(dateString, last);
-            break;
-        }
-        case Egyptian: {
-            out = getCalendarFromEgyptianDate(dateString, last);
-            break;
-        }
-        case Ethiopic: {
-            out = getCalendarFromEthiopicDate(dateString, last);
-            break;
-        }
-        case Gregorian: {
-            out = getCalendarFromGregorianDate(dateString, last);
-            break;
-        }
-        case Hebrew: {
-            out = getCalendarFromHebrewDate(dateString, last);
-            break;
-        }
-        case Islamic: {
-            out = getCalendarFromIslamicDate(dateString, last);
-            break;
-        }
-        case Japanese: {
-            out = getCalendarFromJapaneseDate(dateString, last);
-            break;
-        }
-        case Julian: {
-            out = getCalendarFromJulianDate(dateString, last);
-            break;
-        }
-        case Persic: {
-            out = getCalendarFromPersicDate(dateString, last);
-            break;
-        }
-        default: {
-            throw new MCRException("Calendar type " + calendarType + " not supported!");
-        }
-        }
+        out = switch (calendarType) {
+            case Armenian -> getCalendarFromArmenianDate(dateString, last);
+            case Buddhist -> getCalendarFromBuddhistDate(dateString, last);
+            case Coptic -> getCalendarFromCopticDate(dateString, last);
+            case Egyptian -> getCalendarFromEgyptianDate(dateString, last);
+            case Ethiopic -> getCalendarFromEthiopicDate(dateString, last);
+            case Gregorian -> getCalendarFromGregorianDate(dateString, last);
+            case Hebrew -> getCalendarFromHebrewDate(dateString, last);
+            case Islamic -> getCalendarFromIslamicDate(dateString, last);
+            case Japanese -> getCalendarFromJapaneseDate(dateString, last);
+            case Julian -> getCalendarFromJulianDate(dateString, last);
+            case Persic -> getCalendarFromPersicDate(dateString, last);
+            default -> throw new MCRException("Calendar type " + calendarType + " not supported!");
+        };
 
         LOGGER.debug("Output of getHistoryDateAsCalendar: {}", getCalendarDateToFormattedString(out));
         return out;
@@ -1105,50 +1069,18 @@ public class MCRCalendar {
             start = 1;
             end = length;
         } else {
-            final int[] borders;
-            switch (calendarType) {
-            case Armenian: {
-                borders = calculateArmenianDateBorders(date);
-                break;
-            }
-            case Buddhist: {
-                borders = calculateBuddhistDateBorders(date);
-                break;
-            }
-            case Coptic:
-            case Ethiopic: {
-                borders = calculateCopticDateBorders(date);
-                break;
-            }
-            case Egyptian: {
-                borders = calculateEgyptianDateBorders(date);
-                break;
-            }
-            case Gregorian:
-            case Julian: {
-                borders = calculateGregorianDateBorders(date);
-                break;
-            }
-            case Hebrew: {
-                borders = calculateHebrewDateBorders(date);
-                break;
-            }
-            case Islamic: {
-                borders = calculateIslamicDateBorders(date);
-                break;
-            }
-            case Japanese: {
-                borders = calculateJapaneseDateBorders(date);
-                break;
-            }
-            case Persic: {
-                borders = calculatePersianDateBorders(date);
-                break;
-            }
-            default: {
-                throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
-            }
-            }
+            final int[] borders = switch (calendarType) {
+                case Armenian -> calculateArmenianDateBorders(date);
+                case Buddhist -> calculateBuddhistDateBorders(date);
+                case Coptic, Ethiopic -> calculateCopticDateBorders(date);
+                case Egyptian -> calculateEgyptianDateBorders(date);
+                case Gregorian, Julian -> calculateGregorianDateBorders(date);
+                case Hebrew -> calculateHebrewDateBorders(date);
+                case Islamic -> calculateIslamicDateBorders(date);
+                case Japanese -> calculateJapaneseDateBorders(date);
+                case Persic -> calculatePersianDateBorders(date);
+                default -> throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
+            };
 
             start = borders[0];
             end = borders[1];
@@ -1315,16 +1247,16 @@ public class MCRCalendar {
         if (StringUtils.contains(dateString, "N. CHR") || StringUtils.contains(dateString, "V. CHR")) {
             final int positionNChr = StringUtils.indexOf(dateString, "N. CHR");
             final int positionVChr = StringUtils.indexOf(dateString, "V. CHR");
-            if (-1 != positionNChr) {
-                if (0 == positionNChr) {
+            if (positionNChr != -1) {
+                if (positionNChr == 0) {
                     start = 7;
                     end = length;
                 } else {
                     start = 0;
                     end = positionNChr - 1;
                 }
-            } else if (-1 != positionVChr) {
-                if (0 == positionVChr) {
+            } else if (positionVChr != -1) {
+                if (positionVChr == 0) {
                     start = 7;
                     end = length;
                 } else {
@@ -1338,16 +1270,16 @@ public class MCRCalendar {
         } else if (StringUtils.contains(dateString, "AD") || StringUtils.contains(dateString, "BC")) {
             final int positionAD = StringUtils.indexOf(dateString, "AD");
             final int positionBC = StringUtils.indexOf(dateString, "BC");
-            if (-1 != positionAD) {
-                if (0 == positionAD) {
+            if (positionAD != -1) {
+                if (positionAD == 0) {
                     start = 2;
                     end = length;
                 } else {
                     start = 0;
                     end = positionAD - 1;
                 }
-            } else if (-1 != positionBC) {
-                if (0 == positionBC) {
+            } else if (positionBC != -1) {
+                if (positionBC == 0) {
                     start = 2;
                     end = length;
                 } else {
@@ -1429,30 +1361,13 @@ public class MCRCalendar {
             return true;
         }
 
-        switch (calendarType) {
-        case Buddhist: {
-            return StringUtils.contains(input, "B.E.");
-        }
-        case Gregorian:
-        case Julian: {
-            return StringUtils.contains(input, "BC") || StringUtils.contains(input, "V. CHR");
-        }
-        case Coptic:
-        case Hebrew:
-        case Ethiopic:
-        case Persic:
-        case Chinese:
-        case Islamic:
-        case Armenian:
-        case Egyptian:
-        case Japanese: {
+        return switch (calendarType) {
+            case Buddhist -> StringUtils.contains(input, "B.E.");
+            case Gregorian, Julian -> StringUtils.contains(input, "BC") || StringUtils.contains(input, "V. CHR");
             // these calendars do not allow for an era statement other than -
-            return false;
-        }
-        default: {
-            throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
-        }
-        }
+            case Coptic, Hebrew, Ethiopic, Persic, Chinese, Islamic, Armenian, Egyptian, Japanese -> false;
+            default -> throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
+        };
     }
 
     /**
@@ -1484,33 +1399,15 @@ public class MCRCalendar {
      * @return the first month of a year for the given calendar type
      */
     public static int getFirstMonth(CalendarType calendarType) {
-        switch (calendarType) {
-        case Buddhist:
-        case Gregorian:
-        case Julian: {
-            return GregorianCalendar.JANUARY;
-        }
-        case Coptic:
-        case Egyptian: {
-            return CopticCalendar.TOUT;
-        }
-        case Ethiopic: {
-            return EthiopicCalendar.MESKEREM;
-        }
-        case Hebrew: {
-            return HebrewCalendar.TISHRI;
-        }
-        case Islamic: {
-            return IslamicCalendar.MUHARRAM;
-        }
-        case Armenian:
-        case Persic: {
-            return 0;
-        }
-        default: {
-            throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
-        }
-        }
+        return switch (calendarType) {
+            case Buddhist, Gregorian, Julian -> GregorianCalendar.JANUARY;
+            case Coptic, Egyptian -> CopticCalendar.TOUT;
+            case Ethiopic -> EthiopicCalendar.MESKEREM;
+            case Hebrew -> HebrewCalendar.TISHRI;
+            case Islamic -> IslamicCalendar.MUHARRAM;
+            case Armenian, Persic -> 0;
+            default -> throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
+        };
     }
 
     /**
@@ -1535,20 +1432,11 @@ public class MCRCalendar {
      * @return true, if the given year is a leap year in the given calendar type; otherwise false
      */
     public static boolean isLeapYear(int year, CalendarType calendarType) {
-        switch (calendarType) {
-        case Gregorian: {
-            final GregorianCalendar cal = new GregorianCalendar();
-            return cal.isLeapYear(year);
-        }
-        case Julian: {
-            final GregorianCalendar cal = new GregorianCalendar();
-            cal.setGregorianChange(new Date(Long.MAX_VALUE));
-            return cal.isLeapYear(year);
-        }
-        default: {
-            throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
-        }
-        }
+        return switch (calendarType) {
+            case Gregorian -> new GregorianCalendar().isLeapYear(year);
+            case Julian -> year % 4 == 0;
+            default -> throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
+        };
     }
 
     public enum CalendarType {

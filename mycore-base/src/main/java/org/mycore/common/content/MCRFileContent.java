@@ -19,7 +19,6 @@
 package org.mycore.common.content;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -43,7 +42,7 @@ public class MCRFileContent extends MCRPathContent {
     }
 
     @Override
-    public Source getSource() throws IOException {
+    public Source getSource() {
         return new StreamSource(file);
     }
 

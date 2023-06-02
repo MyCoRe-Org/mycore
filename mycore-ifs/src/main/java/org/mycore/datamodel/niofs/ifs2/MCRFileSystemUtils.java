@@ -29,10 +29,10 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.ProviderMismatchException;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -210,7 +210,7 @@ abstract class MCRFileSystemUtils {
                 throw new IOException(relativePath + " is absolute does not fit to " + toPath(baseDir));
             }
         }
-        Deque<MCRStoredNode> created = new LinkedList<>();
+        Deque<MCRStoredNode> created = new ArrayDeque<>();
         MCRFile file;
         try {
             file = (MCRFile) baseDir.getNodeByPath(ifsPath.toString());
@@ -283,32 +283,24 @@ abstract class MCRFileSystemUtils {
         if (path.isAbsolute()) {
             throw new IllegalArgumentException("path is absolute");
         }
-        switch (path.getNameCount()) {
-        case 0:
-            return fs.getPath("");
-        case 1:
-            return fs.getPath(path.toString());
-        default:
-            String[] pathComp = new String[path.getNameCount() - 1];
-            for (int i = 1; i < pathComp.length; i++) {
-                pathComp[i] = path.getName(i).toString();
+        return switch (path.getNameCount()) {
+            case 0 -> fs.getPath("");
+            case 1 -> fs.getPath(path.toString());
+            default -> {
+                String[] pathComp = new String[path.getNameCount() - 1];
+                for (int i = 1; i < pathComp.length; i++) {
+                    pathComp[i] = path.getName(i).toString();
+                }
+                yield fs.getPath(path.getName(0).toString(), pathComp);
             }
-            return fs.getPath(path.getName(0).toString(), pathComp);
-        }
+        };
     }
 
     private static Optional<MCRDirectory> doResolveParent(MCRPath parent) {
         if (parent.getNameCount() == 0) {
             MCRObjectID derId = MCRObjectID.getInstance(parent.getOwner());
             return Optional.ofNullable(getStore(derId.getBase()))
-                .map(s -> {
-                    try {
-                        return s.retrieve(derId.getNumberAsInteger());
-                    } catch (IOException e) {
-                        LOGGER.warn("Exception while retrieving file collection " + derId, e);
-                        return null;
-                    }
-                });
+                .map(s -> s.retrieve(derId.getNumberAsInteger()));
         }
         //recursive call
         String dirName = parent.getFileName().toString();

@@ -109,7 +109,7 @@ public class MCRMETSServlet extends MCRServlet {
     /**
      * Returns the mets document wrapped in a {@link MCRContent} object.
      */
-    static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) throws Exception {
+    static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) {
         MCRPath metsPath = MCRPath.getPath(derivate, "/mets.xml");
 
         try {
@@ -160,20 +160,17 @@ public class MCRMETSServlet extends MCRServlet {
         if (useExistingMetsParam == null) {
             return true;
         }
-        return Boolean.valueOf(useExistingMetsParam);
+        return Boolean.parseBoolean(useExistingMetsParam);
     }
 
     public static String getOwnerID(String pathInfo) {
         StringBuilder ownerID = new StringBuilder(pathInfo.length());
         boolean running = true;
         for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
-            switch (pathInfo.charAt(i)) {
-            case '/':
+            if (pathInfo.charAt(i) == '/') {
                 running = false;
-                break;
-            default:
+            } else {
                 ownerID.append(pathInfo.charAt(i));
-                break;
             }
         }
         return ownerID.toString();

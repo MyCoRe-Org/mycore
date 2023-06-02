@@ -50,8 +50,6 @@ public class MCRXMLFunctions {
     /**
      * @param q the query to execute (in solr syntax)
      * @return the identifier of the first document matching the query
-     * @throws SolrServerException
-     * @throws IOException
      */
     public static String getIdentifierOfFirst(String q) throws SolrServerException, IOException {
         if (q == null || q.length() == 0) {

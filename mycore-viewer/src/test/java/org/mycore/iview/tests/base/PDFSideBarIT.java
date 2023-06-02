@@ -29,7 +29,7 @@ import org.mycore.iview.tests.model.TestDerivate;
 public class PDFSideBarIT extends SideBarIT {
 
     @Override
-    public void testOverviewLayout() throws InterruptedException {
+    public void testOverviewLayout() {
     }
 
     @Override

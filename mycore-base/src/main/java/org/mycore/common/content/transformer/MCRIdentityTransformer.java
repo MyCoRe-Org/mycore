@@ -18,8 +18,6 @@
 
 package org.mycore.common.content.transformer;
 
-import java.io.IOException;
-
 import org.mycore.common.content.MCRContent;
 
 /**
@@ -40,7 +38,7 @@ public class MCRIdentityTransformer extends MCRContentTransformer {
      * @see org.mycore.common.content.transformer.MCRContentTransformer#transform(org.mycore.common.content.MCRContent)
      */
     @Override
-    public MCRContent transform(MCRContent source) throws IOException {
+    public MCRContent transform(MCRContent source) {
         return source;
     }
 

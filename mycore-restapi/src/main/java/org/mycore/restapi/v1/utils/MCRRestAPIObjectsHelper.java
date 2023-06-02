@@ -35,6 +35,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -77,7 +78,6 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.xml.sax.SAXException;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -85,9 +85,9 @@ import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 
 /**
  * main utility class that handles REST requests
@@ -103,7 +103,6 @@ import jakarta.ws.rs.core.Response.Status;
  * @author Robert Stephan
  * @author Christoph Neidahl
  * 
- * @version $Revision: $ $Date: $
  */
 public class MCRRestAPIObjectsHelper {
 
@@ -167,7 +166,7 @@ public class MCRRestAPIObjectsHelper {
             } else {
                 outputter.output(doc, sw);
             }
-        } catch (SAXException | JDOMException e) {
+        } catch (JDOMException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
                 MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform MCRContent to XML document", e.getMessage()));
         } catch (IOException e) {
@@ -207,8 +206,6 @@ public class MCRRestAPIObjectsHelper {
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
         }
 
-        // return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "Unexepected program flow termination.",
-        //       "Please contact a developer!").createHttpResponse();
     }
 
     private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth, UriInfo info,
@@ -266,7 +263,7 @@ public class MCRRestAPIObjectsHelper {
                     int pos = uri.lastIndexOf(":/");
                     String subPath = uri.substring(pos + 2);
                     while (subPath.startsWith("/")) {
-                        subPath = path.substring(1);
+                        subPath = subPath.substring(1);
                     }
                     e.setAttribute("href", baseURL + subPath);
                 }
@@ -307,8 +304,6 @@ public class MCRRestAPIObjectsHelper {
      * @param sort - the sort criteria
      *
      * @return a Jersey response object
-     * @throws MCRRestAPIException    
-     * 
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
      * 
      */
@@ -419,8 +414,7 @@ public class MCRRestAPIObjectsHelper {
         }
 
         //Filter by modifiedBefore and modifiedAfter
-        List<String> l = new ArrayList<>();
-        l.addAll(mcrIDs);
+        List<String> l = new ArrayList<>(mcrIDs);
         List<MCRObjectIDDate> objIdDates = new ArrayList<>();
         try {
             objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(l);
@@ -516,9 +510,6 @@ public class MCRRestAPIObjectsHelper {
      * @param sort - the sort criteria
      *
      * @return a Jersey response object
-     * @throws MCRRestAPIException    
-     * 
-     * 
      * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
     public static Response listDerivates(UriInfo info, String mcrObjID, String format,
@@ -568,7 +559,7 @@ public class MCRRestAPIObjectsHelper {
                 public Date getLastModified() {
                     return new Date(lastModified);
                 }
-            }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
+            }).sorted(new MCRRestAPISortObjectComparator(sortObj)).collect(Collectors.toList());
 
         //output as XML
         if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
@@ -582,7 +573,7 @@ public class MCRRestAPIObjectsHelper {
                 String mcrID = der.getDerivate().getMetaLink().getXLinkHref();
                 eDerObject.setAttribute("metadata", mcrID);
                 if (der.getDerivate().getClassifications().size() > 0) {
-                    StringBuffer c = new StringBuffer();
+                    StringBuilder c = new StringBuilder();
                     for (int i = 0; i < der.getDerivate().getClassifications().size(); i++) {
                         if (i > 0) {
                             c.append(' ');
@@ -659,7 +650,6 @@ public class MCRRestAPIObjectsHelper {
      * @param path - the sub path of a directory inside the derivate
      * @param depth - the level of subdirectories to be returned
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     public static Response listContents(UriInfo info, Application app, Request request, String mcrObjID,
         String mcrDerID, String format, String path, int depth) throws MCRRestAPIException {
@@ -717,10 +707,8 @@ public class MCRRestAPIObjectsHelper {
      * @param mcrDerID - the MyCoRe Derivate ID
      * 
      * @return the Resolving URL for the main document of the derivate
-     * @throws IOException
      */
-    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID, Application app)
-        throws IOException {
+    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID, Application app) {
         try {
             MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
@@ -750,7 +738,6 @@ public class MCRRestAPIObjectsHelper {
 
     /**
      * validates the given String if it matches the UTC syntax or the beginning of it
-     * @param test
      * @return true, if it is valid
      */
     private static boolean validateDateInput(String test) {
@@ -783,10 +770,10 @@ public class MCRRestAPIObjectsHelper {
                     "Allowed values are 'ID' and 'lastModified'."));
             }
 
-            if ("asc".equals(sortOrder)) {
+            if (Objects.equals(sortOrder, "asc")) {
                 result.setOrder(SortOrder.ASC);
             }
-            if ("desc".equals(sortOrder)) {
+            if (Objects.equals(sortOrder, "desc")) {
                 result.setOrder(SortOrder.DESC);
             }
             if (result.getOrder() == null) {
@@ -814,8 +801,6 @@ public class MCRRestAPIObjectsHelper {
                 idString = URLDecoder.decode(idString, StandardCharsets.UTF_8);
                 //ToDo - Shall we restrict the key set with a property?
 
-                //throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST,
-                //        "The ID is not valid.", "The prefix is unkown. Only 'mcr' is allowed."));
             }
         }
         if (key.equals("mcr")) {
@@ -885,7 +870,7 @@ public class MCRRestAPIObjectsHelper {
         }
 
         String matchedDerID = null;
-        if ("mcr".equals(derKey) &&
+        if (Objects.equals(derKey, "mcr") &&
             MCRMetadataManager.getDerivateIds(parentObjId, 0, TimeUnit.SECONDS)
                 .stream()
                 .map(MCRObjectID::toString)

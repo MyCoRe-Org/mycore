@@ -21,6 +21,7 @@ package org.mycore.iiif.image.parser;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.mycore.iiif.image.model.MCRIIIFImageSourceRegion;
@@ -89,10 +90,10 @@ public class MCRIIIFRegionParser {
 
     private MCRIIIFImageSourceRegion parseAbsoluteImageRegion() {
         List<Double> doubles = parseNumbers();
-        Double x1 = doubles.get(0);
-        Double y1 = doubles.get(1);
-        Double x2 = doubles.get(2) + x1;
-        Double y2 = doubles.get(3) + y1;
+        double x1 = doubles.get(0);
+        double y1 = doubles.get(1);
+        double x2 = doubles.get(2) + x1;
+        double y2 = doubles.get(3) + y1;
         return parseImageRegion((int) Math.round(x1), (int) Math.round(y1), (int) Math.round(x2), (int) Math.round(y2));
     }
 
@@ -123,11 +124,11 @@ public class MCRIIIFRegionParser {
     }
 
     private boolean isFull() {
-        return "full".equals(sourceRegion);
+        return Objects.equals(sourceRegion, "full");
     }
 
     private boolean isSquare() {
-        return "square".equals(sourceRegion);
+        return Objects.equals(sourceRegion, "square");
     }
 
     private List<Double> parseNumbers() {

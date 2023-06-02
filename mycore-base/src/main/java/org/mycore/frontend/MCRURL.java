@@ -79,7 +79,7 @@ public class MCRURL {
         for (Entry<String, List<String>> entrySet : parameterMap.entrySet()) {
             String name = entrySet.getKey();
             for (String value : entrySet.getValue()) {
-                queryBuilder.append(name).append("=").append(value).append("&");
+                queryBuilder.append(name).append('=').append(value).append('&');
             }
         }
         String queryString = queryBuilder.toString();
@@ -94,10 +94,10 @@ public class MCRURL {
             urlBuffer.append(
                 new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null));
             if (query != null) {
-                urlBuffer.append("?").append(query);
+                urlBuffer.append('?').append(query);
             }
             if (uri.getFragment() != null) {
-                urlBuffer.append("#").append(uri.getFragment());
+                urlBuffer.append('#').append(uri.getFragment());
             }
             this.url = new URL(urlBuffer.toString());
             if (this.parameterMap != null) {
@@ -122,7 +122,7 @@ public class MCRURL {
     public MCRURL addParameter(String name, String value) {
         StringBuilder urlBuffer = new StringBuilder(this.url.toString());
         urlBuffer.append(this.url.getQuery() == null ? "?" : "&");
-        urlBuffer.append(name).append("=").append(value);
+        urlBuffer.append(name).append('=').append(value);
         try {
             this.url = new URL(urlBuffer.toString());
             if (this.parameterMap != null) {

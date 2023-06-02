@@ -38,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
@@ -53,7 +54,6 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.user2.utils.MCRRoleTransformer;
 import org.mycore.user2.utils.MCRUserTransformer;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class provides a set of commands for the org.mycore.user2 management which can be used by the command line
@@ -200,7 +200,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "import role from file {0}",
         help = "Imports a role from file, if that role does not exist",
         order = 90)
-    public static void addRole(String fileName) throws SAXParseException, IOException {
+    public static void addRole(String fileName) throws IOException, JDOMException {
         LOGGER.info("Reading file {} ...", fileName);
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
         MCRRole role = MCRRoleTransformer.buildMCRRole(doc.getRootElement());
@@ -221,7 +221,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "delete user {0}",
         help = "Delete the user {0}.",
         order = 110)
-    public static void deleteUser(String userID) throws Exception {
+    public static void deleteUser(String userID) {
         MCRUserManager.deleteUser(userID);
     }
 
@@ -235,7 +235,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "enable user {0}",
         help = "Enables the user for the access.",
         order = 60)
-    public static void enableUser(String userID) throws Exception {
+    public static void enableUser(String userID) {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.enableLogin();
         MCRUserManager.updateUser(mcrUser);
@@ -255,7 +255,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "encrypt passwords in user xml file {0} to file {1}",
         help = "A migration tool to change old plain text password entries to encrpted entries.",
         order = 40)
-    public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws SAXParseException, IOException {
+    public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws IOException, JDOMException {
         File inputFile = getCheckedFile(oldFile);
         if (inputFile == null) {
             return;
@@ -272,8 +272,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         MCRUserManager.updatePasswordHashToSHA256(mcrUser, mcrUser.getPassword());
 
-        FileOutputStream outFile = new FileOutputStream(newFile);
-        saveToXMLFile(mcrUser, outFile);
+        try (FileOutputStream outFile = new FileOutputStream(newFile)) {
+            saveToXMLFile(mcrUser, outFile);
+        }
     }
 
     /**
@@ -286,7 +287,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "disable user {0}",
         help = "Disables access of the user {0}",
         order = 70)
-    public static void disableUser(String userID) throws Exception {
+    public static void disableUser(String userID) {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.disableLogin();
         MCRUserManager.updateUser(mcrUser);
@@ -300,7 +301,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "list all users",
         help = "Lists all users.",
         order = 160)
-    public static void listAllUsers() throws Exception {
+    public static void listAllUsers() {
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
 
         for (MCRUser uid : users) {
@@ -316,7 +317,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         syntax = "list all roles",
         help = "List all roles.",
         order = 140)
-    public static void listAllRoles() throws Exception {
+    public static void listAllRoles() {
         List<MCRRole> roles = MCRRoleManager.listSystemRoles();
 
         for (MCRRole role : roles) {
@@ -342,15 +343,16 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (user.getSystemRoleIDs().isEmpty()) {
             LOGGER.warn("User {} has not any system roles.", user.getUserID());
         }
-        FileOutputStream outFile = new FileOutputStream(filename);
-        LOGGER.info("Writing to file {} ...", filename);
-        saveToXMLFile(user, outFile);
+        try (FileOutputStream outFile = new FileOutputStream(filename)) {
+            LOGGER.info("Writing to file {} ...", filename);
+            saveToXMLFile(user, outFile);
+        }
     }
 
     @MCRCommand(
         syntax = "export all users to directory {0}",
         help = "Exports the data of all users to the directory {0}.")
-    public static List<String> exportAllUserToDirectory(String directory) throws IOException {
+    public static List<String> exportAllUserToDirectory(String directory) {
         File dir = new File(directory);
         if (!dir.exists() || !dir.isDirectory()) {
             throw new MCRException("Directory does not exist: " + dir.getAbsolutePath());
@@ -407,7 +409,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "import user from file {0}",
         help = "Imports a user from file {0}.")
-    public static void importUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void importUserFromFile(String filename) throws IOException, JDOMException {
         MCRUser user = getMCRUserFromFile(filename);
         if (MCRUserManager.exists(user.getUserName(), user.getRealmID())) {
             throw new MCRException("User already exists: " + user.getUserID());
@@ -519,7 +521,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param filename
      *            the filename of the user data input
      */
-    public static void createUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void createUserFromFile(String filename) throws IOException, JDOMException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.createUser(user);
     }
@@ -529,19 +531,19 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *
      * @param filename
      *            the filename of the user data input
-     * @throws SAXParseException
+     * @throws JDOMException
      *             if file could not be parsed
      */
     @MCRCommand(
         syntax = "update user from file {0}",
         help = "Updates a user from file {0}.",
         order = 200)
-    public static void updateUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void updateUserFromFile(String filename) throws IOException, JDOMException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.updateUser(user);
     }
 
-    private static MCRUser getMCRUserFromFile(String filename) throws SAXParseException, IOException {
+    private static MCRUser getMCRUserFromFile(String filename) throws IOException, JDOMException {
         File inputFile = getCheckedFile(filename);
         if (inputFile == null) {
             return null;
@@ -605,16 +607,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @throws IOException
      *             if output file can not be closed
      */
-    private static void saveToXMLFile(MCRUser mcrUser, FileOutputStream outFile) throws MCRException, IOException {
+    private static void saveToXMLFile(MCRUser mcrUser, FileOutputStream outFile) throws IOException {
         // Create the output
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
-
-        try {
-            outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
-        } catch (Exception e) {
-            throw new MCRException("Error while save XML to file: " + e.getMessage());
-        } finally {
-            outFile.close();
-        }
+        outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
     }
 }

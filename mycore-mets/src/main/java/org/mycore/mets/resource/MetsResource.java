@@ -96,7 +96,7 @@ public class MetsResource {
     @Path("/editor/islocked/{derivateId}")
     public String isLocked(@PathParam("derivateId") String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_READ);
-        Boolean isLocked = MCRMetsLock.isLocked(derivateId);
+        boolean isLocked = MCRMetsLock.isLocked(derivateId);
         return "{\"lock\": " + isLocked + " }";
     }
 
@@ -105,7 +105,7 @@ public class MetsResource {
     @Path("/editor/lock/{derivateId}")
     public String lock(@PathParam("derivateId") String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_WRITE);
-        Boolean isLockSuccessfully = MCRMetsLock.doLock(derivateId);
+        boolean isLockSuccessfully = MCRMetsLock.doLock(derivateId);
         return "{\"success\": " + isLockSuccessfully + " }";
     }
 

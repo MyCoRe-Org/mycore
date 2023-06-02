@@ -24,7 +24,6 @@ package org.mycore.common;
  * arguments to a method.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRUsageException extends MCRException {
     /**

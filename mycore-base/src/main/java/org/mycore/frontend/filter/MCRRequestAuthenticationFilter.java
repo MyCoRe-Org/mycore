@@ -42,7 +42,7 @@ public class MCRRequestAuthenticationFilter implements Filter {
     public static final String SESSION_KEY = "mcr.authenticateRequest";
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
     }
 
     @Override

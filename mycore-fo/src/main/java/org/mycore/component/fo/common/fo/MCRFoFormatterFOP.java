@@ -65,8 +65,7 @@ import org.mycore.common.xsl.MCRErrorListener;
  * This class implements the interface to use configured XSL-FO formatters for the layout service.
  * 
  * @author Jens Kupferschmidt
- * @author Ren\u00E9 Adler (eagle)
- * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
+ * @author René Adler (eagle)
  */
 public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
@@ -108,7 +107,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                 URLConnection con = configResource.openConnection();
                 final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
                 final Configuration cfg;
-                try (InputStream is = con.getInputStream();) {
+                try (InputStream is = con.getInputStream()) {
                     cfg = cfgBuilder.build(is);
                 }
                 fopFactoryBuilder.setConfiguration(cfg);
@@ -161,8 +160,6 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             transformer.transform(src, res);
         } catch (FOPException e) {
             throw new TransformerException(e);
-        } finally {
-            out.close();
         }
     }
 }

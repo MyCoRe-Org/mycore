@@ -47,14 +47,12 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected void delete(MCRDNBURN identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void delete(MCRDNBURN identifier, MCRBase obj, String additional) {
         // no user information available
     }
 
     @Override
-    protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+    protected void update(MCRDNBURN identifier, MCRBase obj, String additional) {
         // nothing to do here!
     }
 

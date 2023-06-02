@@ -25,7 +25,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
  * Validates input to be required. XML is valid if at least one value exists at the given XPath.
  * Example: &lt;xed:validate required="true" ... /&gt;
  *
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen
  */
 public class MCRRequiredValidator extends MCRValidator {
 

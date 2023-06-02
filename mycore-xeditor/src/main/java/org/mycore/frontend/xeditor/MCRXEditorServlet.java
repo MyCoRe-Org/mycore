@@ -31,7 +31,7 @@ import org.mycore.frontend.xeditor.target.MCREditorTarget;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXEditorServlet extends MCRServlet {
 

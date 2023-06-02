@@ -19,7 +19,7 @@
 package org.mycore.common.content.transformer;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.Deque;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -103,9 +103,9 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
     public T getJAXBObject(MCRContent source, MCRParameterCollector parameter)
         throws TransformerConfigurationException, SAXException, JAXBException, IOException,
         ParserConfigurationException {
-        LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
-        XMLReader reader = getXMLReader(transformHandlerList);
-        TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+        Deque<TransformerHandler> transformHandlers = getTransformHandlers(parameter);
+        XMLReader reader = getXMLReader(transformHandlers);
+        TransformerHandler lastTransformerHandler = transformHandlers.getLast();
         return getJAXBObject(source, reader, lastTransformerHandler);
     }
 

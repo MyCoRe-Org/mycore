@@ -186,15 +186,12 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                     .findAny();
                 if (audience.isPresent()) {
                     switch (audience.get()) {
-                    case MCRJWTResource.AUDIENCE:
-                        MCRJWTResource.validate(token);
-                        break;
-                    case MCRRestAPIAuthentication.AUDIENCE:
-                        requestContext.setProperty(PROP_RENEW_JWT, true);
-                        MCRRestAPIAuthentication.validate(token);
-                        break;
-                    default:
-                        LOGGER.warn("Cannot validate JWT for '{}' audience.", audience.get());
+                        case MCRJWTResource.AUDIENCE -> MCRJWTResource.validate(token);
+                        case MCRRestAPIAuthentication.AUDIENCE -> {
+                            requestContext.setProperty(PROP_RENEW_JWT, true);
+                            MCRRestAPIAuthentication.validate(token);
+                        }
+                        default -> LOGGER.warn("Cannot validate JWT for '{}' audience.", audience.get());
                     }
                 }
                 userInformation = Optional.of(new MCRJWTUserInformation(jwt));

@@ -26,8 +26,6 @@ import jakarta.ws.rs.ext.ExceptionMapper;
  * maps a REST API exception to a proper response with message as JSON output
  * 
  * @author Robert Stephan
- * 
- * @version $Revision: $ $Date: $
  *
  */
 public class MCRRestAPIExceptionMapper implements ExceptionMapper<MCRRestAPIException> {

@@ -19,7 +19,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -49,10 +48,10 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRRuleAccessInterface;
+import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
@@ -64,7 +63,6 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -80,8 +78,6 @@ import org.mycore.datamodel.niofs.utils.MCRDerivateUtil;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -89,8 +85,6 @@ import org.xml.sax.SAXParseException;
  *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date: 2010-10-29 15:17:03 +0200 (Fri, 29 Oct
- *          2010) $
  */
 @MCRCommandGroup(name = "Derivate Commands")
 public class MCRDerivateCommands extends MCRAbstractCommands {
@@ -122,13 +116,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *
      * @param id
      *            the ID of the MCRDerivate that should be deleted
-     * @throws MCRActiveLinkException
      * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
      */
     @MCRCommand(syntax = "delete derivate {0}",
         help = "The command remove a derivate with the MCRObjectID {0}",
         order = 30)
-    public static void delete(String id) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+    public static void delete(String id) throws MCRPersistenceException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCRMetadataManager.deleteMCRDerivate(objectID);
         LOGGER.info("{} deleted.", objectID);
@@ -141,13 +134,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the start ID for deleting the MCRDerivate
      * @param idTo
      *            the stop ID for deleting the MCRDerivate
-     * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
      */
     @MCRCommand(syntax = "delete derivate from {0} to {1}",
         help = "The command remove derivates in the number range between the MCRObjectID {0} and {1}.",
         order = 20)
     public static List<String> delete(String idFrom, String idTo)
-        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        throws MCRPersistenceException {
         return MCRCommandUtils.getIdsFromIdToId(idFrom, idTo)
             .map(id -> "delete derivate " + id)
             .collect(Collectors.toList());
@@ -232,7 +224,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             "If the numerical part of the provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 40)
     public static boolean loadFromFile(String file)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return loadFromFile(file, true);
     }
 
@@ -244,10 +236,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
-     * @throws MCRPersistenceException
      */
     public static boolean loadFromFile(String file, boolean importMode)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -257,14 +248,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param file
      *            the location of the xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
-     * @throws MCRPersistenceException
      */
 
     @MCRCommand(syntax = "update derivate from file {0}",
         help = "The command update a derivate form the file {0} in the system.",
         order = 50)
     public static boolean updateFromFile(String file)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return updateFromFile(file, true);
     }
 
@@ -278,7 +268,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
      */
     public static boolean updateFromFile(String file, boolean importMode)
-        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -292,12 +282,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, derivate will be updated, else derivate is created
      * @param importMode
      *            if true, servdates are taken from xml file
-     * @throws SAXParseException
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
-     * @throws MCRPersistenceException
      */
-    private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException,
-        IOException, MCRPersistenceException, MCRAccessException {
+    private static boolean processFromFile(File file, boolean update, boolean importMode)
+        throws IOException, MCRPersistenceException, MCRAccessException, JDOMException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", file);
             return false;
@@ -503,14 +491,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
-    /**
-     * @param dir
-     * @param trans
-     * @param nid
-     * @throws FileNotFoundException
-     * @throws TransformerException
-     * @throws IOException
-     */
+
     private static void exportDerivate(File dir, Transformer trans, String nid)
         throws TransformerException, IOException {
         // store the XML file
@@ -526,10 +507,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             obj.getDerivate().getInternals().setSourcePath(nid);
             LOGGER.info("New Internal Path ====>{}", nid);
             // add ACL's
-            if (ACCESS_IMPL instanceof MCRRuleAccessInterface) {
-                Collection<String> l = ((MCRRuleAccessInterface) ACCESS_IMPL).getPermissionsForID(nid);
+            if (ACCESS_IMPL instanceof MCRRuleAccessInterface ruleAccessInterface) {
+                Collection<String> l = ruleAccessInterface.getPermissionsForID(nid);
                 for (String permission : l) {
-                    Element rule = ((MCRRuleAccessInterface) ACCESS_IMPL).getRule(nid, permission);
+                    Element rule = ruleAccessInterface.getRule(nid, permission);
                     obj.getService().addRule(permission, rule);
                 }
             }
@@ -630,7 +611,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            a IFS node (file or directory)
      */
     private static void doForChildren(Path rootPath) throws IOException {
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 // handle events
@@ -723,7 +704,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "check object entries in derivates for base {0}",
         help = "check in all derivates of MCR base ID {0} for existing linked objects",
         order = 400)
-    public static void checkObjectsInDerivates(String baseId) throws IOException {
+    public static void checkObjectsInDerivates(String baseId) {
         if (baseId == null || baseId.length() == 0) {
             LOGGER.error("Base ID missed for check object entries in derivates for base {0}");
             return;
@@ -760,7 +741,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
         PathMatcher matcher = derivateRoot.getFileSystem().getPathMatcher(pattern);
 
-        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {
@@ -781,7 +762,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                             LOGGER.info("Result and Source is the same..");
                         }
 
-                    } catch (JDOMException | SAXException e) {
+                    } catch (JDOMException e) {
                         throw new IOException("Error while processing file : " + file, e);
                     }
 

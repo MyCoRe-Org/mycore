@@ -86,48 +86,27 @@ public class MCRErrorResponse {
             .entity(this)
             .build();
         //s maybe null
-        switch (Response.Status.Family.familyOf(status)) {
-        case CLIENT_ERROR:
-            //Response.Status.OK is to trigger "default" case
-            switch (s != null ? s : Response.Status.OK) {
-            case BAD_REQUEST:
-                e = new BadRequestException(getMessage(), response, getCause());
-                break;
-            case FORBIDDEN:
-                e = new ForbiddenException(getMessage(), response, getCause());
-                break;
-            case NOT_ACCEPTABLE:
-                e = new NotAcceptableException(getMessage(), response, getCause());
-                break;
-            case METHOD_NOT_ALLOWED:
-                e = new NotAllowedException(getMessage(), response, getCause());
-                break;
-            case UNAUTHORIZED:
-                e = new NotAuthorizedException(getMessage(), response, getCause());
-                break;
-            case NOT_FOUND:
-                e = new NotFoundException(getMessage(), response, getCause());
-                break;
-            case UNSUPPORTED_MEDIA_TYPE:
-                e = new NotSupportedException(getMessage(), response, getCause());
-                break;
-            default:
-                e = new ClientErrorException(getMessage(), response, getCause());
-            }
-            break;
-        case SERVER_ERROR:
-            //Response.Status.OK is to trigger "default" case
-            switch (s != null ? s : Response.Status.OK) {
-            case INTERNAL_SERVER_ERROR:
-                e = new InternalServerErrorException(getMessage(), response, getCause());
-                break;
-            default:
-                e = new ServerErrorException(getMessage(), response, getCause());
-            }
-            break;
-        default:
-            e = new WebApplicationException(getMessage(), getCause(), response);
-        }
+        e = switch (Response.Status.Family.familyOf(status)) {
+            case CLIENT_ERROR ->
+                //Response.Status.OK is to trigger "default" case
+                switch (s != null ? s : Response.Status.OK) {
+                    case BAD_REQUEST -> new BadRequestException(getMessage(), response, getCause());
+                    case FORBIDDEN -> new ForbiddenException(getMessage(), response, getCause());
+                    case NOT_ACCEPTABLE -> new NotAcceptableException(getMessage(), response, getCause());
+                    case METHOD_NOT_ALLOWED -> new NotAllowedException(getMessage(), response, getCause());
+                    case UNAUTHORIZED -> new NotAuthorizedException(getMessage(), response, getCause());
+                    case NOT_FOUND -> new NotFoundException(getMessage(), response, getCause());
+                    case UNSUPPORTED_MEDIA_TYPE -> new NotSupportedException(getMessage(), response, getCause());
+                    default -> new ClientErrorException(getMessage(), response, getCause());
+                };
+            case SERVER_ERROR ->
+                //Response.Status.OK is to trigger "default" case
+                switch (s != null ? s : Response.Status.OK) {
+                    case INTERNAL_SERVER_ERROR -> new InternalServerErrorException(getMessage(), response, getCause());
+                    default -> new ServerErrorException(getMessage(), response, getCause());
+                };
+            default -> new WebApplicationException(getMessage(), getCause(), response);
+        };
         LogManager.getLogger().error(this::getLogMessage, e);
         return e;
     }

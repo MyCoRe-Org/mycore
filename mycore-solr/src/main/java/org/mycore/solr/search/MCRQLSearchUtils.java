@@ -24,6 +24,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -127,11 +128,7 @@ public class MCRQLSearchUtils {
             }
         } else if (element.getName().startsWith("boolean")) {
             element.setName("boolean");
-            for (Object child : element.getChildren()) {
-                if (child instanceof Element) {
-                    renameElements((Element) child);
-                }
-            }
+            element.getChildren().forEach(MCRQLSearchUtils::renameElements);
         }
     }
 
@@ -225,7 +222,7 @@ public class MCRQLSearchUtils {
             List<MCRSortBy> sortBy = new ArrayList<>();
             for (String name : sortFields) {
                 String sOrder = getReqParameter(req, name, "ascending");
-                boolean order = "ascending".equals(sOrder) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
+                boolean order = Objects.equals(sOrder, "ascending") ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
                 String fieldName = name.substring(0, name.indexOf(".sortField"));
                 sortBy.add(new MCRSortBy(fieldName, order));
             }

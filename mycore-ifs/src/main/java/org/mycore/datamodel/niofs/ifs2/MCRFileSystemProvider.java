@@ -90,7 +90,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
-    private static MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
+    private static volatile MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
 
     /**
      * set of supported copy options
@@ -117,7 +117,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#newFileSystem(java.net.URI, java.util.Map)
      */
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
+    public FileSystem newFileSystem(URI uri, Map<String, ?> env) {
         throw new FileSystemAlreadyExistsException();
     }
 
@@ -127,7 +127,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public MCRIFSFileSystem getFileSystem(URI uri) {
         if (FILE_SYSTEM_INSTANCE == null) {
-            synchronized (this) {
+            synchronized (FS_URI) {
                 if (FILE_SYSTEM_INSTANCE == null) {
                     FILE_SYSTEM_INSTANCE = new MCRIFSFileSystem(this);
                 }
@@ -217,8 +217,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRStoredNode node = MCRFileSystemUtils.resolvePath(mcrPath);
-        if (node instanceof MCRDirectory) {
-            return MCRDirectoryStreamHelper.getInstance((MCRDirectory) node, mcrPath);
+        if (node instanceof MCRDirectory mcrDirectory) {
+            return MCRDirectoryStreamHelper.getInstance(mcrDirectory, mcrPath);
         }
         throw new NotDirectoryException(dir.toString());
     }
@@ -305,7 +305,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         MCRPath tgt = MCRFileSystemUtils.checkPathAbsolute(target);
         MCRStoredNode srcNode = MCRFileSystemUtils.resolvePath(src);
         //checkParent of target;
-        if (tgt.getNameCount() == 0 && srcNode instanceof MCRDirectory) {
+        if (tgt.getNameCount() == 0 && srcNode instanceof MCRDirectory srcDir) {
             MCRDirectory tgtDir = MCRFileSystemUtils.getFileCollection(tgt.getOwner());
             if (tgtDir != null) {
                 if (tgtDir.hasChildren() && copyOptions.contains(StandardCopyOption.REPLACE_EXISTING)) {
@@ -316,21 +316,20 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 org.mycore.datamodel.ifs2.MCRFileStore store = MCRFileSystemUtils.getStore(tgtDerId.getBase());
                 MCRFileCollection tgtCollection = store.create(tgtDerId.getNumberAsInteger());
                 if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
-                    copyDirectoryAttributes((MCRDirectory) srcNode, tgtCollection);
+                    copyDirectoryAttributes(srcDir, tgtCollection);
                 }
             }
             return; //created new root component
         }
-        if (srcNode instanceof MCRFile) {
-            copyFile((MCRFile) srcNode, tgt, copyOptions, createNew);
-        } else if (srcNode instanceof MCRDirectory) {
-            copyDirectory((MCRDirectory) srcNode, tgt, copyOptions);
+        if (srcNode instanceof MCRFile srcFile) {
+            copyFile(srcFile, tgt, copyOptions, createNew);
+        } else if (srcNode instanceof MCRDirectory srcDir) {
+            copyDirectory(srcDir, tgt, copyOptions);
         }
     }
 
-    private static void copyFile(MCRFile srcNode, MCRPath target, HashSet<CopyOption> copyOptions, boolean createNew)
+    private static void copyFile(MCRFile srcFile, MCRPath target, HashSet<CopyOption> copyOptions, boolean createNew)
         throws IOException {
-        MCRFile srcFile = srcNode;
         boolean fireCreateEvent = createNew || Files.notExists(target);
         MCRFile targetFile = MCRFileSystemUtils.getMCRFile(target, true, createNew, !fireCreateEvent);
         targetFile.setContent(srcFile.getContent());
@@ -426,7 +425,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#isSameFile(java.nio.file.Path, java.nio.file.Path)
      */
     @Override
-    public boolean isSameFile(Path path, Path path2) throws IOException {
+    public boolean isSameFile(Path path, Path path2) {
         return MCRFileSystemUtils.checkPathAbsolute(path).equals(MCRFileSystemUtils.checkPathAbsolute(path2));
     }
 
@@ -434,7 +433,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#isHidden(java.nio.file.Path)
      */
     @Override
-    public boolean isHidden(Path path) throws IOException {
+    public boolean isHidden(Path path) {
         MCRFileSystemUtils.checkPathAbsolute(path);
         return false;
     }
@@ -537,17 +536,11 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (s[0].length() == 0) {
             throw new IllegalArgumentException(attributes);
         }
-        BasicFileAttributeViewImpl view = null;
-        switch (s[0]) {
-        case "basic":
-            view = new BasicFileAttributeViewImpl(mcrPath);
-            break;
-        case "md5":
-            view = new MD5FileAttributeViewImpl(mcrPath);
-            break;
-        default:
-            throw new UnsupportedOperationException("View '" + s[0] + "' not available");
-        }
+        BasicFileAttributeViewImpl view = switch (s[0]) {
+            case "basic" -> new BasicFileAttributeViewImpl(mcrPath);
+            case "md5" -> new MD5FileAttributeViewImpl(mcrPath);
+            default -> throw new UnsupportedOperationException("View '" + s[0] + "' not available");
+        };
         return view.getAttributeMap(s[1].split(","));
     }
 
@@ -568,7 +561,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#setAttribute(java.nio.file.Path, java.lang.String, java.lang.Object, java.nio.file.LinkOption[])
      */
     @Override
-    public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
+    public void setAttribute(Path path, String attribute, Object value, LinkOption... options) {
         throw new UnsupportedOperationException("setAttributes is not implemented yet.");
     }
 
@@ -624,7 +617,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 if (!allowed.contains(attr)) {
                     throw new IllegalArgumentException("'" + attr + "' not recognized");
                 }
-                if ("*".equals(attr)) {
+                if (Objects.equals(attr, "*")) {
                     copyAll = true;
                 }
             }
@@ -636,36 +629,18 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             HashMap<String, Object> map = new HashMap<>();
             for (String attr : map.keySet()) {
                 switch (attr) {
-                case SIZE_NAME:
-                    map.put(attr, attrs.size());
-                    break;
-                case CREATION_TIME_NAME:
-                    map.put(attr, attrs.creationTime());
-                    break;
-                case LAST_ACCESS_TIME_NAME:
-                    map.put(attr, attrs.lastAccessTime());
-                    break;
-                case LAST_MODIFIED_TIME_NAME:
-                    map.put(attr, attrs.lastModifiedTime());
-                    break;
-                case FILE_KEY_NAME:
-                    map.put(attr, attrs.fileKey());
-                    break;
-                case IS_DIRECTORY_NAME:
-                    map.put(attr, attrs.isDirectory());
-                    break;
-                case IS_REGULAR_FILE_NAME:
-                    map.put(attr, attrs.isRegularFile());
-                    break;
-                case IS_SYMBOLIC_LINK_NAME:
-                    map.put(attr, attrs.isSymbolicLink());
-                    break;
-                case IS_OTHER_NAME:
-                    map.put(attr, attrs.isOther());
-                    break;
-                default:
+                    case SIZE_NAME -> map.put(attr, attrs.size());
+                    case CREATION_TIME_NAME -> map.put(attr, attrs.creationTime());
+                    case LAST_ACCESS_TIME_NAME -> map.put(attr, attrs.lastAccessTime());
+                    case LAST_MODIFIED_TIME_NAME -> map.put(attr, attrs.lastModifiedTime());
+                    case FILE_KEY_NAME -> map.put(attr, attrs.fileKey());
+                    case IS_DIRECTORY_NAME -> map.put(attr, attrs.isDirectory());
+                    case IS_REGULAR_FILE_NAME -> map.put(attr, attrs.isRegularFile());
+                    case IS_SYMBOLIC_LINK_NAME -> map.put(attr, attrs.isSymbolicLink());
+                    case IS_OTHER_NAME -> map.put(attr, attrs.isOther());
+                    default -> {
+                    }
                     //ignored
-                    break;
                 }
             }
             return map;
@@ -673,29 +648,23 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
         public void setAttribute(String name, Object value) throws IOException {
             Set<String> allowed = getAllowedAttributes();
-            if ("*".equals(name) || !allowed.contains(name)) {
+            if (Objects.equals(name, "*") || !allowed.contains(name)) {
                 throw new IllegalArgumentException("'" + name + "' not recognized");
             }
             switch (name) {
-            case CREATION_TIME_NAME:
-                this.setTimes(null, null, (FileTime) value);
-                break;
-            case LAST_ACCESS_TIME_NAME:
-                this.setTimes(null, (FileTime) value, null);
-                break;
-            case LAST_MODIFIED_TIME_NAME:
-                this.setTimes((FileTime) value, null, null);
-                break;
-            case SIZE_NAME:
-            case FILE_KEY_NAME:
-            case IS_DIRECTORY_NAME:
-            case IS_REGULAR_FILE_NAME:
-            case IS_SYMBOLIC_LINK_NAME:
-            case IS_OTHER_NAME:
-                throw new IllegalArgumentException("'" + name + "' is a read-only attribute.");
-            default:
-                //ignored
-                break;
+                case CREATION_TIME_NAME -> this.setTimes(null, null, (FileTime) value);
+                case LAST_ACCESS_TIME_NAME -> this.setTimes(null, (FileTime) value, null);
+                case LAST_MODIFIED_TIME_NAME -> this.setTimes((FileTime) value, null, null);
+                case SIZE_NAME,
+                    FILE_KEY_NAME,
+                    IS_DIRECTORY_NAME,
+                    IS_REGULAR_FILE_NAME,
+                    IS_SYMBOLIC_LINK_NAME,
+                    IS_OTHER_NAME -> throw new IllegalArgumentException(
+                        "'" + name + "' is a read-only attribute.");
+                default -> {
+                    //ignored
+                }
             }
 
         }

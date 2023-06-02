@@ -37,7 +37,6 @@ import org.mycore.datamodel.metadata.MCRObject;
  * simple workflow.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRAccessEventHandler extends MCREventHandlerBase {
 
@@ -64,12 +63,10 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         try {
             readrule = new MCRStringContent(strReadRule).asXML().getRootElement().detach();
             editrule = new MCRStringContent(strEditRule).asXML().getRootElement().detach();
+        } catch (RuntimeException rte) {
+            throw rte;
         } catch (Exception e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new ExceptionInInitializerError(e);
-            }
+            throw new ExceptionInInitializerError(e);
         }
     }
 

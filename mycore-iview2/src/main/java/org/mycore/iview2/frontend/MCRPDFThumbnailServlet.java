@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,7 +69,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
             String centerThumb = req.getParameter("centerThumb");
             String imgSize = req.getParameter("ts");
             //defaults to "yes"
-            boolean centered = !"no".equals(centerThumb);
+            boolean centered = !Objects.equals(centerThumb, "no");
             int thumbnailSize = imgSize == null ? this.thumbnailSize : Integer.parseInt(imgSize);
             BasicFileAttributes attrs = Files.readAttributes(pdfFile, BasicFileAttributes.class);
             MCRContent imageContent = pdfTools.getThumnail(pdfFile, attrs, thumbnailSize, centered);

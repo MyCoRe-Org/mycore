@@ -37,8 +37,6 @@ import jakarta.ws.rs.ext.Provider;
  * 
  * @see MCRJerseyDefaultFeature
  * 
- * @version $Revision: $ $Date: $
- * 
  */
 @Provider
 public class MCRRestFeature extends MCRJerseyDefaultFeature {

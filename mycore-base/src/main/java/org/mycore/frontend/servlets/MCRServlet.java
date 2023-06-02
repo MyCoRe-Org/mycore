@@ -71,7 +71,6 @@ import jakarta.servlet.http.HttpSession;
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
     public static final String ATTR_MYCORE_SESSION = "mycore.session";
@@ -160,16 +159,15 @@ public class MCRServlet extends HttpServlet {
     }
 
     private void throwIOException(Exception e) throws IOException {
-        if (e instanceof IOException) {
-            throw (IOException) e;
+        if (e instanceof IOException ioe) {
+            throw ioe;
         }
-        if (e instanceof TransformerException) {
-            TransformerException te = MCRErrorListener.unwrapException((TransformerException) e);
+        if (e instanceof TransformerException tfe) {
+            TransformerException te = MCRErrorListener.unwrapException(tfe);
             String myMessageAndLocation = MCRErrorListener.getMyMessageAndLocation(te);
             throw new IOException("Error while XSL Transformation: " + myMessageAndLocation, e);
         }
-        if (e instanceof SAXParseException) {
-            SAXParseException spe = (SAXParseException) e;
+        if (e instanceof SAXParseException spe) {
             String id = spe.getSystemId() != null ? spe.getSystemId() : spe.getPublicId();
             int line = spe.getLineNumber();
             int column = spe.getColumnNumber();
@@ -322,36 +320,36 @@ public class MCRServlet extends HttpServlet {
                 MCRTransactionHelper.rollbackTransaction();
             }
             throw error;
-        } catch (Exception ex) {
-            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
-                // current Servlet not called via RequestDispatcher
-                MCRTransactionHelper.rollbackTransaction();
-            }
-            if (isBrokenPipe(ex)) {
-                LOGGER.info("Ignore broken pipe.");
+        } catch (ServletException | IOException | SAXException | TransformerException | RuntimeException ex) {
+            if (isHandleExceptionComplete(req, ex)) {
                 return;
             }
-            if (ex.getMessage() == null) {
-                LOGGER.error("Exception while in rendering phase.", ex);
-            } else {
-                LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            if (isHandleExceptionComplete(req, ex)) {
+                return;
             }
-            if (ex instanceof ServletException) {
-                throw (ServletException) ex;
-            } else if (ex instanceof IOException) {
-                throw (IOException) ex;
-            } else if (ex instanceof SAXException) {
-                throw (SAXException) ex;
-            } else if (ex instanceof TransformerException) {
-                throw (TransformerException) ex;
-            } else if (ex instanceof RuntimeException) {
-                throw (RuntimeException) ex;
-            } else {
-                throw new RuntimeException(ex);
-            }
+            throw new RuntimeException(ex);
         } finally {
             cleanupMCRSession(req, getServletName());
         }
+    }
+
+    private boolean isHandleExceptionComplete(HttpServletRequest req, Exception ex) {
+        if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+            // current Servlet not called via RequestDispatcher
+            MCRTransactionHelper.rollbackTransaction();
+        }
+        if (isBrokenPipe(ex)) {
+            LOGGER.info("Ignore broken pipe.");
+            return true;
+        }
+        if (ex.getMessage() == null) {
+            LOGGER.error("Exception while in rendering phase.", ex);
+        } else {
+            LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
+        }
+        return false;
     }
 
     /**
@@ -360,7 +358,6 @@ public class MCRServlet extends HttpServlet {
      * 
      * @param req - the HTTP request
      * @param servletName - the servletName
-     * @throws IOException
      */
     public static void initializeMCRSession(HttpServletRequest req, String servletName) throws IOException {
         // Try to set encoding of form values
@@ -521,7 +518,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     /** Reports an exception to the log */
-    protected void reportException(Exception ex) throws Exception {
+    protected void reportException(Exception ex) {
         String cname = this.getClass().getName();
         String servlet = cname.substring(cname.lastIndexOf(".") + 1);
 
@@ -542,17 +539,17 @@ public class MCRServlet extends HttpServlet {
         boolean first = true;
         for (Enumeration<?> e = parameters.keys(); e.hasMoreElements();) {
             if (first) {
-                redirectURL.append("?");
+                redirectURL.append('?');
                 first = false;
             } else {
-                redirectURL.append("&");
+                redirectURL.append('&');
             }
 
             String name = (String) e.nextElement();
             String value = null;
             value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
 
-            redirectURL.append(name).append("=").append(value);
+            redirectURL.append(name).append('=').append(value);
         }
         LOGGER.debug("Sending redirect to {}", redirectURL);
         return redirectURL.toString();

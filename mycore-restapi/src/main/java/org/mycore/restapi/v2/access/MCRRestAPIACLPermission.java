@@ -31,7 +31,7 @@ public enum MCRRestAPIACLPermission {
     READ(MCRAccessManager.PERMISSION_READ), WRITE(MCRAccessManager.PERMISSION_WRITE),
     DELETE(MCRAccessManager.PERMISSION_DELETE);
 
-    private String value;
+    private final String value;
 
     MCRRestAPIACLPermission(final String value) {
         this.value = value;
@@ -50,18 +50,11 @@ public enum MCRRestAPIACLPermission {
     }
 
     public static MCRRestAPIACLPermission fromMethod(final String method) {
-        switch (method) {
-        case HttpMethod.GET:
-        case HttpMethod.HEAD:
-            return READ;
-        case HttpMethod.DELETE:
-            return DELETE;
-        case HttpMethod.POST:
-        case HttpMethod.PUT:
-        case HttpMethod.PATCH:
-            return WRITE;
-        default:
-            return null;
-        }
+        return switch (method) {
+            case HttpMethod.GET, HttpMethod.HEAD -> READ;
+            case HttpMethod.DELETE -> DELETE;
+            case HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH -> WRITE;
+            default -> null;
+        };
     }
 }

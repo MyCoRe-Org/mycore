@@ -39,7 +39,6 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Juergen Vogler
  * @author Jens Kupferschmidt
  * @author Thomas Junge
- * @version $Revision$ $Date$
  * @see <a href="http://www.icu-project.org/">http://www.icu-project.org/</a>
  */
 public class MCRMetaHistoryDate extends MCRMetaDefault {

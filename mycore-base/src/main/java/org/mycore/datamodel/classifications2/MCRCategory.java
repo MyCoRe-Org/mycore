@@ -26,7 +26,6 @@ import java.util.SortedSet;
 /**
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public interface MCRCategory {

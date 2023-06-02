@@ -49,7 +49,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Wed, 18 Dec 2013) $
  */
 public class MCRPathXML {
 
@@ -189,8 +188,8 @@ public class MCRPathXML {
             catEl.setAttribute("id", category.toString());
             root.addContent(catEl);
         }
-        if (!attrs.isDirectory() && attrs instanceof MCRFileAttributes<?>) {
-            addAttributes(root, (MCRFileAttributes<?>) attrs, path);
+        if (!attrs.isDirectory() && attrs instanceof MCRFileAttributes<?> fAttrs) {
+            addAttributes(root, fAttrs, path);
         } else {
             addBasicAttributes(root, attrs, path);
         }

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom2.Element;
@@ -36,7 +35,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * or by invoking
  * MCRMODSSorter.sort( [JDOM Element with mods:mods] );
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMODSSorter implements URIResolver {
 
@@ -50,7 +49,7 @@ public class MCRMODSSorter implements URIResolver {
     private static final List<String> ORDER_LIST = Arrays.asList(ORDER);
 
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         String subHref = href.substring(href.indexOf(":") + 1);
         Element mods = MCRURIResolver.instance().resolve(subHref);
         MCRMODSSorter.sort(mods);

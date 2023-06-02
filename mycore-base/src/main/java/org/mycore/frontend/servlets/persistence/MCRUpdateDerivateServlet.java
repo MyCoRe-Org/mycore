@@ -31,12 +31,10 @@ import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.xml.sax.SAXParseException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,14 +47,12 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
 
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = -8005685456830013040L;
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
-        ServletException, MCRActiveLinkException, SAXParseException, JDOMException, IOException {
+        ServletException, JDOMException, IOException {
         Document editorSubmission = MCRPersistenceHelper.getEditorSubmission(request, false);
         if (editorSubmission != null) {
             MCRObjectID objectID = updateDerivateXML(editorSubmission);
@@ -100,11 +96,9 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
      *  MyCoRe derivate as XML
      * @return
      *  MCRObjectID of the MyCoRe object
-     * @throws SAXParseException
-     * @throws MCRAccessException 
      */
     private MCRObjectID updateDerivateXML(Document editorSubmission)
-        throws SAXParseException, IOException, MCRAccessException {
+        throws JDOMException, IOException, MCRAccessException {
         Element root = editorSubmission.getRootElement();
         root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
@@ -128,8 +122,6 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
      * If the "objectid" parameter is given, upload form is presented.
      * If not than the user is redirected to the title change form.
      *
-     * @throws IOException
-     * @throws ServletException 
      */
     private void redirectToUpdateDerivate(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {

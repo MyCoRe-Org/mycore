@@ -234,7 +234,7 @@ public class MCROAISetManager {
                 }
             }
         }
-        Collections.sort(setList, Comparator.comparing(Set::getSpec));
+        setList.sort(Comparator.comparing(Set::getSpec));
         return setList;
     }
 

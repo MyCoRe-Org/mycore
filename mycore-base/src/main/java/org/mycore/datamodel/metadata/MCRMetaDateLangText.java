@@ -31,7 +31,6 @@ import java.util.Objects;
  * of a metadata object. The MCRMetaDateLangText class present a single item, which
  * has quadruples of a text and his corresponding language and optional a type and date.
  *
- * @version $Revision$ $Date$
  */
 public class MCRMetaDateLangText extends MCRMetaLangText {
 

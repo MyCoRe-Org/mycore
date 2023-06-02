@@ -79,7 +79,6 @@ import jakarta.xml.bind.DatatypeConverter;
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRUtils {
     // public constant data
@@ -349,15 +348,9 @@ public class MCRUtils {
      * Calculates md5 sum of InputStream. InputStream is consumed after calling this method and automatically closed.
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException {
-        MCRMD5InputStream md5InputStream = null;
-        try {
-            md5InputStream = new MCRMD5InputStream(inputStream);
+        try (MCRMD5InputStream md5InputStream = new MCRMD5InputStream(inputStream)) {
             IOUtils.copy(md5InputStream, new MCRDevNull());
             return md5InputStream.getMD5String();
-        } finally {
-            if (md5InputStream != null) {
-                md5InputStream.close();
-            }
         }
     }
 
@@ -392,7 +385,7 @@ public class MCRUtils {
                 }
             }
             //restore directory dates
-            Files.walkFileTree(expandToDirectory, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(expandToDirectory, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                     Path absolutePath = dir.normalize().toAbsolutePath();

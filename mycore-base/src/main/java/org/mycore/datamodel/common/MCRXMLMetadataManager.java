@@ -34,7 +34,6 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXException;
 
 /**
  * Provides an adapter to communicate with the configured {@link MCRXMLMetadataManagerAdapter} implementation.
@@ -86,7 +85,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param base
      * @see MCRXMLMetadataManagerAdapter#verifyStore(String)
      */
     public void verifyStore(String base) {
@@ -96,10 +94,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param mcrid
-     * @param xml
-     * @param lastModified
-     * @throws MCRPersistenceException
      * @see MCRXMLMetadataManagerAdapter#create(MCRObjectID, MCRContent, Date)
      */
     public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
@@ -110,8 +104,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param mcrid
-     * @throws MCRPersistenceException
      * @see MCRXMLMetadataManagerAdapter#delete(MCRObjectID)
      */
     public void delete(MCRObjectID mcrid) throws MCRPersistenceException {
@@ -121,9 +113,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param mcrid
-     * @param xml
-     * @param lastModified
      * @see MCRXMLMetadataManagerAdapter#update(MCRObjectID, MCRContent, Date)
      */
     public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
@@ -134,9 +123,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param mcrid
-     * @return
-     * @throws IOException
      * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID)
      */
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
@@ -146,10 +132,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param mcrid
-     * @param revision
-     * @return
-     * @throws IOException
      * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID, String)
      */
     public MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException {
@@ -159,8 +141,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param id
-     * @return
      * @see MCRXMLMetadataManagerAdapter#listRevisions(MCRObjectID)
      */
     public List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException {
@@ -170,10 +150,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param project
-     * @param type
-     * @exception MCRPersistenceException
-     * @return
      * @see MCRXMLMetadataManagerAdapter#getHighestStoredID(String, String)
      */
     public int getHighestStoredID(String project, String type) {
@@ -183,9 +159,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param mcrid
-     * @return
-     * @throws MCRPersistenceException
      * @see MCRXMLMetadataManagerAdapter#exists(MCRObjectID)
      */
     public boolean exists(MCRObjectID mcrid) throws MCRPersistenceException {
@@ -195,8 +168,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param base
-     * @return
      * @see MCRXMLMetadataManagerAdapter#listIDsForBase(String)
      */
     public List<String> listIDsForBase(String base) {
@@ -206,8 +177,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param type
-     * @return
      * @see MCRXMLMetadataManagerAdapter#listIDsOfType(String)
      */
     public List<String> listIDsOfType(String type) {
@@ -217,7 +186,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @return
      * @see MCRXMLMetadataManagerAdapter#listIDs()
      */
     public List<String> listIDs() {
@@ -227,7 +195,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @return
      * @see MCRXMLMetadataManagerAdapter#getObjectTypes()
      */
     public Collection<String> getObjectTypes() {
@@ -237,7 +204,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @return
      * @see MCRXMLMetadataManagerAdapter#getObjectBaseIds()
      */
     public Collection<String> getObjectBaseIds() {
@@ -247,8 +213,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param ids
-     * @throws IOException
      * @see MCRXMLMetadataManagerAdapter#retrieveObjectDates(List)
      */
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
@@ -258,9 +222,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param id
-     * @return
-     * @throws IOException
      * @see MCRXMLMetadataManagerAdapter#getLastModified(MCRObjectID)
      */
     public long getLastModified(MCRObjectID id) throws IOException {
@@ -270,10 +231,6 @@ public class MCRXMLMetadataManager {
     /**
      * Delegation, see linked method for relevant documentation.
      *
-     * @param id
-     * @param expire
-     * @param unit
-     * @return
      * @see MCRXMLMetadataManagerAdapter#getLastModifiedHandle(MCRObjectID, long, TimeUnit)
      */
     public MCRCache.ModifiedHandle getLastModifiedHandle(MCRObjectID id, long expire, TimeUnit unit) {
@@ -361,7 +318,7 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @return null if metadata is not present
      */
-    public Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException, SAXException {
+    public Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException {
         MCRContent metadata = retrieveContent(mcrid);
         return metadata == null ? null : metadata.asXML();
     }
@@ -381,7 +338,6 @@ public class MCRXMLMetadataManager {
      * Lists all objects with their last modification dates.
      *
      * @return List of {@link MCRObjectIDDate}
-     * @throws IOException
      */
     public List<MCRObjectIDDate> listObjectDates() throws IOException {
         return retrieveObjectDates(this.listIDs());
@@ -391,7 +347,6 @@ public class MCRXMLMetadataManager {
      * Lists all objects of the specified <code>type</code> and their last modified date.
      *
      * @param type type of object
-     * @throws IOException
      */
     public List<MCRObjectIDDate> listObjectDates(String type) throws IOException {
         return retrieveObjectDates(this.listIDsOfType(type));

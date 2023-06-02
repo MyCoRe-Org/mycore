@@ -59,7 +59,6 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * &lt;/complexType&gt;
  * </pre>
  * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MCRSolrInputDocument",
@@ -100,7 +99,6 @@ public class MCRSolrInputDocument {
      * Objects of the following type(s) are allowed in the list
      * {@link MCRSolrInputField }
      * {@link MCRSolrInputDocument }
-     * 
      * 
      */
     public List<Object> getFieldOrDoc() {

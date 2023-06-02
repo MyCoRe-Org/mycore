@@ -27,7 +27,7 @@ import org.mycore.common.MCRConstants;
  * Two titles are probably same if they are identical or one is prefix of the other.
  * When merging, the title that has a subtitle or the longer one wins.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRTitleInfoMerger extends MCRMerger {
 
@@ -46,7 +46,7 @@ public class MCRTitleInfoMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRTitleInfoMerger)) {
+        if (!(other instanceof MCRTitleInfoMerger otherTitle)) {
             return false;
         }
 
@@ -54,7 +54,6 @@ public class MCRTitleInfoMerger extends MCRMerger {
             return false;
         }
 
-        MCRTitleInfoMerger otherTitle = (MCRTitleInfoMerger) other;
         if (text.equals(otherTitle.text)) {
             return true;
         }

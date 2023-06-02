@@ -125,8 +125,6 @@ public class MCRSkosTransformer {
 
     /**
      * converts classification labels and descriptions to skos:preferedLabels
-     * @param categ
-     * @param eConcept
      */
     private static void convertLabelsAndDescriptions(MCRCategory categ, Element eConcept) {
         for (MCRLabel lbl : categ.getLabels()) {

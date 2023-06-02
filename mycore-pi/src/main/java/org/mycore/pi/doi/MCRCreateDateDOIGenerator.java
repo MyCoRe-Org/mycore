@@ -40,7 +40,6 @@ import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
@@ -62,8 +61,7 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRBase mcrObj, String additional)
-        throws MCRPersistentIdentifierException {
+    public MCRDigitalObjectIdentifier generate(MCRBase mcrObj, String additional) {
         Date createdate = mcrObj.getService().getDate("createdate");
 
         if (createdate != null) {

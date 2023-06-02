@@ -40,7 +40,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 /**
  * Manages all commands for the Command Line Interface and WebCLI.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Robert Stephan
  */
 public class MCRCommandManager {
@@ -146,7 +146,7 @@ public class MCRCommandManager {
     public List<String> invokeCommand(String command) throws Exception {
         if (command.trim().startsWith("#")) {
             //ignore comment
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
         for (List<MCRCommand> commands : knownCommands.values()) {
             for (MCRCommand currentCommand : commands) {

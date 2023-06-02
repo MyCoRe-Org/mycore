@@ -18,7 +18,6 @@
 
 package org.mycore.datamodel.niofs;
 
-import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Path;
 
@@ -31,7 +30,7 @@ public abstract class MCRAbstractFileStore extends FileStore {
     /**
      * Returns base directory of this filestore.
      */
-    public abstract Path getBaseDirectory() throws IOException;
+    public abstract Path getBaseDirectory();
 
     /**
      * Translates the given path into an absolute path of the physical filesystem.

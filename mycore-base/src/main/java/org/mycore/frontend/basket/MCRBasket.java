@@ -38,7 +38,7 @@ import org.jdom2.Element;
  * Entries already contained in the basket can not be 
  * re-added, each entry can be contained only once in the basket. 
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 

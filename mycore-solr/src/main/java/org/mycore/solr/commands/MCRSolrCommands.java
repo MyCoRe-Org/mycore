@@ -141,7 +141,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata and content index in core {0}",
         help = "rebuilds metadata and content index in Solr for core with the id {0}",
         order = 110)
-    public static void rebuildMetadataAndContentIndex(String coreID) throws Exception {
+    public static void rebuildMetadataAndContentIndex(String coreID) {
         MCRSolrCore core = getCore(coreID);
         HttpSolrClient client = core.getClient();
         MCRSolrIndexer.rebuildMetadataIndex(client);
@@ -153,7 +153,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata index for all objects of type {0} in core {1}",
         help = "rebuilds the metadata index in Solr for all objects of type {0} in core with the id {1}",
         order = 130)
-    public static void rebuildMetadataIndexType(String type, String coreID) throws Exception {
+    public static void rebuildMetadataIndexType(String type, String coreID) {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.rebuildMetadataIndex(type, core.getClient());
     }
@@ -162,7 +162,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata index for object {0} in core {1}",
         help = "rebuilds metadata index in Solr for the given object in core with the id {1}",
         order = 120)
-    public static void rebuildMetadataIndexObject(String object, String coreID) throws Exception {
+    public static void rebuildMetadataIndexObject(String object, String coreID) {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.rebuildMetadataIndex(Stream.of(object).collect(Collectors.toList()), core.getClient());
     }
@@ -255,7 +255,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "select objects with solr query {0} in core {1}",
         help = "selects mcr objects with a solr query {0} in core with the id {1}",
         order = 310)
-    public static void selectObjectsWithSolrQuery(String query, String coreID) throws Exception {
+    public static void selectObjectsWithSolrQuery(String query, String coreID) {
         MCRSolrCore core = getCore(coreID);
         MCRObjectCommands.setSelectedObjectIDs(MCRSolrSearchUtils.listIDs(core.getClient(), query));
     }

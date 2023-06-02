@@ -53,7 +53,6 @@ import org.mycore.datamodel.common.MCRDataURL;
 import org.mycore.datamodel.common.MCRDataURLEncoding;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Used to read/write content from any source to any target. Sources and targets can be strings, local files, Apache VFS
@@ -247,7 +246,6 @@ public abstract class MCRContent {
 
     /**
      * Returns content as "data:" URL.
-     * @throws IOException
      */
     public MCRDataURL asDataURL() throws IOException {
         return new MCRDataURL(asByteArray(), getDataURLEncoding(), getMimeType(), getSafeEncoding());
@@ -263,7 +261,7 @@ public abstract class MCRContent {
      * 
      * @return the XML document parsed from content
      */
-    public Document asXML() throws JDOMException, IOException, SAXException {
+    public Document asXML() throws JDOMException, IOException {
         return MCRXMLParserFactory.getNonValidatingParser().parseXML(this);
     }
 
@@ -271,7 +269,7 @@ public abstract class MCRContent {
      * Ensures that content is XML. The content is parsed as if asXML() is called. When content is XML, an MCRContent
      * instance is returned that guarantees that. When XML can not be parsed, an exception is thrown.
      */
-    public MCRContent ensureXML() throws IOException, JDOMException, SAXException {
+    public MCRContent ensureXML() throws IOException, JDOMException {
         return new MCRJDOMContent(asXML());
     }
 

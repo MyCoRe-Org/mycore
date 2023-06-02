@@ -27,6 +27,7 @@ package org.mycore.solr.index.document.jaxb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -52,7 +53,6 @@ import jakarta.xml.bind.annotation.XmlType;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -90,7 +90,6 @@ public class MCRSolrInputDocumentList {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link MCRSolrInputDocument }
-     * 
      * 
      */
     public List<MCRSolrInputDocument> getDoc() {
@@ -133,11 +132,7 @@ public class MCRSolrInputDocumentList {
      *     
      */
     public boolean isOverwrite() {
-        if (overwrite == null) {
-            return true;
-        } else {
-            return overwrite;
-        }
+        return Objects.requireNonNullElse(overwrite, true);
     }
 
     /**

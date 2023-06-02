@@ -35,7 +35,7 @@ import org.xml.sax.XMLReader;
 /**
  * Returns validating or non-validating XML parsers.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {
@@ -112,7 +112,8 @@ public class MCRXMLParserFactory {
         @Override
         public XMLReader createXMLReader() throws JDOMException {
             try {
-                XMLReader reader = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
+                XMLReader reader = MCRXMLHelper
+                    .asSecureXMLReader(SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader());
                 reader.setFeature(SAX_FEATURE_VALIDATION, isValidating());
                 reader.setFeature(SAX_FEATURE_NAMESPACES, true);
                 reader.setFeature(SAX_FEATURE_NAMESPACE_PREFIXES, true);

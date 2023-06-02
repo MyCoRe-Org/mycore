@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.ClassUtils;
@@ -44,7 +45,6 @@ import org.mycore.common.config.MCRConfigurationException;
  * @see MCRCommandLineInterface
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRCommand {
 
@@ -104,19 +104,18 @@ public class MCRCommand {
 
             Format f = null;
             switch (token) {
-            case "int":
-                parameterTypes[i] = Integer.TYPE;
-                f = NumberFormat.getIntegerInstance(Locale.ROOT);
-                break;
-            case "long":
-                parameterTypes[i] = Long.TYPE;
-                f = NumberFormat.getIntegerInstance(Locale.ROOT);
-                break;
-            case "String":
-                parameterTypes[i] = String.class;
-                break;
-            default:
-                unsupportedArgException(methodSignature, token);
+                case "int" -> {
+                    parameterTypes[i] = Integer.TYPE;
+                    f = NumberFormat.getIntegerInstance(Locale.ROOT);
+                }
+                case "long" -> {
+                    parameterTypes[i] = Long.TYPE;
+                    f = NumberFormat.getIntegerInstance(Locale.ROOT);
+                }
+                //CSOFF: InnerAssignment
+                case "String" -> parameterTypes[i] = String.class;
+                //CSON: InnerAssignment
+                default -> unsupportedArgException(methodSignature, token);
             }
             messageFormat.setFormat(i, f);
         }
@@ -124,11 +123,7 @@ public class MCRCommand {
         int pos = format.indexOf("{");
         suffix = pos == -1 ? format : format.substring(0, pos);
 
-        if (helpText != null) {
-            help = helpText;
-        } else {
-            help = "No help text available for this command";
-        }
+        help = Objects.requireNonNullElse(helpText, "No help text available for this command");
     }
 
     private void unsupportedArgException(String methodSignature, String token) {
@@ -247,7 +242,7 @@ public class MCRCommand {
         initMethod(classLoader);
         prepareInvocationParameters(commandParameters);
         Object result = method.invoke(null, commandParameters);
-        if (result instanceof List && !((List) result).isEmpty() && ((List) result).get(0) instanceof String) {
+        if (result instanceof List resultList && !resultList.isEmpty() && resultList.get(0) instanceof String) {
             return (List<String>) result;
         } else {
             return new ArrayList<>();

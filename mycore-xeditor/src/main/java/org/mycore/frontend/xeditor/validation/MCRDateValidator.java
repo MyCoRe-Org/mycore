@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates date values specified by one or more SimpleDateFormat patterns separated by ";".
  * Example: &lt;xed:validate type="date" format="yyyy-MM-dd;dd.MM.yyyy" ... /&gt;
  *  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRDateValidator extends MCRValidator {
 

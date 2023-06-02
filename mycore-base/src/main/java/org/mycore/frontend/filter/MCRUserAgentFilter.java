@@ -49,7 +49,7 @@ public class MCRUserAgentFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(MCRUserAgentFilter.class);
 
     @Override
-    public void init(final FilterConfig arg0) throws ServletException {
+    public void init(final FilterConfig arg0) {
         final String agentRegEx = MCRConfiguration2.getString("MCR.Filter.UserAgent")
             .orElse("(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
         agentPattern = Pattern.compile(agentRegEx);

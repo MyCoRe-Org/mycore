@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,16 +76,14 @@ public class MCRConditionTransformer {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static StringBuilder toSolrQueryString(MCRCondition condition, Set<String> usedFields,
         boolean subCondition) {
-        if (condition instanceof MCRQueryCondition) {
-            MCRQueryCondition qCond = (MCRQueryCondition) condition;
+        if (condition instanceof MCRQueryCondition qCond) {
             return handleQueryCondition(qCond, usedFields);
         }
         if (condition instanceof MCRSetCondition) {
             MCRSetCondition<MCRCondition> setCond = (MCRSetCondition<MCRCondition>) condition;
             return handleSetCondition(setCond, usedFields, subCondition);
         }
-        if (condition instanceof MCRNotCondition) {
-            MCRNotCondition notCond = (MCRNotCondition) condition;
+        if (condition instanceof MCRNotCondition notCond) {
             return handleNotCondition(notCond, usedFields);
         }
         throw new MCRException("Cannot handle MCRCondition class: " + condition.getClass().getCanonicalName());
@@ -95,23 +94,16 @@ public class MCRConditionTransformer {
         String value = qCond.getValue();
         String operator = qCond.getOperator();
         usedFields.add(field);
-        switch (operator) {
-        case "like":
-        case "contains":
-            return getTermQuery(field, value.trim());
-        case "=":
-        case "phrase":
-            return getPhraseQuery(field, value);
-        case "<":
-            return getLTQuery(field, value);
-        case "<=":
-            return getLTEQuery(field, value);
-        case ">":
-            return getGTQuery(field, value);
-        case ">=":
-            return getGTEQuery(field, value);
-        }
-        throw new UnsupportedOperationException("Do not know how to handle operator: " + operator);
+        return switch (operator) {
+            case "like", "contains" -> getTermQuery(field, value.trim());
+            case "=", "phrase" -> getPhraseQuery(field, value);
+            case "<" -> getLTQuery(field, value);
+            case "<=" -> getLTEQuery(field, value);
+            case ">" -> getGTQuery(field, value);
+            case ">=" -> getGTEQuery(field, value);
+            default -> throw new UnsupportedOperationException("Do not know how to handle operator: " + operator);
+        };
+
     }
 
     @SuppressWarnings("rawtypes")
@@ -132,7 +124,7 @@ public class MCRConditionTransformer {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("(");
+        sb.append('(');
         Iterator<MCRCondition<MCRCondition>> iterator = children.iterator();
         StringBuilder subSb = toSolrQueryString(iterator.next(), usedFields, true);
         sb.append(subSb);
@@ -141,7 +133,7 @@ public class MCRConditionTransformer {
             subSb = toSolrQueryString(iterator.next(), usedFields, true);
             sb.append(subSb);
         }
-        sb.append(")");
+        sb.append(')');
         return sb;
     }
 
@@ -171,12 +163,12 @@ public class MCRConditionTransformer {
         StringBuilder subSb = toSolrQueryString(iterator.next(), usedFields, true);
         sb.append(stripPlus ? stripPlus(subSb) : subSb);
         while (iterator.hasNext()) {
-            sb.append(" ");
+            sb.append(' ');
             subSb = toSolrQueryString(iterator.next(), usedFields, true);
             sb.append(stripPlus ? stripPlus(subSb) : subSb);
         }
         if (groupRequired) {
-            sb.append(")");
+            sb.append(')');
         }
         return sb;
     }
@@ -185,7 +177,7 @@ public class MCRConditionTransformer {
     private static StringBuilder handleNotCondition(MCRNotCondition notCond, Set<String> usedFields) {
         MCRCondition child = notCond.getChild();
         StringBuilder sb = new StringBuilder();
-        sb.append("-");
+        sb.append('-');
         StringBuilder solrQueryString = toSolrQueryString(child, usedFields, true);
         if (!explicitAndOrMapping()) {
             stripPlus(solrQueryString);
@@ -202,13 +194,15 @@ public class MCRConditionTransformer {
         StringBuilder sb = new StringBuilder();
         sb.append('+');
         sb.append(field);
-        sb.append(":");
+        sb.append(':');
         sb.append(includeLower ? '[' : '{');
         sb.append(
-            lowerTerm != null ? ("*".equals(lowerTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(lowerTerm)) : "*");
+            lowerTerm != null ? (Objects.equals(lowerTerm, "*") ? "\\*" : MCRSolrUtils.escapeSearchValue(lowerTerm))
+                : "*");
         sb.append(" TO ");
         sb.append(
-            upperTerm != null ? ("*".equals(upperTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(upperTerm)) : "*");
+            upperTerm != null ? (Objects.equals(upperTerm, "*") ? "\\*" : MCRSolrUtils.escapeSearchValue(upperTerm))
+                : "*");
         sb.append(includeUpper ? ']' : '}');
         return sb;
     }
@@ -238,14 +232,14 @@ public class MCRConditionTransformer {
             sb.append('+');
         }
         sb.append(field);
-        sb.append(":");
+        sb.append(':');
         String replaced = value.replaceAll("\\s+", " AND ");
         if (value.length() == replaced.length()) {
             sb.append(MCRSolrUtils.escapeSearchValue(value));
         } else {
-            sb.append("(");
+            sb.append('(');
             sb.append(MCRSolrUtils.escapeSearchValue(replaced));
-            sb.append(")");
+            sb.append(')');
         }
         return sb;
     }
@@ -256,7 +250,7 @@ public class MCRConditionTransformer {
             sb.append('+');
         }
         sb.append(field);
-        sb.append(":");
+        sb.append(':');
         sb.append('"');
         sb.append(MCRSolrUtils.escapeSearchValue(value));
         sb.append('"');
@@ -370,8 +364,7 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     private static String getIndex(MCRCondition cond) {
-        if (cond instanceof MCRQueryCondition) {
-            MCRQueryCondition queryCondition = ((MCRQueryCondition) cond);
+        if (cond instanceof MCRQueryCondition queryCondition) {
             String fieldName = queryCondition.getFieldName();
             return getIndex(fieldName);
         } else if (cond instanceof MCRNotCondition) {

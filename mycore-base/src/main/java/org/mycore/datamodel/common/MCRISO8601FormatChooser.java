@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
  * or methods get removed.
  *
  * @author Thomas Scheffler (yagee)
- * @version $Revision: 18729 $ $Date: 2010-09-21 12:33:45 +0200 (Di, 21. Sep 2010) $
  * @since 1.3
  */
 public final class MCRISO8601FormatChooser {
@@ -86,34 +85,21 @@ public final class MCRISO8601FormatChooser {
     }
 
     private static DateTimeFormatter getFormatterForFormat(MCRISO8601Format isoFormat) {
-        switch (isoFormat) {
-        case YEAR:
-            return YEAR_FORMAT;
-        case YEAR_MONTH:
-            return YEAR_MONTH_FORMAT;
-        case COMPLETE:
-            return COMPLETE_FORMAT;
-        case COMPLETE_HH_MM:
-            return COMPLETE_HH_MM_FORMAT;
-        case COMPLETE_HH_MM_SS:
-            return COMPLETE_HH_MM_SS_FORMAT;
-        case COMPLETE_HH_MM_SS_SSS:
-            return COMPLETE_HH_MM_SS_SSS_FORMAT;
-        case YEAR_ERA:
-            return YEAR_FORMAT;
-        case YEAR_MONTH_ERA:
-            return YEAR_MONTH_FORMAT;
-        case COMPLETE_ERA:
-            return COMPLETE_FORMAT;
-        case COMPLETE_HH_MM_ERA:
-            return COMPLETE_HH_MM_FORMAT;
-        case COMPLETE_HH_MM_SS_ERA:
-            return COMPLETE_HH_MM_SS_FORMAT;
-        case COMPLETE_HH_MM_SS_SSS_ERA:
-            return COMPLETE_HH_MM_SS_SSS_FORMAT;
-        default:
-            return COMPLETE_HH_MM_SS_SSS_FORMAT;
-        }
+        return switch (isoFormat) {
+            case YEAR -> YEAR_FORMAT;
+            case YEAR_MONTH -> YEAR_MONTH_FORMAT;
+            case COMPLETE -> COMPLETE_FORMAT;
+            case COMPLETE_HH_MM -> COMPLETE_HH_MM_FORMAT;
+            case COMPLETE_HH_MM_SS -> COMPLETE_HH_MM_SS_FORMAT;
+            case COMPLETE_HH_MM_SS_SSS -> COMPLETE_HH_MM_SS_SSS_FORMAT;
+            case YEAR_ERA -> YEAR_FORMAT;
+            case YEAR_MONTH_ERA -> YEAR_MONTH_FORMAT;
+            case COMPLETE_ERA -> COMPLETE_FORMAT;
+            case COMPLETE_HH_MM_ERA -> COMPLETE_HH_MM_FORMAT;
+            case COMPLETE_HH_MM_SS_ERA -> COMPLETE_HH_MM_SS_FORMAT;
+            case COMPLETE_HH_MM_SS_SSS_ERA -> COMPLETE_HH_MM_SS_SSS_FORMAT;
+            default -> COMPLETE_HH_MM_SS_SSS_FORMAT;
+        };
     }
 
     private static DateTimeFormatter getFormatterForDuration(String isoString) {

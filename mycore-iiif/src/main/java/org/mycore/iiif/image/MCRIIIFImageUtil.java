@@ -36,7 +36,6 @@ public class MCRIIIFImageUtil {
 
     /**
      * Encodes image identidier so it can be used in an URI
-     * @param imageIdentifier
      * @see <a href="https://iiif.io/api/image/2.1/#uri-encoding-and-decoding">URI encoding of image identifier</a>
      */
     public static String encodeImageIdentifier(String imageIdentifier) {
@@ -61,7 +60,7 @@ public class MCRIIIFImageUtil {
     }
 
     public static String getIIIFURL(MCRIIIFImageImpl impl) {
-        StringBuffer sb = new StringBuffer(MCRFrontendUtil.getBaseURL());
+        StringBuilder sb = new StringBuilder(MCRFrontendUtil.getBaseURL());
         sb.append("api/iiif/image/v2/");
         String defaultImpl = MCRConfiguration2.getString("MCR.IIIFImage.Default").orElse("");
         if (!defaultImpl.equals(impl.getImplName())) {

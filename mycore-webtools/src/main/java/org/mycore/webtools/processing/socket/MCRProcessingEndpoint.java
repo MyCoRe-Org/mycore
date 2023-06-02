@@ -23,6 +23,7 @@ import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,11 +45,11 @@ import org.mycore.frontend.ws.endoint.MCRAbstractEndpoint;
 import com.google.gson.JsonObject;
 
 import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.Session;
-import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.server.ServerEndpoint;
 
 @ServerEndpoint(value = "/ws/mycore-webtools/processing",
@@ -103,7 +104,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     private void handleMessage(Session session, JsonObject request) {
         String type = request.get("type").getAsString();
 
-        if ("connect".equals(type)) {
+        if (Objects.equals(type, "connect")) {
             connect(session);
         }
 
@@ -137,8 +138,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
             if (isClosed()) {
                 return;
             }
-            if (source instanceof MCRProcessable) {
-                this.sender.updateProcessable(session, (MCRProcessable) source);
+            if (source instanceof MCRProcessable processable) {
+                this.sender.updateProcessable(session, processable);
             }
         }
 
@@ -148,8 +149,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
                 return;
             }
 
-            if (source instanceof MCRProcessable) {
-                this.sender.updateProcessable(session, (MCRProcessable) source);
+            if (source instanceof MCRProcessable processable) {
+                this.sender.updateProcessable(session, processable);
             }
         }
 

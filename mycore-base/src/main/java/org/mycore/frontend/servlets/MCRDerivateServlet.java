@@ -24,6 +24,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
@@ -35,10 +36,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.fileupload.MCRUploadHelper;
+import org.mycore.services.i18n.MCRTranslation;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee); Sebastian Röher
@@ -61,7 +62,7 @@ public class MCRDerivateServlet extends MCRServlet {
         if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"),
             getProperty(request, "file2"))) {
             String url = request.getParameter("url");
-            if (url != null && ("".equals(url))) {
+            if ((Objects.equals(url, ""))) {
                 response.sendError(HttpServletResponse.SC_NO_CONTENT, "Parameter 'url' is set but empty!");
                 return;
             }
@@ -89,20 +90,12 @@ public class MCRDerivateServlet extends MCRServlet {
     private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file, String file2)
         throws IOException, MCRAccessException {
         switch (task) {
-        case "ssetfile":
-            setMainFile(myCoreDerivateId, file, job.getResponse());
-            break;
-        case "sdelfile":
-            deleteFile(myCoreDerivateId, file, job.getResponse());
-            break;
-        case TODO_SMOVFILE:
-            moveFile(myCoreDerivateId, file, file2, job.getResponse());
-            break;
-        default:
-            job.getResponse()
+            case "ssetfile" -> setMainFile(myCoreDerivateId, file, job.getResponse());
+            case "sdelfile" -> deleteFile(myCoreDerivateId, file, job.getResponse());
+            case TODO_SMOVFILE -> moveFile(myCoreDerivateId, file, file2, job.getResponse());
+            default -> job.getResponse()
                 .sendError(HttpServletResponse.SC_BAD_REQUEST,
                     String.format(Locale.ENGLISH, "The task \"%s\" is not supported.", task));
-            break;
         }
         return !job.getResponse().isCommitted();
     }

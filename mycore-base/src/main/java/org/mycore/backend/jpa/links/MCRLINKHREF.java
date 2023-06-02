@@ -33,7 +33,6 @@ import jakarta.persistence.Transient;
  *
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 @Entity
 @Table(indexes = {

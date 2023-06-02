@@ -49,7 +49,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * like identifiers, categories, tags, flags etc. within XML.
  * Supported fields are completely configurable using XPath expressions.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 @MCRCommandGroup(name = "Batch Editor")
 public class MCRBatchEditorCommands extends MCRAbstractCommands {
@@ -80,8 +80,8 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "edit {0} at {1} if {2} {3} add {4} {5}",
         help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, "
-            + "add field {4} with value {5}",
-        order = 1)
+            + "add field {4} with value {5}"
+    )
     public static void batchAddIf(String oid, String level, String fieldIf, String valueIf, String field2Add,
         String value2Add)
         throws JaxenException, MCRPersistenceException, MCRAccessException, IOException {
@@ -98,8 +98,8 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "edit {0} at {1} if {2} {3} remove {4} {5}",
         help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, "
-            + "remove field {4} where value is {5}",
-        order = 1)
+            + "remove field {4} where value is {5}"
+    )
     public static void batchRemoveIf(String oid, String level, String fieldIf, String valueIf, String field2Rem,
         String value2Rem)
         throws MCRPersistenceException, MCRAccessException, JaxenException, IOException {
@@ -107,8 +107,8 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "edit {0} at {1} replace {2} {3} with {4} {5}",
-        help = "Edit XML elements in object {0} at level {1}, replace field {2} value {3} by field {4} with value {5}",
-        order = 1)
+        help = "Edit XML elements in object {0} at level {1}, replace field {2} value {3} by field {4} with value {5}"
+    )
     public static void batchReplace(String oid, String level, String oldField, String oldValue, String newField,
         String newValue)
         throws JaxenException, MCRPersistenceException, MCRAccessException, IOException {
@@ -125,10 +125,10 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
             if (a == Action.ADD) {
                 add(base, field1, value1);
             } else if (a == Action.REMOVE) {
-                find(base, field1, value1).forEach(e -> e.detach());
+                find(base, field1, value1).forEach(Element::detach);
             } else if (a == Action.REPLACE) {
                 List<Element> found = find(base, field1, value1);
-                found.forEach(e -> e.detach());
+                found.forEach(Element::detach);
                 if (!found.isEmpty()) {
                     add(base, field2, value2);
                 }
@@ -138,7 +138,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
                 }
             } else if (a == Action.REMOVE_IF) {
                 if (!find(base, field1, value1).isEmpty()) {
-                    find(base, field2, value2).forEach(e -> e.detach());
+                    find(base, field2, value2).forEach(Element::detach);
                 }
             }
         }

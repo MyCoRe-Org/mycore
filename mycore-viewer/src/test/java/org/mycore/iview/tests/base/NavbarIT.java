@@ -56,7 +56,7 @@ public class NavbarIT extends ViewerTestBase {
     private static final Logger LOGGER = LogManager.getLogger(NavbarIT.class);
 
     @Test
-    public void testBasicElementsPresent() throws Exception {
+    public void testBasicElementsPresent() {
         this.setTestName(getClassname() + "-testBasicElementsPresent");
         this.getAppController().openViewer(this.getDriver(), this.getTestDerivate());
         WebDriver driver = this.getDriver();

@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -42,6 +41,7 @@ import org.jdom2.Content;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.ProcessingInstruction;
@@ -57,7 +57,9 @@ import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -74,7 +76,38 @@ import com.google.gson.JsonPrimitive;
  */
 public class MCRXMLHelper {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    /**
+     * Protects XMLReader instance to XML External Entity (XXE) attacks.
+     *
+     * Try to set featues is this order
+     * <ol>
+     *     <li>{@link XMLConstants#FEATURE_SECURE_PROCESSING}</li>
+     *     <li>"http://apache.org/xml/features/disallow-doctype-decl"</li>
+     * </ol>
+     * @param reader a potential unprotected XMLReader
+     * @return the secured instance of <code>reader</code>
+     * @throws SAXNotSupportedException if setting any feature from above failes with this exception
+     * @throws SAXNotRecognizedException if setting any feature from above failes with this exception
+     */
+    public static XMLReader asSecureXMLReader(XMLReader reader)
+        throws SAXNotSupportedException, SAXNotRecognizedException {
+        //prevent https://find-sec-bugs.github.io/bugs.htm#XXE_XMLREADER
+        try {
+            reader.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+            LOGGER.warn(() -> "XML Parser feature " + XMLConstants.FEATURE_SECURE_PROCESSING
+                + " is not supported, try to disable XSD support instead.");
+            try {
+                reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            } catch (SAXNotRecognizedException | SAXNotSupportedException ex) {
+                ex.addSuppressed(e);
+                throw ex;
+            }
+        }
+        return reader;
+    }
 
     /**
      * Removes characters that are illegal in XML text nodes or attribute
@@ -152,11 +185,11 @@ public class MCRXMLHelper {
             return MCRURIResolver.instance().resolve(schemaURI, null);
         } catch (TransformerException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
+            if (cause instanceof IOException ioe) {
+                throw ioe;
             }
-            if (cause instanceof SAXException) {
-                throw (SAXException) cause;
+            if (cause instanceof SAXException se) {
+                throw se;
             }
             throw new IOException(e);
         }
@@ -226,13 +259,13 @@ public class MCRXMLHelper {
         }
     }
 
-    private static Element canonicalElement(Parent e) throws IOException, SAXParseException {
+    private static Element canonicalElement(Parent p) throws IOException, JDOMException {
         XMLOutputter xout = new XMLOutputter(Format.getCompactFormat());
         MCRByteArrayOutputStream bout = new MCRByteArrayOutputStream();
-        if (e instanceof Element) {
-            xout.output((Element) e, bout);
+        if (p instanceof Element e) {
+            xout.output(e, bout);
         } else {
-            xout.output((Document) e, bout);
+            xout.output((Document) p, bout);
         }
         Document xml = MCRXMLParserFactory.getNonValidatingParser()
             .parseXML(new MCRByteContent(bout.getBuffer(), 0, bout.size()));
@@ -325,16 +358,16 @@ public class MCRXMLHelper {
             while (result && i1.hasNext() && i2.hasNext()) {
                 Object o1 = i1.next();
                 Object o2 = i2.next();
-                if (o1 instanceof Element && o2 instanceof Element) {
-                    result = equivalent((Element) o1, (Element) o2);
-                } else if (o1 instanceof Text && o2 instanceof Text) {
-                    result = equivalent((Text) o1, (Text) o2);
-                } else if (o1 instanceof Comment && o2 instanceof Comment) {
-                    result = equivalent((Comment) o1, (Comment) o2);
-                } else if (o1 instanceof ProcessingInstruction && o2 instanceof ProcessingInstruction) {
-                    result = equivalent((ProcessingInstruction) o1, (ProcessingInstruction) o2);
-                } else if (o1 instanceof DocType && o2 instanceof DocType) {
-                    result = equivalent((DocType) o1, (DocType) o2);
+                if (o1 instanceof Element e1 && o2 instanceof Element e2) {
+                    result = equivalent(e1, e2);
+                } else if (o1 instanceof Text t1 && o2 instanceof Text t2) {
+                    result = equivalent(t1, t2);
+                } else if (o1 instanceof Comment c1 && o2 instanceof Comment c2) {
+                    result = equivalent(c1, c2);
+                } else if (o1 instanceof ProcessingInstruction p1 && o2 instanceof ProcessingInstruction p2) {
+                    result = equivalent(p1, p2);
+                } else if (o1 instanceof DocType d1 && o2 instanceof DocType d2) {
+                    result = equivalent(d1, d2);
                 } else {
                     result = false;
                 }
@@ -399,11 +432,11 @@ public class MCRXMLHelper {
          * @return the serialized content, or null if the type is not supported
          */
         public static JsonElement serialize(Content content) {
-            if (content instanceof Element) {
-                return serializeElement((Element) content);
+            if (content instanceof Element element) {
+                return serializeElement(element);
             }
-            if (content instanceof Text) {
-                return serializeText((Text) content);
+            if (content instanceof Text text) {
+                return serializeText(text);
             }
             return null;
         }
@@ -479,33 +512,7 @@ public class MCRXMLHelper {
                 .orElse(namespace.getPrefix());
         }
 
-        private static class Pair<X, Y> {
-            public final X x;
-
-            public final Y y;
-
-            Pair(X x, Y y) {
-                this.x = x;
-                this.y = y;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (o == null || getClass() != o.getClass()) {
-                    return false;
-                }
-                Pair<?, ?> pair = (Pair<?, ?>) o;
-                return Objects.equals(x, pair.x) &&
-                    Objects.equals(y, pair.y);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(x, y);
-            }
+        private record Pair<X, Y>(X x, Y y) {
         }
 
     }

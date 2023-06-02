@@ -50,7 +50,7 @@ public class MCREventManagerTest extends MCRTestCase {
     }
 
     @Test
-    public void instance() throws Exception {
+    public void instance() {
         try {
             MCREventManager.instance();
         } catch (MCRConfigurationException e) {

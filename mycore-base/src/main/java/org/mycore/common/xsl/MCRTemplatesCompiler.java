@@ -39,7 +39,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * Compiles XSL sources, reports compile errors and returns transformer
  * instances for compiled templates.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRTemplatesCompiler {
 
@@ -98,8 +98,7 @@ public class MCRTemplatesCompiler {
         StringBuilder msg = new StringBuilder("Error compiling XSL stylesheet ");
         msg.append(resource);
 
-        if (cause instanceof TransformerException) {
-            TransformerException tex = (TransformerException) cause;
+        if (cause instanceof TransformerException tex) {
             msg.append("\n").append(tex.getMessage());
             SourceLocator sl = tex.getLocator();
             if (sl != null) {

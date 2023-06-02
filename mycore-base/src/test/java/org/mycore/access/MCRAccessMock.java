@@ -18,14 +18,14 @@
 
 package org.mycore.access;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import jakarta.inject.Singleton;
-
 import org.mycore.common.MCRUserInformation;
+
+import jakarta.inject.Singleton;
 
 /**
  * Can be used to write Tests against the {@link MCRAccessManager}.
@@ -35,7 +35,7 @@ import org.mycore.common.MCRUserInformation;
 @Singleton
 public class MCRAccessMock implements MCRAccessInterface {
 
-    private static final List<MCRCheckPermissionCall> CALLS = new LinkedList<>();
+    private static final List<MCRCheckPermissionCall> CALLS = new ArrayList<>();
     private static boolean checkPermissionReturn = true;
 
     public static List<MCRCheckPermissionCall> getCheckPermissionCalls() {

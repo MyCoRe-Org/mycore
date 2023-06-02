@@ -101,11 +101,11 @@ public class MCRConfigurationTest extends MCRTestCase {
              * Size 16 is the default size for a ConcurrentHashMap.
              */
 
-            a = new MCRConfiguration2.SingletonKey(String.valueOf(property[0]).trim().replaceAll(" ", ""),
+            a = new MCRConfiguration2.ConfigSingletonKey(String.valueOf(property[0]).trim().replaceAll(" ", ""),
                 String.valueOf(className[0]).trim().replaceAll(" ", "")).hashCode();
             a = spread(a);
             a = 15 & a;
-            b = new MCRConfiguration2.SingletonKey(String.valueOf(property[1]).trim().replaceAll(" ", ""),
+            b = new MCRConfiguration2.ConfigSingletonKey(String.valueOf(property[1]).trim().replaceAll(" ", ""),
                 String.valueOf(className[1]).trim().replaceAll(" ", "")).hashCode();
             b = spread(b);
             b = 15 & b;

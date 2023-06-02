@@ -62,7 +62,7 @@ public class MCRTileJob implements Cloneable {
     @Column(length = 64)
     private String derivate;
 
-    @Column(length = 255)
+    @Column
     private String path;
 
     @Column

@@ -29,7 +29,7 @@ import org.jdom2.Element;
  * Two identifiers are assumed to be the same when they are equals, neglecting any hyphens.
  * At merge, the identifier containing hyphens wins, because it is regarded prettier ;-)
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRIdentifierMerger extends MCRMerger {
 
@@ -49,11 +49,10 @@ public class MCRIdentifierMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRIdentifierMerger)) {
+        if (!(other instanceof MCRIdentifierMerger oid)) {
             return false;
         }
 
-        MCRIdentifierMerger oid = (MCRIdentifierMerger) other;
         return this.getType().equals(oid.getType())
             && this.getSimplifiedID().equals(oid.getSimplifiedID());
     }

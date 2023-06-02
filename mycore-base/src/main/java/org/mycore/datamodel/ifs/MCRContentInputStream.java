@@ -37,7 +37,6 @@ import org.mycore.common.content.streams.MCRBlockingInputStream;
  * checksum String while content goes through this input stream.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRContentInputStream extends FilterInputStream {
     /** The number of bytes that will be read for content type detection */
@@ -125,15 +124,13 @@ public class MCRContentInputStream extends FilterInputStream {
             int numAvail = header.length - (int) length;
             len = Math.min(len, numAvail);
             System.arraycopy(header, (int) length, buf, off, len);
-            length += len;
-            return len;
         } else {
             len = super.read(buf, off, len);
-            if (len != -1) {
-                length += len;
-            }
-            return len;
         }
+        if (len != -1) {
+            length += len;
+        }
+        return len;
     }
 
     /**

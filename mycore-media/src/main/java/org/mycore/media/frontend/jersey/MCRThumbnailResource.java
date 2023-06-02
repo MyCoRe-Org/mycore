@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -116,7 +117,7 @@ public class MCRThumbnailResource {
                             CacheControl cc = new CacheControl();
                             cc.setMaxAge((int) TimeUnit.DAYS.toSeconds(1));
                             String type = "image/png";
-                            if ("jpg".equals(ext) || "jpeg".equals(ext)) {
+                            if (Objects.equals(ext, "jpg") || Objects.equals(ext, "jpeg")) {
                                 type = "image/jpeg";
                             }
                             return Response.ok(thumbnail.get())

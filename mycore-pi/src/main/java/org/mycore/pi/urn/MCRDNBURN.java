@@ -40,123 +40,55 @@ public class MCRDNBURN extends MCRUniformResourceName {
      * @throws IllegalArgumentException when the given char is not allowed
      */
     private static int getIntegerAlias(char c) throws IllegalArgumentException {
-        switch (c) {
-        case '0':
-            return 1;
-        case '1':
-            return 2;
-        case '2':
-            return 3;
-        case '3':
-            return 4;
-        case '4':
-            return 5;
-        case '5':
-            return 6;
-        case '6':
-            return 7;
-        case '7':
-            return 8;
-        case '8':
-            return 9;
-        case '9':
-            return 41;
+        return switch (c) {
+            case '0' -> 1;
+            case '1' -> 2;
+            case '2' -> 3;
+            case '3' -> 4;
+            case '4' -> 5;
+            case '5' -> 6;
+            case '6' -> 7;
+            case '7' -> 8;
+            case '8' -> 9;
+            case '9' -> 41;
 
-        /* Letters */
-        case 'A':
-        case 'a':
-            return 18;
-        case 'B':
-        case 'b':
-            return 14;
-        case 'C':
-        case 'c':
-            return 19;
-        case 'D':
-        case 'd':
-            return 15;
-        case 'E':
-        case 'e':
-            return 16;
-        case 'F':
-        case 'f':
-            return 21;
-        case 'G':
-        case 'g':
-            return 22;
-        case 'H':
-        case 'h':
-            return 23;
-        case 'I':
-        case 'i':
-            return 24;
-        case 'J':
-        case 'j':
-            return 25;
-        case 'K':
-        case 'k':
-            return 42;
-        case 'L':
-        case 'l':
-            return 26;
-        case 'M':
-        case 'm':
-            return 27;
-        case 'N':
-        case 'n':
-            return 13;
-        case 'O':
-        case 'o':
-            return 28;
-        case 'P':
-        case 'p':
-            return 29;
-        case 'Q':
-        case 'q':
-            return 31;
-        case 'R':
-        case 'r':
-            return 12;
-        case 'S':
-        case 's':
-            return 32;
-        case 'T':
-        case 't':
-            return 33;
-        case 'U':
-        case 'u':
-            return 11;
-        case 'V':
-        case 'v':
-            return 34;
-        case 'W':
-        case 'w':
-            return 35;
-        case 'X':
-        case 'x':
-            return 36;
-        case 'Y':
-        case 'y':
-            return 37;
-        case 'Z':
-        case 'z':
-            return 38;
+            /* Letters */
+            case 'A', 'a' -> 18;
+            case 'B', 'b' -> 14;
+            case 'C', 'c' -> 19;
+            case 'D', 'd' -> 15;
+            case 'E', 'e' -> 16;
+            case 'F', 'f' -> 21;
+            case 'G', 'g' -> 22;
+            case 'H', 'h' -> 23;
+            case 'I', 'i' -> 24;
+            case 'J', 'j' -> 25;
+            case 'K', 'k' -> 42;
+            case 'L', 'l' -> 26;
+            case 'M', 'm' -> 27;
+            case 'N', 'n' -> 13;
+            case 'O', 'o' -> 28;
+            case 'P', 'p' -> 29;
+            case 'Q', 'q' -> 31;
+            case 'R', 'r' -> 12;
+            case 'S', 's' -> 32;
+            case 'T', 't' -> 33;
+            case 'U', 'u' -> 11;
+            case 'V', 'v' -> 34;
+            case 'W', 'w' -> 35;
+            case 'X', 'x' -> 36;
+            case 'Y', 'y' -> 37;
+            case 'Z', 'z' -> 38;
 
-        /* Special chars */
-        case '-':
-            return 39;
-        case ':':
-            return 17;
-        case '_':
-            return 43;
-        case '.':
-            return 47;
-        case '/':
-            return 45;
-        case '+':
-            return 49;
-        }
-        throw new IllegalArgumentException("Invalid Character specified: " + c);
+            /* Special chars */
+            case '-' -> 39;
+            case ':' -> 17;
+            case '_' -> 43;
+            case '.' -> 47;
+            case '/' -> 45;
+            case '+' -> 49;
+            default -> throw new IllegalArgumentException("Invalid Character specified: " + c);
+        };
     }
 
     @Override
@@ -180,9 +112,7 @@ public class MCRDNBURN extends MCRUniformResourceName {
         /* in this case we must add zeroes */
         if (valueSLen < maxSLen) {
             int zeroesToAdd = maxSLen - valueSLen;
-            for (int i = 0; i < zeroesToAdd; i++) {
-                builder.append(0);
-            }
+            builder.append("0".repeat(zeroesToAdd));
             return builder.append(valueS).toString();
         }
         /* no need to add zeroes at all */

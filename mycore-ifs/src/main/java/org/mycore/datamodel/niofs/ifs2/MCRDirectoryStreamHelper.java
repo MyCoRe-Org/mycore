@@ -73,7 +73,7 @@ class MCRDirectoryStreamHelper {
             return new SecureDirectoryStream(dir, path,
                 (java.nio.file.SecureDirectoryStream<Path>) baseDirectoryStream);
         }
-        return new SimpleDirectoryStream(path, baseDirectoryStream);
+        return new SimpleDirectoryStream<>(path, baseDirectoryStream);
     }
 
     private static class AcceptAllFilter
@@ -151,7 +151,7 @@ class MCRDirectoryStreamHelper {
                 getCurrentSecurePath(newDir));
         }
 
-        private MCRStoredNode resolve(Path path) throws IOException {
+        private MCRStoredNode resolve(Path path) {
             checkRelativePath(path);
             return (MCRStoredNode) dir.getNodeByPath(path.toString());
         }
@@ -209,9 +209,8 @@ class MCRDirectoryStreamHelper {
             if (srcFile == null) {
                 throw new NoSuchFileException(this.dirPath.toString(), srcpath.toString(), null);
             }
-            if (!targetpath.isAbsolute() && targetdir instanceof SecureDirectoryStream) {
+            if (!targetpath.isAbsolute() && targetdir instanceof SecureDirectoryStream that) {
                 LOGGER.debug("Move Case #1");
-                SecureDirectoryStream that = (SecureDirectoryStream) targetdir;
                 MCRFile file = getMCRFile(that, targetpath);
                 Files.delete(file.getLocalPath()); //delete for move
                 if (!srcpath.isAbsolute()) {
@@ -338,18 +337,8 @@ class MCRDirectoryStreamHelper {
         }
     }
 
-    private static class MD5FileAttributeViewImpl implements
-        MCRMD5AttributeView {
-
-        private final BasicFileAttributeView baseAttrView;
-
-        private final MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier;
-
-        MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
-            MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) {
-            this.baseAttrView = baseAttrView;
-            this.nodeSupplier = nodeSupplier;
-        }
+    private record MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
+        MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) implements MCRMD5AttributeView {
 
         @Override
         public String name() {
@@ -357,7 +346,7 @@ class MCRDirectoryStreamHelper {
         }
 
         @Override
-        public BasicFileAttributes readAttributes() throws IOException {
+        public BasicFileAttributes readAttributes() {
             return null;
         }
 
@@ -370,9 +359,8 @@ class MCRDirectoryStreamHelper {
         @Override
         public MCRFileAttributes readAllAttributes() throws IOException {
             MCRStoredNode node = nodeSupplier.apply(null);
-            if (node instanceof MCRFile) {
-                return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(),
-                    ((MCRFile) node).getMD5());
+            if (node instanceof MCRFile file) {
+                return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), file.getMD5());
             }
             return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
         }

@@ -16,9 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * 
- */
+
 package org.mycore.restapi.v1.utils;
 
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
@@ -99,8 +97,8 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         jw.endObject();
         if (attrs.isRegularFile()) {
             jw.name("contentType").value(MCRContentTypes.probeContentType(path));
-            if (attrs instanceof MCRFileAttributes) {
-                jw.name("md5").value(((MCRFileAttributes<?>) attrs).md5sum());
+            if (attrs instanceof MCRFileAttributes<?> fileAttrs) {
+                jw.name("md5").value(fileAttrs.md5sum());
             }
         }
     }

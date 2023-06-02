@@ -31,7 +31,6 @@ import com.ibm.icu.util.GregorianCalendar;
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaHistoryDate.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  *
  */
 public class MCRMetaHistoryDateTest extends MCRTestCase {

@@ -19,6 +19,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
@@ -27,7 +28,6 @@ import org.jaxen.expr.Expr;
 import org.jaxen.expr.LocationPath;
 import org.jaxen.expr.Step;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
@@ -45,8 +45,7 @@ public class MCRRepeatBinding extends MCRBinding {
     private String method = DEFAULT_METHOD; // build|clone
 
     public MCRRepeatBinding(String xPath, MCRBinding parent, int minRepeats, int maxRepeats, String method)
-        throws JaxenException,
-        JDOMException {
+        throws JaxenException {
         this(xPath, parent, method);
 
         while (getBoundNodes().size() < minRepeats) {
@@ -57,9 +56,10 @@ public class MCRRepeatBinding extends MCRBinding {
         this.maxRepeats = Math.max(this.maxRepeats, getBoundNodes().size());
     }
 
-    public MCRRepeatBinding(String xPath, MCRBinding parent, String method) throws JaxenException, JDOMException {
+    public MCRRepeatBinding(String xPath, MCRBinding parent, String method) throws JaxenException {
         super(xPath, true, parent);
-        this.method = "clone".equals(method) ? "clone" : "build".equals(method) ? "build" : DEFAULT_METHOD;
+        this.method = Objects.equals(method, "clone") ? "clone"
+            : Objects.equals(method, "build") ? "build" : DEFAULT_METHOD;
         this.maxRepeats = Integer.MAX_VALUE;
     }
 
@@ -67,7 +67,7 @@ public class MCRRepeatBinding extends MCRBinding {
         return repeatPosition;
     }
 
-    public MCRBinding bindRepeatPosition() throws JDOMException, JaxenException {
+    public MCRBinding bindRepeatPosition() {
         repeatPosition++;
         return new MCRBinding(repeatPosition, this);
     }
@@ -102,7 +102,7 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public void insert(int pos) throws JaxenException {
-        if ("build".equals(method)) {
+        if (Objects.equals(method, "build")) {
             Element parentElement = getParentElement();
             Element precedingElement = (Element) (getBoundNodes().get(pos - 1));
             int posOfPrecedingInParent = parentElement.indexOf(precedingElement);

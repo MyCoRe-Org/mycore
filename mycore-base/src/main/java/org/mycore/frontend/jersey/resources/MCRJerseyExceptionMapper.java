@@ -106,8 +106,8 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
     }
 
     private Response getResponse(Exception exc) {
-        if (exc instanceof WebApplicationException) {
-            Response response = ((WebApplicationException) exc).getResponse();
+        if (exc instanceof WebApplicationException wae) {
+            Response response = wae.getResponse();
             if (response.hasEntity()) {
                 return response;
             }
@@ -152,7 +152,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     private static class ExceptionTypeAdapter extends XmlAdapter<RException, Exception> {
         @Override
-        public Exception unmarshal(RException v) throws Exception {
+        public Exception unmarshal(RException v) {
             throw new UnsupportedOperationException();
         }
 

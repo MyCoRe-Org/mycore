@@ -43,7 +43,7 @@ import org.mycore.user2.MCRUserManager;
  * and have authorized us to update their profile as trusted party,
  * and then creates/updates the publication in the works section of that profile.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWorkEventHandler extends MCREventHandlerBase {
 
@@ -71,7 +71,7 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
         Set<MCRUser> users = getUsersForGivenNameIdentifiers(nameIdentifierKeys);
 
         users.stream()
-            .map(user -> new MCRORCIDUser(user))
+            .map(MCRORCIDUser::new)
             .filter(user -> user.getStatus().isORCIDUser())
             .filter(user -> user.getStatus().weAreTrustedParty())
             .forEach(user -> publishToORCID(oid, user));

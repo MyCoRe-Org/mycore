@@ -19,8 +19,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -44,7 +42,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * This servlet displays static *.xml files stored in the web application by sending them to MCRLayoutService.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
 
@@ -56,7 +53,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
-        URISyntaxException, TransformerException {
+        TransformerException {
         String webpageID = getWebpageId(job.getRequest());
         boolean hasAccess = MCRLayoutUtilities.webpageAccess(READ_WEBPAGE_PERMISSION, webpageID, true);
         if (!hasAccess) {
@@ -83,8 +80,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         return builder.toString();
     }
 
-    private void setXSLParameters(URL resource, HttpServletRequest request)
-        throws MalformedURLException, URISyntaxException {
+    private void setXSLParameters(URL resource, HttpServletRequest request) {
         String path = resource.getProtocol().equals("file") ? resource.getPath() : resource.toExternalForm();
         int lastPathElement = path.lastIndexOf('/') + 1;
         String fileName = path.substring(lastPathElement);

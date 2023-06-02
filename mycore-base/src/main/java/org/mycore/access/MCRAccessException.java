@@ -52,19 +52,14 @@ public class MCRAccessException extends MCRCatchException {
     private static String getMessage(Optional<String> action, String oid, String permission, String... privilege) {
         StringBuilder sb = new StringBuilder();
         switch (privilege.length) {
-        case 0:
-            //no privilige but permission was missing
-            sb.append("You do not have the permission '").append(permission).append("' on '").append(oid)
-                .append('\'');
-            break;
-        case 1:
-            sb.append("You do not have the privilege '").append(privilege[0]).append('\'');
-            break;
-        default:
-            sb.append(
+            case 0 ->
+                //no privilige but permission was missing
+                sb.append("You do not have the permission '").append(permission).append("' on '").append(oid)
+                    .append('\'');
+            case 1 -> sb.append("You do not have the privilege '").append(privilege[0]).append('\'');
+            default -> sb.append(
                 Stream.of(privilege).collect(
                     Collectors.joining("', '", "You do not have any of the required privileges ( '", ")")));
-            break;
         }
         sb.append(
             action.map(s -> " to perfom: " + s).orElse("."));

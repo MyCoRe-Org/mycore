@@ -25,7 +25,7 @@ import org.jdom2.Element;
  * Two related items are only probably same
  * if they are of type "host", since there can only be one host per publication.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRRelatedItemMerger extends MCRMerger {
 
@@ -35,11 +35,9 @@ public class MCRRelatedItemMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRRelatedItemMerger)) {
-            return false;
-        } else {
-            return isRelatedItemTypeHost() && ((MCRRelatedItemMerger) other).isRelatedItemTypeHost();
-        }
+        return other instanceof MCRRelatedItemMerger relatedItemMerger
+            && isRelatedItemTypeHost()
+            && relatedItemMerger.isRelatedItemTypeHost();
     }
 
     private boolean isRelatedItemTypeHost() {

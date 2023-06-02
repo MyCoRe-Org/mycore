@@ -152,7 +152,7 @@ public abstract class MCRStore {
      *            the ID of the data
      * @return true, if data for the given ID is existing in the store.
      */
-    public boolean exists(final int id) throws IOException {
+    public boolean exists(final int id) {
         return Files.exists(getSlot(id));
     }
 
@@ -299,7 +299,6 @@ public abstract class MCRStore {
              * 
              * @param dir
              *            the directory thats children should be added
-             * @throws IOException
              */
             private void addChildren(final Path dir) throws IOException {
                 if (Files.isDirectory(dir)) {
@@ -423,7 +422,7 @@ public abstract class MCRStore {
         for (int i = 0; i < paths.length - 1; i++) {
             path.append(paddedId, offset, offset + slotLength[i]);
             paths[i] = path.toString();
-            path.append("/");
+            path.append('/');
             offset += slotLength[i];
         }
         path.append(prefix).append(paddedId).append(suffix);
@@ -453,7 +452,7 @@ public abstract class MCRStore {
      *            the id of the data
      * @return the file object storing that data
      */
-    protected Path getSlot(final int id) throws IOException {
+    protected Path getSlot(final int id) {
         String slotPath = getSlotPath(id);
         return baseDirectory.resolve(toNativePath.apply(slotPath));
     }

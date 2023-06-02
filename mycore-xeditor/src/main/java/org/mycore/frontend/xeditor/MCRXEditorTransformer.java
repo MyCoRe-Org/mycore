@@ -21,6 +21,7 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -60,7 +61,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXEditorTransformer {
 
@@ -81,19 +82,18 @@ public class MCRXEditorTransformer {
         this.transformationParameters = transformationParameters;
     }
 
-    public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
+    public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getValidator().clearRules();
         editorSession.getSubmission().clear();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
-        if (transformer instanceof MCRParameterizedTransformer) {
+        if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
             transformationParameters.setParameter("transformer", this);
-            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource,
-                transformationParameters);
-            if (result instanceof MCRWrappedContent
+            MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
+            if (result instanceof MCRWrappedContent wrappedContent
                 && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
                 //lazy transformation make JUnit tests fail
-                result = ((MCRWrappedContent) result).getBaseContent();
+                result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
             return result;
@@ -143,7 +143,7 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
-    public void bind(String xPath, String initialValue, String name) throws JDOMException, JaxenException {
+    public void bind(String xPath, String initialValue, String name) throws JaxenException {
         if (editorSession.getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
         }
@@ -160,7 +160,7 @@ public class MCRXEditorTransformer {
         editorSession.getValidator().setValidationMarker(currentBinding);
     }
 
-    private void createEmptyDocumentFromXPath(String xPath) throws JaxenException, JDOMException {
+    private void createEmptyDocumentFromXPath(String xPath) throws JaxenException {
         Element root = createRootElement(xPath);
         editorSession.setEditedXML(new Document(root));
         editorSession.setBreakpoint("Starting with empty XML document");
@@ -179,7 +179,7 @@ public class MCRXEditorTransformer {
         currentBinding.setValues(value);
     }
 
-    public void setDefault(String value) throws JaxenException, JDOMException {
+    public void setDefault(String value) {
         currentBinding.setDefault(value);
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
@@ -203,7 +203,7 @@ public class MCRXEditorTransformer {
 
     public void toggleWithinSelectElement(String attrMultiple) {
         withinSelectElement = !withinSelectElement;
-        withinSelectMultiple = "multiple".equals(attrMultiple);
+        withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
     }
 
     public boolean isWithinSelectElement() {
@@ -239,7 +239,7 @@ public class MCRXEditorTransformer {
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats, String method)
-        throws JDOMException, JaxenException {
+        throws JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());
@@ -265,13 +265,13 @@ public class MCRXEditorTransformer {
         return getCurrentRepeat().getRepeatPosition();
     }
 
-    public void bindRepeatPosition() throws JDOMException, JaxenException {
+    public void bindRepeatPosition() {
         setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
         editorSession.getValidator().setValidationMarker(currentBinding);
     }
 
     public String getSwapParameter(String action) throws JaxenException {
-        boolean direction = "down".equals(action) ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
+        boolean direction = Objects.equals(action, "down") ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
         return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
     }
 
@@ -320,7 +320,7 @@ public class MCRXEditorTransformer {
         return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }
 
-    public NodeSet getAdditionalParameters() throws ParserConfigurationException, TransformerException {
+    public NodeSet getAdditionalParameters() throws ParserConfigurationException {
         org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         NodeSet nodeSet = new NodeSet();
 
@@ -366,7 +366,7 @@ public class MCRXEditorTransformer {
     public void declareParameter(String name, String defaultValue) {
         Object currentValue = editorSession.getVariables().get(name);
 
-        if ((currentValue == null) || "".equals(currentValue)) {
+        if ((currentValue == null) || Objects.equals(currentValue, "")) {
             editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
         }
     }

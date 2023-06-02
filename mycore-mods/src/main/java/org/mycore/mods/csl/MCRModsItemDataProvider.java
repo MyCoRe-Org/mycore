@@ -21,9 +21,9 @@ package org.mycore.mods.csl;
 import static org.mycore.common.MCRConstants.MODS_NAMESPACE;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,8 +33,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.undercouch.citeproc.helper.json.JsonBuilder;
-import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -48,7 +46,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.classification.MCRClassMapper;
-import org.xml.sax.SAXException;
 
 import de.undercouch.citeproc.csl.CSLDateBuilder;
 import de.undercouch.citeproc.csl.CSLItemData;
@@ -56,6 +53,8 @@ import de.undercouch.citeproc.csl.CSLItemDataBuilder;
 import de.undercouch.citeproc.csl.CSLName;
 import de.undercouch.citeproc.csl.CSLNameBuilder;
 import de.undercouch.citeproc.csl.CSLType;
+import de.undercouch.citeproc.helper.json.JsonBuilder;
+import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 
 public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
@@ -145,9 +144,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             wrapper.getElement("mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 "mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']")))
-            .ifPresent(el -> {
-                idb.language(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.language(el.getTextNormalize()));
     }
 
     protected void processURL(String id, CSLItemDataBuilder idb) {
@@ -179,21 +176,19 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     Consumer<String> strFN = null;
                     Consumer<Integer> intFn = null;
                     switch (type) {
-                    case "issue":
-                        strFN = idb::issue;
-                        intFn = idb::issue;
-                        break;
-                    case "volume":
-                        strFN = idb::volume;
-                        intFn = idb::volume;
-                        break;
-                    case "article_number":
-                        intFn = idb::number;
-                        strFN = idb::number;
-                        break;
-                    default:
-                        LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
-                        break;
+                        case "issue" -> {
+                            strFN = idb::issue;
+                            intFn = idb::issue;
+                        }
+                        case "volume" -> {
+                            strFN = idb::volume;
+                            intFn = idb::volume;
+                        }
+                        case "article_number" -> {
+                            intFn = idb::number;
+                            strFN = idb::number;
+                        }
+                        default -> LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
                     }
 
                     try {
@@ -332,52 +327,40 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processAbstract(CSLItemDataBuilder idb) {
-        Optional.ofNullable(wrapper.getElement("mods:abstract[not(@altFormat)]")).ifPresent(abstr -> {
-            idb.abstrct(abstr.getTextNormalize());
-        });
+        Optional.ofNullable(wrapper.getElement("mods:abstract[not(@altFormat)]"))
+            .map(Element::getTextNormalize)
+            .ifPresent(idb::abstrct);
     }
 
     protected void processPublicationData(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm")))
-            .ifPresent(el -> {
-                idb.publisherPlace(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.publisherPlace(el.getTextNormalize()));
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher")))
-            .ifPresent(el -> {
-                idb.publisher(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.publisher(el.getTextNormalize()));
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition")))
-            .ifPresent(el -> {
-                idb.edition(el.getTextNormalize());
-            });
+            .ifPresent(el -> idb.edition(el.getTextNormalize()));
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued")))
-            .ifPresent(el -> {
-                idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build());
-            });
+            .ifPresent(el -> idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build()));
     }
 
     protected void processIdentifier(CSLItemDataBuilder idb) {
         final List<Element> parentIdentifiers = wrapper.getElements("mods:relatedItem[@type='host']/mods:identifier");
 
-        parentIdentifiers.forEach(parentIdentifier -> {
-            applyIdentifier(idb, parentIdentifier, true);
-        });
+        parentIdentifiers.forEach(parentIdentifier -> applyIdentifier(idb, parentIdentifier, true));
 
         final List<Element> identifiers = wrapper.getElements("mods:identifier");
-        identifiers.forEach(identifierElement -> {
-            applyIdentifier(idb, identifierElement, false);
-        });
+        identifiers.forEach(identifierElement -> applyIdentifier(idb, identifierElement, false));
 
     }
 
@@ -385,25 +368,19 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         final String type = identifierElement.getAttributeValue("type");
         final String identifier = identifierElement.getTextNormalize();
         switch (type) {
-        case "doi":
-            idb.DOI(identifier);
-            break;
-        case "isbn":
-            idb.ISBN(identifier);
-            break;
-        case "issn":
-            idb.ISSN(identifier);
-            break;
-        case "pmid":
-            if (!parent) {
-                idb.PMID(identifier);
+            case "doi" -> idb.DOI(identifier);
+            case "isbn" -> idb.ISBN(identifier);
+            case "issn" -> idb.ISSN(identifier);
+            case "pmid" -> {
+                if (!parent) {
+                    idb.PMID(identifier);
+                }
             }
-            break;
-        case "pmcid":
-            if (!parent) {
-                idb.PMCID(identifier);
+            case "pmcid" -> {
+                if (!parent) {
+                    idb.PMCID(identifier);
+                }
             }
-            break;
         }
     }
 
@@ -426,15 +403,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             });
 
         Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + SHORT_TITLE_XPATH))
-            .ifPresent((titleInfo) -> {
-                idb.containerTitleShort(buildShortTitle(titleInfo));
-            });
+            .ifPresent((titleInfo) -> idb.containerTitleShort(buildShortTitle(titleInfo)));
 
         wrapper.getElements(".//mods:relatedItem[@type='series' or (@type='host' and "
             + "mods:genre[@type='intern'] = 'series')]/" + USABLE_TITLE_XPATH).stream()
-            .findFirst().ifPresent((relatedItem) -> {
-                idb.collectionTitle(buildTitle(relatedItem));
-            });
+            .findFirst().ifPresent((relatedItem) -> idb.collectionTitle(buildTitle(relatedItem)));
     }
 
     protected void processNames(CSLItemDataBuilder idb) {
@@ -451,45 +424,24 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         roleNameMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
-            case "aut":
-            case "inv":
-                idb.author(cslNames);
-                break;
-            case "col":
-                idb.collectionEditor(cslNames);
-                break;
-            case "edt":
-                idb.editor(cslNames);
-                break;
-            case "fmd":
-                idb.director(cslNames);
-                break;
-            case "ivr":
-                idb.interviewer(cslNames);
-                break;
-            case "ive":
-                idb.author(cslNames);
-                break;
-            case "ill":
-                idb.illustrator(cslNames);
-                break;
-            case "trl":
-                idb.translator(cslNames);
-                break;
-            case "cmp":
-                idb.composer(cslNames);
-                break;
-            case "conference-name":
-            case "pup":
-                idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
-                break;
-            default:
-                if (KNOWN_UNMAPPED_PERSON_ROLES.contains(role)) {
-                    LOGGER.trace("Unmapped person role " + role + " in " + this.id);
-                } else {
-                    LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                case "aut", "inv" -> idb.author(cslNames);
+                case "col" -> idb.collectionEditor(cslNames);
+                case "edt" -> idb.editor(cslNames);
+                case "fmd" -> idb.director(cslNames);
+                case "ivr" -> idb.interviewer(cslNames);
+                case "ive" -> idb.author(cslNames);
+                case "ill" -> idb.illustrator(cslNames);
+                case "trl" -> idb.translator(cslNames);
+                case "cmp" -> idb.composer(cslNames);
+                case "conference-name", "pup" ->
+                    idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
+                default -> {
+                    if (KNOWN_UNMAPPED_PERSON_ROLES.contains(role)) {
+                        LOGGER.trace("Unmapped person role " + role + " in " + this.id);
+                    } else {
+                        LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                    }
                 }
-                break;
             }
         });
 
@@ -506,15 +458,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         parentRoleMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
-            case "aut":
-                idb.containerAuthor(cslNames);
-                break;
-            case "edt":
-                idb.collectionEditor(cslNames);
-                break;
-            default:
+                case "aut" -> idb.containerAuthor(cslNames);
+                case "edt" -> idb.collectionEditor(cslNames);
+                default -> {
+                }
                 // we dont care
-                break;
             }
         });
     }
@@ -525,13 +473,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             final List<Element> roleTerms = roleElement.getChildren("roleTerm", MODS_NAMESPACE);
             for (Element roleTermElement : roleTerms) {
                 final String role = roleTermElement.getTextNormalize();
-                final List<CSLName> cslNames = roleNameMap.computeIfAbsent(role, (s) -> new LinkedList<>());
-                cslNames.add(cslName);
+                roleNameMap.computeIfAbsent(role, s -> new ArrayList<>()).add(cslName);
             }
         } else {
             String nameType = modsName.getAttributeValue("type");
-            if ("conference".equals(nameType)) {
-                roleNameMap.computeIfAbsent("conference-name", (s) -> new LinkedList<>()).add(cslName);
+            if (Objects.equals(nameType, "conference")) {
+                roleNameMap.computeIfAbsent("conference-name", s -> new ArrayList<>()).add(cslName);
             }
         }
     }
@@ -540,7 +487,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         final CSLNameBuilder nameBuilder = new CSLNameBuilder();
 
         String nameType = modsName.getAttributeValue("type");
-        final boolean isInstitution = "corporate".equals(nameType) || "conference".equals(nameType);
+        final boolean isInstitution = Objects.equals(nameType, "corporate") || Objects.equals(nameType, "conference");
         nameBuilder.isInstitution(isInstitution);
 
         if (!isInstitution) {
@@ -549,18 +496,17 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
                 final String type = namePart.getAttributeValue("type");
                 final String content = namePart.getTextNormalize();
-                if (("family".equals(type) || "given".equals(type)) && nonDroppingParticles.contains(content)) {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                        (t) -> new LinkedList<>());
-                    contents.add(content);
-                } else if (("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                        (t) -> new LinkedList<>());
-                    contents.add(content);
+                if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
+                    && nonDroppingParticles.contains(content)) {
+                    typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE, t -> new ArrayList<>())
+                        .add(content);
+                } else if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
+                    && droppingParticles.contains(content)) {
+                    typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE, t -> new ArrayList<>())
+                        .add(content);
                 } else {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(Optional.ofNullable(type)
-                        .orElse(NONE_TYPE), (t) -> new LinkedList<>());
-                    contents.add(content);
+                    typeContentsMap.computeIfAbsent(Optional.ofNullable(type).orElse(NONE_TYPE), t -> new ArrayList<>())
+                        .add(content);
                 }
             });
 
@@ -641,7 +587,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     @Override
-    public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {
+    public void addContent(MCRContent content) throws IOException, JDOMException {
         final Document document = content.asXML();
         addContent(document);
     }

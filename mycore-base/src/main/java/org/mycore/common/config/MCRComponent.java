@@ -110,19 +110,12 @@ public class MCRComponent implements Comparable<MCRComponent> {
         if (priority > 99 || priority < 0) {
             throw new MCRException(artifactId + " has unsupported priority: " + priority);
         }
-        switch (type) {
-        case base:
-            priority += 100;
-            break;
-        case component:
-            priority += 200;
-            break;
-        case module:
-            priority += 300;
-            break;
-        default:
-            throw new MCRException("Do not support MCRComponenty of type: " + type);
-        }
+        priority += switch (type) {
+            case base -> 100;
+            case component -> 200;
+            case module -> 300;
+            default -> throw new MCRException("Do not support MCRComponenty of type: " + type);
+        };
         this.sortCriteria = PRIORITY_FORMAT.format(priority) + getName();
     }
 
@@ -156,18 +149,15 @@ public class MCRComponent implements Comparable<MCRComponent> {
      * Returns resource base path to this components config resources.
      */
     public String getResourceBase() {
-        switch (type) {
-        case base:
-            return "config/";
-        case component:
-            return "components/" + getName() + "/config/";
-        case module:
-            return "config/" + getName() + "/";
-        default:
-            LOGGER.debug("{}: there is no resource base for type {}", getName(), type);
-            break;
-        }
-        return null;
+        return switch (type) {
+            case base -> "config/";
+            case component -> "components/" + getName() + "/config/";
+            case module -> "config/" + getName() + "/";
+            default -> {
+                LOGGER.debug("{}: there is no resource base for type {}", getName(), type);
+                yield null;
+            }
+        };
     }
 
     /**
@@ -252,10 +242,9 @@ public class MCRComponent implements Comparable<MCRComponent> {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRComponent)) {
+        if (!(obj instanceof MCRComponent other)) {
             return false;
         }
-        MCRComponent other = (MCRComponent) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -270,15 +259,10 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         switch (type) {
-        case base:
-        case component:
-            sb.append("mcr:");
-            break;
-        case module:
-            sb.append("app:");
-            break;
-        default:
-            break;
+            case base, component -> sb.append("mcr:");
+            case module -> sb.append("app:");
+            default -> {
+            }
         }
         sb.append(artifactId);
         return sb.toString();

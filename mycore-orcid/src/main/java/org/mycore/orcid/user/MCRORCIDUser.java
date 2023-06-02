@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  * Provides functionality to interact with MCRUser that is also an ORCID user.
  * The user's ORCID iD and access token are stored as attributes.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRORCIDUser {
 

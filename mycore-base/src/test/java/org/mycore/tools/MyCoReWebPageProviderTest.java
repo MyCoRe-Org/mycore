@@ -59,7 +59,7 @@ public class MyCoReWebPageProviderTest extends MCRTestCase {
     }
 
     @Test
-    public void updateMeta() throws Exception {
+    public void updateMeta() {
         MyCoReWebPageProvider wp = new MyCoReWebPageProvider();
         wp.updateMeta("myId", "myPath");
         Element rootElement = wp.getXML().getRootElement();

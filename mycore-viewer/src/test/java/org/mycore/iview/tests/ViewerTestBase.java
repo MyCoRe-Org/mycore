@@ -39,13 +39,13 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
     private ApplicationController applicationController;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         initController();
         getAppController().setUpDerivate(this.getDriver(), getTestDerivate());
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         this.takeScreenshot();
     }
 

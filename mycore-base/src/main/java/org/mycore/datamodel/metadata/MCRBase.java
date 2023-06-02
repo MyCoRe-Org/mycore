@@ -29,13 +29,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.xml.sax.SAXParseException;
 
 import com.google.gson.JsonObject;
 
@@ -44,7 +44,6 @@ import com.google.gson.JsonObject;
  * the frame to produce a full functionality object.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public abstract class MCRBase {
 
@@ -165,9 +164,8 @@ public abstract class MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
-    protected final void setFromURI(URI uri) throws MCRException, SAXParseException, IOException {
-        Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(uri.toURL()));
-        setFromJDOM(jdom);
+    protected final void setFromURI(URI uri) throws JDOMException, IOException {
+        setFromXML(new MCRURLContent(uri.toURL()).asByteArray(), false);
     }
 
     /**
@@ -179,8 +177,14 @@ public abstract class MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
-    protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
-        Document jdom = MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
+    protected final void setFromXML(byte[] xml, boolean valid) throws JDOMException {
+        Document jdom = null;
+        try {
+            jdom = MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
+        } catch (IOException e) {
+            //Why oh why?
+            throw new JDOMException("Unexpected IOException while building JDOM document.", e);
+        }
         setFromJDOM(jdom);
     }
 

@@ -72,10 +72,10 @@ public final class MCRWebsiteWriteProtection {
         }
         // return value contained in config
         String protection = config.getChildTextTrim("protectionEnabled");
-        return Boolean.valueOf(protection);
+        return Boolean.parseBoolean(protection);
     }
 
-    public static org.w3c.dom.Document getMessage() throws JDOMException, IOException {
+    public static org.w3c.dom.Document getMessage() throws JDOMException {
         Element config = getConfiguration();
         if (config == null) {
             return new DOMOutputter().output(new Document());
@@ -132,9 +132,6 @@ public final class MCRWebsiteWriteProtection {
         updateCache(configXML);
     }
 
-    /**
-     * @param configXML
-     */
     private static void updateCache(Element configXML) {
         configCache = configXML;
         cacheInitTime = System.currentTimeMillis();

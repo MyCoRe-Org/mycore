@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -95,7 +96,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             "ps", "qs", "tie", "bq", "bf", "lang", "facet", "facet.field", "facet.sort", "facet.method",
             PHRASE_QUERY_PARAM, };
 
-        RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
+        RESERVED_PARAMETER_KEYS = List.of(parameter);
     }
 
     /**
@@ -108,7 +109,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            containing all the values for the field
      * @param fieldName
      *            the name of the field
-     * @throws ServletException
      */
     private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType)
         throws ServletException {
@@ -117,14 +117,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
                 continue;
             }
             switch (queryType) {
-            case term:
-                query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
-                break;
-            case phrase:
-                query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
-                break;
-            default:
-                throw new ServletException("Query type is unsupported: " + queryType);
+                case term -> query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
+                case phrase -> query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
+                default -> throw new ServletException("Query type is unsupported: " + queryType);
             }
             query.append(' ');
         }
@@ -178,11 +173,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
         return queryParameterMap;
     }
 
-    /**
-     *
-     * @param sortParameters
-     * @return
-     */
     private String buildSolrSortParameter(Map<String, String[]> sortParameters) {
         Set<Entry<String, String[]>> sortParameterEntrys = sortParameters.entrySet();
         Map<Integer, String> positionOrderMap = new HashMap<>();
@@ -196,25 +186,23 @@ public class MCRSolrSearchServlet extends MCRServlet {
             String[] valueArray = sortParameterEntry.getValue();
             if (valueArray.length > 0) {
                 String value = valueArray[0];
-                if ("order".equals(type)) {
+                if (Objects.equals(type, "order")) {
                     positionOrderMap.put(position, value);
-                } else if ("field".equals(type)) {
+                } else if (Objects.equals(type, "field")) {
                     positionFieldMap.put(position, value);
                 }
             }
         }
 
-        ArrayList<Integer> sortedPositions = new ArrayList<>();
-
-        sortedPositions.addAll(positionFieldMap.keySet());
+        ArrayList<Integer> sortedPositions = new ArrayList<>(positionFieldMap.keySet());
         Collections.sort(sortedPositions);
 
         StringBuilder sortBuilder = new StringBuilder();
         for (Integer position : sortedPositions) {
-            sortBuilder.append(",");
+            sortBuilder.append(',');
             sortBuilder.append(positionFieldMap.get(position));
             String order = positionOrderMap.get(position);
-            sortBuilder.append(" ");
+            sortBuilder.append(' ');
             if (order == null) {
                 order = "asc";
                 LOGGER.warn("No sort order found for field with number ''{}'' use default value : ''{}''", position,
@@ -233,8 +221,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * This method is used to create a map wich contains all fields as key and
      * the type of the field as value.
      *
-     * @param typeParameters
-     * @return
      */
     private HashMap<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
         HashMap<String, String> fieldTypeMap = new HashMap<>();
@@ -303,26 +289,21 @@ public class MCRSolrSearchServlet extends MCRServlet {
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
 
             switch (parameterGroup) {
-            case SolrParameter:
-                solrParameter.put(parameterName, currentEntry.getValue());
-                break;
-            case TypeParameter:
-                typeParameter.put(parameterName, currentEntry.getValue());
-                break;
-            case QueryParameter:
-                String[] strings = currentEntry.getValue();
-                for (String v : strings) {
-                    if (v != null && v.length() > 0) {
-                        queryParameter.put(parameterName, currentEntry.getValue());
+                case SolrParameter -> solrParameter.put(parameterName, currentEntry.getValue());
+                case TypeParameter -> typeParameter.put(parameterName, currentEntry.getValue());
+                case QueryParameter -> {
+                    String[] strings = currentEntry.getValue();
+                    for (String v : strings) {
+                        if (v != null && v.length() > 0) {
+                            queryParameter.put(parameterName, currentEntry.getValue());
+                        }
                     }
                 }
-                break;
-            case SortParameter:
-                sortParameter.put(parameterName, currentEntry.getValue());
-                break;
-            default:
-                LOGGER.warn("Unknown parameter group. That should not happen.");
-                continue;
+                case SortParameter -> sortParameter.put(parameterName, currentEntry.getValue());
+                default -> {
+                    LOGGER.warn("Unknown parameter group. That should not happen.");
+                    continue;
+                }
             }
         }
     }
@@ -330,7 +311,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
     /**
      * @param filterQueryMap
      *            a map wich contains all {@link StringBuilder}
-     * @param fieldType
      * @return a {@link StringBuilder} for the specific fieldType
      */
     private StringBuilder getFilterQueryBuilder(HashMap<String, StringBuilder> filterQueryMap, String fieldType) {

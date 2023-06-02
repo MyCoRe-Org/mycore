@@ -19,7 +19,6 @@
 package org.mycore.frontend.xeditor.validation;
 
 import org.jaxen.JaxenException;
-import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
@@ -69,7 +68,7 @@ public abstract class MCRValidator {
         return (getAttributeValue(name) != null);
     }
 
-    public boolean validate(MCRValidationResults results, MCRBinding root) throws JaxenException, JDOMException {
+    public boolean validate(MCRValidationResults results, MCRBinding root) throws JaxenException {
         MCRBinding binding = new MCRBinding(xPath, false, root);
         boolean isValid = validateBinding(results, binding);
         binding.detach();

@@ -26,7 +26,7 @@ import java.io.ByteArrayInputStream;
 import org.junit.Test;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRHeaderInputStreamTest {
 

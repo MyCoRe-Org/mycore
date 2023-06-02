@@ -18,6 +18,7 @@
 package org.mycore.datamodel.common;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -32,7 +33,7 @@ import com.google.common.cache.LoadingCache;
 
 /**
  * 
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRCreatorCache {
@@ -42,9 +43,9 @@ public class MCRCreatorCache {
     private static final long CACHE_SIZE = 5000;
 
     private static LoadingCache<MCRObjectID, String> CACHE = CacheBuilder.newBuilder()
-        .maximumSize(CACHE_SIZE).build(new CacheLoader<MCRObjectID, String>() {
+        .maximumSize(CACHE_SIZE).build(new CacheLoader<>() {
             @Override
-            public String load(final MCRObjectID objectId) throws Exception {
+            public String load(final MCRObjectID objectId) {
                 return Optional.ofNullable(MCRMetadataManager.retrieveMCRObject(objectId).getService()).map(os -> {
                     if (os.isFlagTypeSet("createdby")) {
                         final String creator = os.getFlags("createdby").get(0);
@@ -58,7 +59,8 @@ public class MCRCreatorCache {
                         return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
                             .map(versions -> versions.stream()
                                 .sorted(
-                                    Collections.reverseOrder((v1, v2) -> v1.getRevision().compareTo(v2.getRevision())))
+                                    Collections
+                                        .reverseOrder(Comparator.comparing(MCRAbstractMetadataVersion::getRevision)))
                                 .filter(v -> v.getType() == MCRAbstractMetadataVersion.CREATED).findFirst()
                                 .map(version -> {
                                     LOGGER.info(

@@ -23,7 +23,7 @@ import org.jdom2.Element;
 /**
  * Provides a convenience method to merge one MODS element into another.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMergeTool {
 

@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -125,11 +124,9 @@ public abstract class MCRTransferPackageUtil {
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
      * @throws URISyntaxException
      *                unable to transform the xml
-     * @throws SAXParseException
-     *                xml parsing went wrong
      */
     public static void importFromDirectory(Path targetDirectory) throws JDOMException, IOException,
-        MCRAccessException, SAXParseException, URISyntaxException {
+        MCRAccessException, URISyntaxException {
         // import classifications
         for (Path pathToClassification : getClassifications(targetDirectory)) {
             MCRClassificationUtils.fromPath(pathToClassification);
@@ -220,7 +217,7 @@ public abstract class MCRTransferPackageUtil {
         }
         mcr.setImportMode(true);
 
-        List<String> derivates = new LinkedList<>();
+        List<String> derivates = new ArrayList<>();
         // one must copy the ids before updating the mcr objects
         for (MCRMetaLinkID id : mcr.getStructure().getDerivates()) {
             derivates.add(id.getXLinkHref());

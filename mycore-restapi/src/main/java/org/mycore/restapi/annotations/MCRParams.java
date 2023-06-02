@@ -42,6 +42,16 @@ public @interface MCRParams {
                 public String toString() {
                     return "@" + MCRParams.class.getName() + Arrays.toString(values());
                 }
+
+                @Override
+                public int hashCode() {
+                    return ("values".hashCode() * 127) ^ Arrays.hashCode(values());
+                }
+
+                @Override
+                public boolean equals(Object obj) {
+                    return obj instanceof MCRParams that && Arrays.equals(this.values(), that.values());
+                }
             };
         }
     }

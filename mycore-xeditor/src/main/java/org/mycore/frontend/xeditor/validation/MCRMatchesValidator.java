@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates input to match a specified java.util.regex pattern.
  * Example: &lt;xed:validate xpath="//mods:identifier[@type='doi']" matches="10\.\d+.*" ... /&gt;
  *
- * @author Frank L\u00FCtzenkirchen 
+ * @author Frank Lützenkirchen
  */
 public class MCRMatchesValidator extends MCRValidator {
 

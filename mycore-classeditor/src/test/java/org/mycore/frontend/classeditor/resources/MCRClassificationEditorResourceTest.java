@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -129,7 +130,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     }
 
     @Test
-    public void getRootCategories() throws Exception {
+    public void getRootCategories() {
         final String categoryJsonStr = target("classifications").request().get(String.class);
         MCRCategoryListWrapper categListWrapper = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
             MCRCategoryListWrapper.class);
@@ -138,13 +139,13 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     }
 
     @Test
-    public void getSingleCategory() throws Exception {
+    public void getSingleCategory() {
         Collection<MCRCategory> categs = categDAO.getCategs();
         for (MCRCategory mcrCategory : categs) {
             MCRCategoryID id = mcrCategory.getId();
             String path = id.getRootID();
             String categID = id.getID();
-            if (categID != null && !"".equals(categID)) {
+            if (categID != null && !Objects.equals(categID, "")) {
                 path = path + "/" + categID;
             }
             String categoryJsonStr = target("/classifications/" + path).request().get(String.class);

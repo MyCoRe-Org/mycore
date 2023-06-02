@@ -64,7 +64,7 @@ public class StructureOverviewIT extends ViewerTestBase {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void testStructureOverview() throws IOException, InterruptedException {
+    public void testStructureOverview() throws InterruptedException {
         this.setTestName(getClassname() + "-testStructureOverview");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getTestDerivate());

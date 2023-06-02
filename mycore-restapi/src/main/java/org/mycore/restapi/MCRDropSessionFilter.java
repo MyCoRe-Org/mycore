@@ -18,7 +18,6 @@
 
 package org.mycore.restapi;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +43,7 @@ public class MCRDropSessionFilter implements ContainerRequestFilter {
     ResourceInfo resourceInfo;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         Produces produces = resourceInfo.getResourceMethod().getAnnotation(Produces.class);
         if (produces == null || Stream.of(produces.value()).noneMatch(MediaType.SERVER_SENT_EVENTS::equals)) {
             return;

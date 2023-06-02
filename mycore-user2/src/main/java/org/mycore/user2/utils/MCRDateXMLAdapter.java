@@ -33,14 +33,14 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 public class MCRDateXMLAdapter extends XmlAdapter<String, Date> {
 
     @Override
-    public Date unmarshal(String v) throws Exception {
+    public Date unmarshal(String v) {
         TemporalAccessor dateTime = MCRISO8601FormatChooser.getFormatter(v, null).parse(v);
         Instant instant = Instant.from(dateTime);
         return Date.from(instant);
     }
 
     @Override
-    public String marshal(Date v) throws Exception {
+    public String marshal(Date v) {
         TemporalAccessor dt = v.toInstant();
         return MCRISO8601FormatChooser.getFormatter(null, MCRISO8601Format.COMPLETE_HH_MM_SS).format(dt);
     }

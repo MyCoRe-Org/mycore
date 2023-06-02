@@ -42,19 +42,19 @@ public class MCRFileNameCheckTest extends MCRIFSTest {
     }
 
     @Test(expected = IOException.class)
-    public void checkIllegalWindowsFileName() throws MCRAccessException, IOException {
+    public void checkIllegalWindowsFileName() throws IOException {
         final MCRPath aux = MCRPath.getPath(derivate.toString(), "aux");
         Files.createFile(aux);
     }
 
     @Test(expected = IOException.class)
-    public void checkIllegalFileName() throws MCRAccessException, IOException {
+    public void checkIllegalFileName() throws IOException {
         final MCRPath info = MCRPath.getPath(derivate.toString(), "info@mycore.de");
         Files.createFile(info);
     }
 
     @Test(expected = IOException.class)
-    public void checkIllegalDirectoryName() throws MCRAccessException, IOException {
+    public void checkIllegalDirectoryName() throws IOException {
         final MCRPath dirName = MCRPath.getPath(derivate.toString(), "Nur ein \"Test\"");
         Files.createDirectory(dirName);
     }

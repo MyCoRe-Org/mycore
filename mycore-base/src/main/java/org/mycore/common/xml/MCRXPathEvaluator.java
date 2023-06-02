@@ -36,7 +36,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXPathEvaluator {
 
@@ -65,7 +65,7 @@ public class MCRXPathEvaluator {
 
     public String replaceXPaths(String text, boolean urlEncode) {
         Matcher m = PATTERN_XPATH.matcher(text);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (m.find()) {
             String replacement = replaceXPathOrI18n(m.group(1));
             if (urlEncode) {
@@ -107,8 +107,8 @@ public class MCRXPathEvaluator {
         Object result = evaluateFirst(xPathExpression);
         if (result == null) {
             return false;
-        } else if (result instanceof Boolean) {
-            return (Boolean) result;
+        } else if (result instanceof Boolean b) {
+            return b;
         } else {
             return true;
         }

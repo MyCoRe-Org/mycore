@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
  * Within the URI, the pattern {0} will be replaced by the given identifier value,
  * optionally the pattern {1} will be replaced by the value uri-encoded as http request parameter
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRIdentifierResolver {
 

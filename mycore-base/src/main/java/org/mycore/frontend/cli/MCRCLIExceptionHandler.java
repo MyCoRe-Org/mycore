@@ -30,7 +30,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 /**
  * Shows details about an exception that occured during command processing
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRCLIExceptionHandler {
 

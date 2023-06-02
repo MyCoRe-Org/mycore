@@ -32,7 +32,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * already compiled XSL stylesheets. The cache size can be set via
  * MCR.LayoutService.XSLCacheSize (default is 200).
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXSLTransformerFactory {
 
@@ -43,12 +43,11 @@ public class MCRXSLTransformerFactory {
 
     static {
         int cacheSize = MCRConfiguration2.getInt("MCR.LayoutService.XSLCacheSize").orElse(200);
-        checkPeriod = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod").orElse(10000l);
+        checkPeriod = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod").orElse(10000L);
         cache = new MCRCache<>(cacheSize, MCRXSLTransformerFactory.class.getName());
     }
 
-    /** Returns the compiled XSL templates cached for the given source, if it is up-to-date. 
-     * @throws IOException */
+    /** Returns the compiled XSL templates cached for the given source, if it is up-to-date.   */
     private static Templates getCachedTemplates(MCRTemplatesSource source) throws IOException {
         String key = source.getKey();
         return cache.getIfUpToDate(key, source.getModifiedHandle(checkPeriod));

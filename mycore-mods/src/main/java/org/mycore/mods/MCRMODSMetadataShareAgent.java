@@ -74,7 +74,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
      * #inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void distributeMetadata(MCRObject holder) throws MCRPersistenceException, MCRAccessException {
+    public void distributeMetadata(MCRObject holder) throws MCRPersistenceException {
         MCRMODSWrapper holderWrapper = new MCRMODSWrapper(holder);
         List<MCRMetaLinkID> children = holder.getStructure().getChildren();
         if (!children.isEmpty()) {

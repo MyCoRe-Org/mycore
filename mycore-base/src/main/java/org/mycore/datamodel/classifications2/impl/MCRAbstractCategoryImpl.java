@@ -40,7 +40,6 @@ import org.mycore.util.concurrent.MCRReadWriteGuard;
 /**
  * @author Thomas Scheffler (yagee)
  *
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public abstract class MCRAbstractCategoryImpl implements MCRCategory {
@@ -151,9 +150,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         }
     }
 
-    /**
-     *
-     */
+
     void detachFromParent() {
         if (parent != null) {
             // remove this from current parent

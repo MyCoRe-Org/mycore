@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  * Represents a single "work", that means a publication within the "works" section of an ORCID profile,
  * from a single source.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRWork {
 
@@ -93,7 +93,7 @@ public class MCRWork {
      * Fetches the work's details with the complete publication data from the ORCID profile.
      * Initially, only the work summary was fetched.
      */
-    public void fetchDetails() throws JDOMException, IOException, SAXException {
+    public void fetchDetails() throws JDOMException, IOException {
         orcid.getFetcher().fetchDetails(this);
     }
 
@@ -101,7 +101,7 @@ public class MCRWork {
      * If this work's source is this MyCoRe application,
      * updates the work in the remote ORCID profile from the local MyCoRe object
      */
-    public void update(MCRObjectID objectID) throws IOException, SAXException, JDOMException {
+    public void update(MCRObjectID objectID) throws IOException, JDOMException {
         if (!source.isThisApplication()) {
             throw new MCRORCIDException("can not update that work, is not from us");
         }

@@ -94,11 +94,9 @@ public abstract class MCRAbstractFact<T> implements MCRFact<T> {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof MCRAbstractFact)) {
+        if (!(obj instanceof @SuppressWarnings("rawtypes")MCRAbstractFact other)) {
             return false;
         }
-        @SuppressWarnings("rawtypes")
-        MCRAbstractFact other = (MCRAbstractFact) obj;
         return Objects.equals(name, other.name) && Objects.equals(term, other.term);
     }
 

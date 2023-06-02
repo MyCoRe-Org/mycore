@@ -38,7 +38,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.mycore.wcms2.MCRWebPagesSynchronizer;
-import org.xml.sax.SAXException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -91,7 +90,7 @@ public class MCRWCMSContentManager {
      * @return json object
      * @see ErrorType
      */
-    public JsonObject getContent(String webpageId) throws IOException, JDOMException, SAXException {
+    public JsonObject getContent(String webpageId) throws IOException, JDOMException {
         boolean isXML = webpageId.endsWith(".xml");
         URL resourceURL = null;
         try {

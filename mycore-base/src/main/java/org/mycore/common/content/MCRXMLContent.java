@@ -33,7 +33,7 @@ import org.mycore.common.content.streams.MCRMD5InputStream;
  * Reads MCRContent from an XML document.
  * Provides functionality to output XML using different formatters. 
  * 
- * @author Frank L\u00FCtzenkichen
+ * @author Frank Lützenkichen
  */
 public abstract class MCRXMLContent extends MCRContent {
 

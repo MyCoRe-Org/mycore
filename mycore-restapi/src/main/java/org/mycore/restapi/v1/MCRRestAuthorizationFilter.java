@@ -18,7 +18,6 @@
 
 package org.mycore.restapi.v1;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -131,20 +130,21 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         MCRRestAPIACLPermission permission;
         switch (requestContext.getMethod()) {
-        case HttpMethod.OPTIONS:
-            return;
-        case HttpMethod.GET:
-        case HttpMethod.HEAD:
-            permission = MCRRestAPIACLPermission.READ;
-            break;
-        case HttpMethod.DELETE:
-            permission = MCRRestAPIACLPermission.DELETE;
-            break;
-        default:
-            permission = MCRRestAPIACLPermission.WRITE;
+            case HttpMethod.OPTIONS -> {
+                return;
+            }
+            case HttpMethod.GET, HttpMethod.HEAD -> {
+                permission = MCRRestAPIACLPermission.READ;
+            }
+            case HttpMethod.DELETE -> {
+                permission = MCRRestAPIACLPermission.DELETE;
+            }
+            default -> {
+                permission = MCRRestAPIACLPermission.WRITE;
+            }
         }
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)

@@ -120,21 +120,16 @@ public class MCRWCMSNavigationUtils {
      */
     public static boolean updateHref(MCRNavigationBaseItem item, String from, String to) {
         boolean dirty = false;
-        if (item instanceof MCRNavigation) {
-            MCRNavigation navigation = (MCRNavigation) item;
+        if (item instanceof MCRNavigation navigation) {
             if (navigation.getHrefStartingPage() != null && navigation.getHrefStartingPage().equals(from)) {
                 navigation.setHrefStartingPage(to);
                 dirty = true;
             }
-        } else if (item instanceof MCRNavigationItem) {
-            MCRNavigationItem navItem = (MCRNavigationItem) item;
-            if (navItem.getHref().equals(from)) {
-                navItem.setHref(to);
-                dirty = true;
-            }
+        } else if (item instanceof MCRNavigationItem navItem && navItem.getHref().equals(from)) {
+            navItem.setHref(to);
+            dirty = true;
         }
-        if (item instanceof MCRNavigationItemContainer) {
-            MCRNavigationItemContainer container = (MCRNavigationItemContainer) item;
+        if (item instanceof MCRNavigationItemContainer container) {
             for (MCRNavigationBaseItem child : container.getChildren()) {
                 if (updateHref(child, from, to)) {
                     dirty = true;

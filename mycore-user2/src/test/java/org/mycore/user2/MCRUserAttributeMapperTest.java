@@ -36,7 +36,7 @@ import org.mycore.user2.login.MCRShibbolethUserInformation;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
 public class MCRUserAttributeMapperTest extends MCRUserTestCase {
@@ -113,7 +113,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
-        extraAttribs.entrySet().forEach(e -> user.setUserAttribute(e.getKey(), e.getValue()));
+        extraAttribs.forEach((key, value) -> user.setUserAttribute(key, value));
 
         MCRUserManager.createUser(user);
 
@@ -149,7 +149,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
-        extraAttribs.entrySet().forEach(e -> user.setUserAttribute(e.getKey(), e.getValue()));
+        extraAttribs.forEach((key, value) -> user.setUserAttribute(key, value));
 
         MCRUserManager.createUser(user);
 

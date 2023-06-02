@@ -27,7 +27,6 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -59,8 +58,8 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
             .forEach((serviceToRegister) -> {
                 try {
                     serviceToRegister.register(obj, "", false);
-                } catch (MCRAccessException | MCRActiveLinkException | MCRPersistentIdentifierException
-                    | ExecutionException | InterruptedException e) {
+                } catch (MCRAccessException | MCRPersistentIdentifierException | ExecutionException |
+                         InterruptedException e) {
                     throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
                 }
             });

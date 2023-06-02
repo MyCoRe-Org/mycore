@@ -62,7 +62,7 @@ public class MCRCORSFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         String filterName = filterConfig.getInitParameter(CORS_FILTER_NAME);
         if (filterName != null) {
             LOGGER.info("initializing {}", MCRCORSFilter.class.getSimpleName());
@@ -79,8 +79,7 @@ public class MCRCORSFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
         throws IOException, ServletException {
         // check if the request is a http request
-        if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
-            HttpServletResponse resp = (HttpServletResponse) servletResponse;
+        if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse resp) {
             resp.setHeader("Access-Control-Allow-Origin", this.allowOriginValue);
         }
         filterChain.doFilter(servletRequest, servletResponse);

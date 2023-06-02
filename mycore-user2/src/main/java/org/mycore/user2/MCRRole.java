@@ -101,8 +101,9 @@ public class MCRRole {
     }
 
     @XmlElement(name = "label")
+    @SuppressWarnings("unused")
     private MCRLabel[] getLabelsArray() {
-        return labels.values().toArray(new MCRLabel[labels.size()]);
+        return labels.values().toArray(MCRLabel[]::new);
     }
 
     @SuppressWarnings("unused")
@@ -119,11 +120,7 @@ public class MCRRole {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRRole) {
-            return ((MCRRole) obj).getName().equals(this.getName());
-        } else {
-            return false;
-        }
+        return obj instanceof MCRRole role && role.getName().equals(this.getName());
     }
 
     @Override

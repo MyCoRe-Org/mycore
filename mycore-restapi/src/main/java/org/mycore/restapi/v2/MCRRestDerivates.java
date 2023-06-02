@@ -60,7 +60,6 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -162,7 +161,7 @@ public class MCRRestDerivates {
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
         List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
         return Response.ok()
-            .entity(new GenericEntity<List<MCRMetaEnrichedLinkID>>(derivates) {
+            .entity(new GenericEntity<>(derivates) {
             })
             .lastModified(lastModified)
             .build();
@@ -236,7 +235,7 @@ public class MCRRestDerivates {
         try {
             derivate = new MCRDerivate(inputContent.asXML());
             derivate.validate();
-        } catch (JDOMException | SAXException | MCRException e) {
+        } catch (JDOMException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID)
                 .withMessage("MCRDerivate " + derid + " is not valid")
@@ -480,8 +479,7 @@ public class MCRRestDerivates {
                 description = "You do not have write permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have write permission"),
         })
-    public Response testUpdateDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
-        throws IOException {
+    public Response testUpdateDerivate(@PathParam(PARAM_DERID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
@@ -495,8 +493,7 @@ public class MCRRestDerivates {
                 description = "You do not have delete permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
         })
-    public Response testDeleteDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
-        throws IOException {
+    public Response testDeleteDerivate(@PathParam(PARAM_DERID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 

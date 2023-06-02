@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Normalizes the different variants of hyphens in a given input text to the given character; defaults
  * to a simple "minus".
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  **/
 public class MCRHyphenNormalizer {
 

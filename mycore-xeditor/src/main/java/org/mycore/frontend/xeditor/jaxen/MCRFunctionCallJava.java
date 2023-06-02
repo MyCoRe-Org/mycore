@@ -26,14 +26,13 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jaxen.Context;
-import org.jaxen.FunctionCallException;
 
 class MCRFunctionCallJava implements org.jaxen.Function {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRFunctionCallJava.class);
 
     @Override
-    public Object call(Context context, List args) throws FunctionCallException {
+    public Object call(Context context, List args) {
         try {
             String clazzName = (String) (args.get(0));
             String methodName = (String) (args.get(1));

@@ -33,6 +33,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.util.MCRServletContentHelper;
+import org.mycore.common.function.MCRThrowFunction;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 
 import jakarta.xml.bind.JAXBContext;
@@ -43,21 +44,18 @@ import jakarta.xml.bind.Unmarshaller;
 public abstract class MCRWCMSUtil {
 
     public static MCRNavigation load(org.w3c.dom.Document doc) throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
-        Unmarshaller m = jc.createUnmarshaller();
-        Object navigation = m.unmarshal(doc);
-        if (navigation instanceof MCRNavigation) {
-            return (MCRNavigation) navigation;
-        }
-        return null;
+        return unmarshall(um -> um.unmarshal(doc));
     }
 
     public static MCRNavigation load(File navigationFile) throws JAXBException {
+        return unmarshall(um -> um.unmarshal(navigationFile));
+    }
+
+    private static MCRNavigation unmarshall(MCRThrowFunction<Unmarshaller, Object, JAXBException> unmarshallFunction)
+        throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
-        Unmarshaller m = jc.createUnmarshaller();
-        Object navigation = m.unmarshal(navigationFile);
-        if (navigation instanceof MCRNavigation) {
-            return (MCRNavigation) navigation;
+        if (unmarshallFunction.apply(jc.createUnmarshaller()) instanceof MCRNavigation navigation) {
+            return navigation;
         }
         return null;
     }

@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
 
 import com.google.gson.JsonElement;
@@ -35,19 +35,19 @@ public class MCRURNUtils {
     public static Optional<Date> getDNBRegisterDate(MCRPIRegistrationInfo dnburn) {
         try {
             return Optional.of(getDNBRegisterDate(dnburn.getIdentifier()));
-        } catch (MCRIdentifierUnresolvableException | ParseException e) {
-            e.printStackTrace();
+        } catch (ParseException e) {
+            LogManager.getLogger().warn("Could not parse: " + dnburn.getIdentifier(), e);
         }
 
         return Optional.empty();
     }
 
-    public static Date getDNBRegisterDate(MCRDNBURN dnburn) throws MCRIdentifierUnresolvableException, ParseException {
+    public static Date getDNBRegisterDate(MCRDNBURN dnburn) throws ParseException {
         return getDNBRegisterDate(dnburn.asString());
     }
 
-    public static Date getDNBRegisterDate(String identifier) throws MCRIdentifierUnresolvableException,
-            ParseException {
+    public static Date getDNBRegisterDate(String identifier) throws
+        ParseException {
 
         String date = MCRDNBURNRestClient.getRegistrationInfo(identifier)
                 .map(info -> info.get("created"))

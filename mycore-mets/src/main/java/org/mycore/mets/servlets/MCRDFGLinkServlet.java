@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,7 +77,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         String filePath = request.getParameter("file") == null ? "" : request.getParameter("file");
         String derivateID = request.getParameter("deriv") == null ? "" : request.getParameter("deriv");
 
-        if ("".equals(derivateID)) {
+        if (Objects.equals(derivateID, "")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
         }
 
@@ -113,21 +114,13 @@ public class MCRDFGLinkServlet extends MCRServlet {
             imageNumber = getOrderNumber(metsContent.asXML(), filePath);
         }
 
-        String dfgURL = "";
         switch (imageNumber) {
-        case -1:
-            response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
-                "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
-            return;
-        case -2:
-            dfgURL = "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL;
-            break;
-        default:
-            dfgURL = "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber;
-            break;
+            case -1 -> response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
+                    "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
+            case -2 -> response.sendRedirect("https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL);
+            default -> response.sendRedirect(
+                "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber);
         }
-
-        response.sendRedirect(dfgURL);
     }
 
     private static int getOrderNumber(Document metsDoc, String fileHref) {
@@ -172,14 +165,9 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
     /**
      * Returns the mets document wrapped in a {@link MCRContent} object.
-     * 
-     * @param job
-     * @param useExistingMets
-     * @return
-     * @throws Exception
+     *
      */
-    private static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate)
-        throws Exception {
+    private static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) {
 
         MCRPath metsFile = MCRPath.getPath(derivate, "/mets.xml");
 
@@ -207,7 +195,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         if (useExistingMetsParam == null) {
             return true;
         }
-        return Boolean.valueOf(useExistingMetsParam);
+        return Boolean.parseBoolean(useExistingMetsParam);
     }
 
 }

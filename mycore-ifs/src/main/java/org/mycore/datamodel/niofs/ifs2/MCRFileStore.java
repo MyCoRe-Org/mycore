@@ -51,7 +51,7 @@ public class MCRFileStore extends MCRAbstractFileStore {
     private FileStore baseFileStore;
 
     private static LoadingCache<String, MCRFileStore> instanceHolder = CacheBuilder.newBuilder().weakKeys()
-        .build(new CacheLoader<String, MCRFileStore>() {
+        .build(new CacheLoader<>() {
 
             @Override
             public MCRFileStore load(String contentStoreID) throws Exception {
@@ -85,8 +85,8 @@ public class MCRFileStore extends MCRAbstractFileStore {
             return instanceHolder.get(storeId);
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
+            if (cause instanceof IOException ioe) {
+                throw ioe;
             }
             throw new IOException("Error while geting instance of " + MCRFileStore.class.getSimpleName(), cause);
         }
@@ -153,7 +153,7 @@ public class MCRFileStore extends MCRAbstractFileStore {
     }
 
     @Override
-    public Path getBaseDirectory() throws IOException {
+    public Path getBaseDirectory() {
         return this.contentStore.getBaseDirectory();
     }
 

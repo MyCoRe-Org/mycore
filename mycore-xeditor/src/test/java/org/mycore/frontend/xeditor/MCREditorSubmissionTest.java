@@ -21,7 +21,6 @@ package org.mycore.frontend.xeditor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +36,12 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
-    public void testSubmitTextfields() throws JaxenException, JDOMException, IOException {
+    public void testSubmitTextfields() throws JaxenException, JDOMException {
         String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']]";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
@@ -62,7 +61,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
     }
 
     @Test
-    public void testSubmitSingleCheckbox() throws JaxenException, JDOMException, IOException {
+    public void testSubmitSingleCheckbox() throws JaxenException, JDOMException {
         String template = "document[@archive='false']";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
@@ -85,7 +84,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
     public void testSubmitSelectSingleOption()
-        throws JaxenException, JDOMException, IOException {
+        throws JaxenException, JDOMException {
         String template = "document[category='a']";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
@@ -114,7 +113,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
     public void testSubmitSelectMultipleOptions()
-        throws JaxenException, JDOMException, IOException {
+        throws JaxenException, JDOMException {
         String template = "document[category[1]='a'][category[2]='b'][category[3]='c']";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));

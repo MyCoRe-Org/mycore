@@ -31,7 +31,7 @@ import bibtex.dom.BibtexPersonList;
 /**
  * Transforms a BibTeX field containing author/editor names to multiple JDOM mods:name elements.
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 class MCRPersonListTransformer extends MCRFieldTransformer {
 
@@ -49,12 +49,11 @@ class MCRPersonListTransformer extends MCRFieldTransformer {
 
     @SuppressWarnings("unchecked")
     void buildField(BibtexAbstractValue value, Element parent) {
-        if (!(value instanceof BibtexPersonList)) {
+        if (!(value instanceof BibtexPersonList personList)) {
             LOGGER.error("Cannot not cast {} ({}) to {}", BibtexAbstractValue.class.getName(), value,
                 BibtexPersonList.class.getName());
             return;
         }
-        BibtexPersonList personList = (BibtexPersonList) value;
         for (BibtexPerson person : (List<BibtexPerson>) (personList.getList())) {
             (person.isOthers() ? andOthers : personTransformer).buildField(person, parent);
         }

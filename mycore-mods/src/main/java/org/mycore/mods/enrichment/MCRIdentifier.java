@@ -26,7 +26,7 @@ import org.mycore.common.xml.MCRNodeBuilder;
 /**
  * Represents a publication's identifier like DOI or ISBN
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRIdentifier {
 

@@ -52,7 +52,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.MultiMapSolrParams;
 import org.apache.solr.common.util.NamedList;
@@ -184,8 +183,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
         for (int i = 0; i < namedList.size(); i++) {
             String name = namedList.getName(i);
             Object val = namedList.getVal(i);
-            if (val instanceof String[]) {
-                MultiMapSolrParams.addParam(name, (String[]) val, parameters);
+            if (val instanceof String[] strings) {
+                MultiMapSolrParams.addParam(name, strings, parameters);
             } else {
                 MultiMapSolrParams.addParam(name, val.toString(), parameters);
             }
@@ -198,7 +197,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      * redirects to query handler by using xeditor input document
      */
     private static void redirectToQueryHandler(Document input, HttpServletResponse resp)
-        throws IOException, TransformerException, SAXException {
+        throws IOException {
         LinkedHashMap<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
         for (Element param : children) {
@@ -278,14 +277,12 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void filterParams(ModifiableSolrParams solrParameter) {
-        MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets").ifPresent(disallowedFacets -> {
-            MCRConfiguration2.splitValue(disallowedFacets).forEach(disallowedFacet -> {
-                solrParameter.remove("facet.field", disallowedFacet);
-            });
-        });
+        MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets")
+            .ifPresent(disallowedFacets -> MCRConfiguration2.splitValue(disallowedFacets)
+                .forEach(disallowedFacet -> solrParameter.remove("facet.field", disallowedFacet)));
     }
 
-    private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException, SolrServerException {
+    private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException {
         this.updateQueryHandlerMap();
         PrintWriter writer = resp.getWriter();
         queryHandlerWhitelist.forEach(handler -> writer.append(handler).append('\n'));

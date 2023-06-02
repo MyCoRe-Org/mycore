@@ -18,16 +18,13 @@
 
 package org.mycore.solr.common.xml;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
-
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,7 +69,7 @@ public class MCRSolrQueryResolver implements URIResolver {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         Matcher matcher = OLD_URI_PATTERN.matcher(href);
         Matcher newMatcher = URI_PATTERN.matcher(href);
 
@@ -102,11 +99,7 @@ public class MCRSolrQueryResolver implements URIResolver {
                 MCRSolrURL solrURL = new MCRSolrURL(client, query.get());
                 requestHandler.map("/"::concat).ifPresent(solrURL::setRequestHandler);
 
-                try {
-                    return new MCRURLContent(solrURL.getUrl()).getSource();
-                } catch (IOException e) {
-                    throw new TransformerException("Unable to get input stream from solr: " + solrURL.getUrl(), e);
-                }
+                return new MCRURLContent(solrURL.getUrl()).getSource();
             }
         }
 

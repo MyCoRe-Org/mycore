@@ -73,9 +73,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
                 }
             }
             final MCRAccessKey accessKey = MCRAccessKeyUtils.getLinkedAccessKeyFromCurrentUser(objectId);
-            if (accessKey != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKey)) {
-                return true;
-            }
+            return accessKey != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKey);
         }
         return false;
     }

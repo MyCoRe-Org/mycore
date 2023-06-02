@@ -22,7 +22,7 @@ package org.mycore.frontend.xeditor.validation;
  * Validates input to not match a specified java.util.regex pattern.
  * Example: &lt;xed:validate xpath="/user/@name" matches-not="ldap[0-9]+" ... /&gt;
  *
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRMatchesNotValidator extends MCRValidator {
 

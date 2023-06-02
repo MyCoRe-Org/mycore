@@ -44,7 +44,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
-import org.xml.sax.SAXParseException;
 
 public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
@@ -57,7 +56,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     }
 
     @Test
-    public void testMapping() throws SAXParseException, IOException, JDOMException, URISyntaxException {
+    public void testMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionHelper.isTransactionActive();
         ClassLoader classLoader = getClass().getClassLoader();

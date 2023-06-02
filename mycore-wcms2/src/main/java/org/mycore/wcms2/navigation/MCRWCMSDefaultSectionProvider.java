@@ -18,10 +18,14 @@
 
 package org.mycore.wcms2.navigation;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import jakarta.ws.rs.WebApplicationException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -32,14 +36,12 @@ import org.jdom2.Text;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.tools.MyCoReWebPageProvider;
-import org.xml.sax.SAXParseException;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import jakarta.ws.rs.WebApplicationException;
 
 /**
  * The default implementation to convert MyCoRe Webpage sections
@@ -123,11 +125,11 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
         XMLOutputter out = new XMLOutputter();
         StringWriter writer = new StringWriter();
         for (Content child : element.getContent()) {
-            if (child instanceof Element) {
-                out.output((Element) child, writer);
+            if (child instanceof Element childElement) {
+                out.output(childElement, writer);
             } else if (child instanceof Text text) {
                 String trimmedText = text.getTextTrim();
-                if (!"".equals(trimmedText)) {
+                if (!Objects.equals(trimmedText, "")) {
                     Text newText = new Text(trimmedText);
                     out.output(newText, writer);
                 }
@@ -158,7 +160,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             String xmlAsString = sectionObject.get(JSON_DATA).getAsJsonPrimitive().getAsString();
             try {
                 wp.addSection(title, xmlAsString, lang);
-            } catch (IOException | SAXParseException | JDOMException exc) {
+            } catch (IOException | JDOMException exc) {
                 throw new WebApplicationException("unable to add section " + title, exc);
             }
         }

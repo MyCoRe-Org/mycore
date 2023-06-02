@@ -34,7 +34,6 @@ import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
@@ -98,7 +97,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import jakarta.activation.MimetypesFileTypeMap;
 
@@ -106,7 +104,7 @@ import jakarta.activation.MimetypesFileTypeMap;
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author shermann
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  */
 public class MCRXMLFunctions {
     private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
@@ -127,7 +125,7 @@ public class MCRXMLFunctions {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
 
-    public static Node document(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+    public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
         if (sourceContent == null) {
             throw new TransformerException("Could not load document: " + uri);
@@ -158,19 +156,16 @@ public class MCRXMLFunctions {
         return Normalizer.normalize(arg0, Normalizer.Form.NFC);
     }
 
-    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language) {
         return formatISODate(isoDate, null, simpleFormat, iso639Language);
     }
 
-    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) {
         return formatISODate(isoDate, isoFormat, simpleFormat, iso639Language, TimeZone.getDefault().getID());
     }
 
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language,
-        String timeZone)
-        throws ParseException {
+        String timeZone) {
         if (LOGGER.isDebugEnabled()) {
             String sb = "isoDate=" + isoDate + ", simpleFormat=" + simpleFormat + ", isoFormat=" + isoFormat
                 + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
@@ -228,10 +223,7 @@ public class MCRXMLFunctions {
         if (fieldName == null || fieldName.trim().length() == 0) {
             return "";
         }
-        boolean useLastValue = false;
-        if ("bis".equals(fieldName)) {
-            useLastValue = true;
-        }
+        boolean useLastValue = Objects.equals(fieldName, "bis");
         return MCRCalendar.getISODateToFormattedString(date, useLastValue, calendarName);
     }
 
@@ -378,7 +370,7 @@ public class MCRXMLFunctions {
      */
     public static boolean isWorldReadableComplete(String objId) {
         LOGGER.info("World completely readable: {}", objId);
-        if (objId == null || !MCRObjectID.isValid(objId)) {
+        if (!MCRObjectID.isValid(objId)) {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
@@ -410,7 +402,7 @@ public class MCRXMLFunctions {
      * @param objId MCRObjectID as String
      */
     public static boolean isWorldReadable(String objId) {
-        if (objId == null || !MCRObjectID.isValid(objId)) {
+        if (!MCRObjectID.isValid(objId)) {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
@@ -432,7 +424,7 @@ public class MCRXMLFunctions {
      *         with the display attribute set to true, <code>false</code>
      *         otherwise
      */
-    public static boolean hasDisplayableDerivates(String objectId) throws Exception {
+    public static boolean hasDisplayableDerivates(String objectId) {
         return Optional.of(MCRObjectID.getInstance(objectId))
             .filter(MCRMetadataManager::exists)
             .map(MCRMetadataManager::retrieveMCRObject)
@@ -645,11 +637,6 @@ public class MCRXMLFunctions {
         return !categID.isRootID() && MCRCategoryDAOFactory.getInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
-    /**
-     * @param classificationId
-     * @param categoryId
-     * @return
-     */
     public static String getDisplayName(String classificationId, String categoryId) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
@@ -668,11 +655,6 @@ public class MCRXMLFunctions {
         }
     }
 
-    /**
-     * @param classificationId
-     * @param categoryId
-     * @return
-     */
     public static boolean isCategoryID(String classificationId, String categoryId) {
         MCRCategory category = null;
         try {
@@ -699,7 +681,7 @@ public class MCRXMLFunctions {
     public static String getSize(String derivateId) throws IOException {
         MCRPath rootPath = MCRPath.getPath(derivateId, "/");
         final AtomicLong size = new AtomicLong();
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 size.addAndGet(attrs.size());
@@ -721,7 +703,7 @@ public class MCRXMLFunctions {
         AtomicInteger i = new AtomicInteger(0);
         Files.walkFileTree(MCRPath.getPath(derivateId, "/"), new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 i.incrementAndGet();
                 return FileVisitResult.CONTINUE;
             }
@@ -891,17 +873,13 @@ public class MCRXMLFunctions {
 
     /**
      * This only works with text nodes
-     * @param nodes
      * @return the order of nodes maybe changes
      */
     public static NodeList distinctValues(NodeList nodes) {
-        SortedSet<Node> distinctNodeSet = new TreeSet<>(new Comparator<Node>() {
-            @Override
-            public int compare(Node node, Node t1) {
-                String nodeValue = node.getNodeValue();
-                String nodeValue1 = t1.getNodeValue();
-                return Objects.equals(nodeValue1, nodeValue) ? 0 : -1;
-            }
+        SortedSet<Node> distinctNodeSet = new TreeSet<>((node, t1) -> {
+            String nodeValue = node.getNodeValue();
+            String nodeValue1 = t1.getNodeValue();
+            return Objects.equals(nodeValue1, nodeValue) ? 0 : -1;
         });
         for (int i = 0; i < nodes.getLength(); i++) {
             distinctNodeSet.add(nodes.item(i));

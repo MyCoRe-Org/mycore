@@ -148,7 +148,8 @@ public class MCRFrontendUtil {
         StringBuilder webappBase = new StringBuilder(scheme);
         webappBase.append("://");
         webappBase.append(host);
-        if (!("http".equals(scheme) && serverPort == 80 || "https".equals(scheme) && serverPort == 443)) {
+        if (!(Objects.equals(scheme, "http") && serverPort == 80
+            || Objects.equals(scheme, "https") && serverPort == 443)) {
             webappBase.append(':').append(serverPort);
         }
         webappBase.append(path);
@@ -326,8 +327,7 @@ public class MCRFrontendUtil {
     /**
      * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The IP address of the local host is
      * automatically added to this list.
-     * 
-     * @return
+     *
      */
     private static TreeSet<String> getTrustedProxies() {
         // Always trust the local host
@@ -386,7 +386,6 @@ public class MCRFrontendUtil {
      *
      * @param lastIP IP address from former request
      * @param newIP IP address from current request
-     * @return
      * @throws UnknownHostException if <code>lastIP</code> or <code>newIP</code> are not valid IP addresses.
      */
     public static boolean isIPAddrAllowed(String lastIP, String newIP) throws UnknownHostException {
@@ -424,29 +423,20 @@ public class MCRFrontendUtil {
     }
 
     private static Boolean hasIPVersion(InetAddress ip, int version) {
-        int byteLength;
-        switch (version) {
-        case 4:
-            byteLength = 4;
-            break;
-        case 6:
-            byteLength = 16;
-            break;
-        default:
-            throw new IndexOutOfBoundsException("Unknown ip version: " + version);
-        }
+        int byteLength = switch (version) {
+            case 4 -> 4;
+            case 6 -> 16;
+            default -> throw new IndexOutOfBoundsException("Unknown ip version: " + version);
+        };
         return ip.getAddress().length == byteLength;
     }
 
     private static void addSessionListener() {
         MCRSessionMgr.addSessionListener(event -> {
             switch (event.getType()) {
-            case passivated:
-            case destroyed:
-                CURRENT_SERVLET_JOB.remove();
-                break;
-            default:
-                break;
+                case passivated, destroyed -> CURRENT_SERVLET_JOB.remove();
+                default -> {
+                }
             }
         });
     }

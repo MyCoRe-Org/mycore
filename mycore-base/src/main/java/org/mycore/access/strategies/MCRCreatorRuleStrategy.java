@@ -55,7 +55,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Thomas Scheffler (yagee)
  * @author Kathleen Neumann (mcrkrebs)
  *
- * @version $Revision$ $Date$
  */
 public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Logger LOGGER = LogManager.getLogger(MCRCreatorRuleStrategy.class);

@@ -37,7 +37,6 @@ import com.google.common.cache.CacheBuilder;
  * 
  * @see java.util.Hashtable
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRCache<K, V> {
     /** Tch type string for the MCRCacheJMXBridge */

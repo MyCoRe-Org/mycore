@@ -29,7 +29,7 @@ import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXMLCleanerTest extends MCRTestCase {
 
@@ -96,8 +96,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     private void cleanAndCompareTo(String xPathInput, String xPathExpectedOutput, MCRCleaningRule... rules)
-        throws JaxenException,
-        JDOMException {
+        throws JaxenException {
         Document xmlToClean = buildTestDocument(xPathInput);
         Document expectedXML = buildTestDocument(xPathExpectedOutput);
 
@@ -110,7 +109,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         assertTrue(MCRXMLHelper.deepEqual(expectedXML, result));
     }
 
-    private Document buildTestDocument(String xPath) throws JaxenException, JDOMException {
+    private Document buildTestDocument(String xPath) throws JaxenException {
         return new Document(new MCRNodeBuilder().buildElement(xPath, null, null));
     }
 }

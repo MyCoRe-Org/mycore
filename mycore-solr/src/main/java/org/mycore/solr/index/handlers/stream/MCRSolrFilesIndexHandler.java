@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -71,7 +70,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
     }
 
     @Override
-    public void index() throws IOException, SolrServerException {
+    public void index() throws IOException {
         MCRObjectID mcrID = MCRObjectID.getInstance(getID());
         if (!MCRMetadataManager.exists(mcrID)) {
             LOGGER.warn("Unable to index '{}' cause it doesn't exists anymore!", mcrID);
@@ -90,7 +89,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         final List<MCRSolrIndexHandler> subHandlerList = this.subHandlerList;
         final List<SolrInputDocument> docs = new ArrayList<>();
         final SolrClient solrClient = this.solrClient;
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

@@ -21,10 +21,10 @@ package org.mycore.restapi.v1;
 import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_MCRID;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -59,7 +59,6 @@ import jakarta.ws.rs.core.UriInfo;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision: $ $Date: $
  */
 @Path("/objects")
 public class MCRRestAPIObjects {
@@ -95,7 +94,6 @@ public class MCRRestAPIObjects {
      *     * sortorder = asc | desc
      *
      * @return a Jersey response object
-     * @throws MCRRestAPIException    
      */
 
     @GET
@@ -123,7 +121,6 @@ public class MCRRestAPIObjects {
      *     * sortorder = asc | desc
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
 
     @GET
@@ -150,7 +147,6 @@ public class MCRRestAPIObjects {
      * derivate details will be integrated into the output.
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     @GET
     @Produces(MediaType.TEXT_XML)
@@ -175,7 +171,6 @@ public class MCRRestAPIObjects {
      * allowed values are "derivatedetails" to integrate derivate details into the output.
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     @GET
     @Produces(MediaType.TEXT_XML)
@@ -185,7 +180,8 @@ public class MCRRestAPIObjects {
         @PathParam(PARAM_DERID) String derid,
         @QueryParam("style") String style)
         throws MCRRestAPIException {
-        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, app, "derivatedetails".equals(style));
+        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, app,
+            Objects.equals(style, "derivatedetails"));
     }
 
     /** returns a list of derivates for a given MyCoRe Object 
@@ -207,7 +203,6 @@ public class MCRRestAPIObjects {
      * @param depth - the level of subdirectories that should be returned
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
 
     @GET
@@ -232,7 +227,6 @@ public class MCRRestAPIObjects {
      * "mcr" is the default prefix for MyCoRe IDs.
      *
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @GET
@@ -246,7 +240,7 @@ public class MCRRestAPIObjects {
             if (url != null) {
                 return Response.seeOther(new URI(url)).build();
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
                     "A problem occurred while opening maindoc from derivate " + mcrDerID, e.getMessage()));
@@ -269,7 +263,6 @@ public class MCRRestAPIObjects {
      * @param fileDetails - file metadata from HTTP Post
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @POST
@@ -295,7 +288,6 @@ public class MCRRestAPIObjects {
      * @param overwrite - if true, return an existing derivate (with same label)
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
 
@@ -308,8 +300,7 @@ public class MCRRestAPIObjects {
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID, @FormDataParam("label") String label,
         @FormDataParam("classifications") String classifications,
-        @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite)
-        throws MCRRestAPIException {
+        @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite) {
         return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, classifications, overwrite);
     }
 
@@ -329,7 +320,6 @@ public class MCRRestAPIObjects {
      * @param md5 - the md5 sum of the uploaded file
      * @param size - the size of the uploaded file
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     @POST
     @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
@@ -359,7 +349,6 @@ public class MCRRestAPIObjects {
      * @param mcrDerID - a MyCoRe Derivate ID
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @DELETE
@@ -367,8 +356,7 @@ public class MCRRestAPIObjects {
     @MCRRequireTransaction
     public Response deleteFiles(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID,
-        @PathParam(PARAM_DERID) String mcrDerID)
-        throws MCRRestAPIException {
+        @PathParam(PARAM_DERID) String mcrDerID) {
         return MCRRestAPIUploadHelper.deleteAllFiles(info, request, mcrObjID, mcrDerID);
     }
 
@@ -382,7 +370,6 @@ public class MCRRestAPIObjects {
      * @param mcrDerID - a MyCoRe Derivate ID
      * 
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      * 
      */
     @DELETE

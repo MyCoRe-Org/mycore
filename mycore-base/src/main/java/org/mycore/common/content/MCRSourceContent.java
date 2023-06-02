@@ -34,7 +34,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -55,15 +54,13 @@ public class MCRSourceContent extends MCRWrappedContent {
         }
         this.source = source;
         MCRContent baseContent = null;
-        if (source instanceof JDOMSource) {
-            JDOMSource src = (JDOMSource) source;
+        if (source instanceof JDOMSource src) {
             Document xml = src.getDocument();
             if (xml != null) {
                 baseContent = new MCRJDOMContent(xml);
             } else {
                 for (Object node : src.getNodes()) {
-                    if (node instanceof Element) {
-                        Element element = (Element) node;
+                    if (node instanceof Element element) {
                         Document doc = element.getDocument();
                         if (doc == null) {
                             baseContent = new MCRJDOMContent(element);
@@ -75,8 +72,8 @@ public class MCRSourceContent extends MCRWrappedContent {
                             }
                         }
                         break;
-                    } else if (node instanceof Document) {
-                        baseContent = new MCRJDOMContent((Document) node);
+                    } else if (node instanceof Document doc) {
+                        baseContent = new MCRJDOMContent(doc);
                         break;
                     }
                 }
@@ -91,14 +88,13 @@ public class MCRSourceContent extends MCRWrappedContent {
             } catch (TransformerException e) {
                 throw new MCRException("Error while resolving JAXBSource", e);
             }
-        } else if (source instanceof SAXSource) {
-            SAXSource src = (SAXSource) source;
+        } else if (source instanceof SAXSource src) {
             baseContent = new MCRSAXContent(src.getXMLReader(), src.getInputSource());
-        } else if (source instanceof DOMSource) {
-            Node node = ((DOMSource) source).getNode();
+        } else if (source instanceof DOMSource domSource) {
+            Node node = domSource.getNode();
             baseContent = new MCRDOMContent(node.getOwnerDocument());
-        } else if (source instanceof StreamSource) {
-            InputStream inputStream = ((StreamSource) source).getInputStream();
+        } else if (source instanceof StreamSource streamSource) {
+            InputStream inputStream = streamSource.getInputStream();
             if (inputStream != null) {
                 baseContent = new MCRStreamContent(inputStream);
             } else {
@@ -139,7 +135,7 @@ public class MCRSourceContent extends MCRWrappedContent {
     }
 
     @Override
-    public Source getSource() throws IOException {
+    public Source getSource() {
         return source;
     }
 }

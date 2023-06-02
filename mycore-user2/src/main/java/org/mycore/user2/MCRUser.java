@@ -75,7 +75,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  */
 @Entity
 @Access(AccessType.PROPERTY)
@@ -195,19 +195,19 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this.internalID = internalID;
     }
 
-    @Column(name = "locked", nullable = true)
+    @Column(name = "locked")
     public boolean isLocked() {
         return locked;
     }
 
     public void setLocked(Boolean locked) {
-        this.locked = locked == null ? false : locked;
+        this.locked = locked != null && locked;
     }
 
     /**
      * @return the disabled
      */
-    @Column(name = "disabled", nullable = true)
+    @Column(name = "disabled")
     public boolean isDisabled() {
         return disabled;
     }
@@ -216,7 +216,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @param disabled the disabled to set
      */
     public void setDisabled(Boolean disabled) {
-        this.disabled = disabled == null ? false : disabled;
+        this.disabled = disabled != null && disabled;
     }
 
     /**
@@ -290,7 +290,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * @return the hash
      */
-    @Column(name = "password", nullable = true)
+    @Column(name = "password")
     public String getPassword() {
         return password == null ? null : password.hash;
     }
@@ -305,7 +305,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * @return the salt
      */
-    @Column(name = "salt", nullable = true)
+    @Column(name = "salt")
     public String getSalt() {
         return password == null ? null : password.salt;
     }
@@ -320,7 +320,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * @return the hashType
      */
-    @Column(name = "hashType", nullable = true)
+    @Column(name = "hashType")
     @Enumerated(EnumType.STRING)
     public MCRPasswordHashType getHashType() {
         return password == null ? null : password.hashType;
@@ -340,7 +340,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the user that owns this user.
      */
     @ManyToOne
-    @JoinColumn(name = "owner", nullable = true)
+    @JoinColumn(name = "owner")
     public MCRUser getOwner() {
         return owner;
     }
@@ -372,7 +372,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      *
      * @return the name of the person this login user represents.
      */
-    @Column(name = "realName", nullable = true)
+    @Column(name = "realName")
     public String getRealName() {
         return realName;
     }
@@ -396,7 +396,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return eMail;
     }
 
-    @Column(name = "eMail", nullable = true)
+    @Column(name = "eMail")
+    @SuppressWarnings("unused")
     private String getEMail() {
         return eMail;
     }
@@ -415,7 +416,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      *
      * @return a hint the user has stored in case of forgotten hash.
      */
-    @Column(name = "hint", nullable = true)
+    @Column(name = "hint")
     public String getHint() {
         return password == null ? null : password.hint;
     }
@@ -434,7 +435,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      *
      * @return the last time the user has logged in.
      */
-    @Column(name = "lastLogin", nullable = true)
+    @Column(name = "lastLogin")
     public Date getLastLogin() {
         if (lastLogin == null) {
             return null;
@@ -469,10 +470,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRUser)) {
+        if (!(obj instanceof MCRUser other)) {
             return false;
         }
-        MCRUser other = (MCRUser) obj;
         if (realmID == null) {
             if (other.realmID != null) {
                 return false;
@@ -518,20 +518,23 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public String getUserAttribute(String attribute) {
         switch (attribute) {
-        case MCRUserInformation.ATT_REAL_NAME:
-            return getRealName();
-        case MCRUserInformation.ATT_EMAIL:
-            return getEMailAddress();
-        default:
-            Set<MCRUserAttribute> attrs = attributes.stream()
-                .filter(a -> a.getName().equals(attribute))
-                .collect(Collectors.toSet());
-            if (attrs.size() > 1) {
-                throw new MCRException(getUserID() + ": user attribute " + attribute + " is not unique");
+            case MCRUserInformation.ATT_REAL_NAME -> {
+                return getRealName();
             }
-            return attrs.stream()
-                .map(MCRUserAttribute::getValue)
-                .findAny().orElse(null);
+            case MCRUserInformation.ATT_EMAIL -> {
+                return getEMailAddress();
+            }
+            default -> {
+                Set<MCRUserAttribute> attrs = attributes.stream()
+                    .filter(a -> a.getName().equals(attribute))
+                    .collect(Collectors.toSet());
+                if (attrs.size() > 1) {
+                    throw new MCRException(getUserID() + ": user attribute " + attribute + " is not unique");
+                }
+                return attrs.stream()
+                    .map(MCRUserAttribute::getValue)
+                    .findAny().orElse(null);
+            }
         }
     }
 
@@ -641,7 +644,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * Returns a {@link Date} when this user can not login anymore.
      */
-    @Column(name = "validUntil", nullable = true)
+    @Column(name = "validUntil")
     public Date getValidUntil() {
         if (validUntil == null) {
             return null;
@@ -692,7 +695,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             }
             roles.add(role);
         }
-        return roles.toArray(new MCRRole[roles.size()]);
+        return roles.toArray(MCRRole[]::new);
     }
 
     @SuppressWarnings("unused")

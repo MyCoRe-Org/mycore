@@ -18,20 +18,17 @@
 
 package org.mycore.iiif.image.model;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class MCRIIIFImageTileInformation {
+public record MCRIIIFImageTileInformation(int width, int height, List<Integer> scaleFactors) {
 
-    public final int width;
-
-    public final int height;
-
-    public List<Integer> scaleFactors = new ArrayList<>();
-
-    public MCRIIIFImageTileInformation(int width, int height) {
-        this.width = width;
-        this.height = height;
+    public static List<Integer> scaleFactorsAsPowersOfTwo(int n) {
+        return IntStream.range(0, n)
+            .map(i -> (int) Math.pow(2, i))
+            .boxed()
+            .collect(Collectors.toUnmodifiableList());
     }
 
 }

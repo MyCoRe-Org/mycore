@@ -36,11 +36,11 @@ import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 
 /**
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXEditorValidatorTest extends MCRTestCase {
 
-    private MCREditorSession buildSession(String template) throws JaxenException, JDOMException {
+    private MCREditorSession buildSession(String template) throws JaxenException {
         MCREditorSession session = new MCREditorSession();
         Document editedXML = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         session.setEditedXML(editedXML);

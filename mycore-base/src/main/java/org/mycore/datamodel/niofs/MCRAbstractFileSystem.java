@@ -54,10 +54,10 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR);
 
     private final LoadingCache<String, MCRPath> rootDirectoryCache = CacheBuilder.newBuilder().weakValues()
-        .build(new CacheLoader<String, MCRPath>() {
+        .build(new CacheLoader<>() {
 
             @Override
-            public MCRPath load(final String owner) throws Exception {
+            public MCRPath load(final String owner) {
                 return getPath(owner, "/", instance());
             }
         });
@@ -124,10 +124,9 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     public boolean verifies(MCRPath path) throws NoSuchFileException {
         try {
             return verifies(path, Files.readAttributes(path, MCRFileAttributes.class));
+        } catch (NoSuchFileException nsfe) {
+            throw nsfe;
         } catch (IOException e) {
-            if (e instanceof NoSuchFileException) {
-                throw (NoSuchFileException) e;
-            }
             return false;
         }
     }
@@ -172,7 +171,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     public abstract void removeRoot(String owner) throws FileSystemException;
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         throw new UnsupportedOperationException();
     }
 
@@ -213,14 +212,11 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         }
         final String syntax = syntaxAndPattern.substring(0, pos);
         final String pattern = syntaxAndPattern.substring(pos + 1);
-        switch (syntax) {
-        case "glob":
-            return new MCRGlobPathMatcher(pattern);
-        case "regex":
-            return new MCRPathMatcher(pattern);
-        default:
-            throw new UnsupportedOperationException("If the pattern syntax '" + syntax + "' is not known.");
-        }
+        return switch (syntax) {
+            case "glob" -> new MCRGlobPathMatcher(pattern);
+            case "regex" -> new MCRPathMatcher(pattern);
+            default -> throw new UnsupportedOperationException("If the pattern syntax '" + syntax + "' is not known.");
+        };
     }
 
     public MCRPath getRootDirectory(final String owner) {
@@ -248,7 +244,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     }
 
     @Override
-    public WatchService newWatchService() throws IOException {
+    public WatchService newWatchService() {
         throw new UnsupportedOperationException();
     }
 

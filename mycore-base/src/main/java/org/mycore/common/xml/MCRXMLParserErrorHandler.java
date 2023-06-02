@@ -26,7 +26,7 @@ import org.xml.sax.SAXParseException;
 /**
  * Handles errors during XML parsing.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRXMLParserErrorHandler implements ErrorHandler {
 

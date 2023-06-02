@@ -28,13 +28,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
+import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRURLContent;
-import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -68,7 +68,7 @@ public class MCRXMLParserTest extends MCRTestCase {
     }
 
     @Test
-    public void testInvalidXML() throws SAXParseException, IOException {
+    public void testInvalidXML() throws IOException, JDOMException {
         try {
             MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(xmlResourceInvalid));
             fail("MCRParserXerces accepts invalid XML content when validation is requested");
@@ -79,7 +79,7 @@ public class MCRXMLParserTest extends MCRTestCase {
     }
 
     @Test
-    public void testValidXML() throws SAXParseException, IOException {
+    public void testValidXML() throws IOException, JDOMException {
         MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(xmlResource));
         MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(xmlFile.toUri().toURL()));
     }

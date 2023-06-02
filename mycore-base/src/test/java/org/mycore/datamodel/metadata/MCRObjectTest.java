@@ -25,13 +25,13 @@ import java.net.URL;
 import java.util.Map;
 
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.xml.sax.SAXParseException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -65,7 +65,7 @@ public class MCRObjectTest extends MCRTestCase {
     }
 
     @Test
-    public void createJSON() throws Exception {
+    public void createJSON() {
         JsonObject json = testObject.createJSON();
         assertEquals("Invalid id", "mcr_test_00000001", json.getAsJsonPrimitive("id").getAsString());
         JsonObject textfield = json.getAsJsonObject("metadata").getAsJsonObject("def.textfield");
@@ -76,7 +76,7 @@ public class MCRObjectTest extends MCRTestCase {
         System.out.println(gson.toJson(json));
     }
 
-    private static Document loadResourceDocument(String resource) throws MCRException, SAXParseException, IOException {
+    private static Document loadResourceDocument(String resource) throws MCRException, IOException, JDOMException {
         URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
         return MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(mcrTestUrl));
     }

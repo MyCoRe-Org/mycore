@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
+import org.jdom2.JDOMException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,6 @@ import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.doi.MCRDOIParser;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.xml.sax.SAXParseException;
 
 public class MCRMODSDOIMetadataServiceTest extends MCRTestCase {
 
@@ -49,8 +49,7 @@ public class MCRMODSDOIMetadataServiceTest extends MCRTestCase {
     }
 
     @Test
-    public void testInsert() throws URISyntaxException, SAXParseException, IOException,
-        MCRPersistentIdentifierException {
+    public void testInsert() throws URISyntaxException, IOException, MCRPersistentIdentifierException, JDOMException {
 
         final MCRMODSDOIMetadataService service1 = (MCRMODSDOIMetadataService) MCRConfiguration2
             .getInstanceOf(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_1).get();

@@ -30,7 +30,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -61,7 +60,7 @@ import org.xml.sax.SAXException;
  * WEB-INF/lib/*.jar or WEB-INF/classes/xsl/ or in {@link MCRConfigurationDir}, outputs the
  * dependencies (import/include) and contained templates.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public final class MCRXSLInfoServlet extends MCRServlet {
 
@@ -296,7 +295,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             List<Element> list = xsl.getChildren("template", MCRConstants.XSL_NAMESPACE);
             IteratorIterable<Element> callTemplateElements = xsl
                 .getDescendants(Filters.element("call-template", MCRConstants.XSL_NAMESPACE));
-            LinkedList<Element> templates = new LinkedList<>(list);
+            List<Element> templates = new ArrayList<>(list);
             HashSet<String> callNames = new HashSet<>();
             for (Element callTemplate : callTemplateElements) {
                 String name = callTemplate.getAttributeValue("name");

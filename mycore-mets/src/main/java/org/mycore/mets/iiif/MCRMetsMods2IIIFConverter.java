@@ -158,7 +158,7 @@ public class MCRMetsMods2IIIFConverter {
             String label = Stream.of(order, orderLabel, contentIds)
                 .filter(o -> o != null && !o.isEmpty())
                 .collect(Collectors.joining(" - "));
-            label = ("".equals(label)) ? physicalSubDiv.getId() : label;
+            label = (Objects.equals(label, "")) ? physicalSubDiv.getId() : label;
 
             String identifier = this.physicalIdentifierMap.get(physicalSubDiv);
             try {
@@ -244,16 +244,11 @@ public class MCRMetsMods2IIIFConverter {
             if (dmdSec != null) {
                 MdWrap mdWrap = dmdSec.getMdWrap();
                 MDTYPE mdtype = mdWrap.getMdtype();
-                MCRMetsIIIFModsMetadataExtractor extractor;
-                switch (mdtype) {
-                case MODS:
-                    extractor = new MCRMetsIIIFModsMetadataExtractor();
-                    break;
-                default:
+                if (Objects.requireNonNull(mdtype) != MDTYPE.MODS) {
                     LOGGER.info("No extractor found for mdType: {}", mdtype);
                     return Collections.emptyList();
                 }
-
+                MCRMetsIIIFModsMetadataExtractor extractor = new MCRMetsIIIFModsMetadataExtractor();
                 return extractor
                     .extractModsMetadata(mdWrap.asElement().getChild("xmlData", MCRConstants.METS_NAMESPACE));
             }

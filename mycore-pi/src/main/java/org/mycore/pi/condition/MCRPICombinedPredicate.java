@@ -42,8 +42,6 @@ public abstract class MCRPICombinedPredicate extends MCRPIPredicateBase {
             .map(Integer::parseInt)
             .sorted()
             .map(Object::toString)
-            .map((subProperty) -> {
-                return MCRPIJobService.getPredicateInstance(getPropertyPrefix() + subProperty);
-            });
+            .map((subProperty) -> MCRPIJobService.getPredicateInstance(getPropertyPrefix() + subProperty));
     }
 }

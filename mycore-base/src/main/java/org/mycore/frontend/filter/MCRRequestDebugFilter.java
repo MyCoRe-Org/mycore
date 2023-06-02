@@ -61,7 +61,7 @@ public class MCRRequestDebugFilter implements Filter {
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
 
     }
 
@@ -146,7 +146,7 @@ public class MCRRequestDebugFilter implements Filter {
             MCRStreamUtils
                 .asStream(session.getAttributeNames())
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .forEachOrdered(attrName -> sb.append(" ")
+                .forEachOrdered(attrName -> sb.append(' ')
                     .append(attrName)
                     .append(": ")
                     .append(getValue(attrName,

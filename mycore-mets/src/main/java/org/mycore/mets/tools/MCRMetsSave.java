@@ -20,7 +20,6 @@ package org.mycore.mets.tools;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -189,11 +188,8 @@ public class MCRMetsSave {
      *
      * @param derivateID the derivate identifier
      * @return the mets.xml as JDOM document
-     * @throws JDOMException
-     * @throws IOException
-     * @throws SAXException
      */
-    private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
+    private static Document getCurrentMets(String derivateID) throws JDOMException, IOException {
         MCRPath metsFile = getMetsFile(derivateID);
         return metsFile == null ? null : new MCRPathContent(metsFile).asXML();
     }
@@ -418,7 +414,6 @@ public class MCRMetsSave {
      * @param mets the mets file to search
      * @param path the path to the alto file (e.g. "alto/alto_file.xml" when searching in DEFAULT_FILE_GROUP_USE or
      *             "image_file.jpg" when searchin in ALTO_FILE_GROUP_USE)
-     * @param searchFileGroup
      * @return the id of the matching file or null if there is no matching file
      */
     private static String searchFileInGroup(Document mets, String path, String searchFileGroup) {
@@ -534,8 +529,7 @@ public class MCRMetsSave {
      * @param mets the {@link Mets} object were the URNs should be inserted.
      * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
      */
-    public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap)
-        throws UnsupportedEncodingException {
+    public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap) {
         // put all files of the mets in a list
         List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
         List<File> files = new ArrayList<>();
@@ -562,11 +556,6 @@ public class MCRMetsSave {
         }
     }
 
-    /**
-     * @param mets
-     * @param file
-     * @return
-     */
     private static Document updateOnFileDelete(Document mets, MCRPath file) {
         Mets modifiedMets;
         try {
@@ -660,11 +649,6 @@ public class MCRMetsSave {
         return modifiedMets.asDocument();
     }
 
-    /**
-     *
-     * @param logDiv
-     * @param mets
-     */
     private static void handleParents(LogicalDiv logDiv, Mets mets) {
         LogicalDiv parent = logDiv.getParent();
 
@@ -703,7 +687,7 @@ public class MCRMetsSave {
     public static boolean isComplete(final FileGrp fileGroup, MCRPath rootDir) {
         final AtomicBoolean complete = new AtomicBoolean(true);
         try {
-            Files.walkFileTree(rootDir, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(rootDir, new SimpleFileVisitor<>() {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -753,7 +737,7 @@ public class MCRMetsSave {
             .map(File::getFLocat).map(FLocat::getHref).collect(Collectors.toList());
         List<String> derivateFiles = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory))
             .map(MCRPath::toMCRPath).map(MCRPath::getOwnerRelativePath)
-            .map(path -> path.substring(1)).filter(href -> !"mets.xml".equals(href))
+            .map(path -> path.substring(1)).filter(href -> !Objects.equals(href, "mets.xml"))
             .collect(Collectors.toList());
 
         ArrayList<String> removedFiles = new ArrayList<>(metsFiles);

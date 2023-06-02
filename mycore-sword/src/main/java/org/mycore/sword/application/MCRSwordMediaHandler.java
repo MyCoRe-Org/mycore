@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,7 +74,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
     }
 
     public MediaResource getMediaResourceRepresentation(String derivateID, String requestFilePath,
-        Map<String, String> accept) throws SwordError, SwordServerException {
+        Map<String, String> accept) throws SwordError {
         MediaResource resultRessource;
 
         if (!MCRAccessManager.checkPermission(derivateID, MCRAccessManager.PERMISSION_READ)) {
@@ -83,7 +82,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 "You dont have the right to read from the derivate!");
         }
 
-        if (requestFilePath != null && isValidFilePath(requestFilePath)) {
+        if (isValidFilePath(requestFilePath)) {
             final MCRPath path = MCRPath.getPath(derivateID, requestFilePath);
             checkFile(path);
 
@@ -114,7 +113,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
     }
 
     public void replaceMediaResource(String derivateId, String requestFilePath, Deposit deposit)
-        throws SwordError, SwordServerException {
+        throws SwordError {
         if (!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_WRITE)) {
             throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
                 "You dont have the right to write to the derivate!");
@@ -178,7 +177,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                         }
 
                         MCRSwordUtil.extractZipToPath(tempFile, ifsRootPath);
-                    } catch (IOException | NoSuchAlgorithmException | URISyntaxException e) {
+                    } catch (IOException | URISyntaxException e) {
                         throw new SwordServerException("Error while extracting ZIP.", e);
                     }
                 } else {
@@ -237,7 +236,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
             checkFile(path);
             try {
                 if (Files.isDirectory(path)) {
-                    Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                    Files.walkFileTree(path, new SimpleFileVisitor<>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                             Files.delete(file);

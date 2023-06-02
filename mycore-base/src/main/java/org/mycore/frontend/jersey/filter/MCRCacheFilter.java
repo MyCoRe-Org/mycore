@@ -18,7 +18,6 @@
 
 package org.mycore.frontend.jersey.filter;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,8 +85,7 @@ public class MCRCacheFilter implements ContainerResponseFilter {
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-        throws IOException {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         CacheControl cc;
         String currentCacheControl = requestContext.getHeaderString(HttpHeaders.CACHE_CONTROL);
         if (currentCacheControl != null) {
