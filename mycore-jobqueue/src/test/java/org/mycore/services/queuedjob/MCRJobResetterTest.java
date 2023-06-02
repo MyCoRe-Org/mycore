@@ -25,8 +25,8 @@ import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
 
+import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Queue;
 
 public class MCRJobResetterTest extends MCRJPATestCase {
@@ -36,8 +36,8 @@ public class MCRJobResetterTest extends MCRJPATestCase {
         MCRMockJobDAO mockDAO = new MCRMockJobDAO();
 
         // save reset jobs to this queues
-        Queue<MCRJob> reset1 = new LinkedList<>();
-        Queue<MCRJob> reset2 = new LinkedList<>();
+        Queue<MCRJob> reset1 = new ArrayDeque<>();
+        Queue<MCRJob> reset2 = new ArrayDeque<>();
 
         MCRConfiguration2JobConfig config = new MCRConfiguration2JobConfig();
 

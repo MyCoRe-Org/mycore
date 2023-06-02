@@ -18,15 +18,15 @@
 
 package org.mycore.services.queuedjob;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class MCRMockJobDAO implements MCRJobDAO {
 
-    public final List<MCRJob> daoOfferedJobs = new LinkedList<>();
+    public final List<MCRJob> daoOfferedJobs = new ArrayList<>();
 
     Long id = 1L;
 

@@ -19,11 +19,11 @@
 package org.mycore.services.queuedjob;
 
 import java.util.AbstractQueue;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -63,7 +63,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
         this.action = action;
         running = config.activated(action).orElseGet(config::activated);
         pollLock = new ReentrantLock();
-        listeners = new LinkedList<>();
+        listeners = new ArrayList<>();
     }
 
     /**

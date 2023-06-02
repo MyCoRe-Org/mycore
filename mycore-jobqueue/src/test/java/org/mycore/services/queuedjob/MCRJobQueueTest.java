@@ -18,8 +18,8 @@
 
 package org.mycore.services.queuedjob;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +40,8 @@ public class MCRJobQueueTest extends MCRTestCase {
 
     @Test
     public void offer() throws InterruptedException {
-        final List<MCRJob> offeredJobs = new LinkedList<>();
-        final List<MCRJob> notifiedJobs = new LinkedList<>();
+        final List<MCRJob> offeredJobs = new ArrayList<>();
+        final List<MCRJob> notifiedJobs = new ArrayList<>();
 
         MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, new MCRConfiguration2JobConfig(), mockDAO);
 
@@ -100,7 +100,7 @@ public class MCRJobQueueTest extends MCRTestCase {
     @Test
     public void poll() {
         MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, new MCRConfiguration2JobConfig(), mockDAO);
-        List<MCRJob> offeredJobs = new LinkedList<>();
+        List<MCRJob> offeredJobs = new ArrayList<>();
 
         MCRJob job;
         for (int i = 0; i < 10; i++) {
@@ -115,7 +115,7 @@ public class MCRJobQueueTest extends MCRTestCase {
         }
 
         // poll all jobs
-        List<MCRJob> polledJobs = new LinkedList<>();
+        List<MCRJob> polledJobs = new ArrayList<>();
         MCRJob polledJob;
         while ((polledJob = queue.poll()) != null) {
             polledJobs.add(polledJob);
@@ -132,7 +132,7 @@ public class MCRJobQueueTest extends MCRTestCase {
     @Test
     public void peek() {
         MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, new MCRConfiguration2JobConfig(), mockDAO);
-        List<MCRJob> offeredJobs = new LinkedList<>();
+        List<MCRJob> offeredJobs = new ArrayList<>();
 
         MCRJob job;
         for (int i = 0; i < 10; i++) {
