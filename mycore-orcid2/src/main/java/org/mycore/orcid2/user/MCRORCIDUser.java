@@ -82,14 +82,17 @@ public class MCRORCIDUser {
 
     private static final String WORK_PROPERTY_PREFIX = "MCR.ORCID2.Work.";
 
-    private static final boolean ALWAYS_UPDATE = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "AlwaysUpdateOwn")
-        .orElse(false);
+    private static final boolean ALWAYS_UPDATE
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "AlwaysUpdate").orElse(false);
 
-    private static final boolean CREATE_OWN = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "AlwaysCreateOwn")
-        .orElse(false);
+    private static final boolean CREATE_OWN
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "CreateOwn").orElse(false);
 
     private static final boolean CREATE_OWN_DUPLICATE
         = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "CreateOwnDuplicate").orElse(false);
+
+    private static final boolean RECREATE_DELETED
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "RecreateDeleted").orElse(false);
 
     private final MCRUser user;
 
@@ -309,7 +312,7 @@ public class MCRORCIDUser {
         try {
             return Optional.ofNullable(getUserPropertiesAttributeValueByORCID(orcid))
                 .map(p -> deserializeUserProperties(p))
-                .orElse(new MCRORCIDUserProperties(ALWAYS_UPDATE, CREATE_OWN_DUPLICATE, CREATE_OWN));
+                .orElse(new MCRORCIDUserProperties(ALWAYS_UPDATE, CREATE_OWN_DUPLICATE, CREATE_OWN, RECREATE_DELETED));
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Found corrupt user properites", e);
         }

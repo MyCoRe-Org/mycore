@@ -80,6 +80,15 @@ public class MCRORCIDPutCodeInfo {
     }
 
     /**
+     * Checks if object had own put code.
+     * 
+     * @return true if put code is -1
+     */
+    public boolean hadOwnPutCode() {
+        return ownPutCode == -1;
+    }
+
+    /**
      * Sets own put code.
      * 
      * @param putCode own put code

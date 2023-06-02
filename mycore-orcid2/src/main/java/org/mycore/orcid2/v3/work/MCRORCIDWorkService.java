@@ -166,7 +166,7 @@ public class MCRORCIDWorkService {
      */
     protected static void doDeleteWork(MCRORCIDPutCodeInfo workInfo, String orcid, MCRORCIDCredential credential) {
         removeWork(workInfo.getOwnPutCode(), orcid, credential);
-        workInfo.setOwnPutCode(0);
+        workInfo.setOwnPutCode(-1);
     }
 
     /**

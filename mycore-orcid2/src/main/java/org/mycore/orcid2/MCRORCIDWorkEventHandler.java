@@ -82,31 +82,12 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
-        final MCRORCIDFlagContent flagContent = MCRORCIDMetadataUtils.getORCIDFlagContent(object);
-        // TODO trust empty flag content?
-        if (flagContent == null) {
-            return;
-        }
-        final List<MCRORCIDUserInfo> userInfos = flagContent.getUserInfos();
-        if (userInfos.isEmpty()) {
-            return;
-        }
-        for (MCRORCIDUserInfo userInfo : userInfos) {
-            final MCRORCIDPutCodeInfo workInfo = userInfo.getWorkInfo();
-            if (workInfo != null && workInfo.hasOwnPutCode()) {
-                final String orcid = userInfo.getORCID();
-                try {
-                    final MCRORCIDCredential credential = MCRORCIDUserUtils.getCredentialByORCID(orcid);
-                    if (credential != null) {
-                        removeWork(workInfo, orcid, credential);
-                    } else {
-                        LOGGER.info("Cannot remove work. There are no credentials for {}", orcid);
-                    }
-                } catch (MCRORCIDException e) {
-                    LOGGER.error("Cannot remove work for {}", orcid, e);
-                }
-            }
-        }
+        final T work = transformObject(new MCRJDOMContent(object.createXML()));
+        final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
+            .orElse(new MCRORCIDFlagContent());
+        final Map<MCRORCIDUser, String> toDelete = listUserOrcidPairFromFlag(flagContent);
+        toDelete.putAll(listUserOrcidPairFromObject(object));
+        deleteWorks(toDelete, work, flagContent);
     }
 
     private void handlePublication(MCRObject object) {
@@ -127,39 +108,48 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             LOGGER.info("Nothing to do...", objectID);
             return;
         }
+        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+            throw new MCRORCIDException("Filtered MODS is empty.");
+        }
+        final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
 
         final Map<MCRORCIDUser, String> toDelete = new HashMap<MCRORCIDUser, String>(userOrcidPairFromFlag);
         toDelete.keySet().removeAll(userOrcidPairFromObject.keySet());
         if (!toDelete.isEmpty()) {
-            deleteWorks(toDelete, flagContent);
+            deleteWorks(toDelete, work, flagContent);
         }
 
         final Map<MCRORCIDUser, String> toPublish = new HashMap<MCRORCIDUser, String>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
         if (!toPublish.isEmpty()) {
-            publishWorks(toPublish, object, flagContent);
+            publishWorks(toPublish, work, flagContent);
         }
 
         MCRORCIDMetadataUtils.setORCIDFlagContent(object, flagContent);
         LOGGER.info("Finished publishing {} to ORCID.", objectID);
     }
 
-    private void deleteWorks(Map<MCRORCIDUser, String> userOrcidPair, MCRORCIDFlagContent flagContent) {
+    private void deleteWorks(Map<MCRORCIDUser, String> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
         for (Map.Entry<MCRORCIDUser, String> entry : userOrcidPair.entrySet()) {
             final MCRORCIDUser user = entry.getKey();
             final String orcid = entry.getValue();
-            final MCRORCIDUserInfo userInfo = flagContent.getUserInfoByORCID(orcid);
+            final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
+                .orElse(new MCRORCIDUserInfo(orcid));
             try {
                 final MCRORCIDCredential credential = user.getCredentialByORCID(orcid);
                 if (credential == null) {
                     // user is no longer an author and we no longer have credentials
                     continue;
                 }
-                removeWork(userInfo.getWorkInfo(), orcid, credential);
-                flagContent.updateUserInfoByORCID(orcid, userInfo);
+                updateWorkInfo(work, userInfo.getWorkInfo(), orcid, credential);
+                if (userInfo.getWorkInfo().hasOwnPutCode()) {
+                    removeWork(userInfo.getWorkInfo(), orcid, credential);
+                    flagContent.updateUserInfoByORCID(orcid, userInfo);
+                }
             } catch (MCRORCIDNotFoundException e) {
-                userInfo.getWorkInfo().setOwnPutCode(0);
+                userInfo.getWorkInfo().setOwnPutCode(-1);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (Exception e) {
                 LOGGER.warn("Error while deleting {}", userInfo.getWorkInfo().getOwnPutCode(), e);
@@ -167,13 +157,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
     }
 
-    private void publishWorks(Map<MCRORCIDUser, String> userOrcidPair, MCRObject object,
-        MCRORCIDFlagContent flagContent) {
-        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
-        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
-            throw new MCRORCIDException("Filtered MODS is empty.");
-        }
-        final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
+    private void publishWorks(Map<MCRORCIDUser, String> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
         for (Map.Entry<MCRORCIDUser, String> entry : userOrcidPair.entrySet()) {
             final MCRORCIDUser user = entry.getKey();
             final String orcid = entry.getValue();
@@ -189,43 +173,34 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                     LOGGER.info("The scope is invalid. Skipping...");
                     continue;
                 }
-                publish(work, user.getUserPropertiesByORCID(orcid), userInfo, credential);
+                publishWork(work, user.getUserPropertiesByORCID(orcid), userInfo.getWorkInfo(), orcid, credential);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
-            } catch (MCRORCIDNotFoundException e) {
-                // TODO handle recreate
             } catch (Exception e) {
-                LOGGER.warn("Error while publishing {} to ORCID:", object.getId(), e);
+                LOGGER.warn("Error while publishing Work to {}", orcid, e);
             }
         }
     }
 
-    private void publish(T work, MCRORCIDUserProperties userProperties, MCRORCIDUserInfo userInfo,
-        MCRORCIDCredential credential) {
-        if (userInfo.getWorkInfo() == null) {
-            final MCRORCIDPutCodeInfo workInfo = new MCRORCIDPutCodeInfo();
-            userInfo.setWorkInfo(workInfo);
-            updateWorkInfo(work, userInfo.getWorkInfo(), userInfo.getORCID(), credential);
-            if (workInfo.hasOwnPutCode()) {
-                // there is an inconsistent state
-                doUpdateWork(userInfo.getWorkInfo().getOwnPutCode(), work, userProperties, userInfo.getORCID(),
-                    credential);
-            } else if (workInfo.getOtherPutCodes() != null && userProperties.isCreateOwnDuplicate()) {
-                // there is already work, a duplicate is allowed to be created
-                createWork(work, userInfo.getWorkInfo(), userInfo.getORCID(), credential);
-            } else if (workInfo.getOtherPutCodes() == null && userProperties.isCreateOwn()) {
-                createWork(work, userInfo.getWorkInfo(), userInfo.getORCID(), credential);
-            } else {
-                throw new MCRORCIDException("Check user properties.");
+    private void publishWork(T work, MCRORCIDUserProperties userProperties, MCRORCIDPutCodeInfo workInfo,
+        String orcid, MCRORCIDCredential credential) {
+        updateWorkInfo(work, workInfo, orcid, credential);
+        if (workInfo.hasOwnPutCode()) {
+            if (userProperties.isAlwaysUpdate()) {
+                try {
+                    updateWork(workInfo.getOwnPutCode(), work, orcid, credential);
+                } catch (MCRORCIDNotFoundException e) {
+                    if (userProperties.isRecreateDeleted()) {
+                        createWork(work, workInfo, orcid, credential);
+                    }
+                }
             }
-        } else if (userInfo.getWorkInfo().hasOwnPutCode()) {
-            doUpdateWork(userInfo.getWorkInfo().getOwnPutCode(), work, userProperties, userInfo.getORCID(), credential);
-        }
-    }
-
-    private void doUpdateWork(long putCode, T work, MCRORCIDUserProperties userProperties, String orcid,
-        MCRORCIDCredential credential) {
-        if (userProperties.isAlwaysUpdate()) {
-            updateWork(putCode, work, orcid, credential);
+        } else if (workInfo.hadOwnPutCode()) {
+            if (userProperties.isRecreateDeleted()) {
+                createWork(work, workInfo, orcid, credential);
+            }
+        } else if ((workInfo.getOtherPutCodes() != null && userProperties.isCreateOwnDuplicate())
+            || (workInfo.getOtherPutCodes() == null && userProperties.isCreateOwn())) {
+            createWork(work, workInfo, orcid, credential);
         }
     }
 

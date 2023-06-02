@@ -29,11 +29,13 @@ public class MCRORCIDUserProperties {
 
     private boolean createOwn;
 
+    private boolean recreateDeleted;
+
     /**
      * Constructs new MCRORCIDUserProperties.
      */
     MCRORCIDUserProperties() {
-        this(false, false, false);
+        this(false, false, false, false);
     }
 
     /**
@@ -42,15 +44,18 @@ public class MCRORCIDUserProperties {
      * @param alwaysUpdate if always update
      * @param createOwnDuplicate if create own duplicate
      * @param createOwn if create own
+     * @param recreateDeleted if recreate deleted
      */
-    MCRORCIDUserProperties(boolean alwaysUpdate, boolean createOwnDuplicate, boolean createOwn) {
+    MCRORCIDUserProperties(boolean alwaysUpdate, boolean createOwnDuplicate, boolean createOwn,
+        boolean recreateDeleted) {
         this.alwaysUpdate = alwaysUpdate;
         this.createOwnDuplicate = createOwnDuplicate;
         this.createOwn = createOwn;
+        this.recreateDeleted = recreateDeleted;
     }
 
     /**
-     * Returns if always update.
+     * Returns always update property.
      * 
      * @return true if always update
      */
@@ -59,7 +64,7 @@ public class MCRORCIDUserProperties {
     }
 
     /**
-     * Sets always update.
+     * Sets always update property.
      * 
      * @param alwaysUpdate is always update
      */
@@ -68,7 +73,7 @@ public class MCRORCIDUserProperties {
     }
 
     /**
-     * Returns if create own duplicate.
+     * Returns create own duplicate property.
      * 
      * @return true if create own duplicate
      */
@@ -77,7 +82,7 @@ public class MCRORCIDUserProperties {
     }
 
     /**
-     * Sets is create own duplicate.
+     * Sets create own duplicate property.
      * 
      * @param createOwnDuplicate is create own duplicate
      */
@@ -86,7 +91,7 @@ public class MCRORCIDUserProperties {
     }
 
     /**
-     * Returns if create own.
+     * Returns if create own property.
      * 
      * @return true if create own
      */
@@ -95,11 +100,29 @@ public class MCRORCIDUserProperties {
     }
 
     /**
-     * Sets is create own.
+     * Sets create own property.
      * 
      * @param createOwn is create own
      */
     public void setCreateOwn(boolean createOwn) {
         this.createOwn = createOwn;
+    }
+
+    /**
+     * Returns recreate deleted property.
+     * 
+     * @return true if recreate deleted
+     */
+    public boolean isRecreateDeleted() {
+        return recreateDeleted;
+    }
+
+    /**
+     * Sets recreate deleted property.
+     * 
+     * @param recreateDeleted recreate deleted
+     */
+    public void setRecreateDeleted(boolean recreateDeleted) {
+        this.recreateDeleted = recreateDeleted;
     }
 }

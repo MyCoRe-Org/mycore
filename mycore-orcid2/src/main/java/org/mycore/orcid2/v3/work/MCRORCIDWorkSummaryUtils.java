@@ -97,9 +97,10 @@ public class MCRORCIDWorkSummaryUtils {
         final Supplier<Stream<WorkSummary>> matchingWorksSupplier
             = () -> findMatchingSummariesByIdentifiers(identifiers, summaries);
         long ownPutCode = workInfo.getOwnPutCode();
-        // validate current own put code
-        if (ownPutCode == 0 || !checkPutCodeExistsInSummaries(summaries, ownPutCode)) {
-            // try to find own work via identifiers as fallback
+        if (ownPutCode > 0 && !checkPutCodeExistsInSummaries(summaries, ownPutCode)) {
+            // ownPutCode is outdated because if does not exist in summaries anymore
+            workInfo.setOwnPutCode(-1);
+        } else if (ownPutCode == 0) {
             workInfo.setOwnPutCode(getPutCodeCreatedByThisAppFromSummaries(matchingWorksSupplier.get()));
         }
         if (MCRORCIDMetadataUtils.SAVE_OTHER_PUT_CODES) { // optimization
