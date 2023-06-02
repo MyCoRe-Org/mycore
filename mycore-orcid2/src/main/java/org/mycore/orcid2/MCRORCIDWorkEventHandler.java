@@ -104,7 +104,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             .orElse(new MCRORCIDFlagContent());
         final Map<MCRORCIDUser, String> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
         final Map<MCRORCIDUser, String> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
-        if (userOrcidPairFromFlag.isEmpty() && userOrcidPairFromFlag.isEmpty()) {
+        if (userOrcidPairFromFlag.isEmpty() && userOrcidPairFromObject.isEmpty()) {
             LOGGER.info("Nothing to do...", objectID);
             return;
         }
@@ -162,8 +162,6 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             final MCRORCIDUser user = entry.getKey();
             final String orcid = entry.getValue();
             try {
-                final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
-                    .orElse(new MCRORCIDUserInfo(orcid));
                 final MCRORCIDCredential credential = user.getCredentialByORCID(orcid);
                 if (credential == null) {
                     continue;
@@ -172,6 +170,11 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
                     LOGGER.info("The scope is invalid. Skipping...");
                     continue;
+                }
+                final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
+                    .orElse(new MCRORCIDUserInfo(orcid));
+                if (userInfo.getWorkInfo() == null) {
+                    userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
                 }
                 publishWork(work, user.getUserPropertiesByORCID(orcid), userInfo.getWorkInfo(), orcid, credential);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
