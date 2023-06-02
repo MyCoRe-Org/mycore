@@ -93,7 +93,7 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
 
         try {
             int maxWait = 10000;
-            int stepTime = 1000;
+            int stepTime = 100;
             while (getAllJobs(dao, job1.getAction()).stream()
                 .filter(j -> j.getStatus() == MCRJobStatus.FINISHED || j.getStatus() == MCRJobStatus.ERROR)
                 .count() < 3 && maxWait > 0) {
