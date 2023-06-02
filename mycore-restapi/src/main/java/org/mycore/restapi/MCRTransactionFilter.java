@@ -48,8 +48,8 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
             if (MCRTransactionHelper.transactionRequiresRollback()) {
                 try {
                     MCRTransactionHelper.rollbackTransaction();
-                } catch (RuntimeException e) {
-                    throw new InternalServerErrorException("Transaction rollback was required.", e);
+                } finally {
+                    throw new InternalServerErrorException("Transaction rollback was required.");
                 }
             }
             MCRTransactionHelper.commitTransaction();

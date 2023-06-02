@@ -33,6 +33,7 @@ import org.mycore.sword.application.MCRSwordLifecycle;
 import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.DepositReceipt;
+import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 
 /**
@@ -44,7 +45,7 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
 
     private MCRSwordLifecycleConfiguration lifecycleConfiguration;
 
-    public DepositReceipt addObject(Deposit deposit) {
+    public DepositReceipt addObject(Deposit deposit) throws SwordError, SwordServerException {
         final MCRSwordCollectionProvider collection = MCRSword
             .getCollection(this.lifecycleConfiguration.getCollection());
         final MCRObjectID idOfIngested = collection.getIngester().ingestMetadata(deposit);
@@ -52,7 +53,8 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
         return collection.getMetadataProvider().provideMetadata(createdObject);
     }
 
-    public DepositReceipt addObjectWithDerivate(String objectIdString, Deposit deposit) {
+    public DepositReceipt addObjectWithDerivate(String objectIdString, Deposit deposit)
+        throws SwordError, SwordServerException {
         final MCRSwordCollectionProvider collection = MCRSword
             .getCollection(this.lifecycleConfiguration.getCollection());
         final MCRObjectID idOfIngested = collection.getIngester().ingestMetadataResources(deposit);
@@ -60,7 +62,7 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
         return collection.getMetadataProvider().provideMetadata(createdObject);
     }
 
-    public DepositReceipt addMetadata(MCRObject object, Deposit deposit) {
+    public DepositReceipt addMetadata(MCRObject object, Deposit deposit) throws SwordError, SwordServerException {
         final MCRSwordCollectionProvider collection = MCRSword
             .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().updateMetadata(object, deposit, false);
@@ -73,21 +75,22 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
      * @param deposit the deposit with the new metadata
      * @return a new {@link DepositReceipt} with the new metadata
      */
-    public DepositReceipt replaceMetadata(MCRObject object, Deposit deposit) {
+    public DepositReceipt replaceMetadata(MCRObject object, Deposit deposit) throws SwordError, SwordServerException {
         final MCRSwordCollectionProvider collection = MCRSword
             .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().updateMetadata(object, deposit, true);
         return collection.getMetadataProvider().provideMetadata(object);
     }
 
-    public DepositReceipt replaceMetadataAndResources(MCRObject object, Deposit deposit) {
+    public DepositReceipt replaceMetadataAndResources(MCRObject object, Deposit deposit)
+        throws SwordError, SwordServerException {
         final MCRSwordCollectionProvider collection = MCRSword
             .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().updateMetadataResources(object, deposit);
         return collection.getMetadataProvider().provideMetadata(object);
     }
 
-    public DepositReceipt addResources(MCRObject object, Deposit deposit) {
+    public DepositReceipt addResources(MCRObject object, Deposit deposit) throws SwordError, SwordServerException {
         final MCRSwordCollectionProvider collection = MCRSword
             .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().ingestResource(object, deposit);
@@ -100,7 +103,8 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
      * @param object the MyCoReObject
      * @param accept the accept header of the HTTP-Request
      */
-    public DepositReceipt getMetadata(String collectionString, MCRObject object, Optional<Map<String, String>> accept) {
+    public DepositReceipt getMetadata(String collectionString, MCRObject object, Optional<Map<String, String>> accept)
+        throws SwordError {
         return MCRSword.getCollection(collectionString).getMetadataProvider().provideMetadata(object);
     }
 

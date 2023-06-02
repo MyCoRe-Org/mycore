@@ -26,16 +26,17 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.sword.MCRSwordConstants;
 import org.mycore.sword.MCRSwordUtil;
 import org.swordapp.server.DepositReceipt;
+import org.swordapp.server.SwordError;
 
 public abstract class MCRSwordMetadataProvider implements MCRSwordLifecycle {
     private MCRSwordLifecycleConfiguration lifecycleConfiguration;
 
-    public abstract DepositReceipt provideMetadata(MCRObject object);
+    public abstract DepositReceipt provideMetadata(MCRObject object) throws SwordError;
 
     /**
      * @param id    the id of the MyCoReObject as String
      */
-    public Entry provideListMetadata(MCRObjectID id) {
+    public Entry provideListMetadata(MCRObjectID id) throws SwordError {
         Entry feedEntry = Abdera.getInstance().newEntry();
 
         feedEntry.setId(id.toString());
