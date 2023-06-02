@@ -85,8 +85,8 @@ public class MCRORCIDOAuthClient {
     /**
      * Exchanges authorization code for an MCRORCIDOAuthAccessTokenResponse.
      * 
-     * @param code the ORCiD auth code
-     * @param redirectURI the redirect uri
+     * @param code the ORCID auth code
+     * @param redirectURI the redirect URI
      * @return the MCRORCIDOAuthAccessTokenResponse
      * @throws MCRORCIDRequestException if request fails
      * @see MCRORCIDOAuthAccessTokenResponse

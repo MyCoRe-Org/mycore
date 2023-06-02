@@ -63,7 +63,7 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
- * Resource for orcid oauth methods.
+ * Resource for ORCID OAuth methods.
  */
 @Path("orcid/oauth")
 public class MCRORCIDOAuthResource {
@@ -121,7 +121,7 @@ public class MCRORCIDOAuthResource {
     }
 
     /**
-     * Returns auth URI
+     * Returns authorization URI
      *
      * @param scope the scope
      * @return auth URI

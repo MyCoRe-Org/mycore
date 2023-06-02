@@ -25,6 +25,8 @@ import org.mycore.orcid2.exception.MCRORCIDException;
  */
 public class MCRORCIDInvalidScopeException extends MCRORCIDException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates new MCRORCIDInvalidScopeException.
      */

@@ -43,7 +43,7 @@ import org.mycore.orcid2.client.filter.MCRORCIDXMLWriter;
 abstract class MCRORCIDBaseClient {
 
     /**
-     * ORCID xml media type.
+     * ORCID XML media type.
      */
     protected static final MediaType ORCID_XML_MEDIA_TYPE
         = MediaType.valueOf(MCRORCIDClientConstants.ORCID_XML_MEDIA_TYPE);

@@ -24,7 +24,7 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
- * Provides orcid session utilities.
+ * Provides ORCID session utilities.
  */
 public class MCRORCIDSessionUtils {
 

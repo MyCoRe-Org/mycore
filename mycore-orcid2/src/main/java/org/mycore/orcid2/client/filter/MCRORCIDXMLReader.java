@@ -42,7 +42,8 @@ public class MCRORCIDXMLReader<T> implements MessageBodyReader<T> {
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return true; // handled by consumes annotation
+        // handled by consumes annotation
+        return true;
     }
 
     @Override

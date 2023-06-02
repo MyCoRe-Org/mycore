@@ -38,7 +38,7 @@ import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 public class MCRORCIDApp extends ResourceConfig {
 
     /**
-     * Creates ORCID API App.
+     * Creates ORCID API app.
      */
     public MCRORCIDApp() {
         super();

@@ -122,7 +122,7 @@ public class MCRORCIDClientFactory {
     }
 
     /**
-     * Checks if api is in member mode.
+     * Checks if API is in member mode.
      * 
      * @return true if member mode is enabled
      */

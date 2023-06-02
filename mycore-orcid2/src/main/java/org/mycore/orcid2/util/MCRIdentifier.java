@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Class to store ids.
+ * Class to store IDs.
  */
 public class MCRIdentifier {
 

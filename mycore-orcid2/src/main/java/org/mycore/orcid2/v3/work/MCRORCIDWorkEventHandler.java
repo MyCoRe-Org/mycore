@@ -25,7 +25,7 @@ import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
- * Work handler which publishes object to ORCID.
+ * See {@link org.mycore.orcid2.MCRORCIDWorkEventHandler}.
  */
 public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler<Work> {
 
@@ -47,7 +47,8 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
     @Override
     protected void updateWorkInfo(Work work, MCRORCIDPutCodeInfo workInfo, String orcid,
         MCRORCIDCredential credential) {
-        MCRORCIDWorkService.doUpdateWorkInfo(work, workInfo, orcid, credential);
+        MCRORCIDWorkService.doUpdateWorkInfo(MCRORCIDWorkUtils.listTrustedIdentifiers(work), workInfo, orcid,
+            credential);
     }
 
     @Override

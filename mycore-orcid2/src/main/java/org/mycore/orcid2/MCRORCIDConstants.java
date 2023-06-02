@@ -23,7 +23,7 @@ import java.util.List;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * Provies general constants.
+ * Provides general constants.
  */
 public class MCRORCIDConstants {
 
@@ -33,7 +33,7 @@ public class MCRORCIDConstants {
     public static final String CONFIG_PREFIX = "MCR.ORCID2.";
 
     /**
-     * ORCID Base url.
+     * ORCID Base URL.
      */
     public static final String ORCID_BASE_URL = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "BaseURL");
 

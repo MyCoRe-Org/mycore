@@ -63,7 +63,7 @@ public class MCRORCIDWorkSummaryUtils {
         return modsElements;
     }
 
-    // TODO ingnore case for identifiers/values
+    // TODO ignore case for identifiers/values
     // TODO identifiers may be case sensitive?
     /**
      * Returns a Stream of WorkSummaries matching a Set of MCRIdentifiers.

@@ -44,7 +44,7 @@ import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.xml.sax.SAXException;
 
 /**
- * Provides helper functions to transform between Work or WorkSummary and mods MCRContent.
+ * Provides helper functions to transform between Work or WorkSummary and MODS MCRContent.
  */
 public class MCRORCIDWorkTransformerHelper {
 
@@ -68,9 +68,9 @@ public class MCRORCIDWorkTransformerHelper {
     }
 
     /**
-     * Transforms mods MCRContent to Work.
+     * Transforms MODS MCRContent to Work.
      * 
-     * @param content the mods MCRContent
+     * @param content the MODS MCRContent
      * @return the Work
      * @throws MCRORCIDTransformationException if transformation failed
      */
@@ -84,11 +84,11 @@ public class MCRORCIDWorkTransformerHelper {
     }
 
     /**
-     * Transforms Work to mods MCRContent.
+     * Transforms Work to MODS MCRContent.
      * Merges BibLaTeX using transformer
      * 
      * @param work the Work
-     * @return the mods MCRContent
+     * @return the MODS MCRContent
      * @throws MCRORCIDTransformationException if transformation failed
      */
     public static MCRContent transformWork(Work work) {
@@ -113,7 +113,7 @@ public class MCRORCIDWorkTransformerHelper {
      * Transforms WorkSummary to mods MCRContent.
      * 
      * @param work the WorkSummary
-     * @return the mods MCRContent
+     * @return the MODS MCRContent
      * @throws MCRORCIDTransformationException if transformation failed
      */
     public static MCRContent transformWorkSummary(WorkSummary work) {

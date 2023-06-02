@@ -19,7 +19,7 @@
 package org.mycore.orcid2.client;
 
 /**
- * Interface for ORCID client which bound to specific MCRCredentials.
+ * Interface for ORCID client which bound to specific MCRCredential.
  */
 public interface MCRORCIDUserClient {
 

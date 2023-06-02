@@ -78,12 +78,13 @@ public class MCRORCIDWorkUtils {
     }
 
     /**
-     * Lists identifiers as Set of MCRIdentifier.
+     * Lists trusted identifiers as Set of MCRIdentifier.
      * 
      * @param work the Work
      * @return Set of MCRIdentifier
+     * @see MCRORCIDUtils#checkTrustedIdentifier
      */
-    public static Set<MCRIdentifier> listIdentifiers(Work work) {
+    public static Set<MCRIdentifier> listTrustedIdentifiers(Work work) {
         return work.getExternalIdentifiers().getExternalIdentifier().stream()
             .filter(i -> MCRORCIDUtils.checkTrustedIdentifier(i.getType()))
             .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());

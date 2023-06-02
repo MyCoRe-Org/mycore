@@ -39,7 +39,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.user2.MCRUser;
 import org.mycore.orcid2.client.MCRORCIDCredential;
+import org.mycore.orcid2.client.exception.MCRORCIDInvalidScopeException;
 import org.mycore.orcid2.client.exception.MCRORCIDNotFoundException;
+import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.metadata.MCRORCIDFlagContent;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
@@ -53,7 +55,7 @@ import org.orcid.jaxb.model.message.ScopeConstants;
 
 /**
  * When a publication is created or updated locally in this application,
- * collects all orcid name identifiers from the MODS metadata,
+ * collects all ORCID name identifiers from the MODS metadata,
  * looks up login users that have one of these identifiers stored in their user attributes,
  * checks if these users have an ORCID profile we know of
  * and have authorized us to update their profile as trusted party,
@@ -126,13 +128,13 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             return;
         }
 
-        final Map<MCRORCIDUser, String> toDelete = new HashMap(userOrcidPairFromFlag);
+        final Map<MCRORCIDUser, String> toDelete = new HashMap<MCRORCIDUser, String>(userOrcidPairFromFlag);
         toDelete.keySet().removeAll(userOrcidPairFromObject.keySet());
         if (!toDelete.isEmpty()) {
             deleteWorks(toDelete, flagContent);
         }
 
-        final Map<MCRORCIDUser, String> toPublish = new HashMap(userOrcidPairFromFlag);
+        final Map<MCRORCIDUser, String> toPublish = new HashMap<MCRORCIDUser, String>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
         if (!toPublish.isEmpty()) {
@@ -248,7 +250,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         final Map<MCRORCIDUser, String> userOrcidPair = new HashMap<>();
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             String orcid = null;
-            final Set<MCRUser> users = new HashSet();
+            final Set<MCRUser> users = new HashSet<MCRUser>();
             for (MCRIdentifier id : listTrustedNameIdentifiers(nameElement)) {
                 if (Objects.equals("orcid", id.getType())) {
                     orcid = id.getValue();
@@ -258,7 +260,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             if (orcid != null && users.size() == 1) {
                 userOrcidPair.put(new MCRORCIDUser(users.iterator().next()), orcid);
             } else if (orcid != null && users.size() > 1) {
-                final List<MCRORCIDUser> orcidUsers = new ArrayList();
+                final List<MCRORCIDUser> orcidUsers = new ArrayList<MCRORCIDUser>();
                 for (MCRUser user : users) {
                     final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
                     if (orcidUser.hasCredential(orcid)) {
@@ -298,6 +300,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
+     * @throws MCRORCIDInvalidScopeException if scope is invalid
+     * @throws MCRORCIDRequestException if the request fails
      * @throws MCRORCIDNotFoundException if specified Work does not exist
      */
     abstract protected void removeWork(MCRORCIDPutCodeInfo workInfo, String orcid, MCRORCIDCredential credential);
@@ -309,6 +313,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * @param work the Work
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
+     * @throws MCRORCIDInvalidScopeException if scope is invalid
+     * @throws MCRORCIDRequestException if the request fails
      * @throws MCRORCIDNotFoundException if specified Work does not exist
      */
     abstract protected void updateWork(long putCode, T work, String orcid, MCRORCIDCredential credential);
@@ -320,6 +326,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
+     * @throws MCRORCIDInvalidScopeException if scope is invalid
+     * @throws MCRORCIDRequestException if the request fails
      */
     abstract protected void createWork(T work, MCRORCIDPutCodeInfo workInfo, String orcid,
         MCRORCIDCredential credential);
@@ -331,6 +339,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
+     * @throws MCRORCIDException look up request fails
      */
     abstract protected void updateWorkInfo(T work, MCRORCIDPutCodeInfo workInfo, String orcid,
         MCRORCIDCredential credential);

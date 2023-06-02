@@ -33,7 +33,7 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
- * Provides cli commands for orcid2.
+ * Provides CLI commands for orcid2.
  */
 @MCRCommandGroup(
     name = "ORCID2")
@@ -47,7 +47,7 @@ public class MCRORCIDCommands {
     protected static final String ORCID_TOKEN_ATTRIBUTE_NAME = "token_orcid";
 
     /**
-     * Migrates all orcid token user attributes to MCRORCIDCredential.
+     * Migrates all ORCID token user attributes to MCRORCIDCredential.
      * 
      * @throws MCRORCIDException if migration fails
      * @throws MCRException if there is more than ORCiD attribute for one user

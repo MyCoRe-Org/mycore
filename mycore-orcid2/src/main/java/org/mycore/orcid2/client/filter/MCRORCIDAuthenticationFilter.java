@@ -31,7 +31,7 @@ public class MCRORCIDAuthenticationFilter implements ClientRequestFilter {
     private final String token;
 
     /**
-     * Creates request filter for bearer authentification.
+     * Creates request filter for bearer authentication.
      * 
      * @param token the token
      */

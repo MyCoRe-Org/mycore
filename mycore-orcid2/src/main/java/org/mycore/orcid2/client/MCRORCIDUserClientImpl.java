@@ -39,9 +39,9 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
     private final String orcid;
 
     /**
-     * Creates an MCRORCIDUserClient with given api url and MCRORCIDCredential.
+     * Creates an MCRORCIDUserClient with given API URL and MCRORCIDCredential.
      * 
-     * @param restURL rest url of ORCID api url
+     * @param restURL rest URL of ORCID API URL
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
      */

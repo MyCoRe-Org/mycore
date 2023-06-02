@@ -148,7 +148,7 @@ public class MCRORCIDUtils {
     }
 
     /**
-     * Extracts all orcid name identifiers in mods.
+     * Extracts all ORCID name identifiers of MCRObject.
      * 
      * @param object the MCRObject
      * @return Set of ORCID MCRIdentifier

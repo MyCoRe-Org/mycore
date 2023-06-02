@@ -31,7 +31,7 @@ public class MCRORCIDFlagContent {
     private List<MCRORCIDUserInfo> userInfos = new ArrayList<>();
 
     /**
-     * Initialises new MCRORCIDFlagContent object with List of MCRORCIDUserInfo.
+     * Initializes new MCRORCIDFlagContent object with List of MCRORCIDUserInfo.
      * 
      * @param userInfos List of MCRORCIDUserInfo
      */
@@ -40,13 +40,13 @@ public class MCRORCIDFlagContent {
     }
 
     /**
-     * Initialises new MCRORCIDFlagContent object.
+     * Initializes new MCRORCIDFlagContent object.
      */
     public MCRORCIDFlagContent() {
     }
 
     /**
-     * Returns orcid user infos.
+     * Returns List of MCRORCIDUserInfo.
      * 
      * @return List of MCRORCIDUserInfo
      */
@@ -55,7 +55,7 @@ public class MCRORCIDFlagContent {
     }
 
     /**
-     * Sets orcid user infos.
+     * Sets MCRORCIDUserInfos.
      * 
      * @param userInfos List of MCRORCIDUserInfo
      */

@@ -106,7 +106,7 @@ public class MCRORCIDObjectResource {
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
             final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
-            final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listIdentifiers(work);
+            final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
             final boolean result = MCRORCIDWorkSummaryUtils.findMatchingSummariesByIdentifiers(identifiers, summaries)
                 .findAny().isPresent();
             return new MCRORCIDPublicationStatus(true, result);
@@ -117,7 +117,7 @@ public class MCRORCIDObjectResource {
     }
 
     /**
-     * Creates MCRObject in ORCID profil for given MCRORCIDCredential.
+     * Creates MCRObject in ORCID profile for given MCRORCIDCredential.
      *
      * @param objectID the MCRObjectID
      * @return the Response

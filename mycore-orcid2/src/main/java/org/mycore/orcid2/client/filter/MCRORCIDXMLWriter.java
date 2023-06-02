@@ -41,7 +41,8 @@ public class MCRORCIDXMLWriter implements MessageBodyWriter<Object> {
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return true; // handled by consumes annotation
+        // handled by consumes annotation
+        return true;
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.orcid.jaxb.model.v3.release.error.OrcidError;
 
 /**
- * Provides utilty methods for v3 client.
+ * Provides utility methods for v3 client.
  */
 public class MCRORCIDClientHelper {
 

@@ -33,19 +33,19 @@ public class MCRORCIDReadClientImpl extends MCRORCIDBaseClient implements MCRORC
     private static final int DEFAULT_SEARCH_LIMIT = 1000;
 
     /**
-     * Creates a new Client with given API url.
+     * Creates a new Client with given API URL.
      * Can be used to read ORCID Public API.
      * 
-     * @param restURL url of ORCID API
+     * @param restURL URL of ORCID API
      */
     public MCRORCIDReadClientImpl(String restURL) {
         super(restURL, null);
     }
 
     /**
-     * Creates a new Client with given API url and token.
+     * Creates a new Client with given API URL and token.
      * 
-     * @param restURL url of ORCID API
+     * @param restURL URL of ORCID API
      * @param token the access token
      */
     public MCRORCIDReadClientImpl(String restURL, String token) {

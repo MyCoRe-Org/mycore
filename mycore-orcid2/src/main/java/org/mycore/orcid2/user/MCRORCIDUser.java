@@ -122,7 +122,7 @@ public class MCRORCIDUser {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
         final MCRUserAttribute attribute = new MCRUserAttribute(ATTR_ORCID_ID, orcid);
-        // allow more than one orcid id per user
+        // allow more than one ORCID iD per user
         if (!user.getAttributes().contains(attribute)) {
             user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
             MCRUserManager.updateUser(user);
@@ -145,7 +145,7 @@ public class MCRORCIDUser {
      * 
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
-     * @throws MCRORCIDException if crededential is invalid
+     * @throws MCRORCIDException if credential is invalid
      * @see MCRORCIDUser#addORCID
      */
     public void storeCredential(String orcid, MCRORCIDCredential credential) {
@@ -267,7 +267,7 @@ public class MCRORCIDUser {
         } catch (MCRPersistenceException e) {
             throw new MCRORCIDException("Cannot check publication", e);
         }
-        // TODO uniqueness of ids
+        // TODO uniqueness of IDs
         final Set<MCRIdentifier> nameIdentifiers
             = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object));
         nameIdentifiers.retainAll(getTrustedIdentifiers());
@@ -355,7 +355,7 @@ public class MCRORCIDUser {
      * 
      * @param credentialString MCRORCIDCredential as String
      * @return MCRORCIDCredential
-     * @throws IllegalArgumentException if deserialisation fails
+     * @throws IllegalArgumentException if deserialization fails
      */
     protected static MCRORCIDCredential deserializeCredential(String credentialString) {
         try {

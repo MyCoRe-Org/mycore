@@ -45,7 +45,7 @@ import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
 /**
- * Base resource for orcid methods.
+ * Base resource for ORCID methods.
  */
 @Path("v1")
 public class MCRORCIDResource {
@@ -78,7 +78,7 @@ public class MCRORCIDResource {
      * @param orcid the ORCID iD
      * @param redirectString optional redirect URI as String
      * @return Response
-     * @throws WebApplicationException if orcid is null, user is guest or revoke fails
+     * @throws WebApplicationException if ORCID iD is null, user is guest or revoke fails
      */
     @POST
     @Path("revoke/{orcid}")
@@ -113,7 +113,7 @@ public class MCRORCIDResource {
      * 
      * @param orcid the ORCID iD
      * @return the MCRORCIDUserProperties
-     * @throws WebApplicationException if orcid is null, user is guest
+     * @throws WebApplicationException if ORCID iD is null, user is guest
      */
     @GET
     @Path("{orcid}/user-properties")
@@ -133,7 +133,7 @@ public class MCRORCIDResource {
      * @param orcid the ORCID iD
      * @param userProperties the MCRORCIDUserProperties
      * @return Response
-     * @throws WebApplicationException if orcid is null, user is guest or set fails
+     * @throws WebApplicationException if ORCID iD is null, user is guest or set fails
      */
     @PUT
     @Path("{orcid}/user-properties")

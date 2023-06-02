@@ -33,7 +33,7 @@ import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.Provider;
 
 /**
- * Jersey configuration for ORCID endpoint.
+ * Jersey configuration for ORCID end point.
  */
 @Provider
 public class MCRORCIDFeature extends MCRJerseyDefaultFeature {
