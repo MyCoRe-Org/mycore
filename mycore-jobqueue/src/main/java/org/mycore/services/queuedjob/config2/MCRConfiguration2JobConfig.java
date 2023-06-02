@@ -18,6 +18,12 @@
 
 package org.mycore.services.queuedjob.config2;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
@@ -25,13 +31,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.services.queuedjob.MCRJobAction;
 import org.mycore.services.queuedjob.MCRJobConfig;
 import org.mycore.services.queuedjob.MCRJobStatusListener;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Reads the configuration for the job queue from mycore.properties using the {@link MCRConfiguration2} class.

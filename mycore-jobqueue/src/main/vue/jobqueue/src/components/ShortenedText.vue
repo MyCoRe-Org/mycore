@@ -19,7 +19,7 @@
 </template>
 <script setup lang="ts">
 
-import {defineProps, computed, reactive} from 'vue'
+import {computed, defineProps, reactive} from 'vue'
 
 const props = defineProps({
   text: {

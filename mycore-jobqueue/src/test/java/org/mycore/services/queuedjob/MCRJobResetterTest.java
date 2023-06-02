@@ -18,16 +18,16 @@
 
 package org.mycore.services.queuedjob;
 
+import java.util.ArrayDeque;
+import java.util.Date;
+import java.util.Queue;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
-
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.Queue;
 
 public class MCRJobResetterTest extends MCRJPATestCase {
 

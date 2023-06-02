@@ -20,17 +20,14 @@ package org.mycore.services.queuedjob;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.mcr.cronjob.MCRCronjob;
-
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 /**

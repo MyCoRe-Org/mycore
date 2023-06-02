@@ -18,7 +18,7 @@
 
 package org.mycore.services.queuedjob;
 
-import jakarta.persistence.EntityManager;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +26,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
-import java.util.List;
+import jakarta.persistence.EntityManager;
 
 /**
  * Provides commands to manage the job queue.

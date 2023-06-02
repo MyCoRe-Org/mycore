@@ -18,7 +18,10 @@
 
 package org.mycore.services.queuedjob;
 
-import jakarta.persistence.EntityTransaction;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
@@ -30,9 +33,7 @@ import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import jakarta.persistence.EntityTransaction;
 
 public class MCRJobThreadStarterTest extends MCRJPATestCase {
 

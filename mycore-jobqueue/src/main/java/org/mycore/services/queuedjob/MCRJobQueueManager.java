@@ -18,16 +18,16 @@
 
 package org.mycore.services.queuedjob;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the {@link MCRJobQueue} and other related instances for all {@link MCRJobAction} implementations.

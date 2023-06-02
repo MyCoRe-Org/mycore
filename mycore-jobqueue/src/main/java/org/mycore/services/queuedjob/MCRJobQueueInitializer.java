@@ -23,9 +23,9 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRStartupHandler;
+import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 import jakarta.servlet.ServletContext;
-import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 /**
  * Initializes the job queue on startup.

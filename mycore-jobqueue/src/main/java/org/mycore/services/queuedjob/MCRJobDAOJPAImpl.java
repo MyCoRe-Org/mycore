@@ -25,11 +25,11 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.NonUniqueResultException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

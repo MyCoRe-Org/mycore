@@ -18,12 +18,6 @@
 
 package org.mycore.services.queuedjob;
 
-import jakarta.persistence.EntityManager;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -31,6 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mycore.common.MCRJPATestCase;
+
+import jakarta.persistence.EntityManager;
 
 public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
     public static final String NEW_COUNT = "13";
