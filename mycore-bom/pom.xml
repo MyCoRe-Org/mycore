@@ -594,6 +594,11 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-jobqueue</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-lod</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -636,6 +641,11 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-orcid</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-packer</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

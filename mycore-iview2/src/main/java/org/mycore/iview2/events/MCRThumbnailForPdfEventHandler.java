@@ -38,6 +38,7 @@ import org.mycore.iview2.backend.MCRPDFThumbnailJobAction;
 import org.mycore.iview2.backend.MCRTileInfo;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueue;
+import org.mycore.services.queuedjob.MCRJobQueueManager;
 
 /**
  * This event handler creates iview2 files for title pages in PDFs which can be
@@ -60,7 +61,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
 
     private static MCRJobQueue initializeJobQueue() {
         LOGGER.info("Initializing jobQueue for PDF Thumbnail generation!");
-        return MCRJobQueue.getInstance(MCRPDFThumbnailJobAction.class);
+        return MCRJobQueueManager.getInstance().getJobQueue(MCRPDFThumbnailJobAction.class);
     }
 
     @Override

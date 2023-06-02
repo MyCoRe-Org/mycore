@@ -27,9 +27,6 @@ import org.mycore.services.queuedjob.MCRJobAction;
 
 public class MCRPIRegisterJobAction extends MCRJobAction {
 
-    public MCRPIRegisterJobAction() {
-    }
-
     public MCRPIRegisterJobAction(MCRJob job) {
         super(job);
     }

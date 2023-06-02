@@ -35,6 +35,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -194,6 +195,12 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
 
         configuration.put("MCR.PI.Parsers." + MCRMockIdentifierService.TYPE,
             MCRMockIdentifierParser.class.getName());
+
+        configuration.put("MCR.QueuedJob.activated", "true");
+        configuration.put("MCR.QueuedJob.JobThreads", "2");
+        configuration.put("MCR.QueuedJob.TimeTillReset", "10");
+        configuration.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
+        configuration.put("MCR.Access.Cache.Size", "1000");
 
         return configuration;
     }

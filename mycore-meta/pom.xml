@@ -100,6 +100,10 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
+      <artifactId>mycore-jobqueue</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
       <artifactId>mycore-lod</artifactId>
     </dependency>
     <dependency>
@@ -129,6 +133,10 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-orcid</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-packer</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
