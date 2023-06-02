@@ -83,16 +83,16 @@ public class MCRORCIDUser {
     private static final String WORK_PROPERTY_PREFIX = "MCR.ORCID2.Work.";
 
     private static final boolean ALWAYS_UPDATE
-        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "AlwaysUpdate").orElse(false);
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "AlwaysUpdateWork").orElse(false);
 
     private static final boolean CREATE_OWN
-        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "CreateOwn").orElse(false);
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "CreateFirstWork").orElse(false);
 
     private static final boolean CREATE_OWN_DUPLICATE
-        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "CreateOwnDuplicate").orElse(false);
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "CreateDuplicateWork").orElse(false);
 
     private static final boolean RECREATE_DELETED
-        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "RecreateDeleted").orElse(false);
+        = MCRConfiguration2.getBoolean(WORK_PROPERTY_PREFIX + "RecreateDeletedWork").orElse(false);
 
     private final MCRUser user;
 

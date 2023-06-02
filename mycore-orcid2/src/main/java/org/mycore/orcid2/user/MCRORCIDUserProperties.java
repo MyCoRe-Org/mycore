@@ -23,13 +23,13 @@ package org.mycore.orcid2.user;
  */
 public class MCRORCIDUserProperties {
 
-    private boolean alwaysUpdate;
+    private boolean alwaysUpdateWork;
 
-    private boolean createOwnDuplicate;
+    private boolean createDuplicateWork;
 
-    private boolean createOwn;
+    private boolean createFirstWork;
 
-    private boolean recreateDeleted;
+    private boolean recreateDeletedWork;
 
     /**
      * Constructs new MCRORCIDUserProperties.
@@ -41,88 +41,88 @@ public class MCRORCIDUserProperties {
     /**
      * Constructs new MCRORCIDUserProperties.
      * 
-     * @param alwaysUpdate if always update
-     * @param createOwnDuplicate if create own duplicate
-     * @param createOwn if create own
-     * @param recreateDeleted if recreate deleted
+     * @param alwaysUpdateWork if always update
+     * @param createDuplicateWork if create own duplicate
+     * @param createFirstWork if create own
+     * @param recreateDeletedWork if recreate deleted
      */
-    MCRORCIDUserProperties(boolean alwaysUpdate, boolean createOwnDuplicate, boolean createOwn,
-        boolean recreateDeleted) {
-        this.alwaysUpdate = alwaysUpdate;
-        this.createOwnDuplicate = createOwnDuplicate;
-        this.createOwn = createOwn;
-        this.recreateDeleted = recreateDeleted;
+    MCRORCIDUserProperties(boolean alwaysUpdateWork, boolean createDuplicateWork, boolean createFirstWork,
+        boolean recreateDeletedWork) {
+        this.alwaysUpdateWork = alwaysUpdateWork;
+        this.createDuplicateWork = createDuplicateWork;
+        this.createFirstWork = createFirstWork;
+        this.recreateDeletedWork = recreateDeletedWork;
     }
 
     /**
-     * Returns always update property.
+     * Returns always update work property.
      * 
      * @return true if always update
      */
-    public boolean isAlwaysUpdate() {
-        return alwaysUpdate;
+    public boolean isAlwaysUpdateWork() {
+        return alwaysUpdateWork;
     }
 
     /**
-     * Sets always update property.
+     * Sets always update work property.
      * 
-     * @param alwaysUpdate is always update
+     * @param alwaysUpdateWork is always update work
      */
-    public void setAlwaysUpdate(boolean alwaysUpdate) {
-        this.alwaysUpdate = alwaysUpdate;
+    public void setAlwaysUpdateWork(boolean alwaysUpdateWork) {
+        this.alwaysUpdateWork = alwaysUpdateWork;
     }
 
     /**
-     * Returns create own duplicate property.
+     * Returns create duplicate work property.
      * 
-     * @return true if create own duplicate
+     * @return true if create duplicate work
      */
-    public boolean isCreateOwnDuplicate() {
-        return createOwnDuplicate;
+    public boolean isCreateDuplicateWork() {
+        return createDuplicateWork;
     }
 
     /**
-     * Sets create own duplicate property.
+     * Sets create duplicate work property.
      * 
-     * @param createOwnDuplicate is create own duplicate
+     * @param createDuplicateWork is create duplicate work
      */
-    public void setCreateOwnDuplicate(boolean createOwnDuplicate) {
-        this.createOwnDuplicate = createOwnDuplicate;
+    public void setCreateDuplicateWork(boolean createDuplicateWork) {
+        this.createDuplicateWork = createDuplicateWork;
     }
 
     /**
-     * Returns if create own property.
+     * Returns create first work property.
      * 
-     * @return true if create own
+     * @return true if create first work
      */
-    public boolean isCreateOwn() {
-        return createOwn;
+    public boolean isCreateFirstWork() {
+        return createFirstWork;
     }
 
     /**
-     * Sets create own property.
+     * Sets create first work property.
      * 
-     * @param createOwn is create own
+     * @param createFirstWork is create first work
      */
-    public void setCreateOwn(boolean createOwn) {
-        this.createOwn = createOwn;
+    public void setCreateFirstWork(boolean createFirstWork) {
+        this.createFirstWork = createFirstWork;
     }
 
     /**
-     * Returns recreate deleted property.
+     * Returns recreate deleted work property.
      * 
-     * @return true if recreate deleted
+     * @return true if recreate deleted work
      */
-    public boolean isRecreateDeleted() {
-        return recreateDeleted;
+    public boolean isRecreateDeletedWork() {
+        return recreateDeletedWork;
     }
 
     /**
-     * Sets recreate deleted property.
+     * Sets recreate deleted work property.
      * 
-     * @param recreateDeleted recreate deleted
+     * @param recreateDeletedWork recreate deleted work
      */
-    public void setRecreateDeleted(boolean recreateDeleted) {
-        this.recreateDeleted = recreateDeleted;
+    public void setRecreateDeleted(boolean recreateDeletedWork) {
+        this.recreateDeletedWork = recreateDeletedWork;
     }
 }
