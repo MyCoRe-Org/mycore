@@ -79,7 +79,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         Function<MCRPIRegistrationInfo, Optional<Date>> registerFn = MCRPIUtils.getMCRURNClient()::register;
         do {
             progressedIdentifiersFromDatabase = MCRPIManager.getInstance()
-                .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, registerFn, BATCH_SIZE);
+                .setRegisteredDateForUnregisteredIdentifiers(MCRDNBURN.TYPE, registerFn, BATCH_SIZE);
         } while (progressedIdentifiersFromDatabase > 0);
 
         boolean registered = MCRPIManager.getInstance().isRegistered(urn1);
