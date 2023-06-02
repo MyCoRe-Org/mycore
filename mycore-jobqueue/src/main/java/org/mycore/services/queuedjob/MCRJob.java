@@ -93,8 +93,6 @@ public class MCRJob implements Cloneable {
 
     /**
      * Returns the job Id.
-     * 
-     * @return the job Id
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -114,8 +112,6 @@ public class MCRJob implements Cloneable {
 
     /**
      * Returns the action class ({@link MCRJobAction}).
-     * 
-     * @return the action class
      */
     @Column(name = "action", nullable = false)
     @Convert(converter = MCRJobActionConverter.class)
@@ -133,7 +129,7 @@ public class MCRJob implements Cloneable {
     }
 
     /**
-     * @return the current state ({@link MCRJobStatus}) of the job.
+     * Returns the current state ({@link MCRJobStatus}) of the job.
      */
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -152,8 +148,6 @@ public class MCRJob implements Cloneable {
 
     /**
      * Returns the adding date of job.
-     * 
-     * @return the add date of the job
      */
     @Column(name = "added", nullable = true)
     public Date getAdded() {
@@ -170,8 +164,6 @@ public class MCRJob implements Cloneable {
 
     /**
      * Returns the starting date of execution.
-     *  
-     * @return the job start date
      */
     @Column(name = "start", nullable = true)
     public Date getStart() {
@@ -189,8 +181,6 @@ public class MCRJob implements Cloneable {
 
     /**
      * Returns the finishing date of execution.
-     * 
-     * @return the finishing date
      */
     @Column(name = "finished", nullable = true)
     public Date getFinished() {
@@ -208,9 +198,8 @@ public class MCRJob implements Cloneable {
 
 
     /**
-     * Returns the number of retries .
-     *
-     * @return the number of retries
+     * Returns the number of retries.
+
      */
     @Column(name="tries")
     public Integer getTries() {
@@ -244,8 +233,6 @@ public class MCRJob implements Cloneable {
 
     /**
      * Returns all set parameters of the job.
-     * 
-     * @return the job parameters
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "MCRJobParameter", joinColumns = @JoinColumn(name = "jobID"))
@@ -265,7 +252,7 @@ public class MCRJob implements Cloneable {
     }
 
     /**
-     * Returns an single parameter by it's name.
+     * Returns a single parameter by its name.
      * 
      * @param key - the parameter name.
      * @return the value of the parameter.
@@ -280,7 +267,7 @@ public class MCRJob implements Cloneable {
     }
 
     /**
-     * Set an single parameter.
+     * Set a single parameter.
      * 
      * @param key - the parameter name
      * @param value - the parameter value
