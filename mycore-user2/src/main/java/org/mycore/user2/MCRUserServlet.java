@@ -99,6 +99,10 @@ public class MCRUserServlet extends MCRServlet {
             user = MCRUserManager.getUser(uid);
         }
 
+        if (action == null) {
+            action = "list";
+        }
+
         switch (action) {
             case "show" -> showUser(req, res, user, uid);
             case "save" -> saveCurrentUser(req, res);
