@@ -12,9 +12,13 @@ async function orcidOAuth(scope) {
     window.open(uri, '_blank', `toolbar=no, width=${width}, height=${height}, top=${top}, left=${left}`);
 }
 
-async function revokeORCID(orcid) {
+async function revokeORCID(orcid, redirect_uri) {
     const jwt = await fetchJWT();
-    const revoke = fetch(`${webApplicationBaseURL}api/orcid/v1/revoke/${orcid}`, {
+    let revokeURI = `${webApplicationBaseURL}api/orcid/v1/revoke/${orcid}`;
+    if (redirect_uri) {
+        revokeURI += `?redirect_uri=${redirect_uri}`;
+    }
+    const revoke = fetch(revokeURI, {
         method: 'POST',
         headers: { Authorization: `Bearer ${jwt}`}
     });
