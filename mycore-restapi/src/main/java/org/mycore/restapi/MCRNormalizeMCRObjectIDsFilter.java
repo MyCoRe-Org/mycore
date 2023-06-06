@@ -113,11 +113,11 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
                 String deridExtension = "";
                 if (derid.endsWith(".xml")) {
                     deridExtension = ".xml";
-                    derid = derid.substring(0, mcrid.length() - 4);
+                    derid = derid.substring(0, derid.length() - 4);
                 }
                 if (derid.endsWith(".json")) {
                     deridExtension = ".json";
-                    derid = derid.substring(0, mcrid.length() - 5);
+                    derid = derid.substring(0, derid.length() - 5);
                 }
                 try {
                     if (!SEARCHKEYS_FOR_DERIVATES.isEmpty() && derid.contains(":")) {
