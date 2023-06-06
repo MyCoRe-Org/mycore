@@ -335,6 +335,21 @@ public class MCRORCIDUser {
         MCRUserManager.updateUser(user);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRORCIDUser other = (MCRORCIDUser) obj;
+        return Objects.equals(user, other.user);
+    }
+
     /**
      * Serializes MCRORCIDCredential to String.
      * 

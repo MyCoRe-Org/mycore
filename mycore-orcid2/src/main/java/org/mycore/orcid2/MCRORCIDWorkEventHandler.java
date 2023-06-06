@@ -85,7 +85,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         final T work = transformObject(new MCRJDOMContent(object.createXML()));
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
             .orElse(new MCRORCIDFlagContent());
-        final Map<MCRORCIDUser, String> toDelete = listUserOrcidPairFromFlag(flagContent);
+        final Map<String, MCRORCIDUser> toDelete = listUserOrcidPairFromFlag(flagContent);
         toDelete.putAll(listUserOrcidPairFromObject(object));
         deleteWorks(toDelete, work, flagContent);
     }
@@ -102,8 +102,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
             .orElse(new MCRORCIDFlagContent());
-        final Map<MCRORCIDUser, String> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
-        final Map<MCRORCIDUser, String> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
+        final Map<String, MCRORCIDUser> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
+        final Map<String, MCRORCIDUser> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
         if (userOrcidPairFromFlag.isEmpty() && userOrcidPairFromObject.isEmpty()) {
             LOGGER.info("Nothing to do...", objectID);
             return;
@@ -114,13 +114,13 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
 
-        final Map<MCRORCIDUser, String> toDelete = new HashMap<MCRORCIDUser, String>(userOrcidPairFromFlag);
+        final Map<String, MCRORCIDUser> toDelete = new HashMap<>(userOrcidPairFromFlag);
         toDelete.keySet().removeAll(userOrcidPairFromObject.keySet());
         if (!toDelete.isEmpty()) {
             deleteWorks(toDelete, work, flagContent);
         }
 
-        final Map<MCRORCIDUser, String> toPublish = new HashMap<MCRORCIDUser, String>(userOrcidPairFromFlag);
+        final Map<String, MCRORCIDUser> toPublish = new HashMap<>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
         if (!toPublish.isEmpty()) {
@@ -131,10 +131,10 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         LOGGER.info("Finished publishing {} to ORCID.", objectID);
     }
 
-    private void deleteWorks(Map<MCRORCIDUser, String> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
-        for (Map.Entry<MCRORCIDUser, String> entry : userOrcidPair.entrySet()) {
-            final MCRORCIDUser user = entry.getKey();
-            final String orcid = entry.getValue();
+    private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
+        for (Map.Entry<String, MCRORCIDUser> entry : userOrcidPair.entrySet()) {
+            final String orcid = entry.getKey();
+            final MCRORCIDUser user = entry.getValue();
             final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
                 .orElse(new MCRORCIDUserInfo(orcid));
             try {
@@ -157,10 +157,10 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
     }
 
-    private void publishWorks(Map<MCRORCIDUser, String> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
-        for (Map.Entry<MCRORCIDUser, String> entry : userOrcidPair.entrySet()) {
-            final MCRORCIDUser user = entry.getKey();
-            final String orcid = entry.getValue();
+    private void publishWorks(Map<String, MCRORCIDUser> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
+        for (Map.Entry<String, MCRORCIDUser> entry : userOrcidPair.entrySet()) {
+            final String orcid = entry.getKey();
+            final MCRORCIDUser user = entry.getValue();
             try {
                 final MCRORCIDCredential credential = user.getCredentialByORCID(orcid);
                 if (credential == null) {
@@ -210,16 +210,16 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
     }
 
-    private Map<MCRORCIDUser, String> listUserOrcidPairFromFlag(MCRORCIDFlagContent flagContent) {
+    private Map<String, MCRORCIDUser> listUserOrcidPairFromFlag(MCRORCIDFlagContent flagContent) {
         if (flagContent.getUserInfos() == null) {
             return Collections.emptyMap();
         }
         final List<String> orcids = flagContent.getUserInfos().stream().filter(u -> u.getWorkInfo() != null)
             .filter(u -> u.getWorkInfo().hasOwnPutCode()).map(MCRORCIDUserInfo::getORCID).toList();
-        final Map<MCRORCIDUser, String> userOrcidPair = new HashMap<>();
+        final Map<String, MCRORCIDUser> userOrcidPair = new HashMap<>();
         for (String orcid : orcids) {
             try {
-                userOrcidPair.put(MCRORCIDUserUtils.getORCIDUserByORCID(orcid), orcid);
+                userOrcidPair.put(orcid, MCRORCIDUserUtils.getORCIDUserByORCID(orcid));
             } catch (MCRORCIDException e) {
                 LOGGER.warn(e);
             }
@@ -227,8 +227,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         return userOrcidPair;
     }
 
-    private Map<MCRORCIDUser, String> listUserOrcidPairFromObject(MCRObject object) {
-        final Map<MCRORCIDUser, String> userOrcidPair = new HashMap<>();
+    private Map<String, MCRORCIDUser> listUserOrcidPairFromObject(MCRObject object) {
+        final Map<String, MCRORCIDUser> userOrcidPair = new HashMap<>();
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             String orcid = null;
             final Set<MCRUser> users = new HashSet<MCRUser>();
@@ -239,7 +239,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 users.addAll(MCRORCIDUserUtils.getUserByID(id));
             }
             if (orcid != null && users.size() == 1) {
-                userOrcidPair.put(new MCRORCIDUser(users.iterator().next()), orcid);
+                userOrcidPair.put(orcid, new MCRORCIDUser(users.iterator().next()));
             } else if (orcid != null && users.size() > 1) {
                 final List<MCRORCIDUser> orcidUsers = new ArrayList<MCRORCIDUser>();
                 for (MCRUser user : users) {
@@ -249,7 +249,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                     }
                 }
                 if (orcidUsers.size() == 1) {
-                    userOrcidPair.put(orcidUsers.get(0), orcid);
+                    userOrcidPair.put(orcid, orcidUsers.get(0));
                 } else if (orcidUsers.size() > 1) {
                     LOGGER.warn("This case is not implemented");
                 }
@@ -257,7 +257,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 final MCRORCIDUser orcidUser = new MCRORCIDUser(users.iterator().next());
                 final Map<String, MCRORCIDCredential> pairs = orcidUser.getCredentials();
                 if (pairs.size() == 1) {
-                    userOrcidPair.put(orcidUser, pairs.entrySet().iterator().next().getKey());
+                    userOrcidPair.put(pairs.entrySet().iterator().next().getKey(), orcidUser);
                 } else if (pairs.size() > 1) {
                     LOGGER.info("Try to find credentials for {}, but found more than one pair",
                         users.iterator().next().getUserID());
