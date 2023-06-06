@@ -102,7 +102,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
         if (pathParts.length > derIdPos && pathParts[derIdPos - 1].equals("derivates")) {
             String derid = pathParts[derIdPos];
             String deridExtension = getExtension(derid);
-            derid = derid.substring(0, mcrid.length() - deridExtension.length());
+            derid = derid.substring(0, derid.length() - deridExtension.length());
             try {
                 final boolean searchDerId = !SEARCHKEYS_FOR_DERIVATES.isEmpty() && derid.contains(":");
                 pathParts[derIdPos] = MCRObjectID

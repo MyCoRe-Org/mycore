@@ -19,6 +19,7 @@
 package org.mycore.common.events;
 
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -36,7 +37,12 @@ public class MCREvent {
 
     /** Pre-defined event types * */
     public enum EventType {
-        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE, CUSTOM
+        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE, CUSTOM;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase(Locale.ROOT);
+        }
     }
 
     /** Pre-defined event objects * */
@@ -65,6 +71,11 @@ public class MCREvent {
                 }
             }
             return null;
+        }
+
+        @Override
+        public String toString() {
+            return className;
         }
     }
 
