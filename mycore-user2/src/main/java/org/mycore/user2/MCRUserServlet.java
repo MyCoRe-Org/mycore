@@ -55,6 +55,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.user2.utils.MCRUserTransformer;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -84,7 +85,7 @@ public class MCRUserServlet extends MCRServlet {
         if (forbidIfGuest(res)) {
             return;
         }
-        String action = req.getParameter("action");
+        String action = Optional.ofNullable(req.getParameter("action")).orElse("listUsers");
         String uid = req.getParameter("id");
         MCRUser user;
 
@@ -99,6 +100,7 @@ public class MCRUserServlet extends MCRServlet {
             user = MCRUserManager.getUser(uid);
         }
 
+
         switch (action) {
             case "show" -> showUser(req, res, user, uid);
             case "save" -> saveCurrentUser(req, res);
@@ -106,7 +108,8 @@ public class MCRUserServlet extends MCRServlet {
             case "changeMyPassword" -> redirectToPasswordChangePage(req, res);
             case "password" -> changePassword(req, res, user, uid);
             case "delete" -> deleteUser(req, res, user);
-            default -> listUsers(req, res);
+            case "listUsers" -> listUsers(req, res);
+            default -> throw new ServletException("unknown action: " + action);
         }
     }
 
