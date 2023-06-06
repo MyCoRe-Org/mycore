@@ -120,10 +120,8 @@ public class MCRORCIDWorkService {
                 } else {
                     throw new MCRORCIDException("Not allowed to create duplicate");
                 }
-            } else if (userProperties.isCreateFirstWork()) {
-                doCreateWork(work, userInfo.getWorkInfo(), orcid, credential);
             } else {
-                throw new MCRORCIDException("Check user properties");
+                doCreateWork(work, userInfo.getWorkInfo(), orcid, credential);
             }
             MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             MCRMetadataManager.update(object);
