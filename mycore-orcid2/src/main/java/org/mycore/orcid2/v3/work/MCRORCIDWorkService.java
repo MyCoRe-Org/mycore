@@ -200,7 +200,7 @@ public class MCRORCIDWorkService {
      */
     protected static void doUpdateWork(long putCode, Work work, String orcid, MCRORCIDCredential credential) {
         final Work remoteWork = fetchWork(putCode, orcid, credential);
-        if (MCRORCIDWorkUtils.checkWorkEquality(work, remoteWork)) {
+        if (!MCRORCIDWorkUtils.checkWorkEquality(work, remoteWork)) {
             updateWork(work, orcid, credential, putCode);
         } else {
             LOGGER.info("Update of work of user {} with put code {} not required.", orcid, putCode);
