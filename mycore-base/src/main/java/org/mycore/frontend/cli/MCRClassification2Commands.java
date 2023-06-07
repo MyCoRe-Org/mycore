@@ -606,4 +606,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         LOGGER.info(() -> "Repaired " + updates + " parentID columns for classification " + classID);
     }
 
+    @MCRCommand(syntax = "clear classification export transformer cache",
+        help = "Clears the classification export transformer cache",
+        order = 200)
+    public static void clearExportTransformerCache() {
+        TRANSFORMER_CACHE.clear();
+    }
+
 }

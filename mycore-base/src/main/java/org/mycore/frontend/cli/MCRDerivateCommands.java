@@ -865,4 +865,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRMetadataManager.update(derivate);
     }
 
+    @MCRCommand(syntax = "clear derivate export transformer cache",
+        help = "Clears the derivate export transformer cache",
+        order = 200)
+    public static void clearExportTransformerCache() {
+        TRANSFORMER_CACHE.clear();
+    }
+
 }
