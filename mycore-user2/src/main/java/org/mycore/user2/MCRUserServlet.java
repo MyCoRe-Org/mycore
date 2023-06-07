@@ -103,7 +103,7 @@ public class MCRUserServlet extends MCRServlet {
 
         switch (action) {
             case "show" -> showUser(req, res, user, uid);
-            case "save" -> saveCurrentUser(req, res);
+            case "save" -> saveUser(req, res);
             case "saveCurrentUser" -> saveCurrentUser(req, res);
             case "changeMyPassword" -> redirectToPasswordChangePage(req, res);
             case "password" -> changePassword(req, res, user, uid);
