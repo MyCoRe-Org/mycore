@@ -472,7 +472,7 @@
       <xsl:choose>
         <xsl:when test="count($nameIdentifier) &gt; 0">
           <xsl:value-of
-            select="concat(mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id)" />
+            select="concat('mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id)" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="'+mods.name:&quot;'" />
