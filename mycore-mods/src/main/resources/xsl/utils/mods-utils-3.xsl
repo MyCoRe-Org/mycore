@@ -6,9 +6,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:mcrstring="http://www.mycore.de/xslt/stringutils"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-  xmlns:encoder="xalan://java.net.URLEncoder"
   
-  exclude-result-prefixes="xlink mods fn mcri18n encoder">
+  exclude-result-prefixes="xlink mods fn mcri18n">
   
   <xsl:param name="CurrentUser" />
   <xsl:param name="CurrentLang" />
@@ -482,7 +481,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <a href="{encoder:encode($query)}">
+    <a href="{fn:encode-for-uri($query)}">
       <span>
         <span>
           <xsl:apply-templates select="." mode="nameString" />
