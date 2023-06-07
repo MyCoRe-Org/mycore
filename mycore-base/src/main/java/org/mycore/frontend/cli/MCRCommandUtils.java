@@ -166,8 +166,8 @@ public class MCRCommandUtils {
      * @param style
      *            the name of the style to be used when resolving the stylesheet.
      * @param defaultStyle
-     *            the name of the default style to be used when resolving the stylesheet.
-     *            A corresponding file xsl/<em>defaultStyle</em>.xsl must exist.
+     *            the name of the default style, ending with <em>.xsl</em> to be used when resolving the stylesheet.
+     *            A corresponding file xsl/<em>defaultStyle</em> must exist.
      * @param cache
      *            The transformer cache to be used.
      * @return the transformer
