@@ -34,6 +34,8 @@ import org.jdom2.Element;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
@@ -92,10 +94,17 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private void handlePublication(MCRObject object) {
         final MCRObjectID objectID = object.getId();
-        LOGGER.info("Start publishing {} to ORCID.", objectID);
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
+        if (MCRMetadataManager.exists(objectID)) {
+            final MCRObject outdatedObject = MCRMetadataManager.retrieveMCRObject(objectID);
+            if (MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
+                new MCRMODSWrapper(outdatedObject).getMODS())) {
+                return;
+            }
+        }
+        LOGGER.info("Start publishing {} to ORCID.", objectID);
         if (!MCRORCIDUtils.checkPublishState(object)) {
             LOGGER.info("Object has wrong state. Skipping {}.", objectID);
             return;
