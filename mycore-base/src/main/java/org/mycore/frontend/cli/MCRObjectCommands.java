@@ -1427,4 +1427,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRLinkTableManager.instance().update(MCRObjectID.getInstance(objectId));
     }
 
+    @MCRCommand(syntax = "clear object export transformer cache",
+        help = "Clears the object export transformer cache",
+        order = 200)
+    public static void clearExportTransformerCache() {
+        TRANSFORMER_CACHE.clear();
+    }
+
 }
