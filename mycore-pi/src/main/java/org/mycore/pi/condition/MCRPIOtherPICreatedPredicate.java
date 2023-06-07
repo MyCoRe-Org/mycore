@@ -31,7 +31,7 @@ import org.mycore.pi.MCRPIManager;
  * MCR.PI.Service.RosDokURN.CreationPredicate.4=org.mycore.pi.condition.MCRPIOtherPICreatedPredicate
  * MCR.PI.Service.RosDokURN.CreationPredicate.4.Service=MCRLocalID
  * MCR.PI.Service.RosDokURN.CreationPredicate.4.Type=local_id
-
+ *
  * 
  * @author Robert Stephan
  *
