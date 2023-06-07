@@ -472,16 +472,16 @@
       <xsl:choose>
         <xsl:when test="count($nameIdentifier) &gt; 0">
           <xsl:value-of
-            select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id, '&amp;owner=createdby:', $owner)" />
+            select="concat(mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id)" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=', '+mods.name:&quot;')" />
+          <xsl:value-of select="'+mods.name:&quot;'" />
           <xsl:apply-templates select="." mode="queryableNameString" />
-          <xsl:value-of select="concat('&quot;', '&amp;owner=createdby:', $owner)" />
+          <xsl:value-of select="'&quot;'" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <a href="{fn:encode-for-uri($query)}">
+    <a href="concat($ServletsBaseURL, 'solr/mods_nameIdentifier?q=', fn:encode-for-uri($query), '&amp;owner=createdby:', $owner)">
       <span>
         <span>
           <xsl:apply-templates select="." mode="nameString" />
