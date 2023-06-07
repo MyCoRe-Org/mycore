@@ -18,16 +18,20 @@
 
 package org.mycore.orcid2.v3.work;
 
+import java.util.Set;
+
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
+import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
+import org.mycore.orcid2.work.MCRORCIDWorkEventHandler;
 import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
- * See {@link org.mycore.orcid2.MCRORCIDWorkEventHandler}.
+ * See {@link org.mycore.orcid2.work.MCRORCIDWorkEventHandler}.
  */
-public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler<Work> {
+public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work> {
 
     @Override
     protected void removeWork(MCRORCIDPutCodeInfo workInfo, String orcid, MCRORCIDCredential credential) {
@@ -45,10 +49,24 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
     }
 
     @Override
-    protected void updateWorkInfo(Work work, MCRORCIDPutCodeInfo workInfo, String orcid,
+    protected void updateWorkInfo(Set<MCRIdentifier> identifiers, MCRORCIDPutCodeInfo workInfo, String orcid,
         MCRORCIDCredential credential) {
-        MCRORCIDWorkService.doUpdateWorkInfo(MCRORCIDWorkUtils.listTrustedIdentifiers(work), workInfo, orcid,
-            credential);
+        MCRORCIDWorkService.doUpdateWorkInfo(identifiers, workInfo, orcid, credential);
+    }
+
+    @Override
+    protected void updateWorkInfo(Set<MCRIdentifier> identifiers, MCRORCIDPutCodeInfo workInfo, String orcid) {
+        MCRORCIDWorkService.doUpdateWorkInfo(identifiers, workInfo, orcid);
+    }
+
+    @Override
+    protected Set<MCRIdentifier> listTrustedIdentifiers(Work work) {
+        return MCRORCIDWorkUtils.listTrustedIdentifiers(work);
+    }
+
+    @Override
+    protected Set<String> findMatchingORCIDs(Set<MCRIdentifier> identifiers) {
+        return MCRORCIDWorkService.findMatchingORCIDs(identifiers);
     }
 
     @Override

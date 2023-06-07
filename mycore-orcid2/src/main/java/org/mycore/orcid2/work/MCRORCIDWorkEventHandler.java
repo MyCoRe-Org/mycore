@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2;
+package org.mycore.orcid2.work;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -40,6 +41,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.user2.MCRUser;
+import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDInvalidScopeException;
 import org.mycore.orcid2.client.exception.MCRORCIDNotFoundException;
@@ -67,6 +69,12 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final boolean COLLECT_EXTERNAL_PUT_CODES
+        = MCRConfiguration2.getBoolean("MCR.ORCID2.WorkEventHandler.CollectExternalPutCodes").orElse(false);
+
+    private static final boolean SAVE_OTHER_PUT_CODES
+        = MCRConfiguration2.getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
+
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {
         handlePublication(object);
@@ -85,13 +93,15 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             return;
         }
         final T work = transformObject(new MCRJDOMContent(object.createXML()));
+        final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
             .orElse(new MCRORCIDFlagContent());
         final Map<String, MCRORCIDUser> toDelete = listUserOrcidPairFromFlag(flagContent);
         toDelete.putAll(listUserOrcidPairFromObject(object));
-        deleteWorks(toDelete, work, flagContent);
+        deleteWorks(toDelete, identifiers, flagContent);
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private void handlePublication(MCRObject object) {
         final MCRObjectID objectID = object.getId();
         if (!MCRMODSWrapper.isSupported(object)) {
@@ -122,25 +132,34 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             throw new MCRORCIDException("Filtered MODS is empty.");
         }
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
+        final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
 
         final Map<String, MCRORCIDUser> toDelete = new HashMap<>(userOrcidPairFromFlag);
         toDelete.keySet().removeAll(userOrcidPairFromObject.keySet());
         if (!toDelete.isEmpty()) {
-            deleteWorks(toDelete, work, flagContent);
+            deleteWorks(toDelete, identifiers, flagContent);
         }
 
         final Map<String, MCRORCIDUser> toPublish = new HashMap<>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
+        final Set<String> successfulPublished = new HashSet<>();
         if (!toPublish.isEmpty()) {
-            publishWorks(toPublish, work, flagContent);
+            publishWorks(toPublish, identifiers, work, flagContent, successfulPublished);
+        }
+
+        if (COLLECT_EXTERNAL_PUT_CODES && SAVE_OTHER_PUT_CODES) {
+            final Set<String> matchingOrcids = findMatchingORCIDs(identifiers);
+            matchingOrcids.removeAll(successfulPublished);
+            collectOtherPutCodes(identifiers, new ArrayList(matchingOrcids), flagContent);
         }
 
         MCRORCIDMetadataUtils.setORCIDFlagContent(object, flagContent);
         LOGGER.info("Finished publishing {} to ORCID.", objectID);
     }
 
-    private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
+    private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers,
+        MCRORCIDFlagContent flagContent) {
         for (Map.Entry<String, MCRORCIDUser> entry : userOrcidPair.entrySet()) {
             final String orcid = entry.getKey();
             final MCRORCIDUser user = entry.getValue();
@@ -152,7 +171,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                     // user is no longer an author and we no longer have credentials
                     continue;
                 }
-                updateWorkInfo(work, userInfo.getWorkInfo(), orcid, credential);
+                updateWorkInfo(identifiers, userInfo.getWorkInfo(), orcid, credential);
                 if (userInfo.getWorkInfo().hasOwnPutCode()) {
                     removeWork(userInfo.getWorkInfo(), orcid, credential);
                     flagContent.updateUserInfoByORCID(orcid, userInfo);
@@ -166,7 +185,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
     }
 
-    private void publishWorks(Map<String, MCRORCIDUser> userOrcidPair, T work, MCRORCIDFlagContent flagContent) {
+    private void publishWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers, T work,
+        MCRORCIDFlagContent flagContent, Set<String> successful) {
         for (Map.Entry<String, MCRORCIDUser> entry : userOrcidPair.entrySet()) {
             final String orcid = entry.getKey();
             final MCRORCIDUser user = entry.getValue();
@@ -185,7 +205,9 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 if (userInfo.getWorkInfo() == null) {
                     userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
                 }
+                updateWorkInfo(identifiers, userInfo.getWorkInfo(), orcid, credential);
                 publishWork(work, user.getUserPropertiesByORCID(orcid), userInfo.getWorkInfo(), orcid, credential);
+                successful.add(orcid);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (Exception e) {
                 LOGGER.warn("Error while publishing Work to {}", orcid, e);
@@ -195,7 +217,6 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private void publishWork(T work, MCRORCIDUserProperties userProperties, MCRORCIDPutCodeInfo workInfo,
         String orcid, MCRORCIDCredential credential) {
-        updateWorkInfo(work, workInfo, orcid, credential);
         if (workInfo.hasOwnPutCode()) {
             if (userProperties.isAlwaysUpdateWork()) {
                 try {
@@ -272,17 +293,50 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                         users.iterator().next().getUserID());
                 }
             } else if (orcid == null && users.size() > 1) {
-                // TODO
                 LOGGER.warn("This case is not implemented");
             }
         }
         return userOrcidPair;
     }
 
+    private void collectOtherPutCodes(Set<MCRIdentifier> identifiers, List<String> orcids,
+        MCRORCIDFlagContent flagContent) {
+        orcids.forEach(orcid -> {
+            try {
+                final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
+                    .orElseGet(() -> new MCRORCIDUserInfo(orcid));
+                if (userInfo.getWorkInfo() == null) {
+                    userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
+                }
+                updateWorkInfo(identifiers, userInfo.getWorkInfo(), orcid);
+                flagContent.updateUserInfoByORCID(orcid, userInfo);
+            } catch (MCRORCIDException e) {
+                LOGGER.warn("Could not collect put codes for {}.", orcid);
+            }
+        });
+    }
+
     private List<MCRIdentifier> listTrustedNameIdentifiers(Element nameElement) {
         return MCRORCIDUtils.getNameIdentifiers(nameElement).stream()
             .filter(i -> MCRORCIDUser.TRUSTED_NAME_IDENTIFIER_TYPES.contains(i.getType())).toList();
     }
+
+    /**
+     * Lists trusted identifiers as Set of MCRIdentifier.
+     * 
+     * @param work the Work
+     * @return Set of MCRIdentifier
+     */
+    abstract protected Set<MCRIdentifier> listTrustedIdentifiers(T work);
+
+    /**
+     * Lists matching ORCID iDs based on search via MCRIdentifier
+     * 
+     * @param identifiers the MCRIdentifiers
+     * @return Set of ORCID iDs as String
+     * @throws MCRORCIDException if request fails
+     */
+    abstract protected Set<String> findMatchingORCIDs(Set<MCRIdentifier> identifiers);
 
     /**
      * Removes Work in ORCID profile and updates MCRORCIDPutCodeInfo.
@@ -323,16 +377,26 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         MCRORCIDCredential credential);
 
     /**
-     * Updates Work in ORCID profile and updates MCRORCIDPutCodeInfo.
+     * Updates work info based on MCRIdentifier.
      * 
-     * @param work the Work
+     * @param identifiers the MCRIdentifier
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
      * @throws MCRORCIDException look up request fails
      */
-    abstract protected void updateWorkInfo(T work, MCRORCIDPutCodeInfo workInfo, String orcid,
+    abstract protected void updateWorkInfo(Set<MCRIdentifier> identifiers, MCRORCIDPutCodeInfo workInfo, String orcid,
         MCRORCIDCredential credential);
+
+    /**
+     * Updates work info based on MCRIdentifier.
+     * 
+     * @param identifiers the MCRIdentifier
+     * @param workInfo the MCRORCIDPutCodeInfo
+     * @param orcid the ORCID iD
+     * @throws MCRORCIDException look up request fails
+     */
+    abstract protected void updateWorkInfo(Set<MCRIdentifier> identifiers, MCRORCIDPutCodeInfo workInfo, String orcid);
 
     /**
      * Transforms MCRObject as MCRJDOMContent to Work.
