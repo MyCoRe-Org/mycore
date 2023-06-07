@@ -27,17 +27,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,8 +49,8 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -80,7 +78,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /** Default transformer script */
-    public static final String DEFAULT_TRANSFORMER = "save-classification.xsl";
+    public static final String DEFAULT_STYLE = "save-classification.xsl";
+
+    /** Static compiled transformer stylesheets */
+    private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
 
     /**
      * Deletes a classification
@@ -253,42 +254,31 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * Save a MCRClassification.
      *
      * @param id
-     *            the ID of the MCRClassification to be save.
+     *            the ID of the MCRClassification to save.
      * @param dirname
      *            the directory to export the classification to
      * @param style
-     *            the name part of the stylesheet like <em>style</em>
-     *            -classification.xsl
-     * @return false if an error was occured, else true
+     *            the name of the stylesheet, prefix of <em>style</em>-classification.xsl
      */
-    @MCRCommand(syntax = "export classification {0} to directory {1} with {2}",
-        help = "The command exports the classification with MCRObjectID {0} as xml file to directory named {1} "
-            + "using the stylesheet {2}-object.xsl. For {2} save is the default.",
+    @MCRCommand(syntax = "export classification {0} to directory {1} with stylesheet {2}",
+        help = "Stores the classification with MCRObjectID {0} as xml file to directory {1} "
+            + "with the stylesheet {2}-classification.xsl. For {2}, the default is xsl/save.",
         order = 60)
-    public static boolean export(String id, String dirname, String style) throws Exception {
-        String dname = "";
-        if (dirname.length() != 0) {
-            try {
-                File dir = new File(dirname);
-                if (!dir.isDirectory()) {
-                    dir.mkdir();
-                }
-                if (!dir.isDirectory()) {
-                    LOGGER.error("Can't find or create directory {}", dir.getAbsolutePath());
-                    return false;
-                } else {
-                    dname = dirname;
-                }
-            } catch (Exception e) {
-                LOGGER.error("Can't find or create directory {}", dirname, e);
-                return false;
-            }
+    public static void export(String id, String dirname, String style) throws Exception {
+
+        File dir = new File(dirname);
+        if (!dir.isDirectory()) {
+            LOGGER.error("{} is not a directory.", dirname);
+            return;
         }
+
         MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(id), -1);
         Document classDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
 
-        Transformer trans = getTransformer(style);
-        File xmlOutput = new File(dname, id + ".xml");
+        Transformer trans = getTransformer(style != null ? style + "-classification" : null);
+        String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
+
+        File xmlOutput = new File(dir, id + "." + extension);
         FileOutputStream out = new FileOutputStream(xmlOutput);
         if (trans != null) {
             StreamResult sr = new StreamResult(out);
@@ -299,41 +289,18 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             out.flush();
         }
         LOGGER.info("Classifcation {} saved to {}.", id, xmlOutput.getCanonicalPath());
-        return true;
     }
 
     /**
-     * The method search for a stylesheet mcr_<em>style</em>_object.xsl and
-     * build the transformer. Default is <em>mcr_save-object.xsl</em>.
+     * This method searches for the stylesheet <em>style</em>.xsl and builds the transformer. Default is
+     * <em>save-classification.xsl</em> if no stylesheet is given or the stylesheet couldn't be resolved.
      *
      * @param style
-     *            the style attribute for the transformer stylesheet
+     *            the name of the style to be used when resolving the stylesheet
      * @return the transformer
      */
-    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
-        TransformerConfigurationException {
-        String xslfile = DEFAULT_TRANSFORMER;
-        if (style != null && style.trim().length() != 0) {
-            xslfile = style + "-classification.xsl";
-        }
-        Transformer trans = null;
-
-        URL styleURL = MCRClassification2Commands.class.getResource("/" + xslfile);
-        if (styleURL == null) {
-            styleURL = MCRClassification2Commands.class.getResource(DEFAULT_TRANSFORMER);
-        }
-        if (styleURL != null) {
-            StreamSource source;
-            try {
-                source = new StreamSource(styleURL.toURI().toASCIIString());
-            } catch (URISyntaxException e) {
-                throw new TransformerConfigurationException(e);
-            }
-            TransformerFactory transfakt = TransformerFactory.newInstance();
-            transfakt.setURIResolver(MCRURIResolver.instance());
-            trans = transfakt.newTransformer(source);
-        }
-        return trans;
+    private static Transformer getTransformer(String style) {
+        return MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
     }
 
     /**
@@ -342,21 +309,17 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param dirname
      *            the directory name to store all classifications
      * @param style
-     *            the name part of the stylesheet like <em>style</em>
-     *            -classification.xsl
-     * @return false if an error was occured, else true
+     *            the name of the stylesheet, prefix of <em>style</em>-classification.xsl
+     * @return a list of export commands, one for each classification
      */
-    @MCRCommand(syntax = "export all classifications to directory {0} with {1}",
+    @MCRCommand(syntax = "export all classifications to directory {0} with stylesheet {1}",
         help = "The command store all classifications to the directory with name {0} with the stylesheet "
-            + "{1}-object.xsl. For {1} save is the default.",
+            + "{1}-classification.xsl. For {1}, the default is xsl/save.",
         order = 70)
-    public static boolean exportAll(String dirname, String style) throws Exception {
-        List<MCRCategoryID> allClassIds = DAO.getRootCategoryIDs();
-        boolean ret = false;
-        for (MCRCategoryID id : allClassIds) {
-            ret = ret & export(id.getRootID(), dirname, style);
-        }
-        return ret;
+    public static List<String> exportAll(String dirname, String style) throws Exception {
+         return DAO.getRootCategoryIDs().stream()
+            .map(id -> "export classification " + id + " to directory " + dirname + " with stylesheet " + style)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -642,4 +605,5 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         int updates = em.createNativeQuery(sqlQuery).executeUpdate();
         LOGGER.info(() -> "Repaired " + updates + " parentID columns for classification " + classID);
     }
+
 }

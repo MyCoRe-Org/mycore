@@ -60,6 +60,7 @@ import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -359,95 +360,86 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Export an MCRDerivate to a file named <em>MCRObjectID</em>.xml in a
-     * directory named <em>dirname</em> and store the derivate files in a
-     * nested directory named <em>MCRObjectID</em>. The method uses the
-     * converter stylesheet <em>style</em>.xsl.
+     * Export an MCRDerivate to a file named <em>MCRObjectID</em>.xml in a directory named <em>dirname</em>
+     * and store the derivate files in a nested directory named <em>MCRObjectID</em>.
+     * The method uses the converter stylesheet <em>style</em>.xsl.
      *
      * @param id
-     *            the ID of the MCRDerivate to be save.
+     *            the ID of the MCRDerivate to save.
      * @param dirname
      *            the dirname to store the derivate
      * @param style
-     *            the type of the stylesheet
+     *            the name of the stylesheet, prefix of <em>style</em>-derivate.xsl
      */
-    @MCRCommand(syntax = "export derivate {0} to directory {1} with stylesheet {2}",
-        help = "Stores the derivate with the MCRObjectID {0} to the directory {1}"
-            + " with the stylesheet {2}-derivate.xsl. For {2}, the default is xsl/save.",
+    @MCRCommand(
+        syntax = "export derivate {0} to directory {1} with stylesheet {2}",
+        help = "Stores the derivate with the MCRObjectID {0} to the directory {1}" +
+            " with the stylesheet {2}-derivate.xsl. For {2}, the default is xsl/save.",
         order = 90)
     public static void exportWithStylesheet(String id, String dirname, String style) {
         exportWithStylesheet(id, id, dirname, style);
     }
 
     /**
-     * Export any MCRDerivate's to files named <em>MCRObjectID</em>.xml in a
-     * directory named <em>dirname</em> and the derivate files in nested directories
-     * named <em>MCRObjectID</em>. Exporting starts with <em>fromID</em> and ends with <em>toID</em>.
-     * IDs that aren't found will be skipped. The method use the converter
-     * stylesheet <em>style</em>.xsl.
+     * Export any MCRDerivate's to files named <em>MCRObjectID</em>.xml in a directory named <em>dirname</em>
+     * and the derivate files in nested directories named <em>MCRObjectID</em>.
+     * Exporting starts with <em>fromID</em> and ends with <em>toID</em>. IDs that aren't found will be skipped.
+     * The method use the converter stylesheet <em>style</em>.xsl.
      *
      * @param fromID
-     *            the ID of the MCRObject from be save.
+     *            the first ID of the MCRDerivate to save.
      * @param toID
-     *            the ID of the MCRObject to be save.
+     *            the last ID of the MCRDerivate to save.
      * @param dirname
      *            the filename to store the object
      * @param style
-     *            the type of the stylesheet
+     *            the name of the stylesheet, prefix of <em>style</em>-derivate.xsl
      */
-
     @MCRCommand(syntax = "export derivates from {0} to {1} to directory {2} with stylesheet {3}",
         help = "Stores all derivates with MCRObjectID's between {0} and {1} to the directory {2}"
             + " with the stylesheet {3}-derivate.xsl. For {3}, the default is xsl/save.",
         order = 80)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
-        // check fromID and toID
-        MCRObjectID fid = null;
-        MCRObjectID tid = null;
 
+        // check fromID
+        MCRObjectID fid;
         try {
             fid = MCRObjectID.getInstance(fromID);
         } catch (Exception ex) {
             LOGGER.error("FromID : {}", ex.getMessage());
-
             return;
         }
 
+        // check toID
+        MCRObjectID tid;
         try {
             tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
             LOGGER.error("ToID : {}", ex.getMessage());
-
             return;
         }
 
         // check dirname
         File dir = new File(dirname);
-
-        if (dir.isFile()) {
-            LOGGER.error("{} is not a dirctory.", dirname);
-
+        if (!dir.isDirectory()) {
+            LOGGER.error("{} is not a directory.", dirname);
             return;
         }
 
         Transformer trans = getTransformer(style != null ? style + "-derivate" : null);
+        String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         int k = 0;
-
         try {
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
-
-                exportDerivate(dir, trans, MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i));
-
+                String id = MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
+                exportDerivate(dir, trans, extension, id);
                 k++;
             }
         } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file or objects to {}", dir.getAbsolutePath(), ex);
-
+            LOGGER.error("Exception while storing derivate to " + dir.getAbsolutePath(), ex);
             return;
         }
-
         LOGGER.info("{} Object's stored under {}.", k, dir.getAbsolutePath());
     }
 
@@ -458,8 +450,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param dirname
      *            the filename to store the object
      * @param style
-     *            the type of the stylesheet
-     * @return a list of export commands for each derivate
+     *            the name of the stylesheet, prefix of <em>style</em>-derivate.xsl
+     * @return a list of export commands, one for each derivate
      */
     @MCRCommand(syntax = "export all derivates to directory {0} with stylesheet {1}",
         help = "Stores all derivates to the directory {0} with the stylesheet {1}-derivate.xsl."
@@ -478,8 +470,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param dirname
      *            the filename to store the object
      * @param style
-     *            the type of the stylesheet
-     * @return a list of export commands for derivates with project name
+     *            the name of the stylesheet, prefix of <em>style</em>-derivate.xsl
+     * @return a list of export commands, one for each derivate
      */
     @MCRCommand(syntax = "export all derivates of project {0} to directory {1} with stylesheet {2}",
         help = "Stores all derivates of project {0} to the directory {1} with the stylesheet {2}-derivate.xsl."
@@ -492,7 +484,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
 
-    private static void exportDerivate(File dir, Transformer trans, String nid)
+    private static void exportDerivate(File dir, Transformer trans, String extension, String nid)
         throws TransformerException, IOException {
         // store the XML file
         Document xml = null;
@@ -522,7 +514,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.warn("Could not read {}, continue with next ID", nid);
             return;
         }
-        File xmlOutput = new File(dir, derivateID + ".xml");
+        File xmlOutput = new File(dir, derivateID + "." + extension);
         FileOutputStream out = new FileOutputStream(xmlOutput);
         dir = new File(dir, derivateID.toString());
 

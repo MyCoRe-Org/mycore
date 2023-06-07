@@ -570,16 +570,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * The method uses the converter stylesheet <em>style</em>.xsl.
      *
      * @param id
-     *            the id of the MCRObject to be save.
+     *            the id of the MCRObject to save.
      * @param dirname
      *            the dirname to store the object
      * @param style
-     *            the type of the stylesheet
+     *            the name of the stylesheet, prefix of <em>style</em>-object.xsl
      */
     @MCRCommand(
         syntax = EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND,
-        help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl."
-            + " For {2}, the default is xsl/save.",
+        help = "Stores the object with the MCRObjectID {0} to the directory {1}" +
+            " with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 110)
     public static void exportWithStylesheet(String id, String dirname, String style) {
         exportWithStylesheet(id, id, dirname, style);
@@ -590,7 +590,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * The method use the content transformer <em>transname</em>xsl.
      *
      * @param id
-     *            the id of the MCRObject to be save.
+     *            the id of the MCRObject to save.
      * @param dirname
      *            the dirname to store the object
      * @param transname
@@ -598,7 +598,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export object {0} to directory {1} with transformer {2}",
-        help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the transformer {2}.",
+        help = "Stores the object with the MCRObjectID {0} to the directory {1}" +
+            " with the transformer {2}.",
         order = 110)
     public static void exportWithTransformer(String id, String dirname, String transname) {
         exportWithTransformer(id, id, dirname, transname);
@@ -610,17 +611,17 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * The method uses the converter stylesheet <em>style</em>.xsl.
      *
      * @param fromID
-     *            the ID of the MCRObject from be save.
+     *            the first ID of the MCRObjects to save.
      * @param toID
-     *            the ID of the MCRObject to be save.
+     *            the last ID of the MCRObjects to save.
      * @param dirname
      *            the filename to store the object
      * @param style
-     *            the type of the stylesheet
+     *            the name of the stylesheet, prefix of <em>style</em>-object.xsl
      */
     @MCRCommand(
         syntax = "export objects from {0} to {1} to directory {2} with stylesheet {3}",
-        help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} "
+        help = "Stores all objects with MCRObjectID's between {0} and {1} to the directory {2} "
             + "with the stylesheet {3}-object.xsl. For {3}, the default is xsl/save.",
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
@@ -639,9 +640,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * The method use the content transformer <em>transname</em>xsl.
      *
      * @param fromID
-     *            the ID of the MCRObject from be save.
+     *            the first ID of the MCRObjects to save.
      * @param toID
-     *            the ID of the MCRObject to be save.
+     *            the last ID of the MCRObjects to save.
      * @param dirname
      *            the filename to store the object
      * @param transname
@@ -649,7 +650,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export objects from {0} to {1} to directory {2} with transformer {3}",
-        help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} "
+        help = "Stores all objects with MCRObjectID's between {0} and {1} to the directory {2} "
             + "with the transformer {3}.",
         order = 100)
     public static void exportWithTransformer(String fromID, String toID, String dirname, String transname) {
@@ -667,16 +668,25 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     private static void exportWith(String fromID, String toID, String dirname, String extension,
         FailableBiConsumer<MCRContent, OutputStream, Exception> trans) {
-        MCRObjectID fid, tid;
 
-        // check fromID and toID
+        // check fromID
+        MCRObjectID fid;
         try {
             fid = MCRObjectID.getInstance(fromID);
-            tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
             LOGGER.error("FromID : {}", ex.getMessage());
             return;
         }
+
+        // check toID
+        MCRObjectID tid;
+        try {
+            tid = MCRObjectID.getInstance(toID);
+        } catch (Exception ex) {
+            LOGGER.error("ToID : {}", ex.getMessage());
+            return;
+        }
+
         // check dirname
         File dir = new File(dirname);
         if (!dir.isDirectory()) {
@@ -691,14 +701,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                     continue;
                 }
-                if (!exportMCRObject(dir, extension, trans, id)) {
+                if (!exportObject(dir, extension, trans, id)) {
                     continue;
                 }
                 k++;
             }
         } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file to {}", dir.getAbsolutePath());
+            LOGGER.error("Exception while storing object to " +  dir.getAbsolutePath(), ex);
             return;
         }
         LOGGER.info("{} Object's stored under {}.", k, dir.getAbsolutePath());
@@ -713,12 +722,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param dirname
      *            the filename to store the object
      * @param style
-     *            the type of the stylesheet
+     *            the name of the stylesheet, prefix of <em>style</em>-object.xsl
+     * @return a list of export commands, one for each object
      */
     @MCRCommand(
         syntax = "export all objects of type {0} to directory {1} with stylesheet {2}",
-        help = "Stores all MCRObjects of type {0} to directory {1} with the stylesheet {2}-object.xsl."
-            + "For {2}, the default is xsl/save.",
+        help = "Stores all objects of type {0} to directory {1} " +
+            "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 120)
     public static List<String> exportAllObjectsOfTypeWithStylesheet(String type, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
@@ -734,12 +744,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param dirname
      *            the filename to store the object
      * @param style
-     *            the type of the stylesheet
+     *            the name of the stylesheet, prefix of <em>style</em>-object.xsl
+     * @return a list of export commands, one for each object
      */
     @MCRCommand(
         syntax = "export all objects of base {0} to directory {1} with stylesheet {2}",
-        help = "Stores all MCRObjects of base {0} to directory {1} with the stylesheet {2}-object.xsl."
-            + " For {2}, the default is xsl/save.",
+        help = "Stores all objects of base {0} to directory {1} " +
+            "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 130)
     public static List<String> exportAllObjectsOfBaseWithStylesheet(String base, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
@@ -796,9 +807,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the MCRObjectID
      * @return true if the store was okay (see description), else return false
      */
-    private static boolean exportMCRObject(File dir, String extension,
-        FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
-        String nid) throws IOException, MCRException {
+    private static boolean exportObject(File dir, String extension,
+                                        FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
+                                        String nid) throws IOException, MCRException {
         MCRContent content;
         try {
             // if object doesn't exist - no exception is caught!
