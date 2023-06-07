@@ -84,10 +84,6 @@ public class MCRORCIDWorkService {
     /**
      * Creates MCRObject in ORCID profile for given MCRORCIDCredential and updates flag.
      *
-     * Update and create strategies can be set via:
-     * 
-     * MCR.ORCID2.Work.CollectExternalPutCodes=
-     * 
      * @param object the MCRObject
      * @throws MCRORCIDException if cannot create work, transformation fails or cannot update flags
      */
@@ -155,6 +151,19 @@ public class MCRORCIDWorkService {
         } catch (Exception e) {
             throw new MCRORCIDException("Cannot remove work", e);
         }
+    }
+
+    /**
+     * Checks if Work is published in ORCID profile.
+     * 
+     * @param identifiers the identifiers
+     * @return true if found matching own work in profile
+     * @throws MCRORCIDException look up request fails
+     */
+    public boolean checkOwnWorkExists(Set<MCRIdentifier> identifiers) {
+        final MCRORCIDPutCodeInfo workInfo = new MCRORCIDPutCodeInfo();
+        doUpdateWorkInfo(identifiers, workInfo, orcid, credential);
+        return workInfo.hasOwnPutCode();
     }
 
     /**
@@ -233,7 +242,6 @@ public class MCRORCIDWorkService {
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
      * @throws MCRORCIDException look up request fails
-     * @see MCRORCIDUtils#checkTrustedIdentifier
      */
     protected static void doUpdateWorkInfo(Set<MCRIdentifier> identifiers, MCRORCIDPutCodeInfo workInfo, String orcid,
         MCRORCIDCredential credential) {
@@ -259,7 +267,6 @@ public class MCRORCIDWorkService {
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @throws MCRORCIDException look up request fails
-     * @see MCRORCIDUtils#checkTrustedIdentifier
      */
     protected static void doUpdateWorkInfo(Set<MCRIdentifier> identifiers, MCRORCIDPutCodeInfo workInfo,
         String orcid) {

@@ -18,7 +18,6 @@
 
 package org.mycore.orcid2.v3.rest.resources;
 
-import java.util.List;
 import java.util.Set;
 
 import jakarta.ws.rs.GET;
@@ -49,16 +48,11 @@ import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.util.MCRIdentifier;
-import org.mycore.orcid2.v3.MCRORCIDClientHelper;
-import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkService;
-import org.mycore.orcid2.v3.work.MCRORCIDWorkSummaryUtils;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.orcid.jaxb.model.v3.release.record.Work;
-import org.orcid.jaxb.model.v3.release.record.summary.Works;
-import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 
 /**
  * Basic resource for general methods.
@@ -68,6 +62,7 @@ public class MCRORCIDObjectResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    // TODO work-status?
     /**
      * Returns the publication status for a given MCRObjectID in the current user's ORCID profile, e.g.
      *
@@ -92,7 +87,8 @@ public class MCRORCIDObjectResource {
             // assumption that a publication cannot be in the profile, it is if not users.
             return new MCRORCIDPublicationStatus(false, false);
         }
-        if (orcids.size() > 1) { // should not happen
+        if (orcids.size() > 1) {
+            // should not happen
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         final String orcid = orcids.iterator().next();
@@ -101,14 +97,9 @@ public class MCRORCIDObjectResource {
             return new MCRORCIDPublicationStatus(true, false);
         }
         try {
-            final Works works = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential)
-                .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
-            final List<WorkSummary> summaries
-                = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
             final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
             final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
-            final boolean result = MCRORCIDWorkSummaryUtils.findMatchingSummariesByIdentifiers(identifiers, summaries)
-                .findAny().isPresent();
+            final boolean result = new MCRORCIDWorkService(orcid, credential, null).checkOwnWorkExists(identifiers);
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {
             LOGGER.error("Error while retrieving status: ", e);
@@ -116,6 +107,7 @@ public class MCRORCIDObjectResource {
         }
     }
 
+    // TODO create-work?
     /**
      * Creates MCRObject in ORCID profile for given MCRORCIDCredential.
      *

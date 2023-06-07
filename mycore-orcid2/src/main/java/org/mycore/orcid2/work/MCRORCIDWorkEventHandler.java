@@ -165,6 +165,9 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             final MCRORCIDUser user = entry.getValue();
             final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
                 .orElse(new MCRORCIDUserInfo(orcid));
+            if (userInfo.getWorkInfo() == null) {
+                userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
+            }
             try {
                 final MCRORCIDCredential credential = user.getCredentialByORCID(orcid);
                 if (credential == null) {
