@@ -68,6 +68,15 @@ public class MCREnrichmentTest extends MCRTestCase {
         assertTrue(test(enricherID, xPath, resultFile, debugFile));
     }
 
+    @Test
+    public void testParentIdentifierOnChildLevel() throws JaxenException, IOException {
+        String enricherID = "ParentIdentifierOnChildLevelTest";
+        String xPath = "mods:mods[mods:identifier[@type='doi']='10.23919/EuMC48046.2021']";
+        String resultFile = "testParentIdentifierOnChildLevel-result.xml";
+        //String debugFile = "testResolvingIteration-debug.xml";
+        assertTrue(test(enricherID, xPath, resultFile, null));
+    }
+    
     @Ignore
     public boolean test(String enricherID, String xPath, String resultFile, String debugFile)
         throws JaxenException, IOException {

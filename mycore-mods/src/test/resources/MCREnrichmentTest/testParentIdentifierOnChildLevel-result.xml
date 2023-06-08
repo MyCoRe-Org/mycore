@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:relatedItem type="host">
+    <mods:titleInfo>
+      <mods:title>Proceedings of the 2020 50th European Microwave Conference</mods:title>
+    </mods:titleInfo>
+    <mods:note>from data source GBV via ISBN</mods:note>
+    <mods:identifier type="isbn">978-2-87487-059-0</mods:identifier>
+    <mods:identifier type="doi">10.23919/EuMC48046.2021</mods:identifier>
+  </mods:relatedItem>
+  <mods:note>from data source IEEE via DOI</mods:note>
+  <mods:identifier type="doi">10.23919/EuMC48046.2021</mods:identifier> 
+</mods:mods>
