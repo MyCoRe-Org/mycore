@@ -228,15 +228,22 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                     updateWork(workInfo.getOwnPutCode(), work, orcid, credential);
                 } catch (MCRORCIDNotFoundException e) {
                     if (userProperties.isRecreateDeletedWork()) {
-                        createWork(work, workInfo, orcid, credential);
+                        doCreateWork(work, userProperties, workInfo, orcid, credential);
                     }
                 }
             }
         } else if (workInfo.hadOwnPutCode()) {
             if (userProperties.isRecreateDeletedWork()) {
-                createWork(work, workInfo, orcid, credential);
+                doCreateWork(work, userProperties, workInfo, orcid, credential);
             }
-        } else if (workInfo.getOtherPutCodes() != null) {
+        } else {
+            doCreateWork(work, userProperties, workInfo, orcid, credential);
+        }
+    }
+
+    private void doCreateWork(T work, MCRORCIDUserProperties userProperties, MCRORCIDPutCodeInfo workInfo,
+        String orcid, MCRORCIDCredential credential) {
+        if (workInfo.getOtherPutCodes() != null) {
             if (userProperties.isCreateDuplicateWork()) {
                 createWork(work, workInfo, orcid, credential);
             }
