@@ -107,29 +107,31 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
+        LOGGER.info("Start publishing {} to ORCID.", objectID);
+        if (!MCRORCIDUtils.checkPublishState(object)) {
+            LOGGER.info("Object has wrong state. Skipping {}...", objectID);
+            return;
+        }
         if (MCRMetadataManager.exists(objectID)) {
             final MCRObject outdatedObject = MCRMetadataManager.retrieveMCRObject(objectID);
             if (MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
                 new MCRMODSWrapper(outdatedObject).getMODS())) {
+                LOGGER.info("Metadata does not changed. Skipping {}...", objectID);
                 return;
             }
-        }
-        LOGGER.info("Start publishing {} to ORCID.", objectID);
-        if (!MCRORCIDUtils.checkPublishState(object)) {
-            LOGGER.info("Object has wrong state. Skipping {}.", objectID);
-            return;
         }
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
             .orElse(new MCRORCIDFlagContent());
         final Map<String, MCRORCIDUser> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
         final Map<String, MCRORCIDUser> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
         if (userOrcidPairFromFlag.isEmpty() && userOrcidPairFromObject.isEmpty()) {
-            LOGGER.info("Nothing to do...", objectID);
+            LOGGER.info("Nothing to do. Skipping {}...", objectID);
             return;
         }
         final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
         if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
-            throw new MCRORCIDException("Filtered MODS is empty.");
+            LOGGER.info("Filtered MODS is empty. Skipping {}...", objectID);
+            return;
         }
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
         final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
@@ -155,7 +157,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
 
         MCRORCIDMetadataUtils.setORCIDFlagContent(object, flagContent);
-        LOGGER.info("Finished publishing {} to ORCID.", objectID);
+        LOGGER.info("Finished publishing {} to ORCID successfully.", objectID);
     }
 
     private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers,
