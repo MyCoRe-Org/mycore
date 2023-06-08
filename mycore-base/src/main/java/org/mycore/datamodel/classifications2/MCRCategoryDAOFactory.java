@@ -36,7 +36,7 @@ public class MCRCategoryDAOFactory {
      */
     public static MCRCategoryDAO getInstance() {
         return Objects.requireNonNull(MCRCategoryDAOHolder.INSTANCE,
-            "MCRCategory cannot be NULL - There is a problem with the loading order of classes");
+            "MCRCategoryDAO cannot be NULL - There is a problem with the loading order of classes");
     }
 
     /**
