@@ -34,6 +34,7 @@ import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
+import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.common.ContributorAttributes;
 import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
@@ -79,6 +80,7 @@ public class MCRORCIDWorkUtils {
 
     /**
      * Lists trusted identifiers as Set of MCRIdentifier.
+     * Considers only identifiers with relationship 'self'
      * 
      * @param work the Work
      * @return Set of MCRIdentifier
@@ -86,6 +88,7 @@ public class MCRORCIDWorkUtils {
      */
     public static Set<MCRIdentifier> listTrustedIdentifiers(Work work) {
         return work.getExternalIdentifiers().getExternalIdentifier().stream()
+            .filter(i -> Relationship.SELF.equals(i.getRelationship()))
             .filter(i -> MCRORCIDUtils.checkTrustedIdentifier(i.getType()))
             .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
     }
