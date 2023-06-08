@@ -18,8 +18,6 @@
 
 package org.mycore.orcid2.rest.resources;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import jakarta.ws.rs.Consumes;
@@ -29,7 +27,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -76,7 +73,6 @@ public class MCRORCIDResource {
      * Revokes ORCID iD for current user.
      * 
      * @param orcid the ORCID iD
-     * @param redirectString optional redirect URI as String
      * @return Response
      * @throws WebApplicationException if ORCID iD is null, user is guest or revoke fails
      */
@@ -84,26 +80,15 @@ public class MCRORCIDResource {
     @Path("revoke/{orcid}")
     @MCRRequireTransaction
     @MCRRestrictedAccess(MCRRequireLogin.class)
-    public Response revoke(@PathParam("orcid") String orcid, @QueryParam("redirect_uri") String redirectString) {
+    public Response revoke(@PathParam("orcid") String orcid) {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        URI redirectURI = null;
-        if (redirectString != null) {
-            try {
-                redirectURI = new URI(redirectString);
-            } catch (URISyntaxException e) {
-                throw new WebApplicationException(Status.BAD_REQUEST);
-            }
         }
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         try {
             MCRORCIDUserUtils.revokeCredentialByORCID(orcidUser, orcid);
         } catch (MCRORCIDException e) {
             throw new WebApplicationException(e, Status.BAD_REQUEST);
-        }
-        if (redirectURI != null) {
-            return Response.seeOther(redirectURI).build();
         }
         return Response.ok().build();
     }
