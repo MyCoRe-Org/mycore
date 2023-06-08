@@ -33,7 +33,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
     @Test
     public void getSlotDirPath() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
-            null, Paths.get("/"));
+            null, Paths.get("/"), "test");
 
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "00000");
         resetObjectIDFormatter();
