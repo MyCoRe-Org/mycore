@@ -60,7 +60,7 @@ public class MCRMODSWrapper {
         + " string-length(substring-after(@xlink:href,'_')) > 0 and"
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
         + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and"
-        + " " + xPathRelationshipTypeTest() + "]";
+        + " (" + xPathRelationshipTypeTest() + ")]";
 
     private static final String MODS_CONTAINER = "modsContainer";
 
