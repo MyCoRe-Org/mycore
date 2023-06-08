@@ -32,7 +32,6 @@ import org.jdom2.JDOMException;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
-import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
@@ -103,11 +102,7 @@ public class MCRORCIDWorkSummaryUtils {
         } else if (ownPutCode == 0) {
             workInfo.setOwnPutCode(getPutCodeCreatedByThisAppFromSummaries(matchingWorksSupplier.get()));
         }
-        if (MCRORCIDMetadataUtils.SAVE_OTHER_PUT_CODES) { // optimization
-            workInfo.setOtherPutCodes(getPutCodesNotCreatedByThisAppFromSummaries(matchingWorksSupplier.get()));
-        } else {
-            workInfo.setOtherPutCodes(null);
-        }
+        workInfo.setOtherPutCodes(getPutCodesNotCreatedByThisAppFromSummaries(matchingWorksSupplier.get()));
     }
 
     /**

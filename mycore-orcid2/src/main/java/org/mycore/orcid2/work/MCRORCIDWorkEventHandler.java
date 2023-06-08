@@ -243,7 +243,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private void doCreateWork(T work, MCRORCIDUserProperties userProperties, MCRORCIDPutCodeInfo workInfo,
         String orcid, MCRORCIDCredential credential) {
-        if (workInfo.getOtherPutCodes() != null) {
+        if (workInfo.hasOtherPutCodes()) {
             if (userProperties.isCreateDuplicateWork()) {
                 createWork(work, workInfo, orcid, credential);
             }

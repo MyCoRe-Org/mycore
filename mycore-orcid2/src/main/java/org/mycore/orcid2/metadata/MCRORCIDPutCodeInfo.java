@@ -118,6 +118,15 @@ public class MCRORCIDPutCodeInfo {
     }
 
     /**
+     * Checks if there are other put codes.
+     * 
+     * @return true if there are other put codes
+     */
+    public boolean hasOtherPutCodes() {
+        return otherPutCodes != null && otherPutCodes.length > 0;
+    }
+
+    /**
      * Adds put code to other put codes.
      * 
      * @param putCode put code
