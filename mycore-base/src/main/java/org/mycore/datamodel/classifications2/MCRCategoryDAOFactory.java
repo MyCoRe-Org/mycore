@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.classifications2;
 
+import java.util.Objects;
+
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
@@ -29,24 +31,12 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
  */
 public class MCRCategoryDAOFactory {
 
-    //initialization on class loading had side effects
-    //in some rare conditions the value was returned as NULL before it was initialized.
-    private static MCRCategoryDAO INSTANCE;
-
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
     public static MCRCategoryDAO getInstance() {
-        // to keep the synchronized execution minimal, it is encapsulated in another if block
-        if(INSTANCE == null){
-            synchronized (MCRCategoryDAOFactory.class) {
-                if(INSTANCE == null){
-                    INSTANCE = MCRConfiguration2.<MCRCategoryDAO>getInstanceOf("MCR.Category.DAO")
-                        .orElseGet(MCRCategoryDAOImpl::new);
-                }
-            }
-        }
-        return INSTANCE;
+        return Objects.requireNonNull(MCRCategoryDAOHolder.INSTANCE,
+            "MCRCategory cannot be NULL - There is a problem with the loading order of classes");
     }
 
     /**
@@ -56,7 +46,14 @@ public class MCRCategoryDAOFactory {
      * @param daoClass new dao class
      */
     public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws ReflectiveOperationException {
-        INSTANCE = daoClass.getDeclaredConstructor().newInstance();
+        MCRCategoryDAOHolder.INSTANCE = daoClass.getDeclaredConstructor().newInstance();
+    }
+
+    // encapsulate the INSTANCE in an inner static class to avoid issues with class loading order
+    // this is known as "Bill Pugh singleton"
+    private static class MCRCategoryDAOHolder {
+        private static MCRCategoryDAO INSTANCE = MCRConfiguration2.<MCRCategoryDAO>getInstanceOf("MCR.Category.DAO")
+            .orElseGet(MCRCategoryDAOImpl::new);
     }
 
 }
