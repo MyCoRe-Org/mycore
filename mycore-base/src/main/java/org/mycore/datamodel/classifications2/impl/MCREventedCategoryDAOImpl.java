@@ -34,7 +34,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
 
-    private static MCREventManager manager = MCREventManager.instance();
+    private MCREventManager manager = MCREventManager.instance();
 
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
