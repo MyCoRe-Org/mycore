@@ -109,13 +109,6 @@ public class MCRORCIDWorkService {
             if (userInfo.getWorkInfo().hasOwnPutCode()) {
                 // there is an inconsistent state
                 throw new MCRORCIDWorkAlreadyExistsException();
-            } else if (userInfo.getWorkInfo().hasOtherPutCodes()) {
-                if (userProperties.isCreateDuplicateWork()) {
-                    // there is already work, a duplicate is allowed to be created
-                    doCreateWork(work, userInfo.getWorkInfo(), orcid, credential);
-                } else {
-                    throw new MCRORCIDException("Not allowed to create duplicate");
-                }
             } else {
                 doCreateWork(work, userInfo.getWorkInfo(), orcid, credential);
             }

@@ -62,7 +62,6 @@ public class MCRORCIDObjectResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    // TODO work-status?
     /**
      * Returns the publication status for a given MCRObjectID in the current user's ORCID profile, e.g.
      *
@@ -79,7 +78,7 @@ public class MCRORCIDObjectResource {
     @Path("object-status/v3/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestrictedAccess(MCRRequireLogin.class)
-    public MCRORCIDPublicationStatus getPublicationStatus(@PathParam("objectID") MCRObjectID objectID) {
+    public MCRORCIDPublicationStatus getObjectStatus(@PathParam("objectID") MCRObjectID objectID) {
         final MCRObject object = getObject(objectID);
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         final Set<String> orcids = getMatchingORCIDs(object, orcidUser);
@@ -107,7 +106,6 @@ public class MCRORCIDObjectResource {
         }
     }
 
-    // TODO create-work?
     /**
      * Creates MCRObject in ORCID profile for given MCRORCIDCredential.
      *
@@ -117,7 +115,7 @@ public class MCRORCIDObjectResource {
      * @see MCRORCIDWorkService#createWork
      */
     @POST
-    @Path("create-object/v3/{objectID}")
+    @Path("create-work/v3/{objectID}")
     @MCRRestrictedAccess(MCRRequireLogin.class)
     @MCRRequireTransaction
     public Response createObject(@PathParam("objectID") MCRObjectID objectID) {
