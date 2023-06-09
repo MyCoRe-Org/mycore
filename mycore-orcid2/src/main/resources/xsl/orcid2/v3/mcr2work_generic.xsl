@@ -3,6 +3,7 @@
 <xsl:stylesheet version="3.0"
   xmlns="http://www.w3.org/TR/REC-html40"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:work="http://www.orcid.org/ns/work"
   xmlns:common="http://www.orcid.org/ns/common">
@@ -104,7 +105,7 @@
   <xsl:template name="externalIDs">
     <common:external-ids>
       <xsl:apply-templates select="//mods:identifier" />
-      <xsl:if test="not(//mods:identifier[@type='doi' or @type='scopus' or @type='isbn' or @type='issn' or @type='urn' or @type='pubmed' or @type='pubmedcentral'])">
+      <xsl:if test="not(mods:identifier[@type='doi' or @type='scopus' or @type='isbn' or @type='issn' or @type='urn' or @type='pubmed' or @type='pubmedcentral'])">
         <xsl:call-template name="source-work-id" />
       </xsl:if>
     </common:external-ids>
@@ -113,14 +114,14 @@
   <xsl:template name="source-work-id">
     <common:external-id>
       <common:external-id-type>source-work-id</common:external-id-type>
+      <xsl:variable name="mcrid" select="ancestor::mycoreobject/@ID" />
       <common:external-id-value>
-        <xsl:value-of select="substring-before(ancestor::mycoreobject/@ID,'_mods_')"/>
-        <xsl:text>:</xsl:text>
-        <xsl:value-of select="number(substring-after(ancestor::mycoreobject/@ID,'_mods_'))"/>
+        <xsl:variable name="createdate" select="fn:encode-for-uri(ancestor::mycoreobject/service/servdates[@class='MCRMetaISO8601Date']/servdate[@type='createdate']/text())" />
+        <xsl:value-of select="document(concat('hash:', $mcrid, ':sha1:', $createdate))/string" />
       </common:external-id-value>
       <common:external-id-url>
         <xsl:value-of select="$MCR.ORCID2.Work.SourceURL" />
-        <xsl:value-of select="ancestor::mycoreobject/@ID" />
+        <xsl:value-of select="$mcrid" />
       </common:external-id-url>
       <common:external-id-relationship>self</common:external-id-relationship>
     </common:external-id>
