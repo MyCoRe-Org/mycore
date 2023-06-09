@@ -62,10 +62,15 @@ public class MCRORCIDHashResolver implements URIResolver {
             } else {
                 final String optional = split[3];
                 final int separatorIndex = optional.indexOf(":");
-                final String salt
-                    = URLDecoder.decode(optional.substring(0, separatorIndex), StandardCharsets.UTF_8);
-                final int iterations = Integer.parseInt(optional.substring(separatorIndex + 1));
-                result = MCRUtils.getHash(iterations, salt.getBytes(StandardCharsets.UTF_8), input, algorithm);
+                if (separatorIndex >= 0) {
+                    final String salt
+                        = URLDecoder.decode(optional.substring(0, separatorIndex), StandardCharsets.UTF_8);
+                    final int iterations = Integer.parseInt(optional.substring(separatorIndex + 1));
+                    result = MCRUtils.getHash(iterations, salt.getBytes(StandardCharsets.UTF_8), input, algorithm);
+                } else {
+                    final String salt = URLDecoder.decode(optional, StandardCharsets.UTF_8);
+                    result = MCRUtils.getHash(1, salt.getBytes(StandardCharsets.UTF_8), input, algorithm);
+                }
             }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid format of uri for retrieval of hash: " + href);
