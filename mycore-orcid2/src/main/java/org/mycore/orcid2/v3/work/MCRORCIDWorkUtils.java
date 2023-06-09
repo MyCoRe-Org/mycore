@@ -88,7 +88,7 @@ public class MCRORCIDWorkUtils {
      */
     public static Set<MCRIdentifier> listTrustedIdentifiers(Work work) {
         return work.getExternalIdentifiers().getExternalIdentifier().stream()
-            .filter(i -> Relationship.SELF.equals(i.getRelationship()))
+            .filter(i -> Objects.equals(i.getRelationship(), Relationship.SELF))
             .filter(i -> MCRORCIDUtils.checkTrustedIdentifier(i.getType()))
             .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
     }
