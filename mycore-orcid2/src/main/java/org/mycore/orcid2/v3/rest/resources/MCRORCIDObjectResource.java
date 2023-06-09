@@ -98,7 +98,7 @@ public class MCRORCIDObjectResource {
         try {
             final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
             final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
-            final boolean result = new MCRORCIDWorkService(orcid, credential, null).checkOwnWorkExists(identifiers);
+            final boolean result = new MCRORCIDWorkService(orcid, credential).checkOwnWorkExists(identifiers);
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {
             LOGGER.error("Error while retrieving status: ", e);
@@ -129,7 +129,7 @@ public class MCRORCIDObjectResource {
         session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
         session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
         try {
-            new MCRORCIDWorkService(orcid, credential, orcidUser.getUserPropertiesByORCID(orcid)).createWork(object);
+            new MCRORCIDWorkService(orcid, credential).createWork(object);
         } catch (Exception e) {
             LOGGER.error("Error while creating: ", e);
             throw new WebApplicationException(Status.BAD_REQUEST);

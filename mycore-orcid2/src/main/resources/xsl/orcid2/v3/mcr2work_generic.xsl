@@ -7,7 +7,7 @@
   xmlns:work="http://www.orcid.org/ns/work"
   xmlns:common="http://www.orcid.org/ns/common">
 
-  <xsl:param name="MCR.ORCID2.Works.SourceURL" />
+  <xsl:param name="MCR.ORCID2.Work.SourceURL" />
 
   <xsl:template match="mycoreobject">
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
@@ -119,7 +119,7 @@
         <xsl:value-of select="number(substring-after(ancestor::mycoreobject/@ID,'_mods_'))"/>
       </common:external-id-value>
       <common:external-id-url>
-        <xsl:value-of select="$MCR.ORCID2.Works.SourceURL" />
+        <xsl:value-of select="$MCR.ORCID2.Work.SourceURL" />
         <xsl:value-of select="ancestor::mycoreobject/@ID" />
       </common:external-id-url>
       <common:external-id-relationship>self</common:external-id-relationship>

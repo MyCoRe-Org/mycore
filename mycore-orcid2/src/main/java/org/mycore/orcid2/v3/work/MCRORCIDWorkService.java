@@ -43,7 +43,6 @@ import org.mycore.orcid2.exception.MCRORCIDWorkAlreadyExistsException;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
-import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.client.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.client.MCRORCIDSearchImpl;
@@ -66,19 +65,15 @@ public class MCRORCIDWorkService {
 
     private final MCRORCIDCredential credential;
 
-    private final MCRORCIDUserProperties userProperties;
-
     /**
      * Creates new MCRORCIDWorkService instance.
      * 
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
-     * @param userProperties the MCRORCIDUserProperties
      */
-    public MCRORCIDWorkService(String orcid, MCRORCIDCredential credential, MCRORCIDUserProperties userProperties) {
+    public MCRORCIDWorkService(String orcid, MCRORCIDCredential credential) {
         this.orcid = orcid;
         this.credential = credential;
-        this.userProperties = userProperties;
     }
 
     /**
