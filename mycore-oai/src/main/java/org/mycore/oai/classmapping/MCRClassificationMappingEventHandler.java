@@ -48,8 +48,6 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
-
     private static Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
     private MCRMetaElement oldMappings = null;
@@ -105,9 +103,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 mappings.setNotInherit(true);
                 obj.getMetadata().setMetadataElement(mappings);
             }
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             for (Element classElement : classList) {
                 currentClassElement = classElement;
-                MCRCategory categ = DAO.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"),
+                MCRCategory categ = dao.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"),
                     classElement.getAttributeValue("categid")), 0);
                 addMappings(mappings, categ);
             }
