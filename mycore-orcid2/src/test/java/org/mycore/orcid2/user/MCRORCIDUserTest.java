@@ -46,7 +46,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         assertEquals(0, orcidUser.getCredentials().size());
         final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
-        orcidUser.storeCredential(ORCID, credential);
+        orcidUser.addCredential(ORCID, credential);
         // id_orcid + orcid_credential_orcid
         assertEquals(2, user.getAttributes().size());
         assertNotNull(user.getUserAttribute("orcid_credential_" + ORCID));
@@ -60,7 +60,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
-        orcidUser.storeCredential(ORCID, credential);
+        orcidUser.addCredential(ORCID, credential);
         user.setUserAttribute("test", "test");
         orcidUser.removeAllCredentials();
         // id_orcid + test

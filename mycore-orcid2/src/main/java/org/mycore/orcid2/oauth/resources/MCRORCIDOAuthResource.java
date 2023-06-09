@@ -59,6 +59,7 @@ import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.oauth.MCRORCIDOAuthAccessTokenResponse;
 import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
+import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -166,7 +167,9 @@ public class MCRORCIDOAuthResource {
             final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
                 = MCRORCIDOAuthClient.getInstance().exchangeCode(code, MCRFrontendUtil.getBaseURL() + redirectURI);
             final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
-            MCRORCIDSessionUtils.getCurrentUser().storeCredential(accessTokenResponse.getORCID(), credential);
+            final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+            orcidUser.addCredential(accessTokenResponse.getORCID(), credential);
+            MCRUserManager.updateUser(orcidUser.getUser());
             return marshalOAuthAccessTokenResponse(accessTokenResponse);
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Cannot create response", e);

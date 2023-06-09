@@ -45,7 +45,6 @@ import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
-import org.mycore.user2.MCRUserManager;
 
 /**
  * Provides functionality to interact with MCRUser that is also an ORCID user.
@@ -128,7 +127,6 @@ public class MCRORCIDUser {
         // allow more than one ORCID iD per user
         if (!user.getAttributes().contains(attribute)) {
             user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
-            MCRUserManager.updateUser(user);
         }
     }
 
@@ -151,7 +149,7 @@ public class MCRORCIDUser {
      * @throws MCRORCIDException if credential is invalid
      * @see MCRORCIDUser#addORCID
      */
-    public void storeCredential(String orcid, MCRORCIDCredential credential) {
+    public void addCredential(String orcid, MCRORCIDCredential credential) {
         addORCID(orcid);
         if (!MCRORCIDValidationHelper.validateCredential(credential)) {
             throw new MCRORCIDException("Credential is invalid");
@@ -163,7 +161,6 @@ public class MCRORCIDUser {
             throw new MCRORCIDException("Credential is invalid");
         }
         user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
-        MCRUserManager.updateUser(user);
     }
 
 
@@ -180,7 +177,6 @@ public class MCRORCIDUser {
         }
         // because of Hibernate issues
         user.setAttributes(toKeep);
-        MCRUserManager.updateUser(user);
     }
 
     /**
@@ -198,7 +194,6 @@ public class MCRORCIDUser {
         }
         // because of Hibernate issues
         user.setAttributes(toKeep);
-        MCRUserManager.updateUser(user);
     }
 
     /**
@@ -333,7 +328,6 @@ public class MCRORCIDUser {
             throw new MCRORCIDException("User properties are invalid");
         }
         user.setUserAttribute(getUserPropertiesAttributeNameByORCID(orcid), userPropertiesString);
-        MCRUserManager.updateUser(user);
     }
 
     @Override

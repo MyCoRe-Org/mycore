@@ -68,7 +68,7 @@ public class MCRORCIDCommands {
             final MCRORCIDCredential credential = new MCRORCIDCredential(token);
             credential.setTokenType("bearer");
             final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-            orcidUser.storeCredential(orcid, credential);
+            orcidUser.addCredential(orcid, credential);
             user.getAttributes().removeIf(a -> Objects.equals(a.getName(), ORCID_TOKEN_ATTRIBUTE_NAME));
             MCRUserManager.updateUser(user);
         }

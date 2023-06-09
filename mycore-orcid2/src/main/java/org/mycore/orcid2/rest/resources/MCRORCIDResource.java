@@ -40,6 +40,7 @@ import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.user2.MCRUserManager;
 
 /**
  * Base resource for ORCID methods.
@@ -132,6 +133,7 @@ public class MCRORCIDResource {
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         try {
             orcidUser.setUserProperties(orcid, userProperties);
+            MCRUserManager.updateUser(orcidUser.getUser());
         } catch (MCRORCIDException e) {
             throw new WebApplicationException(e, Status.BAD_REQUEST);
         }
