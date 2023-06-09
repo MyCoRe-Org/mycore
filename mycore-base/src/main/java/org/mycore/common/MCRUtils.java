@@ -322,7 +322,17 @@ public class MCRUtils {
         return MCRCrypt.crypt(salt, text);
     }
 
-    private static String getHash(int iterations, byte[] salt, String text, String algorithm)
+    /**
+     * Hashes string specified by alogrithm.
+     * 
+     * @param iterations hash iterations
+     * @param salt salt
+     * @param text input
+     * @param algorithm hash algorithm
+     * @return hashed string as hex string
+     * @throws NoSuchAlgorithmException is hash algorithm is not supported
+     */
+    public static String getHash(int iterations, byte[] salt, String text, String algorithm)
         throws NoSuchAlgorithmException {
         MessageDigest digest;
         if (--iterations < 0) {
