@@ -20,12 +20,14 @@ package org.mycore.datamodel.common;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -144,7 +146,8 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#listRevisions(MCRObjectID)
      */
     public List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException {
-        return IMPLEMENTATION.listRevisions(id);
+        return MCRAccessManager.checkPermission(id, MCRAccessManager.PERMISSION_HISTORY_VIEW)
+            ? IMPLEMENTATION.listRevisions(id) : Collections.emptyList();
     }
 
     /**
