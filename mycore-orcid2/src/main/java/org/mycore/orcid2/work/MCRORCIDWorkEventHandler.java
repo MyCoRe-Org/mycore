@@ -19,7 +19,6 @@
 package org.mycore.orcid2.work;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -254,7 +253,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private Map<String, MCRORCIDUser> listUserOrcidPairFromFlag(MCRORCIDFlagContent flagContent) {
         if (flagContent.getUserInfos() == null) {
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
         final List<String> orcids = flagContent.getUserInfos().stream().filter(u -> u.getWorkInfo() != null)
             .filter(u -> u.getWorkInfo().hasOwnPutCode()).map(MCRORCIDUserInfo::getORCID).toList();
@@ -275,7 +274,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             String orcid = null;
             final Set<MCRUser> users = new HashSet<MCRUser>();
             for (MCRIdentifier id : listTrustedNameIdentifiers(nameElement)) {
-                if (Objects.equals("orcid", id.getType())) {
+                if (Objects.equals(id.getType(), "orcid")) {
                     orcid = id.getValue();
                 }
                 users.addAll(MCRORCIDUserUtils.getUserByID(id));
