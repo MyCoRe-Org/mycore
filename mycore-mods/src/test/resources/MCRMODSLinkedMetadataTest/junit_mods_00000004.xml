@@ -32,7 +32,7 @@
               </mods:detail>
             </mods:part>
           </mods:relatedItem>
-          <mods:relatedItem type="otherVersion" xlink:href="junit_mods_00000002">
+          <mods:relatedItem type="succeeding" xlink:href="junit_mods_00000002">
           </mods:relatedItem>
         </mods:mods>
       </modsContainer>

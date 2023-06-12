@@ -111,7 +111,12 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                         Filter<Content> sharedMetadata = (Filter<Content>) Filters.element("part",
                             MCRConstants.MODS_NAMESPACE).negate();
                         relatedItem.removeContent(sharedMetadata);
-                        relatedItem.addContent(holderWrapper.getMODS().cloneContent());
+                        List<Content> newRelatedItemContent = holderWrapper.getMODS().cloneContent();
+                        newRelatedItemContent.stream()
+                                .filter(c -> c instanceof Element && ((Element) c).getName().equals("relatedItem"))
+                                .map(Element.class::cast)
+                                .forEach(Element::removeContent);
+                        relatedItem.addContent(newRelatedItemContent);
                         LOGGER.info("Saving: {}", recipientId);
                         try {
                             checkHierarchy(recipientWrapper);
@@ -153,7 +158,12 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
             if (MCRMODSWrapper.isSupported(holderObjectID)) {
                 MCRObject targetObject = MCRMetadataManager.retrieveMCRObject(holderObjectID);
                 MCRMODSWrapper targetWrapper = new MCRMODSWrapper(targetObject);
-                relatedItem.addContent(targetWrapper.getMODS().cloneContent());
+                List<Content> inheritedData = targetWrapper.getMODS().cloneContent();
+                inheritedData.stream()
+                        .filter(c -> c instanceof Element && ((Element) c).getName().equals("relatedItem"))
+                        .map(Element.class::cast)
+                        .forEach(Element::removeContent);
+                relatedItem.addContent(inheritedData);
             }
         }
         checkHierarchy(childWrapper);

@@ -1372,6 +1372,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
+    @MCRCommand(
+            syntax = "repair shared metadata for the ID {0}",
+            help = "Retrieves the MCRObject with the MCRObjectID {0} and repairs the shared metadata.",
+            order = 172)
+    public static void repairInheritedMetadata(String id) throws MCRAccessException {
+        if(!MCRObjectID.isValid(id)) {
+            LOGGER.error("The String {} is not a MCRObjectID.", id);
+            return;
+        }
+        MCRObjectID mid = MCRObjectID.getInstance(id);
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(mid);
+        MCRMetadataManager.repairSharedMetadata(obj);
+    }
+
     /**
      * The method start the repair of the metadata search for a given MCRObjectID as String.
      *
