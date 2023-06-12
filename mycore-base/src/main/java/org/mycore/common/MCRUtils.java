@@ -325,14 +325,22 @@ public class MCRUtils {
     /**
      * Hashes string specified by alogrithm.
      * 
-     * @param iterations hash iterations
-     * @param salt salt
      * @param text input
      * @param algorithm hash algorithm
+     * @param salt salt
+     * @param iterations hash iterations, 1 is default
      * @return hashed string as hex string
-     * @throws NoSuchAlgorithmException is hash algorithm is not supported
+     * @throws MCRException is hashing failed
      */
-    public static String getHash(int iterations, byte[] salt, String text, String algorithm)
+    public static String hashString(String text, String algorithm, byte[] salt, int iterations) {
+        try {
+            return getHash(iterations, salt, text, algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new MCRException("Unable to hash string", e);
+        }
+    }
+
+    private static String getHash(int iterations, byte[] salt, String text, String algorithm)
         throws NoSuchAlgorithmException {
         MessageDigest digest;
         if (--iterations < 0) {

@@ -20,15 +20,18 @@ package org.mycore.orcid2.util;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
+/**
+ * Provides URIResolver to hash string.
+ */
 public class MCRORCIDHashResolver implements URIResolver {
 
     /**
@@ -44,7 +47,7 @@ public class MCRORCIDHashResolver implements URIResolver {
      *            not used
      *
      * @return hashed input as hex string
-     * @throws IllegalArgumentException query is invalid or hash algorithm is not supported
+     * @throws MCRException query is invalid or hash algorithm is not supported
      * @see javax.xml.transform.URIResolver
      */
     @Override
@@ -58,7 +61,7 @@ public class MCRORCIDHashResolver implements URIResolver {
         String result = null;
         try {
             if (split.length == 3) {
-                result = MCRUtils.getHash(1, null, input, algorithm);
+                result = MCRUtils.hashString(input, algorithm, null, 1);
             } else {
                 final String optional = split[3];
                 final int separatorIndex = optional.indexOf(":");
@@ -66,16 +69,14 @@ public class MCRORCIDHashResolver implements URIResolver {
                     final String salt
                         = URLDecoder.decode(optional.substring(0, separatorIndex), StandardCharsets.UTF_8);
                     final int iterations = Integer.parseInt(optional.substring(separatorIndex + 1));
-                    result = MCRUtils.getHash(iterations, salt.getBytes(StandardCharsets.UTF_8), input, algorithm);
+                    result = MCRUtils.hashString(input, algorithm, salt.getBytes(StandardCharsets.UTF_8), iterations);
                 } else {
                     final String salt = URLDecoder.decode(optional, StandardCharsets.UTF_8);
-                    result = MCRUtils.getHash(1, salt.getBytes(StandardCharsets.UTF_8), input, algorithm);
+                    result = MCRUtils.hashString(input, algorithm, salt.getBytes(StandardCharsets.UTF_8), 1);
                 }
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid format of uri for retrieval of hash: " + href);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException("Invalid hash algorithm");
+            throw new MCRException("Invalid format of uri for retrieval of hash: " + href);
         }
         final Element root = new Element("string");
         root.setText(result);
