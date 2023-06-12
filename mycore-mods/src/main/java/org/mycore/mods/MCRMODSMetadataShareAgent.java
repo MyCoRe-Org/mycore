@@ -185,7 +185,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         return inheritedData;
     }
 
-    private void inheritToChild(MCRMODSWrapper parentWrapper, MCRMODSWrapper childWrapper) {
+    void inheritToChild(MCRMODSWrapper parentWrapper, MCRMODSWrapper childWrapper) {
         LOGGER.info("Inserting inherited Metadata.");
         Element hostContainer = childWrapper.getElement(HOST_SECTION_XPATH);
         if (hostContainer == null) {
@@ -198,7 +198,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         hostContainer.addContent(parentWrapper.getMODS().cloneContent());
     }
 
-    private void checkHierarchy(MCRMODSWrapper mods) throws MCRPersistenceException {
+    void checkHierarchy(MCRMODSWrapper mods) throws MCRPersistenceException {
         final MCRObjectID modsId = Objects.requireNonNull(mods.getMCRObject().getId());
         LOGGER.info("Checking relatedItem hierarchy of {}.", modsId);
         final List<Element> relatedItemLeaves
