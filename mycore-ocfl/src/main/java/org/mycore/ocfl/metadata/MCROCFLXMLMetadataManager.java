@@ -49,6 +49,7 @@ import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
@@ -317,7 +318,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     @Override
     public int getHighestStoredID(String project, String type) {
-        return getStoredIDs(project, type).max().orElse(0);
+        return MCRMetadataHistoryManager.getHighestStoredID(project, type)
+            .map(MCRObjectID::getNumberAsInteger).orElse(0);
     }
 
     @Override
