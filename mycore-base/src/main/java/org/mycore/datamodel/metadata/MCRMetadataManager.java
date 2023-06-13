@@ -304,16 +304,10 @@ public final class MCRMetadataManager {
 
         MCRObjectID objectId = mcrObject.getId();
 
-        String createBasePrivilege = "create-" + objectId.getBase();
-        String createTypePrivilege = "create-" + objectId.getTypeId();
-        if (!MCRAccessManager.checkPermission(createBasePrivilege)
-            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
-            throw MCRAccessException.missingPrivilege("Create object with id " + objectId, createBasePrivilege,
-                createTypePrivilege);
-        }
+        checkCreatePrivilege(objectId);
         // exist the object?
         if (MCRMetadataManager.exists(objectId)) {
-            throw new MCRPersistenceException("The object " + objectId + " allready exists, nothing done.");
+            throw new MCRPersistenceException("The object " + objectId + " already exists, nothing done.");
         }
 
         // assign new id if necessary
@@ -351,6 +345,16 @@ public final class MCRMetadataManager {
             parent.getStructure().addChild(new MCRMetaLinkID("child", objectId,
                 mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
             MCRMetadataManager.fireUpdateEvent(parent);
+        }
+    }
+
+    public static void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
+        String createBasePrivilege = "create-" + objectId.getBase();
+        String createTypePrivilege = "create-" + objectId.getTypeId();
+        if (!MCRAccessManager.checkPermission(createBasePrivilege)
+            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
+            throw MCRAccessException.missingPrivilege("Create base with id " + objectId, createBasePrivilege,
+                createTypePrivilege);
         }
     }
 
