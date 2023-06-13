@@ -164,6 +164,6 @@ public class MCRMODSJobDistributeMetadataJobAction extends MCRJobAction {
 
     @Override
     public void rollback() {
-
+        // nothing to do
     }
 }
