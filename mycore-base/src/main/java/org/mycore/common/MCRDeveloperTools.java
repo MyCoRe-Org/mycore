@@ -56,6 +56,10 @@ public class MCRDeveloperTools {
                 .getOrThrow("MCR.Developer.Resource.Override", MCRConfiguration2::splitValue)
                 .map(Paths::get)
                 .map(p -> webResource ? p.resolve("META-INF").resolve("resources") : p)
+                .filter(p -> {
+                    Path thePath = MCRUtils.unsafeResolve(p,  pathParts);
+                    return thePath.isAbsolute() && thePath.startsWith(p);
+                 })
                 .map(p -> MCRUtils.safeResolve(p, pathParts))
                 .filter(Files::exists)
                 .peek(p -> LOGGER.debug("Found overridden Resource: {}", p.toAbsolutePath().toString()))
