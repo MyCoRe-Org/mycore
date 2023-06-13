@@ -111,15 +111,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
     private MCRObjectID createObject(Document doc)
         throws JDOMException, IOException, MCRException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
-        // submitted id can be project_object_00000000 and the number is set by the
-        // MCRMetadataManager#create(MCRObject)} method
-        MCRObjectID oldId = mcrObject.getId();
         MCRMetadataManager.create(mcrObject);
-
-        // if label was id with 00000000, set label to new id
-        if (mcrObject.getLabel().equals(oldId.toString())) {
-            mcrObject.setLabel(mcrObject.getId().toString());
-        }
         return mcrObject.getId();
     }
 

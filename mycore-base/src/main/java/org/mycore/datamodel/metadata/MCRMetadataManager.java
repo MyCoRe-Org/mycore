@@ -312,9 +312,15 @@ public final class MCRMetadataManager {
 
         // assign new id if necessary
         if (objectId.getNumberAsInteger() == 0) {
+            MCRObjectID oldId = objectId;
             objectId = MCRObjectID.getNextFreeId(objectId.getBase());
             mcrObject.setId(objectId);
             LOGGER.info("Assigned new object id {}", objectId);
+
+            // if label was id with 00000000, set label to new id
+            if (mcrObject.getLabel().equals(oldId.toString())) {
+                mcrObject.setLabel(objectId.toString());
+            }
         }
 
         // create this object in datastore
