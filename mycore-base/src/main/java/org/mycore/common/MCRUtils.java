@@ -575,7 +575,13 @@ public class MCRUtils {
     }
 
     public static Path safeResolve(Path basePath, String... resolve) {
-        return safeResolve(basePath, unsafeResolve(basePath, resolve));
+        if (resolve.length == 0) {
+            return basePath;
+        }
+
+        String[] more = Stream.of(resolve).skip(1).toArray(String[]::new);
+        final Path resolvePath = basePath.getFileSystem().getPath(resolve[0], more);
+        return safeResolve(basePath, resolvePath);
     }
     
     public static Path unsafeResolve(Path basePath, String... resolve) {
