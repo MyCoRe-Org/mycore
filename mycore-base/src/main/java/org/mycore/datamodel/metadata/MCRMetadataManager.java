@@ -914,11 +914,8 @@ public final class MCRMetadataManager {
             MCRMetadataManager.fireUpdateEvent(newParent);
         }
 
-
-
         // update all children
         if (shareableMetadataChanged(mcrObject, old)) {
-            // asynchronly update all children
             MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(id);
             metadataShareAgent.distributeMetadata(mcrObject);
         }
