@@ -19,8 +19,10 @@
 package org.mycore.common;
 
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidAlgorithmParameterException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,7 +62,7 @@ public class MCRDeveloperTools {
                 .map(p -> {
                     try {
                         return MCRUtils.safeResolve(p, pathParts);
-                    } catch (MCRException e) {
+                    } catch (MCRException | InvalidPathException e) {
                         LOGGER.debug("Exception in safeResolve", e);
                         return null;
                     }
