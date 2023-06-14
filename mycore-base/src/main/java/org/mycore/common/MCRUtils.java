@@ -583,5 +583,4 @@ public class MCRUtils {
         final Path resolvePath = basePath.getFileSystem().getPath(resolve[0], more);
         return safeResolve(basePath, resolvePath);
     }
-
 }
