@@ -302,8 +302,7 @@ public final class MCRMetadataManager {
      * @throws MCRAccessException if "create-{objectType}" privilege is missing
      */
     public static void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
-
-        MCRObjectID objectId = mcrObject.getId();
+        MCRObjectID objectId = Objects.requireNonNull(mcrObject.getId(), "ObjectID must not be null");
 
         checkCreatePrivilege(objectId);
         // exist the object?
