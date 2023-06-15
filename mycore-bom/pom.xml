@@ -49,7 +49,7 @@
     <ocfl-java.version>1.4.6</ocfl-java.version>
     <rdf4j.version>4.2.0</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
-    <xalan.version>2.7.2</xalan.version>
+    <xalan.version>2.7.3</xalan.version>
   </properties>
 
   <dependencyManagement>
