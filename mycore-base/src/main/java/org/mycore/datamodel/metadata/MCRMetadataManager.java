@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -318,7 +319,7 @@ public final class MCRMetadataManager {
             LOGGER.info("Assigned new object id {}", objectId);
 
             // if label was id with 00000000, set label to new id
-            if (mcrObject.getLabel().equals(oldId.toString())) {
+            if(Objects.equals(mcrObject.getLabel(), oldId.toString())) {
                 mcrObject.setLabel(objectId.toString());
             }
         }
