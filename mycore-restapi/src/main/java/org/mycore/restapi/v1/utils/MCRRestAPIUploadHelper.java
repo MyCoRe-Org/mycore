@@ -124,7 +124,7 @@ public class MCRRestAPIUploadHelper {
             }
 
             MCRObject object = MCRObjectCommands.updateFromFile(fXML.toString(), false);// handles "create" as well
-            mcrID = Objects.requireNonNull(object, "Created object should be not null").getId();
+            mcrID = Objects.requireNonNull(object, "An error occurred while the object was created").getId();
             return Response.created(info.getBaseUriBuilder().path("objects/" + mcrID).build())
                 .type("application/xml; charset=UTF-8")
                 .build();
