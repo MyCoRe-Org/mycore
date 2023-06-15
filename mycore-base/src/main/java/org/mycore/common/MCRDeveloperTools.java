@@ -19,8 +19,10 @@
 package org.mycore.common;
 
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -56,7 +58,15 @@ public class MCRDeveloperTools {
                 .getOrThrow("MCR.Developer.Resource.Override", MCRConfiguration2::splitValue)
                 .map(Paths::get)
                 .map(p -> webResource ? p.resolve("META-INF").resolve("resources") : p)
-                .map(p -> MCRUtils.safeResolve(p, pathParts))
+                .map(p -> {
+                    try {
+                        return MCRUtils.safeResolve(p, pathParts);
+                    } catch (MCRException | InvalidPathException e) {
+                        LOGGER.debug("Exception in safeResolve", e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .filter(Files::exists)
                 .peek(p -> LOGGER.debug("Found overridden Resource: {}", p.toAbsolutePath().toString()))
                 .findFirst();
