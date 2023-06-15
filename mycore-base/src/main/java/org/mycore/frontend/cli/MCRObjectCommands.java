@@ -434,7 +434,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 60)
     public static boolean loadFromFile(String file) throws MCRException, IOException, MCRAccessException,
         JDOMException {
-        return loadFromFile(file, true);
+        return loadFromFile(file, true) != null;
     }
 
     /**
@@ -446,7 +446,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
-    public static boolean loadFromFile(String file, boolean importMode)
+    public static MCRObject loadFromFile(String file, boolean importMode)
         throws MCRException, IOException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), false, importMode);
     }
@@ -464,7 +464,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 80)
     public static boolean updateFromFile(String file)
         throws MCRException, IOException, MCRAccessException, JDOMException {
-        return updateFromFile(file, true);
+        return updateFromFile(file, true) != null;
     }
 
     /**
@@ -475,8 +475,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
+     * @return the updated object
      */
-    public static boolean updateFromFile(String file, boolean importMode)
+    public static MCRObject updateFromFile(String file, boolean importMode)
         throws MCRException, IOException, MCRAccessException, JDOMException {
         return processFromFile(new File(file), true, importMode);
     }
@@ -497,17 +498,18 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the parent of the given object does not exists
      * @throws MCRAccessException
      *            if write permission is missing
+     * @return the created or updated object
      */
-    private static boolean processFromFile(File file, boolean update, boolean importMode)
+    private static MCRObject processFromFile(File file, boolean update, boolean importMode)
         throws MCRException, IOException, MCRAccessException, JDOMException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", file);
-            return false;
+            return null;
         }
 
         if (!file.isFile()) {
             LOGGER.warn("{} ignored, is not a file.", file);
-            return false;
+            return null;
         }
 
         LOGGER.info("Reading file {} ...", file);
@@ -530,7 +532,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info("{} loaded.", mcrObject.getId());
         }
 
-        return true;
+        return mcrObject;
     }
 
     /**

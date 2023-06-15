@@ -30,10 +30,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,9 +52,9 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -74,8 +76,8 @@ import org.mycore.restapi.v1.errors.MCRRestAPIException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
@@ -114,21 +116,15 @@ public class MCRRestAPIUploadHelper {
             Document docOut = sb.build(uploadedInputStream);
 
             MCRObjectID mcrID = MCRObjectID.getInstance(docOut.getRootElement().getAttributeValue("ID"));
-            if (mcrID.getNumberAsInteger() == 0) {
-                mcrID = MCRObjectID.getNextFreeId(mcrID.getBase());
-            }
 
-            fXML = UPLOAD_DIR.resolve(mcrID + ".xml");
-
-            docOut.getRootElement().setAttribute("ID", mcrID.toString());
-            docOut.getRootElement().setAttribute("label", mcrID.toString());
+            fXML = UPLOAD_DIR.resolve(mcrID.getBase() + '_' + UUID.randomUUID() + ".xml");
             XMLOutputter xmlOut = new XMLOutputter(Format.getPrettyFormat());
             try (BufferedWriter bw = Files.newBufferedWriter(fXML, StandardCharsets.UTF_8)) {
                 xmlOut.output(docOut, bw);
             }
 
-            MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
-
+            MCRObject object = MCRObjectCommands.updateFromFile(fXML.toString(), false);// handles "create" as well
+            mcrID = Objects.requireNonNull(object, "Created object should be not null").getId();
             return Response.created(info.getBaseUriBuilder().path("objects/" + mcrID).build())
                 .type("application/xml; charset=UTF-8")
                 .build();
@@ -204,13 +200,14 @@ public class MCRRestAPIUploadHelper {
             }
 
             if (derID == null) {
-                derID = MCRObjectID.getNextFreeId(mcrObjIDObj.getProjectId() + "_derivate");
                 MCRDerivate mcrDerivate = new MCRDerivate();
                 if (label != null && label.length() > 0) {
                     mcrDerivate.getDerivate().getTitles()
                         .add(new MCRMetaLangText("title", null, null, 0, null, label));
                 }
-                mcrDerivate.setId(derID);
+                MCRObjectID zeroDerId
+                    = MCRObjectID.getInstance(MCRObjectID.formatID(mcrObjIDObj.getProjectId() + "_derivate", 0));
+                mcrDerivate.setId(zeroDerId);
                 mcrDerivate.setSchema("datamodel-derivate.xsd");
                 mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
                 mcrDerivate.getDerivate().setInternals(new MCRMetaIFS("internal", null));
@@ -228,6 +225,7 @@ public class MCRRestAPIUploadHelper {
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
                     MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
+                derID = mcrDerivate.getId();
             }
 
             response = Response
