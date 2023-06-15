@@ -338,9 +338,9 @@ public class MCRRestDerivates {
     private Response doCreateDerivate(@BeanParam DerivateMetadata der) {
         LOGGER.debug(der);
         String projectID = mcrId.getProjectId();
-        MCRObjectID derId = MCRObjectID.getNextFreeId(projectID + "_derivate");
+        MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectID.formatID(projectID + "_derivate",0));
         MCRDerivate derivate = new MCRDerivate();
-        derivate.setId(derId);
+        derivate.setId(zeroId);
 
         derivate.setOrder(der.getOrder());
 
@@ -370,17 +370,20 @@ public class MCRRestDerivates {
         ifs.setMainDoc(der.getMainDoc());
         derivate.getDerivate().setInternals(ifs);
 
-        LOGGER.debug("Creating new derivate with ID {}", derId);
+
         try {
             MCRMetadataManager.create(derivate);
         } catch (MCRAccessException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
-                .withMessage("You may not create MCRDerivate " + derId + ".")
+                .withMessage("You may not create MCRDerivate for project " + zeroId.getProjectId() + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
                 .toException();
         }
+
+        MCRObjectID derId = derivate.getId();
+        LOGGER.debug("Created new derivate with ID {}", derId);
         MCRPath rootDir = MCRPath.getPath(derId.toString(), "/");
         if (Files.notExists(rootDir)) {
             try {
