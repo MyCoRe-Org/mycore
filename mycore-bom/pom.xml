@@ -554,6 +554,11 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-classifications</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-coma</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1022,11 +1027,6 @@
         <version>${project.version}</version>
         <type>test-jar</type>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>mycore-classifications</artifactId>
-        <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
