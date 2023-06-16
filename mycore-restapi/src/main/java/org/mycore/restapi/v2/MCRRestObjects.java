@@ -362,15 +362,15 @@ public class MCRRestObjects {
             Element eMCRObj = doc.getRootElement();
             if (eMCRObj.getAttributeValue("ID") != null) {
                 MCRObjectID id = MCRObjectID.getInstance(eMCRObj.getAttributeValue("ID"));
-                MCRObjectID newID = MCRObjectID.getNextFreeId(id.getBase());
-                eMCRObj.setAttribute("ID", newID.toString());
+                MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectID.formatID(id.getBase(), 0));
+                eMCRObj.setAttribute("ID", zeroId.toString());
                 if (eMCRObj.getAttribute("label") == null) {
-                    eMCRObj.setAttribute("label", newID.toString());
+                    eMCRObj.setAttribute("label", zeroId.toString());
                 }
                 if (eMCRObj.getAttribute("version") == null) {
                     eMCRObj.setAttribute("version", MCRCoreVersion.getVersion());
                 }
-                eMCRObj.setAttribute("noNamespaceSchemaLocation", "datamodel-" + newID.getTypeId() + ".xsd",
+                eMCRObj.setAttribute("noNamespaceSchemaLocation", "datamodel-" + zeroId.getTypeId() + ".xsd",
                     XSI_NAMESPACE);
             } else {
                 //TODO error handling
