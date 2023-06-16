@@ -78,6 +78,8 @@ import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
+import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
+import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -542,6 +544,7 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     @XmlElementWrapper(name = "versions")
+    @MCRRestRequiredPermission(MCRRestAPIACLPermission.HISTORY_VIEW)
     public Response getObjectVersions(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(id);
@@ -571,6 +574,7 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns MCRObject with the given " + PARAM_MCRID + " and revision.",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    @MCRRestRequiredPermission(MCRRestAPIACLPermission.HISTORY_READ)
     public Response getObjectVersion(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
         @PathParam("revision") String revision)
         throws IOException {
