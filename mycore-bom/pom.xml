@@ -1027,7 +1027,6 @@
         <groupId>org.mycore</groupId>
         <artifactId>mycore-classifications</artifactId>
         <version>1.0</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>

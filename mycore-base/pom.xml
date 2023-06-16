@@ -367,6 +367,7 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-classifications</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>
