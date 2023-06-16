@@ -105,7 +105,7 @@ public class MCRObjectServlet extends MCRContentServlet {
             final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             resp.sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
-                getErrorI18N(I18N_ERROR_PREFIX, "accessDenied", mcrid.toString() + " " + rev,
+                getErrorI18N(I18N_ERROR_PREFIX, "accessToVersionDenied", mcrid.toString(), rev,
                     currentSession.getUserInformation().getUserID(), currentSession.getCurrentIP()));
             return null;
         }
