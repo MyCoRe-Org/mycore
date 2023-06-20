@@ -20,9 +20,9 @@ package org.mycore.ocfl.layout;
 
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
-import edu.wisc.library.ocfl.api.exception.OcflExtensionException;
-import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
-import edu.wisc.library.ocfl.core.extension.storage.layout.OcflStorageLayoutExtension;
+import io.ocfl.api.exception.OcflExtensionException;
+import io.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.core.extension.storage.layout.OcflStorageLayoutExtension;
 
 public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
 

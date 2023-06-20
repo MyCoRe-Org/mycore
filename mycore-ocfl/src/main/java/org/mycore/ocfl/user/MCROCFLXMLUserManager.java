@@ -42,11 +42,11 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.utils.MCRUserTransformer;
 
-import edu.wisc.library.ocfl.api.OcflOption;
-import edu.wisc.library.ocfl.api.OcflRepository;
-import edu.wisc.library.ocfl.api.exception.OverwriteException;
-import edu.wisc.library.ocfl.api.model.ObjectVersionId;
-import edu.wisc.library.ocfl.api.model.VersionInfo;
+import io.ocfl.api.OcflOption;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.api.exception.OverwriteException;
+import io.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.model.VersionInfo;
 
 /**
  * XML Manager to handle MCRUsers in a MyCoRe OCFL Repository

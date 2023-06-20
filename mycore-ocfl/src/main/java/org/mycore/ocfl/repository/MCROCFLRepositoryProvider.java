@@ -20,7 +20,7 @@ package org.mycore.ocfl.repository;
 
 import org.mycore.common.config.MCRConfiguration2;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
+import io.ocfl.api.OcflRepository;
 
 /**
  * Base Class to provide a {@link OcflRepository}. A {@link MCROCFLRepositoryProvider} will be loaded from the property

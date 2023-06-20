@@ -37,7 +37,7 @@ import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
+import io.ocfl.api.OcflRepository;
 
 /**
  * All OCFL commands utilizing RegEx for bulk operations

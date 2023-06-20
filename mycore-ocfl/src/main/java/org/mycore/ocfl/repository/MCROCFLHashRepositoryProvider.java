@@ -26,10 +26,10 @@ import java.nio.file.Paths;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
-import edu.wisc.library.ocfl.core.OcflRepositoryBuilder;
-import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
-import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.core.OcflRepositoryBuilder;
+import io.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
 import jakarta.inject.Singleton;
 
 /**

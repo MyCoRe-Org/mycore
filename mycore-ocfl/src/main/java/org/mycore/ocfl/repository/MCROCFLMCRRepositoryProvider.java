@@ -24,8 +24,8 @@ import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
 
-import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
-import edu.wisc.library.ocfl.core.extension.OcflExtensionRegistry;
+import io.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.core.extension.OcflExtensionRegistry;
 import jakarta.inject.Singleton;
 
 /**

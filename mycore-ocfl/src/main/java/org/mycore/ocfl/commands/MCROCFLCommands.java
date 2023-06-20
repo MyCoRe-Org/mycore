@@ -55,7 +55,7 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.xml.sax.SAXException;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
+import io.ocfl.api.OcflRepository;
 
 @SuppressWarnings("JavaUtilDate")
 @MCRCommandGroup(name = "OCFL Commands")

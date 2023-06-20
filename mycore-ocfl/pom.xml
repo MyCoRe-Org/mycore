@@ -32,11 +32,11 @@
   <name>MyCoRe OCFL</name>
   <dependencies>
     <dependency>
-      <groupId>edu.wisc.library.ocfl</groupId>
+      <groupId>io.ocfl</groupId>
       <artifactId>ocfl-java-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>edu.wisc.library.ocfl</groupId>
+      <groupId>io.ocfl</groupId>
       <artifactId>ocfl-java-core</artifactId>
     </dependency>
     <dependency>
