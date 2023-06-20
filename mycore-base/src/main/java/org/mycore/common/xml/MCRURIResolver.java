@@ -1133,32 +1133,31 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String target = href.substring(href.indexOf(":") + 1);
-            // fixes exceptions if suburi is empty like "mcrobject:"
             String subUri = target.substring(target.indexOf(":") + 1);
-            if (subUri.length() == 0) {
-                return new JDOMSource(new Element("null"));
-            }
-            // end fix
-            LOGGER.debug("Ensuring xml is not null: {}", target);
-            try {
-                Source result = MCRURIResolver.instance().resolve(target, base);
-                if (result != null) {
-                    // perform actual construction of xml document, as in MCRURIResolver#resolve(String),
-                    // by performing the same actions as MCRSourceContent#asXml(),
-                    // but with a MCRXMLParser configured to be silent to suppress undesirable log messages
-                    MCRContent content = new MCRSourceContent(result).getBaseContent();
-                    Document document = MCRXMLParserFactory.getParser(false, true).parseXML(content);
-                    return new JDOMSource(document.getRootElement().detach());
-                } else {
+            // check if suburi is not empty like "mcrobject:" and return 'null'
+            if (subUri.length() > 0) {
+                LOGGER.debug("Ensuring xml is not null: {}", target);
+                try {
+                    Source result = MCRURIResolver.instance().resolve(target, base);
+                    if (result != null) {
+                        // perform actual construction of xml document, as in MCRURIResolver#resolve(String),
+                        // by performing the same actions as MCRSourceContent#asXml(),
+                        // but with a MCRXMLParser configured to be silent to suppress undesirable log messages
+                        // and try to create the XML to provoke an exception on faulty xml 
+                        MCRContent content = new MCRSourceContent(result).getBaseContent();
+                        MCRXMLParserFactory.getParser(false, true).parseXML(content);
+                        //return the original, unprocessed source
+                        return MCRURIResolver.instance().resolve(target, base);
+                    } else {
+                        LOGGER.debug("MCRNotNullResolver returning empty xml");
+                    }
+                } catch (Exception ex) {
+                    LOGGER.info("MCRNotNullResolver caught exception: {}", ex.getLocalizedMessage());
+                    LOGGER.debug(ex.getStackTrace());
                     LOGGER.debug("MCRNotNullResolver returning empty xml");
-                    return new JDOMSource(new Element("null"));
                 }
-            } catch (Exception ex) {
-                LOGGER.info("MCRNotNullResolver caught exception: {}", ex.getLocalizedMessage());
-                LOGGER.debug(ex.getStackTrace());
-                LOGGER.debug("MCRNotNullResolver returning empty xml");
-                return new JDOMSource(new Element("null"));
             }
+            return new JDOMSource(new Element("null"));
         }
     }
 
