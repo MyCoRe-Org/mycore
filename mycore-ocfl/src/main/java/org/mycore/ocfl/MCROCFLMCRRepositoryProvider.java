@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
+import io.ocfl.api.OcflRepository;
 
 /**
  * @deprecated use {@link org.mycore.ocfl.repository.MCROCFLMCRRepositoryProvider MCROCFLMCRRepositoryProvider}

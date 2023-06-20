@@ -20,8 +20,8 @@ package org.mycore.ocfl.layout;
 
 import org.mycore.common.config.MCRConfiguration2;
 
-import edu.wisc.library.ocfl.api.util.Enforce;
-import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.api.util.Enforce;
+import io.ocfl.core.extension.OcflExtensionConfig;
 
 public class MCRStorageLayoutConfig implements OcflExtensionConfig {
 

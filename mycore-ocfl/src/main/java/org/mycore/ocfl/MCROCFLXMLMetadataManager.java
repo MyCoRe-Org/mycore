@@ -34,7 +34,7 @@ import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
+import io.ocfl.api.OcflRepository;
 
 /**
  * @deprecated use {@link org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager MCROCFLXMLMetadataManager}

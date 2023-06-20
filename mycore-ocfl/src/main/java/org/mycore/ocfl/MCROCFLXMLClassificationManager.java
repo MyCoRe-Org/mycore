@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
+import io.ocfl.api.OcflRepository;
 
 /**
  *@deprecated use {@link org.mycore.ocfl.classification.MCROCFLXMLClassificationManager MCROCFLXMLClassificationManager}

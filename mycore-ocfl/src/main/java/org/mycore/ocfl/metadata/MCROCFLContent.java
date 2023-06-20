@@ -22,8 +22,8 @@ import java.io.InputStream;
 
 import org.mycore.common.content.MCRContent;
 
-import edu.wisc.library.ocfl.api.OcflRepository;
-import edu.wisc.library.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.api.model.ObjectVersionId;
 
 public class MCROCFLContent extends MCRContent {
 
