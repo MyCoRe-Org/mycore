@@ -6,7 +6,7 @@
                 xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 xmlns:piUtil="xalan://org.mycore.pi.frontend.MCRIdentifierXSLUtils"
-                exclude-result-prefixes="i18n mcrxml xalan xlink piUtil"
+                exclude-result-prefixes="i18n mcrxml mods xalan xlink piUtil"
 >
 
   <xsl:param name="CurrentUser" />
