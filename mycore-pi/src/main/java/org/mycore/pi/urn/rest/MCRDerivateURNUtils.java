@@ -20,6 +20,7 @@ package org.mycore.pi.urn.rest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -84,9 +86,8 @@ public class MCRDerivateURNUtils {
                 if (!isFileSupported(file)) {
                     LOGGER.info("File is not displayable within iView2. Use {} as url",
                         MCRFileNodeServlet.class.getSimpleName());
-                    String fileName = URLEncoder.encode(file.getFileName().toString(), StandardCharsets.UTF_8)
-                            .replaceAll("+", "%20");
-                    String filePath = "/" + file.getOwner() + "/" + fileName;
+                    String filePath = "/" + file.getOwner()
+                        + MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath());
                     return new URL(
                         MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
                             + filePath);
@@ -94,16 +95,17 @@ public class MCRDerivateURNUtils {
 
                 return new URL(getViewerURL(file));
             }
-        } catch (MalformedURLException | MCRPersistenceException e) {
+        } catch (MalformedURLException | MCRPersistenceException | URISyntaxException e) {
             LOGGER.error("Malformed URL for URN {}", piInfo.getIdentifier(), e);
         }
 
         return null;
     }
 
-    private static String getViewerURL(MCRPath file) {
-        return new MessageFormat("{0}rsc/viewer/{1}/{2}", Locale.ROOT).format(
-            new Object[] { MCRFrontendUtil.getBaseURL(), file.getOwner(), file.getFileName().toString() });
+    private static String getViewerURL(MCRPath file) throws URISyntaxException {
+        return new MessageFormat("{0}rsc/viewer/{1}{2}", Locale.ROOT).format(
+            new Object[] { MCRFrontendUtil.getBaseURL(), file.getOwner(),
+                MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath()) });
     }
 
     public static URL getDFGViewerURL(MCRPIRegistrationInfo urn) {
