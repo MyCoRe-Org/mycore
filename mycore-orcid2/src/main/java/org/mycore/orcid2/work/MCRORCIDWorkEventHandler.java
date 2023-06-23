@@ -119,28 +119,22 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 return;
             }
         }
-        final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
-            .orElse(new MCRORCIDFlagContent());
-        final Map<String, MCRORCIDUser> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
-        final Map<String, MCRORCIDUser> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
-        if (userOrcidPairFromFlag.isEmpty() && userOrcidPairFromObject.isEmpty()) {
-            LOGGER.info("Nothing to do. Skipping {}...", objectID);
-            return;
-        }
         final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
         if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
             LOGGER.info("Filtered MODS is empty. Skipping {}...", objectID);
             return;
         }
+        final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
+            .orElse(new MCRORCIDFlagContent());
+        final Map<String, MCRORCIDUser> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
+        final Map<String, MCRORCIDUser> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
         final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
         final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
-
         final Map<String, MCRORCIDUser> toDelete = new HashMap<>(userOrcidPairFromFlag);
         toDelete.keySet().removeAll(userOrcidPairFromObject.keySet());
         if (!toDelete.isEmpty()) {
             deleteWorks(toDelete, identifiers, flagContent);
         }
-
         final Map<String, MCRORCIDUser> toPublish = new HashMap<>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
@@ -148,13 +142,11 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         if (!toPublish.isEmpty()) {
             publishWorks(toPublish, identifiers, work, flagContent, successfulPublished);
         }
-
         if (COLLECT_EXTERNAL_PUT_CODES && SAVE_OTHER_PUT_CODES) {
             final Set<String> matchingOrcids = findMatchingORCIDs(identifiers);
             matchingOrcids.removeAll(successfulPublished);
             collectOtherPutCodes(identifiers, new ArrayList(matchingOrcids), flagContent);
         }
-
         MCRORCIDMetadataUtils.setORCIDFlagContent(object, flagContent);
         LOGGER.info("Finished publishing {} to ORCID successfully.", objectID);
     }
