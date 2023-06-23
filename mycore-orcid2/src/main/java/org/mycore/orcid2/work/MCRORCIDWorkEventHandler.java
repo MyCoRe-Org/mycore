@@ -398,8 +398,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * Transforms MCRObject as MCRJDOMContent to Work.
      * 
      * @param object the MCRObject
-     * @param <T> the work type
      * @return the Work
      */
+    @SuppressWarnings("TypeParameterUnusedInFormals")
     abstract protected <T> T transformObject(MCRJDOMContent object);
 }
