@@ -25,6 +25,8 @@ import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
@@ -113,7 +115,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         writePathInfo(file, attrs);
         jw.name("extension").value(getFileExtension(file.getFileName().toString()));
         jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId),
-            relativePath.toString(), this.baseURL));
+            URLEncoder.encode(relativePath.toString(), StandardCharsets.UTF_8).replaceAll("\\+", "%20"), this.baseURL));
         jw.endObject();
         return super.visitFile(file, attrs);
     }
