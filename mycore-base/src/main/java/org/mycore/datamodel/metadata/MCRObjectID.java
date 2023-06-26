@@ -119,6 +119,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     public static synchronized MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         return MCRObjectIDGenerator.getNextFreeId(baseId, maxInWorkflow);
     }
+    
+    /**
+     * @deprecated 
+     */
+    public static MCRObjectID getLastID(String baseId) {
+        return MCRObjectIDGenerator.getLastID(baseId);
+    }
 
     /**
      * This method instantiate this class with a given identifier in MyCoRe schema.
