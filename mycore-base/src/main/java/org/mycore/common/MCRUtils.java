@@ -475,6 +475,9 @@ public class MCRUtils {
         return sizeText + " " + sizeUnit;
     }
 
+    //TODO (Robert) The method compareParts was used only once to compare MCRObjectID objects.
+    // There it was replaced by Comparator.comparing().thenComparing().compareTo()
+    // Can we deprecate or even remove it now?
     /**
      * Helps to implement {@link Comparable#compareTo(Object)}
      *
