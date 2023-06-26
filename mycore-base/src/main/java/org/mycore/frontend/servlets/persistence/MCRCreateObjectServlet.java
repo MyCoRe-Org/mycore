@@ -25,7 +25,6 @@ import java.util.Properties;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -71,9 +70,8 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             String type = getProperty(request, "type");
             String formattedId = MCRObjectID.formatID(projectID + "_" + type, 0);
             objectID = MCRObjectID.getInstance(formattedId);
-
+            MCRMetadataManager.checkCreatePrivilege(objectID);
         }
-        checkCreatePrivilege(objectID);
         request.setAttribute(OBJECT_ID_KEY, objectID);
     }
 
@@ -113,32 +111,10 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
     private MCRObjectID createObject(Document doc)
         throws JDOMException, IOException, MCRException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
-        MCRObjectID objectId = mcrObject.getId();
-        //noinspection SynchronizeOnNonFinalField
-        checkCreatePrivilege(objectId);
-        synchronized (this) {
-            if (objectId.getNumberAsInteger() == 0) {
-                String objId = mcrObject.getId().toString();
-                objectId = MCRObjectID.getNextFreeId(objectId.getBase());
-                if (mcrObject.getLabel().equals(objId)) {
-                    mcrObject.setLabel(objectId.toString());
-                }
-                mcrObject.setId(objectId);
-            }
-        }
         MCRMetadataManager.create(mcrObject);
-        return objectId;
+        return mcrObject.getId();
     }
 
-    private void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
-        String createBasePrivilege = "create-" + objectId.getBase();
-        String createTypePrivilege = "create-" + objectId.getTypeId();
-        if (!MCRAccessManager.checkPermission(createBasePrivilege)
-            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
-            throw MCRAccessException.missingPrivilege("Create object with id " + objectId, createBasePrivilege,
-                createTypePrivilege);
-        }
-    }
 
     /**
      * redirects to new mcrobject form.

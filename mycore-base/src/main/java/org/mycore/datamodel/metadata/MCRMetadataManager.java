@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -301,26 +302,25 @@ public final class MCRMetadataManager {
      * @throws MCRAccessException if "create-{objectType}" privilege is missing
      */
     public static void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
+        MCRObjectID objectId = Objects.requireNonNull(mcrObject.getId(), "ObjectID must not be null");
 
-        MCRObjectID objectId = mcrObject.getId();
-
-        String createBasePrivilege = "create-" + objectId.getBase();
-        String createTypePrivilege = "create-" + objectId.getTypeId();
-        if (!MCRAccessManager.checkPermission(createBasePrivilege)
-            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
-            throw MCRAccessException.missingPrivilege("Create object with id " + objectId, createBasePrivilege,
-                createTypePrivilege);
-        }
+        checkCreatePrivilege(objectId);
         // exist the object?
         if (MCRMetadataManager.exists(objectId)) {
-            throw new MCRPersistenceException("The object " + objectId + " allready exists, nothing done.");
+            throw new MCRPersistenceException("The object " + objectId + " already exists, nothing done.");
         }
 
         // assign new id if necessary
         if (objectId.getNumberAsInteger() == 0) {
+            MCRObjectID oldId = objectId;
             objectId = MCRObjectID.getNextFreeId(objectId.getBase());
             mcrObject.setId(objectId);
             LOGGER.info("Assigned new object id {}", objectId);
+
+            // if label was id with 00000000, set label to new id
+            if(Objects.equals(mcrObject.getLabel(), oldId.toString())) {
+                mcrObject.setLabel(objectId.toString());
+            }
         }
 
         // create this object in datastore
@@ -351,6 +351,16 @@ public final class MCRMetadataManager {
             parent.getStructure().addChild(new MCRMetaLinkID("child", objectId,
                 mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
             MCRMetadataManager.fireUpdateEvent(parent);
+        }
+    }
+
+    public static void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
+        String createBasePrivilege = "create-" + objectId.getBase();
+        String createTypePrivilege = "create-" + objectId.getTypeId();
+        if (!MCRAccessManager.checkPermission(createBasePrivilege)
+            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
+            throw MCRAccessException.missingPrivilege("Create base with id " + objectId, createBasePrivilege,
+                createTypePrivilege);
         }
     }
 
