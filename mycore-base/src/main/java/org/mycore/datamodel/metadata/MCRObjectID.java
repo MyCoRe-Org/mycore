@@ -20,7 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -30,9 +30,8 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.common.MCRObjectIDGenerator;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -57,13 +56,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * public constant value for the MCRObjectID length
      */
     public static final int MAX_LENGTH = 64;
-
-    private static final MCRObjectIDFormat ID_FORMAT = new MCRObjectIDDefaultFormat();
+    
+    private static NumberFormat NUMBER_FORMAT = initNumberFormat();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
-
-    // counter for the next IDs per project base ID
-    private static HashMap<String, Integer> lastNumber = new HashMap<>();
 
     private static HashSet<String> VALID_TYPE_LIST;
 
@@ -104,109 +100,24 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     /**
-     * Returns a MCRObjectID from a given base ID string. A base ID is
-     * <em>project_id</em>_<em>type_id</em>. The number is computed by this
-     * method. It is the next free number of an item in the database for the
-     * given project ID and type ID, with the following additional restriction:
-     * The ID returned can be divided by idFormat.numberDistance without remainder.
-     * The ID returned minus the last ID returned is at least idFormat.numberDistance.
-     *
-     * Example for number distance of 1 (default):
-     *   last ID = 7, next ID = 8
-     *   last ID = 8, next ID = 9
-     *
-     * Example for number distance of 2:
-     *   last ID = 7, next ID = 10
-     *   last ID = 8, next ID = 10
-     *   last ID = 10, next ID = 20
-     *
-     * @param baseId
-     *            <em>project_id</em>_<em>type_id</em>
+     * @deprecated 
      */
     public static synchronized MCRObjectID getNextFreeId(String baseId) {
-        return getNextFreeId(baseId, 0);
+        return MCRObjectIDGenerator.getNextFreeId(baseId);
     }
 
     /**
-     * Returns a MCRObjectID from a given the components of a base ID string. A base ID is
-     * <em>project_id</em>_<em>type_id</em>. The number is computed by this
-     * method. It is the next free number of an item in the database for the
-     * given project ID and type ID, with the following additional restriction:
-     * The ID returned can be divided by idFormat.numberDistance without remainder.
-     * The ID returned minus the last ID returned is at least idFormat.numberDistance.
-     *
-     * Example for number distance of 1 (default):
-     *   last ID = 7, next ID = 8
-     *   last ID = 8, next ID = 9
-     *
-     * Example for number distance of 2:
-     *   last ID = 7, next ID = 10
-     *   last ID = 8, next ID = 10
-     *   last ID = 10, next ID = 20
-     *
-     * @param projectId
-     *            The first component of <em>project_id</em>_<em>type_id</em>
-     * @param type
-     *            The second component of <em>project_id</em>_<em>type_id</em>
+     * @deprecated 
      */
     public static synchronized MCRObjectID getNextFreeId(String projectId, String type) {
-        return getNextFreeId(projectId + "_" + type);
+        return MCRObjectIDGenerator.getNextFreeId(projectId, type);
     }
 
     /**
-     * Returns a MCRObjectID from a given base ID string. Same as
-     * {@link #getNextFreeId(String)} but the additional parameter acts as a
-     * lower limit for integer part of the ID.
-     *
-     * @param baseId
-     *            <em>project_id</em>_<em>type_id</em>
-     * @param maxInWorkflow
-     *            returned integer part of id will be at least
-     *            <code>maxInWorkflow + 1</code>
+     * @deprecated 
      */
     public static synchronized MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
-        int last = Math.max(getLastIDNumber(baseId), maxInWorkflow);
-        int numberDistance = ID_FORMAT.numberDistance();
-        int next = last + numberDistance;
-
-        int rest = next % numberDistance;
-        if (rest != 0) {
-            next += numberDistance - rest;
-        }
-
-        lastNumber.put(baseId, next);
-        String[] idParts = getIDParts(baseId);
-        return getInstance(formatID(idParts[0], idParts[1], next));
-    }
-
-    /**
-     * Returns the last ID number used or reserved for the given object base
-     * type. This may return the value 0 when there is no ID last used or in the
-     * store.
-     */
-    private static int getLastIDNumber(String baseId) {
-        int lastIDKnown = lastNumber.getOrDefault(baseId, 0);
-
-        String[] idParts = getIDParts(baseId);
-        int highestStoredID = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
-
-        return Math.max(lastIDKnown, highestStoredID);
-    }
-
-    /**
-     * Returns the last ID used or reserved for the given object base type.
-     *
-     * @return a valid MCRObjectID, or null when there is no ID for the given
-     *         type
-     */
-    public static MCRObjectID getLastID(String baseId) {
-        int lastIDNumber = getLastIDNumber(baseId);
-        if (lastIDNumber == 0) {
-            return null;
-        }
-
-        String[] idParts = getIDParts(baseId);
-        return getInstance(formatID(idParts[0], idParts[1], lastIDNumber));
+        return MCRObjectIDGenerator.getNextFreeId(baseId, maxInWorkflow);
     }
 
     /**
@@ -237,7 +148,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (number < 0) {
             throw new IllegalArgumentException("number must be non negative integer");
         }
-        return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + ID_FORMAT.numberFormat().format(number);
+        return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + NUMBER_FORMAT.format(number);
     }
 
     /**
@@ -342,7 +253,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return the string of the number
      */
     public String getNumberAsString() {
-        return ID_FORMAT.numberFormat().format(numberPart);
+        return NUMBER_FORMAT.format(numberPart);
     }
 
     /**
@@ -424,40 +335,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return toString().hashCode();
     }
 
-    public interface MCRObjectIDFormat {
-        int numberDistance();
-
-        NumberFormat numberFormat();
-    }
-
-    private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
-
-        private int numberDistance;
-
-        /**
-         * First invocation may return MCR.Metadata.ObjectID.InitialNumberDistance if set,
-         * following invocations will return MCR.Metadata.ObjectID.NumberDistance.
-         * The default for both is 1.
-         */
-        @Override
-        public int numberDistance() {
-            if (numberDistance == 0) {
-                numberDistance = MCRConfiguration2.getInt("MCR.Metadata.ObjectID.NumberDistance").orElse(1);
-                return MCRConfiguration2.getInt("MCR.Metadata.ObjectID.InitialNumberDistance").orElse(numberDistance);
-            }
-            return numberDistance;
-        }
-
-        @Override
-        public NumberFormat numberFormat() {
-            String numberPattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern")
-                .orElse("0000000000").trim();
-            NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
-            format.setGroupingUsed(false);
-            format.setMinimumIntegerDigits(numberPattern.length());
-            return format;
-        }
-
+    private static final NumberFormat initNumberFormat() {
+        String numberPattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern")
+            .orElse("0000000000").trim();
+        NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
+        format.setGroupingUsed(false);
+        format.setMinimumIntegerDigits(numberPattern.length());
+        return format;
     }
 
 }
