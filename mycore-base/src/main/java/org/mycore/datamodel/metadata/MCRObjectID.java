@@ -395,10 +395,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     @Override
     public int compareTo(MCRObjectID o) {
-        return MCRUtils.compareParts(this, o,
-            MCRObjectID::getProjectId,
-            MCRObjectID::getTypeId,
-            MCRObjectID::getNumberAsInteger);
+        return Comparator.comparing(MCRObjectID::getProjectId)
+            .thenComparing(MCRObjectID::getTypeId)
+            .thenComparingInt(MCRObjectID::getNumberAsInteger)
+            .compare(this, o);
     }
 
     /**
