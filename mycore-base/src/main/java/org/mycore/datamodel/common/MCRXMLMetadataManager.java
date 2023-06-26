@@ -156,6 +156,12 @@ public class MCRXMLMetadataManager {
         return IMPLEMENTATION.getHighestStoredID(project, type);
     }
 
+    public int getHighestStoredID(String base) {
+        return IMPLEMENTATION.getHighestStoredID(
+            base.substring(0, base.indexOf("_")),
+            base.substring(base.indexOf("_") + 1));
+    }
+
     /**
      * Delegation, see linked method for relevant documentation.
      *
