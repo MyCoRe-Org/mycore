@@ -19,16 +19,12 @@
 package org.mycore.common.content.transformer;
 
 import java.io.IOException;
-import java.io.StringReader;
 
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
-import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRStringContent;
 
 public class MCRHTML2XHTMLContentTransformer extends MCRContentTransformer {
 
@@ -41,11 +37,10 @@ public class MCRHTML2XHTMLContentTransformer extends MCRContentTransformer {
         document.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
 
         String s = document.outerHtml().replace("<html>", "<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-        try {
-            return new MCRJDOMContent(new SAXBuilder().build(new StringReader(s)));
-        } catch (JDOMException e) {
-            throw new MCRException("Error while parsing Jsoup/XML!", e);
-        }
+        MCRStringContent stringContent = new MCRStringContent(s);
+        stringContent.setMimeType("application/xhtml+xml");
+        stringContent.setName(source.getName() + ".html");
+        return stringContent;
     }
 
     @Override
