@@ -56,7 +56,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * public constant value for the MCRObjectID length
      */
     public static final int MAX_LENGTH = 64;
-    
+
     private static NumberFormat NUMBER_FORMAT = initNumberFormat();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
@@ -99,30 +99,22 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         this.combinedId = formatID(projectId, objectType, numberPart);
     }
 
-    /**
-     * @deprecated 
-     */
+    @Deprecated
     public static synchronized MCRObjectID getNextFreeId(String baseId) {
         return MCRObjectIDGenerator.getNextFreeId(baseId);
     }
 
-    /**
-     * @deprecated 
-     */
+    @Deprecated
     public static synchronized MCRObjectID getNextFreeId(String projectId, String type) {
         return MCRObjectIDGenerator.getNextFreeId(projectId, type);
     }
 
-    /**
-     * @deprecated 
-     */
+    @Deprecated
     public static synchronized MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         return MCRObjectIDGenerator.getNextFreeId(baseId, maxInWorkflow);
     }
-    
-    /**
-     * @deprecated 
-     */
+
+    @Deprecated
     public static MCRObjectID getLastID(String baseId) {
         return MCRObjectIDGenerator.getLastID(baseId);
     }
