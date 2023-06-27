@@ -338,7 +338,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return toString().hashCode();
     }
 
-    private static final NumberFormat initNumberFormat() {
+    private static NumberFormat initNumberFormat() {
         String numberPattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern")
             .orElse("0000000000").trim();
         NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
