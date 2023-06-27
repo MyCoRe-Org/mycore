@@ -102,25 +102,25 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     // TODO remove (Deprecated)
     // @Deprecated
     public static synchronized MCRObjectID getNextFreeId(String baseId) {
-        return MCRObjectIDGenerator.getInstance().getNextFreeID(baseId);
+        return MCRObjectIDGenerator.getNextFreeId(baseId);
     }
 
     // TODO remove (Deprecated)
     // @Deprecated
     public static synchronized MCRObjectID getNextFreeId(String projectId, String type) {
-        return MCRObjectIDGenerator.getInstance().getNextFreeID(projectId, type);
+        return MCRObjectIDGenerator.getNextFreeId(projectId, type);
     }
 
     // TODO remove (Deprecated)
     // @Deprecated
     public static synchronized MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
-        return MCRObjectIDGenerator.getInstance().getNextFreeID(baseId, maxInWorkflow);
+        return MCRObjectIDGenerator.getNextFreeId(baseId, maxInWorkflow);
     }
 
     // TODO remove (Deprecated)
     // @Deprecated
     public static MCRObjectID getLastID(String baseId) {
-        return MCRObjectIDGenerator.getInstance().getLastID(baseId);
+        return MCRObjectIDGenerator.getLastID(baseId);
     }
 
     /**
