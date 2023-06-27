@@ -164,7 +164,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         order = 130)
     public static void rebuildMetadataIndexBase(String base, String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.rebuildMetadataIndexBased(base, core.getClient());
+        MCRSolrIndexer.rebuildMetadataIndexForObjectBase(base, core.getClient());
     }
 
     @MCRCommand(
@@ -316,9 +316,9 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "synchronize solr metadata index for all objects of base {0} in core {1}",
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of base {0}",
         order = 420)
-    public static void synchronizeMetadataIndexBased(String objectBase, String coreID) throws Exception {
+    public static void synchronizeMetadataIndexForObjectBase(String objectBase, String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.synchronizeMetadataIndexBased(core.getClient(), objectBase);
+        MCRSolrIndexer.synchronizeMetadataIndexForObjectBase(core.getClient(), objectBase);
     }
 
     @MCRCommand(

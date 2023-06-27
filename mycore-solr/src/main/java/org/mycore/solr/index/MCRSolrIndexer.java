@@ -33,6 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
@@ -320,7 +321,7 @@ public class MCRSolrIndexer {
      * @param base
      *            of the objects to index
      */
-    public static void rebuildMetadataIndexBased(String base, SolrClient solrClient) {
+    public static void rebuildMetadataIndexForObjectBase(String base, SolrClient solrClient) {
         List<String> identfiersOfBase = MCRXMLMetadataManager.instance().listIDsForBase(base);
         rebuildMetadataIndex(identfiersOfBase, solrClient);
     }
@@ -534,60 +535,36 @@ public class MCRSolrIndexer {
      */
     public static void synchronizeMetadataIndex(SolrClient client, String objectType)
         throws IOException, SolrServerException {
-        LOGGER.info("synchronize {}", objectType);
-        // get ids from store
-        LOGGER.info("fetching mycore store...");
-        List<String> storeList = MCRXMLMetadataManager.instance().listIDsOfType(objectType);
-        LOGGER.info("there are {} mycore objects", storeList.size());
-        // get ids from solr
-        LOGGER.info("fetching solr...");
-        List<String> solrList = MCRSolrSearchUtils.listIDs(client, "objectType:" + objectType);
-        LOGGER.info("there are {} solr objects", solrList.size());
-
-        // documents to remove
-        List<String> toRemove = new ArrayList<>(1000);
-        for (String id : solrList) {
-            if (!storeList.contains(id)) {
-                toRemove.add(id);
-            }
-        }
-        if (!toRemove.isEmpty()) {
-            LOGGER.info("remove {} zombie objects from solr", toRemove.size());
-            deleteById(client, toRemove.toArray(new String[toRemove.size()]));
-        }
-        deleteOrphanedNestedDocuments(client);
-        // documents to add
-        storeList.removeAll(solrList);
-        if (!storeList.isEmpty()) {
-            LOGGER.info("index {} mycore objects", storeList.size());
-            rebuildMetadataIndex(storeList, client);
-        }
+        synchronizeMetadataIndex(client, objectType, () -> MCRXMLMetadataManager.instance().listIDsOfType(objectType),
+            () -> MCRSolrSearchUtils.listIDs(client, "objectType:" + objectType));
     }
 
-    public static void synchronizeMetadataIndexBased(SolrClient client, String objectBase)
+    public static void synchronizeMetadataIndexForObjectBase(SolrClient client, String objectBase)
         throws IOException, SolrServerException {
-        LOGGER.info("synchronize {}", objectBase);
+        final String solrQuery = "objectType:" + objectBase.split("_")[1] + " _root_:" + objectBase + "_*";
+        synchronizeMetadataIndex(client, objectBase, () -> MCRXMLMetadataManager.instance().listIDsForBase(objectBase),
+            () -> MCRSolrSearchUtils.listIDs(client, solrQuery));
+    }
+
+    private static void synchronizeMetadataIndex(SolrClient client, String synchBase,
+        Supplier<List<String>> localIDListSupplier, Supplier<List<String>> indexIDListSupplier)
+        throws SolrServerException, IOException {
+        LOGGER.info("synchronize {}", synchBase);
         // get ids from store
         LOGGER.info("fetching mycore store...");
-        List<String> storeList = MCRXMLMetadataManager.instance().listIDsForBase(objectBase);
+        List<String> storeList = localIDListSupplier.get();
         LOGGER.info("there are {} mycore objects", storeList.size());
         // get ids from solr
         LOGGER.info("fetching solr...");
-        String query = new MessageFormat("objectType:{0} _root_:{1}_*", Locale.ROOT)
-            .format(new Object[] { objectBase.split("_")[1], objectBase });
-        List<String> solrList = MCRSolrSearchUtils.listIDs(client, query);
+        List<String> solrList = indexIDListSupplier.get();
         LOGGER.info("there are {} solr objects", solrList.size());
 
         // documents to remove
-        List<String> toRemove = new ArrayList<>(1000);
-        for (String id : solrList) {
-            if (!storeList.contains(id)) {
-                toRemove.add(id);
-            }
-        }
+        List<String> toRemove = new ArrayList(solrList);
+        toRemove.removeAll(storeList);
         if (!toRemove.isEmpty()) {
             LOGGER.info("remove {} zombie objects from solr", toRemove.size());
-            deleteById(client, toRemove.toArray(new String[toRemove.size()]));
+            deleteById(client, toRemove.toArray(String[]::new));
         }
         deleteOrphanedNestedDocuments(client);
         // documents to add
