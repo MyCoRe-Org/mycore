@@ -33,6 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
@@ -315,6 +316,17 @@ public class MCRSolrIndexer {
     }
 
     /**
+     * Rebuilds solr's metadata index only for objects of the given base.
+     *
+     * @param base
+     *            of the objects to index
+     */
+    public static void rebuildMetadataIndexForObjectBase(String base, SolrClient solrClient) {
+        List<String> identfiersOfBase = MCRXMLMetadataManager.instance().listIDsForBase(base);
+        rebuildMetadataIndex(identfiersOfBase, solrClient);
+    }
+
+    /**
      * Rebuilds solr's metadata index.
      *
      * @param list
@@ -477,6 +489,20 @@ public class MCRSolrIndexer {
         LOGGER.info("Dropping solr index for type {}...done", type);
     }
 
+    public static void dropIndexByBase(String base, SolrClient client) throws Exception {
+        String type = base.split("_")[1];
+        if (!MCRObjectID.isValidType(type) || "data_file".equals(type)) {
+            LOGGER.warn("The type {} of base {} is not a valid type in the actual environment", type, base);
+            return;
+        }
+
+        LOGGER.info("Dropping solr index for base {}...", base);
+        String deleteQuery = new MessageFormat("objectType:{0} _root_:{1}_*", Locale.ROOT)
+            .format(new Object[] { type, base });
+        client.deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
+        LOGGER.info("Dropping solr index for base {}...done", base);
+    }
+
     /**
      * Sends a signal to the remote solr server to optimize its index.
      */
@@ -509,26 +535,36 @@ public class MCRSolrIndexer {
      */
     public static void synchronizeMetadataIndex(SolrClient client, String objectType)
         throws IOException, SolrServerException {
-        LOGGER.info("synchronize {}", objectType);
+        synchronizeMetadataIndex(client, objectType, () -> MCRXMLMetadataManager.instance().listIDsOfType(objectType),
+            () -> MCRSolrSearchUtils.listIDs(client, "objectType:" + objectType));
+    }
+
+    public static void synchronizeMetadataIndexForObjectBase(SolrClient client, String objectBase)
+        throws IOException, SolrServerException {
+        final String solrQuery = "objectType:" + objectBase.split("_")[1] + " _root_:" + objectBase + "_*";
+        synchronizeMetadataIndex(client, objectBase, () -> MCRXMLMetadataManager.instance().listIDsForBase(objectBase),
+            () -> MCRSolrSearchUtils.listIDs(client, solrQuery));
+    }
+
+    private static void synchronizeMetadataIndex(SolrClient client, String synchBase,
+        Supplier<List<String>> localIDListSupplier, Supplier<List<String>> indexIDListSupplier)
+        throws SolrServerException, IOException {
+        LOGGER.info("synchronize {}", synchBase);
         // get ids from store
         LOGGER.info("fetching mycore store...");
-        List<String> storeList = MCRXMLMetadataManager.instance().listIDsOfType(objectType);
+        List<String> storeList = localIDListSupplier.get();
         LOGGER.info("there are {} mycore objects", storeList.size());
         // get ids from solr
         LOGGER.info("fetching solr...");
-        List<String> solrList = MCRSolrSearchUtils.listIDs(client, "objectType:" + objectType);
+        List<String> solrList = indexIDListSupplier.get();
         LOGGER.info("there are {} solr objects", solrList.size());
 
         // documents to remove
-        List<String> toRemove = new ArrayList<>(1000);
-        for (String id : solrList) {
-            if (!storeList.contains(id)) {
-                toRemove.add(id);
-            }
-        }
+        List<String> toRemove = new ArrayList(solrList);
+        toRemove.removeAll(storeList);
         if (!toRemove.isEmpty()) {
             LOGGER.info("remove {} zombie objects from solr", toRemove.size());
-            deleteById(client, toRemove.toArray(new String[toRemove.size()]));
+            deleteById(client, toRemove.toArray(String[]::new));
         }
         deleteOrphanedNestedDocuments(client);
         // documents to add
