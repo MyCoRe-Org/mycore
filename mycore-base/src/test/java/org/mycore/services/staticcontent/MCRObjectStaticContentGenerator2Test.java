@@ -26,7 +26,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-public class MCRObjectStaticContentGeneratorTest2 extends MCRTestCase {
+public class MCRObjectStaticContentGenerator2Test extends MCRTestCase {
 
     @Test
     public void getSlotDirPath2() {
