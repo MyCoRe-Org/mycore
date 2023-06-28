@@ -600,61 +600,40 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     }
     
     /**
-     * 
+     * check if we can enter the project directory
      * @param path
-     * @return true when usable project
+     * @return true when usable project directory
      */
-    private boolean isProjectDirSane(Object path) {
-    	return projectDirStatus(path) > 0;
+    private boolean isProjectDirSane(Path path) {
+    	return projectDirStatus(path) != ProjectDirState.UNUSABLE;
     }
     
     /**
-     * 
-     * @param path
-     * @return: 0 - not usable / no project
-  	 *			1 - clean
-     *			2 - dirty
-     *
-     */
-    //TODO: consider sanity checks like getObjectTypes() does. (performance penalty?)
-    private int projectDirStatus(Object path) {
-    	File p = new File(path.toString());
-    	if (!p.isDirectory()) {
-       		LOGGER.warn(
-    			"File '{}' spotted in data-directory where only subdirectories are expected.",
-    			p.getAbsolutePath()
-    		);
-    		return 0;
-    	}
-    	return 1;
-    }
-    
-    /**
-     * 
+     * check if we can enter the project-type directory
      * @param path
      * @return true when usable type directory (inside project)
      */
-    private boolean isTypeDirSane(Object path) {
-    	return typeDirStatus(path) > 0;
+    private boolean isTypeDirSane(Path path) {
+    	//currently just the same simple check as project-dir...
+    	return isProjectDirSane(path);
     }
     
     /**
      * 
      * @param path
-     * @return: 0 - not usable / no type dir
-  	 *			1 - clean
-     *			2 - dirty
+     * @return: CLEAN or UNUSABLE
      */
-    private int typeDirStatus(Object path) {
+    //TODO: consider sanity checks like getObjectTypes() does. (performance penalty?)
+    private ProjectDirState projectDirStatus(Path path) {
     	File p = new File(path.toString());
     	if (!p.isDirectory()) {
        		LOGGER.warn(
     			"File '{}' spotted in data-directory where only subdirectories are expected.",
     			p.getAbsolutePath()
     		);
-    		return 0;
+    		return ProjectDirState.UNUSABLE;
     	}
-    	return 1;
+    	return ProjectDirState.CLEAN;
     }
     
     /**
