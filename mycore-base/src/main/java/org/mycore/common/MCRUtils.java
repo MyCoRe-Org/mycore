@@ -494,7 +494,12 @@ public class MCRUtils {
      *          is less than, equal to, or greater than the specified object.
      *
      * @throws NullPointerException if either <code>first</code> or <code>other</code> is null
+     * 
+     * deprecated in June 2023, because it was only used to compare MCRObjectID objects
+     * which is no handled differently
+     * 
      */
+    @Deprecated
     @SafeVarargs
     @SuppressWarnings("unchecked")
     public static <T> int compareParts(T first, T other, Function<T, Comparable>... part) {
