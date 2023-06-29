@@ -16,10 +16,43 @@ Steps:
 *   Set the following properties, if necessary:
     *   MCR.ORCID2.OAuth.ClientID
     *   MCR.ORCID2.OAuth.ClientSecret
-    *   MCR.ORCID2.OAuth.Scope
+    *   MCR.ORCID2.OAuth.Scope (whitespace separated list of scopes, eg. '/read-limited /activities/update')
     *   MCR.ORCID2.Client.ReadPublicToken
+    *   MCR.ORCID2.Client.V3.APIMode  (['public'|'member'] default is 'public')
+
+### Scope
+
+See https://info.orcid.org/faq/what-is-an-oauth-scope-and-which-scopes-does-orcid-support/ for available scopes. Note also, that you get an invalid scope error when you combine '/authenticate' with other 3-legged scopes because it is already included.
+
+MCR.ORCID2.OAuth.Scope is not a mandatory property. You can also provide the scope as parameter using rsc/orcid/oauth/init.
+
 
 ## Examples
+
+### Application configuration
+Here an example of an complete ORCID sandbox configuration (ClientID and ClientSecret need to be changed), tested in MyCoRe UBO application.
+
+    MCR.ContentTransformer.import.ORCID.Steps=import.ORCID2Works,import.MODS2MCRObj
+    MCR.ContentTransformer.import.ORCID2Works.Class=org.mycore.ubo.importer.orcid.Orcid2WorksTransformer
+    MCR.ORCID2.API.Resource.Packages=org.mycore.orcid2.rest.resources,org.mycore.orcid2.v3.rest.resources
+    MCR.ORCID2.BaseURL=https://sandbox.orcid.org/
+    MCR.ORCID2.Client.V3.APIMode=member
+    MCR.ORCID2.Client.V3.ErrorHandler.Class=org.mycore.orcid2.v3.client.MCRORCIDClientErrorHandlerImpl
+    MCR.ORCID2.Client.V3.MemberAPI=https://api.sandbox.orcid.org/v3.0
+    MCR.ORCID2.Client.V3.PublicAPI=https://pub.sandbox.orcid.org/v3.0
+    MCR.ORCID2.LinkURL=https://sandbox.orcid.org/
+    MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes=false
+    MCR.ORCID2.OAuth.ClientID=APP-GETYOUROWNCLIENTID
+    MCR.ORCID2.OAuth.ClientSecret=12345678-1234-1234-1234-123456789012
+    MCR.ORCID2.OAuth.Scope=/read-limited /activities/update
+    MCR.ORCID2.Object.TrustedIdentifierTypes=
+    MCR.ORCID2.PreFillRegistrationForm=true
+    MCR.ORCID2.SupportedLanguageCodes=ar,cs,en,es,fr,it,ja,ko,pt,ru,zh_CN,zh_TW
+    MCR.ORCID2.User.TrustedNameIdentifierTypes=orcid
+    MCR.ORCID2.Work.PublishStates=published,
+    MCR.ORCID2.Work.SourceURL=
+    UBO.ORCID2.InfoURL=https://www.uni-due.de/ub/publikationsdienste/orcid.php
+
 
 ### Fetching works from Public API v3
 
