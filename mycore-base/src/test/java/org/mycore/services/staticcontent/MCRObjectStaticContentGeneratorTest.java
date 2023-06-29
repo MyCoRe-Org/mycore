@@ -41,6 +41,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
         Assert.assertEquals("Paths should match", Paths.get("/000/01"), generator.getSlotDirPath(derivate));
     }
 
+    @Test
     public void getSlotDirPath2() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
             null, Paths.get("/"));
@@ -51,7 +52,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
     }
 
     @Test
-    void getSlotDirPath3() {
+    public void getSlotDirPath3() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
             null, Paths.get("/"));
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "0000000");
@@ -65,7 +66,6 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
         try {
             Field fNumberformat = MCRObjectID.class.getDeclaredField("NUMBER_FORMAT");
             fNumberformat.setAccessible(true);
-
             Method mInitNumberformat = MCRObjectID.class.getDeclaredMethod("initNumberFormat");
             mInitNumberformat.setAccessible(true); //if security settings allow this
             Object oNumberFormat = mInitNumberformat.invoke(null);
