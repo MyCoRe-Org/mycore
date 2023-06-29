@@ -18,8 +18,6 @@
 
 package org.mycore.services.staticcontent;
 
-import static org.junit.Assert.fail;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
@@ -73,7 +71,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
             Object oNumberFormat = mInitNumberformat.invoke(null);
             fNumberformat.set(null, oNumberFormat);
         } catch (Exception e) {
-             fail(e.getMessage());
+             Assert.fail(e.getMessage());
         }
     }
 }
