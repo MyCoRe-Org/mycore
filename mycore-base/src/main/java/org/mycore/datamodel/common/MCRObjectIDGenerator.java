@@ -117,7 +117,7 @@ public class MCRObjectIDGenerator {
      * @return a valid MCRObjectID, or null when there is no ID for the given
      *         type
      */
-    public static MCRObjectID getLastID(String baseId) {
+    public static synchronized MCRObjectID getLastID(String baseId) {
         int lastIDNumber = getLastIDNumber(baseId);
         if (lastIDNumber == 0) {
             return null;
