@@ -99,25 +99,25 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         this.combinedId = formatID(projectId, objectType, numberPart);
     }
 
-    // TODO remove (Deprecated)
+    // TODO enable deprecation in last step
     // @Deprecated
-    public static synchronized MCRObjectID getNextFreeId(String baseId) {
+    public static MCRObjectID getNextFreeId(String baseId) {
         return MCRObjectIDGenerator.getNextFreeId(baseId);
     }
 
-    // TODO remove (Deprecated)
+    // TODO enable deprecation in last step
     // @Deprecated
-    public static synchronized MCRObjectID getNextFreeId(String projectId, String type) {
+    public static MCRObjectID getNextFreeId(String projectId, String type) {
         return MCRObjectIDGenerator.getNextFreeId(projectId, type);
     }
 
-    // TODO remove (Deprecated)
+    // TODO enable deprecation in last step
     // @Deprecated
-    public static synchronized MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
+    public static MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         return MCRObjectIDGenerator.getNextFreeId(baseId, maxInWorkflow);
     }
 
-    // TODO remove (Deprecated)
+    // TODO enable deprecation in last step
     // @Deprecated
     public static MCRObjectID getLastID(String baseId) {
         return MCRObjectIDGenerator.getLastID(baseId);
