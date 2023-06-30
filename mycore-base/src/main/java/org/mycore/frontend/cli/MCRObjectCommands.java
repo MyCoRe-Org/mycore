@@ -544,7 +544,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void showNextID(String base) {
 
         try {
-            LOGGER.info("The next free ID  is {}", MCRObjectID.getNextFreeId(base));
+            LOGGER.info("The next free ID  is {}", MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base));
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -558,7 +558,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     public static void showLastID(String base) {
         try {
-            LOGGER.info("The last used ID  is {}", MCRObjectID.getLastID(base));
+            LOGGER.info("The last used ID  is {}",
+                MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -838,7 +839,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 150)
     public static void getNextID(String base) {
         try {
-            LOGGER.info(MCRObjectID.getNextFreeId(base));
+            LOGGER.info(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base));
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -856,7 +857,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Returns the last used MCRObjectID for the ID base {0}.",
         order = 140)
     public static void getLastID(String base) {
-        LOGGER.info(MCRObjectID.getLastID(base));
+        LOGGER.info(MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
     }
 
     /**
@@ -1053,14 +1054,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         switch (resultName) {
             case MCRObject.ROOT_NAME -> MCRMetadataManager.update(new MCRObject(resultDocument));
             case MCRDerivate.ROOT_NAME -> MCRMetadataManager.update(new MCRDerivate(resultDocument));
-            default ->
-                LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
+            default -> LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId,
+                resultName);
         }
     }
 
     @MCRCommand(syntax = "transform object {0} with transformer {1}",
         help = "Transforms the object with the id {0} using the transformer with the id {1} and" +
-                " updates the object with the result")
+            " updates the object with the result")
     public static void transformObject(String objectIDStr, String transformer)
         throws IOException, JDOMException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);

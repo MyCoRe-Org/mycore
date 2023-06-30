@@ -152,7 +152,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     private static MCRObjectID saveAsMyCoReObject(String projectID, Element modsRoot)
         throws MCRPersistenceException, MCRAccessException {
         MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsRoot, projectID);
-        mcrObject.setId(MCRObjectID.getNextFreeId(mcrObject.getId().getBase()));
+        mcrObject.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(mcrObject.getId().getBase()));
         MCRMetadataManager.create(mcrObject);
         return mcrObject.getId();
     }
@@ -167,7 +167,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     private static MCRDerivate createDerivate(MCRObjectID documentID, File fileDir)
         throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
-        derivate.setId(MCRObjectID.getNextFreeId(documentID.getProjectId(), "derivate"));
+        derivate.setId(MCRMetadataManager.getMCRObjectIDGenerator()
+            .getNextFreeId(documentID.getProjectId(), "derivate"));
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")
             .replaceAll(".xml", ".xsd");

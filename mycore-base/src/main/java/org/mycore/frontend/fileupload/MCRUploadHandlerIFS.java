@@ -133,7 +133,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     private MCRObjectID getOrCreateDerivateID() {
         if (derivateID == null) {
             String projectID = MCRObjectID.getInstance(this.documentID).getProjectId();
-            MCRObjectID oid = MCRObjectID.getNextFreeId(projectID + '_' + ID_TYPE);
+            MCRObjectID oid = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectID + '_' + ID_TYPE);
             this.derivateID = oid.toString();
             return oid;
         } else {

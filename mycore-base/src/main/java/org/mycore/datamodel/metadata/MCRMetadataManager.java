@@ -187,7 +187,7 @@ public final class MCRMetadataManager {
 
         // assign new id if necessary
         if (derivateId.getNumberAsInteger() == 0) {
-            derivateId = MCRObjectID.getNextFreeId(derivateId.getBase());
+            derivateId = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(derivateId.getBase());
             mcrDerivate.setId(derivateId);
             LOGGER.info("Assigned new derivate id {}", derivateId);
         }
@@ -324,7 +324,7 @@ public final class MCRMetadataManager {
         // assign new id if necessary
         if (objectId.getNumberAsInteger() == 0) {
             MCRObjectID oldId = objectId;
-            objectId = MCRObjectID.getNextFreeId(objectId.getBase());
+            objectId = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(objectId.getBase());
             mcrObject.setId(objectId);
             LOGGER.info("Assigned new object id {}", objectId);
 

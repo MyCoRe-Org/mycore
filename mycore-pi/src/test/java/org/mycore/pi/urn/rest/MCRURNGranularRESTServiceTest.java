@@ -163,7 +163,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
 
     public static MCRDerivate createDerivate(MCRObjectID objectHrefId) {
         MCRDerivate derivate = new MCRDerivate();
-        derivate.setId(MCRObjectID.getNextFreeId("mycore_derivate"));
+        derivate.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("mycore_derivate"));
         derivate.setSchema("datamodel-derivate.xsd");
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag("internal");
@@ -177,7 +177,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
 
     public static MCRObject createObject() {
         MCRObject object = new MCRObject();
-        object.setId(MCRObjectID.getNextFreeId("mycore_object"));
+        object.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("mycore_object"));
         object.setSchema("noSchema");
         return object;
     }

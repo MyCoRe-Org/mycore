@@ -136,9 +136,9 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         throws MCRPersistenceException, MCRAccessException {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         MCRObject object = wrapper.getMCRObject();
-        MCRObjectID oid = MCRObjectID.getNextFreeId(childID.getBase());
+        MCRObjectID oid = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(childID.getBase());
         if (oid.equals(childID)) {
-            oid = MCRObjectID.getNextFreeId(childID.getBase());
+            oid = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(childID.getBase());
         }
         object.setId(oid);
 

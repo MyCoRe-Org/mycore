@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
@@ -48,7 +49,7 @@ public class MCRPIUtils {
     }
 
     public static MCRObjectID getNextFreeID() {
-        return MCRObjectID.getNextFreeId("MyCoRe_test");
+        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("MyCoRe_test");
     }
 
     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {

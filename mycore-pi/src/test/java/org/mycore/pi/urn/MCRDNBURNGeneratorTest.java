@@ -29,6 +29,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -43,7 +44,7 @@ public class MCRDNBURNGeneratorTest extends MCRStoreTestCase {
 
     @Test
     public void generate() throws Exception {
-        MCRObjectID getID = MCRObjectID.getNextFreeId("test", "mock");
+        MCRObjectID getID = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("test", "mock");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(getID);
         MCRFLURNGenerator flGenerator = (MCRFLURNGenerator) MCRConfiguration2

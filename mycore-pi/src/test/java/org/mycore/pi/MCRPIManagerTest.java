@@ -36,6 +36,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
@@ -144,7 +145,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     }
 
     private MCRPI generateMCRPI() throws MCRPersistentIdentifierException {
-        MCRObjectID mycoreID = MCRObjectID.getNextFreeId("test_unregisterd");
+        MCRObjectID mycoreID = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("test_unregisterd");
         return new MCRPI(generatePIFor(mycoreID).asString(), "Unregistered",
             mycoreID.toString(), null, MOCK_SERVICE, null);
     }
@@ -206,7 +207,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
 
     private MCRObject buildMockObject() {
         MCRObject mcrObject = new MCRObject();
-        MCRObjectID id = MCRObjectID.getNextFreeId("test", "mock");
+        MCRObjectID id = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("test", "mock");
         mcrObject.setId(id);
         mcrObject.setSchema("http://www.w3.org/2001/XMLSchema");
         return mcrObject;

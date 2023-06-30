@@ -29,6 +29,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -56,14 +57,14 @@ public abstract class MCRIFSTest extends MCRStoreTestCase {
 
     public static MCRObject createObject() {
         MCRObject object = new MCRObject();
-        object.setId(MCRObjectID.getNextFreeId("mycore_object"));
+        object.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("mycore_object"));
         object.setSchema("noSchema");
         return object;
     }
 
     public static MCRDerivate createDerivate(MCRObjectID objectHrefId) {
         MCRDerivate derivate = new MCRDerivate();
-        derivate.setId(MCRObjectID.getNextFreeId("mycore_derivate"));
+        derivate.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("mycore_derivate"));
         derivate.setSchema("datamodel-derivate.xsd");
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag("internal");
