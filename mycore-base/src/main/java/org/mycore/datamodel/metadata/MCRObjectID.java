@@ -63,7 +63,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     private static HashSet<String> VALID_TYPE_LIST;
 
-    private Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
+    private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
         = Comparator.comparing(MCRObjectID::getProjectId)
             .thenComparing(MCRObjectID::getTypeId)
             .thenComparingInt(MCRObjectID::getNumberAsInteger);
