@@ -42,14 +42,17 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRDefaultObjectIDGenerator;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRMarkManager.Operation;
+import org.mycore.datamodel.common.MCRObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
@@ -77,8 +80,16 @@ public final class MCRMetadataManager {
 
     private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
+    private static final MCRObjectIDGenerator MCROBJECTID_GENERATOR
+        = MCRConfiguration2.getSingleInstanceOf("MCR.Metadata.ObjectID.Generator.Class",
+            MCRDefaultObjectIDGenerator.class).get();
+
     private MCRMetadataManager() {
 
+    }
+    
+    public static MCRObjectIDGenerator getMCRObjectIDGenerator() {
+        return MCROBJECTID_GENERATOR;
     }
 
     /**

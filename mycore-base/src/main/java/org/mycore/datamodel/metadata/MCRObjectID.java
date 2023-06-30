@@ -31,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.common.MCRObjectIDGenerator;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -107,25 +106,25 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     // TODO enable deprecation in last step
     // @Deprecated
     public static MCRObjectID getNextFreeId(String baseId) {
-        return MCRObjectIDGenerator.getNextFreeId(baseId);
+        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId);
     }
 
     // TODO enable deprecation in last step
     // @Deprecated
     public static MCRObjectID getNextFreeId(String projectId, String type) {
-        return MCRObjectIDGenerator.getNextFreeId(projectId, type);
+        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectId, type);
     }
 
     // TODO enable deprecation in last step
     // @Deprecated
     public static MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
-        return MCRObjectIDGenerator.getNextFreeId(baseId, maxInWorkflow);
+        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId, maxInWorkflow);
     }
 
     // TODO enable deprecation in last step
     // @Deprecated
     public static MCRObjectID getLastID(String baseId) {
-        return MCRObjectIDGenerator.getLastID(baseId);
+        return MCRMetadataManager.getMCRObjectIDGenerator().getLastID(baseId);
     }
 
     /**
