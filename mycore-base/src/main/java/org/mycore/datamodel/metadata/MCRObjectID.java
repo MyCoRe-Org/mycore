@@ -63,6 +63,11 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     private static HashSet<String> VALID_TYPE_LIST;
 
+    private Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
+        = Comparator.comparing(MCRObjectID::getProjectId)
+            .thenComparing(MCRObjectID::getTypeId)
+            .thenComparingInt(MCRObjectID::getNumberAsInteger);
+
     static {
         final String confPrefix = "MCR.Metadata.Type.";
         VALID_TYPE_LIST = MCRConfiguration2.getPropertiesMap()
@@ -309,10 +314,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     @Override
     public int compareTo(MCRObjectID o) {
-        return Comparator.comparing(MCRObjectID::getProjectId)
-            .thenComparing(MCRObjectID::getTypeId)
-            .thenComparingInt(MCRObjectID::getNumberAsInteger)
-            .compare(this, o);
+        return COMPARATOR_FOR_MCR_OBJECT_ID.compare(this, o);
     }
 
     /**
