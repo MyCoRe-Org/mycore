@@ -18,7 +18,7 @@ public interface MCRObjectIDGenerator {
      * @param baseId
      *            <em>project_id</em>_<em>type_id</em>
      */
-    public default MCRObjectID getNextFreeId(String baseId) {
+    default MCRObjectID getNextFreeId(String baseId) {
         return getNextFreeId(baseId, 0);
     }
 
@@ -31,7 +31,7 @@ public interface MCRObjectIDGenerator {
      * @param type
      *            The second component of <em>project_id</em>_<em>type_id</em>
      */
-    public default MCRObjectID getNextFreeId(String projectId, String type) {
+    default MCRObjectID getNextFreeId(String projectId, String type) {
         return getNextFreeId(projectId + "_" + type);
     }
 
@@ -46,7 +46,7 @@ public interface MCRObjectIDGenerator {
      *            returned integer part of id will be at least
      *            <code>maxInWorkflow + 1</code>
      */
-    public MCRObjectID getNextFreeId(String baseId, int maxInWorkflow);
+    MCRObjectID getNextFreeId(String baseId, int maxInWorkflow);
 
     /**
      * Returns the last ID used or reserved for the given object base type.
@@ -54,6 +54,6 @@ public interface MCRObjectIDGenerator {
      * @return a valid MCRObjectID, or null when there is no ID for the given
      *         type
      */
-    public MCRObjectID getLastID(String baseId);
+    MCRObjectID getLastID(String baseId);
 
 }
