@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRJSONManager;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.orcid.MCRORCIDProfile;
@@ -142,7 +143,7 @@ public class MCRORCIDResource {
     }
 
     private MCRObjectID checkID(String objectID) {
-        if (objectID == null || objectID.isEmpty() || !MCRObjectID.isValid(objectID)) {
+        if (objectID == null || objectID.isEmpty() || !MCRObjectIDHelper.isValidID(objectID)) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
         MCRObjectID oid = MCRObjectID.getInstance(objectID);

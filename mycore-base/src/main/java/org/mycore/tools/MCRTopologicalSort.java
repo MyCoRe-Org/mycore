@@ -41,7 +41,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -110,7 +110,7 @@ public class MCRTopologicalSort<T> {
                             case "parent", "relatedItem" -> {
                                 String href = xmlStreamReader
                                     .getAttributeValue("http://www.w3.org/1999/xlink", "href");
-                                if (MCRObjectID.isValid(href)) {
+                                if (MCRObjectIDHelper.isValidID(href)) {
                                     List<String> dependencyList = parentNames.computeIfAbsent(i,
                                         e -> new ArrayList<>());
                                     dependencyList.add(href);

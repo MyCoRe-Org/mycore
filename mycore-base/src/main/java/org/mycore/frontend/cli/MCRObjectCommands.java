@@ -85,6 +85,7 @@ import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -1373,7 +1374,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 180)
     public static void repairMetadataSearchForID(String id) {
         LOGGER.info("Start the repair for the ID {}", id);
-        if (!MCRObjectID.isValid(id)) {
+        if (!MCRObjectIDHelper.isValidID(id)) {
             LOGGER.error("The String {} is not a MCRObjectID.", id);
             return;
         }

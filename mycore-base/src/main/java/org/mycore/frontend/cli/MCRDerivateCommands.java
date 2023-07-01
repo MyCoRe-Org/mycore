@@ -63,6 +63,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -778,7 +779,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "Sets the main file of the derivate with the id {0} to "
             + "the file with the path {1}")
     public static void setMainFile(final String derivateIDString, final String filePath) throws MCRAccessException {
-        if (!MCRObjectID.isValid(derivateIDString)) {
+        if (!MCRObjectIDHelper.isValidID(derivateIDString)) {
             LOGGER.error("{} is not valid. ", derivateIDString);
             return;
         }

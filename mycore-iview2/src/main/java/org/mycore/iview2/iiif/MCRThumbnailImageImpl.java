@@ -87,7 +87,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
      * @return an Optional containing the MyCoRe ID
      */
     protected Optional<MCRObjectID> calculateMCRObjectID(String id) {
-        return MCRObjectID.isValid(id) ? Optional.of(MCRObjectID.getInstance(id)) : Optional.empty();
+        return MCRObjectIDHelper.isValidID(id) ? Optional.of(MCRObjectID.getInstance(id)) : Optional.empty();
     }
 
     private Optional<MCRTileInfo> createTileInfoForMCRObject(MCRObjectID mcrID) {

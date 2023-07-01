@@ -36,6 +36,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -195,7 +196,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         if (href != null) {
             final String testId = href.getValue();
             LOGGER.debug("Checking relatedItem {}.", testId);
-            if (MCRObjectID.isValid(testId)) {
+            if (MCRObjectIDHelper.isValidID(testId)) {
                 final MCRObjectID relatedItemId = MCRObjectID.getInstance(testId);
                 LOGGER.debug("Checking if {} is in {}.", relatedItemId, idCollected);
                 if (!idCollected.add(relatedItemId)) {

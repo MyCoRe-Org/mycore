@@ -371,7 +371,7 @@ public class MCRXMLFunctions {
      */
     public static boolean isWorldReadableComplete(String objId) {
         LOGGER.info("World completely readable: {}", objId);
-        if (!MCRObjectID.isValid(objId)) {
+        if (!MCRObjectIDHelper.isValidID(objId)) {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
@@ -403,7 +403,7 @@ public class MCRXMLFunctions {
      * @param objId MCRObjectID as String
      */
     public static boolean isWorldReadable(String objId) {
-        if (!MCRObjectID.isValid(objId)) {
+        if (!MCRObjectIDHelper.isValidID(objId)) {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);

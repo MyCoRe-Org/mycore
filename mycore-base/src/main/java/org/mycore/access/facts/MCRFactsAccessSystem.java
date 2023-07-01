@@ -50,6 +50,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -159,7 +160,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         if (checkID == null) {
             cacheKey = action;
         } else {
-            if (MCRObjectID.isValid(checkID)) {
+            if (MCRObjectIDHelper.isValidID(checkID)) {
                 MCRObjectID mcrId = MCRObjectID.getInstance(checkID);
                 target = "derivate".equals(mcrId.getTypeId()) ? "files" : "metadata";
 

@@ -37,6 +37,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -266,7 +267,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         if (path instanceof MCRPath mcrPath) {
             // check if the derivate is marked for deletion
             String owner = mcrPath.getOwner();
-            if (MCRObjectID.isValid(owner)) {
+            if (MCRObjectIDHelper.isValidID(owner)) {
                 MCRObjectID mcrObjectID = MCRObjectID.getInstance(owner);
                 if (MCRMarkManager.instance().isMarkedForDeletion(mcrObjectID)) {
                     return;
@@ -316,7 +317,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
      */
     protected Optional<MCRObjectID> getDerivateId(Path path) {
         MCRPath mcrPath = MCRPath.toMCRPath(path);
-        if (MCRObjectID.isValid(mcrPath.getOwner())) {
+        if (MCRObjectIDHelper.isValidID(mcrPath.getOwner())) {
             return Optional.of(MCRObjectID.getInstance(mcrPath.getOwner()));
         }
         return Optional.empty();

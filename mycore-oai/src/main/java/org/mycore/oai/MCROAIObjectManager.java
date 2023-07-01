@@ -24,6 +24,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -146,7 +147,7 @@ public class MCROAIObjectManager {
     }
 
     protected String formatURI(String uri, String id, String metadataPrefix) {
-        MCRObjectID mcrID = MCRObjectID.isValid(id) ? MCRObjectID.getInstance(id) : null;
+        MCRObjectID mcrID = MCRObjectIDHelper.isValidID(id) ? MCRObjectID.getInstance(id) : null;
         boolean exists;
         String objectType;
         if (mcrID != null) {
