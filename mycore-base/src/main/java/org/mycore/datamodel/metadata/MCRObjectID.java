@@ -59,21 +59,21 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     private final int numberPart;
 
     /**
-     * The constructor for MCRObjectID from a given string.
-     *
-     * @exception MCRException
-     *                if the given string is not valid.
+     * Constructor for a MCRObject ID
+     * 
+     * Implementors SHOULD call MCRObjectIDHelper.createID(Stringn id)
+     * to create a new MCRObjectID();
+     * 
+     * @param projectId
+     * @param typeId
+     * @param numberPart
+     * @param combinedId
      */
-    MCRObjectID(String id) throws MCRException {
-        if (!isValid(id)) {
-            throw new MCRException("The ID is not valid: " + id
-                + " , it should match the pattern String_String_Integer");
-        }
-        String[] idParts = getIDParts(id.trim());
-        projectId = idParts[0].intern();
-        objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        numberPart = Integer.parseInt(idParts[2]);
-        this.combinedId = formatID(projectId, objectType, numberPart);
+    public MCRObjectID(String projectId, String typeId, int numberPart, String combinedId){
+        this.projectId = projectId;
+        this.objectType = typeId;
+        this.numberPart = numberPart;
+        this.combinedId = combinedId;
     }
 
     @Deprecated
@@ -104,9 +104,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return an MCRObjectID class instance
      * @exception MCRException if the given identifier is not valid
      */
+    //TODO reduce visablity needed for JsonCreation
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static MCRObjectID getInstance(String id) {
-        return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
+        return MCRObjectIDHelper.createID(id);
     }
 
     // TODO @Deprecated

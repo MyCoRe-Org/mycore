@@ -49,6 +49,29 @@ public class MCRObjectIDHelper{
     /** maximal character length of the whole id */
     public static final int MAX_LENGTH = 64;
     
+    /**
+     * The builder for MCRObjectID from a given string.
+     *
+     * @exception MCRException
+     *                if the given string is not valid.
+     */
+    public static MCRObjectID createID(String id) throws MCRException {
+        return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
+    }
+    
+    private static MCRObjectID mcrObjectIdFromString(String id) {
+        if (!isValidID(id)) {
+            throw new MCRException("The ID is not valid: " + id
+                + " , it should match the pattern String_String_Integer");
+        }
+        String[] idParts = getIDParts(id.trim());
+        String projectId = idParts[0].intern();
+        String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
+        int numberPart = Integer.parseInt(idParts[2]);
+        String combinedId = formatID(projectId, objectType, numberPart);
+        return new MCRObjectID(projectId, objectType, numberPart, combinedId);
+    }
+
     
     /**
      * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
@@ -176,6 +199,50 @@ public class MCRObjectIDHelper{
             .filter(p -> Boolean.parseBoolean(p.getValue()))
             .map(prop -> prop.getKey().substring(confPrefix.length()))
             .collect(Collectors.toCollection(HashSet::new));
+    }
+    
+    /**
+    * holds weak references to generated {@link MCRObjectID} instances.
+    * @author Thomas Scheffler (yagee)
+    *
+    */
+   class MCRObjectIDPool {
+       private static LoadingCache<String, MCRObjectID> objectIDCache = CacheBuilder
+           .newBuilder()
+           .weakValues()
+           .build(new CacheLoader<>() {
+               @Override
+               public MCRObjectID load(String id) {
+                   return MCRObjectIDHelper.mcrObjectIdFromString(id);
+               }
+           });
+
+       static MCRObjectID getMCRObjectID(String id) {
+           try {
+               return objectIDCache.getUnchecked(id);
+           } catch (UncheckedExecutionException e) {
+               Throwable cause = e.getCause();
+               if (cause instanceof MCRException mcre) {
+                   throw mcre;
+               }
+               throw e;
+           }
+       }
+
+       static long getSize() {
+           objectIDCache.cleanUp();
+           //objectIDCache.size() may return more as actually present;
+           return objectIDCache.asMap()
+               .entrySet()
+               .stream()
+               .filter(e -> e.getKey() != null)
+               .filter(e -> e.getValue() != null)
+               .count();
+       }
+
+       static MCRObjectID getIfPresent(String id) {
+           return objectIDCache.getIfPresent(id);
+       }
     }
     
 }
