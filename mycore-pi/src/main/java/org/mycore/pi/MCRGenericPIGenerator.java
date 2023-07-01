@@ -50,6 +50,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -229,7 +230,8 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         }
 
         if (resultingPI.contains(PLACE_HOLDER_OBJECT_NUMBER)) {
-            resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_NUMBER, mcrBase.getId().getNumberAsString());
+            resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_NUMBER,
+                MCRObjectIDHelper.formatNumberPart(mcrBase.getId()));
         }
 
         if (XPATH_PATTERN.asPredicate().test(resultingPI)) {

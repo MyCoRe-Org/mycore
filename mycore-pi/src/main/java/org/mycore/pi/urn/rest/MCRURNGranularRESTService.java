@@ -45,6 +45,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -139,7 +140,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
             .flatMap(new MCRDNBURNParser()::parse)
             .orElseGet(() -> createNewURN(deriv));
 
-        String setID = derivID.getNumberAsString();
+        String setID = MCRObjectIDHelper.formatNumberPart(derivID);
         GranularURNGenerator granularURNGen = new GranularURNGenerator(seed, derivURN, setID);
         Function<MCRPath, Supplier<String>> generateURN = p -> granularURNGen.getURNSupplier();
 

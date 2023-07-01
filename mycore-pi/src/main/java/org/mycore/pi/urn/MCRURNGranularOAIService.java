@@ -33,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -102,7 +103,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         MCRDNBURN newURN = (MCRDNBURN) MCRPIManager.getInstance().get(derivate.getURN())
             .findFirst().get();
 
-        String setID = obj.getId().getNumberAsString();
+        String setID = MCRObjectIDHelper.formatNumberPart(obj.getId());
         MCRDNBURN urntoAssign = newURN.toGranular(setID, count + 1, count + 1);
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
@@ -144,7 +145,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
             .collect(Collectors.toList());
 
         MCRDNBURN newURN = getNewIdentifier(obj, additional);
-        String setID = obj.getId().getNumberAsString();
+        String setID = MCRObjectIDHelper.formatNumberPart(obj.getId());
 
         for (int pathListIndex = 0; pathListIndex < pathList.size(); pathListIndex++) {
             MCRDNBURN subURN = newURN.toGranular(setID, pathListIndex + 1, pathList.size());

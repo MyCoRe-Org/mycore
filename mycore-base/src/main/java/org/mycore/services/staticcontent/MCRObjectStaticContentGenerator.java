@@ -39,6 +39,7 @@ import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -144,7 +145,7 @@ public class MCRObjectStaticContentGenerator {
     }
 
     protected Path getSlotDirPath(MCRObjectID id) {
-        final String numberAsString = id.getNumberAsString();
+        final String numberAsString = MCRObjectIDHelper.formatNumberPart(id);
 
         final int folderSize = 3;
         final int folders = (int) Math.ceil(numberAsString.length() / (double) folderSize);

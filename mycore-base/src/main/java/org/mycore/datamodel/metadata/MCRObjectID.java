@@ -162,7 +162,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return objectType;
     }
 
-    // TODO @Deprecated
+    // TODO 
+    @Deprecated
     public String getNumberAsString() {
         return MCRObjectIDHelper.formatNumberPart(this);
     }
