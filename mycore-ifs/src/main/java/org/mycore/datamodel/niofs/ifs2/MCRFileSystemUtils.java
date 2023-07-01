@@ -74,7 +74,7 @@ abstract class MCRFileSystemUtils {
         return MCRConfiguration2.getString(DEFAULT_CONFIG_PREFIX + "SlotLayout")
             .orElseGet(() -> {
                 String baseID = "a_a";
-                String formatID = MCRObjectID.formatID(baseID, 1);
+                String formatID = MCRObjectIDHelper.formatID(baseID, 1);
                 int patternLength = formatID.length() - baseID.length() - "_".length();
                 return patternLength - 4 + "-2-2";
             });
@@ -155,7 +155,7 @@ abstract class MCRFileSystemUtils {
         int intValue = collection.getID();
         String storeId = collection.getStore().getID();
         String baseId = storeId.substring(STORE_ID_PREFIX.length());
-        return MCRObjectID.formatID(baseId, intValue);
+        return MCRObjectIDHelper.formatID(baseId, intValue);
     }
 
     static MCRPath toPath(MCRStoredNode node) {

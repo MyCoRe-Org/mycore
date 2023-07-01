@@ -151,7 +151,7 @@ public class MCRCommandUtils {
         int lowerBound = fromID < toID ? fromID : toID;
         int upperBound = fromID < toID ? toID : fromID;
         List<String> idList = IntStream.rangeClosed(lowerBound, upperBound).boxed().parallel()
-            .map(n -> MCRObjectID.formatID(fromBase, n))
+            .map(n -> MCRObjectIDHelper.formatID(fromBase, n))
             .filter(id -> MCRMetadataManager.exists(MCRObjectID.getInstance(id)))
             .collect(Collectors.toCollection(ArrayList::new));
         if (idList.isEmpty()) {

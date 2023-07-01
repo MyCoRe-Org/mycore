@@ -20,8 +20,6 @@ package org.mycore.datamodel.metadata;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRObjectIDHelper;
@@ -113,17 +111,20 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return MCRObjectIDHelper.createID(id);
     }
 
-    // TODO @Deprecated
+    // TODO should not be used (use formatID(baseID, number) instead
+    @Deprecated
     public static String formatID(String projectID, String type, int number) {
         return MCRObjectIDHelper.formatID(projectID, type, number);
     }
 
-    //TODO @Deprecated
+    //TODO 
+    @Deprecated
     public static String formatID(String baseID, int number) {
         return MCRObjectIDHelper.formatID(baseID, number);
     }
 
-    //TODO @Deprecated
+    //TODO should not be used (will become internal in MCRObjectIDHelper)
+    @Deprecated
     public static String[] getIDParts(String id) {
         return MCRObjectIDHelper.getIDParts(id);
     }

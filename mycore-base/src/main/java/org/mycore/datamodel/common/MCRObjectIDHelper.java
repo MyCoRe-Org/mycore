@@ -81,6 +81,9 @@ public class MCRObjectIDHelper{
      * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
      * <em>number</em>, where number has leading zeros.
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
+     * 
+     * TODO check if this method can be remove (or made private) 
+     * in favor of formatID(baseId, number)
      */
     public static String formatID(String projectID, String type, int number) {
         if (projectID == null) {

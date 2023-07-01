@@ -688,7 +688,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         int k = 0;
         try {
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
-                String id = MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
+                String id = MCRObjectIDHelper.formatID(fid.getProjectId(), fid.getTypeId(), i);
                 if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                     continue;
                 }

@@ -38,6 +38,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaXML;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -159,7 +160,7 @@ public class MCRMODSWrapper {
     }
 
     public MCRObjectID setID(String projectID, int id) {
-        MCRObjectID objID = MCRObjectID.getInstance(MCRObjectID.formatID(projectID, MODS_OBJECT_TYPE, id));
+        MCRObjectID objID = MCRObjectID.getInstance(MCRObjectIDHelper.formatID(projectID, MODS_OBJECT_TYPE, id));
         object.setId(objID);
         return objID;
     }

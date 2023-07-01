@@ -438,7 +438,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         try {
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
 
-                exportDerivate(dir, trans, MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i));
+                exportDerivate(dir, trans, MCRObjectIDHelper.formatID(fid.getProjectId(), fid.getTypeId(), i));
 
                 k++;
             }

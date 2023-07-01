@@ -26,6 +26,7 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -68,7 +69,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             //editorSubmission is null, when editor input is absent (redirect to editor form in render phase)
             String projectID = getProperty(request, "project");
             String type = getProperty(request, "type");
-            String formattedId = MCRObjectID.formatID(projectID + "_" + type, 0);
+            String formattedId = MCRObjectIDHelper.formatID(projectID + "_" + type, 0);
             objectID = MCRObjectID.getInstance(formattedId);
             MCRMetadataManager.checkCreatePrivilege(objectID);
         }

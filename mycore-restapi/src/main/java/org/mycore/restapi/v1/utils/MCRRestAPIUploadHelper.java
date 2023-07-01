@@ -206,7 +206,7 @@ public class MCRRestAPIUploadHelper {
                         .add(new MCRMetaLangText("title", null, null, 0, null, label));
                 }
                 MCRObjectID zeroDerId
-                    = MCRObjectID.getInstance(MCRObjectID.formatID(mcrObjIDObj.getProjectId() + "_derivate", 0));
+                    = MCRObjectID.getInstance(MCRObjectIDHelper.formatID(mcrObjIDObj.getProjectId() + "_derivate", 0));
                 mcrDerivate.setId(zeroDerId);
                 mcrDerivate.setSchema("datamodel-derivate.xsd");
                 mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));

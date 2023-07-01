@@ -29,6 +29,7 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntityManager;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -69,7 +70,7 @@ public class MCRObjectInfoCommands {
 
         int maxID = mm.getHighestStoredID(idParts[0], idParts[1]);
         return IntStream.rangeClosed(1, maxID)
-            .mapToObj(n -> MCRObjectID.formatID(baseId, n))
+            .mapToObj(n -> MCRObjectIDHelper.formatID(baseId, n))
             .map(id -> "create objectinfo for object " + id)
             .collect(Collectors.toList());
     }

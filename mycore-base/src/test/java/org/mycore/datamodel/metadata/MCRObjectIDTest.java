@@ -35,6 +35,7 @@ import org.jdom2.Element;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 
 public class MCRObjectIDTest extends MCRStoreTestCase {
 
@@ -60,14 +61,14 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
     @Test
     public void compareTo() {
         Set<MCRObjectID> testIds = IntStream.range(0, 17)
-            .mapToObj(i -> MCRObjectID.getInstance(MCRObjectID.formatID("MyCoRe", "test", i)))
+            .mapToObj(i -> MCRObjectID.getInstance(MCRObjectIDHelper.formatID("MyCoRe", "test", i)))
             .flatMap(o -> Stream.of(o, MCRObjectID.getInstance(
-                MCRObjectID.formatID(o.getProjectId(), "junit", o.getNumberAsInteger()))))
+                MCRObjectIDHelper.formatID(o.getProjectId(), "junit", o.getNumberAsInteger()))))
             .flatMap(o -> Stream.concat(Stream.of(o),
                 Stream.of("junit", "mcr", "JUnit")
                     .map(projectId -> MCRObjectID
                         .getInstance(
-                            MCRObjectID.formatID(
+                            MCRObjectIDHelper.formatID(
                                 projectId,
                                 o.getTypeId(),
                                 o.getNumberAsInteger())))))

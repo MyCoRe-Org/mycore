@@ -81,7 +81,7 @@ public class MCROCFLMigration {
             String[] idParts = baseId.split("_");
             int maxId = instance.getHighestStoredID(idParts[0], idParts[1]);
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
-                .mapToObj(i -> MCRObjectID.formatID(baseId, i))
+                .mapToObj(i -> MCRObjectIDHelper.formatID(baseId, i))
                 .collect(Collectors.toList());
 
             for (String id : possibleIds) {

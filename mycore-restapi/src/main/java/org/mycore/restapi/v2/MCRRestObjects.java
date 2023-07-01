@@ -63,6 +63,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -362,7 +363,7 @@ public class MCRRestObjects {
             Element eMCRObj = doc.getRootElement();
             if (eMCRObj.getAttributeValue("ID") != null) {
                 MCRObjectID id = MCRObjectID.getInstance(eMCRObj.getAttributeValue("ID"));
-                MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectID.formatID(id.getBase(), 0));
+                MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectIDHelper.formatID(id.getBase(), 0));
                 eMCRObj.setAttribute("ID", zeroId.toString());
                 if (eMCRObj.getAttribute("label") == null) {
                     eMCRObj.setAttribute("label", zeroId.toString());

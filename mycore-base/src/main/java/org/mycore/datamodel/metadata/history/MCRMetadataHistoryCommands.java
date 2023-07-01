@@ -125,7 +125,7 @@ public class MCRMetadataHistoryCommands {
         AtomicInteger completed = new AtomicInteger(maxId);
         IntStream.rangeClosed(1, maxId)
             .parallel()
-            .mapToObj(i -> MCRObjectID.formatID(baseId, i))
+            .mapToObj(i -> MCRObjectIDHelper.formatID(baseId, i))
             .map(MCRObjectID::getInstance)
             .map(id -> new MCRTransactionableCallable<>(Executors.callable(() -> {
                 EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();

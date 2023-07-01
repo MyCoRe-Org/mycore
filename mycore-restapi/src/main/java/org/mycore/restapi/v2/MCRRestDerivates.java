@@ -41,6 +41,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -338,7 +339,7 @@ public class MCRRestDerivates {
     private Response doCreateDerivate(@BeanParam DerivateMetadata der) {
         LOGGER.debug(der);
         String projectID = mcrId.getProjectId();
-        MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectID.formatID(projectID + "_derivate",0));
+        MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectIDHelper.formatID(projectID + "_derivate",0));
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(zeroId);
 

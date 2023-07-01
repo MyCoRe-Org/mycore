@@ -79,7 +79,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
         }
 
         lastNumber.put(baseId, next);
-        return MCRObjectID.getInstance(MCRObjectID.formatID(baseId, next));
+        return MCRObjectID.getInstance(MCRObjectIDHelper.formatID(baseId, next));
     }
     
     /**
@@ -93,7 +93,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
         if (lastIDNumber == 0) {
             return null;
         }
-        return MCRObjectID.getInstance(MCRObjectID.formatID(baseId, lastIDNumber));
+        return MCRObjectID.getInstance(MCRObjectIDHelper.formatID(baseId, lastIDNumber));
     }
     
     /**
