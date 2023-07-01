@@ -45,7 +45,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
     + "where project is a namespace and type defines the datamodel")
 @JsonFormat(shape = JsonFormat.Shape.STRING)
 public final class MCRObjectID implements Comparable<MCRObjectID> {
-
+    
+    /** maximal character length of the whole id */
+    public static final int MAX_LENGTH = 64;
+   
     private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
         = Comparator.comparing(MCRObjectID::getProjectId)
             .thenComparing(MCRObjectID::getTypeId)

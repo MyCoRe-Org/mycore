@@ -46,9 +46,6 @@ public class MCRObjectIDHelper{
     
     private static Set<String> VALID_TYPES = initValidTypes();
     
-    /** maximal character length of the whole id */
-    public static final int MAX_LENGTH = 64;
-    
     /**
      * The builder for MCRObjectID from a given string.
      *
@@ -157,7 +154,7 @@ public class MCRObjectIDHelper{
             return false;
         }
         String mcrId = id.trim();
-        if (mcrId.length() > MAX_LENGTH) {
+        if (mcrId.length() > MCRObjectID.MAX_LENGTH) {
             return false;
         }
         String[] idParts = getIDParts(mcrId);
