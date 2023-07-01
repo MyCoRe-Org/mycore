@@ -318,7 +318,7 @@ public class MCRMigrationCommands {
     @MCRCommand(syntax = "migrate all derivates",
         help = "Migrates the order and label of all derivates (MCR-2003, MCR-2099)")
     public static List<String> migrateAllDerivates() {
-        List<String> objectTypes = MCRObjectID.listTypes();
+        List<String> objectTypes = MCRObjectIDHelper.listTypes();
         objectTypes.remove("derivate");
         objectTypes.remove("class");
 

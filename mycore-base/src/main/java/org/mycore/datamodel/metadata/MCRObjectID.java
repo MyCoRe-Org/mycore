@@ -128,7 +128,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return MCRObjectIDHelper.getIDParts(id);
     }
 
-    //TODO @Deprecated
+    //TODO 
+    @Deprecated
     public static List<String> listTypes() {
         return MCRObjectIDHelper.listTypes();
     }
