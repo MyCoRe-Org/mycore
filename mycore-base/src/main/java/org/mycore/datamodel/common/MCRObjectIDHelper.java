@@ -142,6 +142,22 @@ public class MCRObjectIDHelper{
     public static boolean isValidType(String type) {
         return VALID_TYPES.contains(type);
     }
+    
+    /**
+     * Check whether the type passed is a valid type in the current mycore environment.
+     * That being said property <code>MCR.Metadata.Type.&#60;type&#62;</code> must be set to <code>true</code> in mycore.properties.
+     *
+     * @param type the type to check
+     * @return true if valid, false otherwise
+     */
+    public static boolean isValidBase(String base) {
+        long countSeparator = base.chars().filter(ch -> ch == '_').count();
+        if(countSeparator == 1) {
+            String type = base.substring(base.indexOf("_")+1);
+            return isValidType(type);
+        }
+        return false;
+    }
 
     /**
      * Checks if the given id is a valid mycore id in the form of {project}_{object_type}_{number}.
