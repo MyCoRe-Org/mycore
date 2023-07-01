@@ -18,19 +18,13 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -51,32 +45,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
     + "where project is a namespace and type defines the datamodel")
 @JsonFormat(shape = JsonFormat.Shape.STRING)
 public final class MCRObjectID implements Comparable<MCRObjectID> {
-    /**
-     * public constant value for the MCRObjectID length
-     */
-    public static final int MAX_LENGTH = 64;
-
-    private static NumberFormat NUMBER_FORMAT = initNumberFormat();
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
-
-    private static HashSet<String> VALID_TYPE_LIST;
 
     private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
         = Comparator.comparing(MCRObjectID::getProjectId)
             .thenComparing(MCRObjectID::getTypeId)
             .thenComparingInt(MCRObjectID::getNumberAsInteger);
-
-    static {
-        final String confPrefix = "MCR.Metadata.Type.";
-        VALID_TYPE_LIST = MCRConfiguration2.getPropertiesMap()
-            .entrySet()
-            .stream()
-            .filter(p -> p.getKey().startsWith(confPrefix))
-            .filter(p -> Boolean.parseBoolean(p.getValue()))
-            .map(prop -> prop.getKey().substring(confPrefix.length()))
-            .collect(Collectors.toCollection(HashSet::new));
-    }
 
     // data of the ID
     private final String projectId;
@@ -108,7 +81,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId);
     }
 
-    
     @Deprecated
     public static MCRObjectID getNextFreeId(String projectId, String type) {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectId, type);
@@ -137,99 +109,34 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
     }
 
-    /**
-     * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
-     * <em>number</em>, where number has leading zeros.
-     * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
-     */
+    // TODO @Deprecated
     public static String formatID(String projectID, String type, int number) {
-        if (projectID == null) {
-            throw new IllegalArgumentException("projectID cannot be null");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("type cannot be null");
-        }
-        if (number < 0) {
-            throw new IllegalArgumentException("number must be non negative integer");
-        }
-        return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + NUMBER_FORMAT.format(number);
+        return MCRObjectIDHelper.formatID(projectID, type, number);
     }
 
-    /**
-     * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
-     * <em>number</em>, where number has leading zeros.
-     *
-     * @param baseID
-     *            is <em>project_id</em>_<em>type_id</em>
-     * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
-     */
+    //TODO @Deprecated
     public static String formatID(String baseID, int number) {
-        String[] idParts = getIDParts(baseID);
-        return formatID(idParts[0], idParts[1], number);
+        return MCRObjectIDHelper.formatID(baseID, number);
     }
 
-    /**
-     * Splits the submitted <code>id</code> in its parts.
-     * <code>MyCoRe_document_00000001</code> would be transformed in { "MyCoRe",
-     * "document", "00000001" }
-     *
-     * @param id
-     *            either baseID or complete ID
-     */
+    //TODO @Deprecated
     public static String[] getIDParts(String id) {
-        return id.split("_");
+        return MCRObjectIDHelper.getIDParts(id);
     }
 
-    /**
-     * Returns a list of available mycore object types.
-     */
+    //TODO @Deprecated
     public static List<String> listTypes() {
-        return new ArrayList<>(VALID_TYPE_LIST);
+        return MCRObjectIDHelper.listTypes();
     }
 
-    /**
-     * Check whether the type passed is a valid type in the current mycore environment.
-     * That being said property <code>MCR.Metadata.Type.&#60;type&#62;</code> must be set to <code>true</code> in mycore.properties.
-     *
-     * @param type the type to check
-     * @return true if valid, false otherwise
-     */
+    //TODO @Deprecated
     public static boolean isValidType(String type) {
-        return VALID_TYPE_LIST.contains(type);
+        return MCRObjectIDHelper.isValidType(type);
     }
 
-    /**
-     * Checks if the given id is a valid mycore id in the form of {project}_{object_type}_{number}.
-     *
-     * @param id the id to check
-     * @return true if the id is valid, false otherwise
-     */
+    //TODO @Deprecated
     public static boolean isValid(String id) {
-        if (id == null) {
-            return false;
-        }
-        String mcrId = id.trim();
-        if (mcrId.length() > MAX_LENGTH) {
-            return false;
-        }
-        String[] idParts = getIDParts(mcrId);
-        if (idParts.length != 3) {
-            return false;
-        }
-        String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
-            LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
-            return false;
-        }
-        try {
-            int numberPart = Integer.parseInt(idParts[2]);
-            if (numberPart < 0) {
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
+        return MCRObjectIDHelper.isValidID(id);
     }
 
     /**
@@ -251,13 +158,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return objectType;
     }
 
-    /**
-     * This method gets the string with <em>number</em>.
-     *
-     * @return the string of the number
-     */
+    // TODO @Deprecated
     public String getNumberAsString() {
-        return NUMBER_FORMAT.format(numberPart);
+        return MCRObjectIDHelper.formatNumberPart(this);
     }
 
     /**
@@ -334,15 +237,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     @Override
     public int hashCode() {
         return toString().hashCode();
-    }
-
-    private static NumberFormat initNumberFormat() {
-        String numberPattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern")
-            .orElse("0000000000").trim();
-        NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
-        format.setGroupingUsed(false);
-        format.setMinimumIntegerDigits(numberPattern.length());
-        return format;
     }
 
 }
