@@ -43,6 +43,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
@@ -325,7 +326,7 @@ abstract class MCRFileSystemUtils {
                         throw new UncheckedIOException(e);
                     }
                 })
-                .filter(path -> MCRObjectID.isValidType(path.getFileName().toString()))
+                .filter(path -> MCRObjectIDHelper.isValidType(path.getFileName().toString()))
                 .filter(Files::isDirectory)
                 .sorted(Comparator.comparing(Path::getFileName))
                 .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())

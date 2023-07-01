@@ -576,7 +576,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             return streamBasePath.flatMap(this::list)
                 .map(Path::getFileName)
                 .map(Path::toString)
-                .filter(MCRObjectID::isValidType)
+                .filter(MCRObjectIDHelper::isValidType)
                 .distinct()
                 .collect(Collectors.toSet());
         }
@@ -585,7 +585,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     public Collection<String> getObjectBaseIds() {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(this::list)
-                .filter(p -> MCRObjectID.isValidType(p.getFileName().toString()))
+                .filter(p -> MCRObjectIDHelper.isValidType(p.getFileName().toString()))
                 .map(p -> p.getParent().getFileName() + "_" + p.getFileName())
                 .collect(Collectors.toSet());
         }

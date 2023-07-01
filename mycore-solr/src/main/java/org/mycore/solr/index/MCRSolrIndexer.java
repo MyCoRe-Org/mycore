@@ -49,6 +49,7 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrUtils;
@@ -466,7 +467,7 @@ public class MCRSolrIndexer {
     }
 
     public static void dropIndexByType(String type, SolrClient client) throws Exception {
-        if (!MCRObjectID.isValidType(type) || Objects.equals(type, "data_file")) {
+        if (!MCRObjectIDHelper.isValidType(type) || Objects.equals(type, "data_file")) {
             LOGGER.warn("The type {} is not a valid type in the actual environment", type);
             return;
         }

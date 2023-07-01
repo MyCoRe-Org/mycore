@@ -134,7 +134,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return MCRObjectIDHelper.listTypes();
     }
 
-    //TODO @Deprecated
+    //TODO 
+    @Deprecated
     public static boolean isValidType(String type) {
         return MCRObjectIDHelper.isValidType(type);
     }
