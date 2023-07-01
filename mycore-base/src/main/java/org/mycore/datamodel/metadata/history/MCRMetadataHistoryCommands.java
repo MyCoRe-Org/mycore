@@ -43,6 +43,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRCreatorCache;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -117,11 +118,10 @@ public class MCRMetadataHistoryCommands {
         mm.verifyStore(baseId);
         ExecutorService executorService = Executors.newWorkStealingPool();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-        String[] idParts = MCRObjectID.getIDParts(baseId);
-        if (idParts.length != 2) {
+        if (!MCRObjectIDHelper.isValidBase(baseId)) {
             throw new MCRUsageException("Valid base ID required!");
         }
-        int maxId = mm.getHighestStoredID(idParts[0], idParts[1]);
+        int maxId = mm.getHighestStoredID(baseId);
         AtomicInteger completed = new AtomicInteger(maxId);
         IntStream.rangeClosed(1, maxId)
             .parallel()

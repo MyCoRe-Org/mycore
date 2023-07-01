@@ -128,6 +128,7 @@ public class MCRObjectIDHelper{
      * @param id
      *            either baseID or complete ID
      */
+   //TODO 2024 make private, external method should instantiate the id or directly work with baseId
     public static String[] getIDParts(String id) {
         return id.split("_");
     }

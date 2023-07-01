@@ -86,6 +86,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -483,7 +484,7 @@ public class MCRXMLFunctions {
             document.appendChild(rootElement);
             MCRLinkTableManager ltm = MCRLinkTableManager.instance();
             for (String id : ltm.getSourceOf(mcrid)) {
-                if (sourceType == null || MCRObjectID.getIDParts(id)[1].equals(sourceType)) {
+                if (sourceType == null || sourceType.equals(MCRObjectIDHelper.createID(id).getTypeId())) {
                     Element link = document.createElement("link");
                     link.setTextContent(id);
                     rootElement.appendChild(link);

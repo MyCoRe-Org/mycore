@@ -537,9 +537,8 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
         List<String> list = new ArrayList<>();
         Iterator<Integer> it = store.listIDs(MCRStore.ASCENDING);
-        String[] idParts = MCRObjectID.getIDParts(base);
         while (it.hasNext()) {
-            list.add(MCRObjectID.formatID(idParts[0], idParts[1], it.next()));
+            list.add(MCRObjectIDHelper.formatID(base, it.next()));
         }
         return list;
     }

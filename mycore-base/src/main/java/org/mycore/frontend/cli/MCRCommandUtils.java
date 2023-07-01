@@ -31,6 +31,7 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.common.MCRObjectIDHelper;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -103,7 +104,7 @@ public class MCRCommandUtils {
      *     Not thrown if the base exists but has no values.
      */
     public static Stream<String> getIdsForBaseId(final String base) throws MCRUsageException {
-        if (MCRObjectID.getIDParts(base).length != 2) {
+        if (!MCRObjectIDHelper.isValidBase(base)) {
             throw new MCRUsageException("Base ID ({project}_{type}) required to enumerate IDs!");
         }
         List<String> idList = MCRXMLMetadataManager.instance().listIDsForBase(base);
