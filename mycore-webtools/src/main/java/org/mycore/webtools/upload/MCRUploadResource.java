@@ -246,7 +246,7 @@ public class MCRUploadResource {
 
     private MCRObjectID getNewCreateDerivateID(MCRObjectID objId) {
         String projectID = objId.getProjectId();
-        return MCRObjectID.getNextFreeId(projectID + "_derivate");
+        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectID + "_derivate");
 
     }
 

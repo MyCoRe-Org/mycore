@@ -85,7 +85,7 @@ public class MCRBasketPersistence {
     public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID)
         throws IOException, MCRPersistenceException, MCRAccessException {
         String base = ownerID.getProjectId() + "_derivate";
-        MCRObjectID derivateOID = MCRObjectID.getNextFreeId(base);
+        MCRObjectID derivateOID = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base);
         String derivateID = derivateOID.toString();
 
         MCRDerivate derivate = createNewDerivate(ownerID, derivateOID);

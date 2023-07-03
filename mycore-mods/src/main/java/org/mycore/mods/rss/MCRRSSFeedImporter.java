@@ -232,7 +232,7 @@ public class MCRRSSFeedImporter {
         MCRObject obj = new MCRObject(new Document(publicationXML));
         MCRMODSWrapper wrapper = new MCRMODSWrapper(obj);
         wrapper.setServiceFlag("status", STATUS_FLAG);
-        MCRObjectID oid = MCRObjectID.getNextFreeId(projectID, "mods");
+        MCRObjectID oid = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectID, "mods");
         obj.setId(oid);
         return obj;
     }
