@@ -21,6 +21,7 @@ package org.mycore.ocfl.repository;
 import org.mycore.common.config.MCRConfiguration2;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
+import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
 
 /**
  * Base Class to provide a {@link OcflRepository}. A {@link MCROCFLRepositoryProvider} will be loaded from the property
@@ -38,4 +39,6 @@ public abstract class MCROCFLRepositoryProvider {
     }
 
     public abstract OcflRepository getRepository();
+
+    public abstract OcflExtensionConfig getExtensionConfig();
 }
