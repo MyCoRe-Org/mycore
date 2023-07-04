@@ -625,11 +625,10 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
      */
     //TODO: consider sanity checks like getObjectTypes() does. (performance penalty?)
     private ProjectDirState projectDirStatus(Path path) {
-    	File p = new File(path.toString());
-    	if (!p.isDirectory()) {
+    	if (Files.isDirectory(path)) {
        		LOGGER.warn(
     			"File '{}' spotted in data-directory where only subdirectories are expected.",
-    			p.getAbsolutePath()
+    			path.toAbsolutePath()
     		);
     		return ProjectDirState.UNUSABLE;
     	}
