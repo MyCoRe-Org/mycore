@@ -8,7 +8,7 @@
   <xsl:include href="coreFunctions.xsl" />
   <xsl:param name="RequestURL" />
   <xsl:template match="*[@ID]">
-   <xsl:if select="acl:checkPermission(@ID,'view-history')">
+   <xsl:if test="acl:checkPermission(@ID,'view-history')">
     <xsl:variable name="verinfo" select="document(concat('versioninfo:',@ID))" />
     <ol class="versioninfo">
       <xsl:for-each select="$verinfo/versions/version">
