@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan i18n">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:acl="xalan://org.mycore.access.MCRAccessManager"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan acl i18n">
   <xsl:output method="html" doctype-system="about:legacy-compat" indent="yes" omit-xml-declaration="yes" media-type="text/html"
     version="5" />
   <xsl:include href="coreFunctions.xsl" />
   <xsl:param name="RequestURL" />
   <xsl:template match="*[@ID]">
+   <xsl:if select="acl:checkPermission(@ID,'view-history')">
     <xsl:variable name="verinfo" select="document(concat('versioninfo:',@ID))" />
     <ol class="versioninfo">
       <xsl:for-each select="$verinfo/versions/version">
@@ -61,5 +64,6 @@
         </li>
       </xsl:for-each>
     </ol>
+   </xsl:if>
   </xsl:template>
 </xsl:stylesheet>

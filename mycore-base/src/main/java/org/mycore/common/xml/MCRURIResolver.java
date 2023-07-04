@@ -1468,8 +1468,7 @@ public final class MCRURIResolver implements URIResolver {
             MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
             try {
                 List<? extends MCRAbstractMetadataVersion<?>> versions = metadataManager.listRevisions(mcrId);
-                boolean authorized = MCRAccessManager.checkPermission(mcrId, MCRAccessManager.PERMISSION_HISTORY_VIEW);
-                if (versions != null && !versions.isEmpty() && authorized) {
+                if (versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
                     return getSource(Instant.ofEpochMilli(metadataManager.getLastModified(mcrId))
