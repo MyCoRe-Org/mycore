@@ -195,9 +195,9 @@ public class MCRUserManager {
         CriteriaQuery<Number> query = cb.createQuery(Number.class);
         Root<MCRUser> users = query.from(MCRUser.class);
         return em.createQuery(
-                query
-                    .select(cb.count(users))
-                    .where(getUserRealmCriterion(cb, users, userName, realm)))
+            query
+                .select(cb.count(users))
+                .where(getUserRealmCriterion(cb, users, userName, realm)))
             .getSingleResult().intValue() > 0;
     }
 
@@ -342,9 +342,9 @@ public class MCRUserManager {
         Root<MCRUser> users = query.from(MCRUser.class);
         users.fetch(MCRUser_.owner);
         return em.createQuery(
-                query
-                    .distinct(true)
-                    .where(cb.equal(users.get(MCRUser_.owner), owner)))
+            query
+                .distinct(true)
+                .where(cb.equal(users.get(MCRUser_.owner), owner)))
             .getResultList();
     }
 
