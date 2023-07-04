@@ -29,7 +29,8 @@ import org.mycore.access.MCRAccessManager;
  */
 public enum MCRRestAPIACLPermission {
     READ(MCRAccessManager.PERMISSION_READ), WRITE(MCRAccessManager.PERMISSION_WRITE),
-    DELETE(MCRAccessManager.PERMISSION_DELETE);
+    DELETE(MCRAccessManager.PERMISSION_DELETE), HISTORY_READ(MCRAccessManager.PERMISSION_HISTORY_READ),
+    HISTORY_VIEW(MCRAccessManager.PERMISSION_HISTORY_VIEW);
 
     private final String value;
 

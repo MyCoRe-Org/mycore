@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_HISTORY_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 import java.io.IOException;
@@ -100,6 +101,14 @@ public class MCRObjectServlet extends MCRContentServlet {
 
     private MCRContent requestVersionedObject(final MCRObjectID mcrid, final HttpServletResponse resp, final String rev)
         throws IOException {
+        if (!MCRAccessManager.checkPermission(mcrid, PERMISSION_HISTORY_READ)) {
+            final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            resp.sendError(
+                HttpServletResponse.SC_UNAUTHORIZED,
+                getErrorI18N(I18N_ERROR_PREFIX, "accessToVersionDenied", mcrid.toString(), rev,
+                    currentSession.getUserInformation().getUserID(), currentSession.getCurrentIP()));
+            return null;
+        }
         MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
         if (xmlMetadataManager.listRevisions(mcrid) != null) {
             MCRContent content = xmlMetadataManager.retrieveContent(mcrid, rev);
