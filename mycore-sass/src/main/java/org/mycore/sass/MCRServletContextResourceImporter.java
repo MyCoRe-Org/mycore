@@ -18,122 +18,90 @@
 
 package org.mycore.sass;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.util.IOUtils;
 import org.mycore.common.MCRDeveloperTools;
 
-import io.bit3.jsass.importer.Import;
-import io.bit3.jsass.importer.Importer;
+import de.larsgrefer.sass.embedded.importer.Servlet5ContextImporter;
 import jakarta.servlet.ServletContext;
 
 /**
  * Imports scss files using {@link ServletContext}.
  */
-public class MCRServletContextResourceImporter implements Importer {
+public class MCRServletContextResourceImporter extends Servlet5ContextImporter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ServletContext context;
+    private final URI baseURL;
+
+    private final Path webappPath;
 
     /**
-     * Initialize MCRServletContextResourceImporter
-     * @param context - the servlet context
+     * Constructs this importer with required properties
+     * @param servletContext to resolve web resources
+     * @param baseURL like "foo/layout.scss", used to resolve relative path against
+     * @see MCRSassCompilerManager#getRealFileName(String)
      */
-    public MCRServletContextResourceImporter(ServletContext context) {
-        this.context = context;
+    public MCRServletContextResourceImporter(ServletContext servletContext, String baseURL) {
+        super(servletContext);
+        this.baseURL = URI.create(baseURL);
+        this.webappPath = Paths.get(servletContext.getRealPath("/"));
     }
 
     @Override
-    public Collection<Import> apply(String url, Import previous) {
-        try {
-
-            final String absolute = previous != null ? previous.getAbsoluteUri().resolve(url).toString() : url;
-
-            List<String> possibleNameForms = getPossibleNameForms(absolute);
-
-            Optional<URL> firstPossibleName = possibleNameForms.stream()
-                .map(form -> {
-                    try {
-                        if (MCRDeveloperTools.overrideActive()) {
-                            final Optional<Path> overriddenFilePath = MCRDeveloperTools
-                                .getOverriddenFilePath(form.startsWith("/") ? form.substring(1) : form, true);
-
-                            if (overriddenFilePath.isPresent()) {
-                                return overriddenFilePath.get().toUri().toURL();
-                            }
-                        }
-
-                        return context.getResource(normalize(form));
-                    } catch (MalformedURLException e) {
-                        // ignore exception because it seems to be a not valid name form
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .findFirst();
-
-            if (!firstPossibleName.isPresent()) {
-                return null;
+    public String canonicalize(String url, boolean fromImport) throws Exception {
+        String modifiedUrl = getRelativePart(url);
+        URI resolveURI;
+        if (modifiedUrl.equals(url)) {
+            resolveURI = modifiedUrl.equals(baseURL.toString()) ? baseURL : baseURL.resolve(modifiedUrl);
+        } else {
+            resolveURI = URI.create(modifiedUrl);
+        }
+        var filePath = MCRDeveloperTools.getOverriddenFilePath(resolveURI.toString(), true)
+            .filter(Files::isRegularFile); //needs to be a file not a directory
+        URL resource;
+        if (filePath.isPresent()) {
+            resource = filePath.get().toUri().toURL();
+        } else {
+            resource = super.canonicalizeUrl(resolveURI.toString());
+            if (resource != null && resource.getFile().endsWith("/")) {
+                //needs to be a file not a directory
+                resource = null;
             }
-            URL resource = firstPossibleName.get();
-
-            String contents = getStringContent(resource);
-            URI absoluteUri = resource.toURI();
-
-            LOGGER.debug("Resolved {} to {}", url, absoluteUri);
-            return buildImport(absolute, contents);
-        } catch (IOException | URISyntaxException e) {
-            LOGGER.error("Error while resolving {}", url, e);
-            return null;
         }
+        LOGGER.debug("Resolved {} to {}", url, resource);
+        return resource == null ? null : resource.toString();
     }
 
-    private List<Import> buildImport(String absolute, String contents) throws URISyntaxException {
-        return Stream.of(new Import(absolute, absolute, contents)).collect(Collectors.toList());
-    }
-
-    private List<String> getPossibleNameForms(String relative) {
-        ArrayList<String> nameFormArray = new ArrayList<>();
-
-        int lastSlashPos = relative.lastIndexOf('/');
-        if (lastSlashPos != -1) {
-            String form = relative.substring(0, lastSlashPos) + "/_" + relative.substring(lastSlashPos + 1);
-            nameFormArray.add(form);
-            nameFormArray.add(form + ".scss");
+    private String getRelativePart(String modifiedURL) {
+        if (modifiedURL.startsWith("jar:")) {
+            final String webResourcePrefix = "!/META-INF/resources/";
+            return modifiedURL.substring(modifiedURL.indexOf(webResourcePrefix) + webResourcePrefix.length());
         }
-
-        nameFormArray.add(relative);
-        nameFormArray.add(relative + ".scss");
-
-        return nameFormArray;
-    }
-
-    private String getStringContent(URL resource) throws IOException {
-        try (InputStream resourceAsStream = resource.openStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8);
-            return IOUtils.toString(inputStreamReader);
+        if (modifiedURL.startsWith("file:")) {
+            final Path localFile = Paths.get(URI.create(modifiedURL));
+            return Stream
+                .concat(MCRDeveloperTools.getOverridePaths().map(p -> p.resolve("META-INF").resolve("resources")),
+                    Stream.of(webappPath))
+                .filter(p -> localFile.startsWith(p))
+                .findAny()
+                .map(basePath -> basePath.relativize(localFile))
+                .map(Path::toString)
+                .orElseThrow();
         }
+        if (!modifiedURL.contains(":")) {
+            LOGGER.debug("Not absolute: {}", modifiedURL);
+            return modifiedURL;
+        }
+        LOGGER.warn("How do we handle: {}?", modifiedURL);
+        return modifiedURL;
     }
 
-    private String normalize(String resource) {
-        return !resource.startsWith("/") ? "/" + resource : resource;
-    }
 }
