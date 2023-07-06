@@ -339,7 +339,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         if (Objects.equals(config.getExtensionName(), MCRStorageLayoutExtension.EXTENSION_NAME)) {
             maxDepth = ((MCRStorageLayoutConfig) config).getSlotLayout().split("-").length;
             path = Path.of(path.toString(), MCROCFLObjectIDPrefixHelper.MCROBJECT.replace(":", ""), project, type);
-            highestStoredID = travelDirectory(path, 1, maxDepth);
+            highestStoredID = traverseDirectory(path, maxDepth);
         } else if (Objects.equals(config.getExtensionName(),
             HashedNTupleIdEncapsulationLayoutExtension.EXTENSION_NAME)) {
             maxDepth = ((HashedNTupleIdEncapsulationLayoutConfig) config).getNumberOfTuples() + 1;
@@ -352,9 +352,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
                     .map(fileName -> Integer.parseInt(fileName.substring(fileName.lastIndexOf('_') + 1)))
                     .max(Integer::compareTo).orElse(0);
             } catch (Exception e) {
-                return MCRMetadataHistoryManager.getHighestStoredID(project, type)
-                    .map(MCRObjectID::getNumberAsInteger)
-                    .orElse(0);
+                // nothing found, let the HistoryManager take over
             }
         }
         return Math.max(highestStoredID, MCRMetadataHistoryManager.getHighestStoredID(project, type)
@@ -362,7 +360,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             .orElse(0));
     }
 
-    private int travelDirectory(Path path, int depth, int maxDepth) {
+    private int traverseDirectory(Path path, int depth) {
         int max = -1;
         Path newPath = path;
         try (DirectoryStream<Path> ds
@@ -378,10 +376,10 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             // fallback to slower full tree search
             return 0;
         }
-        if (depth == maxDepth) {
+        if (depth <= 1) {
             return max;
         } else {
-            return travelDirectory(newPath, depth + 1, maxDepth);
+            return traverseDirectory(newPath, depth - 1);
         }
     }
 
