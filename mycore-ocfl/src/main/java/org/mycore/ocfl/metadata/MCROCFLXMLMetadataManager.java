@@ -56,6 +56,8 @@ import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
+import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
+import org.mycore.ocfl.repository.MCROCFLMCRRepositoryProvider;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
@@ -329,24 +331,31 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     @Override
     public int getHighestStoredID(String project, String type) {
-        Path path
-            = Path.of(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repositoryKey + ".RepositoryRoot"));
         int highestStoredID = 0;
         int maxDepth = Integer.MAX_VALUE;
-        OcflExtensionConfig config = MCRConfiguration2.getSingleInstanceOf("MCR.OCFL.Repository." + repositoryKey)
-            .map(MCROCFLRepositoryProvider.class::cast).orElseThrow().getExtensionConfig();
+        MCROCFLRepositoryProvider oclfRepoProvider
+            = MCRConfiguration2.getSingleInstanceOf("MCR.OCFL.Repository." + repositoryKey)
+                .map(MCROCFLRepositoryProvider.class::cast).orElseThrow();
+
+        OcflExtensionConfig config = oclfRepoProvider.getExtensionConfig();
+        Path basePath = null;
+
         // optimization for known layouts
         if (Objects.equals(config.getExtensionName(), MCRStorageLayoutExtension.EXTENSION_NAME)) {
             maxDepth = ((MCRStorageLayoutConfig) config).getSlotLayout().split("-").length;
-            path = Path.of(path.toString(), MCROCFLObjectIDPrefixHelper.MCROBJECT.replace(":", ""), project, type);
-            highestStoredID = traverseDirectory(path, maxDepth);
+            basePath = ((MCROCFLMCRRepositoryProvider) oclfRepoProvider).getRepositoryRoot()
+                .resolve(MCROCFLObjectIDPrefixHelper.MCROBJECT.replace(":", ""))
+                .resolve(project).resolve(type);
+            highestStoredID = traverseMCRStorageDirectory(basePath, maxDepth);
         } else if (Objects.equals(config.getExtensionName(),
             HashedNTupleIdEncapsulationLayoutExtension.EXTENSION_NAME)) {
             maxDepth = ((HashedNTupleIdEncapsulationLayoutConfig) config).getNumberOfTuples() + 1;
+            basePath = ((MCROCFLHashRepositoryProvider) oclfRepoProvider).getRepositoryRoot();
         }
-        if (highestStoredID == 0) {
+        
+        if (basePath != null && highestStoredID == 0) {
             Pattern pattern = Pattern.compile("^.*" + project + "_{1}" + type + "_{1}\\d+$");
-            try (Stream<Path> stream = Files.find(path, maxDepth,
+            try (Stream<Path> stream = Files.find(basePath, maxDepth,
                 (filePath, fileAttr) -> pattern.matcher(filePath.getFileName().toString()).matches())) {
                 highestStoredID = stream.map(entry -> entry.getFileName().toString())
                     .map(fileName -> Integer.parseInt(fileName.substring(fileName.lastIndexOf('_') + 1)))
@@ -360,7 +369,37 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             .orElse(0));
     }
 
-    private int traverseDirectory(Path path, int depth) {
+    /** 
+     * This method recursively parses a directory structure in MCRStorageLayout,
+     * like this:
+     * <pre>
+     * ocfl-root
+     * +-- mcrobject
+     *     +-- mir
+     *         +-- mods
+     *             +-- 0000
+     *                 +-- 00
+     *                     +-- mir_mods_0000000018
+     *                         ...
+     *                     +-- mir_mods_0000004567
+     *                         ...
+     *                     +-- mir_mods_0000009997
+     *                 +-- 01
+     *                     +-- mir_mods_0000010001
+     *                         ...
+     *                     +-- mir_mods_0000014567
+     *                         ...
+     *                     +-- mir_mods_0000017654 
+     *  </pre>
+     *  
+     * and searches on each level for the directory with the highest number at the end of it's name
+     * finally it returns the highest available number part of a MyCoRe object id.
+     * 
+     * @param path - the root path
+     * @param depth - the level of subdirectories to look into
+     * @return the highest number, or 0 if such cannot be found 
+     */
+    private int traverseMCRStorageDirectory(Path path, int depth) {
         int max = -1;
         Path newPath = path;
         try (DirectoryStream<Path> ds
@@ -379,7 +418,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         if (depth <= 1) {
             return max;
         } else {
-            return traverseDirectory(newPath, depth - 1);
+            return traverseMCRStorageDirectory(newPath, depth - 1);
         }
     }
 
