@@ -249,7 +249,8 @@ public class MCRBasicCommands {
         if (Files.exists(persistenceXMLFile.toPath())) {
             SAXBuilder sb = new SAXBuilder();
             Document persistenceDoc = sb.build(persistenceXMLFile);
-            boolean modified = updatePersistenceIfNeeded(persistenceDoc);
+            // attention: non-short-circuit OR operators to execute complete OR expresssion
+            boolean modified = updatePersistenceIfNeeded(persistenceDoc) | updatePersistenceH2URL(persistenceDoc);
 
             if (modified) {
                 LOGGER.warn("Updating " + persistenceXMLFile + " with new mappings.");
@@ -262,6 +263,25 @@ public class MCRBasicCommands {
         } else {
             LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
         }
+    }
+
+    // default value from src/main/resources/configdir.template/resources/META-INF/persistence.xml
+    private static final String DEFAULT_H2_URL = "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
+
+    private static boolean updatePersistenceH2URL(Document persistenceDoc) {
+        Namespace nsPersistence = persistenceDoc.getRootElement().getNamespace();
+        Element ePersistenceUnit = persistenceDoc.getRootElement().getChild("persistence-unit", nsPersistence);
+        List<Element> properties = ePersistenceUnit.getChild("properties", nsPersistence)
+            .getContent(Filters.element("property", nsPersistence));
+        for (Element p : properties) {
+            if ("javax.persistence.jdbc.url".equals(p.getAttributeValue("name"))
+                && DEFAULT_H2_URL.equals(p.getAttributeValue("value"))) {
+                p.setAttribute("value", "jdbc:h2:file:"
+                    + MCRConfigurationDir.getConfigFile("data/h2/mycore").getAbsolutePath() + ";AUTO_SERVER=TRUE");
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean updatePersistenceIfNeeded(Document persistenceDoc) throws IOException {
