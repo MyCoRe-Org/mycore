@@ -70,10 +70,17 @@ public class MCRServletContextResourceImporter extends Servlet5ContextImporter {
         if (filePath.isPresent()) {
             resource = filePath.get().toUri().toURL();
         } else {
-            resource = super.canonicalizeUrl(resolveURI.toString());
-            if (resource != null && resource.getFile().endsWith("/")) {
-                //needs to be a file not a directory
-                resource = null;
+            resource = super.canonicalizeUrl(
+                resolveURI.toString().startsWith("/") ? resolveURI.toString() : "/" + resolveURI);
+            // jetty needs the / in front of the path, because jakarta.servlet.ServletContext.getResource states
+            // "The path must begin with a / and is interpreted as relative to ..." otherwise it will throw an exception
+            if (resource != null) {
+                if(resource.getFile().endsWith("/")){
+                    return null;
+                }
+                if(!isFile(resource)){ // with jetty the directory does not end with /, so we need to REAL check
+                    return null;
+                }
             }
         }
         LOGGER.debug("Resolved {} to {}", url, resource);
