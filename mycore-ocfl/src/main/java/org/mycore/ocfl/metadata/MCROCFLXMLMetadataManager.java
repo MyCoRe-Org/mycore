@@ -24,7 +24,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,10 +56,10 @@ import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
-import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
-import org.mycore.ocfl.repository.MCROCFLMCRRepositoryProvider;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
+import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
+import org.mycore.ocfl.repository.MCROCFLMCRRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
@@ -355,7 +354,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         } else {
             //for other repository provider implementation start with root directory
             basePath = MCRConfiguration2.getString("MCR.OCFL.Repository." + repositoryKey + ".RepositoryRoot")
-                .map(Paths::get).orElse(null);
+                .map(Path::of).orElse(null);
         }
 
         if (basePath != null && highestStoredID == 0) {
