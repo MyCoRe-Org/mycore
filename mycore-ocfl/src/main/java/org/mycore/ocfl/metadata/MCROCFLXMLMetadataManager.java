@@ -24,6 +24,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Collections;
@@ -351,8 +352,12 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             HashedNTupleIdEncapsulationLayoutExtension.EXTENSION_NAME)) {
             maxDepth = ((HashedNTupleIdEncapsulationLayoutConfig) config).getNumberOfTuples() + 1;
             basePath = ((MCROCFLHashRepositoryProvider) oclfRepoProvider).getRepositoryRoot();
+        } else {
+            //for other repository provider implementation start with root directory
+            basePath = MCRConfiguration2.getString("MCR.OCFL.Repository." + repositoryKey + ".RepositoryRoot")
+                .map(Paths::get).orElse(null);
         }
-        
+
         if (basePath != null && highestStoredID == 0) {
             Pattern pattern = Pattern.compile("^.*" + project + "_{1}" + type + "_{1}\\d+$");
             try (Stream<Path> stream = Files.find(basePath, maxDepth,
