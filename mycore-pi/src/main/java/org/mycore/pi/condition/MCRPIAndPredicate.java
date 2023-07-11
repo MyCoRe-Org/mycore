@@ -18,17 +18,20 @@
 
 package org.mycore.pi.condition;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.datamodel.metadata.MCRBase;
 
-public class MCRPIAndPredicate extends MCRPICombinedPredicate {
+public final class MCRPIAndPredicate extends MCRPIPredicateBase {
 
-    public MCRPIAndPredicate(String propertyPrefix) {
-        super(propertyPrefix);
-    }
+    @MCRInstanceList(valueClass = MCRPIPredicate.class)
+    public List<MCRPIPredicate> predicates = Collections.emptyList();
 
     @Override
     public boolean test(MCRBase mcrBase) {
-        return getCombinedPredicates()
-            .allMatch(predicate -> predicate.test(mcrBase));
+        return predicates.stream().allMatch(predicate -> predicate.test(mcrBase));
     }
+
 }

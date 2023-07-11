@@ -18,25 +18,15 @@
 
 package org.mycore.pi.condition;
 
-import java.util.Optional;
+import org.mycore.common.config.annotation.MCRProperty;
 
-import org.mycore.datamodel.metadata.MCRBase;
+public class MCRPIStatePredicate extends MCRPIStatePredicateBase {
 
-public class MCRPIStatePredicate extends MCRPIPredicateBase implements MCRPIObjectRegistrationPredicate,
-    MCRPICreationPredicate {
-
-    public MCRPIStatePredicate(String propertyPrefix) {
-        super(propertyPrefix);
-    }
+    @MCRProperty(name = "State")
+    public String state;
 
     protected String getRequiredState() {
-        return requireProperty("State");
+        return state;
     }
 
-    @Override
-    public boolean test(MCRBase base) {
-        return Optional.ofNullable(base.getService().getState())
-            .map(state -> state.getID().equals(getRequiredState()))
-            .orElse(false);
-    }
 }

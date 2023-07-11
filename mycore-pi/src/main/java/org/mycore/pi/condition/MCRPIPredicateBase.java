@@ -18,34 +18,17 @@
 
 package org.mycore.pi.condition;
 
-import java.util.Map;
-
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
+import org.jdom2.filter.Filter;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 
 public abstract class MCRPIPredicateBase implements MCRPIPredicate {
 
-    private final String propertyPrefix;
+    private static final XPathFactory FACTORY = XPathFactory.instance();
 
-    public MCRPIPredicateBase(String propertyPrefix) {
-        this.propertyPrefix = propertyPrefix;
-    }
-
-    public String getPropertyPrefix() {
-        return propertyPrefix;
-    }
-
-    @Override
-    public Map<String, String> getProperties() {
-        return MCRConfiguration2.getSubPropertiesMap(propertyPrefix);
-    }
-
-    protected String requireProperty(String key) {
-        final Map<String, String> properties = getProperties();
-        if (!properties.containsKey(key)) {
-            throw new MCRConfigurationException(getPropertyPrefix() + key + " ist not defined!");
-        }
-        return properties.get(key);
+    protected final <T> XPathExpression<T> compileXpath(String xPath, Filter<T> filter) {
+        return FACTORY.compile(xPath, filter, null, MCRConstants.getStandardNamespaces());
     }
 
 }
