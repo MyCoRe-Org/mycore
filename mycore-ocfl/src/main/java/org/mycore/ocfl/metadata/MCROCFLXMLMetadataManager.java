@@ -420,7 +420,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             return 0;
         }
         if (depth <= 1) {
-            return max;
+            return Math.max(0, max);
         } else {
             return traverseMCRStorageDirectory(newPath, depth - 1);
         }
