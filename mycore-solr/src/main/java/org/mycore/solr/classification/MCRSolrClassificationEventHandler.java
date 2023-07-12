@@ -38,46 +38,43 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
  * 
  * @author Robert Stephan
  */
-public class MCRSolrClassificationEventHandler  implements MCREventHandler {
+public class MCRSolrClassificationEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
- 
+
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
             MCRCategory categ = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
             LOGGER.debug("{} handling {} {}", getClass().getName(), categ.getId(), evt.getEventType());
             switch (evt.getEventType()) {
-            case CREATE:
-                MCRCategory categParent = (MCRCategory) evt.get("parent");
-                MCRSolrClassificationUtil.reindex(categ, categParent);
-                break;
-            case UPDATE:
-                MCRCategory categParent2 = (MCRCategory) evt.get("parent");
-                int pos = -1;
-                if(evt.get("index") instanceof Integer) {
-                    pos = (Integer) evt.get("index");
-                }
-                if("move".equals(evt.get("type"))) {
-                    solrMove(categ.getId(), categParent2.getId(), pos);
-                }
-                else if("replace".equals(evt.get("type"))) {
+                case CREATE:
+                    MCRCategory categParent = (MCRCategory) evt.get("parent");
+                    MCRSolrClassificationUtil.reindex(categ, categParent);
+                    break;
+                case UPDATE:
+                    MCRCategory categParent2 = (MCRCategory) evt.get("parent");
+                    int pos = -1;
+                    if (evt.get("index") instanceof Integer) {
+                        pos = (Integer) evt.get("index");
+                    }
+                    if ("move".equals(evt.get("type"))) {
+                        solrMove(categ.getId(), categParent2.getId(), pos);
+                    } else if ("replace".equals(evt.get("type"))) {
+                        solrDelete(categ.getId(), categ.getParent());
+                        @SuppressWarnings("unchecked")
+                        List<MCRCategoryID> replaced = (List<MCRCategoryID>) evt.get("replaced");
+                        MCRSolrClassificationUtil.reindex(replaced);
+                    } else {
+                        MCRSolrClassificationUtil.reindex(categ, categParent2);
+                    }
+                    break;
+                case DELETE:
                     solrDelete(categ.getId(), categ.getParent());
-                    @SuppressWarnings("unchecked")
-                    List<MCRCategoryID> replaced = (List<MCRCategoryID>)evt.get("replaced");
-                    MCRSolrClassificationUtil.reindex(replaced);
-                }
-                else {
-                    MCRSolrClassificationUtil.reindex(categ, categParent2);
-                }
-                break;
-            case DELETE:
-                solrDelete(categ.getId(), categ.getParent());
-                    
-                break;
-            default:
-                LOGGER.error("No Method available for {}", evt.getEventType());
-                break;
+                    break;
+                default:
+                    LOGGER.error("No Method available for {}", evt.getEventType());
+                    break;
             }
         }
     }
@@ -92,7 +89,7 @@ public class MCRSolrClassificationEventHandler  implements MCREventHandler {
                 evt.getEventType());
         }
     }
-    
+
     protected void solrDelete(MCRCategoryID id, MCRCategory parent) {
         try {
             // remove all descendants and itself
@@ -101,7 +98,7 @@ public class MCRSolrClassificationEventHandler  implements MCREventHandler {
                 "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
             toDelete.add(id.toString());
             solrClient.deleteById(toDelete);
-            if(parent!=null) {
+            if (parent != null) {
                 MCRSolrClassificationUtil.reindex(parent);
             }
         } catch (Exception exc) {
@@ -109,7 +106,7 @@ public class MCRSolrClassificationEventHandler  implements MCREventHandler {
         }
     }
 
-   protected void solrMove(MCRCategoryID id, MCRCategoryID newParentID, int index) {
+    protected void solrMove(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         try {
             SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
             List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
