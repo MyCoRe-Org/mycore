@@ -25,9 +25,7 @@ This storage root extension maps OCFL Objects by segmenting their ID via the nam
 ### Configuration
 |     Parameter      | Setting  |
 | :----------------: | :------: |
-|   NumberPattern    | 00000000 |
-|  SlotLayoutClass   |  4-2-2   |
-| SlotLayoutDerivate |  4-2-2   |
+|    SlotLayout      |  4-2-2   |
 
 ### Mappings
 |                Object ID                |            Object Root Path            |
