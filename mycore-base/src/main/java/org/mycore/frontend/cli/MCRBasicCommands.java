@@ -249,9 +249,8 @@ public class MCRBasicCommands {
         if (Files.exists(persistenceXMLFile.toPath())) {
             SAXBuilder sb = new SAXBuilder();
             Document persistenceDoc = sb.build(persistenceXMLFile);
-            // attention: non-short-circuit OR operators to execute complete OR expresssion
-            boolean modified = updatePersistenceIfNeeded(persistenceDoc) | updatePersistenceH2URL(persistenceDoc);
-
+            // attention: non-short-circuit OR operators to execute left and right side of OR expression
+            boolean modified = updatePersistenceMappings(persistenceDoc) | updatePersistenceH2JdbcUrl(persistenceDoc);
             if (modified) {
                 LOGGER.warn("Updating " + persistenceXMLFile + " with new mappings.");
                 XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
@@ -259,16 +258,22 @@ public class MCRBasicCommands {
                     out.output(persistenceDoc, bw);
                 }
             }
-
         } else {
             LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
         }
     }
 
-    // default value from src/main/resources/configdir.template/resources/META-INF/persistence.xml
+    // default value as defined in src/main/resources/configdir.template/resources/META-INF/persistence.xml
     private static final String DEFAULT_H2_URL = "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
 
-    private static boolean updatePersistenceH2URL(Document persistenceDoc) {
+    /**
+     * changes an unconfigured H2 JDBC URL,
+     * that the database files are created in the current MYCORE_HOME directory
+     * 
+     * @param persistenceDoc the persistence.xml as JDOM2 document
+     * @return true if the Jdbc URL was change
+     */
+    private static boolean updatePersistenceH2JdbcUrl(Document persistenceDoc) {
         Namespace nsPersistence = persistenceDoc.getRootElement().getNamespace();
         Element ePersistenceUnit = persistenceDoc.getRootElement().getChild("persistence-unit", nsPersistence);
         List<Element> properties = ePersistenceUnit.getChild("properties", nsPersistence)
@@ -284,7 +289,15 @@ public class MCRBasicCommands {
         return false;
     }
 
-    private static boolean updatePersistenceIfNeeded(Document persistenceDoc) throws IOException {
+    /** 
+     * adds or removes mapping entries in persistence.xml,
+     * that they match the defined JPA-mappings in the currently available MyCoRe components
+     * 
+     * @param persistenceDoc - the persistence.xml as JDOM2 document
+     * @return true, if the mappings changed
+     * @throws IOException
+     */
+    private static boolean updatePersistenceMappings(Document persistenceDoc) throws IOException {
         Namespace nsPersistence = persistenceDoc.getRootElement().getNamespace();
         Element ePersistenceUnit = persistenceDoc.getRootElement().getChild("persistence-unit", nsPersistence);
         List<Element> mappingElements = ePersistenceUnit
