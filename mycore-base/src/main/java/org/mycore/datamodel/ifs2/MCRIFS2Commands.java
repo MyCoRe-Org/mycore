@@ -3,12 +3,9 @@ package org.mycore.datamodel.ifs2;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
@@ -26,10 +23,10 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -63,14 +60,9 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     }
 
     private static void initFileStores() {
-        final String defaultScheme = MCRConfiguration2.getStringOrThrow("MCR.NIO.DefaultScheme");
-        URI schemeURI;
-        try {
-            schemeURI = new URI(defaultScheme, "/", null);
-        } catch (URISyntaxException e) {
-            throw new MCRException(e);
-        }
-        final FileSystem defaultFileSystem = FileSystems.getFileSystem(schemeURI);
+        //FileSystems.getFileSystem(schemeURI) will not work in WebCLI
+        //Workaround is to go via MCRPath
+        final FileSystem defaultFileSystem = MCRPath.getRootPath("ignored").getFileSystem();
         defaultFileSystem.getFileStores()
             .forEach(FileStore::name);
     }
