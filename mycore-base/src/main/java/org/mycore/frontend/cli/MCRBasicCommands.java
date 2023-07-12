@@ -281,9 +281,11 @@ public class MCRBasicCommands {
         for (Element p : properties) {
             if ("javax.persistence.jdbc.url".equals(p.getAttributeValue("name"))
                 && DEFAULT_H2_URL.equals(p.getAttributeValue("value"))) {
-                p.setAttribute("value", "jdbc:h2:file:"
-                    + MCRConfigurationDir.getConfigFile("data/h2/mycore").getAbsolutePath() + ";AUTO_SERVER=TRUE");
-                return true;
+                File databaseFile = MCRConfigurationDir.getConfigFile("data/h2/mycore");
+                if (databaseFile != null) {
+                    p.setAttribute("value", "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE");
+                    return true;
+                }
             }
         }
         return false;
