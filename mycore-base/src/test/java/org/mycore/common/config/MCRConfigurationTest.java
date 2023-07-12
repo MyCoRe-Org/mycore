@@ -19,6 +19,7 @@
 package org.mycore.common.config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -128,5 +129,20 @@ public class MCRConfigurationTest extends MCRTestCase {
         Object classA = MCRConfiguration2.getSingleInstanceOf(String.valueOf(property[0]).trim().replaceAll(" ", ""))
             .orElseThrow();
         assertEquals("MCRConfigurationSingletonCollisionClassA", classA.getClass().getSimpleName());
+    }
+
+    /**
+     * <p>MCR-2827 check for correct get behavior</p>
+     * Reuses the collision mapping from {@link #testSingletonCollision}, so if it fails this is also likely to fail.
+     * @author Tobias Lenhardt [Hammer1279]
+     */
+    @Test
+    public final void testSingletonMapGet() {
+        testSingletonCollision();
+        MCRConfiguration2.getPropertiesMap().forEach((key, value) -> {
+            if (value.matches(".+MCRConfigurationSingletonCollisionClass[AB]")) {
+                assertNotNull(MCRConfiguration2.instanceHolder.get(new MCRConfiguration2.SingletonKey(key, value)));
+            }
+        });
     }
 }

@@ -94,6 +94,11 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
         }
     }
 
+    @Override
+    public V get(Object arg0) {
+        return keyMap.containsKey(arg0) ? super.get(keyMap.get(arg0)) : super.get(arg0);
+    }
+
     /**
      * Wrapper for {@link SingletonKey} to modify the HashCode value.
      */
