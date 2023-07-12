@@ -97,7 +97,9 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
             toDelete.add(id.toString());
             solrClient.deleteById(toDelete);
             // reindex parent
-            MCRSolrClassificationUtil.reindex(parent);
+            if (parent != null) {
+                MCRSolrClassificationUtil.reindex(parent);
+            }
         } catch (Exception exc) {
             LOGGER.error("Solr: unable to delete categories of parent {}", id);
         }
