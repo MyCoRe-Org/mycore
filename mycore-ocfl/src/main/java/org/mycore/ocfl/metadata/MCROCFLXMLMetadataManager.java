@@ -21,6 +21,9 @@ package org.mycore.ocfl.metadata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,8 +33,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -41,6 +46,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -49,6 +55,11 @@ import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
+import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
+import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
+import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
+import org.mycore.ocfl.repository.MCROCFLMCRRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
@@ -64,6 +75,9 @@ import edu.wisc.library.ocfl.api.model.OcflObjectVersion;
 import edu.wisc.library.ocfl.api.model.VersionDetails;
 import edu.wisc.library.ocfl.api.model.VersionInfo;
 import edu.wisc.library.ocfl.api.model.VersionNum;
+import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
+import edu.wisc.library.ocfl.core.extension.storage.layout.HashedNTupleIdEncapsulationLayoutExtension;
+import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata. Provides
@@ -317,7 +331,99 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     @Override
     public int getHighestStoredID(String project, String type) {
-        return getStoredIDs(project, type).max().orElse(0);
+        int highestStoredID = 0;
+        int maxDepth = Integer.MAX_VALUE;
+        MCROCFLRepositoryProvider oclfRepoProvider
+            = MCRConfiguration2.getSingleInstanceOf("MCR.OCFL.Repository." + repositoryKey)
+                .map(MCROCFLRepositoryProvider.class::cast).orElseThrow();
+
+        OcflExtensionConfig config = oclfRepoProvider.getExtensionConfig();
+        Path basePath = null;
+
+        // optimization for known layouts
+        if (Objects.equals(config.getExtensionName(), MCRStorageLayoutExtension.EXTENSION_NAME)) {
+            maxDepth = ((MCRStorageLayoutConfig) config).getSlotLayout().split("-").length;
+            basePath = ((MCROCFLMCRRepositoryProvider) oclfRepoProvider).getRepositoryRoot()
+                .resolve(MCROCFLObjectIDPrefixHelper.MCROBJECT.replace(":", ""))
+                .resolve(project).resolve(type);
+            highestStoredID = traverseMCRStorageDirectory(basePath, maxDepth);
+        } else if (Objects.equals(config.getExtensionName(),
+            HashedNTupleIdEncapsulationLayoutExtension.EXTENSION_NAME)) {
+            maxDepth = ((HashedNTupleIdEncapsulationLayoutConfig) config).getNumberOfTuples() + 1;
+            basePath = ((MCROCFLHashRepositoryProvider) oclfRepoProvider).getRepositoryRoot();
+        } else {
+            //for other repository provider implementation start with root directory
+            basePath = MCRConfiguration2.getString("MCR.OCFL.Repository." + repositoryKey + ".RepositoryRoot")
+                .map(Path::of).orElse(null);
+        }
+
+        if (basePath != null && highestStoredID == 0) {
+            Pattern pattern = Pattern.compile("^.*" + project + "_{1}" + type + "_{1}\\d+$");
+            try (Stream<Path> stream = Files.find(basePath, maxDepth,
+                (filePath, fileAttr) -> pattern.matcher(filePath.getFileName().toString()).matches())) {
+                highestStoredID = stream.map(entry -> entry.getFileName().toString())
+                    .map(fileName -> Integer.parseInt(fileName.substring(fileName.lastIndexOf('_') + 1)))
+                    .max(Integer::compareTo).orElse(0);
+            } catch (Exception e) {
+                // nothing found, let the HistoryManager take over
+            }
+        }
+        return Math.max(highestStoredID, MCRMetadataHistoryManager.getHighestStoredID(project, type)
+            .map(MCRObjectID::getNumberAsInteger)
+            .orElse(0));
+    }
+
+    /** 
+     * This method recursively parses a directory structure in MCRStorageLayout,
+     * like this:
+     * <pre>
+     * ocfl-root
+     * +-- mcrobject
+     *     +-- mir
+     *         +-- mods
+     *             +-- 0000
+     *                 +-- 00
+     *                     +-- mir_mods_0000000018
+     *                         ...
+     *                     +-- mir_mods_0000004567
+     *                         ...
+     *                     +-- mir_mods_0000009997
+     *                 +-- 01
+     *                     +-- mir_mods_0000010001
+     *                         ...
+     *                     +-- mir_mods_0000014567
+     *                         ...
+     *                     +-- mir_mods_0000017654 
+     *  </pre>
+     *  
+     * and searches on each level for the directory with the highest number at the end of it's name
+     * finally it returns the highest available number part of a MyCoRe object id.
+     * 
+     * @param path - the root path
+     * @param depth - the level of subdirectories to look into
+     * @return the highest number, or 0 if such cannot be found 
+     */
+    private int traverseMCRStorageDirectory(Path path, int depth) {
+        int max = -1;
+        Path newPath = path;
+        try (DirectoryStream<Path> ds
+            = Files.newDirectoryStream(path, p -> p.getFileName().toString().matches("^.*\\d+$"))) {
+            for (Path entry : ds) {
+                int current = Integer.parseInt(entry.getFileName().toString().replaceAll("^.*_", ""));
+                if (max < current) {
+                    max = current;
+                    newPath = entry;
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            // fallback to slower full tree search
+            return 0;
+        }
+        if (depth <= 1) {
+            return Math.max(0, max);
+        } else {
+            return traverseMCRStorageDirectory(newPath, depth - 1);
+        }
     }
 
     @Override
