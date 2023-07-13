@@ -66,6 +66,10 @@ import org.xml.sax.SAXParseException;
 public class MCRBasicCommands {
     private static Logger LOGGER = LogManager.getLogger(MCRBasicCommands.class);
 
+    // default value as defined in src/main/resources/configdir.template/resources/META-INF/persistence.xml
+    private static final String PERSISTENCE_DEFAULT_H2_URL
+        = "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
+
     /**
      * Shows a list of commands understood by the command line interface and
      * shows their input syntax. This method implements the "help" command
@@ -249,8 +253,8 @@ public class MCRBasicCommands {
         if (Files.exists(persistenceXMLFile.toPath())) {
             SAXBuilder sb = new SAXBuilder();
             Document persistenceDoc = sb.build(persistenceXMLFile);
-            boolean modified = updatePersistenceIfNeeded(persistenceDoc);
-
+            // attention: non-short-circuit OR operators to execute left and right side of OR expression
+            boolean modified = updatePersistenceMappings(persistenceDoc) | updatePersistenceH2JdbcUrl(persistenceDoc);
             if (modified) {
                 LOGGER.warn("Updating " + persistenceXMLFile + " with new mappings.");
                 XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
@@ -258,13 +262,45 @@ public class MCRBasicCommands {
                     out.output(persistenceDoc, bw);
                 }
             }
-
         } else {
             LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
         }
     }
 
-    private static boolean updatePersistenceIfNeeded(Document persistenceDoc) throws IOException {
+    /**
+     * changes an unconfigured H2 JDBC URL,
+     * that the database files are created in the current MYCORE_HOME directory
+     * 
+     * @param persistenceDoc the persistence.xml as JDOM2 document
+     * @return true if the Jdbc URL was change
+     */
+    private static boolean updatePersistenceH2JdbcUrl(Document persistenceDoc) {
+        Namespace nsPersistence = persistenceDoc.getRootElement().getNamespace();
+        Element ePersistenceUnit = persistenceDoc.getRootElement().getChild("persistence-unit", nsPersistence);
+        List<Element> properties = ePersistenceUnit.getChild("properties", nsPersistence)
+            .getContent(Filters.element("property", nsPersistence));
+        for (Element p : properties) {
+            if ("javax.persistence.jdbc.url".equals(p.getAttributeValue("name"))
+                && PERSISTENCE_DEFAULT_H2_URL.equals(p.getAttributeValue("value"))) {
+                File databaseFile = MCRConfigurationDir.getConfigFile("data/h2/mycore");
+                if (databaseFile != null) {
+                    p.setAttribute("value", "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** 
+     * adds or removes mapping entries in persistence.xml,
+     * that they match the defined JPA-mappings in the currently available MyCoRe components
+     * 
+     * @param persistenceDoc - the persistence.xml as JDOM2 document
+     * @return true, if the mappings changed
+     * @throws IOException
+     */
+    private static boolean updatePersistenceMappings(Document persistenceDoc) throws IOException {
         Namespace nsPersistence = persistenceDoc.getRootElement().getNamespace();
         Element ePersistenceUnit = persistenceDoc.getRootElement().getChild("persistence-unit", nsPersistence);
         List<Element> mappingElements = ePersistenceUnit
