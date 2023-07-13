@@ -64,8 +64,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
         evt.put("parent", super.getCategory(newParentID, -1));
         evt.put("index", index);
-        // Type is used for specifying a special Update operation
-        // originally named UType (Update Type), it is an Optional Value
+        // "type" is used for specifying a special update operation
         evt.put("type", "move");
         MCREventManager.instance().handleEvent(evt);
         super.moveCategory(id, newParentID, index);
@@ -85,8 +84,8 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         Collection<MCRCategoryImpl> rv = super.replaceCategory(newCategory);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put(MCREvent.CLASS_KEY, newCategory);
-        evt.put("replaced", rv.stream().map(MCRCategory::getId).toList());
         evt.put("type", "replace");
+        evt.put("replaced", rv);
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }

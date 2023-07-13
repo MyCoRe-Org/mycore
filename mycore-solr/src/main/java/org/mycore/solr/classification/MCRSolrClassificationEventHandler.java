@@ -18,6 +18,7 @@
 
 package org.mycore.solr.classification;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,26 +48,28 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
             MCRCategory categ = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
             LOGGER.debug("{} handling {} {}", getClass().getName(), categ.getId(), evt.getEventType());
+            MCRCategory categParent = (MCRCategory) evt.get("parent");
             switch (evt.getEventType()) {
                 case CREATE:
-                    MCRCategory categParent = (MCRCategory) evt.get("parent");
                     MCRSolrClassificationUtil.reindex(categ, categParent);
                     break;
                 case UPDATE:
-                    MCRCategory categParent2 = (MCRCategory) evt.get("parent");
                     int pos = -1;
                     if (evt.get("index") instanceof Integer) {
                         pos = (Integer) evt.get("index");
                     }
-                    if ("move".equals(evt.get("type"))) {
-                        solrMove(categ.getId(), categParent2.getId(), pos);
-                    } else if ("replace".equals(evt.get("type"))) {
-                        solrDelete(categ.getId(), categ.getParent());
-                        @SuppressWarnings("unchecked")
-                        List<MCRCategoryID> replaced = (List<MCRCategoryID>) evt.get("replaced");
-                        MCRSolrClassificationUtil.reindex(replaced);
-                    } else {
-                        MCRSolrClassificationUtil.reindex(categ, categParent2);
+                    switch ((String) evt.get("type")) {
+                        case "move":
+                            solrMove(categ.getId(), categParent.getId(), pos);
+                            break;
+                        case "replace":
+                            @SuppressWarnings("unchecked")
+                            Collection<MCRCategory> replaced = (Collection<MCRCategory>) evt.get("replaced");
+                            solrDelete(categ.getId(), categ.getParent());
+                            MCRSolrClassificationUtil.reindex(replaced.toArray(new MCRCategory[replaced.size()]));
+                            break;
+                        default:
+                            MCRSolrClassificationUtil.reindex(categ, categParent);
                     }
                     break;
                 case DELETE:
@@ -98,6 +101,7 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
                 "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
             toDelete.add(id.toString());
             solrClient.deleteById(toDelete);
+            // reindex parent
             if (parent != null) {
                 MCRSolrClassificationUtil.reindex(parent);
             }
