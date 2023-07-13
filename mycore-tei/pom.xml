@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2023.05</version>
+    <version>2023.08-SNAPSHOT</version>
   </parent>
   <artifactId>mycore-tei</artifactId>
   <name>MyCoRe TEI</name>
