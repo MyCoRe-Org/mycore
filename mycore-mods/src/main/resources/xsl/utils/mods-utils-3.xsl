@@ -6,9 +6,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:mcrstring="http://www.mycore.de/xslt/stringutils"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-  xmlns:encoder="xalan://java.net.URLEncoder"
   
-  exclude-result-prefixes="xlink mods fn mcri18n encoder">
+  exclude-result-prefixes="xlink mods fn mcri18n">
   
   <xsl:param name="CurrentUser" />
   <xsl:param name="CurrentLang" />
@@ -473,16 +472,16 @@
       <xsl:choose>
         <xsl:when test="count($nameIdentifier) &gt; 0">
           <xsl:value-of
-            select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id, '&amp;owner=createdby:', $owner)" />
+            select="concat('mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id)" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=', '+mods.name:&quot;')" />
+          <xsl:value-of select="'+mods.name:&quot;'" />
           <xsl:apply-templates select="." mode="queryableNameString" />
-          <xsl:value-of select="concat('&quot;', '&amp;owner=createdby:', $owner)" />
+          <xsl:value-of select="'&quot;'" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <a href="{encoder:encode($query)}">
+    <a href="concat($ServletsBaseURL, 'solr/mods_nameIdentifier?q=', fn:encode-for-uri($query), '&amp;owner=createdby:', $owner)">
       <span>
         <span>
           <xsl:apply-templates select="." mode="nameString" />
@@ -679,4 +678,4 @@
   </xsl:template>
   -->
   
-</xsl:stylesheet>  
+</xsl:stylesheet>

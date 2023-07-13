@@ -44,6 +44,7 @@ import org.mycore.frontend.jersey.MCRJWTUtil;
 import org.mycore.frontend.jersey.resources.MCRJWTResource;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.user2.MCRRealm;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -336,13 +337,17 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         @Override
         public String getUserAttribute(String attribute) {
-            if (MCRUserInformation.ATT_REAL_NAME.equals(attribute)) {
-                return jwt.getClaim("name").asString();
-            }
-            if (MCRUserInformation.ATT_EMAIL.equals(attribute)) {
-                return jwt.getClaim("email").asString();
-            }
-            return jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).asString();
+            return switch (attribute) {
+                case MCRUserInformation.ATT_REAL_NAME -> jwt.getClaim("name").asString();
+                case MCRUserInformation.ATT_EMAIL -> jwt.getClaim("email").asString();
+                case MCRRealm.USER_INFORMATION_ATTR -> {
+                    if (getUserID().contains("@")) {
+                        yield getUserID().substring(getUserID().lastIndexOf("@") + 1);
+                    }
+                    yield null;
+                }
+                default -> jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).asString();
+            };
         }
     }
 

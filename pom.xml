@@ -1185,6 +1185,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-migration</module>
     <module>mycore-mods</module>
     <module>mycore-orcid</module>
+    <module>mycore-orcid2</module>
     <module>mycore-oai</module>
     <module>mycore-pandoc</module>
     <module>mycore-pi</module>

@@ -53,6 +53,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlgraphics.io.Resource;
 import org.apache.xmlgraphics.io.ResourceResolver;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -140,7 +141,10 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     }
 
     private static TransformerFactory getTransformerFactory() throws TransformerFactoryConfigurationError {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory
+            = MCRConfiguration2.getString("MCR.LayoutService.FoFormatter.transformerFactoryImpl")
+                .map(impl -> TransformerFactory.newInstance(impl, MCRClassTools.getClassLoader()))
+                .orElseGet(TransformerFactory::newInstance);
         transformerFactory.setURIResolver(MCRURIResolver.instance());
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
         return transformerFactory;

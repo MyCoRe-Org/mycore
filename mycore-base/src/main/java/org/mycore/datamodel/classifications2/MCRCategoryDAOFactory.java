@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.classifications2;
 
+import java.util.Objects;
+
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
@@ -28,14 +30,12 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
  */
 public class MCRCategoryDAOFactory {
 
-    private static MCRCategoryDAO INSTANCE = MCRConfiguration2.<MCRCategoryDAO>getInstanceOf("MCR.Category.DAO")
-        .orElseGet(MCRCategoryDAOImpl::new);
-
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
     public static MCRCategoryDAO getInstance() {
-        return INSTANCE;
+        return Objects.requireNonNull(MCRCategoryDAOHolder.INSTANCE,
+            "MCRCategoryDAO cannot be NULL - There is a problem with the loading order of classes");
     }
 
     /**
@@ -45,7 +45,14 @@ public class MCRCategoryDAOFactory {
      * @param daoClass new dao class
      */
     public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws ReflectiveOperationException {
-        INSTANCE = daoClass.getDeclaredConstructor().newInstance();
+        MCRCategoryDAOHolder.INSTANCE = daoClass.getDeclaredConstructor().newInstance();
+    }
+
+    // encapsulate the INSTANCE in an inner static class to avoid issues with class loading order
+    // this is known as "Bill Pugh singleton"
+    private static class MCRCategoryDAOHolder {
+        private static MCRCategoryDAO INSTANCE = MCRConfiguration2.<MCRCategoryDAO>getInstanceOf("MCR.Category.DAO")
+            .orElseGet(MCRCategoryDAOImpl::new);
     }
 
 }

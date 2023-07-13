@@ -159,6 +159,15 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
+        syntax = "rebuild solr metadata index for all objects of base {0} in core {1}",
+        help = "rebuilds the metadata index in Solr for all objects of base {0} in core with the id {1}",
+        order = 130)
+    public static void rebuildMetadataIndexBase(String base, String coreID) throws Exception {
+        MCRSolrCore core = getCore(coreID);
+        MCRSolrIndexer.rebuildMetadataIndexForObjectBase(base, core.getClient());
+    }
+
+    @MCRCommand(
         syntax = "rebuild solr metadata index for object {0} in core {1}",
         help = "rebuilds metadata index in Solr for the given object in core with the id {1}",
         order = 120)
@@ -243,6 +252,15 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
+        syntax = "delete from solr index all objects of base {0} in core {1}",
+        help = "deletes all objects of base {0} from index in Solr in core with the id {1}",
+        order = 220)
+    public static void dropIndexByBase(String base, String coreID) throws Exception {
+        MCRSolrCore core = getCore(coreID);
+        MCRSolrIndexer.dropIndexByBase(base, core.getClient());
+    }
+
+    @MCRCommand(
         syntax = "delete from solr index object {0} in core {1}",
         help = "deletes an object with id {0} from index in Solr in core with the id {1}",
         order = 230)
@@ -292,6 +310,15 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static void synchronizeMetadataIndex(String objectType, String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.synchronizeMetadataIndex(core.getClient(), objectType);
+    }
+
+    @MCRCommand(
+        syntax = "synchronize solr metadata index for all objects of base {0} in core {1}",
+        help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of base {0}",
+        order = 420)
+    public static void synchronizeMetadataIndexForObjectBase(String objectBase, String coreID) throws Exception {
+        MCRSolrCore core = getCore(coreID);
+        MCRSolrIndexer.synchronizeMetadataIndexForObjectBase(core.getClient(), objectBase);
     }
 
     @MCRCommand(

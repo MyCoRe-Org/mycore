@@ -146,6 +146,9 @@ public class MCRMODSWrapperTest extends MCRTestCase {
 
         relatedItem.setAttribute("type", "series");
         assertEquals("There should be one related item!", 1, wrapper.getLinkedRelatedItems().size());
+
+        relatedItem.removeAttribute("href", MCRConstants.XLINK_NAMESPACE);
+        assertEquals("There should be no related item!", 0, wrapper.getLinkedRelatedItems().size());
     }
 
     @Override

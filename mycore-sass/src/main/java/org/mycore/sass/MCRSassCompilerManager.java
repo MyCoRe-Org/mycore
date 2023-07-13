@@ -18,8 +18,10 @@
 
 package org.mycore.sass;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +39,11 @@ import com.google.common.css.compiler.ast.GssParserException;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.NullGssSourceMapGenerator;
 
-import io.bit3.jsass.CompilationException;
-import io.bit3.jsass.Compiler;
-import io.bit3.jsass.Options;
-import io.bit3.jsass.Output;
-import io.bit3.jsass.context.FileContext;
-import io.bit3.jsass.context.StringContext;
-import io.bit3.jsass.importer.Import;
-import io.bit3.jsass.importer.Importer;
+import de.larsgrefer.sass.embedded.SassCompilationFailedException;
+import de.larsgrefer.sass.embedded.connection.ConnectionFactory;
+import de.larsgrefer.sass.embedded.importer.CustomImporter;
+import de.larsgrefer.sass.embedded.importer.FileImporter;
+import de.larsgrefer.sass.embedded.importer.Importer;
 
 /**
  * Compiles .scss to .css or .min.css using different sources ({@link Importer}s)
@@ -76,10 +75,11 @@ public class MCRSassCompilerManager {
      *                 .scss file, then compiles and decides to minify or not).
      * @param importer a additional list of importers
      * @return Optional with the compiled css as string. Empty optional if the fileName is not valid.
-     * @throws CompilationException if {@link Compiler#compile(FileContext)} throws
+     * @throws SassCompilationFailedException if compiling sass input fails
+     * @throws IOException if communication with dart-sass or reading input fails
      */
     public synchronized Optional<String> getCSSFile(String file, List<Importer> importer)
-        throws CompilationException {
+        throws IOException, SassCompilationFailedException {
         if (!isDeveloperMode() && fileCompiledContentMap.containsKey(file)) {
             return Optional.of(fileCompiledContentMap.get(file));
         } else {
@@ -108,34 +108,26 @@ public class MCRSassCompilerManager {
      *
      * @param name the name of the file (with .min.css or .css ending)
      * @return the compiled css
+     * @throws SassCompilationFailedException if compiling sass input fails
+     * @throws IOException if communication with dart-sass or reading input fails
      */
-    private String compile(String name, List<Importer> importer) throws CompilationException {
-        Options options = new Options();
-        Collection<Importer> importerList = options.getImporters();
-        importerList.addAll(importer);
-
-        String realFileName = name.replace(".min.css", ".scss").replace(".css", ".scss");
-
-        Optional<Import> importedStartStylesheet = importer.stream()
-            .map(i -> i.apply(realFileName, null))
-            .filter(Objects::nonNull)
-            .map(i -> i.stream().findFirst())
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
-
-        if (!importedStartStylesheet.isPresent()) {
-            return null;
+    private String compile(String name, List<Importer> importer) throws IOException, SassCompilationFailedException {
+        String css;
+        try (MCRSassCompiler sassCompiler = new MCRSassCompiler(ConnectionFactory.bundled())) {
+            importer.forEach(i -> registerImporter(sassCompiler, i));
+            String realFileName = getRealFileName(name);
+            URL resource = importer.stream()
+                .map(i -> toURL(i, realFileName))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseGet(() -> getClass().getResource("/" + name));
+            if (resource == null) {
+                return null;
+            }
+            var compileSuccess = sassCompiler.compile(resource);
+            css = compileSuccess.getCss();
         }
 
-        Import firstImport = importedStartStylesheet.get();
-
-        StringContext context = new StringContext(firstImport.getContents(), firstImport.getAbsoluteUri(),
-            firstImport.getAbsoluteUri(), options);
-        Compiler compiler = new Compiler();
-        Output output = compiler.compile(context);
-
-        String css = output.getCss();
         boolean compress = name.endsWith(".min.css");
         if (compress) {
             try {
@@ -160,6 +152,44 @@ public class MCRSassCompilerManager {
 
         return css;
 
+    }
+
+    /**
+     * Replaces {@code (.min).css} with {@code .scss}
+     * @param name filename a browser expects
+     * @return the filename available as a resource
+     */
+    public static String getRealFileName(String name) {
+        return name.replace(".min.css", ".scss").replace(".css", ".scss");
+    }
+
+    private void registerImporter(MCRSassCompiler sassCompiler, Importer importer) {
+        if (importer instanceof FileImporter fi) {
+            sassCompiler.registerImporter(fi);
+        }
+        if (importer instanceof CustomImporter ci) {
+            sassCompiler.registerImporter(ci);
+        }
+    }
+
+    private URL toURL(Importer importer, String name) {
+        try {
+            if (importer instanceof FileImporter fi) {
+                final File file = fi.handleImport(name, false);
+                if (file != null) {
+                    return file.toURI().toURL();
+                }
+            }
+            if (importer instanceof CustomImporter ci) {
+                final String canonicalized = ci.canonicalize(name, false);
+                if (canonicalized != null) {
+                    return new URL(canonicalized);
+                }
+            }
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
+        return null;
     }
 
     /**

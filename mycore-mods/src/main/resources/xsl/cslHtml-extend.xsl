@@ -22,6 +22,7 @@
 
 
     <xsl:mode on-no-match="shallow-copy"/>
+    <xsl:output method="xhtml" indent="no" encoding="UTF-8" media-type="application/xhtml+xml" />
 
     <xsl:template match="html:div">
         <xsl:copy>

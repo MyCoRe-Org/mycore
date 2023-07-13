@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.mycore.mods.classification;
 
 import java.util.AbstractMap;
@@ -62,17 +61,16 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
-
     private static List<Map.Entry<MCRCategoryID, MCRCategoryID>> getMappings(MCRCategory category) {
         Optional<MCRLabel> labelOptional = category.getLabel("x-mapping");
 
         if (labelOptional.isPresent()) {
+            final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             String label = labelOptional.get().getText();
             return Stream.of(label.split("\\s"))
                 .map(categIdString -> categIdString.split(":"))
                 .map(categIdArr -> new MCRCategoryID(categIdArr[0], categIdArr[1]))
-                .filter(DAO::exist)
+                .filter(dao::exist)
                 .map(mappingTarget -> new AbstractMap.SimpleEntry<>(category.getId(), mappingTarget))
                 .collect(Collectors.toList());
         }
@@ -109,8 +107,11 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             .stream().forEach(Element::detach);
 
         LOGGER.info("check mappings {}", obj.getId());
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         mcrmodsWrapper.getMcrCategoryIDs().stream()
-            .map(categoryId -> DAO.getCategory(categoryId, 0))
+            .map(categoryId -> {
+                return dao.getCategory(categoryId, 0);
+            })
             .filter(Objects::nonNull)
             .map(MCRClassificationMappingEventHandler::getMappings)
             .flatMap(Collection::stream)

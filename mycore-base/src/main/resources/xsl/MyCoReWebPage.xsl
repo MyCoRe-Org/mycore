@@ -25,6 +25,9 @@
           <xsl:when test="/MyCoReWebPage/section[ lang($CurrentLang)]/@title != '' ">
             <xsl:value-of select="/MyCoReWebPage/section[lang($CurrentLang)]/@title" />
           </xsl:when>
+          <xsl:when test="/MyCoReWebPage/section[lang('all')]/@title != '' ">
+            <xsl:value-of select="/MyCoReWebPage/section[lang('all')]/@title" />
+          </xsl:when>
           <xsl:when test="/MyCoReWebPage/section[@alt and contains(@alt,$CurrentLang)]/@title != '' ">
             <xsl:value-of select="/MyCoReWebPage/section[contains(@alt,$CurrentLang)]/@title" />
           </xsl:when>

@@ -21,7 +21,7 @@
   
   <rule ref="category/java/codestyle.xml/ClassNamingConventions">
     <properties>
-      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Utils?|Helper|Manager|Commands)" />
+      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Utils?|Helper|Manager|Commands|Constants)" />
     </properties>
   </rule>
   <rule ref="category/java/codestyle.xml/ExtendsObject" />

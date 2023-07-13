@@ -98,7 +98,7 @@ public class MCREnricher {
 
     private String dsConfig;
 
-    private MCRIdentifierPool idPool;
+    private MCRIdentifierPool idPool = new MCRIdentifierPool();
 
     private Map<String, MCRDataSourceCall> id2call;
 
@@ -117,8 +117,7 @@ public class MCREnricher {
 
     public synchronized void enrich(Element publication) {
         debugger.debugPublication("before", publication);
-
-        idPool = new MCRIdentifierPool();
+        
         id2call = prepareDataSourceCalls();
 
         idPool.addIdentifiersFrom(publication);
