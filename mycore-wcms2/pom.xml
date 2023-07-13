@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2022.06.2-SNAPSHOT</version>
+    <version>2022.06.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-wcms2</artifactId>
