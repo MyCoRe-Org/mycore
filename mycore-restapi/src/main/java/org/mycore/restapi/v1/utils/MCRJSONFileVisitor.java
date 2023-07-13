@@ -31,8 +31,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
@@ -51,8 +49,6 @@ import jakarta.ws.rs.core.UriInfo;
  *
  */
 public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
-    private static final Logger LOGGER = LogManager.getLogger(MCRJSONFileVisitor.class);
-
     private JsonWriter jw;
 
     private String baseURL;
@@ -114,19 +110,19 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         MCRPath mcrPath = MCRPath.toMCRPath(file);
         MCRPath relativePath = mcrPath.getRoot().relativize(mcrPath);
+        final String fileNodeServletSecuredURI;
         try {
-            jw.beginObject();
-            writePathInfo(file, attrs);
-            jw.name("extension").value(getFileExtension(file.getFileName().toString()));
-            jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId),
-                MCRXMLFunctions.encodeURIPath(relativePath.toString()), this.baseURL));
-            jw.endObject();
-            return super.visitFile(file, attrs);
+            fileNodeServletSecuredURI = MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(
+                MCRObjectID.getInstance(derId), MCRXMLFunctions.encodeURIPath(relativePath.toString()), this.baseURL);
         } catch (URISyntaxException e) {
-            LOGGER.error("Can't encode file path to URI {}", relativePath.toString(), e);
+            throw new IOException("Can't encode file path to URI " + relativePath.toString(), e);
         }
-
-        return null;
+        jw.beginObject();
+        writePathInfo(file, attrs);
+        jw.name("extension").value(getFileExtension(file.getFileName().toString()));
+        jw.name("href").value(fileNodeServletSecuredURI);
+        jw.endObject();
+        return super.visitFile(file, attrs);
     }
 
     private static String getFileExtension(String fileName) {
