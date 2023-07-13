@@ -25,13 +25,15 @@ import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URISyntaxException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
@@ -49,6 +51,7 @@ import jakarta.ws.rs.core.UriInfo;
  *
  */
 public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
+    private static final Logger LOGGER = LogManager.getLogger(MCRJSONFileVisitor.class);
 
     private JsonWriter jw;
 
@@ -111,13 +114,19 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         MCRPath mcrPath = MCRPath.toMCRPath(file);
         MCRPath relativePath = mcrPath.getRoot().relativize(mcrPath);
-        jw.beginObject();
-        writePathInfo(file, attrs);
-        jw.name("extension").value(getFileExtension(file.getFileName().toString()));
-        jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId),
-            URLEncoder.encode(relativePath.toString(), StandardCharsets.UTF_8).replaceAll("\\+", "%20"), this.baseURL));
-        jw.endObject();
-        return super.visitFile(file, attrs);
+        try {
+            jw.beginObject();
+            writePathInfo(file, attrs);
+            jw.name("extension").value(getFileExtension(file.getFileName().toString()));
+            jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId),
+                MCRXMLFunctions.encodeURIPath(relativePath.toString()), this.baseURL));
+            jw.endObject();
+            return super.visitFile(file, attrs);
+        } catch (URISyntaxException e) {
+            LOGGER.error("Can't encode file path to URI {}", relativePath.toString(), e);
+        }
+
+        return null;
     }
 
     private static String getFileExtension(String fileName) {
