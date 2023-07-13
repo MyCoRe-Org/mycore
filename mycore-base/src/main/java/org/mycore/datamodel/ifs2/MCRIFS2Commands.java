@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -111,8 +112,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         initFileStores();
         final MCRStore store = MCRStoreCenter.instance().getStore(ifsStoreId);
         if (!(store instanceof MCRFileStore)) {
-            LOGGER.error("Store " + ifsStoreId + " is not found or is not a file store.");
-            return;
+            throw new MCRException("Store " + ifsStoreId + " is not found or is not a file store.");
         }
         Path targetPath = Paths.get(targetFile);
         if (!Files.isDirectory(targetPath.getParent())) {
@@ -180,9 +180,8 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     public static void verifyVersioningMetadataStore(String storeId) {
         initMetadataStores();
         MCRVersioningMetadataStore store = MCRStoreCenter.instance().getStore(storeId);
-        if (storeId == null) {
-            LOGGER.error("MCRVersioningMetadataStore with id " + storeId + " was not found.");
-            return;
+        if (store == null) {
+            throw new MCRException("MCRVersioningMetadataStore with id " + storeId + " was not found.");
         }
         store.verify();
     }
@@ -201,7 +200,13 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     public static void repairMetaXML(int fileCollection, String storeId) throws IOException {
         initFileStores();
         MCRFileStore store = MCRStoreCenter.instance().getStore(storeId);
+        if (store == null) {
+            throw new MCRException("MCRFileStore with id " + storeId + " was not found.");
+        }
         final MCRFileCollection fc = store.retrieve(fileCollection);
+        if (fc == null) {
+            throw new MCRException("File collection " + fileCollection + " not found in MCRFileStore " + storeId + ".");
+        }
         fc.repairMetadata();
     }
 
