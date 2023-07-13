@@ -37,7 +37,8 @@
   </properties>
   <build>
     <plugins>
-      <plugin> <!-- required to use orcid-model -->
+      <plugin>
+        <!-- required to use orcid-model -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -61,7 +62,8 @@
           </execution>
         </executions>
       </plugin>
-      <plugin> <!-- required to use orcid-model -->
+      <plugin>
+        <!-- required to use orcid-model -->
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
         <version>0.5.0</version>
@@ -80,7 +82,8 @@
           </execution>
         </executions>
       </plugin>
-      <plugin> <!-- skip required because of orcid-model -->
+      <plugin>
+        <!-- skip required because of orcid-model -->
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
         <executions>
@@ -92,7 +95,8 @@
           </execution>
         </executions>
       </plugin>
-      <plugin> <!-- exclude required because of orcid-model -->
+      <plugin>
+        <!-- exclude required because of orcid-model -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
@@ -114,7 +118,8 @@
           </sourceFileExcludes>
         </configuration>
       </plugin>
-      <plugin> <!-- exclude required because of orcid-model -->
+      <plugin>
+        <!-- exclude required because of orcid-model -->
         <groupId>de.thetaphi</groupId>
         <artifactId>forbiddenapis</artifactId>
         <configuration>
@@ -138,16 +143,19 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
     </dependency>
-    <dependency> <!-- required by orcid model -->
+    <dependency>
+      <!-- required by orcid model -->
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
-    <dependency> <!-- required by orcid model -->
+    <dependency>
+      <!-- required by orcid model -->
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId> <!-- required by orcid model -->
+      <groupId>commons-lang</groupId>
+      <!-- required by orcid model -->
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
     </dependency>
