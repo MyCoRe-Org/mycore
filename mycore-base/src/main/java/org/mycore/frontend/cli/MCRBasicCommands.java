@@ -66,6 +66,10 @@ import org.xml.sax.SAXParseException;
 public class MCRBasicCommands {
     private static Logger LOGGER = LogManager.getLogger(MCRBasicCommands.class);
 
+    // default value as defined in src/main/resources/configdir.template/resources/META-INF/persistence.xml
+    private static final String PERSISTENCE_DEFAULT_H2_URL
+        = "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
+
     /**
      * Shows a list of commands understood by the command line interface and
      * shows their input syntax. This method implements the "help" command
@@ -263,9 +267,6 @@ public class MCRBasicCommands {
         }
     }
 
-    // default value as defined in src/main/resources/configdir.template/resources/META-INF/persistence.xml
-    private static final String DEFAULT_H2_URL = "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
-
     /**
      * changes an unconfigured H2 JDBC URL,
      * that the database files are created in the current MYCORE_HOME directory
@@ -280,7 +281,7 @@ public class MCRBasicCommands {
             .getContent(Filters.element("property", nsPersistence));
         for (Element p : properties) {
             if ("javax.persistence.jdbc.url".equals(p.getAttributeValue("name"))
-                && DEFAULT_H2_URL.equals(p.getAttributeValue("value"))) {
+                && PERSISTENCE_DEFAULT_H2_URL.equals(p.getAttributeValue("value"))) {
                 File databaseFile = MCRConfigurationDir.getConfigFile("data/h2/mycore");
                 if (databaseFile != null) {
                     p.setAttribute("value", "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE");
