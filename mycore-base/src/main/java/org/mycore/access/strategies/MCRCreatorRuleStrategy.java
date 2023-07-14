@@ -37,7 +37,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 /**
  *
  * First, a check is done if the user is in the submitter role, if the user is the creator of the object and if the
- * creator ist permitted to perform the requested action in the object's current state (two groups of states, submitted,
+ * creator is permitted to perform the requested action in the object's current state (two groups of states, submitted,
  * and review, are checked). If not it will be tried to check the permission against the rule ID
  * <code>default_&lt;ObjectType&gt;</code> if it exists. If not the last
  * fallback is done against <code>default</code>.
@@ -145,6 +145,9 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     }
 
     public boolean isCreatorRuleAvailable(String id, String permission) {
+        if (!MCRObjectID.isValid(id)) {
+            return false;
+        }
         try {
             MCRObjectID mcrObjectId = MCRObjectID.getInstance(id);
             MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
