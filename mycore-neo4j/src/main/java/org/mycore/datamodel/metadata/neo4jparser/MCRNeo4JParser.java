@@ -69,7 +69,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
       MCRObjectID id = mcrObject.getId();
 
-      sbNode.append("    SET a:").append(id.getTypeId()).append(" , a.id='").append(id).append("'");
+      sbNode.append("    SET a:").append(id.getTypeId()).append(" , a.id='").append(id).append('\'');
 
       attributes.forEach((k, v) -> LOGGER.debug("Neo4J property configuration " + k + " " + v));
       parserMap.forEach((k, v) -> LOGGER.debug("Neo4J configured Parser " + k + " " + v.toString()));
@@ -133,7 +133,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
                         .map(value -> StringUtils.replace(value, "'", ""))
                         .map(value -> "'" + value + "'")
                         .toList();
-                  sbNode.append(", a.").append(key).append("=").append(cleaned);
+                  sbNode.append(", a.").append(key).append('=').append(cleaned);
                }
             }
 
@@ -189,7 +189,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
                   List<Neo4JRelation> relations = clazz.parse(elm, id);
                   relations.stream().forEach((relation) -> {
                      sbQuery.append(relation.toAppendQuery());
-                     sbQuery.append("\n");
+                     sbQuery.append('\n');
                   });
                }
             }

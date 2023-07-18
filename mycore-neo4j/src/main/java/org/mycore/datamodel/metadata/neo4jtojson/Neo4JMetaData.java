@@ -1,4 +1,4 @@
-package org.mycore.datamodel.metadata.neo4jToJson;
+package org.mycore.datamodel.metadata.neo4jtojson;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

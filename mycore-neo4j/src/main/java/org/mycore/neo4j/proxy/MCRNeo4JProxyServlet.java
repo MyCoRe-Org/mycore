@@ -165,7 +165,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
 
       StringBuilder relationsBuilder = new StringBuilder();
 
-      relationsBuilder.append("[");
+      relationsBuilder.append('[');
       for (Neo4JRelationShipJsonRecord relationship : relationShips) {
          //translate relation
          String type = relationship.type();
@@ -193,7 +193,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
       if (nodes.size() == 1) {
          resultBuilder.append("{\"nodes\":[").append(nodesArray).append("],");
       } else {
-         resultBuilder.append("{\"nodes\":").append(nodesArray).append(",");
+         resultBuilder.append("{\"nodes\":").append(nodesArray).append(',');
       }
       resultBuilder.append("\"relations\":").append(relationsBuilder);
       if (!unprocessed.isEmpty()) {
