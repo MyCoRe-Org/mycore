@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mycoreclass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="MyMssProject">
+    <label xml:lang="de" text="LANG" description="Auswahl nach dem Eigner"/>
+    <label xml:lang="en" text="LANG" description="Selection of the owner"/>
+    <label xml:lang="ar" text="LANG" description="الإختيار حسب المالك"/>
+    <categories>
+        <category ID="hebraica_sbb">
+            <label xml:lang="de" text="Test URZ"/>
+            <label xml:lang="x-isil" text="DE-0"/>
+            <label xml:lang="x-short" text="URZ"/>
+            <url xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.urz.uni-leipzig.de"/>
+        </category>
+        <category ID="sanaa_quran">
+            <label xml:lang="de" text="Test URZ 1"/>
+            <label xml:lang="x-isil" text="DE-1"/>
+            <label xml:lang="x-short" text="URZ1"/>
+            <url xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.urz.uni-leipzig.de"/>
+        </category>
+    </categories>
+</mycoreclass>

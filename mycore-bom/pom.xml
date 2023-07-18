@@ -33,6 +33,7 @@
 
   <properties>
     <grizzly.version>4.0.0</grizzly.version>
+    <hamcrest.version>2.2</hamcrest.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
     <hibernate.version>5.6.7.Final</hibernate.version>
     <hk2.version>3.0.2</hk2.version>
@@ -45,6 +46,7 @@
     <jersey.version>3.1.0</jersey.version>
     <!-- defined in parent POM: -->
     <!-- <log4j.version>2.19.0</log4j.version> -->
+    <neo4j.version>5.6.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.0.0</ocfl-java.version>
     <rdf4j.version>4.2.0</rdf4j.version>
@@ -650,6 +652,11 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-neo4j</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-oai</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -778,6 +785,11 @@
             <artifactId>xml-apis</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver</artifactId>
+        <version>${neo4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
@@ -1042,7 +1054,7 @@
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-core</artifactId>
-        <version>2.2</version>
+        <version>${hamcrest.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
