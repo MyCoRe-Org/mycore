@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.test.neo4j.parser;
 
 import org.jdom2.Document;
@@ -15,6 +33,7 @@ import java.util.Map;
 
 public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
     protected final Document doc;
+
     protected final Element metadata;
 
     public AbstractNeo4JParserTest() {
@@ -37,6 +56,6 @@ public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
     protected void addClassification(String file) throws Exception {
         Document classification = (new SAXBuilder()).build(this.getClass().getResourceAsStream(file));
         MCRCategory category = MCRXMLTransformer.getCategory(classification);
-        MCRCategoryDAOFactory.getInstance().addCategory((MCRCategoryID)null, category);
+        MCRCategoryDAOFactory.getInstance().addCategory((MCRCategoryID) null, category);
     }
 }

@@ -43,42 +43,42 @@ import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CO
  */
 public class MCRNeo4JUtilsConfigurationHelper {
 
-   /**
+    /**
     * A map of MyCoRe properties starts with MCR.Neo4J... Map<MCRObjectType, Map<property, path_to_element>>
     */
-   static Map<String, Map<String, String>> attributePaths = new HashMap<>();
+    static Map<String, Map<String, String>> attributePaths = new HashMap<>();
 
-   /**
+    /**
     * Retrieves the configuration for the specified MCR object type. Configured in the Style of
     * MCR.Neo4J.NodeAttribute.<MCRObjectType>.propertyName=Path/to/value
     *
     * @param type the MCR object type
     * @return a map of attribute paths for the specified object type
     */
-   public static Map<String, String> getConfiguration(String type) {
-      if (attributePaths.containsKey(type)) {
-         return attributePaths.get(type);
-      }
+    public static Map<String, String> getConfiguration(String type) {
+        if (attributePaths.containsKey(type)) {
+            return attributePaths.get(type);
+        }
 
-      Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX
+        Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX
             + "NodeAttribute." + type + ".");
-      Map<String, String> attributes = new HashMap<>();
-      attributes.put("id", "/mycoreobject/@ID");
-      attributes.put("type", type);
-      String desc = properties.get("descriptor");
-      if (desc != null && desc.length() > 1) {
-         attributes.put("descriptor", desc);
-      } else {
-         attributes.put("descriptor", "/mycoreobject/@label");
-      }
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("id", "/mycoreobject/@ID");
+        attributes.put("type", type);
+        String desc = properties.get("descriptor");
+        if (desc != null && desc.length() > 1) {
+            attributes.put("descriptor", desc);
+        } else {
+            attributes.put("descriptor", "/mycoreobject/@label");
+        }
 
-      properties.forEach((k, v) -> {
-         if (!k.startsWith("descriptor")) {
-            attributes.put(k, v);
-         }
-      });
-      attributePaths.put(type, attributes);
-      return attributes;
-   }
+        properties.forEach((k, v) -> {
+            if (!k.startsWith("descriptor")) {
+                attributes.put(k, v);
+            }
+        });
+        attributePaths.put(type, attributes);
+        return attributes;
+    }
 
 }

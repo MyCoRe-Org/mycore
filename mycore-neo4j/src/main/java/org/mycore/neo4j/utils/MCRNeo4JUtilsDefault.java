@@ -44,48 +44,50 @@ import static org.mycore.neo4j.utils.MCRNeo4JDatabaseDriver.commitWriteOnlyQuery
  */
 public class MCRNeo4JUtilsDefault implements MCRNeo4JUtilsInterface {
 
-   private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JUtilsDefault.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JUtilsDefault.class);
 
-   private final MCRNeo4JMetaParser parser;
+    private final MCRNeo4JMetaParser parser;
 
-   public MCRNeo4JUtilsDefault() {
-      parser = new MCRNeo4JParser();
-   }
+    public MCRNeo4JUtilsDefault() {
+        parser = new MCRNeo4JParser();
+    }
 
-   /**
+    /**
     * Adds a node to Neo4j based on the provided MCRObject and its configuration according to the
     * MCRNeo4JUtilsConfigurationHelper class.
     *
     * @param mcrObject the MCRObject to be added as a node
     */
-   @Override
-   public void addNodeByMCRObject(MCRObject mcrObject) {
-      String queryString = parser.createNeo4JQuery(mcrObject);
-      LOGGER.info("Query: " + queryString);
-      commitWriteOnlyQuery(queryString);
-   }
+    @Override
+    public void addNodeByMCRObject(MCRObject mcrObject) {
+        String queryString = parser.createNeo4JQuery(mcrObject);
+        LOGGER.info("Query: " + queryString);
+        commitWriteOnlyQuery(queryString);
+    }
 
-   /**
+    /**
     * Updates a node in Neo4j based on the provided MCRObject. This method delegates the operation to addNodeByMCRObject
     * as there is no separate update functionality.
     *
     * @param mcrObject the MCRObject to be updated
     */
-   @Override public void updateNodeByMCRObject(MCRObject mcrObject) {
-      String updateQuery = parser.createNeo4JUpdateQuery(mcrObject);
-      LOGGER.info("UpdateQuery: {}", updateQuery);
-      commitWriteOnlyQuery(updateQuery);
-      addNodeByMCRObject(mcrObject);
-   }
+    @Override
+    public void updateNodeByMCRObject(MCRObject mcrObject) {
+        String updateQuery = parser.createNeo4JUpdateQuery(mcrObject);
+        LOGGER.info("UpdateQuery: {}", updateQuery);
+        commitWriteOnlyQuery(updateQuery);
+        addNodeByMCRObject(mcrObject);
+    }
 
-   /**
+    /**
     * Deletes a node from Neo4j based on the provided MCRObject ID.
     *
     * @param id the ID of the MCRObject representing the node to be deleted
     */
-   @Override public void deleteNodeByMCRObjectID(String id) {
-      String queryString = "MATCH (n {id:'" + id + "'}) DETACH DELETE n;";
-      commitWriteOnlyQuery(queryString);
-   }
+    @Override
+    public void deleteNodeByMCRObjectID(String id) {
+        String queryString = "MATCH (n {id:'" + id + "'}) DETACH DELETE n;";
+        commitWriteOnlyQuery(queryString);
+    }
 
 }

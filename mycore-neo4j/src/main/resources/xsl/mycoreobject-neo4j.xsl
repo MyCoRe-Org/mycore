@@ -7,7 +7,7 @@
   <xsl:param name="MCR.Neo4J.colors"/>
 
   <xsl:template match="/mycoreobject">
-    <link rel="stylesheet" href="/css/graph.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="/css/mcr_neo4j_graph.css" type="text/css" media="all" />
 
     <div class="graph-container">
       <div class="graph-panel">
@@ -35,7 +35,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/standalone/umd/vis-network.min.js"></script>
-    <script type="text/javascript" src="/js/graph.js" id="{@ID}" baseUrl="{$WebApplicationBaseURL}" colors="{$MCR.Neo4J.colors}"></script>
+    <script type="text/javascript" src="/js/mcr_neo4j_graph.js" id="{@ID}" baseUrl="{$WebApplicationBaseURL}" colors="{$MCR.Neo4J.colors}"></script>
   </xsl:template>
 
 </xsl:stylesheet>

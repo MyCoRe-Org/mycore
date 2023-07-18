@@ -181,12 +181,12 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
 
          relationsBuilder.append("{\"from\":\"").append(relationship.startElementId()).append("\",\"to\":\"")
                .append(relationship.endElementId()).append("\",\"type\":\"").append(type).append("\"}");
-         relationsBuilder.append(",");
+         relationsBuilder.append(',');
       }
       if (relationsBuilder.length() > 1) {
          relationsBuilder.deleteCharAt(relationsBuilder.length() - 1);
       }
-      relationsBuilder.append("]");
+      relationsBuilder.append(']');
 
       StringBuilder resultBuilder = new StringBuilder();
       String nodesArray = objectMapper.writeValueAsString(nodes);

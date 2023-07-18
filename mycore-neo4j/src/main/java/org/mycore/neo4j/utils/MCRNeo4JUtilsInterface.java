@@ -26,26 +26,26 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public interface MCRNeo4JUtilsInterface {
 
-   /**
+    /**
     * Adds a node to Neo4j based on the provided MCRObject and its configuration according to the
     * MCRNeo4JUtilsConfigurationHelper class.
     *
     * @param mcrObject the MCRObject to be added as a node
     */
-   void addNodeByMCRObject(MCRObject mcrObject);
+    void addNodeByMCRObject(MCRObject mcrObject);
 
-   /**
+    /**
     * Updates a node in Neo4j based on the provided MCRObject.
     *
     * @param mcrObject the MCRObject to be updated
     */
-   void updateNodeByMCRObject(MCRObject mcrObject);
+    void updateNodeByMCRObject(MCRObject mcrObject);
 
-   /**
+    /**
     * Deletes a node and its relation from Neo4j based on the provided MCRObject ID.
     *
     * @param id the ID of the MCRObject representing the node to be deleted
     */
-   void deleteNodeByMCRObjectID(String id);
+    void deleteNodeByMCRObjectID(String id);
 
 }
