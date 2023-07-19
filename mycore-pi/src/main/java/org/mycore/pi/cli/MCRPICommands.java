@@ -41,6 +41,7 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceDates;
 import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierEventHandler;
@@ -173,7 +174,8 @@ public class MCRPICommands {
             LOGGER.info("Already present in Database: {}", serviceID);
             return;
         }
-        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier, new Date());
+        Date now = new Date();
+        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier, new MCRPIServiceDates(now, now));
         MCRPIService.addFlagToObject(mcrBase, mcrpi);
         MCRMetadataManager.update(mcrBase);
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);

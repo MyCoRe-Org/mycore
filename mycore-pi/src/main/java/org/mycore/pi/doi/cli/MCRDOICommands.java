@@ -59,6 +59,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.pi.MCRPIMetadataService;
+import org.mycore.pi.MCRPIServiceDates;
 import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIParser;
@@ -109,7 +110,8 @@ public class MCRDOICommands {
 
         if (!registrationService.isRegistered(objectID, doiString)) {
             LOGGER.info("{} is not found in PI-Database. Insert it..", objectID);
-            registrationService.insertIdentifierToDatabase(mcrObject, "", doi, new Date());
+            Date now = new Date();
+            registrationService.insertIdentifierToDatabase(mcrObject, "", doi, new MCRPIServiceDates(now, now));
         }
 
         if (!synchronizer.getIdentifier(mcrObject, "").isPresent()) {

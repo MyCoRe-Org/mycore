@@ -115,9 +115,9 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     @Override
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier, Date registerDate) {
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier, MCRPIServiceDates dates) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-                this.getServiceID(), null, registerDate);
+                this.getServiceID(), dates);
         MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
     }
