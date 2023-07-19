@@ -147,7 +147,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     private MCRPI generateMCRPI() throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("test_unregisterd");
         return new MCRPI(generatePIFor(mycoreID).asString(), "Unregistered",
-            mycoreID.toString(), null, MOCK_SERVICE, null);
+            mycoreID.toString(), null, MOCK_SERVICE, new MCRPIServiceDates(null, null));
     }
 
     private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) {
