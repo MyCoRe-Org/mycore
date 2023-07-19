@@ -109,7 +109,7 @@ public class MCRDOICommands {
 
         if (!registrationService.isRegistered(objectID, doiString)) {
             LOGGER.info("{} is not found in PI-Database. Insert it..", objectID);
-            registrationService.insertIdentifierToDatabase(mcrObject, "", doi);
+            registrationService.insertIdentifierToDatabase(mcrObject, "", doi, new Date());
         }
 
         if (!synchronizer.getIdentifier(mcrObject, "").isPresent()) {

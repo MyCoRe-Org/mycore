@@ -174,8 +174,8 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) {
-        // not used in this impl
+    protected Date registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) {
+        return null;
     }
 
     @Override

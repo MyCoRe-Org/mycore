@@ -315,10 +315,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<>(() -> {
             this.validateRegistration(obj, additional, updateObject);
             final T identifier = getNewIdentifier(obj, additional);
-            this.registerIdentifier(obj, additional, identifier);
+            Date registerOrRegistrationStarted = this.registerIdentifier(obj, additional, identifier);
             this.getMetadataService().insertIdentifier(identifier, obj, additional);
 
-            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier);
+            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier, registerOrRegistrationStarted);
 
             addFlagToObject(obj, databaseEntry);
 
@@ -343,13 +343,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
     }
 
-    protected Date provideRegisterDate(MCRBase obj, String additional) {
-        return new Date();
-    }
 
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier) {
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier, Date registerDate) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), provideRegisterDate(obj, additional), null);
+            this.getServiceID(), registerDate, null);
         MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
     }
@@ -373,7 +370,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return this.type;
     }
 
-    protected abstract void registerIdentifier(MCRBase obj, String additional, T pi)
+    protected abstract Date registerIdentifier(MCRBase obj, String additional, T pi)
         throws MCRPersistentIdentifierException;
 
     protected final void onDelete(T identifier, MCRBase obj, String additional)

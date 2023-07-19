@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -37,6 +38,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
@@ -111,6 +113,29 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     @SuppressWarnings({ "WeakerAccess", "unused" })
     protected void rollbackRegisterJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         // can be used to rollback
+    }
+
+    @Override
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier, Date registerDate) {
+        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
+                this.getServiceID(), null, registerDate);
+        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
+        return databaseEntry;
+    }
+
+
+    @Override
+    public Date registerIdentifier(MCRBase obj, String additional, T newDOI)
+            throws MCRPersistentIdentifierException {
+        if (!additional.equals("")) {
+            throw new MCRPersistentIdentifierException(
+                    getClass().getName() + " doesn't support additional information! (" + additional + ")");
+        }
+        if (getRegistrationPredicate().test(obj)) {
+            //TODO: implement and call startRegisterJob(obj, newDOI);
+            return new Date();
+        }
+        return null;
     }
 
     /**

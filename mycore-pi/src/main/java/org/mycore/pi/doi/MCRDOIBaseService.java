@@ -135,19 +135,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         }
     }
 
-    @Override
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, MCRDigitalObjectIdentifier identifier) {
-        Date registrationStarted = null;
-        if (getRegistrationPredicate().test(obj)) {
-            registrationStarted = new Date();
-            startRegisterJob(obj, identifier);
-        }
 
-        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
-        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
-        return databaseEntry;
-    }
 
     protected void startRegisterJob(MCRBase obj, MCRDigitalObjectIdentifier newDOI) {
         HashMap<String, String> contextParameters = new HashMap<>();
@@ -168,11 +156,6 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
             throw new MCRPersistentIdentifierException(
                 "Error while validating generated xml for " + id, e);
         }
-    }
-
-    @Override
-    protected Date provideRegisterDate(MCRBase obj, String additional) {
-        return null;
     }
 
     protected abstract Document transform(MCRBase obj, String pi)

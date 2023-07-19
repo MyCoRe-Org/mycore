@@ -57,6 +57,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIGenerator;
+import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.client.datacite.MCRDataciteClient;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
@@ -224,14 +225,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         super.validateRegistration(obj, additional);
     }
 
-    @Override
-    public void registerIdentifier(MCRBase obj, String additional, MCRDigitalObjectIdentifier newDOI)
-        throws MCRPersistentIdentifierException {
-        if (!additional.equals("")) {
-            throw new MCRPersistentIdentifierException(
-                getClass().getName() + " doesn't support additional information! (" + additional + ")");
-        }
-    }
 
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
         return new URI(this.registerURL + registerURLContext.replaceAll("\\$[iI][dD]", obj.getId().toString()));

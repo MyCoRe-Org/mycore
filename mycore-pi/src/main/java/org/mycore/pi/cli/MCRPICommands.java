@@ -173,7 +173,7 @@ public class MCRPICommands {
             LOGGER.info("Already present in Database: {}", serviceID);
             return;
         }
-        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier);
+        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier, new Date());
         MCRPIService.addFlagToObject(mcrBase, mcrpi);
         MCRMetadataManager.update(mcrBase);
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);

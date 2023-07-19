@@ -126,29 +126,6 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
         // deleting ist not supported
     }
 
-    @Override
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional,
-        MCRPURL identifier) {
-        Date registrationStarted = null;
-        if (getRegistrationPredicate().test(obj)) {
-            registrationStarted = new Date();
-            startRegisterJob(obj, identifier);
-        }
-
-        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
-        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
-        return databaseEntry;
-    }
-
-    @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRPURL purl)
-        throws MCRPersistentIdentifierException {
-        if (!Objects.equals(additional, "")) {
-            throw new MCRPersistentIdentifierException(
-                getClass().getName() + " doesn't support additional information! (" + additional + ")");
-        }
-    }
 
     @Override
     protected void delete(MCRPURL identifier, MCRBase obj, String additional) {

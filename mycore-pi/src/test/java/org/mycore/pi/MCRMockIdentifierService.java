@@ -22,6 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
 
+import java.util.Date;
+
 public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
     protected static final String TYPE = "mock";
 
@@ -38,8 +40,9 @@ public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
     private boolean updatedCalled = false;
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi) {
+    protected Date registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi) {
         registerCalled = true;
+        return new Date();
     }
 
     @Override

@@ -100,30 +100,6 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
         super("handle");
     }
 
-    @Override
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional,
-        MCRHandle identifier) {
-        Date registrationStarted = null;
-        if (getRegistrationPredicate().test(obj)) {
-            registrationStarted = new Date();
-            startRegisterJob(obj, identifier);
-        }
-
-        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
-        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
-        return databaseEntry;
-    }
-
-    @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRHandle pi)
-        throws MCRPersistentIdentifierException {
-        if (!Objects.equals(additional, "")) {
-            String className = this.getClass().getName();
-            throw new MCRPersistentIdentifierException(
-                className + " doesn't support additional information! (" + additional + ")");
-        }
-    }
 
     @Override
     protected void delete(MCRHandle identifier, MCRBase obj, String additional) {

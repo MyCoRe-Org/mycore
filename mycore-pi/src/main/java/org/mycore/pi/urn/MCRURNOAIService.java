@@ -38,12 +38,13 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
+    protected Date registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
         throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
+        return null;
     }
 
     @Override
@@ -56,9 +57,5 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
         // nothing to do here!
     }
 
-    @Override
-    protected Date provideRegisterDate(MCRBase obj, String additional) {
-        return null;
-    }
 
 }
