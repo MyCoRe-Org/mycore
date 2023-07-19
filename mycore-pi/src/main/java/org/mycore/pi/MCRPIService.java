@@ -315,10 +315,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<>(() -> {
             this.validateRegistration(obj, additional, updateObject);
             final T identifier = getNewIdentifier(obj, additional);
-            Date registered = this.registerIdentifier(obj, additional, identifier);
+            MCRPIServiceDates dates = this.registerIdentifier(obj, additional, identifier);
             this.getMetadataService().insertIdentifier(identifier, obj, additional);
 
-            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier, new MCRPIServiceDates(registered, null));
+            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier, dates);
 
             addFlagToObject(obj, databaseEntry);
 
@@ -343,8 +343,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
     }
 
-
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier, MCRPIServiceDates registrationDates) {
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier,
+        MCRPIServiceDates registrationDates) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
             this.getServiceID(), registrationDates);
         MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
@@ -370,7 +370,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return this.type;
     }
 
-    protected abstract Date registerIdentifier(MCRBase obj, String additional, T pi)
+    protected abstract MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, T pi)
         throws MCRPersistentIdentifierException;
 
     protected final void onDelete(T identifier, MCRBase obj, String additional)

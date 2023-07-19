@@ -148,7 +148,7 @@ public class MCRDOICommands {
                             if (!registrationService.isRegistered(objectID, "")) {
                                 LOGGER.info("DOI is not registered in MyCoRe. Add to Database: {}", doi.asString());
                                 MCRPI databaseEntry = new MCRPI(doi.asString(), registrationService.getType(),
-                                    objectID.toString(), "", serviceID, new Date());
+                                    objectID.toString(), "", serviceID, new MCRPIServiceDates(new Date(), null));
                                 MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
                             }
 

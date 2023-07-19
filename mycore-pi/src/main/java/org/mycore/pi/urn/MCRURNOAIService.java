@@ -18,12 +18,11 @@
 
 package org.mycore.pi.urn;
 
-import java.util.Date;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceDates;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
@@ -38,13 +37,13 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected Date registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
+    protected MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
         throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
-        return null;
+        return new MCRPIServiceDates(null, null);
     }
 
     @Override
@@ -56,6 +55,5 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional) {
         // nothing to do here!
     }
-
 
 }

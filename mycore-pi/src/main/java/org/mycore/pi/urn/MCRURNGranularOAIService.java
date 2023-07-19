@@ -41,6 +41,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceDates;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -106,7 +107,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         MCRDNBURN urntoAssign = newURN.toGranular(setID, count + 1, count + 1);
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), new Date());
+            this.getServiceID(), new MCRPIServiceDates(new Date(), null));
         em.persist(databaseEntry);
         return newURN;
     }
@@ -151,13 +152,13 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
             derivate.getOrCreateFileMetadata(pathList.get(pathListIndex), subURN.asString()).setUrn(subURN.asString());
             MCRPI databaseEntry = new MCRPI(subURN.asString(), getType(), obj.getId().toString(),
                 pathList.get(pathListIndex).getOwnerRelativePath(),
-                this.getServiceID(), null);
+                this.getServiceID(), new MCRPIServiceDates(null, null));
             em.persist(databaseEntry);
         }
 
         derivate.setURN(newURN.asString());
         MCRPI databaseEntry = new MCRPI(newURN.asString(), getType(), obj.getId().toString(), "",
-            this.getServiceID(), new Date());
+            this.getServiceID(), new MCRPIServiceDates(new Date(), null));
         em.persist(databaseEntry);
         return newURN;
     }
@@ -174,8 +175,8 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected Date registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) {
-        return null;
+    protected MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) {
+        return new MCRPIServiceDates(null, null);
     }
 
     @Override

@@ -54,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceDates;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
@@ -214,7 +215,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     private BiConsumer<Supplier<String>, String> persistURNStr(MCRDerivate deriv, Date registerDate, String serviceID) {
         return (urnSup, path) -> {
             MCRPI mcrpi = new MCRPI(urnSup.get(), getType(), deriv.getId().toString(), path, serviceID,
-                registerDate);
+                new MCRPIServiceDates(registerDate, null));
             MCREntityManagerProvider.getCurrentEntityManager().persist(mcrpi);
         };
     }
@@ -253,9 +254,9 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected Date registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) {
+    protected MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) {
         // not used in this impl
-        return null;
+        return new MCRPIServiceDates(null, null);
     }
 
     @Override

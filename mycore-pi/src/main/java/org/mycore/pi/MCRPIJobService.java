@@ -124,7 +124,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
 
     @Override
-    public Date registerIdentifier(MCRBase obj, String additional, T newDOI)
+    public MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, T newDOI)
             throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
@@ -132,9 +132,9 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         }
         if (getRegistrationPredicate().test(obj)) {
             this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER, obj, newDOI));
-            return new Date();
+            return new MCRPIServiceDates(new Date(), null);
         }
-        return null;
+        return new MCRPIServiceDates(null, null);
     }
     
     @Override
@@ -143,7 +143,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     /**
-     * @see #addRegisterJob(Map)
+     * see {@link #addRegisterJob(Map)}.
      */
     protected void addDeleteJob(Map<String, String> contextParameters) {
         MCRJob job = createJob(contextParameters, PiJobAction.DELETE);
@@ -151,7 +151,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     /**
-     * @see #addRegisterJob(Map)
+     * see {@link #addRegisterJob(Map)}.
      */
     protected void addUpdateJob(Map<String, String> contextParameters) {
         MCRJob job = createJob(contextParameters, PiJobAction.UPDATE);
@@ -344,7 +344,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * in parent class MCRPIJobService
      * @return the registration predicate
      * 
-     * @see MCRPIJobService
+     * *See {@link #addRegisterJob(Map)}.
      */
     @Deprecated
     protected Predicate<MCRBase> getRegistrationCondition() {

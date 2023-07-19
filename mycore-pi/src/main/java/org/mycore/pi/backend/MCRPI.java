@@ -128,21 +128,8 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     private MCRPI() {
     }
 
-    public MCRPI(String identifier, String type, String mycoreID, String additional, String service, Date registered) {
-        this();
-        this.identifier = identifier;
-        this.type = type;
-        this.mycoreID = mycoreID;
-        this.additional = additional;
-        this.service = service;
-        this.registered = registered;
-        //TODO: disabled by MCR-1393
-        //        this.mcrRevision = MCRCoreVersion.getRevision();
-        this.mcrVersion = MCRCoreVersion.getVersion();
-        this.created = new Date();
-    }
-
-    public MCRPI(String identifier, String type, String mycoreID, String additional, String service, MCRPIServiceDates dates) {
+    public MCRPI(String identifier, String type, String mycoreID, String additional, String service,
+        MCRPIServiceDates dates) {
         this();
         this.identifier = identifier;
         this.type = type;
