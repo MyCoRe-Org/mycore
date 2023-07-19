@@ -89,6 +89,17 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     }
 
     @Override
+    protected boolean validateRegistrationDocument(MCRBase obj, MCRDigitalObjectIdentifier identifier,
+        String additional) {
+        try {
+            validateDocument(obj.getId().toString(), transform(obj, identifier.asString()));
+            return true;
+        } catch (MCRPersistentIdentifierException | MCRConfigurationException e) {
+            return false;
+        }
+    }
+
+    @Override
     protected Document transform(MCRBase obj, String pi)
         throws MCRPersistentIdentifierException {
         Document resultDocument;

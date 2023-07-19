@@ -19,7 +19,6 @@
 package org.mycore.pi.doi;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -29,7 +28,6 @@ import javax.xml.validation.Schema;
 
 import org.jdom2.Document;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -39,7 +37,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
 import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.xml.sax.SAXException;
 
@@ -118,22 +115,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         return exists;
     }
 
-    @Override
-    public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
-        if (isRegistered(obj.getId(), additional)) {
-            HashMap<String, String> contextParameters = new HashMap<>();
-            contextParameters.put(CONTEXT_DOI, doi.asString());
-            contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
-            this.addUpdateJob(contextParameters);
-        } else if (!hasRegistrationStarted(obj.getId(), additional)
-            && getRegistrationPredicate().test(obj)) {
-            // validate
-            transform(obj, doi.asString());
-            this.updateStartRegistrationDate(obj.getId(), "", new Date());
-            startRegisterJob(obj, doi);
-        }
-    }
+
 
 
 

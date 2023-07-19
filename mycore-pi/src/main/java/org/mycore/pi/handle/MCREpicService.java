@@ -21,17 +21,13 @@ package org.mycore.pi.handle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Predicate;
 
 import org.jdom2.Document;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -42,7 +38,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.MCRPIJobService;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCREpicService extends MCRPIJobService<MCRHandle> {
@@ -107,16 +102,8 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     @Override
-    protected void update(MCRHandle identifier, MCRBase obj, String additional) {
-        if (!this.hasRegistrationStarted(obj.getId(), additional)) {
-            Predicate<MCRBase> registrationCondition = this.getRegistrationPredicate();
-            if (registrationCondition.test(obj)) {
-                this.updateStartRegistrationDate(obj.getId(), "", new Date());
-                this.startRegisterJob(obj, identifier);
-            }
-        } else if (this.isRegistered(obj.getId(), "")) {
-            this.startUpdateJob(obj, identifier);
-        }
+    protected boolean validateRegistrationDocument(MCRBase obj, MCRHandle identifier, String additional) {
+        return true;
     }
 
     @Override

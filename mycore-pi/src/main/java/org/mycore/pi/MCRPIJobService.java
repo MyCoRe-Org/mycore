@@ -38,7 +38,6 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
@@ -355,6 +354,24 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                 " uses old property key RegistrationConditionProvider, use " + REGISTRATION_PREDICATE + " instead.");
         }
     }
+
+    @Override
+    protected void update(T identifier, MCRBase obj, String additional)
+            throws MCRPersistentIdentifierException {
+        if (this.isRegistered(obj.getId(), "")) {
+            // nothing
+            //TODO: implement and call this.addUpdateJob(createJobContextParams(PiJobAction.UPDATE, obj, identifier));
+        } else if (!this.hasRegistrationStarted(obj.getId(), additional) &&
+                this.getRegistrationPredicate().test(obj) &&
+                validateRegistrationDocument(obj, identifier, additional)) {
+            //TODO: check what happens if the validation fails
+            this.updateStartRegistrationDate(obj.getId(), "", new Date());
+            //TODO: implement and call this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER,
+            // obj, identifier));
+        }
+    }
+
+    protected abstract boolean validateRegistrationDocument(MCRBase obj, T identifier, String additional);
 
     public enum PiJobAction {
         DELETE("delete"), REGISTER("register"), UPDATE("update");

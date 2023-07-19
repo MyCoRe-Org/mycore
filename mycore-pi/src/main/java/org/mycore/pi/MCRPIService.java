@@ -318,7 +318,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             Date registerOrRegistrationStarted = this.registerIdentifier(obj, additional, identifier);
             this.getMetadataService().insertIdentifier(identifier, obj, additional);
 
-            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier, registerOrRegistrationStarted);
+            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier,
+                    registerOrRegistrationStarted);
 
             addFlagToObject(obj, databaseEntry);
 

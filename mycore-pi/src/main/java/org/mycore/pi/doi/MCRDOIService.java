@@ -57,7 +57,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.client.datacite.MCRDataciteClient;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
@@ -258,6 +257,18 @@ public class MCRDOIService extends MCRDOIBaseService {
 
     public MCRDataciteClient getDataciteClient() {
         return new MCRDataciteClient(host, getUsername(), getPassword());
+    }
+
+    @Override
+    protected boolean validateRegistrationDocument(MCRBase obj, MCRDigitalObjectIdentifier identifier,
+        String additional) {
+        try {
+            transform(obj, identifier.asString());
+            return true;
+        } catch (MCRPersistentIdentifierException e) {
+            LOGGER.error("Error while validating Datacite document!", e);
+            return false;
+        }
     }
 
     @Override

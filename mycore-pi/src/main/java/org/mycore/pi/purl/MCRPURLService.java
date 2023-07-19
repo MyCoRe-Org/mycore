@@ -23,15 +23,12 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPURLService extends MCRPIJobService<MCRPURL> {
@@ -133,14 +130,8 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     }
 
     @Override
-    protected void update(MCRPURL purl, MCRBase obj, String additional) {
-        if (isRegistered(obj.getId(), additional)) {
-            startUpdateJob(obj, purl);
-        } else if (!hasRegistrationStarted(obj.getId(), additional)
-            && getRegistrationPredicate().test(obj)) {
-            this.updateStartRegistrationDate(obj.getId(), "", new Date());
-            startRegisterJob(obj, purl);
-        }
+    protected boolean validateRegistrationDocument(MCRBase obj, MCRPURL identifier, String additional) {
+        return true;
     }
 
     private void startUpdateJob(MCRBase obj, MCRPURL purl) {
