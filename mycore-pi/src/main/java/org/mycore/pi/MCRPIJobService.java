@@ -339,18 +339,6 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         return PiJobAction.valueOf(contextParameters.get("action"));
     }
 
-    /**
-     * This function is replaced by getRegistrationPredicate() 
-     * in parent class MCRPIJobService
-     * @return the registration predicate
-     * 
-     * *See {@link #addRegisterJob(Map)}.
-     */
-    @Deprecated
-    protected Predicate<MCRBase> getRegistrationCondition() {
-        return super.getRegistrationPredicate();
-    }
-
     @Override
     protected void checkConfiguration() throws MCRConfigurationException {
         super.checkConfiguration();
