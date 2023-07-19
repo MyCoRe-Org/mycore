@@ -115,15 +115,13 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         return exists;
     }
 
-
-
-
-
-    protected void startRegisterJob(MCRBase obj, MCRDigitalObjectIdentifier newDOI) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(CONTEXT_DOI, newDOI.asString());
-        contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
-        this.addRegisterJob(contextParameters);
+    @Override
+    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj,
+        MCRDigitalObjectIdentifier doi) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(CONTEXT_DOI, doi.asString());
+        params.put(CONTEXT_OBJ, obj.getId().toString());
+        return params;
     }
 
     protected MCRContentTransformer getTransformer() {

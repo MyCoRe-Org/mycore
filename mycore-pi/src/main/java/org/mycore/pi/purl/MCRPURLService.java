@@ -120,9 +120,8 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
 
     @Override
     public void deleteJob(Map<String, String> parameters) {
-        // deleting ist not supported
+        // delete is not supported
     }
-
 
     @Override
     protected void delete(MCRPURL identifier, MCRBase obj, String additional) {
@@ -134,18 +133,12 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
         return true;
     }
 
-    private void startUpdateJob(MCRBase obj, MCRPURL purl) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(CONTEXT_PURL, purl.asString());
-        contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());
-        this.addUpdateJob(contextParameters);
-    }
-
-    private void startRegisterJob(MCRBase obj, MCRPURL purl) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(CONTEXT_PURL, purl.asString());
-        contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());
-        this.addRegisterJob(contextParameters);
+    @Override
+    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRPURL purl) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(CONTEXT_PURL, purl.asString());
+        params.put(CONTEXT_OBJECT, obj.getId().toString());
+        return params;
     }
 
     protected void doWithPURLManager(Consumer<MCRPURLManager> action) {

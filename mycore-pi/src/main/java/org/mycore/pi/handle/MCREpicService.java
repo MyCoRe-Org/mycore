@@ -95,12 +95,6 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
         super("handle");
     }
 
-
-    @Override
-    protected void delete(MCRHandle identifier, MCRBase obj, String additional) {
-        this.startDeleteJob(obj, identifier);
-    }
-
     @Override
     protected boolean validateRegistrationDocument(MCRBase obj, MCRHandle identifier, String additional) {
         return true;
@@ -115,6 +109,14 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
         } catch (IOException e) {
             throw new MCRPersistentIdentifierException("Error while communicating with epic service", e);
         }
+    }
+
+    @Override
+    protected void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        String epic = parameters.get(EPIC_KEY);
+        String objId = parameters.get(OBJECT_ID_KEY);
+
+        createOrUpdate(epic, objId);
     }
 
     @Override
@@ -179,37 +181,16 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     @Override
-    protected void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
-        String epic = parameters.get(EPIC_KEY);
-        String objId = parameters.get(OBJECT_ID_KEY);
-
-        createOrUpdate(epic, objId);
-    }
-
-    @Override
     protected Optional<String> getJobInformation(Map<String, String> contextParameters) {
         return Optional.empty();
     }
 
-    private void startUpdateJob(MCRBase obj, MCRHandle epic) {
+    @Override
+    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRHandle epic) {
         HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
-        this.addUpdateJob(contextParameters);
-    }
-
-    private void startRegisterJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(EPIC_KEY, epic.asString());
-        contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
-        this.addRegisterJob(contextParameters);
-    }
-
-    private void startDeleteJob(MCRBase obj, MCRHandle epic) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(EPIC_KEY, epic.asString());
-        contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
-        this.addDeleteJob(contextParameters);
+        return contextParameters;
     }
 
     private MCREpicClient getClient() {

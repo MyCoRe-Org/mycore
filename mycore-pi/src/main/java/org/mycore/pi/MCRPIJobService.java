@@ -131,10 +131,15 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                     getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
         if (getRegistrationPredicate().test(obj)) {
-            //TODO: implement and call startRegisterJob(obj, newDOI);
+            this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER, obj, newDOI));
             return new Date();
         }
         return null;
+    }
+    
+    @Override
+    protected void delete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        this.addDeleteJob(createJobContextParams(MCRPIJobService.PiJobAction.DELETE, obj, identifier));
     }
 
     /**
@@ -359,19 +364,19 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     protected void update(T identifier, MCRBase obj, String additional)
             throws MCRPersistentIdentifierException {
         if (this.isRegistered(obj.getId(), "")) {
-            // nothing
-            //TODO: implement and call this.addUpdateJob(createJobContextParams(PiJobAction.UPDATE, obj, identifier));
+            this.addUpdateJob(createJobContextParams(PiJobAction.UPDATE, obj, identifier));
         } else if (!this.hasRegistrationStarted(obj.getId(), additional) &&
                 this.getRegistrationPredicate().test(obj) &&
                 validateRegistrationDocument(obj, identifier, additional)) {
             //TODO: check what happens if the validation fails
             this.updateStartRegistrationDate(obj.getId(), "", new Date());
-            //TODO: implement and call this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER,
-            // obj, identifier));
+            this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER, obj, identifier));
         }
     }
 
     protected abstract boolean validateRegistrationDocument(MCRBase obj, T identifier, String additional);
+    
+    protected abstract HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, T pi);
 
     public enum PiJobAction {
         DELETE("delete"), REGISTER("register"), UPDATE("update");
