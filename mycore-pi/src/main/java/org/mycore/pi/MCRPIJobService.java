@@ -79,7 +79,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #addDeleteJob(Map)}
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     *        with piJobAction = 'DELETE'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
      */
@@ -91,7 +92,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #updateJob(Map)}
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     *        with piJobAction = 'UPDATE'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
      */
@@ -103,7 +105,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #addRegisterJob(Map)}
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     *        with piJobAction = 'REGISTER'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
      */
