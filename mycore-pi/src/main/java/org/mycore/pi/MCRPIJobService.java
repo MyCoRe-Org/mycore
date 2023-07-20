@@ -143,7 +143,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     /**
-     * Adds a job for a given PIAction, which will be called in the persistent {@link MCRJob} environment in an extra thread.
+     * Adds a job for a given PIAction, which will be called in the persistent {@link MCRJob} environment 
+     * in an extra thread.
      *
      * @param piJobAction      the action that the job executes (REGISTER, UPDATE, DELETE)
      * 
