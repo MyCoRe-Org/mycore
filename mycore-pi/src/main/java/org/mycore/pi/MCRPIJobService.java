@@ -349,14 +349,14 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     @Override
     protected void update(T identifier, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
-        if (this.isRegistered(obj.getId(), "")) {
+        throws MCRPersistentIdentifierException {
+        if (this.isRegistered(obj.getId(), additional)) {
             this.addUpdateJob(createJobContextParams(PiJobAction.UPDATE, obj, identifier));
         } else if (!this.hasRegistrationStarted(obj.getId(), additional) &&
-                this.getRegistrationPredicate().test(obj) &&
-                validateRegistrationDocument(obj, identifier, additional)) {
+            this.getRegistrationPredicate().test(obj) &&
+            validateRegistrationDocument(obj, identifier, additional)) {
             //TODO: check what happens if the validation fails
-            this.updateStartRegistrationDate(obj.getId(), "", new Date());
+            this.updateStartRegistrationDate(obj.getId(), additional, new Date());
             this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER, obj, identifier));
         }
     }
