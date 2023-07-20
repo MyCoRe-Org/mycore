@@ -308,7 +308,7 @@ public class MCRDOIService extends MCRDOIBaseService {
                 HashMap<String, String> contextParameters = new HashMap<>();
                 contextParameters.put(CONTEXT_DOI, doi.asString());
                 contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
-                this.addDeleteJob(contextParameters);
+                this.addJob(PiJobAction.DELETE, contextParameters);
             }
         }
     }
