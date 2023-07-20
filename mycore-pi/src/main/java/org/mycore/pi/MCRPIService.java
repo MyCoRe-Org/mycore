@@ -160,10 +160,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
 
         String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService;
-        MCRPIMetadataService<T> metadataServiceObj = (MCRPIMetadataService<T>) MCRConfiguration2
-            .getInstanceOf(msProperty)
+        MCRPIMetadataService<T> mdService =  MCRConfiguration2.<MCRPIMetadataService<T>>getInstanceOf(msProperty)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(msProperty));
-        return metadataServiceObj;
+        return mdService;
     }
 
     protected MCRPIGenerator<T> getGenerator() {
@@ -175,7 +174,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .orElseThrow(generatorPropertiesNotSetError);
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
-        MCRPIGenerator<T> generator = (MCRPIGenerator<T>) MCRConfiguration2.getInstanceOf(generatorPropertyKey)
+        MCRPIGenerator<T> generator = MCRConfiguration2.<MCRPIGenerator<T>>getInstanceOf(generatorPropertyKey)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(generatorPropertyKey));
         return generator;
     }
