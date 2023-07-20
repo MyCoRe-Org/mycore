@@ -128,7 +128,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
         if (getRegistrationPredicate().test(obj)) {
-            this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER, obj, newDOI));
+            this.addJob(PiJobAction.REGISTER, createJobContextParams(PiJobAction.REGISTER, obj, newDOI));
             return new MCRPIServiceDates(new Date(), null);
         }
         return new MCRPIServiceDates(null, null);
@@ -136,34 +136,20 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     @Override
     protected void delete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
-        this.addDeleteJob(createJobContextParams(MCRPIJobService.PiJobAction.DELETE, obj, identifier));
+        this.addJob(PiJobAction.DELETE, createJobContextParams(PiJobAction.DELETE, obj, identifier));
     }
 
     /**
-     * see {@link #addRegisterJob(Map)}.
-     */
-    protected void addDeleteJob(Map<String, String> contextParameters) {
-        MCRJob job = createJob(contextParameters, PiJobAction.DELETE);
-        getJobQueue().offer(job);
-    }
-
-    /**
-     * see {@link #addRegisterJob(Map)}.
-     */
-    protected void addUpdateJob(Map<String, String> contextParameters) {
-        MCRJob job = createJob(contextParameters, PiJobAction.UPDATE);
-        getJobQueue().offer(job);
-    }
-
-    /**
-     * Adds a register job which will be called in the persistent {@link MCRJob} environment in a extra thread.
+     * Adds a job for a given PIAction, which will be called in the persistent {@link MCRJob} environment in an extra thread.
      *
+     * @param piAction          the action that the job executes (REGISTER, UPDATE, DELETE)
+     * 
      * @param contextParameters pass parameters which are needed to register the PI. The parameter action and
      *                          registrationServiceID will be added, because they are necessary to reassign the job to
      *                          the right {@link MCRPIJobService} and method.
      */
-    protected void addRegisterJob(Map<String, String> contextParameters) {
-        MCRJob job = createJob(contextParameters, PiJobAction.REGISTER);
+    protected void addJob(PiJobAction piJobAction, Map<String, String> contextParameters) {
+        MCRJob job = createJob(contextParameters, piJobAction);
         getJobQueue().offer(job);
     }
 
@@ -349,13 +335,13 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     protected void update(T identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         if (this.isRegistered(obj.getId(), additional)) {
-            this.addUpdateJob(createJobContextParams(PiJobAction.UPDATE, obj, identifier));
+            this.addJob(PiJobAction.UPDATE, createJobContextParams(PiJobAction.UPDATE, obj, identifier));
         } else if (!this.hasRegistrationStarted(obj.getId(), additional) &&
             this.getRegistrationPredicate().test(obj) &&
             validateRegistrationDocument(obj, identifier, additional)) {
             //TODO: check what happens if the validation fails
             this.updateStartRegistrationDate(obj.getId(), additional, new Date());
-            this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER, obj, identifier));
+            this.addJob(PiJobAction.REGISTER, createJobContextParams(PiJobAction.REGISTER, obj, identifier));
         }
     }
 
