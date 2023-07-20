@@ -62,7 +62,6 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-
     public MCRPIJobService(String identType) {
         super(identType);
     }
@@ -116,18 +115,17 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     @Override
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier, MCRPIServiceDates dates) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-                this.getServiceID(), dates);
+            this.getServiceID(), dates);
         MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
     }
 
-
     @Override
     public MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, T newDOI)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
-                    getClass().getName() + " doesn't support additional information! (" + additional + ")");
+                getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
         if (getRegistrationPredicate().test(obj)) {
             this.addRegisterJob(createJobContextParams(PiJobAction.REGISTER, obj, newDOI));
@@ -135,7 +133,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         }
         return new MCRPIServiceDates(null, null);
     }
-    
+
     @Override
     protected void delete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
         this.addDeleteJob(createJobContextParams(MCRPIJobService.PiJobAction.DELETE, obj, identifier));
@@ -362,7 +360,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     protected abstract boolean validateRegistrationDocument(MCRBase obj, T identifier, String additional);
-    
+
     protected abstract HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, T pi);
 
     public enum PiJobAction {
