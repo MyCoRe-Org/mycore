@@ -134,7 +134,8 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     }
 
     @Override
-    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRPURL purl) {
+    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRPURL purl,
+        String additional) {
         HashMap<String, String> params = new HashMap<>();
         params.put(CONTEXT_PURL, purl.asString());
         params.put(CONTEXT_OBJECT, obj.getId().toString());

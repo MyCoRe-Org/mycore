@@ -117,7 +117,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
 
     @Override
     protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj,
-        MCRDigitalObjectIdentifier doi) {
+        MCRDigitalObjectIdentifier doi, String additional) {
         HashMap<String, String> params = new HashMap<>();
         params.put(CONTEXT_DOI, doi.asString());
         params.put(CONTEXT_OBJ, obj.getId().toString());

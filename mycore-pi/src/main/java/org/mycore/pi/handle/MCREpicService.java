@@ -186,7 +186,8 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     @Override
-    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRHandle epic) {
+    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRHandle epic,
+        String additional) {
         HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
