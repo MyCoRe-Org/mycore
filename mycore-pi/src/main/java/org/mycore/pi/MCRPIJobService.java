@@ -124,14 +124,14 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     @Override
-    public MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, T newDOI)
+    public MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, T identifier)
         throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
         if (getRegistrationPredicate().test(obj)) {
-            this.addJob(PiJobAction.REGISTER, createJobContextParams(PiJobAction.REGISTER, obj, newDOI));
+            this.addJob(PiJobAction.REGISTER, createJobContextParams(PiJobAction.REGISTER, obj, identifier));
             return new MCRPIServiceDates(new Date(), null);
         }
         return new MCRPIServiceDates(null, null);
@@ -351,7 +351,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     protected abstract boolean validateRegistrationDocument(MCRBase obj, T identifier, String additional);
 
-    protected abstract HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, T pi);
+    protected abstract HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, T identifier);
 
     public enum PiJobAction {
         DELETE("delete"), REGISTER("register"), UPDATE("update");
