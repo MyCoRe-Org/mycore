@@ -70,6 +70,7 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
                             break;
                         default:
                             MCRSolrClassificationUtil.reindex(categ, categParent);
+                            break;
                     }
                     break;
                 case DELETE:
