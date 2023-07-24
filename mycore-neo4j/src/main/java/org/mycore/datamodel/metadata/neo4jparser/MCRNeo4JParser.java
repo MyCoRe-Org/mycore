@@ -18,6 +18,15 @@
 
 package org.mycore.datamodel.metadata.neo4jparser;
 
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
+import static org.mycore.neo4j.utils.MCRNeo4JUtilsConfigurationHelper.getConfiguration;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,15 +43,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.datamodel.metadata.neo4jutil.Neo4JRelation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
-import static org.mycore.neo4j.utils.MCRNeo4JUtilsConfigurationHelper.getConfiguration;
-
 /**
  * @author Andreas Kluge (ai112vezo)
  */
@@ -54,8 +54,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
    public MCRNeo4JParser() {
       Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "ParserClass.");
-      parserMap = // new HashMap<>();
-            propertiesMap.entrySet().stream()
+      parserMap = propertiesMap.entrySet().stream()
                   .collect(Collectors.toMap(Map.Entry::getKey,
                         e -> MCRConfiguration2.getOrThrow(NEO4J_CONFIG_PREFIX + "ParserClass." + e.getKey(),
                               MCRConfiguration2::instantiateClass)));
@@ -71,8 +70,8 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
       sbNode.append("    SET a:").append(id.getTypeId()).append(" , a.id='").append(id).append('\'');
 
-      attributes.forEach((k, v) -> LOGGER.debug("Neo4J property configuration " + k + " " + v));
-      parserMap.forEach((k, v) -> LOGGER.debug("Neo4J configured Parser " + k + " " + v.toString()));
+      attributes.forEach((k, v) -> LOGGER.debug("Neo4J property configuration {} {}", k, v));
+      parserMap.forEach((k, v) -> LOGGER.debug("Neo4J configured Parser {} {}", k, v));
 
       attributes.forEach((k, v) -> {
          if (k.startsWith("link") && v.length() > 0) {
@@ -82,7 +81,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
          XPathExpression<Element> xpath = xpf.compile(v, Filters.element(), null);
          List<Element> elements = xpath.evaluate(xml);
          if (elements.isEmpty()) {
-            LOGGER.warn("No entries for path " + v);
+            LOGGER.warn("No entries for path {}", v);
             return;
          }
 
@@ -90,8 +89,8 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
             LOGGER.debug("current Element: {}", parent);
             Attribute classAttribute = parent.getAttribute("class");
             if (classAttribute == null) {
-               LOGGER.error("Parent of current Element: {}", parent.getParent().toString());
-               LOGGER.error("NULL Class printing current Element {}", parent.toString());
+               LOGGER.error("Parent of current Element: {}", parent.getParent());
+               LOGGER.error("NULL Class printing current Element {}", parent);
                LOGGER.error("Parser Attributes {}", parent.getAttributes());
                // TODO: return (no crash/error message) or no return and let it crash
                return;
@@ -140,7 +139,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
          }
       });
 
-      sbNode.append("\n");
+      sbNode.append('\n');
       return sbNode.toString();
    }
 
@@ -173,8 +172,8 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
          if (k.startsWith("link") && v.length() > 0) {
             XPathExpression<Element> xpath = xpf.compile(v, Filters.element(), null);
             List<Element> elms = xpath.evaluate(xml);
-            if (elms.size() == 0) {
-               LOGGER.warn("No entries for path " + v);
+            if (elms.isEmpty()) {
+               LOGGER.warn("No entries for path {}", v);
                return;
             }
 

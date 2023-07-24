@@ -57,7 +57,7 @@ public class MCRNeo4JMetaISO8601DateParser extends MCRNeo4JAbstractDataModelPars
                 } catch (ParseException e) {
                     values.add(new Neo4JNode("de", text));
                     values.add(new Neo4JNode("en", text));
-                 }
+                }
             }
         }
         return values;

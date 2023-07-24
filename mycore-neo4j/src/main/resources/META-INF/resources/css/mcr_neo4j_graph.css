@@ -16,7 +16,6 @@ body {
 
 .graph-container {
   --panel-height: 50px;
-
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   position: relative;
@@ -38,7 +37,7 @@ body {
 .graph-container .graph-reset-btn {
   all: unset;
   background-color: #45a2ef;
-  color: #ffffff;
+  color: #fff;
   cursor: pointer;
   font-family: inherit;
   padding: 6px 16px;
@@ -72,8 +71,8 @@ body {
 }
 
 .graph-container #graph-metadata {
-  background-color: #ffffff;
-  border: 1px solid #000000;
+  background-color: #fff;
+  border: 1px solid #000;
   display: none;
   max-width: 500px;
   padding: 25px;

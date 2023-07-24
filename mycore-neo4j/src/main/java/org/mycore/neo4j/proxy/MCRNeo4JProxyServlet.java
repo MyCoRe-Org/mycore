@@ -18,22 +18,10 @@
 
 package org.mycore.neo4j.proxy;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.neo4jToJson.Neo4JNodeJsonRecord;
-import org.mycore.datamodel.metadata.neo4jToJson.Neo4JPathJsonRecord;
-import org.mycore.datamodel.metadata.neo4jToJson.Neo4JRelationShipJsonRecord;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.neo4j.utils.MCRNeo4JDatabaseDriver;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.DEFAULT_NEO4J_SERVER_URL;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CLASSID_CATEGID_SEPARATOR;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -41,10 +29,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.DEFAULT_NEO4J_SERVER_URL;
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CLASSID_CATEGID_SEPARATOR;
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.neo4jtojson.Neo4JNodeJsonRecord;
+import org.mycore.datamodel.metadata.neo4jtojson.Neo4JPathJsonRecord;
+import org.mycore.datamodel.metadata.neo4jtojson.Neo4JRelationShipJsonRecord;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.neo4j.utils.MCRNeo4JDatabaseDriver;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Andreas Kluge (ai112vezo)
@@ -105,8 +107,8 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
       }
 
       MCRNeo4JDatabaseDriver.getInstance().createConnection(SERVER_URL,
-            MCRConfiguration2.getStringOrThrow(NEO4J_CONFIG_PREFIX + "user"),
-            MCRConfiguration2.getStringOrThrow(NEO4J_CONFIG_PREFIX + "password"));
+         MCRConfiguration2.getStringOrThrow(NEO4J_CONFIG_PREFIX + "user"),
+         MCRConfiguration2.getStringOrThrow(NEO4J_CONFIG_PREFIX + "password"));
 
       final List<Map<String, String>> result = MCRNeo4JDatabaseDriver.commitReadOnlyQuery(query, language);
 
@@ -135,19 +137,19 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
 
             if (StringUtils.contains(key, "node_")) {
                try {
-                  Neo4JNodeJsonRecord nodeObject =
-                        objectMapper.readerFor(Neo4JNodeJsonRecord.class).withRootName("n").readValue(value);
+                  Neo4JNodeJsonRecord nodeObject
+                     = objectMapper.readerFor(Neo4JNodeJsonRecord.class).withRootName("n").readValue(value);
                   nodes.add(nodeObject);
                } catch (JsonProcessingException e) {
-                  e.printStackTrace();
+                  LOGGER.error(e);
                }
             } else if (StringUtils.contains(key, "rel_")) {
                try {
-                  Neo4JRelationShipJsonRecord relationShipObject =
-                        objectMapper.readerFor(Neo4JRelationShipJsonRecord.class).withRootName("r").readValue(value);
+                  Neo4JRelationShipJsonRecord relationShipObject
+                     = objectMapper.readerFor(Neo4JRelationShipJsonRecord.class).withRootName("r").readValue(value);
                   relationShips.add(relationShipObject);
                } catch (JsonProcessingException e) {
-                  e.printStackTrace();
+                  LOGGER.error(e);
                }
             } else if (StringUtils.contains(key, "path_")) {
                try {
@@ -155,7 +157,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
                   nodes.addAll(pathObject.nodes());
                   relationShips.addAll(pathObject.relationships());
                } catch (JsonProcessingException e) {
-                  e.printStackTrace();
+                  LOGGER.error(e);
                }
             } else {
                unprocessed.add(value);
@@ -163,6 +165,12 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
          }
       }
 
+      return buildPath(lang, nodes, relationShips, unprocessed);
+
+   }
+
+   private String buildPath(String lang, Set<Neo4JNodeJsonRecord> nodes,
+      Set<Neo4JRelationShipJsonRecord> relationShips, List<String> unprocessed) throws JsonProcessingException {
       StringBuilder relationsBuilder = new StringBuilder();
 
       relationsBuilder.append('[');
@@ -171,16 +179,15 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
          String type = relationship.type();
          try {
             if (type.contains(NEO4J_CLASSID_CATEGID_SEPARATOR)) {
-                String[] sep = type.split(NEO4J_CLASSID_CATEGID_SEPARATOR);
-                type = getClassificationLabel(sep[0], sep[1], lang);
-             }
-        } catch (Exception e) {
-            System.out.println(relationship);
-            e.printStackTrace();
-        }
+               String[] sep = type.split(NEO4J_CLASSID_CATEGID_SEPARATOR);
+               type = getClassificationLabel(sep[0], sep[1], lang);
+            }
+         } catch (Exception e) {
+            LOGGER.error(() -> "Error at relationship " + relationship, e);
+         }
 
          relationsBuilder.append("{\"from\":\"").append(relationship.startElementId()).append("\",\"to\":\"")
-               .append(relationship.endElementId()).append("\",\"type\":\"").append(type).append("\"}");
+            .append(relationship.endElementId()).append("\",\"type\":\"").append(type).append("\"}");
          relationsBuilder.append(',');
       }
       if (relationsBuilder.length() > 1) {
@@ -200,10 +207,8 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
          resultBuilder.append(",\"unprocessed\":").append(unprocessed);
 
       }
-      resultBuilder.append("}");
+      resultBuilder.append('}');
 
       return resultBuilder.toString();
-
    }
 }
-

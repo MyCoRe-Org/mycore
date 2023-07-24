@@ -18,18 +18,23 @@
 
 package org.mycore.neo4j.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_PARAMETER_SEPARATOR;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.neo4jToJson.Neo4JMetaData;
-import org.mycore.datamodel.metadata.neo4jToJson.Neo4JNodeJsonRecord;
+import org.mycore.datamodel.metadata.neo4jtojson.Neo4JMetaData;
+import org.mycore.datamodel.metadata.neo4jtojson.Neo4JNodeJsonRecord;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
@@ -42,16 +47,12 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Path;
 import org.neo4j.driver.types.Relationship;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_PARAMETER_SEPARATOR;
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * The MCRNeo4JDatabaseDriver class is a Java driver implementation for connecting to a Neo4j database. It provides
@@ -130,7 +131,6 @@ public class MCRNeo4JDatabaseDriver {
     * @param queryString the query string to be executed
     */
     public static void commitWriteOnlyQuery(String queryString) {
-        //Driver driver = getConnection();
         Driver driver = MCRNeo4JDatabaseDriver.getInstance().getDriver();
         try {
             driver.verifyConnectivity();
@@ -165,11 +165,11 @@ public class MCRNeo4JDatabaseDriver {
                 List<Map<String, String>> records = new ArrayList<>();
                 Result result = tx.run(queryString);
                 while (result.hasNext()) {
-                    Record record = result.next();
+                    Record thisRecord = result.next();
                     Map<String, String> keyMap = new HashMap<>();
 
-                    for (String key : record.keys()) {
-                        Value recordData = record.get(key);
+                    for (String key : thisRecord.keys()) {
+                        Value recordData = thisRecord.get(key);
                         counter.getAndAdd(1);
                         if (StringUtils.equals(recordData.type().name(), "NODE")) {
                             String node = nodeToJson(recordData.asNode(), gson, lang);
@@ -195,7 +195,7 @@ public class MCRNeo4JDatabaseDriver {
                             String relationshipJson = gson.toJson(relationships);
 
                             pathSB.append("{\"p\":{\"nodes\":[");
-                            pathSB.append(start).append(",");
+                            pathSB.append(start).append(',');
 
                             pathSB.append(end).append("],");
                             pathSB.append("\"relationships\":").append(relationshipJson);
@@ -209,7 +209,7 @@ public class MCRNeo4JDatabaseDriver {
                         } else {
                             LOGGER.warn("Got record of type {} for key {} which is not parsed",
                                 recordData.type().name(), key);
-                            keyMap.put(key, gson.toJson(record.asMap()));
+                            keyMap.put(key, gson.toJson(thisRecord.asMap()));
                         }
                     }
                     records.add(keyMap);
@@ -225,24 +225,22 @@ public class MCRNeo4JDatabaseDriver {
         StringBuilder sb = new StringBuilder();
 
         String labels = gson.toJson(startNode.labels());
-        // Long id = startNode.id();
         String elementId = startNode.elementId();
         boolean mcridBool = startNode.asMap().containsKey("id");
 
         List<Neo4JMetaData> neo4JMetaDataList = propertiesMapToJson(startNode.asMap(), lang);
         String neo4JMetaDataListString = gson.toJson(neo4JMetaDataList);
 
-        sb.append("{");
-        sb.append("\"type\":").append(labels).append(",");
+        sb.append('{');
+        sb.append("\"type\":").append(labels).append(',');
         sb.append("\"id\":\"").append(elementId).append("\",");
-        //sb.append("\"elementId\":\"").append(elementId).append("\",");
         if (mcridBool) {
             String mcrID = String.valueOf(startNode.asMap().get("id"));
-            LOGGER.debug("MCRID: " + mcrID);
+            LOGGER.debug("MCRID: {}", mcrID);
             sb.append("\"mcrid\":\"").append(mcrID).append("\",");
         }
         sb.append("\"metadata\":").append(neo4JMetaDataListString);
-        sb.append("}");
+        sb.append('}');
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
@@ -286,12 +284,10 @@ public class MCRNeo4JDatabaseDriver {
         String lang) {
         if (value instanceof List<?>) {
             List<String> stringList = ((List<?>) value).stream().map(Object::toString).toList();
-            // System.out.println("Value List: " + stringList);
 
             if (stringList.size() == 1) {
                 if (stringList.get(0).contains(NEO4J_PARAMETER_SEPARATOR)) {
                     String[] sep = stringList.get(0).split(NEO4J_PARAMETER_SEPARATOR);
-                    // System.out.println("Class: " + sep[0] + " Cate: " + sep[1]);
                     String classification = getClassificationLabel(sep[0], sep[1], lang);
                     metaDataList.add(new Neo4JMetaData(key, List.of(classification)));
                 }
@@ -299,17 +295,15 @@ public class MCRNeo4JDatabaseDriver {
                 metaDataList.add(new Neo4JMetaData(key, stringList));
             }
         } else if (value instanceof String) {
-            // System.out.println("Value String: " + value);
             if (((String) value).contains(NEO4J_PARAMETER_SEPARATOR)) {
                 String[] sep = ((String) value).split(NEO4J_PARAMETER_SEPARATOR);
-                // System.out.println("Class: " + sep[0] + " Cate: " + sep[0]);
                 String classification = getClassificationLabel(sep[0], sep[1], lang);
                 metaDataList.add(new Neo4JMetaData(key, List.of(classification)));
             } else {
                 metaDataList.add(new Neo4JMetaData(key, List.of(value.toString())));
             }
         } else {
-            System.out.println("Value ELSE: " + value);
+            LOGGER.info("Value ELSE: {}", value);
         }
     }
 

@@ -18,17 +18,17 @@
 
 package org.mycore.test.neo4j.parser;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
+import java.util.List;
+
 import org.junit.Test;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.neo4jparser.MCRNeo4JMetaClassificationParser;
 import org.mycore.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.datamodel.metadata.neo4jutil.Neo4JRelation;
-
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 public class MCRMetaClassificationParserTest extends AbstractNeo4JParserTest {
     @Test

@@ -18,20 +18,21 @@
 
 package org.mycore.test.neo4j.parser;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.neo4jparser.MCRNeo4JParser;
 
-import java.io.IOException;
-
-public class MCRNeo4JParserTest extends MCRStoreTestCase {
+public class MCRNeo4JParserTest extends AbstractNeo4JParserTest {
     @BeforeClass
     public static void beforeClass() {
         System.setProperty("log4j.configurationFile", "log4j2-test.xml");
@@ -58,6 +59,7 @@ public class MCRNeo4JParserTest extends MCRStoreTestCase {
         final MCRObject manuscript = new MCRObject(read("/mcrobjects/a_mcrobject_00000001.xml"));
         final String result = parser.createNeo4JQuery(manuscript);
         System.out.println(result);
+        assertNotNull(result);
     }
 
     protected Document read(String file) throws IOException, JDOMException {

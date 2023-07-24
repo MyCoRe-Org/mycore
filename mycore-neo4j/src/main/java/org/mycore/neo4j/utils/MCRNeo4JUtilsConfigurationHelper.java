@@ -18,12 +18,12 @@
 
 package org.mycore.neo4j.utils;
 
-import org.mycore.common.config.MCRConfiguration2;
+import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * The MCRNeo4JUtilsConfigurationHelper class provides utility methods for managing configuration settings related to
@@ -42,6 +42,10 @@ import static org.mycore.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CO
  * @author Jens Kupferschmidt
  */
 public class MCRNeo4JUtilsConfigurationHelper {
+
+    private MCRNeo4JUtilsConfigurationHelper() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
     * A map of MyCoRe properties starts with MCR.Neo4J... Map<MCRObjectType, Map<property, path_to_element>>

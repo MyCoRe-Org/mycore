@@ -30,11 +30,7 @@ import java.util.List;
  */
 public abstract class MCRNeo4JAbstractDataModelParser {
 
-   // public abstract Map<String, String> parse(Element classElement);
-
    public abstract List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID);
-
-   // public abstract List<String> parse(Element rootTag);
 
    /**
     * The corresponding DataModel Parser extracts the information within the <rootTag> and return the information as <T>

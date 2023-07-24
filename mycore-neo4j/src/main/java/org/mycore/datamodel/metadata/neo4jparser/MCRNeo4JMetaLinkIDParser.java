@@ -37,7 +37,8 @@ public class MCRNeo4JMetaLinkIDParser extends MCRNeo4JAbstractDataModelParser {
 
    private static final Logger LOGGER = LogManager.getLogger();
 
-   @Override public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
+   @Override
+   public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
       List<Neo4JRelation> relations = new ArrayList<>();
 
       for (Element element : classElement.getChildren()) {
@@ -68,7 +69,8 @@ public class MCRNeo4JMetaLinkIDParser extends MCRNeo4JAbstractDataModelParser {
       return relations;
    }
 
-   @Override public List<Neo4JNode> parse(Element rootTag) {
+   @Override
+   public List<Neo4JNode> parse(Element rootTag) {
       return Collections.emptyList();
    }
 }

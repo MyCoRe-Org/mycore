@@ -67,12 +67,11 @@ public class MCRNeo4JMetaXMLParser extends MCRNeo4JAbstractDataModelParser {
             if (child.getChildren().size() > 0) {
                 Element grandChild = child.getChildren().get(0);
                 String nameTag = grandChild.getName();
-                MCRNeo4JAbstractDataModelParser clazz = parserMap.get("MCRMetaXML." + nameTag.toString());
+                MCRNeo4JAbstractDataModelParser clazz = parserMap.get("MCRMetaXML." + nameTag);
                 if (null == clazz) {
-                    LOGGER.warn("Parser class for MCRMetaXML." + nameTag.toString() + " not set!");
+                    LOGGER.warn("Parser class for MCRMetaXML." + nameTag + " not set!");
                 } else {
-                    List<Neo4JNode> list = clazz.parse(grandChild);
-                    return list;
+                    return clazz.parse(grandChild);
                 }
             }
         }

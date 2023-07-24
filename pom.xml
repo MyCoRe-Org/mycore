@@ -162,6 +162,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <packages>org.mycore.mods*</packages>
               </group>
               <group>
+                <title>MyCoRe Component: Neo4J</title>
+                <packages>org.mycore.neo4j*</packages>
+              </group>
+              <group>
                 <title>MyCoRe Component: ORCID Integration</title>
                 <packages>org.mycore.orcid*</packages>
               </group>
@@ -1184,6 +1188,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-mets</module>
     <module>mycore-migration</module>
     <module>mycore-mods</module>
+    <module>mycore-neo4j</module>
     <module>mycore-orcid</module>
     <module>mycore-orcid2</module>
     <module>mycore-oai</module>
