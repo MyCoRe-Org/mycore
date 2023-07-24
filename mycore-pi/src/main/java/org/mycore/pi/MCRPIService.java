@@ -477,11 +477,12 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
             return Objects.equals(flag.getAdditional(), additional) && Objects
                 .equals(flag.getIdentifier(), mcrpi.getIdentifier());
-        }).findAny().orElseThrow(() -> new MCRException(new MCRPersistentIdentifierException(
-            "Could find flag to update (" + id + "," + additional + "," + mcrpi.getIdentifier() + ")")));
-
-        int flagIndex = service.getFlagIndex(stringFlag);
-        service.removeFlag(flagIndex);
+        }).findAny().ifPresentOrElse((stringFlag) -> {
+            int flagIndex = service.getFlagIndex(stringFlag);
+            service.removeFlag(flagIndex);
+        }, () -> {LOGGER.warn(
+            "Could not find flag to update (" + id + "," + additional + "," + mcrpi.getIdentifier() + ")");
+        });
 
         addFlagToObject(obj, mcrpi);
         try {
