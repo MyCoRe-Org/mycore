@@ -473,7 +473,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         MCRObjectService service = obj.getService();
         ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
         Gson gson = getGson();
-        String stringFlag = flags.stream().filter(_stringFlag -> {
+        flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
             return Objects.equals(flag.getAdditional(), additional) && Objects
                 .equals(flag.getIdentifier(), mcrpi.getIdentifier());
