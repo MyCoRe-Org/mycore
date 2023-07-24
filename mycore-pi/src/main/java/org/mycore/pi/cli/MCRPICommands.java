@@ -41,6 +41,7 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceDates;
 import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierEventHandler;
@@ -109,13 +110,15 @@ public class MCRPICommands {
             String urn = derivate.getDerivate().getURN();
             if (urn != null) {
                 LOGGER.info("Found URN in :{}", derivateID);
-                MCRPI derivatePI = new MCRPI(urn, MCRDNBURN.TYPE, derivateID, "", serviceID, new Date());
+                MCRPI derivatePI = new MCRPI(urn, MCRDNBURN.TYPE, derivateID, "", serviceID,
+                    new MCRPIServiceDates(new Date(), null));
                 if (MCRPIManager.getInstance().exist(derivatePI)) {
                     LOGGER.warn("PI-Entry for {} already exist!", urn);
                 } else {
                     em.persist(derivatePI);
                     derivate.getUrnMap().forEach((file, fileURN) -> {
-                        MCRPI filePI = new MCRPI(fileURN, MCRDNBURN.TYPE, derivateID, file, serviceID, new Date());
+                        MCRPI filePI = new MCRPI(fileURN, MCRDNBURN.TYPE, derivateID, file, serviceID,
+                            new MCRPIServiceDates(new Date(), null));
                         if (MCRPIManager.getInstance().exist(filePI)) {
                             LOGGER.warn("PI-Entry for {} already exist!", fileURN);
                         } else {
@@ -173,7 +176,9 @@ public class MCRPICommands {
             LOGGER.info("Already present in Database: {}", serviceID);
             return;
         }
-        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier);
+        Date now = new Date();
+        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier,
+            new MCRPIServiceDates(now, now));
         MCRPIService.addFlagToObject(mcrBase, mcrpi);
         MCRMetadataManager.update(mcrBase);
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);

@@ -21,6 +21,7 @@ package org.mycore.pi.backend;
 import java.util.Date;
 
 import org.mycore.common.MCRCoreVersion;
+import org.mycore.pi.MCRPIServiceDates;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -127,30 +128,16 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     private MCRPI() {
     }
 
-    public MCRPI(String identifier, String type, String mycoreID, String additional, String service, Date registered) {
+    public MCRPI(String identifier, String type, String mycoreID, String additional, String service,
+        MCRPIServiceDates dates) {
         this();
         this.identifier = identifier;
         this.type = type;
         this.mycoreID = mycoreID;
         this.additional = additional;
         this.service = service;
-        this.registered = registered;
-        //TODO: disabled by MCR-1393
-        //        this.mcrRevision = MCRCoreVersion.getRevision();
-        this.mcrVersion = MCRCoreVersion.getVersion();
-        this.created = new Date();
-    }
-
-    public MCRPI(String identifier, String type, String mycoreID, String additional, String service, Date registered,
-        Date registrationStarted) {
-        this();
-        this.identifier = identifier;
-        this.type = type;
-        this.mycoreID = mycoreID;
-        this.additional = additional;
-        this.service = service;
-        this.registered = registered;
-        this.registrationStarted = registrationStarted;
+        this.registered = dates.registered();
+        this.registrationStarted = dates.registrationStarted();
         //TODO: disabled by MCR-1393
         //        this.mcrRevision = MCRCoreVersion.getRevision();
         this.mcrVersion = MCRCoreVersion.getVersion();

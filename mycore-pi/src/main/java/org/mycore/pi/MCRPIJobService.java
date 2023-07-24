@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -62,7 +62,6 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-
     public MCRPIJobService(String identType) {
         super(identType);
     }
@@ -80,7 +79,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #addDeleteJob(Map)}
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     *        with piJobAction = 'DELETE'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
      */
@@ -92,7 +92,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #updateJob(Map)}
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     *        with piJobAction = 'UPDATE'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
      */
@@ -104,7 +105,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #addRegisterJob(Map)}
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     *        with piJobAction = 'REGISTER'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
      */
@@ -113,31 +115,46 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         // can be used to rollback
     }
 
-    /**
-     * @see #addRegisterJob(Map)
-     */
-    protected void addDeleteJob(Map<String, String> contextParameters) {
-        MCRJob job = createJob(contextParameters, PiJobAction.DELETE);
-        getJobQueue().offer(job);
+    @Override
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier, MCRPIServiceDates dates) {
+        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
+            this.getServiceID(), dates);
+        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
+        return databaseEntry;
+    }
+
+    @Override
+    public MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, T identifier)
+        throws MCRPersistentIdentifierException {
+        if (!additional.equals("")) {
+            throw new MCRPersistentIdentifierException(
+                getClass().getName() + " doesn't support additional information! (" + additional + ")");
+        }
+        if (getRegistrationPredicate().test(obj)) {
+            this.addJob(PiJobAction.REGISTER,
+                createJobContextParams(PiJobAction.REGISTER, obj, identifier, additional));
+            return new MCRPIServiceDates(new Date(), null);
+        }
+        return new MCRPIServiceDates(null, null);
+    }
+
+    @Override
+    protected void delete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        this.addJob(PiJobAction.DELETE, createJobContextParams(PiJobAction.DELETE, obj, identifier, additional));
     }
 
     /**
-     * @see #addRegisterJob(Map)
-     */
-    protected void addUpdateJob(Map<String, String> contextParameters) {
-        MCRJob job = createJob(contextParameters, PiJobAction.UPDATE);
-        getJobQueue().offer(job);
-    }
-
-    /**
-     * Adds a register job which will be called in the persistent {@link MCRJob} environment in a extra thread.
+     * Adds a job for a given PIAction, which will be called in the persistent {@link MCRJob} environment 
+     * in an extra thread.
      *
+     * @param piJobAction      the action that the job executes (REGISTER, UPDATE, DELETE)
+     * 
      * @param contextParameters pass parameters which are needed to register the PI. The parameter action and
      *                          registrationServiceID will be added, because they are necessary to reassign the job to
      *                          the right {@link MCRPIJobService} and method.
      */
-    protected void addRegisterJob(Map<String, String> contextParameters) {
-        MCRJob job = createJob(contextParameters, PiJobAction.REGISTER);
+    protected void addJob(PiJobAction piJobAction, Map<String, String> contextParameters) {
+        MCRJob job = createJob(contextParameters, piJobAction);
         getJobQueue().offer(job);
     }
 
@@ -310,18 +327,6 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         return PiJobAction.valueOf(contextParameters.get("action"));
     }
 
-    /**
-     * This function is replaced by getRegistrationPredicate() 
-     * in parent class MCRPIJobService
-     * @return the registration predicate
-     * 
-     * @see MCRPIJobService
-     */
-    @Deprecated
-    protected Predicate<MCRBase> getRegistrationCondition() {
-        return super.getRegistrationPredicate();
-    }
-
     @Override
     protected void checkConfiguration() throws MCRConfigurationException {
         super.checkConfiguration();
@@ -330,6 +335,25 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                 " uses old property key RegistrationConditionProvider, use " + REGISTRATION_PREDICATE + " instead.");
         }
     }
+
+    @Override
+    protected void update(T identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
+        if (this.isRegistered(obj.getId(), additional)) {
+            this.addJob(PiJobAction.UPDATE, createJobContextParams(PiJobAction.UPDATE, obj, identifier, additional));
+        } else if (!this.hasRegistrationStarted(obj.getId(), additional) &&
+            this.getRegistrationPredicate().test(obj) &&
+            validateRegistrationDocument(obj, identifier, additional)) {
+            this.updateStartRegistrationDate(obj.getId(), additional, new Date());
+            this.addJob(PiJobAction.REGISTER,
+                createJobContextParams(PiJobAction.REGISTER, obj, identifier, additional));
+        }
+    }
+
+    protected abstract boolean validateRegistrationDocument(MCRBase obj, T identifier, String additional);
+
+    protected abstract HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, T identifier,
+        String additional);
 
     public enum PiJobAction {
         DELETE("delete"), REGISTER("register"), UPDATE("update");
