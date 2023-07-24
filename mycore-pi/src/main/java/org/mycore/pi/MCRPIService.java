@@ -480,8 +480,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }).findAny().ifPresentOrElse((stringFlag) -> {
             int flagIndex = service.getFlagIndex(stringFlag);
             service.removeFlag(flagIndex);
-        }, () -> {LOGGER.warn(
-            "Could not find flag to update (" + id + "," + additional + "," + mcrpi.getIdentifier() + ")");
+        }, () -> {
+            LOGGER.warn("Could not find flag to update (" + id + "," + additional + "," + mcrpi.getIdentifier() + ")");
         });
 
         addFlagToObject(obj, mcrpi);
