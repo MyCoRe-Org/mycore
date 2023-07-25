@@ -224,6 +224,17 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         });
     }
 
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream().anyMatch(_stringFlag -> {
+            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+            return flag.getAdditional().equals(additional)
+                && Objects.equals(flag.getService(), piService.getServiceID());
+        });
+    }
+
     protected void validatePermission(MCRBase obj, boolean writePermission) throws MCRAccessException {
         List<String> requiredPermissions = new ArrayList<>(writePermission ? 2 : 1);
         requiredPermissions.add("register-" + getServiceID());
