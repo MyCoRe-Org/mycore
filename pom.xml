@@ -277,7 +277,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <compilerArguments>-implicit:none -AaddGeneratedAnnotation=false</compilerArguments>
+              <compilerArguments>-implicit:none</compilerArguments>
               <processors>
                 <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
               </processors>
