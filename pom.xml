@@ -163,7 +163,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
               </group>
               <group>
                 <title>MyCoRe Component: Neo4J</title>
-                <packages>org.mycore.neo4j*</packages>
+                <packages>org.mycore.mcr.neo4j*</packages>
               </group>
               <group>
                 <title>MyCoRe Component: ORCID Integration</title>

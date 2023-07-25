@@ -5,7 +5,7 @@
 
     <servlet>
         <servlet-name>Neo4JProxyServlet</servlet-name>
-        <servlet-class>org.mycore.neo4j.proxy.MCRNeo4JProxyServlet</servlet-class>
+        <servlet-class>org.mycore.mcr.neo4j.proxy.MCRNeo4JProxyServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -14,4 +14,3 @@
     </servlet-mapping>
 
 </web-fragment>
-

@@ -92,7 +92,7 @@ Stellen Sie sicher, dass Sie die folgenden Voraussetzungen erfüllen, bevor Sie 
 ### Maven
 
      <dependency>
-      <groupId>org.mycore</groupId>
+      <groupId>org.mycore.mcr</groupId>
       <artifactId>mycore-neo4j</artifactId>
      </dependency>
 
