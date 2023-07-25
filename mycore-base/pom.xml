@@ -127,10 +127,12 @@
             <exclude>**/*$*</exclude>
             <exclude>${excludes.test}</exclude>
           </excludes>
-          <property>
-            <name>known.issues</name>
-            <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
+          <properties>
+            <property>
+              <name>known.issues</name>
+              <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
           </property>
+          </properties>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
       </plugin>
