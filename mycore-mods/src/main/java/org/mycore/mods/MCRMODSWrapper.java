@@ -343,8 +343,8 @@ public class MCRMODSWrapper {
     }
 
     private static String xPathRelationshipTypeTest() {
-        return "(" +Stream.of(MCRMODSRelationshipType.values())
+        return Stream.of(MCRMODSRelationshipType.values())
             .map(s -> String.format(Locale.ROOT, "@type='%s'", s))
-            .collect(Collectors.joining(" or ")) +")";
+            .collect(Collectors.joining(" or "));
     }
 }
