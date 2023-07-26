@@ -24,7 +24,6 @@ import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.get
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -256,7 +255,7 @@ public class MCRNeo4JDatabaseDriver {
     }
 
     private static List<Neo4JMetaData> propertiesMapToJson(Map<String, Object> map, String lang) {
-        List<Neo4JMetaData> metaDataList = new LinkedList<>();
+        List<Neo4JMetaData> metaDataList = new ArrayList<>();
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
