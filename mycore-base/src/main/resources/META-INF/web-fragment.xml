@@ -5,6 +5,9 @@
 
   <name>mycore</name>
   <ordering>
+    <after>
+      <name>log4j</name>
+    </after>
     <before>
       <others />
     </before>
