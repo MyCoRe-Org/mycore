@@ -921,6 +921,22 @@ public final class MCRMetadataManager {
         }
     }
 
+    /**
+     * This method is used to repair the shared metadata of an object. 
+     * It should be only called if something programmatically changed in the shared metadata handling, like a bugfix
+     * or migration.
+     * @param mcrObject the object to repair
+     * @throws MCRAccessException
+     */
+    public static void repairSharedMetadata(final MCRObject mcrObject)
+        throws MCRAccessException {
+        MCRObjectID id = mcrObject.getId();
+        receiveMetadata(mcrObject);
+        MCRMetadataManager.fireUpdateEvent(mcrObject);
+        MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(id);
+        metadataShareAgent.distributeMetadata(mcrObject);
+    }
+
     private static boolean shareableMetadataChanged(final MCRObject mcrObject, MCRObject old) {
         MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(mcrObject.getId());
         return metadataShareAgent.shareableMetadataChanged(old, mcrObject);
