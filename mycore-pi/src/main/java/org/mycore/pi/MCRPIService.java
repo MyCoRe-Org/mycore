@@ -366,12 +366,15 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         Gson gson = MCRPIService.getGson();
         obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
             .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
-            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
-            .forEach(entry -> {
+            .map(entry -> {
                 // disabled: Git does not provide a revision number as integer (see MCR-1393)
                 //           entry.setMcrRevision(MCRCoreVersion.getRevision());
                 entry.setMcrVersion(MCRCoreVersion.getVersion());
                 entry.setMycoreID(obj.getId().toString());
+                return entry;
+            })
+            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
+            .forEach(entry -> {
                 LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
                 MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
             });
