@@ -49,6 +49,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
+ * Proxy Servlet for accessing and querying Neo4J
  * @author Andreas Kluge (ai112vezo)
  */
 

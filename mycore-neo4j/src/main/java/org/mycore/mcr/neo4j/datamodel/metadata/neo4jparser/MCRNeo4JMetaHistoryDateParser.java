@@ -18,6 +18,10 @@
 
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -25,11 +29,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
+ * Neo4J DataModelParser for HistoryDates
  * @author Andreas Kluge (ai112vezo)
  */
 public class MCRNeo4JMetaHistoryDateParser extends MCRNeo4JAbstractDataModelParser {

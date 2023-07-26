@@ -21,6 +21,7 @@ package org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
+ * Neo4J Parser Interface
  * @author Andreas Kluge (ai112vezo)
  */
 public interface MCRNeo4JMetaParser {

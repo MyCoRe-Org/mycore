@@ -18,6 +18,14 @@
 
 package org.mycore.mcr.neo4j.index;
 
+import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
+import static org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver.commitWriteOnlyQuery;
+
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
@@ -32,15 +40,8 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
 import org.mycore.util.concurrent.MCRDelayedRunnable;
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
-import static org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver.commitWriteOnlyQuery;
-
 /**
+ * Neo4J Event Handler for Indexing
  * @author Thomas Scheffler (yagee)
  * @author Andreas Kluge
  * @author Jens Kupferschmidt

@@ -18,12 +18,6 @@
 
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jdom2.Element;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
-
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_PARAMETER_SEPARATOR;
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassLabel;
 
@@ -31,7 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jdom2.Element;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
+
 /**
+ * Neo4J DataModelParser for Classifications
  * @author Andreas Kluge (ai112vezo)
  * @author Jens Kupferschmidt
  * @author Michael Becker

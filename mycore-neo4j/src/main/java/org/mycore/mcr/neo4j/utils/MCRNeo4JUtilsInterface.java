@@ -21,6 +21,7 @@ package org.mycore.mcr.neo4j.utils;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
+ * Interface for Neo4JUtils
  * @author Andreas Kluge
  * @author Jens Kupferschmidt
  */

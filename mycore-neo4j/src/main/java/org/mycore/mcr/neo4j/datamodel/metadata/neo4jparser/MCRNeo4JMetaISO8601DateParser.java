@@ -31,6 +31,7 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
 
 /**
+ * Neo4J DataModelParser for ISO8601 Dates
  * @author Jens Kupferschmidt
  */
 public class MCRNeo4JMetaISO8601DateParser extends MCRNeo4JAbstractDataModelParser {

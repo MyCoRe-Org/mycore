@@ -44,6 +44,7 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
 
 /**
+ * Parser Class for Neo4J
  * @author Andreas Kluge (ai112vezo)
  */
 public class MCRNeo4JParser implements MCRNeo4JMetaParser {

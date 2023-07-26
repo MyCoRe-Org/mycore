@@ -19,6 +19,7 @@
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil;
 
 /**
+ * Utility Class providing constants to Neo4J Implementation
  * @author Andreas Kluge (ai112vezo)
  */
 public class MCRNeo4JConstants {

@@ -18,14 +18,6 @@
 
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.Element;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
-
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
 
 import java.util.Collections;
@@ -34,7 +26,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.Element;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
+
 /**
+ * Neo4J DataModelParser for XML
  * @author Andreas Kluge (ai112vezo)
  */
 public class MCRNeo4JMetaXMLParser extends MCRNeo4JAbstractDataModelParser {
