@@ -30,11 +30,11 @@ import org.mycore.common.config.MCRConfiguration2;
  * Neo4j in MyCoRe. It maintains a map of attribute paths for different MCR object types.
  * <p>
  * Note: This class assumes the usage of MyCoRe and its specific configuration conventions. The attributePaths map
- * follows the format: Map<MCRObjectType, Map<property, path_to_element>>
+ * follows the format: {@code Map<MCRObjectType, Map<property, path_to_element>>}
  * <p>
- * Example usage: Map<String, String> configuration = MCRNeo4JUtilsConfigurationHelper.getConfiguration("ObjectType");
- * String idPath = configuration.get("id"); String descriptorPath = configuration.get("descriptor"); // Use the
- * configuration for further processing
+ * Example usage: {@code Map<String, String> configuration = MCRNeo4JUtilsConfigurationHelper.getConfiguration("ObjectType");}
+ * {@code String idPath = configuration.get("id"); String descriptorPath = configuration.get("descriptor");}
+ * // Use the configuration for further processing
  * <p>
  * Note: This class utilizes the MCRConfiguration2 class for retrieving configuration properties.
  *
@@ -44,13 +44,13 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRNeo4JUtilsConfigurationHelper {
 
     /**
-    * A map of MyCoRe properties starts with MCR.Neo4J... Map<MCRObjectType, Map<property, path_to_element>>
+    * A map of MyCoRe properties starts with {@code MCR.Neo4J... Map<MCRObjectType, Map<property, path_to_element>>}
     */
     static Map<String, Map<String, String>> attributePaths = new HashMap<>();
 
     /**
     * Retrieves the configuration for the specified MCR object type. Configured in the Style of
-    * MCR.Neo4J.NodeAttribute.<MCRObjectType>.propertyName=Path/to/value
+    * {@code MCR.Neo4J.NodeAttribute.<MCRObjectType>.propertyName=Path/to/value}
     *
     * @param type the MCR object type
     * @return a map of attribute paths for the specified object type

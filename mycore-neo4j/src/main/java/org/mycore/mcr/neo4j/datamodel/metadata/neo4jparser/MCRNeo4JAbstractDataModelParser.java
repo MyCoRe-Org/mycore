@@ -36,10 +36,10 @@ public abstract class MCRNeo4JAbstractDataModelParser {
     * The corresponding DataModel Parser extracts the information within the <rootTag> and return the information as <T>
     * The calling MCRNeo4JMetaParser implementation may require different return types.
     * <p>
-    * The implementation of MCRNeo4JParser requires either List<String> or Map<String, List<String>>
+    * The implementation of MCRNeo4JParser requires either {@code List<String>} or {@code Map<String, List<String>>}
     *
     * @param rootTag jdom2 Element
-    * @return <T> Handled by the calling MCRNeo4JMetaParser implementation
+    * @return {@code <T>} Handled by the calling MCRNeo4JMetaParser implementation
     */
    public abstract List<Neo4JNode> parse(Element rootTag);
 }
