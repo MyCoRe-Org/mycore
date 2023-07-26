@@ -36,6 +36,15 @@ public class MCRIdentifierMergerTest extends MCRTestCase {
         String a = "[mods:identifier[@type='issn']='12345678']";
         String b = "[mods:identifier[@type='issn']='1234-5678']";
         MCRMergerTest.test(a, b, b);
+        MCRMergerTest.test(b, a, b);
+    }
+
+    @Test
+    public void testMergeURLEncoded() throws Exception {
+        String a = "[mods:identifier[@type='doi']='10.1002/%28issn%291521-3765']";
+        String b = "[mods:identifier[@type='doi']='10.1002/(issn)1521-3765']";
+        MCRMergerTest.test(a, b, b);
+        MCRMergerTest.test(b, a, b);
     }
 
     @Test
@@ -51,5 +60,6 @@ public class MCRIdentifierMergerTest extends MCRTestCase {
         String a = "[mods:identifier[@type='doi']='10.1530/EJE-21-1086']";
         String b = "[mods:identifier[@type='doi']='10.1530/eje-21-1086']";
         MCRMergerTest.test(a, b, a);
+        MCRMergerTest.test(b, a, b);
     }
 }
