@@ -33,7 +33,9 @@ public abstract class MCRNeo4JAbstractDataModelParser {
    public abstract List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID);
 
    /**
-    * The corresponding DataModel Parser extracts the information within the <rootTag> and return the information as <T>
+    * The corresponding DataModel Parser extracts the information within the {@code <rootTag>}
+    * and return the information as {@code <T>}
+    * <p>
     * The calling MCRNeo4JMetaParser implementation may require different return types.
     * <p>
     * The implementation of MCRNeo4JParser requires either {@code List<String>} or {@code Map<String, List<String>>}

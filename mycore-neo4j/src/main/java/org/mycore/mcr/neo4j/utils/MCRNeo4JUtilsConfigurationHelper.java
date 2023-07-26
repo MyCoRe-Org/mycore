@@ -32,7 +32,8 @@ import org.mycore.common.config.MCRConfiguration2;
  * Note: This class assumes the usage of MyCoRe and its specific configuration conventions. The attributePaths map
  * follows the format: {@code Map<MCRObjectType, Map<property, path_to_element>>}
  * <p>
- * Example usage: {@code Map<String, String> configuration = MCRNeo4JUtilsConfigurationHelper.getConfiguration("ObjectType");}
+ * Example usage: {@code Map<String, String> configuration =
+ * MCRNeo4JUtilsConfigurationHelper.getConfiguration("ObjectType");}
  * {@code String idPath = configuration.get("id"); String descriptorPath = configuration.get("descriptor");}
  * // Use the configuration for further processing
  * <p>
