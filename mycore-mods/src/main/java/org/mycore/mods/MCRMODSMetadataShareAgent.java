@@ -18,6 +18,8 @@
 
 package org.mycore.mods;
 
+import static org.mycore.mods.MCRMODSWrapper.LINKED_RELATED_ITEMS;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -42,8 +44,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
-
-import static org.mycore.mods.MCRMODSWrapper.LINKED_RELATED_ITEMS;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -111,7 +111,8 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                         Filter<Content> sharedMetadata = (Filter<Content>) Filters.element("part",
                             MCRConstants.MODS_NAMESPACE).negate();
                         relatedItem.removeContent(sharedMetadata);
-                        relatedItem.addContent(holderWrapper.getMODS().cloneContent());
+                        List<Content> newRelatedItemContent = getClearContent(holderWrapper);
+                        relatedItem.addContent(newRelatedItemContent);
                         LOGGER.info("Saving: {}", recipientId);
                         try {
                             checkHierarchy(recipientWrapper);
@@ -123,6 +124,15 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                 }
             }
         }
+    }
+
+    /**
+     * Determines if the content of the relatedItem should be removed, when it is inserted as related item
+     * @param relatedItem the relatedItem element
+     * @return true if the content should be removed
+     */
+    protected boolean isClearableRelatedItem(Element relatedItem) {
+        return relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE) != null;
     }
 
     /* (non-Javadoc)
@@ -153,10 +163,26 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
             if (MCRMODSWrapper.isSupported(holderObjectID)) {
                 MCRObject targetObject = MCRMetadataManager.retrieveMCRObject(holderObjectID);
                 MCRMODSWrapper targetWrapper = new MCRMODSWrapper(targetObject);
-                relatedItem.addContent(targetWrapper.getMODS().cloneContent());
+                List<Content> inheritedData = getClearContent(targetWrapper);
+                relatedItem.addContent(inheritedData);
             }
         }
         checkHierarchy(childWrapper);
+    }
+
+    /**
+     * @param targetWrapper the wrapper of the target object
+     * @return a list of content that can be added to a relatedItem element as shared metadata
+     */
+    private List<Content> getClearContent(MCRMODSWrapper targetWrapper) {
+        List<Content> inheritedData = targetWrapper.getMODS().cloneContent();
+        inheritedData.stream()
+                .filter(c -> c instanceof Element)
+                .map(Element.class::cast)
+                .filter(element -> element.getName().equals("relatedItem"))
+                .filter(this::isClearableRelatedItem)
+                .forEach(Element::removeContent);
+        return inheritedData;
     }
 
     private void inheritToChild(MCRMODSWrapper parentWrapper, MCRMODSWrapper childWrapper) {

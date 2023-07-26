@@ -90,7 +90,7 @@ public class MCRCategoryTransformer {
      * @param emptyLeaves
      *            if true, also include empty leaves
      * @param completeId
-     *            if true, category ID is given in form {classID}':'{categID} 
+     *            if true, category ID is given in form {classID}':'{categID}
      */
     public static Element getEditorItems(MCRCategory cl, boolean sort, boolean emptyLeaves, boolean completeId) {
         return new ItemElementFactory(cl, STANDARD_LABEL, sort, emptyLeaves, completeId).getResult();
@@ -251,6 +251,7 @@ public class MCRCategoryTransformer {
 
             for (MCRLabel label : category.getLabels()) {
                 addLabel(ce, label, category);
+                addDescription(ce, label);
             }
             for (MCRCategory cat : category.getChildren()) {
                 addChildren(ce, cat);
@@ -281,6 +282,17 @@ public class MCRCategoryTransformer {
             }
 
             le.setText(text);
+        }
+
+        void addDescription(Element item, MCRLabel label) {
+            if (label.getDescription() == null || label.getDescription().length() == 0) {
+                return;
+            }
+
+            Element desc = new Element("description");
+            desc.setAttribute("lang", label.getLang(), XML_NAMESPACE);
+            desc.setText(label.getDescription());
+            item.addContent(desc);
         }
 
         private void sortItems(List<Element> items) {

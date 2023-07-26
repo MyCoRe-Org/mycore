@@ -224,6 +224,17 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         });
     }
 
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream().anyMatch(_stringFlag -> {
+            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+            return flag.getAdditional().equals(additional)
+                && Objects.equals(flag.getService(), piService.getServiceID());
+        });
+    }
+
     protected void validatePermission(MCRBase obj, boolean writePermission) throws MCRAccessException {
         List<String> requiredPermissions = new ArrayList<>(writePermission ? 2 : 1);
         requiredPermissions.add("register-" + getServiceID());
@@ -354,12 +365,15 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         Gson gson = MCRPIService.getGson();
         obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
             .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
-            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
-            .forEach(entry -> {
+            .map(entry -> {
                 // disabled: Git does not provide a revision number as integer (see MCR-1393)
                 //           entry.setMcrRevision(MCRCoreVersion.getRevision());
                 entry.setMcrVersion(MCRCoreVersion.getVersion());
                 entry.setMycoreID(obj.getId().toString());
+                return entry;
+            })
+            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
+            .forEach(entry -> {
                 LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
                 MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
             });

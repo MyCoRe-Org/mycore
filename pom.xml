@@ -561,8 +561,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <name>${changes.mailSender.name}</name>
                 <email>${changes.mailSender.email}</email>
               </mailSender>
-              <webUser>${jira.webUser}</webUser>
-              <webPassword>${jira.webPassword}</webPassword>
               <template>announcement.vm</template>
               <useJql>true</useJql>
               <templateDirectory>src/changes</templateDirectory>

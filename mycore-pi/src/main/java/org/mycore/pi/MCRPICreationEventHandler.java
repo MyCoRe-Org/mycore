@@ -51,6 +51,7 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
         List<MCRPIService<MCRPersistentIdentifier>> listOfServicesWithCreatablePIs = MCRPIServiceManager
             .getInstance().getAutoCreationList().stream()
             .filter(Predicate.not(s -> services.contains(s.getServiceID())))
+            .filter(Predicate.not(s -> MCRPIService.hasFlag(obj, "", s)))
             .filter(s -> s.getCreationPredicate().test(obj))
             .collect(Collectors.toList());
 
