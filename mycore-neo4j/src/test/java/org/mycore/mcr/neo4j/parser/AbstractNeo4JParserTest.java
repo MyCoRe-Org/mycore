@@ -25,6 +25,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -40,7 +41,7 @@ public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
         try {
             doc = new SAXBuilder().build(getClass().getResourceAsStream("/mcrobjects/a_mcrobject_00000001.xml"));
         } catch (JDOMException | IOException e) {
-            throw new RuntimeException("Error while loading Resource:", e);
+            throw new MCRException("Error while loading Resource:", e);
         }
         metadata = doc.getRootElement().getChild("metadata");
     }
