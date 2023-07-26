@@ -73,7 +73,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <plugin>
           <groupId>org.mycore.plugins</groupId>
           <artifactId>datamodel-plugin</artifactId>
-          <version>0.8-SNAPSHOT</version>
+          <version>0.8</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
