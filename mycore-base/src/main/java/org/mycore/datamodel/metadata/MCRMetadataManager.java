@@ -87,7 +87,7 @@ public final class MCRMetadataManager {
     private MCRMetadataManager() {
 
     }
-    
+
     public static MCRObjectIDGenerator getMCRObjectIDGenerator() {
         return MCROBJECTID_GENERATOR;
     }
@@ -266,7 +266,7 @@ public final class MCRMetadataManager {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("adding Derivate in data store");
             }
-            MCRMetadataManager.addOrUpdateDerivateToObject(objectId, der);
+            MCRMetadataManager.addOrUpdateDerivateToObject(objectId, der, mcrDerivate.isImportMode());
         } catch (final Exception e) {
             MCRMetadataManager.restore(mcrDerivate, objectId, objectBackup);
             // throw final exception
@@ -329,7 +329,7 @@ public final class MCRMetadataManager {
             LOGGER.info("Assigned new object id {}", objectId);
 
             // if label was id with 00000000, set label to new id
-            if(Objects.equals(mcrObject.getLabel(), oldId.toString())) {
+            if (Objects.equals(mcrObject.getLabel(), oldId.toString())) {
                 mcrObject.setLabel(objectId.toString());
             }
         }
@@ -821,7 +821,7 @@ public final class MCRMetadataManager {
         // add the link to metadata
         final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance()
             .getDerivateLink(mcrDerivate);
-        addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
+        MCRMetadataManager.addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink, mcrDerivate.isImportMode());
     }
 
     /**
@@ -972,13 +972,14 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      *             if a persistence problem is occurred
      */
-    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link)
+    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link,
+        boolean isImportMode)
         throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         if (!object.getStructure().addOrUpdateDerivate(link)) {
             return false;
         }
-        if (!object.isImportMode()) {
+        if (!isImportMode && !object.isImportMode()) {
             object.getService().setDate("modifydate");
         }
         MCRMetadataManager.fireUpdateEvent(object);
