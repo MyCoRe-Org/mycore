@@ -18,6 +18,10 @@
 
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil;
 
+import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CLASSID_CATEGID_SEPARATOR;
+
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -25,19 +29,12 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
-import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CLASSID_CATEGID_SEPARATOR;
-
-import java.util.Optional;
-
 /**
+ * Util for Neo4J
  * @author Andreas Kluge
  * @author Jens Kupferschmidt
  */
 public class MCRNeo4JUtil {
-
-   private MCRNeo4JUtil() {
-      throw new IllegalStateException("Utility class");
-   }
 
    /**
     * Retrieves the label of a classification based on the provided class ID and category ID.
@@ -91,5 +88,9 @@ public class MCRNeo4JUtil {
       filteredType = StringUtils.remove(filteredType, ';');
 
       return filteredType;
+   }
+
+   private MCRNeo4JUtil() {
+      throw new IllegalStateException("Utility class");
    }
 }
