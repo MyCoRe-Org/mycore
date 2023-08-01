@@ -84,15 +84,9 @@ export class UploadTarget {
                 const uploadID = (Math.random() * 10000).toString(10);
 
                 fileInput.setAttribute("type", "file");
-                fileInput.addEventListener('change', async () => {
+                fileInput.addEventListener('change', () => {
                     for (let i = 0; i < fileInput.files.length; i++) {
                         let file = fileInput.files.item(i);
-                        const validation = await this.validateTraverse(this.object, file);
-                        if (!validation.test) {
-                            // TODO: show nice in GUI
-                            alert(validation.reason);
-                            return true;
-                        }
                         const fileTransfer = new FileTransfer(file, this.target, uploadID, this.object, [], this.uploadHandler, this.classifications);
                         FileTransferQueue.getQueue().add(fileTransfer);
                     }
@@ -173,17 +167,10 @@ export class UploadTarget {
      * @param fileEntry the entry which contains the name and size
      * @private
      */
-    private async validateFile(object: string, fileEntry: File|FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
+    private async validateFile(object: string, fileEntry: any): Promise<{ valid: boolean, reason: string | null }> {
         const size = await this.getEntrySize(fileEntry);
         return new Promise((accept, reject) => {
-            const isFileSystemEntry = 'fullPath' in fileEntry;
-
-            let uploadPath;
-            if(isFileSystemEntry){
-                uploadPath = fileEntry.fullPath[0] == '/' ? fileEntry.fullPath.substr(1) : fileEntry.fullPath;
-            } else {
-                uploadPath = fileEntry.name;
-            }
+            const uploadPath = fileEntry.fullPath[0] == '/' ? fileEntry.fullPath.substr(1) : fileEntry.fullPath;
             const url = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + object + "/" + uploadPath + "?size=" + size;
             const request = new XMLHttpRequest();
             request.open('GET', url, true);
