@@ -62,7 +62,7 @@ public class MCRUserAgentFilter implements Filter {
 
     @Override
     public void init(final FilterConfig arg0) throws ServletException {
-        final String agentRegEx = MCRConfiguration2.getStringOrThrow("MCR.Filter.UserAgent.Pattern");
+        final String agentRegEx = MCRConfiguration2.getStringOrThrow("MCR.Filter.UserAgent.BotPattern");
         agentPattern = Pattern.compile(agentRegEx);
     }
 
