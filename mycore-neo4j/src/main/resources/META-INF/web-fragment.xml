@@ -3,6 +3,13 @@
               xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
               metadata-complete="true" id="mymss_common">
 
+    <name>mycore_neo4j</name>
+    <ordering>
+        <after>
+            <name>mycore</name>
+        </after>
+    </ordering>
+
     <servlet>
         <servlet-name>Neo4JProxyServlet</servlet-name>
         <servlet-class>org.mycore.mcr.neo4j.proxy.MCRNeo4JProxyServlet</servlet-class>
