@@ -17,7 +17,7 @@ Folgen Sie diesen Schritten, um Neo4j direkt auf Ihrem System zu installieren:
 
 1. Gehen Sie zur offiziellen Neo4j-Website: [https://neo4j.com/](https://neo4j.com/download-center/?ref=subscription#community)
 
-2. Klicken Sie auf den "pricing" um zur Downloadseite zu gelangen.
+2. Klicken Sie auf den "Pricing" um zur Downloadseite zu gelangen.
 
 3. Wählen Sie "Graph Database", dann "Self-Managed" und klicken Sie bei "Community Edition" auf "Download for Free".
 
@@ -79,7 +79,7 @@ Stellen Sie sicher, dass Sie die erforderlichen Verbindungsparameter wie Host, P
 
 # Neo4J MCR-Modul
 
-Das Neo4J MCR-Modul stellt eine Zwischentechnologie, für die Verbindung von Neo4j mit dem MyCore Framework dar.
+Das Neo4J MCR-Modul stellt eine Verbindung von Neo4j mit dem MyCoRe Framework her.
 
 ## Voraussetzung
 

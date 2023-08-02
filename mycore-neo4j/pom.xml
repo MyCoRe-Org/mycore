@@ -30,24 +30,9 @@
   <artifactId>mycore-neo4j</artifactId>
   <name>MyCoRe Neo4J</name>
   <properties>
-    <manifest.priority>55</manifest.priority>
+    <manifest.priority>57</manifest.priority>
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.mycore.plugins</groupId>
-        <artifactId>datamodel-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>schema</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
