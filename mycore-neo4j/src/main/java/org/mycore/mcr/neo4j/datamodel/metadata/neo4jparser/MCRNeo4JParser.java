@@ -131,8 +131,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
                   final String cleaned = text.stream()
                      .map(value -> StringUtils.replace(value, "'", ""))
-                     .map(value -> "'" + value + "'")
-                     .collect(Collectors.joining(", ", "[", "]"));
+                     .collect(Collectors.joining("', '", "['", "']"));
                   sbNode.append(", a.").append(key).append('=').append(cleaned);
                }
             }
