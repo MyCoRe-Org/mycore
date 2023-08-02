@@ -129,7 +129,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
    }
 
    @Override
-   protected synchronized void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+   protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
       updateObject(evt, obj);
    }
 
@@ -139,7 +139,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
    }
 
    @Override
-   protected synchronized void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+   protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
       deleteObject(obj.getId());
    }
 
@@ -148,7 +148,6 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
       handleObjectUpdated(evt, obj);
    }
 
-   @SuppressWarnings("unused")
    protected synchronized void updateObject(MCREvent evt, MCRObject mcrObject) {
       LOGGER.debug("Neo4j: update id {}", mcrObject.getId());
 
@@ -180,7 +179,6 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
       });
    }
 
-   @SuppressWarnings("unused")
    protected synchronized void addObject(MCREvent evt, MCRObject mcrObject) {
       LOGGER.debug("Neo4j: add id {}", mcrObject.getId());
 
