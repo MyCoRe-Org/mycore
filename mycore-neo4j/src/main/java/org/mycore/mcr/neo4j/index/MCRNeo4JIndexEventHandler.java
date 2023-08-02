@@ -18,8 +18,8 @@
 
 package org.mycore.mcr.neo4j.index;
 
-import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
-import static org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver.commitWriteOnlyQuery;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants;
+import org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver;
 
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Executors;
@@ -37,6 +37,7 @@ import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
+import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 import org.mycore.util.concurrent.MCRDelayedRunnable;
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
@@ -52,7 +53,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JIndexEventHandler.class);
 
    private static final long DELAY_IN_MS
-      = MCRConfiguration2.getLong(NEO4J_CONFIG_PREFIX + "DelayIndexing_inMS").orElse(2000L);
+      = MCRConfiguration2.getLong(MCRNeo4JConstants.NEO4J_CONFIG_PREFIX + "DelayIndexing_inMS").orElse(2000L);
 
    private static final DelayQueue<MCRDelayedRunnable> NEO4J_TASK_QUEUE = new DelayQueue<>();
 
@@ -167,11 +168,11 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
                try {
                   String updateQuery = parser.createNeo4JUpdateQuery(mcrObject);
                   LOGGER.debug("UpdateQuery: {}", updateQuery);
-                  commitWriteOnlyQuery(updateQuery);
+                  MCRNeo4JQueryRunner.commitWriteOnlyQuery(updateQuery);
 
                   String query = parser.createNeo4JQuery(mcrObject);
                   LOGGER.info("Query: {}", query);
-                  commitWriteOnlyQuery(query);
+                  MCRNeo4JQueryRunner.commitWriteOnlyQuery(query);
                } catch (Exception e) {
                   LOGGER.error("Error creating transfer thread for object {}", mcrObject, e);
                }
@@ -199,7 +200,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
                try {
                   String query = parser.createNeo4JQuery(mcrObject);
                   LOGGER.info("Query: {}", query);
-                  commitWriteOnlyQuery(query);
+                  MCRNeo4JQueryRunner.commitWriteOnlyQuery(query);
                } catch (Exception e) {
                   LOGGER.error("Error creating transfer thread for object {}", mcrObject, e);
                }
@@ -213,7 +214,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
          .onCommit(() -> putIntoTaskQueue(new MCRDelayedRunnable(id.toString(), DELAY_IN_MS,
             new MCRTransactionableRunnable(() -> {
                String queryString = "MATCH (n {id:'" + id + "'}) DETACH DELETE n";
-               commitWriteOnlyQuery(queryString);
+               MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
             }))));
    }
 

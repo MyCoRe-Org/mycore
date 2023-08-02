@@ -18,8 +18,6 @@
 
 package org.mycore.mcr.neo4j.utils;
 
-import static org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver.commitWriteOnlyQuery;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -62,7 +60,7 @@ public class MCRNeo4JUtilsDefault implements MCRNeo4JUtilsInterface {
     public void addNodeByMCRObject(MCRObject mcrObject) {
         String queryString = parser.createNeo4JQuery(mcrObject);
         LOGGER.info("Query: {}", queryString);
-        commitWriteOnlyQuery(queryString);
+        MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
     }
 
     /**
@@ -75,7 +73,7 @@ public class MCRNeo4JUtilsDefault implements MCRNeo4JUtilsInterface {
     public void updateNodeByMCRObject(MCRObject mcrObject) {
         String updateQuery = parser.createNeo4JUpdateQuery(mcrObject);
         LOGGER.info("UpdateQuery: {}", updateQuery);
-        commitWriteOnlyQuery(updateQuery);
+        MCRNeo4JQueryRunner.commitWriteOnlyQuery(updateQuery);
         addNodeByMCRObject(mcrObject);
     }
 
@@ -87,7 +85,7 @@ public class MCRNeo4JUtilsDefault implements MCRNeo4JUtilsInterface {
     @Override
     public void deleteNodeByMCRObjectID(String id) {
         String queryString = "MATCH (n {id:'" + id + "'}) DETACH DELETE n;";
-        commitWriteOnlyQuery(queryString);
+        MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
     }
 
 }

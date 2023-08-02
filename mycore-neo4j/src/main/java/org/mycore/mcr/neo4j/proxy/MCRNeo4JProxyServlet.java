@@ -47,6 +47,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 
 /**
  * Proxy Servlet for accessing and querying Neo4J
@@ -111,7 +112,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
          MCRConfiguration2.getStringOrThrow(NEO4J_CONFIG_PREFIX + "user"),
          MCRConfiguration2.getStringOrThrow(NEO4J_CONFIG_PREFIX + "password"));
 
-      final List<Map<String, String>> result = MCRNeo4JDatabaseDriver.commitReadOnlyQuery(query, language);
+      final List<Map<String, String>> result = MCRNeo4JQueryRunner.commitReadOnlyQuery(query, language);
 
       if (result == null) {
          LOGGER.info("Result is null");

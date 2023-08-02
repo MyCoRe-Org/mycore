@@ -30,11 +30,10 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver;
+import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JUtilsInterface;
 
 import java.util.List;
-
-import static org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver.commitWriteOnlyQuery;
 
 @MCRCommandGroup(name = "Commands to handle Neo4J")
 @SuppressWarnings("unused")
@@ -48,7 +47,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       LOGGER.info("Start clean data from Neo4J instance for an MCRID");
       String queryString = "MATCH (n {id:'" + id + "'}) DETACH DELETE n";
       LOGGER.info("Query: {}", queryString);
-      commitWriteOnlyQuery(queryString);
+      MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
    }
 
    @MCRCommand(syntax = "clean neo4j of base {0}", help = "clean the Neo4J database for a MCRBase {0}", order = 20)
@@ -59,7 +58,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       for (String objectId : selectedObjectIds) {
          String queryString = "MATCH (n {id:'" + objectId + "'}) DETACH DELETE n";
          LOGGER.info("Query: {}", queryString);
-         commitWriteOnlyQuery(queryString);
+         MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
       }
    }
 
@@ -68,7 +67,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       LOGGER.info("Start clean data from Neo4J instance for MCRType {}", type);
       String queryString = "MATCH (n:" + type + ") DETACH DELETE n";
       LOGGER.info("Query: {}", queryString);
-      commitWriteOnlyQuery(queryString);
+      MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
    }
 
    @MCRCommand(syntax = "clean neo4j metadata", help = "clean the complete Neo4J database", order = 40)
@@ -76,7 +75,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       LOGGER.info("Start clean all data from Neo4J");
       String queryString = "MATCH (n) DETACH DELETE n";
       LOGGER.info("Query: {}", queryString);
-      commitWriteOnlyQuery(queryString);
+      MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
    }
 
    @MCRCommand(syntax = "synchronize neo4j of id {0}",

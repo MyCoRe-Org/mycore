@@ -129,10 +129,10 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
                      key = k + "_" + lang;
                   }
 
-                  final List<String> cleaned = text.stream()
+                  final String cleaned = text.stream()
                      .map(value -> StringUtils.replace(value, "'", ""))
                      .map(value -> "'" + value + "'")
-                     .toList();
+                     .collect(Collectors.joining(", ", "[", "]"));
                   sbNode.append(", a.").append(key).append('=').append(cleaned);
                }
             }
