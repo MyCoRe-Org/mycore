@@ -42,7 +42,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
    private static final String NEO4J_MANAGER_CLASS_PROPERTY = "MCR.Neo4J.Manager.Class";
    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JCommands.class.getName());
 
-   @MCRCommand(syntax = "clean neo4j of id {0}", help = "clean the Neo4J database for an ID {0}", order = 10)
+   @MCRCommand(syntax = "clean neo4j for id {0}", help = "clean the Neo4J database for an ID {0}", order = 10)
    public static void cleanForMCRID(final String id) {
       LOGGER.info("Start clean data from Neo4J instance for an MCRID");
       String queryString = "MATCH (n {id:'" + id + "'}) DETACH DELETE n";
@@ -50,7 +50,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
    }
 
-   @MCRCommand(syntax = "clean neo4j of base {0}", help = "clean the Neo4J database for a MCRBase {0}", order = 20)
+   @MCRCommand(syntax = "clean neo4j for base {0}", help = "clean the Neo4J database for a MCRBase {0}", order = 20)
    public static void cleanForBase(final String baseId) {
       LOGGER.info("Start clean data from Neo4J instance for MCRBase {}", baseId);
       List<String> selectedObjectIds = MCRXMLMetadataManager
@@ -62,7 +62,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       }
    }
 
-   @MCRCommand(syntax = "clean neo4j of type {0}", help = "clean the Neo4J database for a MCRType {0}", order = 30)
+   @MCRCommand(syntax = "clean neo4j for type {0}", help = "clean the Neo4J database for a MCRType {0}", order = 30)
    public static void cleanForType(final String type) {
       LOGGER.info("Start clean data from Neo4J instance for MCRType {}", type);
       String queryString = "MATCH (n:" + type + ") DETACH DELETE n";
@@ -78,7 +78,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
    }
 
-   @MCRCommand(syntax = "synchronize neo4j of id {0}",
+   @MCRCommand(syntax = "synchronize neo4j for id {0}",
       help = "synchronize metadata to the Neo4J database for MCRID {0}",
       order = 50)
    public static void synchronizeForMCRID(final String id) {
@@ -89,7 +89,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       clazz.updateNodeByMCRObject(mcrObject);
    }
 
-   @MCRCommand(syntax = "synchronize neo4j of base {0}",
+   @MCRCommand(syntax = "synchronize neo4j for base {0}",
       help = "synchronize metadata to the Neo4J database for MCRBase {0}", order = 60)
    public static void synchronizeForBase(final String baseId) {
       LOGGER.info("Synchronize Neo4J with metadata for MCRBase {}", baseId);
@@ -103,7 +103,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       }
    }
 
-   @MCRCommand(syntax = "synchronize neo4j of type {0}",
+   @MCRCommand(syntax = "synchronize neo4j for type {0}",
       help = "synchronize metadata to the Neo4J database for MCRType {0}", order = 70)
    public static void synchronizeForType(final String type) {
       LOGGER.info("Synchronize Neo4J with metadata for MCRType {}", type);
@@ -119,7 +119,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
 
    @MCRCommand(syntax = "synchronize neo4j metadata", help = "synchronize all metadata the Neo4J database", order = 80)
    public static void synchronizeAll() {
-      LOGGER.info("Synchronize Neo4J with all metadata");
+      LOGGER.info("Synchronisation of all metadata with the Neo4J database");
       MCRNeo4JManager clazz
          = MCRConfiguration2.getOrThrow(NEO4J_MANAGER_CLASS_PROPERTY, MCRConfiguration2::instantiateClass);
       List<String> selectedObjectIds = MCRXMLMetadataManager
@@ -140,10 +140,10 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
    }
 
    @MCRCommand(syntax = "test neo4j of id {0}",
-      help = "synchronize metadata to the Neo4J database for MCRID {0}",
+      help = "Prints a Neo4J query statement for testing purpose using MCRID",
       order = 90)
    public static void test(final String id) {
-      LOGGER.info("Synchronize Neo4J with metadata for MCRID");
+      LOGGER.info("Test Query for Neo4J with metadata for MCRID");
 
       MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
       MCRNeo4JParser parser = new MCRNeo4JParser();
