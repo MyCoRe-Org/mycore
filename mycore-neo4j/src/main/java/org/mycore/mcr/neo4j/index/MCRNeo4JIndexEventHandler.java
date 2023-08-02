@@ -19,7 +19,6 @@
 package org.mycore.mcr.neo4j.index;
 
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants;
-import org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver;
 
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Executors;

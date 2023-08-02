@@ -25,7 +25,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * @author Andreas Kluge
  * @author Jens Kupferschmidt
  */
-public interface MCRNeo4JUtilsInterface {
+public interface MCRNeo4JManager {
 
     /**
     * Adds a node to Neo4j based on the provided MCRObject and its configuration according to the

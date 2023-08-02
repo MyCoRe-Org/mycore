@@ -40,13 +40,13 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
  * @author Andreas Kluge
  * @author Jens Kupferschmidt
  */
-public class MCRNeo4JUtilsDefault implements MCRNeo4JUtilsInterface {
+public class MCRNeo4JDefaultManager implements MCRNeo4JManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JUtilsDefault.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JDefaultManager.class);
 
     private final MCRNeo4JMetaParser parser;
 
-    public MCRNeo4JUtilsDefault() {
+    public MCRNeo4JDefaultManager() {
         parser = new MCRNeo4JParser();
     }
 
