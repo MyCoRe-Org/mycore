@@ -60,7 +60,6 @@ public class MCRNeo4JQueryRunner {
             return tx.run(query);
          });
       }
-      driver.session().close();
    }
 
    /**
