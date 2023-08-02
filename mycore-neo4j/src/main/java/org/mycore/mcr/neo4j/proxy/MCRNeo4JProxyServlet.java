@@ -23,8 +23,8 @@ import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstant
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -130,7 +130,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
 
       Set<Neo4JNodeJsonRecord> nodes = new HashSet<>();
       Set<Neo4JRelationShipJsonRecord> relationShips = new HashSet<>();
-      List<String> unprocessed = new LinkedList<>();
+      List<String> unprocessed = new ArrayList<>();
 
       for (Map<String, String> resultMap : result) {
          for (Map.Entry<String, String> entry : resultMap.entrySet()) {
