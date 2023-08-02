@@ -18,14 +18,11 @@
 
 package org.mycore.frontend.cli;
 
-import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,15 +30,20 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+
+import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * This class provides a set of commands for the org.mycore.access management
@@ -50,7 +52,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
  */
-
 @MCRCommandGroup(name = "Access Commands")
 public class MCRAccessCommands extends MCRAbstractCommands {
     /** The logger */
@@ -226,14 +227,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         out.output(doc, fos);
     }
 
-    private static Element getRuleFromFile(String fileName) throws Exception {
-        if (!checkFilename(fileName)) {
-            LOGGER.warn("Wrong file format or file doesn't exist");
-            return null;
-        }
-        Document ruleDom = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(fileName));
-        Element rule = ruleDom.getRootElement();
-        if (!rule.getName().equals("condition")) {
+    private static String filenameToUri(String filename) {
+        return "file://" + new File(filename).getAbsolutePath();
+    }
+
+    private static Element getRuleFromUri(String uri) {
+        Element rule = MCRURIResolver.instance().resolve(uri);
+        if (rule == null || !Objects.equals(rule.getName(), "condition")) {
             LOGGER.warn("ROOT element is not valid, a valid rule would be for example:");
             LOGGER.warn("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
             return null;
@@ -244,25 +244,69 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     /**
      * updates the permission for a given id and a given permission type with a
      * given rule
-     * 
+     *
      * @param permission
      *            String type of permission like read, writedb, etc.
      * @param id
-     *            String the id of the object the rule is assigned to
-     * @param strFileRule
+     *            String the URI of to the XML resource, that contains the rule
+     * @param ruleUri
      *            String the path to the xml file, that contains the rule
      */
-    @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2}",
+    @MCRCommand(syntax = "update permission {0} for id {1} with rule {2}",
         help = "The command updates access rule for a given id of a given permission with a given special rule",
         order = 70)
-    public static void permissionUpdateForID(String permission, String id, String strFileRule) throws Exception {
-        permissionUpdateForID(permission, id, strFileRule, "");
+    public static void permissionUpdateForID(String permission, String id, String ruleUri) {
+        permissionUpdateForID(permission, id, ruleUri, "");
     }
 
     /**
      * updates the permission for a given id and a given permission type with a
      * given rule
-     * 
+     *
+     * @param permission
+     *            String type of permission like read, writedb, etc.
+     * @param id
+     *            String the URI of to the XML resource, that contains the rule
+     * @param strFileRule
+     *            String the path to the xml file, that contains the rule
+     */
+    @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2}",
+        help = "The command updates access rule for a given id of a given permission with a given special rule",
+        order = 71)
+    public static void permissionFileUpdateForID(String permission, String id, String strFileRule) {
+        permissionUpdateForID(permission, id, filenameToUri(strFileRule));
+    }
+
+    /**
+     * updates the permission for a given id and a given permission type with a
+     * given rule
+     *
+     * @param permission
+     *            String type of permission like read, writedb, etc.
+     * @param id
+     *            String the id of the object the rule is assigned to
+     * @param ruleUri
+     *            String the URI of to the XML resource, that contains the rule
+     * @param description
+     *            String give a special description, if the semantics of your
+     *            rule is multiple used
+     */
+    @MCRCommand(syntax = "update permission {0} for id {1} with rule {2} described by {3}",
+        help = "The command updates access rule for a given id of a given permission with a given special rule",
+        order = 60)
+    public static void permissionUpdateForID(String permission, String id, String ruleUri, String description) {
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
+        Element rule = getRuleFromUri(ruleUri);
+        if (rule == null) {
+            return;
+        }
+        accessImpl.addRule(id, permission, rule, description);
+    }
+
+    /**
+     * updates the permission for a given id and a given permission type with a
+     * given rule
+     *
      * @param permission
      *            String type of permission like read, writedb, etc.
      * @param id
@@ -275,21 +319,33 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2} described by {3}",
         help = "The command updates access rule for a given id of a given permission with a given special rule",
-        order = 60)
-    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description)
-        throws Exception {
-        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
-        Element rule = getRuleFromFile(strFileRule);
-        if (rule == null) {
-            return;
-        }
-        accessImpl.addRule(id, permission, rule, description);
+        order = 61)
+    public static void permissionFileUpdateForID(String permission, String id, String strFileRule, String description) {
+        permissionUpdateForID(permission, id, filenameToUri(strFileRule), description);
     }
 
     /**
      * updates the permissions for all ids of a given MCRObjectID-Type with a
      * given rule and a given permission
-     * 
+     *
+     * @param permission
+     *            String type of permission like read, writedb, etc.
+     * @param ruleUri
+     *            String the URI of the rule XML resource, that contains the rule
+     */
+    @MCRCommand(
+        syntax = "update permission {0} for selected with rule {1}",
+        help = "The command updates access rule for a given permission and all ids "
+            + "of a given MCRObject-Type with a given special rule",
+        order = 90)
+    public static void permissionUpdateForSelected(String permission, String ruleUri) {
+        permissionUpdateForSelected(permission, ruleUri, "");
+    }
+
+    /**
+     * updates the permissions for all ids of a given MCRObjectID-Type with a
+     * given rule and a given permission
+     *
      * @param permission
      *            String type of permission like read, writedb, etc.
      * @param strFileRule
@@ -299,15 +355,43 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         syntax = "update permission {0} for selected with rulefile {1}",
         help = "The command updates access rule for a given permission and all ids "
             + "of a given MCRObject-Type with a given special rule",
-        order = 90)
-    public static void permissionUpdateForSelected(String permission, String strFileRule) throws Exception {
-        permissionUpdateForSelected(permission, strFileRule, "");
+        order = 91)
+    public static void permissionFileUpdateForSelected(String permission, String strFileRule) {
+        permissionUpdateForSelected(permission, filenameToUri(strFileRule));
     }
 
     /**
      * updates the permissions for all ids of a given MCRObjectID-Type and for a
      * given permission type with a given rule
-     * 
+     *
+     * @param permission
+     *            String type of permission like read, writedb, etc.
+     * @param ruleUri
+     *            String the URI of the rule XML resource, that contains the rule
+     * @param description
+     *            String give a special description, if the semantics of your
+     *            rule is multiple used
+     */
+    @MCRCommand(
+        syntax = "update permission {0} for selected with rule {1} described by {2}",
+        help = "The command updates access rule for a given permission and all ids "
+            + "of a given MCRObject-Type with a given special rule",
+        order = 80)
+    public static void permissionUpdateForSelected(String permission, String ruleUri, String description) {
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
+        Element rule = getRuleFromUri(ruleUri);
+        if (rule == null) {
+            return;
+        }
+        for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
+            accessImpl.addRule(id, permission, rule, description);
+        }
+    }
+
+    /**
+     * updates the permissions for all ids of a given MCRObjectID-Type and for a
+     * given permission type with a given rule
+     *
      * @param permission
      *            String type of permission like read, writedb, etc.
      * @param strFileRule
@@ -316,22 +400,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String give a special description, if the semantics of your
      *            rule is multiple used
      */
-
     @MCRCommand(
         syntax = "update permission {0} for selected with rulefile {1} described by {2}",
         help = "The command updates access rule for a given permission and all ids "
             + "of a given MCRObject-Type with a given special rule",
         order = 80)
-    public static void permissionUpdateForSelected(String permission, String strFileRule, String description)
-        throws Exception {
-        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
-        Element rule = getRuleFromFile(strFileRule);
-        if (rule == null) {
-            return;
-        }
-        for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
-            accessImpl.addRule(id, permission, rule, description);
-        }
+    public static void permissionFileUpdateForSelected(String permission, String strFileRule, String description) {
+        permissionUpdateForSelected(permission, filenameToUri(strFileRule), description);
     }
 
     /**
