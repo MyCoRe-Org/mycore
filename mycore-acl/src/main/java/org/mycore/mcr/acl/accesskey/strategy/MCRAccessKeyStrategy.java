@@ -41,7 +41,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    public boolean checkPermission(final String objectIdString, final String permission) {
+    public boolean checkPermission(String objectIdString, String permission) {
         if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
             && MCRObjectID.isValid(objectIdString)) {
@@ -61,7 +61,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * @param permission permission type
      * @return true if permitted, otherwise false
      */
-    public boolean checkObjectPermission(final MCRObjectID objectId, final String permission) {
+    public boolean checkObjectPermission(MCRObjectID objectId, String permission) {
         LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
         if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
@@ -87,7 +87,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * @param permission permission type
      * @return true if permitted, otherwise false
      */
-    public boolean checkDerivatePermission(final MCRObjectID objectId, final String permission) {
+    public boolean checkDerivatePermission(MCRObjectID objectId, String permission) {
         LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
         if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))

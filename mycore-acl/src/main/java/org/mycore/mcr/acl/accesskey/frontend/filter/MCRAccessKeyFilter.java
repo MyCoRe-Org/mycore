@@ -92,7 +92,7 @@ public class MCRAccessKeyFilter implements Filter {
         return this.getClass().getSimpleName();
     }
 
-    private static MCRObjectID extractObjectId(final HttpServletRequest request) {
+    private static MCRObjectID extractObjectId(HttpServletRequest request) {
         final String pathInfo = request.getPathInfo();
         final String id = pathInfo == null ? null : pathInfo.substring(1);
         if (id != null) {

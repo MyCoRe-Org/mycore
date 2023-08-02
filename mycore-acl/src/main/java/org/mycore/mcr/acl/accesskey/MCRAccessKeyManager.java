@@ -68,7 +68,7 @@ public final class MCRAccessKeyManager {
      * @param objectId the {@link MCRObjectID}
      * @return {@link MCRAccessKey} list
      */
-    public static synchronized List<MCRAccessKey> listAccessKeys(final MCRObjectID objectId) {
+    public static synchronized List<MCRAccessKey> listAccessKeys(MCRObjectID objectId) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
             .setParameter("objectId", objectId)
@@ -85,7 +85,7 @@ public final class MCRAccessKeyManager {
      * @param type permission type
      * @return true if valid or false
      */
-    public static boolean isValidType(final String type) {
+    public static boolean isValidType(String type) {
         return (MCRAccessManager.PERMISSION_READ.equals(type) || MCRAccessManager.PERMISSION_WRITE.equals(type));
     }
 
@@ -95,7 +95,7 @@ public final class MCRAccessKeyManager {
      * @param secret the secret
      * @return true if valid or false
      */
-    public static boolean isValidSecret(final String secret) {
+    public static boolean isValidSecret(String secret) {
         return secret.length() > 0;
     }
 
@@ -107,7 +107,7 @@ public final class MCRAccessKeyManager {
      * @return hashed secret
      * @throws MCRException if encryption fails
      */
-    public static String hashSecret(final String secret, final MCRObjectID objectId) throws MCRException {
+    public static String hashSecret(String secret, MCRObjectID objectId) throws MCRException {
         switch (SECRET_STORAGE_MODE) {
         case "plain":
             return secret;
@@ -137,7 +137,7 @@ public final class MCRAccessKeyManager {
      * @param accessKey access key with secret
      * @throws MCRException key is not valid
      */
-    public static synchronized void createAccessKey(final MCRObjectID objectId, final MCRAccessKey accessKey)
+    public static synchronized void createAccessKey(MCRObjectID objectId, MCRAccessKey accessKey)
         throws MCRException {
         final String secret = accessKey.getSecret();
         if (secret == null || !isValidSecret(secret)) {
@@ -162,7 +162,7 @@ public final class MCRAccessKeyManager {
      * @param accessKey access key with hashed secret
      * @throws MCRException key is not valid
      */
-    private static synchronized void addAccessKey(final MCRObjectID objectId, final MCRAccessKey accessKey)
+    private static synchronized void addAccessKey(MCRObjectID objectId, MCRAccessKey accessKey)
         throws MCRException {
         final String secret = accessKey.getSecret();
         if (secret == null) {
@@ -193,7 +193,7 @@ public final class MCRAccessKeyManager {
      * @param accessKeys the {@link MCRAccessKey} list
      * @throws MCRAccessKeyException key is not valid
      */
-    public static synchronized void addAccessKeys(final MCRObjectID objectId, final List<MCRAccessKey> accessKeys)
+    public static synchronized void addAccessKeys(MCRObjectID objectId, List<MCRAccessKey> accessKeys)
         throws MCRAccessKeyException {
         for (MCRAccessKey accessKey : accessKeys) { //Transaktion
             addAccessKey(objectId, accessKey);
@@ -214,7 +214,7 @@ public final class MCRAccessKeyManager {
      *
      * @param objectId the {@link MCRObjectID}
      */
-    public static void clearAccessKeys(final MCRObjectID objectId) {
+    public static void clearAccessKeys(MCRObjectID objectId) {
         MCREntityManagerProvider.getCurrentEntityManager()
             .createNamedQuery("MCRAccessKey.clearWithObjectId")
             .setParameter("objectId", objectId)
@@ -227,7 +227,7 @@ public final class MCRAccessKeyManager {
      * @param objectId the {@link MCRObjectID}
      * @param secret the secret
      */
-    public static synchronized void removeAccessKey(final MCRObjectID objectId, final String secret)
+    public static synchronized void removeAccessKey(MCRObjectID objectId, String secret)
         throws MCRAccessKeyNotFoundException {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey == null) {
@@ -248,8 +248,8 @@ public final class MCRAccessKeyManager {
      * @param updatedAccessKey access key
      * @throws MCRException if update fails
      */
-    public static synchronized void updateAccessKey(final MCRObjectID objectId, final String secret,
-        final MCRAccessKey updatedAccessKey) throws MCRException {
+    public static synchronized void updateAccessKey(MCRObjectID objectId, String secret, MCRAccessKey updatedAccessKey)
+        throws MCRException {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey != null) {
             final String type = updatedAccessKey.getType();
@@ -293,7 +293,7 @@ public final class MCRAccessKeyManager {
      * @param secret the hashed secret 
      * @return the {@link MCRAccessKey}
      */
-    public static synchronized MCRAccessKey getAccessKeyWithSecret(final MCRObjectID objectId, final String secret) {
+    public static synchronized MCRAccessKey getAccessKeyWithSecret(MCRObjectID objectId, String secret) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final MCRAccessKey accessKey = em.createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
             .setParameter("objectId", objectId)
@@ -315,8 +315,7 @@ public final class MCRAccessKeyManager {
      * @param type the type
      * @return {@link MCRAccessKey} list
      */
-    public static synchronized List<MCRAccessKey> listAccessKeysWithType(final MCRObjectID objectId,
-        final String type) {
+    public static synchronized List<MCRAccessKey> listAccessKeysWithType(MCRObjectID objectId, String type) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
             .setParameter("objectId", objectId)

@@ -82,9 +82,8 @@ public class MCRRestObjectAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
-    public Response listAccessKeysForObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @DefaultValue("0") @QueryParam("offset") final int offset,
-        @DefaultValue("128") @QueryParam("limit") final int limit) {
+    public Response listAccessKeysForObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @DefaultValue("0") @QueryParam("offset") int offset, @DefaultValue("128") @QueryParam("limit") int limit) {
         return MCRRestAccessKeyHelper.doListAccessKeys(objectId, offset, limit);
     }
 
@@ -108,9 +107,8 @@ public class MCRRestObjectAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
-    public Response getAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public Response getAccessKeyFromObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @PathParam(PARAM_SECRET) String secret, @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding) {
         return MCRRestAccessKeyHelper.doGetAccessKey(objectId, secret, secretEncoding);
     }
 
@@ -137,8 +135,7 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response createAccessKeyForObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        final String accessKeyJson) {
+    public Response createAccessKeyForObject(@PathParam(PARAM_MCRID) MCRObjectID objectId, String accessKeyJson) {
         return MCRRestAccessKeyHelper.doCreateAccessKey(objectId, accessKeyJson, uriInfo);
     }
 
@@ -163,9 +160,9 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response updateAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String secret, final String accessKeyJson,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public Response updateAccessKeyFromObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @PathParam(PARAM_SECRET) String secret, String accessKeyJson,
+        @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding) {
         return MCRRestAccessKeyHelper.doUpdateAccessKey(objectId, secret, accessKeyJson, secretEncoding);
     }
 
@@ -187,9 +184,8 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response removeAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public Response removeAccessKeyFromObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @PathParam(PARAM_SECRET) String secret, @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding) {
         return MCRRestAccessKeyHelper.doRemoveAccessKey(objectId, secret, secretEncoding);
     }
 }

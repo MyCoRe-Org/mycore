@@ -62,7 +62,7 @@ public class MCRAccessKeyTransformer {
      * @return the {@link MCRAccessKey}
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static MCRAccessKey accessKeyFromJson(final String json)
+    public static MCRAccessKey accessKeyFromJson(String json)
         throws MCRAccessKeyTransformationException {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -79,7 +79,7 @@ public class MCRAccessKeyTransformer {
      * @return the {@link MCRAccessKey} list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static List<MCRAccessKey> accessKeysFromJson(final String json)
+    public static List<MCRAccessKey> accessKeysFromJson(String json)
         throws MCRAccessKeyTransformationException {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -96,7 +96,7 @@ public class MCRAccessKeyTransformer {
      * @return access key as json string
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static String jsonFromAccessKey(final MCRAccessKey accessKey)
+    public static String jsonFromAccessKey(MCRAccessKey accessKey)
         throws MCRAccessKeyTransformationException {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -113,7 +113,7 @@ public class MCRAccessKeyTransformer {
      * @return access keys as json array string
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static String jsonFromAccessKeys(final List<MCRAccessKey> accessKeys)
+    public static String jsonFromAccessKeys(List<MCRAccessKey> accessKeys)
         throws MCRAccessKeyTransformationException {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -176,7 +176,7 @@ public class MCRAccessKeyTransformer {
      * @return the accesskeys element with access key list as json string as content
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static Element elementFromAccessKeys(final List<MCRAccessKey> accessKeys)
+    public static Element elementFromAccessKeys(List<MCRAccessKey> accessKeys)
         throws MCRAccessKeyTransformationException {
         final String jsonString = jsonFromAccessKeys(accessKeys);
         final Element element = elementFromAccessKeysJson(jsonString);
@@ -190,7 +190,7 @@ public class MCRAccessKeyTransformer {
      * @param json the JSON
      * @return element with accesskeys name
      */
-    private static Element elementFromAccessKeysJson(final String json) {
+    private static Element elementFromAccessKeysJson(String json) {
         final Element element = new Element(ACCESS_KEY_TYPE);
         element.setText(json);
         return element;

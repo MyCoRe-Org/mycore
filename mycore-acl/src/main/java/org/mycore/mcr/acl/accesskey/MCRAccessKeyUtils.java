@@ -62,7 +62,7 @@ public class MCRAccessKeyUtils {
 
     private static Set<String> allowedSessionPermissionTypes = loadAllowedSessionPermissionTypes();
 
-    private static Set<String> parseListStringToSet(final Optional<String> listString) {
+    private static Set<String> parseListStringToSet(Optional<String> listString) {
         return listString.stream()
             .flatMap(MCRConfiguration2::splitValue)
             .collect(Collectors.toSet());
@@ -90,8 +90,8 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value or not allowed.
      */
-    public static synchronized void addAccessKeySecretForObject(final MCRSession session, final MCRObjectID objectId,
-        final String value) throws MCRException {
+    public static synchronized void addAccessKeySecretForObject(MCRSession session, MCRObjectID objectId, String value)
+        throws MCRException {
         if (!isAccessKeyForSessionAllowed()) {
             throw new MCRAccessKeyException("Access keys is not allowed.");
         }
@@ -120,8 +120,8 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value or not allowed.
      */
-    public static synchronized void addAccessKeySecret(final MCRSession session, final MCRObjectID objectId,
-        final String value) throws MCRException {
+    public static synchronized void addAccessKeySecret(MCRSession session, MCRObjectID objectId, String value)
+        throws MCRException {
         if (!isAccessKeyForSessionAllowed()) {
             throw new MCRAccessKeyException("Access keys is not allowed.");
         }
@@ -159,8 +159,8 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKeySecretForObject(final MCRUser user, final MCRObjectID objectId,
-        final String value) throws MCRException {
+    public static synchronized void addAccessKeySecretForObject(MCRUser user, MCRObjectID objectId, String value)
+        throws MCRException {
         if (isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
             final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
             final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
@@ -185,8 +185,8 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKeySecret(final MCRUser user, final MCRObjectID objectId,
-        final String value) throws MCRException {
+    public static synchronized void addAccessKeySecret(MCRUser user, MCRObjectID objectId, String value)
+        throws MCRException {
         if ("derivate".equals(objectId.getTypeId())) {
             addAccessKeySecretForObject(user, objectId, value);
         } else {
@@ -220,7 +220,7 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKeySecretToCurrentSession(final MCRObjectID objectId, final String value)
+    public static synchronized void addAccessKeySecretToCurrentSession(MCRObjectID objectId, String value)
         throws MCRException {
         addAccessKeySecret(MCRSessionMgr.getCurrentSession(), objectId, value);
     }
@@ -232,7 +232,7 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKeySecretToCurrentUser(final MCRObjectID objectId, final String value)
+    public static synchronized void addAccessKeySecretToCurrentUser(MCRObjectID objectId, String value)
         throws MCRException {
         addAccessKeySecret(MCRUserManager.getCurrentUser(), objectId, value);
     }
@@ -244,7 +244,7 @@ public class MCRAccessKeyUtils {
      * @param limit the limit
      * @return a list with all users which own at least an access key in given range
      */
-    private static List<MCRUser> listUsersWithAccessKey(final int offset, final int limit) {
+    private static List<MCRUser> listUsersWithAccessKey(int offset, int limit) {
         return MCRUserManager.listUsers(null, null, null, null, ACCESS_KEY_PREFIX + "*", offset, limit);
     }
 
@@ -292,7 +292,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the {@link MCRObjectID}
      * @return secret or null
      */
-    public static synchronized String getAccessKeySecret(final MCRSession session, final MCRObjectID objectId) {
+    public static synchronized String getAccessKeySecret(MCRSession session, MCRObjectID objectId) {
         final Object secret = session.get(getAttributeName(objectId));
         if (secret != null) {
             return (String) secret;
@@ -307,8 +307,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the {@link MCRObjectID}
      * @return secret or null
      */
-    public static synchronized String getAccessKeySecret(final MCRUserInformation userInformation,
-        final MCRObjectID objectId) {
+    public static synchronized String getAccessKeySecret(MCRUserInformation userInformation, MCRObjectID objectId) {
         return userInformation.getUserAttribute(getAttributeName(objectId));
     }
 
@@ -318,7 +317,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the {@link MCRObjectID}
      * @return secret or null
      */
-    public static synchronized String getAccessKeySecretFromCurrentSession(final MCRObjectID objectId) {
+    public static synchronized String getAccessKeySecretFromCurrentSession(MCRObjectID objectId) {
         return getAccessKeySecret(MCRSessionMgr.getCurrentSession(), objectId);
     }
 
@@ -328,7 +327,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the {@link MCRObjectID}
      * @return secret or null
      */
-    public static synchronized String getAccessKeySecretFromCurrentUser(final MCRObjectID objectId) {
+    public static synchronized String getAccessKeySecretFromCurrentUser(MCRObjectID objectId) {
         return getAccessKeySecret(MCRSessionMgr.getCurrentSession().getUserInformation(), objectId);
     }
 
@@ -338,7 +337,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the {@link MCRObjectID}
      * @return the attribute name
      */
-    private static String getAttributeName(final MCRObjectID objectId) {
+    private static String getAttributeName(MCRObjectID objectId) {
         return ACCESS_KEY_PREFIX + objectId.toString();
     }
 
@@ -349,8 +348,7 @@ public class MCRAccessKeyUtils {
      * @param objectId of a {@link MCRObjectID}
      * @return access key
      */
-    public static MCRAccessKey getLinkedAccessKey(final MCRSession session,
-        final MCRObjectID objectId) {
+    public static MCRAccessKey getLinkedAccessKey(MCRSession session, MCRObjectID objectId) {
         final String secret = getAccessKeySecret(session, objectId);
         if (secret != null) {
             return MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
@@ -365,8 +363,7 @@ public class MCRAccessKeyUtils {
      * @param objectId of a {@link MCRObjectID}
      * @return access key
      */
-    public static MCRAccessKey getLinkedAccessKey(final MCRUserInformation userInformation,
-        final MCRObjectID objectId) {
+    public static MCRAccessKey getLinkedAccessKey(MCRUserInformation userInformation, MCRObjectID objectId) {
         final String secret = getAccessKeySecret(userInformation, objectId);
         if (secret != null) {
             return MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
@@ -380,7 +377,7 @@ public class MCRAccessKeyUtils {
      * @param objectId of a {@link MCRObjectID}
      * @return access key
      */
-    public static MCRAccessKey getLinkedAccessKeyFromCurrentSession(final MCRObjectID objectId) {
+    public static MCRAccessKey getLinkedAccessKeyFromCurrentSession(MCRObjectID objectId) {
         return getLinkedAccessKey(MCRSessionMgr.getCurrentSession(), objectId);
     }
 
@@ -390,7 +387,7 @@ public class MCRAccessKeyUtils {
      * @param objectId of a {@link MCRObjectID}
      * @return access key
      */
-    public static MCRAccessKey getLinkedAccessKeyFromCurrentUser(final MCRObjectID objectId) {
+    public static MCRAccessKey getLinkedAccessKeyFromCurrentUser(MCRObjectID objectId) {
         return getLinkedAccessKey(MCRSessionMgr.getCurrentSession().getUserInformation(), objectId);
     }
 
@@ -400,7 +397,7 @@ public class MCRAccessKeyUtils {
      * @param session the {@link MCRSession}
      * @param objectId the {@link MCRObjectID}
      */
-    public static synchronized void removeAccessKeySecret(final MCRSession session, final MCRObjectID objectId) {
+    public static synchronized void removeAccessKeySecret(MCRSession session, MCRObjectID objectId) {
         session.deleteObject(getAttributeName(objectId));
         MCRAccessCacheHelper.clearPermissionCache(objectId.toString());
     }
@@ -411,7 +408,7 @@ public class MCRAccessKeyUtils {
      * @param user the {@link MCRUser}
      * @param objectId the {@link MCRObjectID}
      */
-    public static synchronized void removeAccessKeySecret(final MCRUser user, final MCRObjectID objectId) {
+    public static synchronized void removeAccessKeySecret(MCRUser user, MCRObjectID objectId) {
         user.getAttributes().removeIf(ua -> ua.getName().equals(getAttributeName(objectId)));
         MCRUserManager.updateUser(user);
         MCRAccessCacheHelper.clearPermissionCache(objectId.toString());
@@ -422,7 +419,7 @@ public class MCRAccessKeyUtils {
      *
      * @param objectId the {@link MCRObjectID}
      */
-    public static synchronized void removeAccessKeySecretFromCurrentSession(final MCRObjectID objectId) {
+    public static synchronized void removeAccessKeySecretFromCurrentSession(MCRObjectID objectId) {
         removeAccessKeySecret(MCRSessionMgr.getCurrentSession(), objectId);
     }
 
@@ -431,7 +428,7 @@ public class MCRAccessKeyUtils {
      *
      * @param objectId the {@link MCRObjectID}
      */
-    public static synchronized void removeAccessKeySecretFromCurrentUser(final MCRObjectID objectId) {
+    public static synchronized void removeAccessKeySecretFromCurrentUser(MCRObjectID objectId) {
         removeAccessKeySecret(MCRUserManager.getCurrentUser(), objectId);
     }
 
@@ -439,11 +436,11 @@ public class MCRAccessKeyUtils {
         return !allowedSessionPermissionTypes.isEmpty();
     }
 
-    public static boolean isAccessKeyForSessionAllowed(final String permission) {
+    public static boolean isAccessKeyForSessionAllowed(String permission) {
         return allowedSessionPermissionTypes.contains(permission);
     }
 
-    public static boolean isAccessKeyForObjectTypeAllowed(final String type) {
+    public static boolean isAccessKeyForObjectTypeAllowed(String type) {
         return allowedObjectTypes.contains(type);
     }
 

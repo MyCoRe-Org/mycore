@@ -39,7 +39,7 @@ public class MCRAccessKeyStrategyHelper {
      * @param permission permission
      * @return (sanitized) permission
      */
-    protected static String sanitizePermission(final String permission) {
+    protected static String sanitizePermission(String permission) {
         if (PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission)) {
             LOGGER.debug("Mapped {} to read.", permission);
             return PERMISSION_READ;
@@ -54,7 +54,7 @@ public class MCRAccessKeyStrategyHelper {
      * @param accessKey the {@link MCRAccessKey}
      * @return true if valid, otherwise false
      */
-    public static boolean verifyAccessKey(final String permission, final MCRAccessKey accessKey) {
+    public static boolean verifyAccessKey(String permission, MCRAccessKey accessKey) {
         final String sanitizedPermission = sanitizePermission(permission);
         if (PERMISSION_READ.equals(sanitizedPermission) || PERMISSION_WRITE.equals(sanitizedPermission)) {
             if (Boolean.FALSE.equals(accessKey.getIsActive())) {

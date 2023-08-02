@@ -52,7 +52,7 @@ public class MCRAccessKeyCommands {
 
     @MCRCommand(syntax = "clear all access keys for {0}",
         help = "Clears all access keys for MCRObject/Derivate {0}")
-    public static void clearAccessKeys(final String objectIdString) throws MCRException {
+    public static void clearAccessKeys(String objectIdString) throws MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         if (!MCRMetadataManager.exists(objectId)) {
             throw new MCRException("MCRObject/Derivate doesn't exists.");
@@ -63,7 +63,7 @@ public class MCRAccessKeyCommands {
 
     @MCRCommand(syntax = "create access key for {0} from file {1}",
         help = "Creates an access key {0} for MCRObject/Derivate from file {1} in json format")
-    public static void createAccessKey(final String objectIdString, final String pathString)
+    public static void createAccessKey(String objectIdString, String pathString)
         throws IOException, MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         if (!MCRMetadataManager.exists(objectId)) {
@@ -77,7 +77,7 @@ public class MCRAccessKeyCommands {
     @MCRCommand(syntax = "update access key for {0} with secret {1} from file {2}",
         help = "Updates an access key for MCRObject/Derivate {0}"
             + " with (hashed) secret {1} from file {2} in json format")
-    public static void updateAccessKey(final String objectIdString, final String secret, final String pathString)
+    public static void updateAccessKey(String objectIdString, String secret, String pathString)
         throws IOException, MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         if (!MCRMetadataManager.exists(objectId)) {
@@ -90,7 +90,7 @@ public class MCRAccessKeyCommands {
 
     @MCRCommand(syntax = "delete access key for {0} with secret {1}",
         help = "Deletes an access key for MCRObject/Derivate {0} with (hashed) secret {1}")
-    public static void removeAccessKey(final String objectIdString, final String secret) throws MCRException {
+    public static void removeAccessKey(String objectIdString, String secret) throws MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         if (!MCRMetadataManager.exists(objectId)) {
             throw new MCRException("MCRObject/Derivate doesn't exists.");
@@ -101,7 +101,7 @@ public class MCRAccessKeyCommands {
 
     @MCRCommand(syntax = "import access keys for {0} from file {1}",
         help = "Imports access keys for MCRObject/Derivate {0} from file {1} in json array format")
-    public static void importAccessKeysFromFile(final String objectIdString, final String pathString)
+    public static void importAccessKeysFromFile(String objectIdString, String pathString)
         throws IOException, MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         if (!MCRMetadataManager.exists(objectId)) {
@@ -116,7 +116,7 @@ public class MCRAccessKeyCommands {
 
     @MCRCommand(syntax = "export access keys for {0} to file {1}",
         help = "Exports access keys for MCRObject/Derivate {0} to file {1} in json array format")
-    public static void exportAccessKeysToFile(final String objectIdString, final String pathString)
+    public static void exportAccessKeysToFile(String objectIdString, String pathString)
         throws IOException, MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         if (!MCRMetadataManager.exists(objectId)) {
@@ -138,13 +138,13 @@ public class MCRAccessKeyCommands {
 
     @MCRCommand(syntax = "hash access key secret {0} for {1}",
         help = "Hashes secret {0} for MCRObject/Derivate {1}")
-    public static void hashSecret(final String secret, final String objectIdString) throws MCRException {
+    public static void hashSecret(String secret, String objectIdString) throws MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         final String result = MCRAccessKeyManager.hashSecret(secret, objectId);
         LOGGER.info("Hashed secret for {}: '{}'.", objectIdString, result);
     }
 
-    private static MCRAccessKey readAccessKeyFromFile(final String pathString) throws IOException, MCRException {
+    private static MCRAccessKey readAccessKeyFromFile(String pathString) throws IOException, MCRException {
         final Path path = Path.of(pathString);
         final String accessKeyJson = Files.readString(path, UTF_8);
         return MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);

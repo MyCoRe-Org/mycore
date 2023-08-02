@@ -50,15 +50,14 @@ public class MCRRestAccessKeyHelper {
      */
     protected static final String QUERY_PARAM_SECRET_ENCODING = "secret_encoding";
 
-    private static WebApplicationException getUnknownObjectException(final MCRObjectID objectId) {
+    private static WebApplicationException getUnknownObjectException(MCRObjectID objectId) {
         return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
             .withMessage(objectId + " does not exist!")
             .withErrorCode("objectNotFound")
             .toException();
     }
 
-    protected static Response doCreateAccessKey(final MCRObjectID objectId, final String accessKeyJson,
-        final UriInfo uriInfo) {
+    protected static Response doCreateAccessKey(MCRObjectID objectId, String accessKeyJson, UriInfo uriInfo) {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
@@ -68,8 +67,7 @@ public class MCRRestAccessKeyHelper {
         return Response.created(uriInfo.getAbsolutePathBuilder().path(encodedSecret).build()).build();
     }
 
-    protected static Response doGetAccessKey(final MCRObjectID objectId, final String secret,
-        final String secretEncoding) {
+    protected static Response doGetAccessKey(MCRObjectID objectId, String secret, String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
@@ -85,7 +83,7 @@ public class MCRRestAccessKeyHelper {
         throw new MCRAccessKeyNotFoundException("Key does not exist.");
     }
 
-    protected static Response doListAccessKeys(final MCRObjectID objectId, final int offset, final int limit) {
+    protected static Response doListAccessKeys(MCRObjectID objectId, int offset, int limit) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
@@ -97,8 +95,7 @@ public class MCRRestAccessKeyHelper {
         return Response.ok(new MCRAccessKeyInformation(accessKeysResult, accessKeys.size())).build();
     }
 
-    protected static Response doRemoveAccessKey(final MCRObjectID objectId, final String secret,
-        final String secretEncoding) {
+    protected static Response doRemoveAccessKey(MCRObjectID objectId, String secret, String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
@@ -110,8 +107,8 @@ public class MCRRestAccessKeyHelper {
         return Response.noContent().build();
     }
 
-    protected static Response doUpdateAccessKey(final MCRObjectID objectId, final String secret,
-        final String accessKeyJson, final String secretEncoding) {
+    protected static Response doUpdateAccessKey(MCRObjectID objectId, String secret, String accessKeyJson,
+        String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
@@ -124,7 +121,7 @@ public class MCRRestAccessKeyHelper {
         return Response.noContent().build();
     }
 
-    private static String decode(final String text, final String encoding) {
+    private static String decode(String text, String encoding) {
         if ("base64url".equals(encoding)) {
             return new String(Base64.getUrlDecoder().decode(text.getBytes(UTF_8)), UTF_8);
         }

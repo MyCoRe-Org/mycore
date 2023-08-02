@@ -113,7 +113,7 @@ public class MCRAccessKey {
      * @param secret the secret the user must know to acquire permission.
      * @param type the type of permission.
      */
-    public MCRAccessKey(final String secret, final String type) {
+    public MCRAccessKey(String secret, String type) {
         this();
         setSecret(secret);
         setType(type);
@@ -134,7 +134,7 @@ public class MCRAccessKey {
     /**
      * @param objectId the {@link MCRObjectID} to set
      */
-    public void setObjectId(final MCRObjectID objectId) {
+    public void setObjectId(MCRObjectID objectId) {
         this.objectId = objectId;
     }
 
@@ -169,7 +169,7 @@ public class MCRAccessKey {
     /**
      * @param secret key secret
      */
-    public void setSecret(final String secret) {
+    public void setSecret(String secret) {
         this.secret = secret;
     }
 
@@ -201,7 +201,7 @@ public class MCRAccessKey {
     /**
      * @param isActive the state
      */
-    public void setIsActive(final Boolean isActive) {
+    public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -216,7 +216,7 @@ public class MCRAccessKey {
     /**
      * @param expiration the expiration date
      */
-    public void setExpiration(final Date expiration) {
+    public void setExpiration(Date expiration) {
 
         this.expiration = expiration;
     }
@@ -247,7 +247,7 @@ public class MCRAccessKey {
     /**
      * @param created date of creation
      */
-    public void setCreated(final Date created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 
@@ -262,7 +262,7 @@ public class MCRAccessKey {
     /**
      * @param createdBy name of creator
      */
-    public void setCreatedBy(final String createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -278,7 +278,7 @@ public class MCRAccessKey {
      * @param lastModified date of last modification
      */
     @Column(name = "lastModified")
-    public void setLastModified(final Date lastModified) {
+    public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -293,7 +293,7 @@ public class MCRAccessKey {
     /**
      * @param lastModifiedBy name of last modifier
      */
-    public void setLastModifiedBy(final String lastModifiedBy) {
+    public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 

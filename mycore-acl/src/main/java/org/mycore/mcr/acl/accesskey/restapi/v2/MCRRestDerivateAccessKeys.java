@@ -89,9 +89,9 @@ public class MCRRestDerivateAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
-    public Response listAccessKeysForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @DefaultValue("0") @QueryParam("offset") final int offset,
-        @DefaultValue("128") @QueryParam("limit") final int limit) {
+    public Response listAccessKeysForDerivate(@PathParam(PARAM_DERID) MCRObjectID derivateId,
+        @DefaultValue("0") @QueryParam("offset") int offset,
+        @DefaultValue("128") @QueryParam("limit") int limit) {
         MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doListAccessKeys(derivateId, offset, limit);
     }
@@ -116,9 +116,8 @@ public class MCRRestDerivateAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
-    public Response getAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public Response getAccessKeyFromDerivate(@PathParam(PARAM_DERID) MCRObjectID derivateId,
+        @PathParam(PARAM_SECRET) String secret, @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding) {
         MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doGetAccessKey(derivateId, secret, secretEncoding);
     }
@@ -146,8 +145,7 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response createAccessKeyForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        final String accessKeyJson) {
+    public Response createAccessKeyForDerivate(@PathParam(PARAM_DERID) MCRObjectID derivateId, String accessKeyJson) {
         MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doCreateAccessKey(derivateId, accessKeyJson, uriInfo);
     }
@@ -173,9 +171,9 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response updateAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String encodedSecret, final String accessKeyJson,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public Response updateAccessKeyFromDerivate(@PathParam(PARAM_DERID) MCRObjectID derivateId,
+        @PathParam(PARAM_SECRET) String encodedSecret, String accessKeyJson,
+        @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding) {
         MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doUpdateAccessKey(derivateId, encodedSecret, accessKeyJson, secretEncoding);
     }
@@ -198,9 +196,8 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response removeAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public Response removeAccessKeyFromDerivate(@PathParam(PARAM_DERID) MCRObjectID derivateId,
+        @PathParam(PARAM_SECRET) String secret, @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding) {
         MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, secret, secretEncoding);
     }

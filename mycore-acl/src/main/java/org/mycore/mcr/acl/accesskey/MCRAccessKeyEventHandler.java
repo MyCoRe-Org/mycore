@@ -94,7 +94,7 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
      * Then the servlag will be deleted.
      * @param obj the {@link MCRBase}
      */
-    private void handleBaseCreated(final MCRBase obj) {
+    private void handleBaseCreated(MCRBase obj) {
         final MCRObjectService service = obj.getService();
         try {
             final List<MCRAccessKey> accessKeys = MCRAccessKeyTransformer
@@ -114,7 +114,7 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
      * {@link MCRAccessKey} string will not handled
      * @param obj the {@link MCRBase}
      */
-    private void handleBaseUpdated(final MCRBase obj) {
+    private void handleBaseUpdated(MCRBase obj) {
         final MCRObjectService service = obj.getService();
         service.removeFlags(MCRAccessKeyTransformer.ACCESS_KEY_TYPE);
     }
@@ -124,7 +124,7 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
      *
      * @param obj the {@link MCRBase}
      */
-    private void handleBaseDeleted(final MCRBase obj) {
+    private void handleBaseDeleted(MCRBase obj) {
         MCRAccessKeyManager.clearAccessKeys(obj.getId());
     }
 }
