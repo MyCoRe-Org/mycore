@@ -28,7 +28,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
@@ -45,8 +44,6 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidTypeException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
-import jakarta.persistence.EntityManager;
-
 /**
  * Methods to manage {@link MCRAccessKey}.
  */
@@ -62,6 +59,8 @@ public final class MCRAccessKeyManager {
     private static final int HASHING_ITERATIONS = MCRConfiguration2
         .getInt(SECRET_STORAGE_MODE_PROP_PREFX + ".Hash.Iterations").orElse(1000);
 
+    private static final MCRAccessKeyDAO DAO = new MCRAccessKeyDAO();
+
     /**
      * Returns all access keys for given {@link MCRObjectID}.
      *
@@ -69,14 +68,7 @@ public final class MCRAccessKeyManager {
      * @return {@link MCRAccessKey} list
      */
     public static synchronized List<MCRAccessKey> listAccessKeys(MCRObjectID objectId) {
-        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
-            .getResultList();
-        for (MCRAccessKey accessKey : accessKeys) {
-            em.detach(accessKey);
-        }
-        return accessKeys;
+        return (List) DAO.findAll(objectId);
     }
 
     /**
@@ -135,10 +127,11 @@ public final class MCRAccessKeyManager {
      *
      * @param objectId the {@link MCRObjectID}
      * @param accessKey access key with secret
-     * @throws MCRException key is not valid
+     * @throws MCRAccessKeyInvalidSecretException secret is not valid
+     * @throws MCRAccessKeyNotFoundException if key does not exist
+     * @throws MCRAccessKeyCollisionException if secret exists for {@link MCRObjectID}
      */
-    public static synchronized void createAccessKey(MCRObjectID objectId, MCRAccessKey accessKey)
-        throws MCRException {
+    public static synchronized void createAccessKey(MCRObjectID objectId, MCRAccessKey accessKey) {
         final String secret = accessKey.getSecret();
         if (secret == null || !isValidSecret(secret)) {
             throw new MCRAccessKeyInvalidSecretException("Incorrect secret.");
@@ -155,58 +148,21 @@ public final class MCRAccessKeyManager {
     }
 
     /**
-     * Adds a {@link MCRAccessKey} for given {@link MCRObjectID}.
-     * Checks for a {@link MCRAccessKey} collision
-     *
-     * @param objectId the {@link MCRObjectID}
-     * @param accessKey access key with hashed secret
-     * @throws MCRException key is not valid
-     */
-    private static synchronized void addAccessKey(MCRObjectID objectId, MCRAccessKey accessKey)
-        throws MCRException {
-        final String secret = accessKey.getSecret();
-        if (secret == null) {
-            LOGGER.debug("Incorrect secret.");
-            throw new MCRAccessKeyInvalidSecretException("Incorrect secret.");
-        }
-        final String type = accessKey.getType();
-        if (type == null || !isValidType(type)) {
-            LOGGER.debug("Invalid permission type.");
-            throw new MCRAccessKeyInvalidTypeException("Invalid permission type.");
-        }
-        if (getAccessKeyWithSecret(objectId, secret) == null) {
-            accessKey.setId(0); //prevent collision
-            accessKey.setObjectId(objectId);
-            final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-            em.persist(accessKey);
-            em.detach(accessKey);
-        } else {
-            LOGGER.debug("Key collision.");
-            throw new MCRAccessKeyCollisionException("Key collision.");
-        }
-    }
-
-    /**
      * Adds {@link MCRAccessKey} list for given {@link MCRObjectID}.
-     *
+     * 
      * @param objectId the {@link MCRObjectID}
      * @param accessKeys the {@link MCRAccessKey} list
      * @throws MCRAccessKeyException key is not valid
      */
-    public static synchronized void addAccessKeys(MCRObjectID objectId, List<MCRAccessKey> accessKeys)
-        throws MCRAccessKeyException {
-        for (MCRAccessKey accessKey : accessKeys) { //Transaktion
-            addAccessKey(objectId, accessKey);
-        }
+    public static synchronized void addAccessKeys(MCRObjectID objectId, List<MCRAccessKey> accessKeys) {
+        accessKeys.forEach(a -> addAccessKey(objectId, a));
     }
 
     /**
      * Deletes all {@link MCRAccessKey}.
      */
     public static void clearAccessKeys() {
-        MCREntityManagerProvider.getCurrentEntityManager()
-            .createNamedQuery("MCRAccessKey.clear")
-            .executeUpdate();
+        DAO.deleteAll();
     }
 
     /**
@@ -215,10 +171,7 @@ public final class MCRAccessKeyManager {
      * @param objectId the {@link MCRObjectID}
      */
     public static void clearAccessKeys(MCRObjectID objectId) {
-        MCREntityManagerProvider.getCurrentEntityManager()
-            .createNamedQuery("MCRAccessKey.clearWithObjectId")
-            .setParameter("objectId", objectId)
-            .executeUpdate();
+        DAO.deleteAll(objectId);
     }
 
     /**
@@ -226,17 +179,16 @@ public final class MCRAccessKeyManager {
      *
      * @param objectId the {@link MCRObjectID}
      * @param secret the secret
+     * @throws MCRAccessKeyNotFoundException if key does not exist
      */
-    public static synchronized void removeAccessKey(MCRObjectID objectId, String secret)
-        throws MCRAccessKeyNotFoundException {
+    public static synchronized void removeAccessKey(MCRObjectID objectId, String secret) {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey == null) {
             LOGGER.debug("Key does not exist.");
             throw new MCRAccessKeyNotFoundException("Key does not exist.");
         } else {
             MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
-            final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-            em.remove(em.contains(accessKey) ? accessKey : em.merge(accessKey));
+            DAO.delete(accessKey);
         }
     }
 
@@ -246,10 +198,11 @@ public final class MCRAccessKeyManager {
      * @param objectId the {@link MCRObjectID}
      * @param secret the access key secret 
      * @param updatedAccessKey access key
-     * @throws MCRException if update fails
+     * @throws MCRAccessKeyNotFoundException if key does not exist
+     * @throws MCRAccessKeyInvalidTypeException if type is invalid
      */
-    public static synchronized void updateAccessKey(MCRObjectID objectId, String secret, MCRAccessKey updatedAccessKey)
-        throws MCRException {
+    public static synchronized void updateAccessKey(MCRObjectID objectId, String secret,
+        MCRAccessKey updatedAccessKey) {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey != null) {
             final String type = updatedAccessKey.getType();
@@ -259,7 +212,7 @@ public final class MCRAccessKeyManager {
                     accessKey.setType(type);
                 } else {
                     LOGGER.debug("Unkown Type.");
-                    throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
+                    throw new MCRAccessKeyInvalidTypeException("Unknown type.");
                 }
             }
             final Boolean isActive = updatedAccessKey.getIsActive();
@@ -278,8 +231,7 @@ public final class MCRAccessKeyManager {
             }
             accessKey.setLastModifiedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             accessKey.setLastModified(new Date());
-            final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-            em.merge(accessKey);
+            DAO.update(accessKey);
         } else {
             LOGGER.debug("Key does not exist.");
             throw new MCRAccessKeyNotFoundException("Key does not exist.");
@@ -291,21 +243,10 @@ public final class MCRAccessKeyManager {
      *
      * @param objectId the {@link MCRObjectID}
      * @param secret the hashed secret 
-     * @return the {@link MCRAccessKey}
+     * @return the {@link MCRAccessKey} or null
      */
     public static synchronized MCRAccessKey getAccessKeyWithSecret(MCRObjectID objectId, String secret) {
-        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final MCRAccessKey accessKey = em.createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
-            .setParameter("secret", secret)
-            .getResultList()
-            .stream()
-            .findFirst()
-            .orElse(null);
-        if (accessKey != null) {
-            em.detach(accessKey);
-        }
-        return accessKey;
+        return DAO.findBySecret(objectId, secret);
     }
 
     /**
@@ -316,14 +257,27 @@ public final class MCRAccessKeyManager {
      * @return {@link MCRAccessKey} list
      */
     public static synchronized List<MCRAccessKey> listAccessKeysWithType(MCRObjectID objectId, String type) {
-        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
-            .setParameter("type", type)
-            .getResultList();
-        for (MCRAccessKey accessKey : accessKeys) {
-            em.detach(accessKey);
+        return (List) DAO.findAllByType(objectId, type);
+    }
+
+    private static synchronized void addAccessKey(MCRObjectID objectId, MCRAccessKey accessKey) {
+        final String secret = accessKey.getSecret();
+        if (secret == null) {
+            LOGGER.debug("Incorrect secret.");
+            throw new MCRAccessKeyInvalidSecretException("Incorrect secret.");
         }
-        return accessKeys;
+        final String type = accessKey.getType();
+        if (type == null || !isValidType(type)) {
+            LOGGER.debug("Invalid permission type.");
+            throw new MCRAccessKeyInvalidTypeException("Invalid permission type.");
+        }
+        if (getAccessKeyWithSecret(objectId, secret) == null) {
+            accessKey.setId(0); //prevent collision
+            accessKey.setObjectId(objectId);
+            DAO.create(accessKey);
+        } else {
+            LOGGER.debug("Key collision.");
+            throw new MCRAccessKeyCollisionException("Key collision.");
+        }
     }
 }
