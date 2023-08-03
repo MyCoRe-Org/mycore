@@ -37,12 +37,18 @@ import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+/**
+ * Provides CLI interface for {@link MCRAccessKey}s.
+ */
 @MCRCommandGroup(
     name = "Access keys")
 public class MCRAccessKeyCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Removes all {@link MCRAccessKey}s.
+     */
     @MCRCommand(syntax = "clear all access keys",
         help = "Clears all access keys")
     public static void clearAccessKeys() {
@@ -50,6 +56,11 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Cleared all access keys.");
     }
 
+    /**
+     * Removes all {@link MCRAccessKey}s for {@link MCRObjectID}.
+     * 
+     * @param objectIdString the MCRObjectID as String
+     */
     @MCRCommand(syntax = "clear all access keys for {0}",
         help = "Clears all access keys for MCRObject/Derivate {0}")
     public static void clearAccessKeys(String objectIdString) {
@@ -61,6 +72,14 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Cleared all access keys of {}.", objectIdString);
     }
 
+    /**
+     * Creates {@link MCRAccessKey} from path for {@link MCRObjectID}.
+     * 
+     * @param objectIdString the MCRObjectID as String
+     * @param pathString the path
+     * @throws IOException if path is invalid
+     * @throws MCRException if object does not exist
+     */
     @MCRCommand(syntax = "create access key for {0} from file {1}",
         help = "Creates an access key {0} for MCRObject/Derivate from file {1} in json format")
     public static void createAccessKey(String objectIdString, String pathString) throws IOException {
@@ -73,6 +92,15 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Created access key for {}.", objectIdString);
     }
 
+    /**
+     * Updates {@link MCRAccessKey} from path for {@link MCRObjectID} by secret.
+     * 
+     * @param objectIdString the MCRObjectID as String
+     * @param secret the secret
+     * @param pathString the path
+     * @throws IOException if path is invalid
+     * @throws MCRException if object does not exist
+     */
     @MCRCommand(syntax = "update access key for {0} with secret {1} from file {2}",
         help = "Updates an access key for MCRObject/Derivate {0}"
             + " with (hashed) secret {1} from file {2} in json format")
@@ -86,6 +114,13 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Updated access key ({}) for {}.", secret, objectIdString);
     }
 
+    /**
+     * Removes {@link MCRAccessKey} for {@link MCRObjectID} by secret.
+     * 
+     * @param objectIdString the MCRObjectID as String
+     * @param secret the secret
+     * @throws MCRException if object does not exist
+     */
     @MCRCommand(syntax = "delete access key for {0} with secret {1}",
         help = "Deletes an access key for MCRObject/Derivate {0} with (hashed) secret {1}")
     public static void removeAccessKey(String objectIdString, String secret) {
@@ -97,6 +132,14 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Deleted access key ({}) for {}.", secret, objectIdString);
     }
 
+    /**
+     * Imports List of {@link MCRAccessKey} specified by path for {@link MCRObjectID}.
+     * 
+     * @param objectIdString the MCRObjectID as String
+     * @param pathString the path
+     * @throws IOException if path is invalid
+     * @throws MCRException if object does not exist
+     */
     @MCRCommand(syntax = "import access keys for {0} from file {1}",
         help = "Imports access keys for MCRObject/Derivate {0} from file {1} in json array format")
     public static void importAccessKeysFromFile(String objectIdString, String pathString) throws IOException {
@@ -111,6 +154,14 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Imported access keys for {} from file {}.", objectIdString, pathString);
     }
 
+    /**
+     * Exports {@link MCRAccessKey} for {@link MCRObjectID} to path.
+     * 
+     * @param objectIdString the MCRObjectID as String
+     * @param pathString the path
+     * @throws IOException if path is invalid
+     * @throws MCRException if object does not exist
+     */
     @MCRCommand(syntax = "export access keys for {0} to file {1}",
         help = "Exports access keys for MCRObject/Derivate {0} to file {1} in json array format")
     public static void exportAccessKeysToFile(String objectIdString, String pathString) throws IOException {
@@ -125,6 +176,9 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Exported access keys for {} to file {}.", objectIdString, pathString);
     }
 
+    /**
+     * Removes all access key user attributes.
+     */
     @MCRCommand(syntax = "clean up access key user attributes",
         help = "Cleans all access key secret attributes of users if the corresponding key does not exist.")
     public static void cleanUp() {
@@ -132,6 +186,12 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Cleaned up access keys.");
     }
 
+    /**
+     * Hashes secret from {@link MCRObjectID}.
+     * 
+     * @param secret the secret
+     * @param objectIdString the MCRObjectID as String
+     */
     @MCRCommand(syntax = "hash access key secret {0} for {1}",
         help = "Hashes secret {0} for MCRObject/Derivate {1}")
     public static void hashSecret(String secret, String objectIdString) {

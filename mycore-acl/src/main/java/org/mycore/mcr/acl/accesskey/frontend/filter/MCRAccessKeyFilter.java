@@ -41,7 +41,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet filter that extracts access key value from query string and includes value if valid as
- * an attribute into the session
+ * an attribute into the session.
  */
 public class MCRAccessKeyFilter implements Filter {
 
@@ -85,7 +85,7 @@ public class MCRAccessKeyFilter implements Filter {
 
     @Override
     public void destroy() {
-        //not needed
+        // not required
     }
 
     private String getFilterName() {

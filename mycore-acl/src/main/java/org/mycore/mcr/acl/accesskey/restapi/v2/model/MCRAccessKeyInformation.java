@@ -24,30 +24,59 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+/**
+ * REST Model for {@link MCRAccessKey}.
+ */
 public class MCRAccessKeyInformation {
 
     private List<MCRAccessKey> accessKeys;
 
     private int totalAccessKeyCount;
 
+    /**
+     * Creates MCRAccessKeyInformation with List of {@link MCRAccessKey}s and total count.
+     * 
+     * @param accessKeys List of MCRAccessKey
+     * @param totalAccessKeyCount total count
+     */
     public MCRAccessKeyInformation(List<MCRAccessKey> accessKeys, int totalAccessKeyCount) {
         setAccessKeys(accessKeys);
         setTotalAccessKeyCount(totalAccessKeyCount);
     }
 
+    /**
+     * Sets {@link MCRAccessKey}s.
+     * 
+     * @param accessKeys List of MCRAccessKey
+     */
     public void setAccessKeys(List<MCRAccessKey> accessKeys) {
         this.accessKeys = accessKeys;
     }
 
+    /**
+     * Returns List of {@link MCRAccessKey}.
+     * 
+     * @return List of MCRAccessKey
+     */
     @JsonProperty("items")
     public List<MCRAccessKey> getAccessKeys() {
         return this.accessKeys;
     }
 
+    /**
+     * Sets total count.
+     * 
+     * @param totalAccessKeyCount the total count
+     */
     public void setTotalAccessKeyCount(int totalAccessKeyCount) {
         this.totalAccessKeyCount = totalAccessKeyCount;
     }
 
+    /**
+     * Returns total count.
+     * 
+     * @return total count
+     */
     @JsonProperty("totalResults")
     public int getTotalAccessKeyCount() {
         return this.totalAccessKeyCount;

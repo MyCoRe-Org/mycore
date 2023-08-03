@@ -32,8 +32,8 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationExceptio
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 /**
- * This class contains EventHandler methods to manage access keys of
- * MCRObjects and MCRDerivates.
+ * This class contains EventHandler methods to manage {@link MCRAccessKey}s of
+ * {@link MCRObject}s and {@link MCRDerivate}s.
  * 
  */
 public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
@@ -89,10 +89,11 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * Add all {@link MCRAccessKey} from servflags to object.
-     *
+     * Add all {@link MCRAccessKey}s from servflags to object.
+     * 
      * Then the servlag will be deleted.
-     * @param obj the {@link MCRBase}
+     * 
+     * @param obj the MCRBase
      */
     private void handleBaseCreated(MCRBase obj) {
         final MCRObjectService service = obj.getService();
@@ -110,9 +111,10 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
 
     /**
      * Removes {@link MCRAccessKey} string for servflags.
-     *
+     * 
      * {@link MCRAccessKey} string will not handled
-     * @param obj the {@link MCRBase}
+     * 
+     * @param obj the link MCRBase
      */
     private void handleBaseUpdated(MCRBase obj) {
         final MCRObjectService service = obj.getService();
@@ -120,9 +122,9 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * Deletes all {@link MCRAccessKey} for given {@link MCRBase}
-     *
-     * @param obj the {@link MCRBase}
+     * Deletes all {@link MCRAccessKey}s for given {@link MCRBase}.
+     * 
+     * @param obj the MCRBase
      */
     private void handleBaseDeleted(MCRBase obj) {
         MCRAccessKeyManager.clearAccessKeys(obj.getId());

@@ -78,6 +78,16 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <!-- exclude required because of generated sources by hibernates-->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <sourceFileExcludes>
+            <exclude>**/*_.java</exclude>
+          </sourceFileExcludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>

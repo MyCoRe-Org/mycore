@@ -55,9 +55,9 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     }
 
     /**
-     * Fetches access key and checks object permission
-     *
-     * @param objectId the {@link MCRObjectID}
+     * Fetches {@link MCRAccessKey} and checks object permission for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
      * @param permission permission type
      * @return true if permitted, otherwise false
      */
@@ -81,9 +81,9 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     }
 
     /**
-     * Fetches access key and checks derivate permission
-     *
-     * @param objectId the {@link MCRObjectID}
+     * Fetches {@link MCRAccessKey} and checks derivate permission for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
      * @param permission permission type
      * @return true if permitted, otherwise false
      */

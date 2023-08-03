@@ -58,10 +58,10 @@ public final class MCRAccessKeyManager {
     private static final MCRAccessKeyDAO DAO = new MCRAccessKeyDAO();
 
     /**
-     * Returns all access keys for given {@link MCRObjectID}.
-     *
-     * @param objectId the {@link MCRObjectID}
-     * @return {@link MCRAccessKey} list
+     * Returns all {@link MCRAccessKey} for given {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
+     * @return MCRAccessKey list
      */
     public static synchronized List<MCRAccessKey> listAccessKeys(MCRObjectID objectId) {
         return (List) DAO.findAll(objectId);
@@ -69,9 +69,9 @@ public final class MCRAccessKeyManager {
 
     /**
      * Checks the quality of the permission.
-     *
+     * 
      * @param type permission type
-     * @return true if valid or false
+     * @return true if valid
      */
     public static boolean isValidType(String type) {
         return (MCRAccessManager.PERMISSION_READ.equals(type) || MCRAccessManager.PERMISSION_WRITE.equals(type));
@@ -79,9 +79,9 @@ public final class MCRAccessKeyManager {
 
     /**
      * Checks the quality of the secret.
-     *
+     * 
      * @param secret the secret
-     * @return true if valid or false
+     * @return true if valid
      */
     public static boolean isValidSecret(String secret) {
         return secret.length() > 0;
@@ -89,9 +89,9 @@ public final class MCRAccessKeyManager {
 
     /**
      * Encrypts secret and uses {@link MCRObjectID} as salt.
-     *
+     * 
      * @param secret the secret
-     * @param objectId the {@link MCRObjectID}
+     * @param objectId the MCRObjectID
      * @return hashed secret
      * @throws MCRException if encryption fails
      */
@@ -119,13 +119,12 @@ public final class MCRAccessKeyManager {
 
     /**
      * Creates a {@link MCRAccessKey} for given {@link MCRObjectID}.
-     * Hashed the secret
-     *
-     * @param objectId the {@link MCRObjectID}
-     * @param accessKey access key with secret
-     * @throws MCRAccessKeyInvalidSecretException secret is not valid
+     * 
+     * @param objectId the MCRObjectID
+     * @param accessKey the MCRAccessKey
+     * @throws MCRAccessKeyInvalidSecretException if secret is not valid
      * @throws MCRAccessKeyNotFoundException if key does not exist
-     * @throws MCRAccessKeyCollisionException if secret exists for {@link MCRObjectID}
+     * @throws MCRAccessKeyCollisionException if secret exists for MCRObjectID
      */
     public static synchronized void createAccessKey(MCRObjectID objectId, MCRAccessKey accessKey) {
         final String secret = accessKey.getSecret();
@@ -146,9 +145,9 @@ public final class MCRAccessKeyManager {
     /**
      * Adds {@link MCRAccessKey} list for given {@link MCRObjectID}.
      * 
-     * @param objectId the {@link MCRObjectID}
-     * @param accessKeys the {@link MCRAccessKey} list
-     * @throws MCRAccessKeyException key is not valid
+     * @param objectId the MCRObjectID
+     * @param accessKeys the MCRAccessKey list
+     * @throws MCRAccessKeyException if key is not valid
      */
     public static synchronized void addAccessKeys(MCRObjectID objectId, List<MCRAccessKey> accessKeys) {
         accessKeys.forEach(a -> addAccessKey(objectId, a));
@@ -163,8 +162,8 @@ public final class MCRAccessKeyManager {
 
     /**
      * Deletes the all {@link MCRAccessKey} for given {@link MCRObjectID}.
-     *
-     * @param objectId the {@link MCRObjectID}
+     * 
+     * @param objectId the MCRObjectID
      */
     public static void clearAccessKeys(MCRObjectID objectId) {
         DAO.deleteAll(objectId);
@@ -172,10 +171,10 @@ public final class MCRAccessKeyManager {
 
     /**
      * Removes {@link MCRAccessKey} for given {@link MCRObjectID} and secret.
-     *
-     * @param objectId the {@link MCRObjectID}
+     * 
+     * @param objectId the MCRObjectID
      * @param secret the secret
-     * @throws MCRAccessKeyNotFoundException if key does not exist
+     * @throws MCRAccessKeyNotFoundException if MCRAccessKey does not exist
      */
     public static synchronized void removeAccessKey(MCRObjectID objectId, String secret) {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
@@ -188,11 +187,11 @@ public final class MCRAccessKeyManager {
     }
 
     /**
-     * Updates {@link MCRAccessKey}
-     *
-     * @param objectId the {@link MCRObjectID}
-     * @param secret the access key secret 
-     * @param updatedAccessKey access key
+     * Updates {@link MCRAccessKey}.
+     * 
+     * @param objectId the MCRObjectID
+     * @param secret the secret 
+     * @param updatedAccessKey the MCRAccessKey
      * @throws MCRAccessKeyNotFoundException if key does not exist
      * @throws MCRAccessKeyInvalidTypeException if type is invalid
      */
@@ -232,22 +231,22 @@ public final class MCRAccessKeyManager {
     }
 
     /**
-     * Return the {@link MCRAccessKey} for given {@link MCRObjectID} and secret.
-     *
-     * @param objectId the {@link MCRObjectID}
+     * Returns the {@link MCRAccessKey} for given {@link MCRObjectID} and secret.
+     * 
+     * @param objectId the MCRObjectID
      * @param secret the hashed secret 
-     * @return the {@link MCRAccessKey} or null
+     * @return the MCRAccessKey or null
      */
     public static synchronized MCRAccessKey getAccessKeyWithSecret(MCRObjectID objectId, String secret) {
         return DAO.findBySecret(objectId, secret);
     }
 
     /**
-     * Return the access keys for given {@link MCRObjectID} and type.
-     *
-     * @param objectId the {@link MCRObjectID}
+     * Returns the {@link MCRAccessKey}s for given {@link MCRObjectID} and type.
+     * 
+     * @param objectId the MCRObjectID
      * @param type the type
-     * @return {@link MCRAccessKey} list
+     * @return MCRAccessKey list
      */
     public static synchronized List<MCRAccessKey> listAccessKeysWithType(MCRObjectID objectId, String type) {
         return (List) DAO.findAllByType(objectId, type);

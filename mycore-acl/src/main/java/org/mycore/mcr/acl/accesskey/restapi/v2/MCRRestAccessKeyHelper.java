@@ -25,6 +25,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
+
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
@@ -34,19 +38,19 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
 import org.mycore.restapi.v2.MCRErrorResponse;
 
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
-
+/**
+ * Helper class for {@link org.mycore.datamodel.metadata.MCRObject}
+ * and {@link org.mycore.datamodel.metadata.MCRDerivate} endpoint.
+ */
 public class MCRRestAccessKeyHelper {
 
     /**
-     * Placeholder for the path param secret
+     * Placeholder for the path param secret.
      */
     protected static final String PARAM_SECRET = "secret";
 
     /**
-     * Placeholder for the query param secret_format
+     * Placeholder for the query param secret_format.
      */
     protected static final String QUERY_PARAM_SECRET_ENCODING = "secret_encoding";
 
@@ -57,6 +61,14 @@ public class MCRRestAccessKeyHelper {
             .toException();
     }
 
+    /**
+     * Adds {@link MCRAccessKey} for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID of MCRObject
+     * @param accessKeyJson the MCRAccessKey as json
+     * @param uriInfo the UriInfo
+     * @return the Response
+     */
     protected static Response doCreateAccessKey(MCRObjectID objectId, String accessKeyJson, UriInfo uriInfo) {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         if (!MCRMetadataManager.exists(objectId)) {
@@ -67,6 +79,14 @@ public class MCRRestAccessKeyHelper {
         return Response.created(uriInfo.getAbsolutePathBuilder().path(encodedSecret).build()).build();
     }
 
+    /**
+     * Returns {@link MCRAccessKey} with secret for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
+     * @param secret the secret
+     * @param secretEncoding the enconding of the secret
+     * @return the Response
+     */
     protected static Response doGetAccessKey(MCRObjectID objectId, String secret, String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
@@ -83,6 +103,14 @@ public class MCRRestAccessKeyHelper {
         throw new MCRAccessKeyNotFoundException("Key does not exist.");
     }
 
+    /**
+     * Returns all {@link MCRAccessKey}s for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
+     * @param offset the offset
+     * @param limit the limit
+     * @return the Response
+     */
     protected static Response doListAccessKeys(MCRObjectID objectId, int offset, int limit) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
@@ -95,6 +123,14 @@ public class MCRRestAccessKeyHelper {
         return Response.ok(new MCRAccessKeyInformation(accessKeysResult, accessKeys.size())).build();
     }
 
+    /**
+     * Removes {@link MCRAccessKey} with secret for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
+     * @param secret the secret
+     * @param secretEncoding the enconding of the secret
+     * @return the Response
+     */
     protected static Response doRemoveAccessKey(MCRObjectID objectId, String secret, String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
@@ -107,6 +143,15 @@ public class MCRRestAccessKeyHelper {
         return Response.noContent().build();
     }
 
+    /**
+     * Updates {@link MCRAccessKey} with secret for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
+     * @param secret the secret
+     * @param accessKeyJson the MCRAccessKey as json
+     * @param secretEncoding the enconding of the secret
+     * @return the Response
+     */
     protected static Response doUpdateAccessKey(MCRObjectID objectId, String secret, String accessKeyJson,
         String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {

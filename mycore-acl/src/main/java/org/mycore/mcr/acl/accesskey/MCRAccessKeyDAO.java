@@ -27,8 +27,17 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+/**
+ * DAO for {@link MCRAccessKey}.
+ */
 public class MCRAccessKeyDAO {
 
+    /**
+     * Returns {@link MCRAccessKey} Collection for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
+     * @return MCRAccessKey Collection
+     */
     public Collection<MCRAccessKey> findAll(MCRObjectID objectId) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
@@ -40,6 +49,13 @@ public class MCRAccessKeyDAO {
         return accessKeys;
     }
 
+    /**
+     * Returns {@link MCRAccessKey} for {@link MCRObjectID} and secret.
+     * 
+     * @param objectId the MCRObjectID
+     * @param secret the secret
+     * @return the MCRAccessKey or null
+     */
     public MCRAccessKey findBySecret(MCRObjectID objectId, String secret) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final MCRAccessKey accessKey = em.createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
@@ -55,6 +71,13 @@ public class MCRAccessKeyDAO {
         return accessKey;
     }
 
+    /**
+     * Returns {@link MCRAccessKey} for {@link MCRObjectID} specified by type.
+     * 
+     * @param objectId the MCRObjectID
+     * @param type the type
+     * @return MCRAccessKey Collection
+     */
     public Collection<MCRAccessKey> findAllByType(MCRObjectID objectId, String type) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
@@ -68,28 +91,51 @@ public class MCRAccessKeyDAO {
 
     }
 
+    /**
+     * Creates {@link MCRAccessKey}.
+     * 
+     * @param accessKey the MCRAccessKey
+     */
     public void create(MCRAccessKey accessKey) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.persist(accessKey);
         em.detach(accessKey);
     }
 
+    /**
+     * Updates {@link MCRAccessKey}.
+     * 
+     * @param accessKey the MCRAccessKey
+     */
     public void update(MCRAccessKey accessKey) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.merge(accessKey);
     }
 
+    /**
+     * Deletes {@link MCRAccessKey}.
+     * 
+     * @param accessKey the MCRAccessKey
+     */
     public void delete(MCRAccessKey accessKey) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.remove(em.contains(accessKey) ? accessKey : em.merge(accessKey));
     }
 
+    /**
+     * Deletes all {@link MCRAccessKey}
+     */
     public void deleteAll() {
         MCREntityManagerProvider.getCurrentEntityManager()
             .createNamedQuery("MCRAccessKey.clear")
             .executeUpdate();
     }
 
+    /**
+     * Deletes all {@link MCRAccessKey} for {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
+     */
     public void deleteAll(MCRObjectID objectId) {
         MCREntityManagerProvider.getCurrentEntityManager()
             .createNamedQuery("MCRAccessKey.clearWithObjectId")

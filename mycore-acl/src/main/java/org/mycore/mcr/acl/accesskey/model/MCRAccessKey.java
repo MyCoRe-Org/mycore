@@ -36,6 +36,12 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
+/**
+ * Model for access key.
+ * 
+ * An access keys contains a secret and a type.
+ * Value is the key secret of the key and type the permission.
+ */
 @NamedQueries({
     @NamedQuery(name = "MCRAccessKey.getWithObjectId",
         query = "SELECT k"
@@ -58,12 +64,6 @@ import jakarta.persistence.Table;
         query = "DELETE"
             + "  FROM MCRAccessKey k"),
 })
-
-/**
- * Access keys for a {@link MCRObject}.
- * An access keys contains a secret and a type.
- * Value is the key secret of the key and type the permission.
- */
 @Entity
 @Table(name = "MCRAccessKey")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -104,11 +104,14 @@ public class MCRAccessKey {
     /** The name of the last modifier */
     private String lastModifiedBy;
 
+    /**
+     * Creates blank MCRAccessKey.
+     */
     protected MCRAccessKey() {
     }
 
     /**
-     * Creates a new access key with secret and type.
+     * Creates a MCRAccessKey with secret and type.
      *
      * @param secret the secret the user must know to acquire permission.
      * @param type the type of permission.
@@ -120,7 +123,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return the linked objectId
+     * Returns the linked {@link MCRObjectID}.
+     * 
+     * @return the MCRObjectID
      */
     @JsonIgnore
     @Column(name = "object_id",
@@ -132,14 +137,18 @@ public class MCRAccessKey {
     }
 
     /**
-     * @param objectId the {@link MCRObjectID} to set
+     * Sets {@link MCRObjectID}.
+     * 
+     * @param objectId the MCRObjectID
      */
     public void setObjectId(MCRObjectID objectId) {
         this.objectId = objectId;
     }
 
     /**
-     * @return internal id
+     * Returns the intenal id.
+     * 
+     * @return the internal id
      */
     @JsonIgnore
     @Id
@@ -151,14 +160,18 @@ public class MCRAccessKey {
     }
 
     /**
-     * @param id internal id
+     * Sets the internal id.
+     * 
+     * @param id the internal id
      */
     public void setId(int id) {
         this.id = id;
     }
 
     /**
-     * @return the key secret
+     * Returns the secret.
+     * 
+     * @return the secret
      */
     @Column(name = "secret",
         nullable = false)
@@ -167,13 +180,17 @@ public class MCRAccessKey {
     }
 
     /**
-     * @param secret key secret
+     * Sets the secret.
+     * 
+     * @param secret the secret
      */
     public void setSecret(String secret) {
         this.secret = secret;
     }
 
     /**
+     * Returns the type.
+     * 
      * @return permission type 
      */
     @Column(name = "type",
@@ -183,6 +200,8 @@ public class MCRAccessKey {
     }
 
     /**
+     * Sets the type.
+     * 
      * @param type permission type
      */
     public void setType(String type) {
@@ -190,7 +209,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return active or not
+     * Returns if active.
+     * 
+     * @return true if active
      */
     @Column(name = "isActive",
         nullable = false)
@@ -199,6 +220,8 @@ public class MCRAccessKey {
     }
 
     /**
+     * Sets the state.
+     * 
      * @param isActive the state
      */
     public void setIsActive(Boolean isActive) {
@@ -206,7 +229,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return expiration date
+     * Returns the expiration date.
+     * 
+     * @return the expiration date
      */
     @Column(name = "expiration")
     public Date getExpiration() {
@@ -214,6 +239,8 @@ public class MCRAccessKey {
     }
 
     /**
+     * Sets the expiration date.
+     * 
      * @param expiration the expiration date
      */
     public void setExpiration(Date expiration) {
@@ -222,7 +249,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return comment
+     * Returns the comment.
+     * 
+     * @return the comment
      */
     @Column(name = "comment")
     public String getComment() {
@@ -230,6 +259,8 @@ public class MCRAccessKey {
     }
 
     /**
+     * Sets the comment.
+     * 
      * @param comment the comment
      */
     public void setComment(String comment) {
@@ -237,6 +268,8 @@ public class MCRAccessKey {
     }
 
     /**
+     * Returns date of creation.
+     * 
      * @return date of creation
      */
     @Column(name = "created")
@@ -245,6 +278,8 @@ public class MCRAccessKey {
     }
 
     /**
+     * Sets date of creation.
+     * 
      * @param created date of creation
      */
     public void setCreated(Date created) {
@@ -252,7 +287,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return name of creator
+     * Returns name of creator.
+     * 
+     * @return the name
      */
     @Column(name = "createdBy")
     public String getCreatedBy() {
@@ -260,14 +297,18 @@ public class MCRAccessKey {
     }
 
     /**
-     * @param createdBy name of creator
+     * Sets name of creator.
+     * 
+     * @param createdBy the name
      */
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
     /**
-     * @return date of last modification
+     * Returns date of last modification.
+     * 
+     * @return the date
      */
     @Column(name = "lastModified")
     public Date getLastModified() {
@@ -275,7 +316,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @param lastModified date of last modification
+     * Sets data of last modification.
+     * 
+     * @param lastModified the date
      */
     @Column(name = "lastModified")
     public void setLastModified(Date lastModified) {
@@ -283,7 +326,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return name of last modifier
+     * Returns name of last modifier.
+     * 
+     * @return the name
      */
     @Column(name = "lastModifiedBy")
     public String getLastModifiedBy() {
@@ -291,7 +336,9 @@ public class MCRAccessKey {
     }
 
     /**
-     * @param lastModifiedBy name of last modifier
+     * Sets name of last modifier.
+     * 
+     * @param lastModifiedBy the name
      */
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;

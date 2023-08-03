@@ -31,7 +31,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Methods for transforming {@link MCRAccessKey} between JSON.
+ * Methods to transform betwenn {@link MCRAccessKey} and JSON.
  */
 public class MCRAccessKeyTransformer {
 
@@ -57,9 +57,9 @@ public class MCRAccessKeyTransformer {
 
     /**
      * Transforms JSON to a {@link MCRAccessKey}.
-     *
+     * 
      * @param json the json
-     * @return the {@link MCRAccessKey}
+     * @return the MCRAccessKey
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
     public static MCRAccessKey accessKeyFromJson(String json)
@@ -74,9 +74,9 @@ public class MCRAccessKeyTransformer {
 
     /**
      * Transforms JSON to {@link MCRAccessKey} list.
-     *
+     * 
      * @param json the json
-     * @return the {@link MCRAccessKey} list
+     * @return the MCRAccessKey list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
     public static List<MCRAccessKey> accessKeysFromJson(String json)
@@ -91,8 +91,8 @@ public class MCRAccessKeyTransformer {
 
     /**
      * Transforms a {@link MCRAccessKey} to JSON.
-     *
-     * @param accessKey the {@link MCRAccessKey}
+     * 
+     * @param accessKey the MCRAccessKey
      * @return access key as json string
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
@@ -108,8 +108,8 @@ public class MCRAccessKeyTransformer {
 
     /**
      * Transforms a {@link MCRAccessKey} list to JSON.
-     *
-     * @param accessKeys the {@link MCRAccessKey} list
+     * 
+     * @param accessKeys the MCRAccessKey list
      * @return access keys as json array string
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
@@ -124,11 +124,11 @@ public class MCRAccessKeyTransformer {
     }
 
     /**
-     * Transforms service element to {@link MCRAccessKey} list
-     *
-     * @param objectId the linked {@link MCRObjectID}
+     * Transforms service element to {@link MCRAccessKey} list.
+     * 
+     * @param objectId the linked MCRObjectID
      * @param element the service element
-     * @return the {@link MCRAccessKey} list
+     * @return the MCRAccessKey list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
     public static List<MCRAccessKey> accessKeysFromElement(MCRObjectID objectId, Element element)
@@ -152,11 +152,11 @@ public class MCRAccessKeyTransformer {
     }
 
     /**
-     * Transforms servflag element to {@link MCRAccessKey} list
-     *
-     * @param objectId the linked {@link MCRObjectID}
+     * Transforms servflag element to {@link MCRAccessKey} list.
+     * 
+     * @param objectId the linked MCRObjectID
      * @param servFlag servlag element {@link org.mycore.datamodel.metadata.MCRObjectService}
-     * @return the {@link MCRAccessKey} list
+     * @return the MCRAccessKey list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
     private static List<MCRAccessKey> accessKeysFromAccessKeyElement(MCRObjectID objectId, Element element)
@@ -170,9 +170,9 @@ public class MCRAccessKeyTransformer {
     }
 
     /**
-     * Transforms {@link MCRAccessKey} list to a element
-     *
-     * @param accessKeys the {@link MCRAccessKey} list
+     * Transforms {@link MCRAccessKey} list to a element.
+     * 
+     * @param accessKeys the MCRAccessKey list
      * @return the accesskeys element with access key list as json string as content
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
@@ -185,8 +185,8 @@ public class MCRAccessKeyTransformer {
     }
 
     /**
-     * Transforms JSON of {@link MCRAccessKey} list to a element
-     *
+     * Transforms JSON of {@link MCRAccessKey} list to a element.
+     * 
      * @param json the JSON
      * @return element with accesskeys name
      */

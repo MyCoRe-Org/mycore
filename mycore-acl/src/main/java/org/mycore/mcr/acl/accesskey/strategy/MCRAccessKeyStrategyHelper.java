@@ -29,13 +29,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+/**
+ * Provies helper for {@link MCRAccessKeyStrategy}.
+ */
 public class MCRAccessKeyStrategyHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * maps view and preview permission to read
-     *
+     * Maps view and preview permission to read.
+     * 
      * @param permission permission
      * @return (sanitized) permission
      */
@@ -48,11 +51,11 @@ public class MCRAccessKeyStrategyHelper {
     }
 
     /**
-     * verifies {@link MCRAccessKey} for permission.
-     *
+     * Verifies {@link MCRAccessKey} for permission.
+     * 
      * @param permission permission type
-     * @param accessKey the {@link MCRAccessKey}
-     * @return true if valid, otherwise false
+     * @param accessKey the MCRAccessKey
+     * @return true if valid
      */
     public static boolean verifyAccessKey(String permission, MCRAccessKey accessKey) {
         final String sanitizedPermission = sanitizePermission(permission);

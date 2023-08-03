@@ -19,10 +19,15 @@
 package org.mycore.mcr.acl.accesskey.exception;
 
 /**
- * Exception that refers to an expired access key.
+ * Thrown to indicate that the {@link org.mycore.mcr.acl.accesskey.model.MCRAccessKey} is expired.
  */
 public class MCRAccessKeyExpiredException extends MCRAccessKeyException {
 
+    /**
+     * Constructs a MCRAccessKeyExpiredException with error message.
+     * 
+     * @param errorMessage the error message
+     */
     public MCRAccessKeyExpiredException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.expired");
     }

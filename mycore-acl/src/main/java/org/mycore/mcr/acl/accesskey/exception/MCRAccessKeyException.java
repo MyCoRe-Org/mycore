@@ -21,7 +21,7 @@ package org.mycore.mcr.acl.accesskey.exception;
 import org.mycore.common.MCRException;
 
 /**
- * Instances of this class represent a general exception related to access keys.
+ * Thrown to indicate a general exception related to access keys.
  */
 public class MCRAccessKeyException extends MCRException {
 
@@ -30,19 +30,40 @@ public class MCRAccessKeyException extends MCRException {
     */
     private String errorCode;
 
+    /**
+     * Constructs a MCRAccessKeyException with error message.
+     * 
+     * @param errorMessage the error message
+     */
     public MCRAccessKeyException(String errorMessage) {
         super(errorMessage);
     }
 
+    /**
+     * Constructs a MCRAccessKeyException with error message and error code.
+     * 
+     * @param errorMessage the error message
+     * @param errorCode the error code
+     */
     public MCRAccessKeyException(String errorMessage, String errorCode) {
         super(errorMessage);
         this.errorCode = errorCode;
     }
 
+    /**
+     * Retruns the error code.
+     * 
+     * @return the error code
+     */
     public String getErrorCode() {
         return errorCode;
     }
 
+    /**
+     * Sets the error code.
+     * 
+     * @param errorCode the error code
+     */
     public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }

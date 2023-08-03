@@ -55,6 +55,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
+/**
+ * Endpoint to manage {@link MCRAccessKey}s for {@link org.mycore.datamodel.metadata.MCRObject}.
+ */
 @MCRApiDraft("MCRAccessKey")
 @Path("/objects/{" + PARAM_MCRID + "}/accesskeys")
 @Tag(name = TAG_MYCORE_OBJECT)
@@ -63,6 +66,14 @@ public class MCRRestObjectAccessKeys {
     @Context
     UriInfo uriInfo;
 
+    /**
+     * Returns all {@link MCRAccessKey}s of {@link org.mycore.datamodel.metadata.MCRObject}.
+     * 
+     * @param objectId the MCRObjectID of MCRObject
+     * @param offset the offset
+     * @param limit the limit
+     * @return the Response
+     */
     @GET
     @Operation(
         summary = "Lists all access keys for an object",
@@ -87,6 +98,14 @@ public class MCRRestObjectAccessKeys {
         return MCRRestAccessKeyHelper.doListAccessKeys(objectId, offset, limit);
     }
 
+    /**
+     * Returns {@link MCRAccessKey} with secret of {@link org.mycore.datamodel.metadata.MCRObject}.
+     * 
+     * @param objectId the MCRObjectID of MCRObject
+     * @param secret the secret
+     * @param secretEncoding the enconding of the secret
+     * @return the Response
+     */
     @GET
     @Path("/{" + PARAM_SECRET + "}")
     @Operation(
@@ -112,6 +131,13 @@ public class MCRRestObjectAccessKeys {
         return MCRRestAccessKeyHelper.doGetAccessKey(objectId, secret, secretEncoding);
     }
 
+    /**
+     * Adds {@link MCRAccessKey} to {@link org.mycore.datamodel.metadata.MCRObject}.
+     * 
+     * @param objectId the MCRObjectID of MCRObject
+     * @param accessKeyJson the MCRAccessKey as json
+     * @return the Response
+     */
     @POST
     @Operation(
         summary = "Creates an access key for an object",
@@ -139,6 +165,15 @@ public class MCRRestObjectAccessKeys {
         return MCRRestAccessKeyHelper.doCreateAccessKey(objectId, accessKeyJson, uriInfo);
     }
 
+    /**
+     * Updates {@link MCRAccessKey} with secret of {@link org.mycore.datamodel.metadata.MCRObject}.
+     * 
+     * @param objectId the MCRObjectID of MCRObject
+     * @param secret the secret
+     * @param accessKeyJson the MCRAccessKey as json
+     * @param secretEncoding the enconding of the secret
+     * @return the Response
+     */
     @PUT
     @Path("/{" + PARAM_SECRET + "}")
     @Operation(
@@ -166,6 +201,14 @@ public class MCRRestObjectAccessKeys {
         return MCRRestAccessKeyHelper.doUpdateAccessKey(objectId, secret, accessKeyJson, secretEncoding);
     }
 
+    /**
+     * Removes {@link MCRAccessKey} with secret from {@link org.mycore.datamodel.metadata.MCRObject}.
+     * 
+     * @param objectId the MCRObjectID of MCRObject
+     * @param secret the secret
+     * @param secretEncoding the enconding of the secret
+     * @return the Response
+     */
     @DELETE
     @Path("/{" + PARAM_SECRET + "}")
     @Operation(

@@ -19,14 +19,22 @@
 package org.mycore.mcr.acl.accesskey.exception;
 
 /**
- * Exception that refers to an invalid permission type.
+ * Thrown to indicate that there is an access key with invalid type.
  */
 public class MCRAccessKeyInvalidTypeException extends MCRAccessKeyException {
 
+    /**
+     * Constructs a MCRAccessKeyInvalidTypeException with default error message.
+     */
     public MCRAccessKeyInvalidTypeException() {
         this("Invalid type");
     }
 
+    /**
+     * Constructs a MCRAccessKeyInvalidTypeException with error message.
+     * 
+     * @param errorMessage the error message
+     */
     public MCRAccessKeyInvalidTypeException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.invalidType");
     }

@@ -31,6 +31,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
+/**
+ * {@link ExceptionMapper} for {@link MCRAccessKeyException}s.
+ */
 @Provider
 public class MCRRestAccessKeyExceptionMapper implements ExceptionMapper<MCRAccessKeyException> {
 
@@ -42,6 +45,12 @@ public class MCRRestAccessKeyExceptionMapper implements ExceptionMapper<MCRAcces
         return fromException(exception);
     }
 
+    /**
+     * Creates Reponse from {@link MCRAccessKeyException}.
+     * 
+     * @param e the MCRAccessKeyException
+     * @return the Response
+     */
     public static Response fromException(MCRAccessKeyException e) {
         if (e instanceof MCRAccessKeyNotFoundException) {
             return getResponse(e, Response.Status.NOT_FOUND.getStatusCode(),

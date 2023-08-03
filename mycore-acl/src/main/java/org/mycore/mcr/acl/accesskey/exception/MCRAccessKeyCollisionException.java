@@ -19,15 +19,22 @@
 package org.mycore.mcr.acl.accesskey.exception;
 
 /**
- * Exception that refers to a collision of access keys.
- * This refers to value duplicates.
+ * Thrown to indicate that there is an {@link org.mycore.mcr.acl.accesskey.model.MCRAccessKey} collision.
  */
 public class MCRAccessKeyCollisionException extends MCRAccessKeyException {
 
+    /**
+     * Constructs a MCRAccessKeyCollisionException with default error message.
+     */
     public MCRAccessKeyCollisionException() {
         this("Key collision");
     }
 
+    /**
+     * Constructs a MCRAccessKeyCollisionException with error message.
+     * 
+     * @param errorMessage the error message
+     */
     public MCRAccessKeyCollisionException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.collision");
     }

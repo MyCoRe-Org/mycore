@@ -19,10 +19,15 @@
 package org.mycore.mcr.acl.accesskey.exception;
 
 /**
- * Exception that refers to a disabled access key.
+ * Thrown to indicate that the {@link org.mycore.mcr.acl.accesskey.model.MCRAccessKey} is disabled.
  */
 public class MCRAccessKeyDisabledException extends MCRAccessKeyException {
 
+    /**
+     * Constructs a MCRAccessKeyDisabledException with error message.
+     * 
+     * @param errorMessage the error message
+     */
     public MCRAccessKeyDisabledException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.disabled");
     }

@@ -33,6 +33,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
 import org.mycore.restapi.v2.MCRRestAuthorizationFilter;
 
+/**
+ * {@link ContainerRequestFilter} that enables {@link org.mycore.mcr.acl.accesskey.model.MCRAccessKey}
+ * for current {@link org.mycore.common.MCRSession}.
+ */
 @Provider
 @Priority(Priorities.AUTHENTICATION + 1)
 public class MCRAccessKeyFilter implements ContainerRequestFilter {
