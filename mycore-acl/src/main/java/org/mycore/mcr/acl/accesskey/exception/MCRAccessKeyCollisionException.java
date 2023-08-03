@@ -23,6 +23,11 @@ package org.mycore.mcr.acl.accesskey.exception;
  * This refers to value duplicates.
  */
 public class MCRAccessKeyCollisionException extends MCRAccessKeyException {
+
+    public MCRAccessKeyCollisionException() {
+        this("Key collision");
+    }
+
     public MCRAccessKeyCollisionException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.collision");
     }

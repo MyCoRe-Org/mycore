@@ -24,8 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -48,8 +46,6 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
  * Methods to manage {@link MCRAccessKey}.
  */
 public final class MCRAccessKeyManager {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SECRET_STORAGE_MODE_PROP_PREFX = "MCR.ACL.AccessKey.Secret.Storage.Mode";
 
@@ -134,7 +130,7 @@ public final class MCRAccessKeyManager {
     public static synchronized void createAccessKey(MCRObjectID objectId, MCRAccessKey accessKey) {
         final String secret = accessKey.getSecret();
         if (secret == null || !isValidSecret(secret)) {
-            throw new MCRAccessKeyInvalidSecretException("Incorrect secret.");
+            throw new MCRAccessKeyInvalidSecretException();
         }
         accessKey.setSecret(hashSecret(secret, objectId));
         accessKey.setCreatedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
@@ -184,8 +180,7 @@ public final class MCRAccessKeyManager {
     public static synchronized void removeAccessKey(MCRObjectID objectId, String secret) {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey == null) {
-            LOGGER.debug("Key does not exist.");
-            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+            throw new MCRAccessKeyNotFoundException();
         } else {
             MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
             DAO.delete(accessKey);
@@ -211,8 +206,7 @@ public final class MCRAccessKeyManager {
                     MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
                     accessKey.setType(type);
                 } else {
-                    LOGGER.debug("Unkown Type.");
-                    throw new MCRAccessKeyInvalidTypeException("Unknown type.");
+                    throw new MCRAccessKeyInvalidTypeException();
                 }
             }
             final Boolean isActive = updatedAccessKey.getIsActive();
@@ -233,8 +227,7 @@ public final class MCRAccessKeyManager {
             accessKey.setLastModified(new Date());
             DAO.update(accessKey);
         } else {
-            LOGGER.debug("Key does not exist.");
-            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+            throw new MCRAccessKeyNotFoundException();
         }
     }
 
@@ -263,21 +256,18 @@ public final class MCRAccessKeyManager {
     private static synchronized void addAccessKey(MCRObjectID objectId, MCRAccessKey accessKey) {
         final String secret = accessKey.getSecret();
         if (secret == null) {
-            LOGGER.debug("Incorrect secret.");
-            throw new MCRAccessKeyInvalidSecretException("Incorrect secret.");
+            throw new MCRAccessKeyInvalidSecretException();
         }
         final String type = accessKey.getType();
         if (type == null || !isValidType(type)) {
-            LOGGER.debug("Invalid permission type.");
-            throw new MCRAccessKeyInvalidTypeException("Invalid permission type.");
+            throw new MCRAccessKeyInvalidTypeException();
         }
         if (getAccessKeyWithSecret(objectId, secret) == null) {
             accessKey.setId(0); //prevent collision
             accessKey.setObjectId(objectId);
             DAO.create(accessKey);
         } else {
-            LOGGER.debug("Key collision.");
-            throw new MCRAccessKeyCollisionException("Key collision.");
+            throw new MCRAccessKeyCollisionException();
         }
     }
 }

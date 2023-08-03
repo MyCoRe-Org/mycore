@@ -22,6 +22,11 @@ package org.mycore.mcr.acl.accesskey.exception;
  * Exception that refers to an invalid value.
  */
 public class MCRAccessKeyInvalidSecretException extends MCRAccessKeyException {
+
+    public MCRAccessKeyInvalidSecretException() {
+        this("Invalid secret");
+    }
+
     public MCRAccessKeyInvalidSecretException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.invalidSecret");
     }

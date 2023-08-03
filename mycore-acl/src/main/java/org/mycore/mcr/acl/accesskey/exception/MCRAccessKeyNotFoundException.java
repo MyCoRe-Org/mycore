@@ -22,6 +22,11 @@ package org.mycore.mcr.acl.accesskey.exception;
  * Exception that refers to an unknown access key.
  */
 public class MCRAccessKeyNotFoundException extends MCRAccessKeyException {
+
+    public MCRAccessKeyNotFoundException() {
+        this("Key does not exist");
+    }
+
     public MCRAccessKeyNotFoundException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.unknownKey");
     }

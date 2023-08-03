@@ -26,7 +26,6 @@ import javax.xml.transform.URIResolver;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
-import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
 
 /**
  * Returns a JSON string with all {@link MCRAccessKey} for an given {@link MCRObjectID}.
@@ -41,7 +40,7 @@ public class MCRAccessKeyURIResolver implements URIResolver {
      * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
      */
     @Override
-    public Source resolve(String href, String base) throws MCRAccessKeyTransformationException {
+    public Source resolve(String href, String base) {
         final MCRObjectID objectId = MCRObjectID.getInstance(href.substring(href.indexOf(":") + 1));
         final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.listAccessKeys(objectId);
         return new JDOMSource(MCRAccessKeyTransformer.elementFromAccessKeys(accessKeys));
