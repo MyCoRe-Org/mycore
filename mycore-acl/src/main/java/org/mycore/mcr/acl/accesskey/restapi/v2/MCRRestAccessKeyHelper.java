@@ -23,6 +23,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.ws.rs.WebApplicationException;
@@ -167,7 +168,7 @@ public class MCRRestAccessKeyHelper {
     }
 
     private static String decode(String text, String encoding) {
-        if ("base64url".equals(encoding)) {
+        if (Objects.equals(encoding, "base64url")) {
             return new String(Base64.getUrlDecoder().decode(text.getBytes(UTF_8)), UTF_8);
         }
         return text;

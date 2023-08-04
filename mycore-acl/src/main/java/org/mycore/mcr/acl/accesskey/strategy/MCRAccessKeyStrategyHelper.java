@@ -24,6 +24,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +44,7 @@ public class MCRAccessKeyStrategyHelper {
      * @return (sanitized) permission
      */
     protected static String sanitizePermission(String permission) {
-        if (PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission)) {
+        if (permission.equals(PERMISSION_VIEW) || permission.equals(PERMISSION_PREVIEW)) {
             LOGGER.debug("Mapped {} to read.", permission);
             return PERMISSION_READ;
         }
@@ -59,7 +60,7 @@ public class MCRAccessKeyStrategyHelper {
      */
     public static boolean verifyAccessKey(String permission, MCRAccessKey accessKey) {
         final String sanitizedPermission = sanitizePermission(permission);
-        if (PERMISSION_READ.equals(sanitizedPermission) || PERMISSION_WRITE.equals(sanitizedPermission)) {
+        if (sanitizedPermission.equals(PERMISSION_READ) || sanitizedPermission.equals(PERMISSION_WRITE)) {
             if (Boolean.FALSE.equals(accessKey.getIsActive())) {
                 return false;
             }
@@ -67,9 +68,9 @@ public class MCRAccessKeyStrategyHelper {
             if (expiration != null && new Date().after(expiration)) {
                 return false;
             }
-            if ((sanitizedPermission.equals(PERMISSION_READ)
-                && accessKey.getType().equals(PERMISSION_READ))
-                || accessKey.getType().equals(PERMISSION_WRITE)) {
+            if ((Objects.equals(sanitizedPermission, PERMISSION_READ)
+                && Objects.equals(accessKey.getType(), PERMISSION_READ))
+                || Objects.equals(accessKey.getType(), PERMISSION_WRITE)) {
                 LOGGER.debug("Access granted.");
                 return true;
             }

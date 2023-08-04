@@ -19,6 +19,7 @@
 package org.mycore.mcr.acl.accesskey.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -345,6 +346,11 @@ public class MCRAccessKey {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(objectId, type, secret);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -353,7 +359,7 @@ public class MCRAccessKey {
             return false;
         }
         MCRAccessKey other = (MCRAccessKey) o;
-        return this.id == other.getId() && this.type.equals(other.getType())
-            && this.secret.equals(other.getSecret());
+        return Objects.equals(objectId, other.getObjectId()) && Objects.equals(type, other.getType())
+            && Objects.equals(secret, other.getSecret());
     }
 }

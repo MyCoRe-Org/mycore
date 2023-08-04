@@ -23,6 +23,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
@@ -35,8 +37,8 @@ import org.mycore.crypt.MCRCipherManager;
 import org.mycore.crypt.MCRCryptKeyFileNotFoundException;
 import org.mycore.crypt.MCRCryptKeyNoPermissionException;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mcr.acl.accesskey.dao.MCRAccessKeyDAO;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
-import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidSecretException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidTypeException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
@@ -74,7 +76,8 @@ public final class MCRAccessKeyManager {
      * @return true if valid
      */
     public static boolean isValidType(String type) {
-        return (MCRAccessManager.PERMISSION_READ.equals(type) || MCRAccessManager.PERMISSION_WRITE.equals(type));
+        return Objects.equals(type, MCRAccessManager.PERMISSION_READ)
+            || Objects.equals(type, MCRAccessManager.PERMISSION_WRITE);
     }
 
     /**
@@ -123,15 +126,18 @@ public final class MCRAccessKeyManager {
      * @param objectId the MCRObjectID
      * @param accessKey the MCRAccessKey
      * @throws MCRAccessKeyInvalidSecretException if secret is not valid
-     * @throws MCRAccessKeyNotFoundException if key does not exist
+     * @throws MCRAccessKeyInvalidTypeException if type is not valid
      * @throws MCRAccessKeyCollisionException if secret exists for MCRObjectID
      */
     public static synchronized void createAccessKey(MCRObjectID objectId, MCRAccessKey accessKey) {
-        final String secret = accessKey.getSecret();
-        if (secret == null || !isValidSecret(secret)) {
-            throw new MCRAccessKeyInvalidSecretException();
-        }
+        final String secret = Optional.ofNullable(accessKey.getSecret()).filter(s -> isValidSecret(s))
+            .orElseThrow(MCRAccessKeyInvalidSecretException::new);
+        Optional.ofNullable(accessKey.getType()).filter(t -> isValidType(t))
+            .orElseThrow(MCRAccessKeyInvalidTypeException::new);
         accessKey.setSecret(hashSecret(secret, objectId));
+        if (checkAccessKeyExists(objectId, accessKey.getSecret())) {
+            throw new MCRAccessKeyCollisionException();
+        }
         accessKey.setCreatedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
         accessKey.setCreated(new Date());
         accessKey.setLastModifiedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
@@ -139,7 +145,9 @@ public final class MCRAccessKeyManager {
         if (accessKey.getIsActive() == null) {
             accessKey.setIsActive(true);
         }
-        addAccessKey(objectId, accessKey);
+        accessKey.setId(0); //prevent collision
+        accessKey.setObjectId(objectId);
+        DAO.create(accessKey);
     }
 
     /**
@@ -147,7 +155,9 @@ public final class MCRAccessKeyManager {
      * 
      * @param objectId the MCRObjectID
      * @param accessKeys the MCRAccessKey list
-     * @throws MCRAccessKeyException if key is not valid
+     * @throws MCRAccessKeyInvalidSecretException if secret is not valid
+     * @throws MCRAccessKeyInvalidTypeException if type is not valid
+     * @throws MCRAccessKeyCollisionException if secret exists for MCRObjectID
      */
     public static synchronized void addAccessKeys(MCRObjectID objectId, List<MCRAccessKey> accessKeys) {
         accessKeys.forEach(a -> addAccessKey(objectId, a));
@@ -177,13 +187,12 @@ public final class MCRAccessKeyManager {
      * @throws MCRAccessKeyNotFoundException if MCRAccessKey does not exist
      */
     public static synchronized void removeAccessKey(MCRObjectID objectId, String secret) {
-        final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
-        if (accessKey == null) {
-            throw new MCRAccessKeyNotFoundException();
-        } else {
+        Optional.ofNullable(DAO.findBySecret(objectId, secret)).ifPresentOrElse(k -> {
             MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
-            DAO.delete(accessKey);
-        }
+            DAO.delete(k);
+        }, () -> {
+            throw new MCRAccessKeyNotFoundException();
+        });
     }
 
     /**
@@ -197,31 +206,25 @@ public final class MCRAccessKeyManager {
      */
     public static synchronized void updateAccessKey(MCRObjectID objectId, String secret,
         MCRAccessKey updatedAccessKey) {
-        final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
+        final MCRAccessKey accessKey = DAO.findBySecret(objectId, secret);
         if (accessKey != null) {
-            final String type = updatedAccessKey.getType();
-            if (type != null && !accessKey.getType().equals(type)) {
-                if (isValidType(type)) {
+            Optional.ofNullable(updatedAccessKey.getType()).filter(t -> !t.equals(accessKey.getType())).ifPresent(t -> {
+                if (isValidType(t)) {
                     MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
-                    accessKey.setType(type);
+                    accessKey.setType(t);
                 } else {
                     throw new MCRAccessKeyInvalidTypeException();
                 }
-            }
-            final Boolean isActive = updatedAccessKey.getIsActive();
-            if (isActive != null) {
+            });
+            Optional.ofNullable(updatedAccessKey.getIsActive()).ifPresent(a -> {
                 MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
-                accessKey.setIsActive(isActive);
-            }
-            final Date expiration = updatedAccessKey.getExpiration();
-            if (expiration != null) {
+                accessKey.setIsActive(a);
+            });
+            Optional.ofNullable(updatedAccessKey.getExpiration()).ifPresent(e -> {
                 MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
-                accessKey.setExpiration(expiration);
-            }
-            final String comment = updatedAccessKey.getComment();
-            if (comment != null) {
-                accessKey.setComment(comment);
-            }
+                accessKey.setExpiration(e);
+            });
+            Optional.ofNullable(updatedAccessKey.getComment()).ifPresent(c -> accessKey.setComment(c));
             accessKey.setLastModifiedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             accessKey.setLastModified(new Date());
             DAO.update(accessKey);
@@ -252,16 +255,16 @@ public final class MCRAccessKeyManager {
         return (List) DAO.findAllByType(objectId, type);
     }
 
+    private static boolean checkAccessKeyExists(MCRObjectID objectId, String secret) {
+        return (DAO.findBySecret(objectId, secret) != null);
+    }
+
     private static synchronized void addAccessKey(MCRObjectID objectId, MCRAccessKey accessKey) {
-        final String secret = accessKey.getSecret();
-        if (secret == null) {
-            throw new MCRAccessKeyInvalidSecretException();
-        }
-        final String type = accessKey.getType();
-        if (type == null || !isValidType(type)) {
-            throw new MCRAccessKeyInvalidTypeException();
-        }
-        if (getAccessKeyWithSecret(objectId, secret) == null) {
+        final String secret = Optional.ofNullable(accessKey.getSecret()).filter(s -> isValidSecret(s))
+            .orElseThrow(MCRAccessKeyInvalidSecretException::new);
+        Optional.ofNullable(accessKey.getType()).filter(t -> isValidType(t))
+            .orElseThrow(MCRAccessKeyInvalidTypeException::new);
+        if (!checkAccessKeyExists(objectId, secret)) {
             accessKey.setId(0); //prevent collision
             accessKey.setObjectId(objectId);
             DAO.create(accessKey);

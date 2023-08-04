@@ -21,6 +21,7 @@ package org.mycore.mcr.acl.accesskey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.jdom2.Element;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -62,8 +63,7 @@ public class MCRAccessKeyTransformer {
      * @return the MCRAccessKey
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static MCRAccessKey accessKeyFromJson(String json)
-        throws MCRAccessKeyTransformationException {
+    public static MCRAccessKey accessKeyFromJson(String json) {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.readValue(json, MCRAccessKey.class);
@@ -79,8 +79,7 @@ public class MCRAccessKeyTransformer {
      * @return the MCRAccessKey list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static List<MCRAccessKey> accessKeysFromJson(String json)
-        throws MCRAccessKeyTransformationException {
+    public static List<MCRAccessKey> accessKeysFromJson(String json) {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
             return Arrays.asList(objectMapper.readValue(json, MCRAccessKey[].class));
@@ -96,8 +95,7 @@ public class MCRAccessKeyTransformer {
      * @return access key as json string
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static String jsonFromAccessKey(MCRAccessKey accessKey)
-        throws MCRAccessKeyTransformationException {
+    public static String jsonFromAccessKey(MCRAccessKey accessKey) {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(accessKey);
@@ -113,8 +111,7 @@ public class MCRAccessKeyTransformer {
      * @return access keys as json array string
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static String jsonFromAccessKeys(List<MCRAccessKey> accessKeys)
-        throws MCRAccessKeyTransformationException {
+    public static String jsonFromAccessKeys(List<MCRAccessKey> accessKeys) {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(accessKeys);
@@ -131,42 +128,24 @@ public class MCRAccessKeyTransformer {
      * @return the MCRAccessKey list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static List<MCRAccessKey> accessKeysFromElement(MCRObjectID objectId, Element element)
-        throws MCRAccessKeyTransformationException {
-        if (ROOT_SERVICE.equals(element.getName())) {
+    public static List<MCRAccessKey> accessKeysFromElement(MCRObjectID objectId, Element element) {
+        if (Objects.equals(element.getName(), ROOT_SERVICE)) {
             Element servFlagsRoot = element.getChild(ROOT_SERV_FLAGS);
             if (servFlagsRoot != null) {
                 final List<Element> servFlags = servFlagsRoot.getChildren(SERV_FLAG);
                 for (Element servFlag : servFlags) {
-                    if (ACCESS_KEY_TYPE.equals(servFlag.getAttributeValue("type"))) {
+                    if (Objects.equals(servFlag.getAttributeValue("type"), ACCESS_KEY_TYPE)) {
                         return accessKeysFromAccessKeyElement(objectId, servFlag);
                     }
                 }
             }
-        } else if (SERV_FLAG.equals(element.getName()) && ACCESS_KEY_TYPE.equals(element.getAttributeValue("type"))) {
+        } else if (Objects.equals(element.getName(), SERV_FLAG)
+            && Objects.equals(element.getAttributeValue("type"), ACCESS_KEY_TYPE)) {
             return accessKeysFromAccessKeyElement(objectId, element);
-        } else if (ACCESS_KEY_TYPE.equals(element.getName())) {
+        } else if (Objects.equals(element.getName(), ACCESS_KEY_TYPE)) {
             return accessKeysFromAccessKeyElement(objectId, element);
         }
         return new ArrayList<>();
-    }
-
-    /**
-     * Transforms servflag element to {@link MCRAccessKey} list.
-     * 
-     * @param objectId the linked MCRObjectID
-     * @param servFlag servlag element {@link org.mycore.datamodel.metadata.MCRObjectService}
-     * @return the MCRAccessKey list
-     * @throws MCRAccessKeyTransformationException if the transformation fails
-     */
-    private static List<MCRAccessKey> accessKeysFromAccessKeyElement(MCRObjectID objectId, Element element)
-        throws MCRAccessKeyTransformationException {
-        final String json = element.getText();
-        final List<MCRAccessKey> accessKeyList = accessKeysFromJson(json);
-        for (MCRAccessKey accessKey : accessKeyList) {
-            accessKey.setObjectId(objectId);
-        }
-        return accessKeyList;
     }
 
     /**
@@ -176,12 +155,23 @@ public class MCRAccessKeyTransformer {
      * @return the accesskeys element with access key list as json string as content
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static Element elementFromAccessKeys(List<MCRAccessKey> accessKeys)
-        throws MCRAccessKeyTransformationException {
+    public static Element elementFromAccessKeys(List<MCRAccessKey> accessKeys) {
         final String jsonString = jsonFromAccessKeys(accessKeys);
         final Element element = elementFromAccessKeysJson(jsonString);
         element.setAttribute("count", Integer.toString(accessKeys.size()));
         return element;
+    }
+
+    /**
+     * Transforms servflag element to {@link MCRAccessKey} list.
+     * 
+     * @param objectId the linked MCRObjectID
+     * @param element servlag element {@link org.mycore.datamodel.metadata.MCRObjectService}
+     * @return the MCRAccessKey list
+     * @throws MCRAccessKeyTransformationException if the transformation fails
+     */
+    private static List<MCRAccessKey> accessKeysFromAccessKeyElement(MCRObjectID objectId, Element element) {
+        return accessKeysFromJson(element.getText()).stream().peek(a -> a.setObjectId(objectId)).toList();
     }
 
     /**

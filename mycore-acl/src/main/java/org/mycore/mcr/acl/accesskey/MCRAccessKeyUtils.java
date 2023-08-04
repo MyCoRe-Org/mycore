@@ -21,6 +21,7 @@ package org.mycore.mcr.acl.accesskey;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,6 @@ import java.util.stream.Collectors;
 
 import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
@@ -89,10 +89,11 @@ public class MCRAccessKeyUtils {
      * @param session the MCRSession
      * @param objectId the MCRObjectID
      * @param value the value of a MCRAccessKey
-     * @throws MCRException if there is no matching MCRAccessKey with the same value or not allowed.
+     * @throws MCRAccessKeyNotFoundException if there is no matching MCRAccessKey
+     * @throws MCRAccessKeyException if MCRAccessKey is not allowed
      */
-    public static synchronized void addAccessKeySecretForObject(MCRSession session, MCRObjectID objectId, String value)
-        throws MCRException {
+    public static synchronized void addAccessKeySecretForObject(MCRSession session, MCRObjectID objectId,
+        String value) {
         if (!isAccessKeyForSessionAllowed()) {
             throw new MCRAccessKeyException("Access keys is not allowed.");
         }
@@ -119,14 +120,13 @@ public class MCRAccessKeyUtils {
      * @param session the MCRSession
      * @param objectId the MCRObjectID
      * @param value the value of a MCRAccessKey
-     * @throws MCRException if there is no matching MCRAccessKey with the same value or not allowed.
+     * @throws MCRAccessKeyException if there is no matching MCRAccessKey with the same value or not allowed.
      */
-    public static synchronized void addAccessKeySecret(MCRSession session, MCRObjectID objectId, String value)
-        throws MCRException {
+    public static synchronized void addAccessKeySecret(MCRSession session, MCRObjectID objectId, String value) {
         if (!isAccessKeyForSessionAllowed()) {
             throw new MCRAccessKeyException("Access keys is not allowed.");
         }
-        if ("derivate".equals(objectId.getTypeId())) {
+        if (Objects.equals(objectId.getTypeId(), "derivate")) {
             addAccessKeySecretForObject(session, objectId, value);
         } else {
             boolean success = false;
@@ -158,10 +158,10 @@ public class MCRAccessKeyUtils {
      * @param user the MCRUser the value should assigned
      * @param objectId the MCRObjectID
      * @param value the value of a MCRAccessKey
-     * @throws MCRException if there is no matching MCRAccessKey with the same value.
+     * @throws MCRAccessKeyNotFoundException if there is no matching MCRAccessKey
+     * @throws MCRAccessKeyException if MCRAccessKey is not allowed
      */
-    public static synchronized void addAccessKeySecretForObject(MCRUser user, MCRObjectID objectId, String value)
-        throws MCRException {
+    public static synchronized void addAccessKeySecretForObject(MCRUser user, MCRObjectID objectId, String value) {
         if (isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
             final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
             final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
@@ -184,11 +184,10 @@ public class MCRAccessKeyUtils {
      * @param user the MCRUser the value should assigned
      * @param objectId the MCRObjectID
      * @param value the value of a MCRAccessKey
-     * @throws MCRException if there is no matching MCRAccessKey with the same value.
+     * @throws MCRAccessKeyException if there is no matching MCRAccessKey with the same value or not allowed.
      */
-    public static synchronized void addAccessKeySecret(MCRUser user, MCRObjectID objectId, String value)
-        throws MCRException {
-        if ("derivate".equals(objectId.getTypeId())) {
+    public static synchronized void addAccessKeySecret(MCRUser user, MCRObjectID objectId, String value) {
+        if (Objects.equals(objectId.getTypeId(), "derivate")) {
             addAccessKeySecretForObject(user, objectId, value);
         } else {
             boolean success = false;
@@ -219,10 +218,9 @@ public class MCRAccessKeyUtils {
      * 
      * @param objectId the MCRObjectID
      * @param value the value of a MCRAccessKey
-     * @throws MCRException if there is no matching MCRAccessKey with the same value
+     * @throws MCRAccessKeyException if there is no matching MCRAccessKey with the same value or not allowed.
      */
-    public static synchronized void addAccessKeySecretToCurrentSession(MCRObjectID objectId, String value)
-        throws MCRException {
+    public static synchronized void addAccessKeySecretToCurrentSession(MCRObjectID objectId, String value) {
         addAccessKeySecret(MCRSessionMgr.getCurrentSession(), objectId, value);
     }
 
@@ -231,22 +229,10 @@ public class MCRAccessKeyUtils {
      * 
      * @param objectId the MCRObjectID
      * @param value the value of a MCRAccessKey
-     * @throws MCRException if there is no matching MCRAccessKey with the same value
+     * @throws MCRAccessKeyException if there is no matching MCRAccessKey with the same value or not allowed.
      */
-    public static synchronized void addAccessKeySecretToCurrentUser(MCRObjectID objectId, String value)
-        throws MCRException {
+    public static synchronized void addAccessKeySecretToCurrentUser(MCRObjectID objectId, String value) {
         addAccessKeySecret(MCRUserManager.getCurrentUser(), objectId, value);
-    }
-
-    /**
-     * Lists all users which own at least an access key user attribute in given range
-     * 
-     * @param offset the offset
-     * @param limit the limit
-     * @return a list with all users which own at least an access key in given range
-     */
-    private static List<MCRUser> listUsersWithAccessKey(int offset, int limit) {
-        return MCRUserManager.listUsers(null, null, null, null, ACCESS_KEY_PREFIX + "*", offset, limit);
     }
 
     /**
@@ -294,11 +280,7 @@ public class MCRAccessKeyUtils {
      * @return secret or null
      */
     public static synchronized String getAccessKeySecret(MCRSession session, MCRObjectID objectId) {
-        final Object secret = session.get(getAttributeName(objectId));
-        if (secret != null) {
-            return (String) secret;
-        }
-        return null;
+        return Optional.ofNullable(session.get(getAttributeName(objectId))).map(Object::toString).orElse(null);
     }
 
     /**
@@ -333,16 +315,6 @@ public class MCRAccessKeyUtils {
     }
 
     /**
-     * Returns the attribute name for user and session of an access key value.
-     * 
-     * @param objectId the MCRObjectID
-     * @return the attribute name
-     */
-    private static String getAttributeName(MCRObjectID objectId) {
-        return ACCESS_KEY_PREFIX + objectId.toString();
-    }
-
-    /**
      * Retrieves linked {@link MCRAccessKey} for {@link MCRObjectID} if exists from {@link MCRSession}.
      * 
      * @param session the MCRSession
@@ -350,11 +322,8 @@ public class MCRAccessKeyUtils {
      * @return the MCRAccessKey or null
      */
     public static MCRAccessKey getLinkedAccessKey(MCRSession session, MCRObjectID objectId) {
-        final String secret = getAccessKeySecret(session, objectId);
-        if (secret != null) {
-            return MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        }
-        return null;
+        return Optional.ofNullable(getAccessKeySecret(session, objectId))
+            .map(s -> MCRAccessKeyManager.getAccessKeyWithSecret(objectId, s)).orElse(null);
     }
 
     /**
@@ -365,11 +334,8 @@ public class MCRAccessKeyUtils {
      * @return the MCRAccessKey or null
      */
     public static MCRAccessKey getLinkedAccessKey(MCRUserInformation userInformation, MCRObjectID objectId) {
-        final String secret = getAccessKeySecret(userInformation, objectId);
-        if (secret != null) {
-            return MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        }
-        return null;
+        return Optional.ofNullable(getAccessKeySecret(userInformation, objectId))
+            .map(s -> MCRAccessKeyManager.getAccessKeyWithSecret(objectId, s)).orElse(null);
     }
 
     /**
@@ -410,7 +376,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the MCRObjectID
      */
     public static synchronized void removeAccessKeySecret(MCRUser user, MCRObjectID objectId) {
-        user.getAttributes().removeIf(ua -> ua.getName().equals(getAttributeName(objectId)));
+        user.getAttributes().removeIf(ua -> Objects.equals(ua.getName(), getAttributeName(objectId)));
         MCRUserManager.updateUser(user);
         MCRAccessCacheHelper.clearPermissionCache(objectId.toString());
     }
@@ -469,5 +435,13 @@ public class MCRAccessKeyUtils {
      */
     public static Set<String> getAllowedSessionPermissionTypes() {
         return allowedSessionPermissionTypes;
+    }
+
+    private static List<MCRUser> listUsersWithAccessKey(int offset, int limit) {
+        return MCRUserManager.listUsers(null, null, null, null, ACCESS_KEY_PREFIX + "*", offset, limit);
+    }
+
+    private static String getAttributeName(MCRObjectID objectId) {
+        return ACCESS_KEY_PREFIX + objectId.toString();
     }
 }

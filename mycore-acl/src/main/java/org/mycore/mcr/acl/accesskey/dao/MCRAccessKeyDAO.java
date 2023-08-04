@@ -16,10 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mcr.acl.accesskey;
+package org.mycore.mcr.acl.accesskey.dao;
 
 import java.util.Collection;
-import java.util.List;
 
 import jakarta.persistence.EntityManager;
 
@@ -40,13 +39,12 @@ public class MCRAccessKeyDAO {
      */
     public Collection<MCRAccessKey> findAll(MCRObjectID objectId) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
+        return em.createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
             .setParameter("objectId", objectId)
-            .getResultList();
-        for (MCRAccessKey accessKey : accessKeys) {
-            em.detach(accessKey);
-        }
-        return accessKeys;
+            .getResultList()
+            .stream()
+            .peek(a -> em.detach(a))
+            .toList();
     }
 
     /**
@@ -58,17 +56,14 @@ public class MCRAccessKeyDAO {
      */
     public MCRAccessKey findBySecret(MCRObjectID objectId, String secret) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final MCRAccessKey accessKey = em.createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
+        return em.createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
             .setParameter("objectId", objectId)
             .setParameter("secret", secret)
             .getResultList()
             .stream()
+            .peek(a -> em.detach(a))
             .findFirst()
             .orElse(null);
-        if (accessKey != null) {
-            em.detach(accessKey);
-        }
-        return accessKey;
     }
 
     /**
@@ -80,15 +75,13 @@ public class MCRAccessKeyDAO {
      */
     public Collection<MCRAccessKey> findAllByType(MCRObjectID objectId, String type) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
+        return em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
             .setParameter("objectId", objectId)
             .setParameter("type", type)
-            .getResultList();
-        for (MCRAccessKey accessKey : accessKeys) {
-            em.detach(accessKey);
-        }
-        return accessKeys;
-
+            .getResultList()
+            .stream()
+            .peek(a -> em.detach(a))
+            .toList();
     }
 
     /**

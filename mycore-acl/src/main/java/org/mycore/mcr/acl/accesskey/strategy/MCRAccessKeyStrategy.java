@@ -23,6 +23,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,11 +43,11 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     @Override
     public boolean checkPermission(String objectIdString, String permission) {
-        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
-            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
+        if ((permission.equals(PERMISSION_READ) || permission.equals(PERMISSION_WRITE)
+            || permission.equals(PERMISSION_VIEW) || permission.equals(PERMISSION_PREVIEW))
             && MCRObjectID.isValid(objectIdString)) {
             final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-            if ("derivate".equals(objectId.getTypeId())) {
+            if (Objects.equals(objectId.getTypeId(), "derivate")) {
                 return checkDerivatePermission(objectId, permission);
             }
             return checkObjectPermission(objectId, permission);
@@ -63,8 +64,8 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      */
     public boolean checkObjectPermission(MCRObjectID objectId, String permission) {
         LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
-        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
-            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
+        if ((permission.equals(PERMISSION_READ) || permission.equals(PERMISSION_WRITE)
+            || permission.equals(PERMISSION_VIEW) || permission.equals(PERMISSION_PREVIEW))
             && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
             if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed(permission)) {
                 final MCRAccessKey accessKey = MCRAccessKeyUtils.getLinkedAccessKeyFromCurrentSession(objectId);
@@ -89,8 +90,8 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      */
     public boolean checkDerivatePermission(MCRObjectID objectId, String permission) {
         LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
-            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
+        if ((permission.equals(PERMISSION_READ) || permission.equals(PERMISSION_WRITE)
+            || permission.equals(PERMISSION_VIEW) || permission.equals(PERMISSION_PREVIEW))
             && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
             if (checkObjectPermission(objectId, permission)) {
                 return true;

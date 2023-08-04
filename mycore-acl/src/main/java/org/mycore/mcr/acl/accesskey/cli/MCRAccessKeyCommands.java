@@ -60,6 +60,7 @@ public class MCRAccessKeyCommands {
      * Removes all {@link MCRAccessKey}s for {@link MCRObjectID}.
      * 
      * @param objectIdString the MCRObjectID as String
+     * @throws MCRException if object does not exist
      */
     @MCRCommand(syntax = "clear all access keys for {0}",
         help = "Clears all access keys for MCRObject/Derivate {0}")
@@ -191,6 +192,7 @@ public class MCRAccessKeyCommands {
      * 
      * @param secret the secret
      * @param objectIdString the MCRObjectID as String
+     * @throws MCRException if MCRObjectID is invalid
      */
     @MCRCommand(syntax = "hash access key secret {0} for {1}",
         help = "Hashes secret {0} for MCRObject/Derivate {1}")
