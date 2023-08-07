@@ -8,7 +8,7 @@
 
 
 
-    <xsl:function name="mcrlayoututils:readAccess" as="xs:string">
+    <xsl:function name="mcrlayoututils:read-access" as="xs:string">
         <xsl:param name="webpageID" as="xs:string"/>
         <xsl:param name="blockerWebpageID" as="xs:string"/>
         <xsl:choose>
@@ -19,6 +19,10 @@
                 <xsl:value-of select="count(document(concat('layoutUtils:readAccess:', $webpageID))/true)&gt;0" />
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:function>
+
+    <xsl:function name="mcrlayoututils:get-personal-navigation">
+        <xsl:copy-of select="document('layoutUtils:personalNavigation')" />
     </xsl:function>
 
 

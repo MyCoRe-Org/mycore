@@ -52,8 +52,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
@@ -1569,14 +1571,20 @@ public final class MCRURIResolver implements URIResolver {
                 throw new TransformerException("No arguments given");
             }
             String function = args[1];
-            String[] params = args[2].split(":split:");
 
             if (function.equals("readAccess")) {
+                String[] params = args[2].split(":split:");
                 if (params.length == 1) {
                     return new JDOMSource(new Element(String.valueOf(MCRLayoutUtilities.readAccess(params[0]))));
                 } else if (params.length == 2) {
                     return new JDOMSource(
                         new Element(String.valueOf(MCRLayoutUtilities.readAccess(params[0], params[1]))));
+                }
+            } else if (function.equals("personalNavigation")) {
+                try {
+                    return new DOMSource(MCRLayoutUtilities.getPersonalNavigation());
+                } catch (JDOMException | XPathExpressionException e) {
+                    throw new MCRException("Error while loading personal navigation!", e);
                 }
             }
             throw new TransformerException("Unknown argument: " + args[2]);
