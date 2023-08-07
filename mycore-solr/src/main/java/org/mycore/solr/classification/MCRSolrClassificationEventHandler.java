@@ -65,7 +65,7 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
                 @SuppressWarnings("unchecked")
                 Collection<MCRCategory> replaced = (Collection<MCRCategory>) evt.get("replaced");
                 MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
-                MCRSolrClassificationUtil.reindex(replaced.toArray(new MCRCategory[replaced.size()]));
+                MCRSolrClassificationUtil.reindex(replaced.toArray(MCRCategory[]::new));
             }
             default -> MCRSolrClassificationUtil.reindex(categ, categParent);
         }

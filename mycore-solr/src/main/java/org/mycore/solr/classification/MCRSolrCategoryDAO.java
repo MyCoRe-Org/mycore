@@ -96,7 +96,7 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
         // remove all old categories
         MCRSolrClassificationUtil.solrDelete(newCategory.getId(), newCategory.getParent());
         // reindex all new
-        MCRSolrClassificationUtil.reindex(replacedCategories.toArray(MCRCategoryImpl[]::new));
+        MCRSolrClassificationUtil.reindex(replacedCategories.toArray(MCRCategory[]::new));
         return replacedCategories;
     }
 
