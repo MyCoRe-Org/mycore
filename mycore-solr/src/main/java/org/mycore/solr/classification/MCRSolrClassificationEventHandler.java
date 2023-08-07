@@ -50,32 +50,24 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
             LOGGER.debug("{} handling {} {}", getClass().getName(), categ.getId(), evt.getEventType());
             MCRCategory categParent = (MCRCategory) evt.get("parent");
             switch (evt.getEventType()) {
-                case CREATE:
-                    MCRSolrClassificationUtil.reindex(categ, categParent);
-                    break;
-                case UPDATE:
-                    switch ((String) evt.get("type")) {
-                        case "move":
-                            MCRSolrClassificationUtil.solrMove(categ.getId(), categParent.getId());
-                            break;
-                        case "replace":
-                            @SuppressWarnings("unchecked")
-                            Collection<MCRCategory> replaced = (Collection<MCRCategory>) evt.get("replaced");
-                            MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
-                            MCRSolrClassificationUtil.reindex(replaced.toArray(new MCRCategory[replaced.size()]));
-                            break;
-                        default:
-                            MCRSolrClassificationUtil.reindex(categ, categParent);
-                            break;
-                    }
-                    break;
-                case DELETE:
-                    MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
-                    break;
-                default:
-                    LOGGER.error("No Method available for {}", evt.getEventType());
-                    break;
+                case CREATE -> MCRSolrClassificationUtil.reindex(categ, categParent);
+                case UPDATE -> processUpdate(evt, categ, categParent);
+                case DELETE -> MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
+                default -> LOGGER.error("No Method available for {}", evt.getEventType());
             }
+        }
+    }
+
+    private void processUpdate(MCREvent evt, MCRCategory categ, MCRCategory categParent) {
+        switch ((String) evt.get("type")) {
+            case "move" -> MCRSolrClassificationUtil.solrMove(categ.getId(), categParent.getId());
+            case "replace" -> {
+                @SuppressWarnings("unchecked")
+                Collection<MCRCategory> replaced = (Collection<MCRCategory>) evt.get("replaced");
+                MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
+                MCRSolrClassificationUtil.reindex(replaced.toArray(new MCRCategory[replaced.size()]));
+            }
+            default -> MCRSolrClassificationUtil.reindex(categ, categParent);
         }
     }
 
