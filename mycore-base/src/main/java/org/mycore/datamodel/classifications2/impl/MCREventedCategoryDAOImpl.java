@@ -26,6 +26,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
@@ -63,7 +64,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
         evt.put("parent", super.getCategory(newParentID, -1));
         // "type" is used for specifying a special update operation
-        evt.put("type", "move");
+        evt.put(MCRCategoryDAO.UPDATE_TYPE_KEY, MCRCategoryDAO.UpdateType.MOVE);
         MCREventManager.instance().handleEvent(evt);
         super.moveCategory(id, newParentID, index);
     }
@@ -82,7 +83,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         Collection<MCRCategoryImpl> rv = super.replaceCategory(newCategory);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put(MCREvent.CLASS_KEY, newCategory);
-        evt.put("type", "replace");
+        evt.put(MCRCategoryDAO.UPDATE_TYPE_KEY, MCRCategoryDAO.UpdateType.REPLACE);
         evt.put("replaced", rv);
         MCREventManager.instance().handleEvent(evt);
         return rv;

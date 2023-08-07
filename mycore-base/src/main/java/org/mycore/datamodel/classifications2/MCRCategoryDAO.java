@@ -32,6 +32,18 @@ import java.util.SortedSet;
 public interface MCRCategoryDAO {
 
     /**
+     * key for update type as payload in MCREvent
+     */
+    public static final String UPDATE_TYPE_KEY = "type";
+
+    /**
+     * different update types, used in MCRSolrClassificationEventHandler
+     */
+    public enum UpdateType {
+        MOVE, REPLACE
+    };
+
+    /**
      * Adds a category as child of another category.
      * When parentID is null a root category will be created.
      * 

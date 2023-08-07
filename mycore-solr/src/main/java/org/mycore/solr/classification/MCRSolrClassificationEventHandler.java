@@ -19,18 +19,14 @@
 package org.mycore.solr.classification;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.solr.search.MCRSolrSearchUtils;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 
 /**
  * Eventhandler that stores classification and their modifications in a Solr collection
@@ -42,7 +38,7 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
 public class MCRSolrClassificationEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
+    
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
@@ -59,9 +55,9 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
     }
 
     private void processUpdate(MCREvent evt, MCRCategory categ, MCRCategory categParent) {
-        switch ((String) evt.get("type")) {
-            case "move" -> MCRSolrClassificationUtil.solrMove(categ.getId(), categParent.getId());
-            case "replace" -> {
+        switch ((MCRCategoryDAO.UpdateType) evt.get(MCRCategoryDAO.UPDATE_TYPE_KEY)) {
+            case MOVE -> MCRSolrClassificationUtil.solrMove(categ.getId(), categParent.getId());
+            case REPLACE -> {
                 @SuppressWarnings("unchecked")
                 Collection<MCRCategory> replaced = (Collection<MCRCategory>) evt.get("replaced");
                 MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
