@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -43,6 +44,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 
 import com.google.common.collect.Lists;
 
@@ -249,5 +251,34 @@ public abstract class MCRSolrClassificationUtil {
     public static String encodeCategoryId(MCRCategoryID classId) {
         return classId.toString().replaceAll(":", "\\\\:");
     }
+    
+    protected static void solrDelete(MCRCategoryID id, MCRCategory parent) {
+        try {
+            // remove all descendants and itself
+            HttpSolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+            List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
+                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
+            toDelete.add(id.toString());
+            solrClient.deleteById(toDelete);
+            // reindex parent
+            if (parent != null) {
+                MCRSolrClassificationUtil.reindex(parent);
+            }
+        } catch (Exception exc) {
+            LOGGER.error("Solr: unable to delete categories of parent {}", id);
+        }
+    }
 
+    protected static void solrMove(MCRCategoryID id, MCRCategoryID newParentID) {
+        try {
+            SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+            List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
+                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
+            reindexList.add(id.toString());
+            reindexList.add(newParentID.toString());
+            MCRSolrClassificationUtil.reindex(MCRSolrClassificationUtil.fromString(reindexList));
+        } catch (Exception exc) {
+            LOGGER.error("Solr: unable to move categories of category {} to {}", id, newParentID);
+        }
+    }
 }

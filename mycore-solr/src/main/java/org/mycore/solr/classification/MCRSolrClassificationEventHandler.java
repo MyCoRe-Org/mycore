@@ -56,12 +56,12 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
                 case UPDATE:
                     switch ((String) evt.get("type")) {
                         case "move":
-                            solrMove(categ.getId(), categParent.getId());
+                            MCRSolrClassificationUtil.solrMove(categ.getId(), categParent.getId());
                             break;
                         case "replace":
                             @SuppressWarnings("unchecked")
                             Collection<MCRCategory> replaced = (Collection<MCRCategory>) evt.get("replaced");
-                            solrDelete(categ.getId(), categ.getParent());
+                            MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
                             MCRSolrClassificationUtil.reindex(replaced.toArray(new MCRCategory[replaced.size()]));
                             break;
                         default:
@@ -70,7 +70,7 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
                     }
                     break;
                 case DELETE:
-                    solrDelete(categ.getId(), categ.getParent());
+                    MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
                     break;
                 default:
                     LOGGER.error("No Method available for {}", evt.getEventType());
@@ -87,36 +87,6 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
                 evt.getEventType());
             LOGGER.info("Doing nothing for undo of {} {}", ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
                 evt.getEventType());
-        }
-    }
-
-    protected void solrDelete(MCRCategoryID id, MCRCategory parent) {
-        try {
-            // remove all descendants and itself
-            HttpSolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-            List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
-            toDelete.add(id.toString());
-            solrClient.deleteById(toDelete);
-            // reindex parent
-            if (parent != null) {
-                MCRSolrClassificationUtil.reindex(parent);
-            }
-        } catch (Exception exc) {
-            LOGGER.error("Solr: unable to delete categories of parent {}", id);
-        }
-    }
-
-    protected void solrMove(MCRCategoryID id, MCRCategoryID newParentID) {
-        try {
-            SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-            List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
-            reindexList.add(id.toString());
-            reindexList.add(newParentID.toString());
-            MCRSolrClassificationUtil.reindex(MCRSolrClassificationUtil.fromString(reindexList));
-        } catch (Exception exc) {
-            LOGGER.error("Solr: unable to move categories of category {} to {}", id, newParentID);
         }
     }
 }
