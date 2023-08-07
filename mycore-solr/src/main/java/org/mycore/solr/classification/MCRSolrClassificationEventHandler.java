@@ -54,13 +54,9 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
                     MCRSolrClassificationUtil.reindex(categ, categParent);
                     break;
                 case UPDATE:
-                    int pos = -1;
-                    if (evt.get("index") instanceof Integer) {
-                        pos = (Integer) evt.get("index");
-                    }
                     switch ((String) evt.get("type")) {
                         case "move":
-                            solrMove(categ.getId(), categParent.getId(), pos);
+                            solrMove(categ.getId(), categParent.getId());
                             break;
                         case "replace":
                             @SuppressWarnings("unchecked")
@@ -111,7 +107,7 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
         }
     }
 
-    protected void solrMove(MCRCategoryID id, MCRCategoryID newParentID, int index) {
+    protected void solrMove(MCRCategoryID id, MCRCategoryID newParentID) {
         try {
             SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
             List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,

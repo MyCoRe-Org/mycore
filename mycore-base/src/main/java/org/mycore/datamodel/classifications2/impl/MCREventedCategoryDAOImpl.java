@@ -41,7 +41,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.CREATE);
         evt.put(MCREvent.CLASS_KEY, category);
         evt.put("parent", super.getCategory(parentID, -1));
-        evt.put("index", position);
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }
@@ -63,7 +62,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
         evt.put("parent", super.getCategory(newParentID, -1));
-        evt.put("index", index);
         // "type" is used for specifying a special update operation
         evt.put("type", "move");
         MCREventManager.instance().handleEvent(evt);
