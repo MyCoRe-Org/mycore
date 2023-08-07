@@ -26,7 +26,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRClassificationUpdateType;
 
 /**
  * Eventhandler that stores classification and their modifications in a Solr collection
@@ -55,7 +55,7 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
     }
 
     private void processUpdate(MCREvent evt, MCRCategory categ, MCRCategory categParent) {
-        switch ((MCRCategoryDAO.UpdateType) evt.get(MCRCategoryDAO.UPDATE_TYPE_KEY)) {
+        switch ((MCRClassificationUpdateType) evt.get(MCRClassificationUpdateType.KEY)) {
             case MOVE -> MCRSolrClassificationUtil.solrMove(categ.getId(), categParent.getId());
             case REPLACE -> {
                 @SuppressWarnings("unchecked")
