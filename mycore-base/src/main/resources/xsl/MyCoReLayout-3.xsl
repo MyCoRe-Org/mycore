@@ -6,9 +6,7 @@
   <xsl:include href="xslInclude:functions" />
   <xsl:include href="xslInclude:components-3" />
 
-  <xsl:variable name="direction">
-    <xsl:value-of select="mcri18n:text-direction($CurrentLang)" />
-  </xsl:variable>
+  <xsl:variable name="direction" select="mcri18n:text-direction($CurrentLang)" />
 
   <xsl:template match="/">
     <site title="{$PageTitle}">
