@@ -10,8 +10,8 @@
     <xsl:choose>
       <xsl:when test="$derivID">
         <xsl:variable name="supportedContentTypeStr" select="mcrproperty:one('MCR.Module-iview2.SupportedContentTypes')" />
-        <xsl:variable name="mainFile" select="mcrderivate:getMainFile($derivID)" />
-        <xsl:variable name="contentType" select="mcrderivate:getContentType($derivID, $mainFile)" />
+        <xsl:variable name="mainFile" select="mcrderivate:get-main-file($derivID)" />
+        <xsl:variable name="contentType" select="mcrderivate:get-file-content-type($derivID, $mainFile)" />
         <xsl:variable name="supportedContentTypes" select="tokenize($supportedContentTypeStr, ',')" />
         <xsl:if test="contains($supportedContentTypes, $contentType)">
           <xsl:value-of select="$mainFile" />

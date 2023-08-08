@@ -6,14 +6,14 @@
                 xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
                 exclude-result-prefixes="fn xs">
 
-    <xsl:function name="mcrderivate:getMainFile" as="xs:string">
+    <xsl:function name="mcrderivate:get-main-file" as="xs:string">
         <xsl:param name="derivID" as="xs:string"/>
         <xsl:variable name="derivate" select="document(concat('mcrobject:', $derivID))" />
         <xsl:variable name="mainFile" select="$derivate/mycorederivate/derivate/internals/internal/@maindoc" />
         <xsl:value-of select="$mainFile" />
     </xsl:function>
 
-    <xsl:function name="mcrderivate:getContentType" as="xs:string">
+    <xsl:function name="mcrderivate:get-file-content-type" as="xs:string">
         <xsl:param name="derivID" as="xs:string"/>
         <xsl:param name="path" as="xs:string"/>
         <xsl:variable name="directory">
