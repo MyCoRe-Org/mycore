@@ -41,7 +41,9 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCRCategory rv = super.addCategory(parentID, category, position);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.CREATE);
         evt.put(MCREvent.CLASS_KEY, category);
-        evt.put("parent", super.getCategory(parentID, -1));
+        if (parentID != null) {
+            evt.put("parent", super.getCategory(parentID, -1));
+        }
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }
