@@ -139,7 +139,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
       LOGGER.info("Neo4j connected {}", connected);
    }
 
-   @MCRCommand(syntax = "test neo4j of id {0}",
+   @MCRCommand(syntax = "test neo4j for id {0}",
       help = "Prints a Neo4J query statement for testing purpose using MCRID",
       order = 90)
    public static void test(final String id) {
