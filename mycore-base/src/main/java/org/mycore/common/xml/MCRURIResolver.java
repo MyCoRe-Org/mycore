@@ -524,9 +524,9 @@ public final class MCRURIResolver implements URIResolver {
         private static final int REQUEST_TIMEOUT = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.RequestTimeout")
             .orElse(30000);
 
-        private final CloseableHttpClient restClient;
+        private CloseableHttpClient restClient;
 
-        private final org.apache.logging.log4j.Logger logger;
+        private org.apache.logging.log4j.Logger logger;
 
         MCRRESTResolver() {
             CacheConfig cacheConfig = CacheConfig.custom()
