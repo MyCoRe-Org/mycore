@@ -6,8 +6,8 @@
                 xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   exclude-result-prefixes="xlink mcri18n xsl">
   &html-output;
-  <xsl:include href="mycoreobject.xsl" />
-  <xsl:include href="response-utils-3.xsl" />
+  <xsl:include href="resource:xsl/mycoreobject.xsl" />
+  <xsl:include href="resource:xsl/solr/response/response-utils-3.xsl" />
   <xsl:include href="xslInclude:solrResponse-3" />
 
   <!-- Trefferliste ausgeben -->
