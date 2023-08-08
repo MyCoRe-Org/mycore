@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.SortedSet;
 
@@ -26,6 +27,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRClassificationUpdateType;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
@@ -38,7 +40,8 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
         MCRCategory rv = super.addCategory(parentID, category, position);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.CREATE);
-        evt.put("class", category);
+        evt.put(MCREvent.CLASS_KEY, category);
+        evt.put("parent", super.getCategory(parentID, -1));
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }
@@ -50,7 +53,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.DELETE);
-        evt.put("class", category);
+        evt.put(MCREvent.CLASS_KEY, category);
         MCREventManager.instance().handleEvent(evt, MCREventManager.BACKWARD);
         super.deleteCategory(id);
     }
@@ -58,12 +61,10 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
-        evt.put("class", super.getCategory(id, -1));
+        evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
         evt.put("parent", super.getCategory(newParentID, -1));
-        evt.put("index", index);
-        // Type is used for specifying a special Update operation
-        // originally named UType (Update Type), it is an Optional Value
-        evt.put("type", "move");
+        // "type" is used for specifying a special update operation
+        evt.put(MCRClassificationUpdateType.KEY, MCRClassificationUpdateType.MOVE);
         MCREventManager.instance().handleEvent(evt);
         super.moveCategory(id, newParentID, index);
     }
@@ -72,7 +73,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     public MCRCategory removeLabel(MCRCategoryID id, String lang) {
         MCRCategory rv = super.removeLabel(id, lang);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
-        evt.put("class", super.getCategory(id, -1));
+        evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }
@@ -81,7 +82,9 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     public Collection<MCRCategoryImpl> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
         Collection<MCRCategoryImpl> rv = super.replaceCategory(newCategory);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
-        evt.put("class", newCategory);
+        evt.put(MCREvent.CLASS_KEY, newCategory);
+        evt.put(MCRClassificationUpdateType.KEY, MCRClassificationUpdateType.REPLACE);
+        evt.put("replaced", rv);
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }
@@ -90,7 +93,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
         MCRCategory rv = super.setLabel(id, label);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
-        evt.put("class", super.getCategory(id, -1));
+        evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }
@@ -99,7 +102,16 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     public MCRCategory setLabels(MCRCategoryID id, SortedSet<MCRLabel> labels) {
         MCRCategory rv = super.setLabels(id, labels);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
-        evt.put("class", super.getCategory(id, -1));
+        evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
+        MCREventManager.instance().handleEvent(evt);
+        return rv;
+    }
+
+    @Override
+    public MCRCategory setURI(MCRCategoryID id, URI uri) {
+        MCRCategory rv = super.setURI(id, uri);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
+        evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
         MCREventManager.instance().handleEvent(evt);
         return rv;
     }
