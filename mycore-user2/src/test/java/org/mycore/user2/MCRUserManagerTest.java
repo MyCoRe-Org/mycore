@@ -161,6 +161,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     }
     @Test
     public final void testCreateUserUpdateBug(){
+        //MCR-2912
         MCRUser user2Created = new MCRUser("junit2");
         user2Created.setRealName("Test Case 2");
         user2Created.setPassword("test2");
