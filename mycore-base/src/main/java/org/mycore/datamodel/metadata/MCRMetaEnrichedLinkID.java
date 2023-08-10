@@ -139,7 +139,7 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
             .collect(Collectors.toList());
     }
 
-    protected Stream<Element> elementsWithNameFromContentList(String name) {
+    public Stream<Element> elementsWithNameFromContentList(String name) {
         return getContentList().stream()
             .filter(Element.class::isInstance)
             .map(Element.class::cast)
