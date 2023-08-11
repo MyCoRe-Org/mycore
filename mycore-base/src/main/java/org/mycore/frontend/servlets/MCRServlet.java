@@ -257,6 +257,10 @@ public class MCRServlet extends HttpServlet {
                             finalSession.setCurrentLanguage(selectedLanguage);
                         });
                 }
+            } catch (IllegalArgumentException e) {
+                //from Locale.LanguageRange.parse(...)
+                //error example (found in tomcat logs): "range=no;en-us"
+                //do nothing = same behaviour as with no Accept-Language-Header set
             } finally {
                 if (MCRTransactionHelper.transactionRequiresRollback()) {
                     MCRTransactionHelper.rollbackTransaction();
@@ -307,6 +311,8 @@ public class MCRServlet extends HttpServlet {
         }
 
         MCRServletJob job = new MCRServletJob(req, res);
+
+        @SuppressWarnings("unused")
         MCRSession session = MCRSessionMgr.getCurrentSession();
 
         try {
@@ -417,6 +423,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     private Exception processThinkPhase(MCRServletJob job) {
+        @SuppressWarnings("unused")
         MCRSession session = MCRSessionMgr.getCurrentSession();
         try {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
@@ -456,6 +463,7 @@ public class MCRServlet extends HttpServlet {
         if (allowCrossDomainRequests() && !job.getResponse().containsHeader(ACCESS_CONTROL_ALLOW_ORIGIN)) {
             job.getResponse().setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
         }
+        @SuppressWarnings("unused")
         MCRSession session = MCRSessionMgr.getCurrentSession();
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
             // current Servlet not called via RequestDispatcher
