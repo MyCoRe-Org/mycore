@@ -20,6 +20,8 @@ package org.mycore.datamodel.metadata;
 
 import java.util.stream.Collectors;
 
+import org.jdom2.Element;
+
 public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLinkIDFactory {
 
     @Override
@@ -45,4 +47,12 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
 
         return derivateLinkID;
     }
+
+    @Override
+    public MCREditableMetaEnrichedLinkID fromDom(Element element) {
+        final MCREditableMetaEnrichedLinkID mcrMetaLinkID = new MCREditableMetaEnrichedLinkID();
+        mcrMetaLinkID.setFromDOM(element);
+        return mcrMetaLinkID;
+    }
+
 }
