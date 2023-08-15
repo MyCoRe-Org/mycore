@@ -11,7 +11,4 @@
         <xsl:value-of select="count($isCompletelyTiled/true)&gt;0" />
     </xsl:function>
 
-
-
-
 </xsl:stylesheet>
