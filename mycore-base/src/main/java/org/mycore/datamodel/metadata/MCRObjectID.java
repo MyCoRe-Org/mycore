@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,6 +62,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
+    private static Pattern ID_PATTERN = Pattern.compile("^([a-zA-Z][\\w&&[^_]]*)_([\\w&&[^_]]+)_(\\d+)$");
+
     private static HashSet<String> VALID_TYPE_LIST;
 
     private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
@@ -69,10 +73,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     static {
         final String confPrefix = "MCR.Metadata.Type.";
-        VALID_TYPE_LIST = MCRConfiguration2.getPropertiesMap()
+        VALID_TYPE_LIST = MCRConfiguration2.getSubPropertiesMap(confPrefix)
             .entrySet()
             .stream()
-            .filter(p -> p.getKey().startsWith(confPrefix))
             .filter(p -> Boolean.parseBoolean(p.getValue()))
             .map(prop -> prop.getKey().substring(confPrefix.length()))
             .collect(Collectors.toCollection(HashSet::new));
@@ -108,7 +111,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId);
     }
 
-    
     @Deprecated
     public static MCRObjectID getNextFreeId(String projectId, String type) {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectId, type);
@@ -208,25 +210,25 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (id == null) {
             return false;
         }
-        String mcrId = id.trim();
-        if (mcrId.length() > MAX_LENGTH) {
+        if (id.length() > MAX_LENGTH) {
             return false;
         }
-        String[] idParts = getIDParts(mcrId);
-        if (idParts.length != 3) {
-            return false;
-        }
-        String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
-            LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
-            return false;
-        }
-        try {
-            int numberPart = Integer.parseInt(idParts[2]);
-            if (numberPart < 0) {
+        Matcher m = ID_PATTERN.matcher(id);
+        if (m.matches()) {
+            String objectType = m.group(1).toLowerCase(Locale.ROOT).intern();
+            if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
+                LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
                 return false;
             }
-        } catch (NumberFormatException e) {
+            try {
+                int numberPart = Integer.parseInt(m.group(2));
+                if (numberPart < 0) {
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        } else {
             return false;
         }
         return true;
