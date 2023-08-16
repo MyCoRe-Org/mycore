@@ -1322,7 +1322,7 @@ public final class MCRURIResolver implements URIResolver {
             for (String include : propValue) {
                 // create a new include element
                 Element includeElement = new Element("include", xslNamespace);
-                includeElement.setAttribute("href", include);
+                includeElement.setAttribute("href", include.contains(":") ? include : "resource:xsl/" + include);
                 root.addContent(includeElement);
                 LOGGER.debug("Resolved XSL include: {}", include);
             }
