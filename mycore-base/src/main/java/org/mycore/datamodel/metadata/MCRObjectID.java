@@ -77,7 +77,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
             .entrySet()
             .stream()
             .filter(p -> Boolean.parseBoolean(p.getValue()))
-            .map(prop -> prop.getKey().substring(confPrefix.length()))
+            .map(prop -> prop.getKey())
             .collect(Collectors.toCollection(HashSet::new));
     }
 
