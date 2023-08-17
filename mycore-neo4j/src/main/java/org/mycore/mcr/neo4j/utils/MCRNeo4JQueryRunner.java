@@ -1,13 +1,7 @@
 package org.mycore.mcr.neo4j.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,7 +81,7 @@ public class MCRNeo4JQueryRunner {
                   Value recordData = thisRecord.get(key);
                   counter.getAndAdd(1);
                   if (StringUtils.equals(recordData.type().name(), "NODE")) {
-                     String node = nodeToJson(recordData.asNode(), gson, lang);
+                     String node = gson.toJson(nodeToNeo4JNodeJsonRecord(recordData.asNode(), lang));
                      String nodeSB = "{\"n\":" + node + "}";
                      LOGGER.debug("record is Node");
                      keyMap.put("node_" + key, nodeSB);
@@ -105,8 +99,8 @@ public class MCRNeo4JQueryRunner {
                      Iterable<Relationship> relationships = neo4jPath.relationships();
 
                      // Parse Stuff to use full Json
-                     String start = nodeToJson(startNode, gson, lang);
-                     String end = nodeToJson(endNode, gson, lang);
+                     String start = gson.toJson(nodeToNeo4JNodeJsonRecord(startNode, lang));
+                     String end = gson.toJson(nodeToNeo4JNodeJsonRecord(endNode, lang));
                      String relationshipJson = gson.toJson(relationships);
 
                      pathSB.append("{\"p\":{\"nodes\":[");
@@ -128,7 +122,6 @@ public class MCRNeo4JQueryRunner {
                   }
                }
                records.add(keyMap);
-
             }
             return records;
          });
@@ -136,54 +129,34 @@ public class MCRNeo4JQueryRunner {
 
    }
 
-   private static String nodeToJson(Node startNode, Gson gson, String lang) {
+   private static Neo4JNodeJsonRecord nodeToNeo4JNodeJsonRecord(Node startNode, String lang) {
       String elementId = startNode.elementId();
       boolean mcridBool = startNode.asMap().containsKey("id");
+      List<Neo4JMetaData> neo4JMetaDataList = wrapPropertiesMapTranslation(startNode.asMap(), lang);
 
-      List<Neo4JMetaData> neo4JMetaDataList = propertiesMapToJson(startNode.asMap(), lang);
-
-      JsonObject jsonNode = new JsonObject();
-      JsonArray labelArray = new JsonArray();
+      List<String> labels = new ArrayList<>();
       for (String label: startNode.labels()){
-         labelArray.add(label);
+         labels.add(label);
       }
-      jsonNode.add("type", labelArray);
-      jsonNode.addProperty( "id", elementId);
       if (mcridBool) {
          String mcrID = String.valueOf(startNode.asMap().get("id"));
-         LOGGER.debug("MCRID: {}", mcrID);
-         jsonNode.addProperty("mcrid", mcrID);
+         return new Neo4JNodeJsonRecord(labels, elementId, mcrID, neo4JMetaDataList);
+      } else {
+         return new Neo4JNodeJsonRecord(labels, elementId, "", neo4JMetaDataList);
       }
-      JsonArray jsonArray = new JsonArray();
-      for (Neo4JMetaData metaData: neo4JMetaDataList) {
-         JsonObject jsO = new JsonObject();
-         jsO.addProperty("title", metaData.title());
-         JsonArray innerArray = new JsonArray();
-         for (String contentString: metaData.content()) {
-            innerArray.add(contentString);
-         }
-         jsO.add("content", innerArray);
-         jsonArray.add(jsO);
-      }
-
-      jsonNode.add("metadata", jsonArray);
-
-      ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-      objectMapper.configure(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED, true);
-      objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-
-      try {
-         Neo4JNodeJsonRecord node = objectMapper.readValue(gson.toJson(jsonNode), Neo4JNodeJsonRecord.class);
-         return objectMapper.writeValueAsString(node);
-      } catch (JsonProcessingException e) {
-         LOGGER.error(e.getLocalizedMessage());
-      }
-
-      return null;
    }
 
-   private static List<Neo4JMetaData> propertiesMapToJson(Map<String, Object> map, String lang) {
+   /**
+    * Wrapper between MyCore i18n translation logic and (non language specific) neo4j database representation.
+    * if lang is null -> use default language or de for translation
+    * if key is longer than 3 chars and ends with _xy checks if xy equals lang, if true translate else skip this key
+    * else case: translate value with corresponding lang
+    *
+    * @param map key-value-pairs, translate the values
+    * @param lang MyCore Language short notation
+    * @return List of translated Neo4JMetaData Objects
+    */
+   private static List<Neo4JMetaData> wrapPropertiesMapTranslation(Map<String, Object> map, String lang) {
       List<Neo4JMetaData> metaDataList = new ArrayList<>();
 
       for (Map.Entry<String, Object> entry : map.entrySet()) {
