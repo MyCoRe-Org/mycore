@@ -62,7 +62,11 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
-    private static Pattern ID_PATTERN = Pattern.compile("^([a-zA-Z][\\w&&[^_]]*)_([\\w&&[^_]]+)_(\\d+)$");
+    /**ID pattern with groups
+     * 
+     * attention: group(0) matches the whole expression, part numbering starts with group(1)
+     */
+    private static Pattern ID_PATTERN = Pattern.compile("(^[a-zA-Z][\\w&&[^_]]*)_([\\w&&[^_]]+)_(\\d+$)");
 
     private static HashSet<String> VALID_TYPE_LIST;
 
@@ -215,13 +219,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         }
         Matcher m = ID_PATTERN.matcher(id);
         if (m.matches()) {
-            String objectType = m.group(1).toLowerCase(Locale.ROOT).intern();
+            String objectType = m.group(2).toLowerCase(Locale.ROOT).intern();
             if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
                 LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
                 return false;
             }
             try {
-                int numberPart = Integer.parseInt(m.group(2));
+                int numberPart = Integer.parseInt(m.group(3));
                 if (numberPart < 0) {
                     return false;
                 }
