@@ -64,7 +64,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     /**ID pattern with groups
      * 
-     * attention: group(0) matches the whole expression, part numbering starts with group(1)
+     * attention: group(0) returns the whole expression, part numbering starts with group(1)
      */
     private static Pattern ID_PATTERN = Pattern.compile("(^[a-zA-Z][\\w&&[^_]]*)_([\\w&&[^_]]+)_(\\d+$)");
 
@@ -85,12 +85,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
             .collect(Collectors.toCollection(HashSet::new));
     }
 
-    // data of the ID
+    // parts of the ID
     private final String projectId;
     private final String objectType;
-    private final String combinedId;
-
     private final int numberPart;
+    
+    // complete id as formatted string
+    private final String combinedId;
 
     /**
      * The constructor for MCRObjectID from a given string.
@@ -110,6 +111,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         this.combinedId = formatID(projectId, objectType, numberPart);
     }
 
+    //ID generation methods move to MCRObjectIDGenerator
+    //deprecated in 2023.06
     @Deprecated
     public static MCRObjectID getNextFreeId(String baseId) {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId);
