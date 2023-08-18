@@ -68,8 +68,8 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
         assertFalse("The mcrid 'JUnit_test_123 ' is invalid (space at end)", MCRObjectID.isValid("JUnit_test_123 "));
         assertFalse("The mcrid 'JUnit_test_-123' is invalid (negative number)", MCRObjectID.isValid("JUnit_test_-123"));
         assertFalse(
-            "The mcrid 'JUnitaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123' is invalid (length)",
-            MCRObjectID.isValid("JUnitaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123"));
+            "The mcrid 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123' is invalid (length)",
+            MCRObjectID.isValid("aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123"));
     }
 
     @Test

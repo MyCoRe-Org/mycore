@@ -89,7 +89,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     private final String projectId;
     private final String objectType;
     private final int numberPart;
-    
+
     // complete id as formatted string
     private final String combinedId;
 
@@ -224,7 +224,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (m.matches()) {
             String objectType = m.group(2).toLowerCase(Locale.ROOT).intern();
             if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
-                LOGGER.warn("Property MCR.Metadata.Type.{} is not set to 'true'. Thus {} cannot be a valid id.", objectType, id);
+                LOGGER.warn("Property MCR.Metadata.Type.{} is not set to 'true'. Thus {} cannot be a valid id.",
+                    objectType, id);
                 return false;
             }
             try {
