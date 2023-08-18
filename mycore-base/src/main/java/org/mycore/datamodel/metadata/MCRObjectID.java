@@ -66,7 +66,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * 
      * attention: group(0) returns the whole expression, part numbering starts with group(1)
      */
-    private static Pattern ID_PATTERN = Pattern.compile("(^[a-zA-Z][\\w&&[^_]]*)_([\\w&&[^_]]+)_(\\d+$)");
+    private static Pattern ID_PATTERN = Pattern.compile("^([a-zA-Z][a-zA-Z0-9]*)_([a-zA-Z0-9]+)_([0-9]+)$");
 
     private static HashSet<String> VALID_TYPE_LIST;
 
