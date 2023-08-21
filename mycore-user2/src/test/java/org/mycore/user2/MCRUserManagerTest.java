@@ -159,8 +159,9 @@ public class MCRUserManagerTest extends MCRUserTestCase {
          */
         assertEquals("There should be one attribute", 1, user.getAttributes().size());
     }
+
     @Test
-    public final void testCreateUserUpdateBug(){
+    public final void testCreateUserUpdateBug() {
         //MCR-2912
         MCRUser user2Created = new MCRUser("junit2");
         user2Created.setRealName("Test Case 2");
@@ -177,7 +178,8 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         startNewTransaction();
 
         junit2 = MCRUserManager.getUser("junit2", MCRRealmFactory.getLocalRealm());
-        System.out.println(junit2.getAttributes().stream().map(attr->attr.getName()+"="+attr.getValue()).collect(Collectors.toList()));
+        System.out.println(junit2.getAttributes().stream().map(attr -> attr.getName() + "=" + attr.getValue())
+            .collect(Collectors.toList()));
         assertEquals(3, junit2.getAttributes().size());
     }
 
