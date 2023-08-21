@@ -76,7 +76,7 @@ export class FileTransferQueue {
      */
     private pendingFileTransferList: Array<FileTransfer> = [];
 
-    private commitHandlerList: Array<(uploadID: string, error: boolean, err?: string) => void> = [];
+    private commitHandlerList: Array<(uploadID: string, error: boolean, err?: string, location?: string) => void> = [];
 
     private commitStartHandlerList: Array<(uploadID: string) => void> = [];
 
@@ -186,7 +186,7 @@ export class FileTransferQueue {
         this.commitStartHandlerList.push(handler);
     }
 
-    public addCommitCompleteHandler(handler: (uploadID: string, error: boolean, err?: string) => void) {
+    public addCommitCompleteHandler(handler: (uploadID: string, error: boolean, err?: string, location?: string) => void) {
         this.commitHandlerList.push(handler);
     }
 
@@ -292,7 +292,7 @@ export class FileTransferQueue {
         xhr.open('PUT', basicURL + uploadHandlerParameter + classificationsParameter, true);
         xhr.onload = (result) => {
             if (xhr.status === 204 || xhr.status === 201 || xhr.status == 200) {
-                this.commitHandlerList.forEach(handler => handler(uploadID, false));
+                this.commitHandlerList.forEach(handler => handler(uploadID, false, null, xhr.getResponseHeader("Location")))
             } else {
                 let message;
                 switch (xhr.responseType) {

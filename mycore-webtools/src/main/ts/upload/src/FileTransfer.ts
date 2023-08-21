@@ -145,7 +145,7 @@ export class FileTransfer {
 
         this.request = new XMLHttpRequest();
 
-        this.request.open('PUT', Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + this.targetObject + this.target + uploadPath + "?uploadID=" + this._uploadID, true);
+        this.request.open('PUT', Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + this.targetObject + this.target + uploadPath + "?uploadID=" + this._uploadID + (this._uploadHandler ? "&uploadHandler=" + this._uploadHandler : ""), true);
 
         this.request.onreadystatechange = (result) => {
             if (this.request.readyState === 4 && this.request.status === 204) {

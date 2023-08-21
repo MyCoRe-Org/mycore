@@ -22,15 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -39,41 +36,29 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRAccessManager;
-import org.mycore.access.MCRRuleAccessInterface;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaClassification;
-import org.mycore.datamodel.metadata.MCRMetaIFS;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
-import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
-import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
-import org.mycore.frontend.fileupload.MCRUploadHelper;
-import org.mycore.services.i18n.MCRTranslation;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
+import org.mycore.frontend.fileupload.MCRUploadHelper;
+import org.mycore.services.i18n.MCRTranslation;
+
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -84,8 +69,6 @@ import jakarta.ws.rs.core.Response;
 public class MCRUploadResource {
 
     private static final String FILE_PROCESSOR_PROPERTY = "MCR.MCRUploadHandlerIFS.FileProcessors";
-
-    private static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.NotPreferredFiletypeForMainfile";
 
     private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
 
@@ -132,45 +115,10 @@ public class MCRUploadResource {
         }).collect(Collectors.toList());
     }
 
-    private static void setDefaultMainFile(MCRDerivate derivate) {
-        MCRPath path = MCRPath.getPath(derivate.getId().toString(), "/");
-        List<String> ignoreMainfileList = MCRConfiguration2.getString(IGNORE_MAINFILE_PROPERTY)
-            .map(MCRConfiguration2::splitValue)
-            .map(s -> s.collect(Collectors.toList()))
-            .orElseGet(Collections::emptyList);
-        try {
-            MCRFileCollectingFileVisitor<java.nio.file.Path> visitor = new MCRFileCollectingFileVisitor<>();
-            Files.walkFileTree(path, visitor);
-
-            //sort files by name
-            ArrayList<java.nio.file.Path> paths = visitor.getPaths();
-            paths.sort(Comparator.comparing(java.nio.file.Path::getNameCount)
-                .thenComparing(java.nio.file.Path::getFileName));
-            //extract first file, before filtering
-            MCRPath firstPath = MCRPath.toMCRPath(paths.get(0));
-
-            //filter files, remove files that should be ignored for mainfile
-            paths.stream()
-                .map(MCRPath.class::cast)
-                .filter(p -> ignoreMainfileList.stream().noneMatch(p.getOwnerRelativePath()::endsWith))
-                .findFirst()
-                .or(() -> Optional.of(firstPath))
-                .ifPresent(file -> {
-                    derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
-                    try {
-                        MCRMetadataManager.update(derivate);
-                    } catch (MCRPersistenceException | MCRAccessException e) {
-                        LOGGER.error("Could not set main file!", e);
-                    }
-                });
-        } catch (IOException e) {
-            LOGGER.error("Could not set main file!", e);
-        }
-    }
-
     @PUT
     @Path("commit")
-    public void commit(@QueryParam("uploadID") String uploadID,
+    public Response commit(@QueryParam("uploadID") String uploadID,
+        @QueryParam("uploadHandler") String uploadHandlerID,
         @QueryParam("classifications") String classificationValues) {
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(uploadID);
         if (bucket == null) {
@@ -178,46 +126,30 @@ public class MCRUploadResource {
         }
 
         final List<MCRMetaClassification> classifications = getClassifications(classificationValues);
-
-        final java.nio.file.Path root = bucket.getRoot();
-
         MCRObjectID objOrDerivateID = MCRObjectID.getInstance(bucket.getObjectID());
-        final boolean isDerivate = "derivate".equals(objOrDerivateID.getTypeId());
 
-        final MCRPath targetDerivateRoot;
-
-        if (isDerivate) {
-            targetDerivateRoot = MCRPath.getPath(objOrDerivateID.toString(), "/");
-        } else {
-            try {
-                objOrDerivateID = createDerivate(objOrDerivateID, classifications).getId();
-                targetDerivateRoot = MCRPath.getPath(objOrDerivateID.toString(), "/");
-            } catch (MCRAccessException e) {
-                throw new MCRUploadException("mcr.upload.create.derivate.failed", e);
-            }
-        }
-
-        final MCRTreeCopier copier;
-        try {
-            copier = new MCRTreeCopier(root, targetDerivateRoot, false, true);
-        } catch (NoSuchFileException e) {
-            throw new MCRException(e);
-        }
+        MCRUploadHandler uploadHandler = getUploadHandler(uploadHandlerID);
+        URI location;
 
         try {
-            Files.walkFileTree(root, copier);
-        } catch (IOException e) {
-            throw new MCRUploadException("mcr.upload.import.failed", e);
+            location = uploadHandler.commit(objOrDerivateID, bucket, classifications);
+        } finally {
+            MCRFileUploadBucket.releaseBucket(bucket.getBucketID());
         }
-
-        MCRDerivate theDerivate = MCRMetadataManager.retrieveMCRDerivate(objOrDerivateID);
-
-        String mainDoc = theDerivate.getDerivate().getInternals().getMainDoc();
-        if (mainDoc == null || mainDoc.isEmpty()) {
-            setDefaultMainFile(theDerivate);
+        if (location == null) {
+            return Response.ok().build();
         }
+        return Response.created(location).build();
+    }
 
-        MCRFileUploadBucket.releaseBucket(uploadID);
+    public static MCRUploadHandler getUploadHandler(String uploadHandlerID) {
+        Optional<MCRUploadHandler> uploadHandler = MCRConfiguration2
+            .getInstanceOf("MCR.Upload.Handler." + Optional.ofNullable(uploadHandlerID).orElse("Default"));
+
+        if (uploadHandler.isEmpty()) {
+            throw new BadRequestException("uploadHandler " + uploadHandlerID + " is invalid!");
+        }
+        return uploadHandler.get();
     }
 
     private List<MCRMetaClassification> getClassifications(String classifications) {
@@ -242,53 +174,6 @@ public class MCRUploadResource {
             .map(category -> new MCRMetaClassification("classification", 0, null, category.getRootID(),
                 category.getID()))
             .collect(Collectors.toList());
-    }
-
-    private MCRObjectID getNewCreateDerivateID(MCRObjectID objId) {
-        String projectID = objId.getProjectId();
-        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectID + "_derivate");
-
-    }
-
-    private MCRDerivate createDerivate(MCRObjectID objectID, List<MCRMetaClassification> classifications)
-        throws MCRPersistenceException, MCRAccessException {
-
-        MCRObjectID derivateID = getNewCreateDerivateID(objectID);
-        MCRDerivate derivate = new MCRDerivate();
-        derivate.setId(derivateID);
-        derivate.getDerivate().getClassifications().addAll(classifications);
-
-        String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate").orElse("datamodel-derivate.xml")
-            .replaceAll(".xml", ".xsd");
-        derivate.setSchema(schema);
-
-        MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmeta");
-        linkId.setReference(objectID, null, null);
-        derivate.getDerivate().setLinkMeta(linkId);
-
-        MCRMetaIFS ifs = new MCRMetaIFS();
-        ifs.setSubTag("internal");
-        ifs.setSourcePath(null);
-        derivate.getDerivate().setInternals(ifs);
-
-        LOGGER.debug("Creating new derivate with ID {}", derivateID);
-        MCRMetadataManager.create(derivate);
-
-        setDefaultPermissions(derivateID);
-
-        return derivate;
-    }
-
-    private void setDefaultPermissions(MCRObjectID derivateID) {
-        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
-            MCRRuleAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
-            for (String permission : configuredPermissions) {
-                MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
-                    "default derivate rule");
-            }
-        }
     }
 
     @GET
@@ -326,14 +211,13 @@ public class MCRUploadResource {
     public void uploadFile(@PathParam("path") String path,
         @PathParam("objectID") String objectID,
         @QueryParam("uploadID") String uploadID,
+        @QueryParam("uploadHandler") String uploadHandlerID,
         InputStream contents)
         throws IOException {
 
         MCRObjectID oid = MCRObjectID.getInstance(objectID);
-        if (!MCRMetadataManager.exists(oid) || !MCRAccessManager
-            .checkPermission(oid, MCRAccessManager.PERMISSION_WRITE)) {
-            throw new ForbiddenException("No write access to " + oid);
-        }
+        MCRUploadHandler uploadHandler = getUploadHandler(uploadHandlerID);
+        uploadHandler.validateObject(oid);
 
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getOrCreateBucket(uploadID, objectID);
 

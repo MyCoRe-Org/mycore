@@ -85,8 +85,8 @@ export class FileTransferGUI {
             this.handleCommitStartet(uploadID);
         });
 
-        queue.addCommitCompleteHandler((uploadID: string, error: boolean, message: string) => {
-            this.handleCommitCompleted(uploadID, error, message);
+        queue.addCommitCompleteHandler((uploadID: string, error: boolean, message: string, location: string) => {
+            this.handleCommitCompleted(uploadID, error, message, location);
         });
 
         queue.addProgressHandler((ft) => this.handleTransferProgress(ft));
@@ -239,12 +239,17 @@ export class FileTransferGUI {
         this.showCommitWarning(true);
     }
 
-    private handleCommitCompleted(uploadID: string, error: boolean, message: string) {
+    private handleCommitCompleted(uploadID: string, error: boolean, message: string, location: string) {
         this.runningCommitList.splice(this.runningCommitList.indexOf(uploadID), 1);
         if (!error) {
             if (this.runningCommitList.length === 0) {
                 this.showCommitWarning(false);
-                window.location.reload();
+
+                if (!location) {
+                    window.location.reload();
+                } else {
+                    window.location.assign(location);
+                }
             }
         } else {
             this.showCommitWarning(false);
