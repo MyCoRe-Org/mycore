@@ -20,6 +20,8 @@ package org.mycore.datamodel.metadata;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,6 +57,19 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
         getStore().create(id2, new Document(new Element("test")), new Date());
         MCRObjectID id3 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
         assertEquals("Second id should be int 3", 3, id3.getNumberAsInteger());
+    }
+
+    @Test
+    public void validateID() {
+        assertTrue("The mcrid 'JUnit_test_123' is valid", MCRObjectID.isValid("JUnit_test_123"));
+        assertFalse("The mcrid 'JUnit_xxx_123' is invalid (unknown type)", MCRObjectID.isValid("JUnit_xxx_123"));
+        assertFalse("The mcrid 'JUnit_test__123' is invalid (to many underscores)",
+            MCRObjectID.isValid("JUnit_test__123"));
+        assertFalse("The mcrid 'JUnit_test_123 ' is invalid (space at end)", MCRObjectID.isValid("JUnit_test_123 "));
+        assertFalse("The mcrid 'JUnit_test_-123' is invalid (negative number)", MCRObjectID.isValid("JUnit_test_-123"));
+        assertFalse(
+            "The mcrid 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123' is invalid (length)",
+            MCRObjectID.isValid("aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123"));
     }
 
     @Test
