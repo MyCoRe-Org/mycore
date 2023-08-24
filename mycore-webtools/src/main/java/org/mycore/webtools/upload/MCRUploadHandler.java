@@ -2,11 +2,15 @@ package org.mycore.webtools.upload;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.webtools.upload.exception.MCRBadFileException;
+import org.mycore.webtools.upload.exception.MCRBadUploadParameterException;
+import org.mycore.webtools.upload.exception.MCRMissingParameterException;
+import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
+import org.mycore.webtools.upload.exception.MCRUploadServerException;
 
 /**
  * Handles uploaded {@link MCRFileUploadBucket}s
@@ -14,22 +18,35 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public interface MCRUploadHandler {
 
     /**
+     * Checks if the upload is allowed for the current user and if the parameters are valid
+     * @param uploadID the uploadID which was passed to the upload
+     * @param parameters the parameters that were passed to the upload, eg. the {@link MCRObjectID}
+     * @throws MCRUploadForbiddenException if the upload is not allowed
+     * @throws MCRUploadServerException  if something went wrong serverside while begin
+     */
+    void begin(String uploadID, Map<String, List<String>> parameters)
+        throws MCRUploadForbiddenException, MCRUploadServerException,
+        MCRMissingParameterException, MCRBadUploadParameterException;
+
+    /**
      * Traverses the given {@link MCRFileUploadBucket} and creates or updates the corresponding
      * {@link org.mycore.datamodel.metadata.MCRObject}
      * 
-     * @param objectID the {@link MCRObjectID} of the {@link org.mycore.datamodel.metadata.MCRObject} or
-     * {@link org.mycore.datamodel.metadata.MCRDerivate} to create or update
+     * {@link MCRMetaClassification} that should be assigned to the new
+     * {@link org.mycore.datamodel.metadata.MCRDerivate}
      * @param bucket the {@link MCRFileUploadBucket} to traverse
-     * @param classifications the {@link MCRMetaClassification}s to add to the Derivate
+     * @throws MCRUploadServerException  if something went wrong serverside while commiting
      */
-    URI commit(MCRObjectID objectID, MCRFileUploadBucket bucket, List<MCRMetaClassification> classifications);
+    URI commit(MCRFileUploadBucket bucket) throws MCRUploadServerException;
 
     /**
-     * Validates the given {@link MCRObjectID} and throws an exception if the object is not valid
-     *
-     * @param oid the {@link MCRObjectID} to validate
-     * @throws ForbiddenException if the user is not allowed to access the object
-     * @throws BadRequestException if the object is not valid
+     * Validates if the file name and size
+     * @param name the file name
+     * @param size the size of the file
+     * @throws MCRUploadForbiddenException if the user is not allowed to upload the file
+     * @throws MCRBadFileException if the file bad
+     * @throws MCRUploadServerException if something went wrong serverside while uploading
      */
-    void validateObject(MCRObjectID oid) throws ForbiddenException, BadRequestException;
+    void validateFileMetadata(String name, long size)
+        throws MCRUploadForbiddenException, MCRBadFileException, MCRUploadServerException;
 }

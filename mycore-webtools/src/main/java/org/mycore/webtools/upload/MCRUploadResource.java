@@ -29,41 +29,34 @@ import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.metadata.MCRMetaClassification;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
-import org.mycore.frontend.fileupload.MCRUploadHelper;
-import org.mycore.services.i18n.MCRTranslation;
-
-import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import org.mycore.webtools.upload.exception.MCRBadFileException;
+import org.mycore.webtools.upload.exception.MCRBadUploadParameterException;
+import org.mycore.webtools.upload.exception.MCRMissingParameterException;
+import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
+import org.mycore.webtools.upload.exception.MCRUploadServerException;
 
 @Path("files/upload/")
 public class MCRUploadResource {
@@ -116,25 +109,47 @@ public class MCRUploadResource {
     }
 
     @PUT
-    @Path("commit")
-    public Response commit(@QueryParam("uploadID") String uploadID,
-        @QueryParam("uploadHandler") String uploadHandlerID,
-        @QueryParam("classifications") String classificationValues) {
+    @Path("{uploadID}/begin")
+    public Response begin(@PathParam("uploadID") String uploadID,
+        @QueryParam("uploadHandler") String uploadHandlerID) throws MCRUploadServerException {
+        MultivaluedMap<String, String> parameters = request.getUriInfo().getQueryParameters();
+
+        MCRUploadHandler uploadHandler = getUploadHandler(uploadHandlerID);
+        try {
+            uploadHandler.begin(uploadID, parameters);
+        } catch (MCRUploadForbiddenException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        } catch (MCRBadUploadParameterException | MCRMissingParameterException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (MCRUploadServerException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+
+        MCRFileUploadBucket.createBucket(uploadID, parameters, uploadHandler);
+
+        return Response.noContent().build();
+    }
+
+    @PUT
+    @Path("{uploadID}/commit")
+    public Response commit(@PathParam("uploadID") String uploadID) {
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(uploadID);
         if (bucket == null) {
             throw new BadRequestException("uploadID " + uploadID + " is invalid!");
         }
 
-        final List<MCRMetaClassification> classifications = getClassifications(classificationValues);
-        MCRObjectID objOrDerivateID = MCRObjectID.getInstance(bucket.getObjectID());
-
-        MCRUploadHandler uploadHandler = getUploadHandler(uploadHandlerID);
         URI location;
 
         try {
-            location = uploadHandler.commit(objOrDerivateID, bucket, classifications);
+            location = bucket.getUploadHandler().commit(bucket);
+        } catch (MCRUploadServerException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         } finally {
-            MCRFileUploadBucket.releaseBucket(bucket.getBucketID());
+            try {
+                MCRFileUploadBucket.releaseBucket(bucket.getBucketID());
+            } catch (MCRUploadServerException e) {
+                // cant handle that
+            }
         }
         if (location == null) {
             return Response.ok().build();
@@ -144,82 +159,46 @@ public class MCRUploadResource {
 
     public static MCRUploadHandler getUploadHandler(String uploadHandlerID) {
         Optional<MCRUploadHandler> uploadHandler = MCRConfiguration2
-            .getInstanceOf("MCR.Upload.Handler." + Optional.ofNullable(uploadHandlerID).orElse("Default"));
+            .getSingleInstanceOf("MCR.Upload.Handler." + Optional.ofNullable(uploadHandlerID).orElse("Default"));
 
         if (uploadHandler.isEmpty()) {
-            throw new BadRequestException("uploadHandler " + uploadHandlerID + " is invalid!");
+            throw new BadRequestException("The UploadHandler " + uploadHandlerID + " is invalid!");
         }
         return uploadHandler.get();
     }
 
-    private List<MCRMetaClassification> getClassifications(String classifications) {
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        final List<MCRCategoryID> categoryIDS = Stream.of(classifications)
-            .filter(Objects::nonNull)
-            .filter(Predicate.not(String::isBlank))
-            .flatMap(c -> Stream.of(c.split(",")))
-            .filter(Predicate.not(String::isBlank))
-            .filter(cv -> cv.contains(":"))
-            .map(classValString -> {
-                final String[] split = classValString.split(":");
-                return new MCRCategoryID(split[0], split[1]);
-            }).collect(Collectors.toList());
-
-        if (!categoryIDS.stream().allMatch(dao::exist)) {
-            final String parsedIDS = categoryIDS.stream().map(Object::toString).collect(Collectors.joining(","));
-            throw new MCRException(String.format(Locale.ROOT, "One of the Categories \"%s\" was not found", parsedIDS));
-        }
-
-        return categoryIDS.stream()
-            .map(category -> new MCRMetaClassification("classification", 0, null, category.getRootID(),
-                category.getID()))
-            .collect(Collectors.toList());
-    }
-
     @GET
-    @Path("{objectID}/{path:.+}")
+    @Path("{uploadID}/{path:.+}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response validateFile(@PathParam("path") String path,
-        @PathParam("objectID") String objectID,
+    public Response validateFile(
+        @PathParam("uploadID") String uploadID,
+        @QueryParam("uploadHandler") String uploadHandlerID,
+        @PathParam("path") String path,
         @QueryParam("size") String size) {
         String fileName = Paths.get(path).getFileName().toString();
         String unicodeNormalizedFileName =  Normalizer.normalize(fileName, Normalizer.Form.NFC);
-        String translation = MCRTranslation.translate("IFS.invalid.fileName", unicodeNormalizedFileName);
+
         try {
-            MCRUploadHelper.checkPathName(unicodeNormalizedFileName);
-        } catch (MCRException e) {
-            LOGGER.warn("Invalid file name: {} -> {}", unicodeNormalizedFileName, e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), translation)
-                    .entity(translation).build();
-        }
-
-        long sizeL = Long.parseLong(size);
-        long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
-
-        if (sizeL > maxSize) {
-            translation = MCRTranslation.translate("component.webtools.upload.invalid.fileSize",
-                unicodeNormalizedFileName, MCRUtils.getSizeFormatted(sizeL), MCRUtils.getSizeFormatted(maxSize));
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                translation).entity(translation).build();
+            getUploadHandler(uploadHandlerID).validateFileMetadata(unicodeNormalizedFileName, Long.parseLong(size));
+        } catch (MCRUploadForbiddenException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        } catch (MCRBadFileException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (MCRUploadServerException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
         return Response.ok().build();
     }
 
     @PUT
-    @Path("{objectID}/{path:.+}")
-    public void uploadFile(@PathParam("path") String path,
-        @PathParam("objectID") String objectID,
-        @QueryParam("uploadID") String uploadID,
-        @QueryParam("uploadHandler") String uploadHandlerID,
+    @Path("{uploadID}/{path:.+}")
+    public Response uploadFile(@PathParam("path") String path,
+        @PathParam("uploadID") String uploadID,
         InputStream contents)
         throws IOException {
 
-        MCRObjectID oid = MCRObjectID.getInstance(objectID);
-        MCRUploadHandler uploadHandler = getUploadHandler(uploadHandlerID);
-        uploadHandler.validateObject(oid);
-
-        final MCRFileUploadBucket bucket = MCRFileUploadBucket.getOrCreateBucket(uploadID, objectID);
+        final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(uploadID);
 
         String unicodeNormalizedPath = Normalizer.normalize(path, Normalizer.Form.NFC);
         final java.nio.file.Path filePath = MCRUtils.safeResolve(bucket.getRoot(), unicodeNormalizedPath);
@@ -231,18 +210,22 @@ public class MCRUploadResource {
         }
 
         String actualStringFileName = bucket.getRoot().relativize(filePath).getFileName().toString();
+        MCRUploadHandler uploadHandler = bucket.getUploadHandler();
+
+        String contentLengthStr = request.getHeaderString(HttpHeaders.CONTENT_LENGTH);
+        long contentLength = contentLengthStr == null ? 0 : Long.parseLong(contentLengthStr);
         try {
-            MCRUploadHelper.checkPathName(actualStringFileName);
-        } catch (MCRException e) {
-            throw new ClientErrorException(e.getMessage(), Response.Status.BAD_REQUEST.getStatusCode());
+            uploadHandler.validateFileMetadata(actualStringFileName, contentLength);
+        } catch (MCRUploadForbiddenException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        } catch (MCRBadFileException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (MCRUploadServerException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
-        long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
-        String contentLength = request.getHeaderString(HttpHeaders.CONTENT_LENGTH);
-        if (contentLength == null || Long.parseLong(contentLength) == 0) {
+        if (contentLength == 0) {
             Files.createDirectory(filePath);
-        } else if (Long.parseLong(contentLength) > maxSize) {
-            throw new BadRequestException("File is to big. " + unicodeNormalizedPath);
         } else {
             final List<MCRPostUploadFileProcessor> processors = FILE_PROCESSORS.stream()
                 .filter(processor -> processor.isProcessable(unicodeNormalizedPath))
@@ -267,6 +250,7 @@ public class MCRUploadResource {
                 Files.deleteIfExists(input);
             }
         }
+        return Response.noContent().build();
     }
 
 }

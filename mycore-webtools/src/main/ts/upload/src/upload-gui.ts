@@ -22,6 +22,7 @@ import {FileTransferQueue} from "./FileTransferQueue";
 import {FileTransfer} from "./FileTransfer";
 import {Utils} from "./Utils";
 import {I18N} from "./I18N";
+import {TransferSession} from "./TransferSession";
 
 export class FileTransferGUI {
 
@@ -90,6 +91,10 @@ export class FileTransferGUI {
         });
 
         queue.addProgressHandler((ft) => this.handleTransferProgress(ft));
+
+        queue.addBeginSessionErrorHandler((session, message) => {
+           this.handleSessionBeginError(session, message);
+        });
 
         window.setInterval(() => {
             for (let id in this.tpMap) {
@@ -253,11 +258,11 @@ export class FileTransferGUI {
             }
         } else {
             this.showCommitWarning(false);
-            this.showCommitError(message);
+            this.showError(message);
         }
     }
 
-    private showCommitError(message: string) {
+    private showError(message: string) {
         const error = this._uploadBox.querySelector(".mcr-commit-error");
         if (error.classList.contains("d-none")) {
             error.classList.remove("d-none");
@@ -275,6 +280,10 @@ export class FileTransferGUI {
         } else if (!show && !warning.classList.contains("d-none")) {
             warning.classList.add("d-none");
         }
+    }
+
+    private handleSessionBeginError(session: TransferSession, message: string) {
+        this.showError(message);
     }
 }
 

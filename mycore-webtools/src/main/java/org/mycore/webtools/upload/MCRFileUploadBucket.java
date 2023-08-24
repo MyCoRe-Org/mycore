@@ -21,46 +21,55 @@ package org.mycore.webtools.upload;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.mycore.webtools.upload.exception.MCRUploadServerException;
 
 /**
- * MCR.Upload.TempDirectory.Delete.Failed = Dass Löschen eines temporären Ordner ist gescheitert!
- * MCR.Upload.TempDirectory.Create.Failed = Das Erstellen eines temporären Ordner ist gescheitert!
- * MCR.Upload.UploadHandlerNotSupported = Upload Handler werden aktuell nicht unterstützt!
+ * A MCRFileUploadBucket is a temporary directory for file uploads. It is created on demand and deleted when the session
+ * is closed or the application is shut down or the bucket is closed.
+ * The bucket is identified by a bucketID. It also contains a root directory, where the uploaded files are stored,
+ * the parameters and the upload handler used for the upload.
  *
  */
 public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
 
     private static final ConcurrentHashMap<String, MCRFileUploadBucket> BUCKET_MAP = new ConcurrentHashMap<>();
 
-    private String bucketID;
-
-    private String objectID;
+    private final String bucketID;
 
     private Path root;
 
     private String sessionID;
 
+    private final Map<String, List<String>> parameters;
+
+    private final MCRUploadHandler uploadHandler;
+
     /**
      *
      * @param bucketID of the bucket
-     * @param objectID the id of the mycore metadata object or derivate id
      */
-    private MCRFileUploadBucket(String bucketID, String objectID) {
+    private MCRFileUploadBucket(String bucketID, Map<String, List<String>> parameters, MCRUploadHandler uploadHandler)
+        throws MCRUploadServerException {
         this.bucketID = bucketID;
-        this.objectID = objectID;
+        this.parameters = parameters;
+        this.uploadHandler = uploadHandler;
         sessionID = MCRSessionMgr.getCurrentSessionID();
 
         try {
             root = Files.createTempDirectory("mycore_" + bucketID);
         } catch (IOException e) {
-            throw new MCRUploadException("MCR.Upload.TempDirectory.Create.Failed", e);
+            throw new MCRUploadServerException("component.webtools.upload.temp.create.failed", e);
         }
 
         MCRSessionMgr.addSessionListener(this);
@@ -71,20 +80,33 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
         return BUCKET_MAP.get(bucketID);
     }
 
-    public static synchronized MCRFileUploadBucket getOrCreateBucket(String bucketID, String objectID) {
-        final MCRFileUploadBucket mcrFileUploadBucket = BUCKET_MAP
-            .computeIfAbsent(bucketID, (id) -> new MCRFileUploadBucket(bucketID, objectID));
-        return mcrFileUploadBucket;
+    public static synchronized MCRFileUploadBucket createBucket(String bucketID,
+        Map<String, List<String>> parameters,
+        MCRUploadHandler uploadHandler) throws MCRUploadServerException {
+        try {
+            return BUCKET_MAP.computeIfAbsent(bucketID, (id) -> {
+                try {
+                    return new MCRFileUploadBucket(id, parameters, uploadHandler);
+                } catch (MCRUploadServerException e) {
+                    throw new MCRException(e);
+                }
+            });
+        } catch (MCRException e) {
+            if (e.getCause() instanceof MCRUploadServerException use) {
+                throw use;
+            }
+            throw e;
+        }
     }
 
-    public static synchronized void releaseBucket(String bucketID) {
+    public static synchronized void releaseBucket(String bucketID) throws MCRUploadServerException {
         if (BUCKET_MAP.containsKey(bucketID)) {
             final MCRFileUploadBucket bucket = BUCKET_MAP.get(bucketID);
             if (Files.exists(bucket.root)) {
                 try {
                     Files.walkFileTree(bucket.root, MCRRecursiveDeleter.instance());
                 } catch (IOException e) {
-                    throw new MCRUploadException("MCR.Upload.TempDirectory.Delete.Failed", e);
+                    throw new MCRUploadServerException("component.webtools.upload.temp.delete.failed", e);
                 }
             }
             BUCKET_MAP.remove(bucketID);
@@ -95,8 +117,12 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
         return bucketID;
     }
 
-    public String getObjectID() {
-        return objectID;
+    public Map<String, List<String>> getParameters() {
+        return Collections.unmodifiableMap(parameters);
+    }
+
+    public MCRUploadHandler getUploadHandler() {
+        return uploadHandler;
     }
 
     public Path getRoot() {
@@ -115,6 +141,10 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
 
     @Override
     public void close() {
-        releaseBucket(this.bucketID);
+        try {
+            releaseBucket(this.bucketID);
+        } catch (MCRUploadServerException e) {
+            throw new MCRException("Error while releasing bucket on close", e);
+        }
     }
 }

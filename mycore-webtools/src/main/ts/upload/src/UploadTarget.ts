@@ -28,8 +28,7 @@ export class UploadTarget {
     // the path to a folder
     private target: string | null;
     private uploadHandler: string | null;
-    private object: string | null;
-    private classifications: string | null;
+    private attributes: Record<string, string> = {};
 
     private readonly uploadTargetAttribute = "data-upload-target";
 
@@ -37,9 +36,13 @@ export class UploadTarget {
 
     constructor(element: HTMLElement, manualToggle: HTMLElement) {
         this.target = element.getAttribute(this.uploadTargetAttribute);
-        this.object = element.getAttribute("data-upload-object");
-        this.uploadHandler = element.getAttribute("data-upload-handler");
-        this.classifications = element.getAttribute(this.uploadClassificationsAttribute);
+        this.uploadHandler = element.getAttribute("data-upload-handler") || "Default";
+
+        element.getAttributeNames().forEach((name) => {
+           if(name.startsWith("data-upload-")) {
+               this.attributes[name.substring("data-upload-".length)] = element.getAttribute(name) || "Default";
+           }
+        });
 
         const observer = new MutationObserver((mutations => {
             mutations.forEach((mutation) => {
@@ -47,8 +50,9 @@ export class UploadTarget {
                     if (this.uploadTargetAttribute === mutation.attributeName) {
                         this.target = element.getAttribute(this.uploadTargetAttribute);
                     }
-                    if (this.uploadClassificationsAttribute === mutation.attributeName) {
-                        this.classifications = element.getAttribute(this.uploadClassificationsAttribute);
+                    if(mutation.attributeName.startsWith("data-upload-")) {
+                        this.attributes[mutation.attributeName.substring("data-upload-".length)] =
+                            element.getAttribute(mutation.attributeName);
                     }
                 }
             })
@@ -82,18 +86,20 @@ export class UploadTarget {
                 }
 
                 const uploadID = (Math.random() * 10000).toString(10);
+                FileTransferQueue.getQueue().registerTransferSession(uploadID, this.uploadHandler,this.attributes);
 
                 fileInput.setAttribute("type", "file");
                 fileInput.addEventListener('change', async () => {
                     for (let i = 0; i < fileInput.files.length; i++) {
                         let file = fileInput.files.item(i);
-                        const validation = await this.validateTraverse(this.object, file);
+                        const validation = await this.validateTraverse(uploadID, file);
                         if (!validation.test) {
                             // TODO: show nice in GUI
                             alert(validation.reason);
                             return true;
                         }
-                        const fileTransfer = new FileTransfer(file, this.target, uploadID, this.object, [], this.uploadHandler, this.classifications);
+                        const fileTransfer = new FileTransfer(file, this.target, uploadID, []);
+                        FileTransferQueue.getQueue()
                         FileTransferQueue.getQueue().add(fileTransfer);
                     }
                 });
@@ -110,6 +116,7 @@ export class UploadTarget {
         if ("dataTransfer" in event) {
             let items = event.dataTransfer.items;
             const uploadID = (Math.random() * 10000).toString(10);
+            FileTransferQueue.getQueue().registerTransferSession(uploadID, this.uploadHandler,this.attributes);
 
             const webkitEntries: any[] = [];
             for (let i = 0; i < items.length; i++) {
@@ -118,7 +125,7 @@ export class UploadTarget {
 
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
-                const validation = await this.validateTraverse(this.object, file);
+                const validation = await this.validateTraverse(uploadID, file);
                 if (!validation.test) {
                     // TODO: show nice in GUI
                     alert(validation.reason);
@@ -127,26 +134,26 @@ export class UploadTarget {
             }
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
-                this.traverse(file, uploadID, this.object);
+                this.traverse(uploadID, file);
             }
         }
 
         return true;
     }
 
-    private async validateTraverse(object: string, fileEntry: any): Promise<{ test: boolean, fileEntry: any, reason: string | null }> {
+    private async validateTraverse(uploadId: string, fileEntry: any): Promise<{ test: boolean, fileEntry: any, reason: string | null }> {
         if (fileEntry.isDirectory) {
             let children = await this.readEntries(fileEntry);
             for (let childIndex in children) {
                 const child = children[childIndex];
-                const validation = await this.validateTraverse(object, child);
+                const validation = await this.validateTraverse(uploadId, child);
                 if (!validation.test) {
                     return validation;
                 }
             }
             return {test: true, fileEntry, reason: null};
         } else {
-            const validation = await this.validateFile(object, fileEntry);
+            const validation = await this.validateFile(uploadId, fileEntry);
             return {test: validation.valid, fileEntry, reason: validation.reason};
         }
     }
@@ -169,11 +176,11 @@ export class UploadTarget {
      * This method sends the name and the size of a fileEntry to the server to validate them.
      * The client could lie, but the data will be also validated at the real upload. This is only to prevent the client
      * sending a 2GB file unnecessarily.
-     * @param object the object id to which the file is added
+     * @param uploadId the upload id to which the file is added
      * @param fileEntry the entry which contains the name and size
      * @private
      */
-    private async validateFile(object: string, fileEntry: File|FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
+    private async validateFile(uploadId: string, fileEntry: File|FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
         const size = await this.getEntrySize(fileEntry);
         return new Promise((accept, reject) => {
             const isFileSystemEntry = 'fullPath' in fileEntry;
@@ -184,7 +191,8 @@ export class UploadTarget {
             } else {
                 uploadPath = fileEntry.name;
             }
-            const url = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + object + "/" + uploadPath + "?size=" + size;
+            const url = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + uploadId + "/" + uploadPath + "?size=" + size+
+                "&uploadHandler=" + this.uploadHandler;
             const request = new XMLHttpRequest();
             request.open('GET', url, true);
 
@@ -221,8 +229,8 @@ export class UploadTarget {
         });
     }
 
-    private traverse(fileEntry: any, uploadID: string, object: string, parentTransfers: FileTransfer[] = []) {
-        const fileTransfer = new FileTransfer(fileEntry, this.target, uploadID, object, parentTransfers, this.uploadHandler, this.classifications);
+    private traverse(uploadID: string, fileEntry: any, parentTransfers: FileTransfer[] = []) {
+        const fileTransfer = new FileTransfer(fileEntry, this.target, uploadID, parentTransfers);
         FileTransferQueue.getQueue().add(fileTransfer);
 
         if (fileEntry.isDirectory) {
@@ -237,7 +245,7 @@ export class UploadTarget {
             const readEntry = (results) => {
                 const result = results;
 
-                result.forEach((e) => this.traverse(e, uploadID, object, newParentTransfers));
+                result.forEach((e) => this.traverse(uploadID, e, newParentTransfers));
                 if (result.length > 0) {
                     reader.readEntries(readEntry, errorCallback);
                 }

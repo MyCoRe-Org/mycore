@@ -26,16 +26,15 @@ export class FileTransfer {
     private progressHandler: () => void;
     private request: XMLHttpRequest;
 
-    constructor(private _entry: any, private _target: string, private _uploadID: string, private _targetObject: string, public requires: Array<FileTransfer> = [], private _uploadHandler: string = null, private _classifications: string = null) {
+    constructor(private _entry: any,
+                private _target: string,
+                private _uploadID: string,
+                public requires: Array<FileTransfer> = []) {
         this._transferID = (Math.random() * 1000).toString();
     }
 
     get fileName(): string {
         return (this._entry instanceof File) ? this._entry.name : this._entry.fullPath;
-    }
-
-    get uploadHandler(): string {
-        return this._uploadHandler;
     }
 
     get uploadID(): string {
@@ -48,14 +47,6 @@ export class FileTransfer {
 
     get target(): string {
         return this._target;
-    }
-
-    get targetObject(): string {
-        return this._targetObject;
-    }
-
-    get classifications(): string {
-        return this._classifications;
     }
 
     private _error: boolean = false;
@@ -145,7 +136,7 @@ export class FileTransfer {
 
         this.request = new XMLHttpRequest();
 
-        this.request.open('PUT', Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + this.targetObject + this.target + uploadPath + "?uploadID=" + this._uploadID + (this._uploadHandler ? "&uploadHandler=" + this._uploadHandler : ""), true);
+        this.request.open('PUT', Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" +  this._uploadID + this.target + uploadPath, true);
 
         this.request.onreadystatechange = (result) => {
             if (this.request.readyState === 4 && this.request.status === 204) {
