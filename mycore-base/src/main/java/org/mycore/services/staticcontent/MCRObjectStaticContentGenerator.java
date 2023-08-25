@@ -50,11 +50,13 @@ public class MCRObjectStaticContentGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String CONFIG_ID_PREFIX = "MCR.Object.Static.Content.Generator.";
+    protected static final String CONFIG_ID_PREFIX = "MCR.Object.Static.Content.Generator.";
 
     private static final String DEFAULT_TRANSFORMER_PATH_PROPERTY = "MCR.Object.Static.Content.Default.Path";
 
     private static final String CLASS_SUFFIX = ".Class";
+
+    protected final String configID;
 
     private MCRContentTransformer transformer;
 
@@ -67,17 +69,20 @@ public class MCRObjectStaticContentGenerator {
                     "The suffix " + TRANSFORMER_SUFFIX + " is not set for " + CONFIG_ID_PREFIX + configID)),
             MCRConfiguration2.getString(CONFIG_ID_PREFIX + configID + ROOT_PATH_SUFFIX)
                 .orElseGet(() -> MCRConfiguration2.getStringOrThrow(DEFAULT_TRANSFORMER_PATH_PROPERTY) + "/"
-                    + configID));
+                    + configID),
+            configID);
     }
 
-    protected MCRObjectStaticContentGenerator(String transformer, String staticFileRootPath) {
+    protected MCRObjectStaticContentGenerator(String transformer, String staticFileRootPath, String configID) {
         this(MCRContentTransformerFactory.getTransformer(transformer),
-            staticFileRootPath != null ? Paths.get(staticFileRootPath) : null);
+            staticFileRootPath != null ? Paths.get(staticFileRootPath) : null, configID);
     }
 
-    protected MCRObjectStaticContentGenerator(MCRContentTransformer transformer, Path staticFileRootPath) {
+    protected MCRObjectStaticContentGenerator(MCRContentTransformer transformer, Path staticFileRootPath,
+        String configID) {
         this.transformer = transformer;
         this.staticFileRootPath = staticFileRootPath;
+        this.configID = configID;
     }
 
     static MCRObjectStaticContentGenerator get(String id) {
@@ -175,5 +180,9 @@ public class MCRObjectStaticContentGenerator {
 
     public MCRContentTransformer getTransformer() {
         return transformer;
+    }
+
+    public String getConfigID() {
+        return configID;
     }
 }
