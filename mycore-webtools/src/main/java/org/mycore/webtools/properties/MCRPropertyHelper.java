@@ -18,7 +18,6 @@
 
 package org.mycore.webtools.properties;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -54,7 +53,7 @@ class MCRPropertyHelper {
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             try (InputStream is = component.getConfigFileStream(filename)) {
                 if (is != null) {
-                    map.put(component.getName(), IOUtils.toByteArray(is));
+                    map.put(component.getName(), is.readAllBytes());
                 }
             }
         }
@@ -62,7 +61,7 @@ class MCRPropertyHelper {
         try (InputStream configStream = getConfigFileStream(filename)) {
             if (configStream != null) {
                 LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
-                map.put("classpath_" + filename, IOUtils.toByteArray(configStream));
+                map.put("classpath_" + filename, configStream.readAllBytes());
             }
         }
 
@@ -71,7 +70,7 @@ class MCRPropertyHelper {
         if (localConfigFile != null && localConfigFile.canRead()) {
             LogManager.getLogger().debug("Loaded config file from config dir: " + filename);
             try (FileInputStream fis = new FileInputStream(localConfigFile)) {
-                map.put("configdir_" + filename, IOUtils.toByteArray(fis));
+                map.put("configdir_" + filename, fis.readAllBytes());
             }
         }
         return map;
