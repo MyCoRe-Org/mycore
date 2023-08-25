@@ -228,7 +228,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     }
 
     private static String filenameToUri(String filename) {
-        return "file://" + new File(filename).getAbsolutePath();
+        return new File(filename).toURI().toString();
     }
 
     private static Element getRuleFromUri(String uri) {
