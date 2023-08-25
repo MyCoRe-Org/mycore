@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +41,8 @@ import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.common.resource.provider.MCRCombinedResourceProvider;
 import org.mycore.common.resource.provider.MCRResourceProvider;
-import org.mycore.common.resource.provider.MCRResourceProvider.ProvidedURL;
+import org.mycore.common.resource.provider.MCRResourceProvider.PrefixStripper;
+import org.mycore.common.resource.provider.MCRResourceProvider.ProvidedUrl;
 
 /**
  * A {@link MCRResourceResolver} is a component that uses a {@link MCRResourceProvider} to lookup resources.
@@ -151,7 +153,7 @@ public final class MCRResourceResolver {
      * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
-    public List<ProvidedURL> resolveAll(MCRResourcePath path) {
+    public List<ProvidedUrl> resolveAll(MCRResourcePath path) {
         return resolveAll(path, defaultHints());
     }
 
@@ -159,7 +161,7 @@ public final class MCRResourceResolver {
      * Resolves a {@link MCRResourcePath}using the given hints, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
-    public List<ProvidedURL> resolveAll(MCRResourcePath path, MCRHints hints) {
+    public List<ProvidedUrl> resolveAll(MCRResourcePath path, MCRHints hints) {
         return allResources(path, hints);
     }
 
@@ -181,15 +183,15 @@ public final class MCRResourceResolver {
      * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
-    public List<ProvidedURL> resolveAll(Optional<MCRResourcePath> path) {
+    public List<ProvidedUrl> resolveAll(Optional<MCRResourcePath> path) {
         return path.map(this::resolveAll).orElse(Collections.emptyList());
     }
 
     /**
-     * Resolves a {@link MCRResourcePath}using the given hints, returning all alternatives (i.e. because one module
+     * Resolves a {@link MCRResourcePath} using the given hints, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
-    public List<ProvidedURL> resolveAll(Optional<MCRResourcePath> path, MCRHints hints) {
+    public List<ProvidedUrl> resolveAll(Optional<MCRResourcePath> path, MCRHints hints) {
         return path.map(p -> resolveAll(p, hints)).orElse(Collections.emptyList());
     }
 
@@ -213,7 +215,7 @@ public final class MCRResourceResolver {
      * Shorthand for {@link MCRResourceResolver#resolveAll(MCRResourcePath)}, interpreting
      * the given path as a resource path.
      */
-    public List<ProvidedURL> resolveAllResource(String path) {
+    public List<ProvidedUrl> resolveAllResource(String path) {
         return resolveAllResource(path, defaultHints());
     }
 
@@ -221,7 +223,7 @@ public final class MCRResourceResolver {
      * Shorthand for {@link MCRResourceResolver#resolveAll(MCRResourcePath, MCRHints)}, interpreting
      * the given path as a resource path.
      */
-    public List<ProvidedURL> resolveAllResource(String path, MCRHints hints) {
+    public List<ProvidedUrl> resolveAllResource(String path, MCRHints hints) {
         return MCRResourcePath.ofPath(path)
             .map(resourcePath -> allResources(resourcePath, hints))
             .orElse(Collections.emptyList());
@@ -247,7 +249,7 @@ public final class MCRResourceResolver {
      * Shorthand for {@link MCRResourceResolver#resolveAll(MCRResourcePath)}, interpreting
      * the given path as a web resource path.
      */
-    public List<ProvidedURL> resolveAllWebResource(String path) {
+    public List<ProvidedUrl> resolveAllWebResource(String path) {
         return resolveAllWebResource(path, defaultHints());
     }
 
@@ -255,7 +257,7 @@ public final class MCRResourceResolver {
      * Shorthand for {@link MCRResourceResolver#resolveAll(MCRResourcePath, MCRHints)}, interpreting
      * the given path as a web resource path.
      */
-    public List<ProvidedURL> resolveAllWebResource(String path, MCRHints hints) {
+    public List<ProvidedUrl> resolveAllWebResource(String path, MCRHints hints) {
         return MCRResourcePath.ofWebPath(path)
             .map(resourcePath -> allResources(resourcePath, hints))
             .orElse(Collections.emptyList());
@@ -273,9 +275,9 @@ public final class MCRResourceResolver {
         return resourceUrl;
     }
 
-    private List<ProvidedURL> allResources(MCRResourcePath path, MCRHints hints) {
+    private List<ProvidedUrl> allResources(MCRResourcePath path, MCRHints hints) {
         LOGGER.debug("Resolving all resource {}", path);
-        List<ProvidedURL> resourceUrls = provider.provideAll(path, hints);
+        List<ProvidedUrl> resourceUrls = provider.provideAll(path, hints);
         if (LOGGER.isDebugEnabled()) {
             if (resourceUrls.isEmpty()) {
                 LOGGER.debug("Unable to resolve resource URL for path {}", path);
@@ -286,6 +288,55 @@ public final class MCRResourceResolver {
             }
         }
         return resourceUrls;
+    }
+
+    /**
+     * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}. 
+     */
+    public Optional<MCRResourcePath> reverse(URL resourceUrl, boolean performConsistencyCheck) {
+        return this.reverse(resourceUrl, defaultHints(), performConsistencyCheck);
+    }
+
+    /**
+     * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}, using the given hints. Optionally
+     * performs a consistency check by resolving the calculated {@link MCRResourcePath} and comparing the 
+     * result of this resolution against the given resource URL. 
+     */
+    public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints, boolean performConsistencyCheck) {
+        LOGGER.debug("Reversing resource URL {}", resourceUrl);
+        Set<PrefixStripper> strippers = provider.prefixPatterns(hints);
+        for (PrefixStripper stripper : strippers) {
+            Optional<MCRResourcePath> potentialPath = stripper.strip(resourceUrl);
+            if (potentialPath.isPresent()) {
+                if (performConsistencyCheck && !isConsistent(resourceUrl, potentialPath.get(), hints)) {
+                    continue;
+                }
+                return potentialPath;
+            }
+        }
+        LOGGER.debug("Unable to reverse path for resource URL {}", resourceUrl);
+        return Optional.empty();
+    }
+
+    private boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, MCRHints hints) {
+        LOGGER.debug("Trying potential path {}", potentialPath);
+        Optional<URL> resolvedResourceUrl = resolve(potentialPath, hints);
+        if (resolvedResourceUrl.isEmpty()) {
+            LOGGER.debug("Unable to resolve resource URL for potential path {}", potentialPath);
+            return false;
+        }
+        return isConsistent(resourceUrl, potentialPath, resolvedResourceUrl.get());
+        
+    }
+
+    private static boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, URL resolvedResourceUrl) {
+        LOGGER.debug("Resolved resource URL for possible path {} as {}", potentialPath, resolvedResourceUrl);
+        if (!resolvedResourceUrl.toString().equals(resourceUrl.toString())) {
+            LOGGER.debug("Resolved resource URL doesn't match original resource URL");
+            return false;
+        }
+        LOGGER.debug("Resolved resource URL matches original resource URL");
+        return true;
     }
 
     /**

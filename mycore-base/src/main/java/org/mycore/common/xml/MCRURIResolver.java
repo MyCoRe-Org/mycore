@@ -18,7 +18,6 @@
 
 package org.mycore.common.xml;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -78,7 +77,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
@@ -88,6 +86,7 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.resource.MCRResourceHelper;
+import org.mycore.common.resource.MCRResourcePath;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -259,63 +258,20 @@ public final class MCRURIResolver implements URIResolver {
     /**
      * Tries to calculate the resource uri to the directory of the stylesheet that includes the given file.
      * @param base the base uri of the stylesheet that includes the given file
+     * @param performConsistencyCheck whether to check if the calculated resource path actually is the resources path 
      * @return the resource uri to the directory of the stylesheet that includes the given file.
      */
-    static String getParentDirectoryResourceURI(String base) {
+    static String getParentDirectoryResourceURI(String base, boolean performConsistencyCheck) {
         if (base == null) {
             // the file was not included from another file, so we need to use the default resource directory
             final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
             return "resource:" + xslFolder + "/";
         } else {
             String resolvingBase = null;
-
-            String configurationResourceDir = MCRConfigurationDir.getConfigurationDirectory().toPath()
-                .toAbsolutePath()
-                .normalize()
-                .resolve("resources")
-                .toFile()
-                .toURI()
-                .toString();
-
-            String webappPath = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString()
-                : null;
-
-            Optional<String> matching = MCRDeveloperTools.getOverridePaths()
-                .map(Path::toAbsolutePath)
-                .map(Path::toFile)
-                .map(File::toURI)
-                .map(URI::toString)
-                .filter(base::startsWith)
-                .findFirst();
-            if (matching.isPresent()) {
-                // in this case the developer mode is active and the file is in the override directory e.G.
-                // /root/workspace/mir/src/main/resources/xsl/mir-accesskey-utils.xsl
-                resolvingBase = base.substring(matching.get().length());
-            } else if (base.contains(".jar!")) {
-                // in this case the file is in a jar file e.G.
-                // /root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl
-                resolvingBase = base.lastIndexOf(".jar!") > 0
-                    ? base.substring(base.lastIndexOf(".jar!") + ".jar!".length())
-                    : base;
-            } else if (base.startsWith(configurationResourceDir)) {
-                // in this case the file is in the configuration directory e.G.
-                // file:/root/.mycore/dev-mir/resources/xsl/mir-accesskey-utils.xsl
-                resolvingBase = base.substring(configurationResourceDir.length());
-            } else if (webappPath != null && base.startsWith(webappPath)) {
-                // in this case the file is in the webapp directory e.G.
-                // file:/../mir/mir-webapp/target/catalina-base/webapps/mir/WEB-INF/classes/xsl/mir-accesskey-utils.xsl
-                resolvingBase = base.substring(webappPath.length());
-            }
-
-            if (resolvingBase != null) {
-                resolvingBase = resolvingBase.startsWith("/") ? resolvingBase.substring(1) : resolvingBase;
-                resolvingBase = "resource:" + resolvingBase;
-            } else {
-                resolvingBase = base;
-            }
-
-            if (!resolvingBase.endsWith("/") && resolvingBase.lastIndexOf('/') > 0) {
-                resolvingBase = resolvingBase.substring(0, resolvingBase.lastIndexOf('/') + 1);
+            MCRResourcePath resourcePath = MCRResourceHelper.getResourcePath(base, performConsistencyCheck);
+            if (resourcePath != null) {
+                String path = resourcePath.asRelativePath();
+                resolvingBase = "resource:" + path.substring(0, path.lastIndexOf('/') + 1);
             }
             return resolvingBase;
         }
@@ -375,7 +331,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private Source tryResolveXSL(String href, String base) throws TransformerException {
-        String baseURI = getParentDirectoryResourceURI(base);
+        String baseURI = getParentDirectoryResourceURI(base, true);
         final String uri = baseURI + href;
         LOGGER.debug("Trying to resolve {} from uri {}", href, uri);
         Source newResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve(uri, base);
@@ -1248,7 +1204,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            final String baseURI = getParentDirectoryResourceURI(base);
+            final String baseURI = getParentDirectoryResourceURI(base, true);
             // set xslt folder
             final String xslFolder;
             if (StringUtils.startsWith(baseURI, "resource:xsl/")) {
@@ -1440,15 +1396,14 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             String versionType = href.substring(href.indexOf(":") + 1);
             final Element versionElement = new Element("version");
-            versionElement.setText(
-                switch (versionType) {
-                    case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
-                    case "abbrev" -> MCRCoreVersion.getAbbrev();
-                    case "branch" -> MCRCoreVersion.getBranch();
-                    case "version" -> MCRCoreVersion.getVersion();
-                    case "revision" -> MCRCoreVersion.getRevision();
-                    default -> MCRCoreVersion.getCompleteVersion();
-                });
+            versionElement.setText(switch (versionType) {
+            case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
+            case "abbrev" -> MCRCoreVersion.getAbbrev();
+            case "branch" -> MCRCoreVersion.getBranch();
+            case "version" -> MCRCoreVersion.getVersion();
+            case "revision" -> MCRCoreVersion.getRevision();
+            default -> MCRCoreVersion.getCompleteVersion();
+            });
             return new JDOMSource(versionElement);
         }
     }

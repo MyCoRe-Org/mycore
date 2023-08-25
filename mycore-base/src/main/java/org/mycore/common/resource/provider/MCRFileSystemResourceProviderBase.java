@@ -26,9 +26,11 @@ package org.mycore.common.resource.provider;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,7 +113,7 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
     }
 
     @Override
-    protected final List<ProvidedURL> doProvideAll(MCRResourcePath path, MCRHints hints) {
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
         return getResourceUrls(path, hints).map(this::providedURL).collect(Collectors.toList());
     }
 
@@ -157,14 +159,10 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
     }
 
     private Optional<String> getRelativePath(MCRResourcePath path) {
-        switch (mode) {
-            case RESOURCES:
-                return Optional.of(path.asRelativePath());
-            case WEB_RESOURCES:
-                return path.asRelativeWebPath();
-            default:
-                throw new MCRException("Unknown mode " + mode);
-        }
+        return switch (mode) {
+            case RESOURCES -> Optional.of(path.asRelativePath());
+            case WEB_RESOURCES -> path.asRelativeWebPath();
+        };
     }
 
     private boolean isUsableFile(File file) {
@@ -191,6 +189,13 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
         } catch (MalformedURLException e) {
             throw new MCRException("Failed to convert file to URL: " + file.getAbsolutePath(), e);
         }
+    }
+
+    @Override
+    public final Set<PrefixStripper> prefixPatterns(MCRHints hints) {
+        Set<PrefixStripper> strippers = new HashSet<>();
+        getBaseDirs(hints).forEach(baseDir -> strippers.add(new BaseDirPrefixStripper(baseDir)));
+        return strippers;
     }
 
     @Override

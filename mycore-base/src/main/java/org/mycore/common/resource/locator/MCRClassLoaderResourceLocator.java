@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRException;
@@ -34,6 +35,7 @@ import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.resource.MCRResourcePath;
 import org.mycore.common.resource.hint.MCRResourceHintKeys;
+import org.mycore.common.resource.provider.MCRResourceProvider;
 
 /**
  * A {@link MCRClassLoaderResourceLocator} is a {@link MCRResourceLocator} that uses
@@ -61,6 +63,11 @@ public class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
         } catch (IOException e) {
             throw new MCRException(e);
         }
+    }
+
+    @Override
+    public Set<MCRResourceProvider.PrefixStripper> prefixPatterns(MCRHints hints) {
+        return MCRResourceProvider.JarUrlPrefixStripper.INSTANCE_SET;
     }
 
 }

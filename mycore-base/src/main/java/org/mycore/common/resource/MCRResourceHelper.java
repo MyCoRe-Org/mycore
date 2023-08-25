@@ -25,6 +25,7 @@ package org.mycore.common.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.mycore.common.MCRException;
@@ -109,6 +110,18 @@ public final class MCRResourceHelper {
         return asStream(getWebResourceUrl(path, classLoader));
     }
 
+    /**
+     * Shorthand for {@link MCRResourceResolver#reverse(URL, boolean)} returning <code>null</code>
+     * instead of an empty {@link java.util.Optional} and taking a String instead of an {@link URL} the .
+     */
+    public static MCRResourcePath getResourcePath(String resourceUrl, boolean performConsistencyCheck) {
+        try {
+            return MCRResourceResolver.instance().reverse(new URL(resourceUrl), performConsistencyCheck).orElse(null);
+        } catch (MalformedURLException e) {
+            throw new MCRException("Unable to convert string tu URL", e);
+        }
+    }
+
     private static MCRHints modifyHints(ClassLoader classLoader) {
         MCRHintsBuilder builder = MCRResourceResolver.defaultHints().builder();
         builder.add(MCRResourceHintKeys.CLASS_LOADER, classLoader);
@@ -122,5 +135,6 @@ public final class MCRResourceHelper {
             throw new MCRException(e);
         }
     }
+
 
 }

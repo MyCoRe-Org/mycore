@@ -40,7 +40,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.resource.MCRResourcePath;
 import org.mycore.common.resource.MCRResourceResolver;
-import org.mycore.common.resource.provider.MCRResourceProvider.ProvidedURL;
+import org.mycore.common.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -222,7 +222,7 @@ public class MCRDeveloperCommands {
 
     private static void doShowAllResourceUrls(MCRResourcePath path) {
         try {
-            List<ProvidedURL> urls = MCRResourceResolver.instance().resolveAll(path);
+            List<ProvidedUrl> urls = MCRResourceResolver.instance().resolveAll(path);
             if (urls.isEmpty()) {
                 LOGGER.info("Resource {} not found", path);
             } else {

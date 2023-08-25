@@ -27,8 +27,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -36,6 +38,8 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.resource.MCRResourcePath;
+import org.mycore.common.resource.provider.MCRResourceProvider;
+import org.mycore.common.resource.provider.MCRResourceProvider.PrefixStripper;
 
 /**
  * A {@link MCRCombinedResourceLocator} is a {@link MCRResourceLocator} that delegates to multiple other
@@ -63,6 +67,13 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
             resourceUrls = Stream.concat(locator.locate(path, hints), resourceUrls);
         }
         return resourceUrls;
+    }
+
+    @Override
+    public Set<MCRResourceProvider.PrefixStripper> prefixPatterns(MCRHints hints) {
+        Set<PrefixStripper> strippers = new HashSet<>();
+        locators.forEach(locator -> strippers.addAll(locator.prefixPatterns(hints)));
+        return strippers;
     }
 
     public static class Factory implements Supplier<MCRCombinedResourceLocator> {

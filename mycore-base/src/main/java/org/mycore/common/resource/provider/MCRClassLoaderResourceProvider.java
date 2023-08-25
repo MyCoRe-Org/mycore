@@ -26,6 +26,7 @@ package org.mycore.common.resource.provider;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -54,12 +55,17 @@ public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final List<ProvidedURL> doProvideAll(MCRResourcePath path, MCRHints hints) {
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
         return doProvide(path, hints).stream().map(this::providedURL).collect(Collectors.toList());
     }
 
     private Optional<ClassLoader> getClassloader(MCRHints hints) {
         return hints.get(MCRResourceHintKeys.CLASS_LOADER);
+    }
+
+    @Override
+    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
+        return JarUrlPrefixStripper.INSTANCE_SET;
     }
 
     public static class Factory implements Supplier<MCRClassLoaderResourceProvider> {

@@ -24,6 +24,7 @@
 package org.mycore.common.resource.locator;
 
 import java.net.URL;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
@@ -32,6 +33,7 @@ import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.common.resource.MCRResourcePath;
 import org.mycore.common.resource.filter.MCRResourceFilter;
 import org.mycore.common.resource.provider.MCRLFSResourceProvider;
+import org.mycore.common.resource.provider.MCRResourceProvider;
 
 /**
  * A {@link MCRResourceFilter} implements the <em>locate</em>-phase for a {@link MCRLFSResourceProvider}.
@@ -47,5 +49,7 @@ public interface MCRResourceLocator {
      * Returns a description of this {@link MCRResourceLocator}.
      */
     MCRTreeMessage compileDescription(Level level);
+
+    Set<MCRResourceProvider.PrefixStripper> prefixPatterns(MCRHints hints);
 
 }

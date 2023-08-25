@@ -32,7 +32,7 @@ public class MCRResourcePathTest extends MCRTestCase {
 
     @Test
     public void nullIsNoResourcePath() {
-        assertEquals(EMPTY, MCRResourcePath.ofPath(null));
+        assertEquals(EMPTY, MCRResourcePath.ofPath((String) null));
     }
 
     @Test

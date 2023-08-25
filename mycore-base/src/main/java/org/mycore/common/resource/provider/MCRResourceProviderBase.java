@@ -66,9 +66,9 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
         return resourceUrl;
     }
 
-    public final List<ProvidedURL> provideAll(MCRResourcePath path, MCRHints hints) {
+    public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
         logger.debug("Providing all resource URLs for path {} [{}]", path, coverage);
-        List<ProvidedURL> resourceUrls = doProvideAll(path, hints);
+        List<ProvidedUrl> resourceUrls = doProvideAll(path, hints);
         if (logger.isDebugEnabled()) {
             return logResourceUrls(resourceUrls);
         } else {
@@ -76,7 +76,7 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
         }
     }
 
-    private List<ProvidedURL> logResourceUrls(List<ProvidedURL> resourceUrl) {
+    private List<ProvidedUrl> logResourceUrls(List<ProvidedUrl> resourceUrl) {
         resourceUrl.forEach(url -> logger.debug("Providing resource URL {} [{}]", url.url, coverage));
         return resourceUrl;
     }
@@ -87,10 +87,10 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
     protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints);
 
-    protected abstract List<ProvidedURL> doProvideAll(MCRResourcePath path, MCRHints hints);
+    protected abstract List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints);
 
-    protected final ProvidedURL providedURL(URL url) {
-        return new ProvidedURL(url, coverage());
+    protected final ProvidedUrl providedURL(URL url) {
+        return new ProvidedUrl(url, coverage());
     }
 
     public String coverage() {

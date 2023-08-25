@@ -105,6 +105,13 @@ public abstract class MCRResourcePath {
     /**
      * Creates a {@link MCRResourcePath} that represents the given path as a resource path
      */
+    public static Optional<MCRResourcePath> ofPath(Optional<String> path) {
+        return path.flatMap(MCRResourcePath::ofPath);
+    }
+
+    /**
+     * Creates a {@link MCRResourcePath} that represents the given path as a resource path
+     */
     public static Optional<MCRResourcePath> ofPath(String path) {
         return cleanAndSafePath(path).map(MCRResourcePath::createResourcePath);
     }

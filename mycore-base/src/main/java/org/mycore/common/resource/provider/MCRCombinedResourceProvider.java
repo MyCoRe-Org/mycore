@@ -26,10 +26,12 @@ package org.mycore.common.resource.provider;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.Level;
@@ -72,15 +74,22 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final List<ProvidedURL> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        List<ProvidedURL> resourceUrls = new LinkedList<>();
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
+        List<ProvidedUrl> resourceUrls = new LinkedList<>();
         for (MCRResourceProvider provider : providers) {
-            for (ProvidedURL providedURL : provider.provideAll(path, hints)) {
+            for (ProvidedUrl providedURL : provider.provideAll(path, hints)) {
                 String origin = coverage() + " / " + providedURL.origin;
-                resourceUrls.add(new ProvidedURL(providedURL.url, origin));
+                resourceUrls.add(new ProvidedUrl(providedURL.url, origin));
             }
         }
         return resourceUrls;
+    }
+
+    @Override
+    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
+        Set<PrefixStripper> strippers = new HashSet<>();
+        providers.forEach(provider -> strippers.addAll(provider.prefixPatterns(hints)));
+        return strippers;
     }
 
     @Override

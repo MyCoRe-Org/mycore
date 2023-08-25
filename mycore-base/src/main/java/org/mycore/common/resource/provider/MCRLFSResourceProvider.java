@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,7 +77,7 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final List<ProvidedURL> doProvideAll(MCRResourcePath path, MCRHints hints) {
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
         return filter.filter(locator.locate(path, hints), hints).map(this::providedURL).collect(Collectors.toList());
     }
 
@@ -90,6 +91,11 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
+        return locator.prefixPatterns(hints);
     }
 
     @Override

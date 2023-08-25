@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 
@@ -18,13 +20,15 @@ public class MCRURIResolverTest extends MCRTestCase {
     public static final String TEST_DEVELOPER_FOLDER_STRING = "/home/workspace";
 
     @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.Developer.Resource.Override", string = TEST_DEVELOPER_FOLDER_STRING)
+    })
     public void testGetParentDirectoryResourceURI() {
         Map<String, String> testData = new LinkedHashMap<>();
 
-        testData.put("/root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl",
+        testData.put("jar:file:///root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl",
             "resource:xsl/directory/");
-
-        testData.put("/root/.m2/repository/some/directory/some.jar!/xsl/myfile.xsl",
+        testData.put("jar:file:///root/.m2/repository/some/directory/some.jar!/xsl/myfile.xsl",
             "resource:xsl/");
 
         String configurationXSLDirectory
@@ -43,18 +47,9 @@ public class MCRURIResolverTest extends MCRTestCase {
             + "/directory/mir-accesskey-utils.xsl", "resource:directory/");
 
         for (Map.Entry<String, String> entry : testData.entrySet()) {
-            String result = MCRURIResolver.getParentDirectoryResourceURI(entry.getKey());
+            String result = MCRURIResolver.getParentDirectoryResourceURI(entry.getKey(), false);
             Assert.assertEquals(entry.getValue(), result);
         }
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> properties = super.getTestProperties();
-
-        properties.put("MCR.Developer.Resource.Override", TEST_DEVELOPER_FOLDER_STRING);
-
-        return properties;
     }
 
     @Test
