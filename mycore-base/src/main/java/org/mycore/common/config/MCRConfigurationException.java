@@ -28,6 +28,7 @@ import org.mycore.common.MCRException;
  * @author Frank Lützenkirchen
  */
 public class MCRConfigurationException extends MCRException {
+
     private static final long serialVersionUID = 1L;
 
     /**

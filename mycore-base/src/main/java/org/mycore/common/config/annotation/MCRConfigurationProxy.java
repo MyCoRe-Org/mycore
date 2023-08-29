@@ -23,26 +23,20 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.Supplier;
 
 /**
- * This annotation is used to mark methods that should be called after the creation of the object.
- * <p>
- * The method may have a single parameter of type {@link String} for which, if present, the name of the
- * configuration property containing the class name of the configured instance will be passed.
- * <p>
- * The method needs to be public.
- *
- * @author Sebastian Hofmann
+ * This annotation is used to mark classes that shouldn't be configured directly. Instead, an instance of
+ * a {@link Supplier} is configured that is then used to supply the actually requested instance.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ ElementType.TYPE })
 @Inherited
-public @interface MCRPostConstruction {
+public @interface MCRConfigurationProxy {
 
     /**
-     * @return the order in which the annotated methods are processed. The higher the value, the later the
-     * method is processed.
+     * @return The class that is configured and used to supply the actually requested instance.
      */
-    int order() default 0;
+    Class<? extends Supplier<?>> proxyClass();
 
 }

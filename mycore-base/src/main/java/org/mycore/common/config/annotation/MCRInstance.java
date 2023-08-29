@@ -18,49 +18,41 @@
 
 package org.mycore.common.config.annotation;
 
-import org.mycore.common.config.MCRConfigurationException;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.mycore.common.config.MCRConfigurationException;
+
 /**
- * This annotation is used to mark fields or methods that should be set to or called with a value of type
- * {@link String} from the configuration properties.
+ * This annotation is used to mark fields or methods that should be set to or called with
+ * a configured instance of a type compatible with {@link MCRInstance#valueClass()}
+ * which is configured from the configuration properties.
  * <p>
  * The field or method needs to be public.
-  *
- * @author Sebastian Hofmann
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Inherited
-public @interface MCRProperty {
+public @interface MCRInstance {
 
     /**
-     * @return The name of property, or <code>*</code> for a map of all properties;
+     * @return The name of property containing the class name.
      */
     String name();
 
     /**
-     * @return true if the property specified by {@link MCRProperty#name()} has to be present in the properties.
+     * @return The class or a superclass of the configured instance.
+     */
+    Class<?> valueClass();
+
+    /**
+     * @return true if the property specified by {@link MCRInstance#name()} has to be present in the properties.
      * {@link MCRConfigurationException} is thrown if the property is required but not present.
      */
     boolean required() default true;
-
-    /**
-     * @return true if the property is absolute and not specific for this instance e.g. MCR.NameOfProject.
-     */
-    boolean absolute() default false;
-
-    /**
-     * @return The name for a default property that should be used as a default value if the property
-     * specified by {@link MCRProperty#name()} is not present in the properties. {@link MCRConfigurationException} is
-     * thrown if the default property is not present. The default property must be absolute, e.g. MCR.NameOfProject.
-     */
-    String defaultName() default "";
 
     /**
      * @return the order in which the annotated fields or methods are processed. The higher the value, the later the
