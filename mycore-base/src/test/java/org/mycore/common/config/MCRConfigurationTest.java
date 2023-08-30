@@ -18,21 +18,26 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2.SingletonKey;
+import org.mycore.common.config.singletoncollision.MCRConfigurationSingletonCollisionClassA;
+import org.mycore.common.config.singletoncollision.MCRConfigurationSingletonCollisionClassB;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Thomas Scheffler (yagee)
  * @author Tobias Lenhardt [Hammer1279]
  */
 public class MCRConfigurationTest extends MCRTestCase {
+    
+    public static final String COLLISION_PROPERTY_NAME =  "MCR.Configuration.SingletonCollision.PropertyName";
 
     @Test(expected = MCRConfigurationException.class)
     public final void testDeprecatedProperties() {
@@ -41,108 +46,127 @@ public class MCRConfigurationTest extends MCRTestCase {
     }
 
     /**
-     * Internal Method of {@link java.util.concurrent.ConcurrentHashMap}.
-     * @see {@link java.util.concurrent.ConcurrentHashMap#spread}
-     */
-    private int spread(int h) {
-        return (h ^ (h >>> 16)) & 0x7fffffff /* all usable bits */;
-    }
-
-    /**
      * Generate a Singleton Collision and see if it gets correctly resolved.
      * It is limited to 1 minute in case of a recursive operation.
      * <p>This checks for the Bug MCR-2806 - Singleton Recursive Update
+     *
      * @author Tobias Lenhardt [Hammer1279]
      */
     @Test(timeout = 3600) // 1 minute
     public final void testSingletonCollision() {
 
+        Pair<String, String> properties = createConflictConfiguration();
+
+        Object objectA = MCRConfiguration2.getSingleInstanceOf(properties.getLeft()).orElseThrow();
+        Object objectB = MCRConfigurationSingletonCollisionClassA.COLLISION_CLASS_B;
+
+        assertTrue("Wrong or no class loaded!", objectA instanceof MCRConfigurationSingletonCollisionClassA);
+        assertTrue("Wrong or no class loaded!", objectB instanceof MCRConfigurationSingletonCollisionClassB);
+
+    }
+
+    /**
+     * <p>MCR-2827 check for correct get behavior</p>
+     * Reuses the collision mapping created for {@link #testSingletonCollision}, so if it fails this is also likely to 
+     * fail.
+     *
+     * @author Tobias Lenhardt [Hammer1279]
+     */
+    @Test
+    public final void testSingletonMapGet() {
+
+        Pair<String, String> properties = createConflictConfiguration();
+        String propertyA = properties.getLeft();
+        String propertyB = properties.getRight();
+        String classNameA = MCRConfiguration2.getStringOrThrow(propertyA);
+        String classNameB = MCRConfiguration2.getStringOrThrow(propertyB);
+
+        MCRConfiguration2.getSingleInstanceOf(propertyA).orElseThrow();
+
+        assertNotNull(MCRConfiguration2.instanceHolder.get(new SingletonKey(propertyA, classNameA)));
+        assertNotNull(MCRConfiguration2.instanceHolder.get(new SingletonKey(propertyB, classNameB)));
+
+    }
+
+    private Pair<String, String> createConflictConfiguration() {
+
         char[] letters = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 
         int limit = 50; // initial size of char arrays
 
-        char[][] className = new char[2][limit];
-        char[][] property = new char[2][limit];
+        String classNameA = MCRConfigurationSingletonCollisionClassA.class.getName();
+        String classNameB = MCRConfigurationSingletonCollisionClassB.class.getName();
 
-        int a = -1;
-        int b = -1;
+        char[] propertyCharsA = new char[limit];
+        char[] propertyCharsB = new char[limit];
 
+        String propertyA;
+        String propertyB;
+
+        int a;
+        int b;
+        
         int i = 0;
-
-        // the two test classes
-        className[0]
-            = "org.mycore.common.config.singletoncollision.MCRConfigurationSingletonCollisionClassA".toCharArray();
-        className[1]
-            = "org.mycore.common.config.singletoncollision.MCRConfigurationSingletonCollisionClassB".toCharArray();
-
+        
         // Generate Conflict
         do {
             // resize arrays when full
             if (i == limit) {
                 limit = limit * 2;
-                for (int j = 0; j < 2; j++) {
-                    property[j] = Arrays.copyOf(property[j], limit);
-                }
+                propertyCharsA = Arrays.copyOf(propertyCharsA, limit);
+                propertyCharsB = Arrays.copyOf(propertyCharsB, limit);
             }
 
             // Generate Random Text
-            property[0][i] = letters[(int) (Math.random() * letters.length)];
-            property[1][i] = letters[(int) (Math.random() * letters.length)];
+            propertyCharsA[i] = letters[(int) (Math.random() * letters.length)];
+            propertyCharsB[i] = letters[(int) (Math.random() * letters.length)];
 
             /*
              * Calculate Slot placement in Map
-             * 
+             *
              * 1. Step: create a SingletonKey and get its hashCode
              * 2. Step: Spread Bits
              * 3. Step: get Map slot via Bitwise AND
-             * 
+             *
              * The 15 here is not a magic number.
              * It is to do the calculation assuming we got a size 16 ConcurrentHashMap.
              * Usually right after start, it won't be above this size.
              * Size 16 is the default size for a ConcurrentHashMap.
              */
-
-            a = new MCRConfiguration2.SingletonKey(String.valueOf(property[0]).trim().replaceAll(" ", ""),
-                String.valueOf(className[0]).trim().replaceAll(" ", "")).hashCode();
+            propertyA= toSuitableString(propertyCharsA);
+            a = new SingletonKey(propertyA, classNameA).hashCode();
             a = spread(a);
             a = 15 & a;
-            b = new MCRConfiguration2.SingletonKey(String.valueOf(property[1]).trim().replaceAll(" ", ""),
-                String.valueOf(className[1]).trim().replaceAll(" ", "")).hashCode();
+            propertyB = toSuitableString(propertyCharsB);
+            b = new SingletonKey(propertyB, classNameB).hashCode();
             b = spread(b);
             b = 15 & b;
             i++;
-        } while (a != b && (a != -1 || b != -1));
+        } while (a != b);
+        
         LogManager.getLogger().info("Colliding Strings:");
-        LogManager.getLogger().info(String.valueOf(className[0]).trim().replaceAll(" ", "") + " "
-            + String.valueOf(property[0]).trim().replaceAll(" ", "") + " => " + a);
-        LogManager.getLogger().info(String.valueOf(className[1]).trim().replaceAll(" ", "") + " "
-            + String.valueOf(property[1]).trim().replaceAll(" ", "") + " => " + b);
-        assertTrue(a == b && (a != -1 || b != -1));
+        LogManager.getLogger().info(classNameA + " " + propertyA + " => " + a);
+        LogManager.getLogger().info(classNameB + " " + propertyB + " => " + b);
 
-        MCRConfiguration2.set(String.valueOf(property[0]).trim().replaceAll(" ", ""),
-            String.valueOf(className[0]).trim().replaceAll(" ", ""));
-        MCRConfiguration2.set(String.valueOf(property[1]).trim().replaceAll(" ", ""),
-            String.valueOf(className[1]).trim().replaceAll(" ", ""));
-        MCRConfiguration2.set("MCR.Configuration.SingletonCollision.PropertyName",
-            String.valueOf(property[1]).trim().replaceAll(" ", ""));
+        MCRConfiguration2.set(propertyA, classNameA);
+        MCRConfiguration2.set(propertyB, classNameB);
+        MCRConfiguration2.set(COLLISION_PROPERTY_NAME, propertyB);
 
-        Object classA = MCRConfiguration2.getSingleInstanceOf(String.valueOf(property[0]).trim().replaceAll(" ", ""))
-            .orElseThrow();
-        assertEquals("MCRConfigurationSingletonCollisionClassA", classA.getClass().getSimpleName());
+        return Pair.of(propertyA, propertyB);
+
     }
 
     /**
-     * <p>MCR-2827 check for correct get behavior</p>
-     * Reuses the collision mapping from {@link #testSingletonCollision}, so if it fails this is also likely to fail.
-     * @author Tobias Lenhardt [Hammer1279]
+     * Internal Method of {@link java.util.concurrent.ConcurrentHashMap}.
+     *
+     * @see {@link java.util.concurrent.ConcurrentHashMap#spread(int)}
      */
-    @Test
-    public final void testSingletonMapGet() {
-        testSingletonCollision();
-        MCRConfiguration2.getPropertiesMap().forEach((key, value) -> {
-            if (value.matches(".+MCRConfigurationSingletonCollisionClass[AB]")) {
-                assertNotNull(MCRConfiguration2.instanceHolder.get(new MCRConfiguration2.SingletonKey(key, value)));
-            }
-        });
+    private int spread(int h) {
+        return (h ^ (h >>> 16)) & 0x7fffffff /* all usable bits */;
     }
+
+    private static String toSuitableString(char[] value) {
+        return String.valueOf(value).trim().replaceAll("\\s+", "");
+    }
+
 }
