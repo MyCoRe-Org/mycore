@@ -95,8 +95,8 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
     }
 
     @Override
-    public V get(Object arg0) {
-        return keyMap.containsKey(arg0) ? super.get(keyMap.get(arg0)) : super.get(arg0);
+    public V get(Object key) {
+        return keyMap.containsKey(key) ? super.get(keyMap.get(key)) : super.get(key);
     }
 
     /**
