@@ -761,6 +761,11 @@
         <version>${oaipmh.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>xsonify-serializer</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
         <version>4.0-SNAPSHOT</version>

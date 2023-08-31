@@ -377,6 +377,10 @@
       <artifactId>xalan</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>xsonify-serializer</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
       <scope>runtime</scope>
