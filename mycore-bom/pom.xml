@@ -761,7 +761,7 @@
         <version>${oaipmh.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mycore</groupId>
+        <groupId>org.mycore.xsonify</groupId>
         <artifactId>xsonify-serializer</artifactId>
         <version>1.0-SNAPSHOT</version>
       </dependency>

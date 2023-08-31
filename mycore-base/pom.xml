@@ -377,7 +377,7 @@
       <artifactId>xalan</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mycore</groupId>
+      <groupId>org.mycore.xsonify</groupId>
       <artifactId>xsonify-serializer</artifactId>
     </dependency>
     <dependency>
