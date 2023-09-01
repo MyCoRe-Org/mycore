@@ -365,6 +365,10 @@
       <artifactId>jsoup</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mycore.xsonify</groupId>
+      <artifactId>xsonify-serializer</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>
       <artifactId>svnkit</artifactId>
     </dependency>
@@ -375,10 +379,6 @@
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.mycore.xsonify</groupId>
-      <artifactId>xsonify-serializer</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
