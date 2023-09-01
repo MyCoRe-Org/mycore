@@ -229,7 +229,7 @@
   <xsl:template name="contributorAttributes">
     <xsl:if test="mods:role/mods:roleTerm[@type='code'][@authority='marcrelator']">
       <work:contributor-attributes>
-        <xsl:apply-templates select="mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'][1]" />
+        <xsl:apply-templates select="(mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'])[1]" />
       </work:contributor-attributes>
     </xsl:if>
   </xsl:template>
