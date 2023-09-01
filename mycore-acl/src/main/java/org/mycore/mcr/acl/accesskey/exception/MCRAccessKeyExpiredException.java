@@ -29,6 +29,6 @@ public class MCRAccessKeyExpiredException extends MCRAccessKeyException {
      * @param errorMessage the error message
      */
     public MCRAccessKeyExpiredException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.expired");
+        super(errorMessage, "accessKeyExpired");
     }
 }

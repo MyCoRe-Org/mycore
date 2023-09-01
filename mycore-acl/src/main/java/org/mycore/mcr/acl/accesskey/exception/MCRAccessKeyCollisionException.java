@@ -36,6 +36,6 @@ public class MCRAccessKeyCollisionException extends MCRAccessKeyException {
      * @param errorMessage the error message
      */
     public MCRAccessKeyCollisionException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.collision");
+        super(errorMessage, "accessKeyCollision");
     }
 }

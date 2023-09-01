@@ -29,6 +29,6 @@ public class MCRAccessKeyTransformationException extends MCRAccessKeyException {
      * @param errorMessage the error message
      */
     public MCRAccessKeyTransformationException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.transformation");
+        super(errorMessage, "transformationError");
     }
 }

@@ -29,6 +29,6 @@ public class MCRAccessKeyDisabledException extends MCRAccessKeyException {
      * @param errorMessage the error message
      */
     public MCRAccessKeyDisabledException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.disabled");
+        super(errorMessage, "accessKeyDisabled");
     }
 }

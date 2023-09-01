@@ -36,6 +36,6 @@ public class MCRAccessKeyNotFoundException extends MCRAccessKeyException {
      * @param errorMessage the error message
      */
     public MCRAccessKeyNotFoundException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.unknownKey");
+        super(errorMessage, "unknownKey");
     }
 }

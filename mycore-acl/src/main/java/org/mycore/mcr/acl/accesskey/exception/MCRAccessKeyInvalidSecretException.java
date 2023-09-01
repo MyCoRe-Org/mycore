@@ -36,6 +36,6 @@ public class MCRAccessKeyInvalidSecretException extends MCRAccessKeyException {
      * @param errorMessage the error message
      */
     public MCRAccessKeyInvalidSecretException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.invalidSecret");
+        super(errorMessage, "invalidSecret");
     }
 }

@@ -36,6 +36,6 @@ public class MCRAccessKeyInvalidTypeException extends MCRAccessKeyException {
      * @param errorMessage the error message
      */
     public MCRAccessKeyInvalidTypeException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.invalidType");
+        super(errorMessage, "invalidType");
     }
 }
