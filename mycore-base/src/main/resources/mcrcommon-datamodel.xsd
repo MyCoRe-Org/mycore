@@ -169,9 +169,30 @@
   <xs:element name="derobject">
     <xs:complexType>
       <xs:sequence>
+        <xs:element type="xs:integer" name="order" minOccurs="0"/>
+        <xs:element type="xs:string" name="maindoc" minOccurs="0"/>
+        <xs:element name="title" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attributeGroup ref="MCRMetaLangText" />
+                <xs:attributeGroup ref="notInherited" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="classification" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attributeGroup ref="MCRMetaClassification" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
         <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax" />
       </xs:sequence>
-      <xs:attribute name="inherited" use="required" type="xs:integer" fixed="0" />
+      <xs:attributeGroup ref="notInherited" />
       <xs:attribute name="sequence" type="xs:integer" />
       <xs:attributeGroup ref="supportedXlinks" />
     </xs:complexType>
