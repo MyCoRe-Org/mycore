@@ -35,13 +35,15 @@
     </work:title>
   </xsl:template>
 
-  <xsl:template match="mods:mods/mods:titleInfo[not(@type='translated')]">
+  <xsl:template match="mods:mods/mods:titleInfo[not(@type='translated')][1]">
     <common:title>
       <xsl:apply-templates select="mods:nonSort" />
       <xsl:apply-templates select="mods:title" />
     </common:title>
     <xsl:apply-templates select="mods:subTitle" />
   </xsl:template>
+
+  <xsl:template match="mods:mods/mods:titleInfo[not(@type='translated')][position() &gt; 1]"/>
 
   <xsl:template match="mods:mods/mods:titleInfo/mods:nonSort">
     <xsl:value-of select="text()" />
@@ -54,7 +56,7 @@
     </common:subtitle>
   </xsl:template>
 
-  <xsl:template match="mods:mods/mods:titleInfo[@type='translated']">
+  <xsl:template match="mods:mods/mods:titleInfo[@type='translated'][1]">
     <common:translated-title>
       <xsl:apply-templates select="@xml:lang" />
       <xsl:apply-templates select="mods:nonSort" />
@@ -62,6 +64,8 @@
       <xsl:apply-templates select="mods:subTitle" />
     </common:translated-title>
   </xsl:template>
+
+  <xsl:template match="mods:mods/mods:titleInfo[@type='translated'][position() &gt; 1]"/>
   
   <xsl:template match="mods:mods/mods:titleInfo[@type='translated']/@xml:lang">
     <xsl:attribute name="language-code">
@@ -223,14 +227,14 @@
   </xsl:template>
 
   <xsl:template name="contributorAttributes">
-    <xsl:if test="mods:role/mods:roleTerm[@type='code']">
+    <xsl:if test="mods:role/mods:roleTerm[@type='code'][@authority='marcrelator']">
       <work:contributor-attributes>
-        <xsl:apply-templates select="mods:role/mods:roleTerm" />
+        <xsl:apply-templates select="(mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'])[1]" />
       </work:contributor-attributes>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:mods/mods:name/mods:role/mods:roleTerm">
+  <xsl:template match="mods:mods/mods:name/mods:role/mods:roleTerm[@authority='marcrelator']">
     <work:contributor-role>
       <xsl:choose>
         <xsl:when test=".='aut'">author</xsl:when>
