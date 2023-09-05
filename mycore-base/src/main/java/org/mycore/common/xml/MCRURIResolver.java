@@ -36,6 +36,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -51,13 +52,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
@@ -72,10 +76,12 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRByteContent;
@@ -104,6 +110,7 @@ import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
+import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MCRObjectFactory;
@@ -229,6 +236,9 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
         supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
         supportedSchemes.put("xslImport", new MCRXslImportResolver());
+        supportedSchemes.put("currentUserInfo", new MCRCurrentUserInfoResolver());
+        supportedSchemes.put("version", new MCRVersionResolver());
+        supportedSchemes.put("layoutUtils", new MCRLayoutUtilsResolver());
         supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
         supportedSchemes.put("deletedMcrObject", new MCRDeletedObjectResolver());
         supportedSchemes.put("fileMeta", new MCRFileMetadataResolver());
@@ -1295,7 +1305,7 @@ public final class MCRURIResolver implements URIResolver {
      * @return A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
-        private static Logger LOGGER = LogManager.getLogger(MCRXslIncludeResolver.class);
+        private static final Logger LOGGER = LogManager.getLogger(MCRXslIncludeResolver.class);
 
         @Override
         public Source resolve(String href, String base) {
@@ -1456,6 +1466,129 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(root);
         }
 
+    }
+
+    /**
+     * Resolves the current user information. Example: currentUserInfo:attribute=eMail&attribute=realName&role=administrator <br>
+     * Returns: <br>
+     * <code>
+     *     &lt;user id="admin"&gt; <br>
+     *     &lt;attribute name="eMail"&gt;example@mycore.de&lt;/attribute&gt;<br>
+     *     &lt;attribute name="realName"&gt;Administrator&lt;/attribute&gt;<br>
+     *     &lt;role name="administrator"&gt;true&lt;/role&gt;<br>
+     *     &lt;/user&gt;<br>
+     * </code>
+     */
+    private static class MCRCurrentUserInfoResolver implements URIResolver {
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
+            String userID = userInformation.getUserID();
+
+            String[] split = href.split(":");
+
+            Set<String> suppliedAttributes = new HashSet<>();
+            Set<String> suppliedRoles = new HashSet<>();
+            Element root = new Element("user");
+            root.setAttribute("id", userID);
+
+            if (split.length == 2) {
+                String req = split[1];
+                URLEncodedUtils.parse(req, StandardCharsets.UTF_8).forEach(nv -> {
+                    if (nv.getName().equals("attribute")) {
+                        if (suppliedAttributes.contains(nv.getValue())) {
+                            LOGGER.warn("Duplicate attribute {} in user info request", nv.getValue());
+                            return;
+                        }
+                        suppliedAttributes.add(nv.getValue());
+                        Element attribute = new Element("attribute");
+                        attribute.setAttribute("name", nv.getValue());
+                        attribute.setText(userInformation.getUserAttribute(nv.getValue()));
+                        root.addContent(attribute);
+                    } else if (nv.getName().equals("role")) {
+                        if (suppliedRoles.contains(nv.getValue())) {
+                            LOGGER.warn("Duplicate role {} in user info request", nv.getValue());
+                            return;
+                        }
+                        suppliedRoles.add(nv.getValue());
+                        Element role = new Element("role");
+                        role.setAttribute("name", nv.getValue());
+                        role.setText(String.valueOf(userInformation.isUserInRole(nv.getValue())));
+                        root.addContent(role);
+                    }
+                });
+            }
+
+            return new JDOMSource(root);
+        }
+    }
+
+    /**
+     * Resolves the software Version of the MyCoRe Instance. The following types are supported: gitDescribe, abbrev,
+     * branch, version, revision, completeVersion. The default is completeVersion.
+     * The resulting XML looks like this:
+     * <code>
+     *     &lt;version&gt;MyCoRe 2022.06.3-SNAPSHOT 2022.06.x:v2022.06.2-1-g881e24d&lt;/version&gt;
+     * </code>
+     */
+    private static class MCRVersionResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String versionType = href.substring(href.indexOf(":") + 1);
+            final Element versionElement = new Element("version");
+            versionElement.setText(switch (versionType) {
+            case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
+            case "abbrev" -> MCRCoreVersion.getAbbrev();
+            case "branch" -> MCRCoreVersion.getBranch();
+            case "version" -> MCRCoreVersion.getVersion();
+            case "revision" -> MCRCoreVersion.getRevision();
+            default -> MCRCoreVersion.getCompleteVersion();
+            });
+            return new JDOMSource(versionElement);
+        }
+    }
+
+    /**
+     * Resolver for MCRLayoutUtils. The following types are supported: readAccess:$webpageID,
+     * readAccess:$webpageID:split:$blockerWebpageID
+     * returns
+     * <code>
+     *     &lt;true /&gt;
+     * </code>
+     * or
+     * <code>
+     *     &lt;false /&gt;
+     * </code>
+     */
+    private static class MCRLayoutUtilsResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String[] args = href.split(":", 3);
+
+            if (args.length < 2) {
+                throw new TransformerException("No arguments given");
+            }
+            String function = args[1];
+
+            if (function.equals("readAccess")) {
+                String[] params = args[2].split(":split:");
+                if (params.length == 1) {
+                    return new JDOMSource(new Element(String.valueOf(MCRLayoutUtilities.readAccess(params[0]))));
+                } else if (params.length == 2) {
+                    return new JDOMSource(
+                        new Element(String.valueOf(MCRLayoutUtilities.readAccess(params[0], params[1]))));
+                }
+            } else if (function.equals("personalNavigation")) {
+                try {
+                    return new DOMSource(MCRLayoutUtilities.getPersonalNavigation());
+                } catch (JDOMException | XPathExpressionException e) {
+                    throw new MCRException("Error while loading personal navigation!", e);
+                }
+            }
+            throw new TransformerException("Unknown argument: " + args[2]);
+        }
     }
 
     private static class MCRVersionInfoResolver implements URIResolver {
@@ -1756,9 +1889,9 @@ public final class MCRURIResolver implements URIResolver {
 
         private final static String CONFIG_PREFIX = "MCR.URIResolver.CachingResolver";
 
-        private long maxAge;
+        private final long maxAge;
 
-        private MCRCache<String, Element> cache;
+        private final MCRCache<String, Element> cache;
 
         MCRCachingResolver() {
             int capacity = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + ".Capacity", Integer::parseInt);

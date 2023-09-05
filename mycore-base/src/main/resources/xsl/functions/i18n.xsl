@@ -39,4 +39,14 @@
         </xsl:choose>
     </xsl:function>
 
+    <xsl:function name="mcri18n:text-direction" as="xs:string">
+        <xsl:param name="language" as="xs:string"/>
+
+        <xsl:variable name="langXML" select="fn:document(concat('language:', $language))" />
+        <xsl:choose>
+            <xsl:when test="$langXML/language/@rtl">rtl</xsl:when>
+            <xsl:otherwise>ltr</xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+
 </xsl:stylesheet>

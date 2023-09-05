@@ -6,22 +6,19 @@
     data of all child categories of the requested node.
   -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan i18n">
-  <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="ServletsBaseURL" />
-  <xsl:param name="template" />
-
-  <xsl:param name="MCR.classbrowser.folder.closed" />
-  <xsl:param name="MCR.classbrowser.folder.open" />
-  <xsl:param name="MCR.classbrowser.folder.leaf" />
+<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:mcrproperty="http://www.mycore.de/xslt/property"
+                exclude-result-prefixes="mcrproperty">
 
   <xsl:output method="xml" omit-xml-declaration="yes" />
 
+  <xsl:include href="default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions" />
+
   <xsl:template match="/classificationBrowserData">
-    <xsl:variable name="folder.closed" select="$MCR.classbrowser.folder.closed" />
-    <xsl:variable name="folder.open" select="$MCR.classbrowser.folder.open" />
-    <xsl:variable name="folder.leaf" select="$MCR.classbrowser.folder.leaf" />
+    <xsl:variable name="folder.closed" select="mcrproperty:one('MCR.classbrowser.folder.closed')" />
+    <xsl:variable name="folder.open" select="mcrproperty:one('MCR.classbrowser.folder.open')" />
+    <xsl:variable name="folder.leaf" select="mcrproperty:one('MCR.classbrowser.folder.leaf')" />
     <xsl:variable name="maxLinks">
       <xsl:value-of select="category[not(@numLinks &lt; following-sibling::category/@numLinks)]/@numLinks" />
     </xsl:variable>
