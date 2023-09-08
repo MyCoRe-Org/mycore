@@ -221,9 +221,21 @@
   </xsl:template>
 
   <xsl:template name="creditName">
-    <work:credit-name>
-      <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], ' ', mods:namePart[@type='family']))" />
-    </work:credit-name>
+    <xsl:if test="mods:namePart">
+      <work:credit-name>
+        <xsl:choose>
+          <xsl:when test="mods:namePart[@type='given'] and mods:namePart[@type='family']">
+            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], ' ', mods:namePart[@type='family']))" />
+          </xsl:when>
+          <xsl:when test="mods:namePart[@type='given'] or mods:namePart[@type='family']">
+            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], mods:namePart[@type='family']))" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="normalize-space(mods:namePart)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </work:credit-name>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="contributorAttributes">
