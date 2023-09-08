@@ -221,20 +221,32 @@
   </xsl:template>
 
   <xsl:template name="creditName">
-    <work:credit-name>
-      <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], ' ', mods:namePart[@type='family']))" />
-    </work:credit-name>
+    <xsl:if test="mods:namePart">
+      <work:credit-name>
+        <xsl:choose>
+          <xsl:when test="mods:namePart[@type='given'] and mods:namePart[@type='family']">
+            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], ' ', mods:namePart[@type='family']))" />
+          </xsl:when>
+          <xsl:when test="mods:namePart[@type='given'] or mods:namePart[@type='family']">
+            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], mods:namePart[@type='family']))" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="normalize-space(mods:namePart)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </work:credit-name>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="contributorAttributes">
-    <xsl:if test="mods:role/mods:roleTerm[@type='code'][@authority='marcrelator']">
+    <xsl:if test="mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'][. = 'aut' or . = 'asg' or . = 'edt' or . = 'trl' or . = 'hst']">
       <work:contributor-attributes>
-        <xsl:apply-templates select="(mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'])[1]" />
+        <xsl:apply-templates select="(mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'][. = 'aut' or . = 'asg' or . = 'edt' or . = 'trl' or . = 'hst'])[1]" />
       </work:contributor-attributes>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:mods/mods:name/mods:role/mods:roleTerm[@authority='marcrelator']">
+  <xsl:template match="mods:mods/mods:name/mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'][. = 'aut' or . = 'asg' or . = 'edt' or . = 'trl' or . = 'hst']">
     <work:contributor-role>
       <xsl:choose>
         <xsl:when test=".='aut'">author</xsl:when>
@@ -242,7 +254,6 @@
         <xsl:when test=".='edt'">editor</xsl:when>
         <xsl:when test=".='trl'">chair-or-translator</xsl:when>
         <xsl:when test=".='hst'">chair-or-translator</xsl:when>
-        <xsl:otherwise>author</xsl:otherwise>
       </xsl:choose>
     </work:contributor-role>
   </xsl:template>
