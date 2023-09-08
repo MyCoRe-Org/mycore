@@ -239,14 +239,14 @@
   </xsl:template>
 
   <xsl:template name="contributorAttributes">
-    <xsl:if test="mods:role/mods:roleTerm[@type='code'][@authority='marcrelator']">
+    <xsl:if test="mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'][. = 'aut' or . = 'asg' or . = 'edt' or . = 'trl' or . = 'hst']">
       <work:contributor-attributes>
-        <xsl:apply-templates select="(mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'])[1]" />
+        <xsl:apply-templates select="(mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'][. = 'aut' or . = 'asg' or . = 'edt' or . = 'trl' or . = 'hst'])[1]" />
       </work:contributor-attributes>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:mods/mods:name/mods:role/mods:roleTerm[@authority='marcrelator']">
+  <xsl:template match="mods:mods/mods:name/mods:role/mods:roleTerm[@type='code'][@authority='marcrelator'][. = 'aut' or . = 'asg' or . = 'edt' or . = 'trl' or . = 'hst']">
     <work:contributor-role>
       <xsl:choose>
         <xsl:when test=".='aut'">author</xsl:when>
@@ -254,7 +254,6 @@
         <xsl:when test=".='edt'">editor</xsl:when>
         <xsl:when test=".='trl'">chair-or-translator</xsl:when>
         <xsl:when test=".='hst'">chair-or-translator</xsl:when>
-        <xsl:otherwise>author</xsl:otherwise>
       </xsl:choose>
     </work:contributor-role>
   </xsl:template>
