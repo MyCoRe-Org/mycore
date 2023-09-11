@@ -56,15 +56,15 @@ public class MCRPropertyHelperContentServlet extends MCRContentServlet {
             propertiesElement.addContent(componentElement);
             for (MCRProperty property : map.get(component)) {
                 Element propertyElement = new Element("property");
-                propertyElement.setAttribute("name", property.getProperty());
+                propertyElement.setAttribute("name", property.name());
 
-                if (property.getOld() != null) {
-                    propertyElement.setAttribute("oldValue", property.getOld());
+                if (property.oldValue() != null) {
+                    propertyElement.setAttribute("oldValue", property.oldValue());
 
                 }
 
-                propertyElement.setAttribute("newValue", property.getNew());
-                propertyElement.setAttribute("component", property.getComponent());
+                propertyElement.setAttribute("newValue", property.newValue());
+                propertyElement.setAttribute("component", property.component());
                 componentElement.addContent(propertyElement);
             }
         }

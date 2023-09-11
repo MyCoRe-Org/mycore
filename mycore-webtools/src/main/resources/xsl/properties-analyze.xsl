@@ -1,6 +1,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
                 version="3.0"
 >
+
+    <xsl:include href="functions/i18n.xsl" />
 
     <xsl:template match="properties-analyze">
         <site title="Properties">
@@ -19,20 +22,20 @@
             <xsl:variable name="safe_name" select="replace(@name, '\.', '_')"/>
             <div class="card-header" id="{$safe_name}">
                 <h5 class="mb-0">
-                    Komponente -
+                    <xsl:value-of select="mcri18n:translate('component.properties-analyze.component')" /> -
                     <xsl:value-of select="@name"/> -
                     <button class="btn btn-link"
                             data-toggle="collapse"
                             data-target="#{$safe_name}-collapse-overwritten"
                             aria-expanded="true" aria-controls="{$safe_name}-collapse">
-                        überschriebene Properties
+                        <xsl:value-of select="mcri18n:translate('component.properties-analyze.property.overwritten')" />
                     </button>
                     -
                     <button class="btn btn-link"
                             data-toggle="collapse"
                             data-target="#{$safe_name}-collapse-all"
                             aria-expanded="true" aria-controls="{$safe_name}-collapse">
-                        restliche Properties
+                         <xsl:value-of select="mcri18n:translate('component.properties-analyze.property.others')" />
                     </button>
                 </h5>
             </div>
@@ -78,7 +81,7 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="{$safe_name}-{$savePropName}-modal-title">
-                                                    Überschreibungshistorie für
+                                                    <xsl:value-of select="mcri18n:translate('component.properties-analyze.property.history')" />
                                                     <xsl:value-of select="@name"/>
                                                 </h5>
                                                 <button type="button" class="close" data-dismiss="modal"
@@ -94,7 +97,7 @@
                                                                 <div class="list-group-item flex-column align-items-start">
                                                                     <div class="d-flex w-100 justify-content-between">
                                                                         <b>
-                                                                            Komponente -
+                                                                            <xsl:value-of select="mcri18n:translate('component.properties-analyze.component')" /> -
                                                                             <xsl:value-of select="@name"/>
                                                                         </b>
                                                                     </div>

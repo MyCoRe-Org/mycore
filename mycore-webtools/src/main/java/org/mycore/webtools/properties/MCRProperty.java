@@ -18,54 +18,5 @@
 
 package org.mycore.webtools.properties;
 
-class MCRProperty {
-
-    private String old;
-    private String nevv;
-    private String component;
-    private String property;
-
-    MCRProperty(
-        String component,
-        String property,
-        String old,
-        String nevv) {
-
-        this.old = old;
-        this.nevv = nevv;
-        this.component = component;
-        this.property = property;
-    }
-
-    public String getOld() {
-        return old;
-    }
-
-    public void setOld(String old) {
-        this.old = old;
-    }
-
-    public String getNew() {
-        return nevv;
-    }
-
-    public void setNew(String nevv) {
-        this.nevv = nevv;
-    }
-
-    public String getComponent() {
-        return component;
-    }
-
-    public void setComponent(String component) {
-        this.component = component;
-    }
-
-    public String getProperty() {
-        return property;
-    }
-
-    public void setProperty(String property) {
-        this.property = property;
-    }
+record MCRProperty(String component, String name, String oldValue, String newValue) {
 }

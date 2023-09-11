@@ -145,9 +145,9 @@ public class MCRSolrConfigReloader {
             List<String> observedTypes = getObserverConfigTypes();
             JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreURL);
 
-            List<byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
+            Map<String, byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + configType + "/" + SOLR_CONFIG_UPDATE_FILE_NAME);
-            for (byte[] configFileData : configFileContents) {
+            for (byte[] configFileData : configFileContents.values()) {
                 String content = new String(configFileData, StandardCharsets.UTF_8);
                 JsonElement json = JsonParser.parseString(content);
                 if (!json.isJsonArray()) {
