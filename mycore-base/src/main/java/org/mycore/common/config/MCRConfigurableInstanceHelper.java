@@ -79,17 +79,17 @@ class MCRConfigurableInstanceHelper {
      */
     public static <T> Optional<T> getInstance(String name) throws MCRConfigurationException {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
-        if (configuration.className() != null) {
-            return Optional.of(getInstance(configuration));
-        } else {
+        String className = configuration.className();
+        if (className == null || className.isBlank()) {
             return Optional.empty();
         }
+        return Optional.of(getInstance(configuration));
     }
 
     public static <T> T getInstance(MCRInstanceConfiguration configuration) throws MCRConfigurationException {
         String className = configuration.className();
-        if (className == null) {
-            throw new MCRConfigurationException("Missing property: " + configuration.name().actual());
+        if (className == null || className.isBlank()) {
+            throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual());
         }
         Class<T> targetClass = getClass(configuration.name().actual(), configuration.className());
         return getInstance(targetClass, configuration);
@@ -835,9 +835,11 @@ class MCRConfigurableInstanceHelper {
 
             MCRInstanceConfiguration nestedConfiguration = configuration.nestedConfiguration(annotation().name());
 
-            if (nestedConfiguration.className() == null) {
+            String nestedClassName = nestedConfiguration.className();
+            if (nestedClassName == null || nestedClassName.isBlank()) {
                 if (annotation.required()) {
-                    throw new MCRConfigurationException("Missing property: " + nestedConfiguration.name().actual());
+                    throw new MCRConfigurationException("Missing or empty property: "
+                        + nestedConfiguration.name().actual());
                 } else {
                     return null;
                 }
