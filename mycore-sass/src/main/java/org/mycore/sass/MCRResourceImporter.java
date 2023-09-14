@@ -73,11 +73,7 @@ public class MCRResourceImporter extends CustomImporter {
     @Override
     public String canonicalize(String url, boolean fromImport) throws Exception {
         LOGGER.debug(() -> "handle canonicalize: " + url);
-        if (!url.startsWith(SASS_URL_PREFIX)) {
-            return null;
-        }
-        String resourcePath = url.substring(SASS_URL_PREFIX.length());
-        URL resource = getWebResourceUrl(resourcePath);
+        URL resource = toURL(url);
         if (resource == null || resource.getFile().endsWith("/") || !URL_HELPER.isFile(resource)) {
             //with jetty the directory does not end with /, so we need to REAL check
             return null;
@@ -100,14 +96,12 @@ public class MCRResourceImporter extends CustomImporter {
     @Override
     public ImportSuccess handleImport(String url) throws IOException {
         LOGGER.debug(() -> "handle import: " + url);
-        if (!url.startsWith(SASS_URL_PREFIX)) {
+        URL configResource = toURL(url);
+        if (configResource == null) {
             return null;
         }
-        ImportSuccess.Builder result = ImportSuccess.newBuilder();
-        String resourcePath = url.substring(SASS_URL_PREFIX.length());
-        LOGGER.debug(() -> "resource: " + resourcePath);
-        URL configResource = getWebResourceUrl(resourcePath);
         LOGGER.debug(() -> "resource url: " + configResource);
+        ImportSuccess.Builder result = ImportSuccess.newBuilder();
         URLConnection urlConnection = configResource.openConnection();
         try (InputStream in = urlConnection.getInputStream()) {
             ByteString content = ByteString.readFrom(in);
@@ -115,6 +109,15 @@ public class MCRResourceImporter extends CustomImporter {
             result.setSyntax(SyntaxUtil.guessSyntax(urlConnection));
         }
         return result.build();
+    }
+
+    private URL toURL(String url) {
+        if (!url.startsWith(SASS_URL_PREFIX)) {
+            return null;
+        }
+        String resourcePath = url.substring(SASS_URL_PREFIX.length());
+        URL configResource = getWebResourceUrl(resourcePath);
+        return configResource;
     }
 
     /**

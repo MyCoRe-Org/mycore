@@ -125,7 +125,7 @@ class MCRSassCompiler implements Closeable {
         throws SassCompilationFailedException, IOException {
         String ourURL = MCRResourceImporter.SASS_URL_PREFIX + realFileName;
         MCRResourceImporter importer = new MCRResourceImporter(servletContext);
-        var importSuccess = importer.handleImport(ourURL);
+        ImportSuccess importSuccess = importer.handleImport(ourURL);
         Syntax syntax = importSuccess.getSyntax();
         ByteString content = importSuccess.getContentsBytes();
         customImporters.put(importer.getId(), importer.autoCanonicalize());
