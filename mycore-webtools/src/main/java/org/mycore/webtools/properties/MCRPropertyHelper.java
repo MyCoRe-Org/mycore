@@ -39,7 +39,7 @@ class MCRPropertyHelper {
         configFileContents = MCRConfigurationInputStream.getConfigFileContents("mycore.properties");
     }
 
-    public Map<String, List<MCRProperty>> analyzeProperties() throws IOException {
+    public Map<String, List<MCRProperty>> analyzeProperties() {
         Properties properties = new MCRProperties();
         Properties currentProperties = new MCRProperties();
         final AtomicReference<Properties> oldProperties = new AtomicReference<Properties>(null);
@@ -55,6 +55,8 @@ class MCRPropertyHelper {
                 properties.load(bais);
                 bais.reset();
                 currentProperties.load(bais);
+            } catch (IOException e) {
+                // can't happen ByteArrayInputStream does not throw IOException
             }
 
             currentProperties.forEach((k, v) -> {
