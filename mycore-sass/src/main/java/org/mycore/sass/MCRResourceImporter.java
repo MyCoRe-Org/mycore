@@ -84,7 +84,7 @@ public class MCRResourceImporter extends CustomImporter {
 
     /**
      * Handles the import of a URL and returns the success of the import along with its content.
-     *
+     * <br>
      * This method takes a URL as input and checks if it starts with the "sass:/" prefix. If it does,
      * it attempts to locate the resource URL. If the resource URL is found,
      * it reads its content returns the an ImportSuccess object.
