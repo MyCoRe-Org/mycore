@@ -73,13 +73,13 @@ public class MCRResourceImporter extends CustomImporter {
     @Override
     public String canonicalize(String url, boolean fromImport) throws Exception {
         LOGGER.debug(() -> "handle canonicalize: " + url);
-        URL resource = toURL(url);
-        if (resource == null || resource.getFile().endsWith("/") || !URL_HELPER.isFile(resource)) {
+        URL sassResourceURL = toURL(url);
+        if (sassResourceURL == null || sassResourceURL.getFile().endsWith("/") || !URL_HELPER.isFile(sassResourceURL)) {
             //with jetty the directory does not end with /, so we need to REAL check
             return null;
         }
-        LOGGER.debug("Resolved {} to {}", url, resource);
-        return resource == null ? null : url;
+        LOGGER.debug("Resolved {} to {}", url, sassResourceURL);
+        return sassResourceURL == null ? null : url;
     }
 
     /**
@@ -96,13 +96,13 @@ public class MCRResourceImporter extends CustomImporter {
     @Override
     public ImportSuccess handleImport(String url) throws IOException {
         LOGGER.debug(() -> "handle import: " + url);
-        URL configResource = toURL(url);
-        if (configResource == null) {
+        URL sassResourceURL = toURL(url);
+        if (sassResourceURL == null) {
             return null;
         }
-        LOGGER.debug(() -> "resource url: " + configResource);
+        LOGGER.debug(() -> "resource url: " + sassResourceURL);
         ImportSuccess.Builder result = ImportSuccess.newBuilder();
-        URLConnection urlConnection = configResource.openConnection();
+        URLConnection urlConnection = sassResourceURL.openConnection();
         try (InputStream in = urlConnection.getInputStream()) {
             ByteString content = ByteString.readFrom(in);
             result.setContentsBytes(content);
