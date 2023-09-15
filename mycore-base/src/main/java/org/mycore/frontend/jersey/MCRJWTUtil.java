@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
@@ -39,8 +38,8 @@ import org.mycore.common.events.MCRStartupHandler;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.core.Response;
@@ -54,7 +53,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
 
     public static final String JWT_SESSION_ATTRIBUTE_PREFIX = "mcr:sa:";
 
-    private static Gson GSON = MCRJSONUtils.createGSON();
+    private static final  ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
 
@@ -102,34 +101,34 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
     }
 
     public static Response getJWTLoginSuccessResponse(String jwt) throws IOException {
-        JsonObject response = new JsonObject();
-        response.addProperty("login_success", true);
-        response.addProperty("access_token", jwt);
-        response.addProperty("token_type", "Bearer");
+        ObjectNode response = OBJECT_MAPPER.createObjectNode();
+        response.put("login_success", true);
+        response.put("access_token", jwt);
+        response.put("token_type", "Bearer");
         return Response.status(Response.Status.OK)
             .header("Authorization", "Bearer " + jwt)
-            .entity(GSON.toJson(response))
+            .entity(response)
             .build();
     }
 
     public static Response getJWTRenewSuccessResponse(String jwt) throws IOException {
-        JsonObject response = new JsonObject();
-        response.addProperty("executed", true);
-        response.addProperty("access_token", jwt);
-        response.addProperty("token_type", "Bearer");
+        ObjectNode response = OBJECT_MAPPER.createObjectNode();
+        response.put("executed", true);
+        response.put("access_token", jwt);
+        response.put("token_type", "Bearer");
         return Response.status(Response.Status.OK)
             .header("Authorization", "Bearer " + jwt)
-            .entity(GSON.toJson(response))
+            .entity(response)
             .build();
     }
 
     public static Response getJWTLoginErrorResponse(String errorDescription) throws IOException {
-        JsonObject response = new JsonObject();
-        response.addProperty("login_success", false);
-        response.addProperty("error", "login_failed");
-        response.addProperty("error_description", errorDescription);
+        ObjectNode response = OBJECT_MAPPER.createObjectNode();
+        response.put("login_success", false);
+        response.put("error", "login_failed");
+        response.put("error_description", errorDescription);
         return Response.status(Response.Status.FORBIDDEN)
-            .entity(GSON.toJson(response))
+            .entity(response)
             .build();
     }
 
