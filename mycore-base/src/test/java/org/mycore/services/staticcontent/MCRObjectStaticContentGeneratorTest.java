@@ -33,7 +33,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
     @Test
     public void getSlotDirPath() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
-            null, Paths.get("/"));
+            null, Paths.get("/"), "test");
 
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "00000");
         resetObjectIDFormatter();
@@ -44,7 +44,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
     @Test
     public void getSlotDirPath2() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
-            null, Paths.get("/"));
+            null, Paths.get("/"), "test");
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "000000");
         resetObjectIDFormatter();
         MCRObjectID derivate = MCRObjectID.getInstance("mcr_derivate_000001");
@@ -54,7 +54,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
     @Test
     public void getSlotDirPath3() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
-            null, Paths.get("/"));
+            null, Paths.get("/"), "test");
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "0000000");
         resetObjectIDFormatter();
         MCRObjectID derivate = MCRObjectID.getInstance("mcr_derivate_0000001");

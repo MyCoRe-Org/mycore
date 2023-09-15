@@ -334,7 +334,7 @@ public class MCRObjectStructure {
             List<Element> derobjectList = subElement.getChildren();
 
             for (Element derElement : derobjectList) {
-                addDerivate(MCRMetaEnrichedLinkID.fromDom(derElement));
+                addDerivate(MCRMetaEnrichedLinkIDFactory.getInstance().fromDom(derElement));
             }
         }
     }

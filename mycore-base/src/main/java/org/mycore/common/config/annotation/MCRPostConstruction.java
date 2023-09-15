@@ -25,9 +25,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation tells which method should be called after the creation
- * of the object.
- * The method should have a String as a parameter which will get the property passed.
+ * This annotation is used to mark methods that should be called after the creation of the object.
+ * <p>
+ * The method may have a single parameter of type {@link String} for which, if present, the name of the
+ * configuration property containing the class name of the configured instance will be passed.
+ * <p>
+ * The method needs to be public.
+ *
  * @author Sebastian Hofmann
  */
 @Retention(RetentionPolicy.RUNTIME)

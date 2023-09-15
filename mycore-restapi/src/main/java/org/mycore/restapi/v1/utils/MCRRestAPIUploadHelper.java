@@ -224,7 +224,8 @@ public class MCRRestAPIUploadHelper {
 
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                    MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
+                    MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate),
+                    mcrDerivate.isImportMode());
                 derID = mcrDerivate.getId();
             }
 
@@ -299,7 +300,7 @@ public class MCRRestAPIUploadHelper {
             if (Files.notExists(derRoot)) {
                 derRoot.getFileSystem().createRoot(derID.toString());
             }
-            
+
             if (formParamUnzip) {
                 String maindoc = null;
                 try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {

@@ -19,7 +19,6 @@ package org.mycore.pi;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +39,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
@@ -523,35 +521,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return getPredicateInstance(predicateProperty);
     }
 
-    @SuppressWarnings("unchecked")
     public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
-        final String clazz = MCRConfiguration2.getStringOrThrow(predicateProperty);
-        final String errorMessageBegin = String.format(Locale.ROOT, "Configured class %s(%s)", clazz,
-            predicateProperty);
-        try {
-            return (Predicate<MCRBase>) MCRClassTools.forName(clazz)
-                .getConstructor(String.class)
-                .newInstance(predicateProperty + ".");
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " was not found!", e);
-        } catch (IllegalAccessException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " has no public constructor!", e);
-        } catch (InstantiationException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " seems to be abstract!", e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " has no default constructor!", e);
-        } catch (InvocationTargetException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " could not be initialized", e);
-        } catch (ClassCastException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " needs to extend the right parent class",
-                e);
-        }
+        return MCRConfiguration2.<Predicate<MCRBase>>getInstanceOf(predicateProperty)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(predicateProperty));
     }
 
 }

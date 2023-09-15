@@ -17,16 +17,17 @@
  */
 package org.mycore.pi.condition;
 
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIManager;
 
 /**
- * PI Predicate, that checks if an other PersistentIdentifier was registered within the PI component
+ * PI Predicate, that checks if another PersistentIdentifier was registered within the PI component
  * before the current PI will be created or registered.
- * 
+ * <p>
  * Use the properties *.Service and *.Type 
  * to specify the PI service and type of the PI which should be checked. 
- * 
+ * <p>
  * sample configuration:
  * MCR.PI.Service.RosDokURN.CreationPredicate=org.mycore.pi.condition.MCRPIAndPredicate
  * MCR.PI.Service.RosDokURN.CreationPredicate.1=org.mycore.pi.condition.MCRPIOtherPIRegisteredPredicate
@@ -40,19 +41,15 @@ import org.mycore.pi.MCRPIManager;
 public class MCRPIOtherPIRegisteredPredicate extends MCRPIPredicateBase
     implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
 
-    final private String type;
+    @MCRProperty(name = "Type")
+    public String type;
 
-    final private String service;
-
-    public MCRPIOtherPIRegisteredPredicate(String propertyPrefix) {
-        super(propertyPrefix);
-
-        type = requireProperty("Type");
-        service = requireProperty("Service");
-    }
+    @MCRProperty(name = "Service")
+    public String service;
 
     @Override
     public boolean test(MCRBase mcrBase) {
         return MCRPIManager.getInstance().isRegistered(mcrBase.getId(), "", type, service);
     }
+
 }

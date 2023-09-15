@@ -20,23 +20,22 @@ package org.mycore.pi.condition;
 
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRPIXPathPredicate extends MCRPIPredicateBase
     implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
-    final private XPathExpression<Boolean> expr;
 
-    public MCRPIXPathPredicate(String propertyPrefix) {
-        super(propertyPrefix);
-        final String xPath = "boolean(" + requireProperty("XPath") + ")";
-        XPathFactory factory = XPathFactory.instance();
-        expr = factory.compile(xPath, Filters.fboolean(), null, MCRConstants.getStandardNamespaces());
+    private XPathExpression<Boolean> expression;
+
+    @MCRProperty(name="XPath")
+    public void setXPath(String xPath) {
+        expression = compileXpath("boolean(" + xPath + ")", Filters.fboolean());
     }
 
     @Override
     public boolean test(MCRBase mcrBase) {
-        return expr.evaluateFirst(mcrBase.createXML()) == Boolean.TRUE;
+        return expression.evaluateFirst(mcrBase.createXML()) == Boolean.TRUE;
     }
+
 }

@@ -30,7 +30,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.function.MCRTriConsumer;
 
@@ -124,7 +123,7 @@ public class MCRConfiguration2 {
      * Returns a new instance of the class specified in the configuration property with the given name.
      * If you call a method on the returned Optional directly you need to set the type like this:
      * <pre>
-     * MCRConfiguration.&lt;MCRMyType&gt; getInstanceOf(name)
+     * MCRConfiguration2.&lt;MCRMyType&gt; getInstanceOf(name)
      *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
      * </pre>
      * 
@@ -147,7 +146,7 @@ public class MCRConfiguration2 {
      * previously instantiated by this method this instance is returned.
      * If you call a method on the returned Optional directly you need to set the type like this:
      * <pre>
-     * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name)
+     * MCRConfiguration2.&lt;MCRMyType&gt; getSingleInstanceOf(name)
      *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
      * </pre>
      *
@@ -169,7 +168,7 @@ public class MCRConfiguration2 {
      * previously instantiated by this method this instance is returned.
      * If you call a method on the returned Optional directly you need to set the type like this:
      * <pre>
-     * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name, alternative)
+     * MCRConfiguration2.&lt;MCRMyType&gt; getSingleInstanceOf(name, alternative)
      *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
      * </pre>
      *
@@ -186,7 +185,7 @@ public class MCRConfiguration2 {
             .or(() -> Optional.ofNullable(alternative)
                 .map(className -> new ConfigSingletonKey(name, className.getName()))
                 .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
-                    (k) -> MCRConfigurableInstanceHelper.getInstance(alternative, Collections.emptyMap(), null))));
+                    (k) -> MCRConfigurableInstanceHelper.getInstance(MCRInstanceConfiguration.ofClass(alternative)))));
     }
 
     /**
@@ -295,10 +294,10 @@ public class MCRConfiguration2 {
      */
     public static <T> Map<String, Callable<T>> getInstances(String prefix) {
         return getInstantiatablePropertyKeys(prefix)
-            .collect(Collectors.toMap(MCRConfigurableInstanceHelper::getIDFromClassProperty, v -> {
-                final String classProp = v;
-                return () -> (T) getInstanceOf(classProp).orElse(null);
-            }));
+            .collect(Collectors.toMap(
+                k -> MCRInstanceName.of(k).canonical(),
+                v -> () -> (T) getInstanceOf(v).orElse(null)
+            ));
     }
 
     /**
@@ -419,11 +418,8 @@ public class MCRConfiguration2 {
         return LISTENERS.remove(uuid) != null;
     }
 
-    public static <T> T instantiateClass(String classname) {
-        LogManager.getLogger().debug("Loading Class: {}", classname);
-
-        Class<? extends T> cl = getClassObject(classname);
-        return MCRConfigurableInstanceHelper.getInstance(cl, Collections.emptyMap(), null);
+    public static <T> T instantiateClass(String className) {
+        return MCRConfigurableInstanceHelper.getInstance(MCRInstanceConfiguration.ofClass(className));
     }
 
     private static <T> Class<? extends T> getClassObject(String classname) {

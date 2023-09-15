@@ -20,20 +20,14 @@ package org.mycore.solr.classification;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 import java.util.SortedSet;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
-import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
  * Extends the default category dao with solr support. Every create/write/delete operation
@@ -42,8 +36,6 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
  * @author Matthias Eichner
  */
 public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCategoryDAO.class);
 
     @Override
     public MCRCategory setURI(MCRCategoryID id, URI uri) {
@@ -85,50 +77,26 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 0);
         MCRCategory parent = category.getParent();
         super.deleteCategory(id);
-        solrDelete(id, parent);
+        MCRSolrClassificationUtil.solrDelete(id, parent);
     }
 
-    protected void solrDelete(MCRCategoryID id, MCRCategory parent) {
-        try {
-            // remove all descendants and itself
-            HttpSolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-            List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
-            toDelete.add(id.toString());
-            solrClient.deleteById(toDelete);
-            // reindex parent
-            MCRSolrClassificationUtil.reindex(parent);
-        } catch (Exception exc) {
-            LOGGER.error("Solr: unable to delete categories of parent {}", id);
-        }
-    }
+   
 
     @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         super.moveCategory(id, newParentID, index);
-        solrMove(id, newParentID, index);
+        MCRSolrClassificationUtil.solrMove(id, newParentID);
     }
 
-    protected void solrMove(MCRCategoryID id, MCRCategoryID newParentID, int index) {
-        try {
-            SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-            List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
-            reindexList.add(id.toString());
-            reindexList.add(newParentID.toString());
-            MCRSolrClassificationUtil.reindex(MCRSolrClassificationUtil.fromString(reindexList));
-        } catch (Exception exc) {
-            LOGGER.error("Solr: unable to move categories of category {} to {}", id, newParentID);
-        }
-    }
+    
 
     @Override
     public Collection<MCRCategoryImpl> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
         Collection<MCRCategoryImpl> replacedCategories = super.replaceCategory(newCategory);
         // remove all old categories
-        solrDelete(newCategory.getId(), newCategory.getParent());
+        MCRSolrClassificationUtil.solrDelete(newCategory.getId(), newCategory.getParent());
         // reindex all new
-        MCRSolrClassificationUtil.reindex(replacedCategories.toArray(MCRCategoryImpl[]::new));
+        MCRSolrClassificationUtil.reindex(replacedCategories.toArray(MCRCategory[]::new));
         return replacedCategories;
     }
 

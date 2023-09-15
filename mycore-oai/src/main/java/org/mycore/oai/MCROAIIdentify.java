@@ -20,6 +20,7 @@ package org.mycore.oai;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -112,6 +113,7 @@ public class MCROAIIdentify extends SimpleIdentify {
             .stream()
             .filter(p -> p.getKey().startsWith(this.configPrefix + "Friends."))
             .map(Map.Entry::getValue)
+            .filter(Predicate.not(String::isBlank))
             .forEach(desc.getFriendsList()::add);
         return desc;
     }
