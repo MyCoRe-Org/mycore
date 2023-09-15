@@ -1,13 +1,18 @@
 package org.mycore.common.xml;
 
+import org.glassfish.jersey.server.internal.scanning.FilesScanner;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfigurationDir;
 
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class MCRURIResolverTest {
+public class MCRURIResolverTest extends MCRTestCase {
+
+    public static final String TEST_DEVELOPER_FOLDER_STRING = "/home/workspace";
 
     @Test
     public void testGetParentDirectoryResourceURI() {
@@ -31,9 +36,21 @@ public class MCRURIResolverTest {
         testData.put(configurationXSLDirectory + "/directory/mir-accesskey-utils.xsl",
             "resource:xsl/directory/");
 
+        testData.put(Paths.get(TEST_DEVELOPER_FOLDER_STRING).toAbsolutePath().toFile().toURI()
+            + "/directory/mir-accesskey-utils.xsl", "resource:directory/");
+
         for (Map.Entry<String, String> entry : testData.entrySet()) {
             String result = MCRURIResolver.getParentDirectoryResourceURI(entry.getKey());
             Assert.assertEquals(entry.getValue(), result);
         }
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> properties = super.getTestProperties();
+
+        properties.put("MCR.Developer.Resource.Override", TEST_DEVELOPER_FOLDER_STRING);
+
+        return properties;
     }
 }
