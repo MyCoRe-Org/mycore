@@ -2,6 +2,8 @@
 <xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:mcri18n="http://www.mycore.de/xslt/i18n">
 
+  <!-- TODO: check for side effects / get user agent using property mechanism -->
+  <xsl:param name="User-Agent"/>
   <xsl:param name="msie-banner" select="'enabled'"/>
 
   <xsl:template name="msie-note">

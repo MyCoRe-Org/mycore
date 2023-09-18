@@ -6,8 +6,8 @@
                 xmlns:mcrurl="http://www.mycore.de/xslt/url"
                 xmlns:mcri18n="http://www.mycore.de/xslt/i18n" exclude-result-prefixes="xsl mcrurl mcri18n">
 
-  <xsl:include href="MyCoReLayout-3.xsl" />
-  <xsl:include href="classificationBrowser-3.xsl" />
+  <xsl:include href="MyCoReLayout.xsl" />
+  <xsl:include href="classificationBrowser.xsl" />
 
   <xsl:variable name="PageID" select="'select-group'" />
 

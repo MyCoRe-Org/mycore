@@ -6,8 +6,8 @@
                 xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
                 exclude-result-prefixes="mcri18n">
   &html-output;
-  <xsl:include href="MyCoReLayout-3.xsl" />
-  <xsl:include href="response-utils-3.xsl" />
+  <xsl:include href="MyCoReLayout.xsl" />
+  <xsl:include href="response-utils.xsl" />
   <xsl:include href="xslInclude:solrResponse-3" />
 
   <xsl:param name="MCR.Results.FetchHit" />
