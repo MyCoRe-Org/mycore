@@ -9,7 +9,7 @@
                 exclude-result-prefixes="xsl mcri18n mcrurl"
 >
 
-  <xsl:include href="MyCoReLayout-3.xsl"/>
+  <xsl:include href="MyCoReLayout.xsl"/>
 
   <xsl:variable name="PageID">
     <xsl:choose>

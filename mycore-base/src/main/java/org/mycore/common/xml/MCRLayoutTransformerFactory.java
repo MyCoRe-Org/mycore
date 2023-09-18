@@ -151,7 +151,8 @@ public class MCRLayoutTransformerFactory {
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
     private String buildStylesheetName(String id) {
-        return String.format(Locale.ROOT, "xsl/%s.xsl", id.replaceAll("-default$", ""));
+        final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+        return String.format(Locale.ROOT, "%s/%s.xsl", xslFolder, id.replaceAll("-default$", ""));
     }
 
 }

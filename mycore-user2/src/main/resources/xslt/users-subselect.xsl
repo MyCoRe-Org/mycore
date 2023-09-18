@@ -9,7 +9,7 @@
                 exclude-result-prefixes="xsl mcri18n mcrurl"
 >
 
-  <xsl:include href="users-3.xsl" />
+  <xsl:include href="users.xsl" />
 
   <!-- ========== XED Subselect detection ========== -->
   <xsl:variable name="xedSession" select="mcrurl:get-param($RequestURL, '_xed_subselect_session')" />

@@ -5,7 +5,7 @@
                 version="3">
 
 
-  <xsl:include href="classificationEditorBase-3.xsl" />
+  <xsl:include href="classificationEditorBase.xsl" />
   <xsl:output method="html" media-type="text/html" encoding="UTF-8" indent="yes" />
 
   <xsl:template match="classificationEditor">
