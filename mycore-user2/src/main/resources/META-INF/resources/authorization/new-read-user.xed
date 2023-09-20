@@ -3,8 +3,8 @@
 <MyCoReWebPage>
   <section i18n="component.user2.admin.createUnpriv.title" xml:lang="all">
     <xed:form class="userEditor form-horizontal" role="form" xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser">
-      <xed:preload uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" />
-      <xed:preload uri="xslStyle:user-xeditor-templates:webapp:{$MCR.UserForms.CustomIncludes}" />
+      <xed:preload uri="xslStyleXEditor:user-xeditor-templates:webapp:authorization/user-editor.xed" />
+      <xed:preload uri="xslStyleXEditor:user-xeditor-templates:webapp:{$MCR.UserForms.CustomIncludes}" />
       <xed:source uri="user:{$id}" />
       <xed:cancel url="{$ServletsBaseURL}MCRUserServlet?action=show&amp;id={$id}" />
 

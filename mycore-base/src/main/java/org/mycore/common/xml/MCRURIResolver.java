@@ -233,6 +233,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("catchEx", new MCRExceptionAsXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
+        supportedSchemes.put("xslStyleXEditor", new MCRXslStyleXEDitorResolver());
         supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
         supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
         supportedSchemes.put("xslImport", new MCRXslImportResolver());
@@ -1220,11 +1221,22 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-        private MCRXSLTransformer getTransformer(String... stylesheet) {
+        protected MCRXSLTransformer getTransformer(String... stylesheet) {
             final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
             String[] stylesheets = new String[stylesheet.length];
             for (int i = 0; i < stylesheets.length; i++) {
                 stylesheets[i] = xslFolder + "/" + stylesheet[i] + ".xsl";
+            }
+            return MCRXSLTransformer.getInstance(stylesheets);
+        }
+    }
+
+    private static class MCRXslStyleXEDitorResolver extends MCRXslStyleResolver {
+        @Override
+        protected MCRXSLTransformer getTransformer(String... stylesheet) {
+            String[] stylesheets = new String[stylesheet.length];
+            for (int i = 0; i < stylesheets.length; i++) {
+                stylesheets[i] = "xsl/" + stylesheet[i] + ".xsl";
             }
             return MCRXSLTransformer.getInstance(stylesheets);
         }
