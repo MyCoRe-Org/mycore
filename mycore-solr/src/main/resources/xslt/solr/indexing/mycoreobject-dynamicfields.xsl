@@ -5,7 +5,7 @@
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mcrsolr="http://www.mycore.de/xslt/solr">
   
-  <xsl:import href="xslImport:solr-document-3:solr/indexing/mycoreobject-dynamicfields.xsl" />
+  <xsl:import href="xslImport:solr-document:solr/indexing/mycoreobject-dynamicfields.xsl" />
 
   <xsl:import href="resource:xslt/functions/solr.xsl" />
 

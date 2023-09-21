@@ -13,7 +13,7 @@
   &html-output;
 
   <xsl:include href="MyCoReLayout.xsl" />
-  <xsl:include href="xslInclude:MyCoReWebPage-3" />
+  <xsl:include href="xslInclude:MyCoReWebPage" />
   <!-- <xsl:include href="xslInclude:MyCoReWebPage" /> -->
 
   <xsl:variable name="PageID" select="/MyCoReWebPage/@id" />
