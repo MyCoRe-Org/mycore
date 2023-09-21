@@ -94,7 +94,11 @@ export default new class MCRAccessKeyServicePlugin {
   public async getAccessKeys(): Promise<MCRAccessKeyInformation> {
     const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys` : 'accesskeys';
     const response = await this.instance.get(url);
-    return <MCRAccessKeyInformation>response.data;
+    const information: MCRAccessKeyInformation = {
+      items: response.data,
+      totalResults: parseInt(response.headers['x-total-count'], 10),
+    };
+    return information;
   }
 
   public async getAccessKey(secret: string): Promise<MCRAccessKey> {
