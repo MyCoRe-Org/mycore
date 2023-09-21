@@ -8,7 +8,7 @@
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="response-utils.xsl" />
-  <xsl:include href="xslInclude:solrResponse-3" />
+  <xsl:include href="xslInclude:solrResponse" />
 
   <xsl:param name="MCR.Results.FetchHit" />
   <xsl:param name="DisplaySearchForm" select="'false'" />
