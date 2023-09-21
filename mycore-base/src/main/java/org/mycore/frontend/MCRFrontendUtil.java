@@ -20,9 +20,8 @@ package org.mycore.frontend;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Enumeration;
@@ -162,11 +161,11 @@ public class MCRFrontendUtil {
             BASE_URL = BASE_URL + "/";
         }
         try {
-            URL url = new URL(BASE_URL);
-            InetAddress baseHost = InetAddress.getByName(url.getHost());
+            URI baseUri = new URI(BASE_URL);
+            InetAddress baseHost = InetAddress.getByName(baseUri.getHost());
             BASE_HOST_IP = baseHost.getHostAddress();
-        } catch (MalformedURLException e) {
-            LOGGER.error("Can't create URL from String {}", BASE_URL);
+        } catch (URISyntaxException e) {
+            LOGGER.error("Can't create URI from String {}", BASE_URL);
         } catch (UnknownHostException e) {
             LOGGER.error("Can't find host IP for URL {}", BASE_URL);
         }

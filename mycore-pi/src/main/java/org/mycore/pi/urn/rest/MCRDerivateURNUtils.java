@@ -20,6 +20,7 @@ package org.mycore.pi.urn.rest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -67,14 +68,14 @@ public class MCRDerivateURNUtils {
 
         try {
             // the base urn, links to frontpage (metadata + viewer)
-            if (piInfo.getAdditional() == null || piInfo.getAdditional().trim().length() == 0) {
+            if (piInfo.getAdditional() == null || piInfo.getAdditional().trim().isEmpty()) {
                 MCRObjectID derID = MCRObjectID.getInstance(derivateID);
                 final MCRObjectID objectId = MCRMetadataManager.getObjectId(derID, 0, TimeUnit.SECONDS);
                 if (objectId == null) {
                     LOGGER.warn("Object for {} could NOT be found", derivateID);
                     return null;
                 }
-                return new URL(MCRFrontendUtil.getBaseURL() + "receive/" + objectId + "?derivate=" + derID);
+                return new URI(MCRFrontendUtil.getBaseURL() + "receive/" + objectId + "?derivate=" + derID).toURL();
             } else /* an urn for a certain file, links to iview2 */ {
                 MCRPath file = MCRPath.getPath(derivateID, piInfo.getAdditional());
 
@@ -88,12 +89,11 @@ public class MCRDerivateURNUtils {
                         MCRFileNodeServlet.class.getSimpleName());
                     String filePath = "/" + file.getOwner()
                         + MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath());
-                    return new URL(
-                        MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
-                            + filePath);
+                    return new URI(MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
+                        + filePath).toURL();
                 }
 
-                return new URL(getViewerURL(file));
+                return new URI(getViewerURL(file)).toURL();
             }
         } catch (MalformedURLException | MCRPersistenceException | URISyntaxException e) {
             LOGGER.error("Malformed URL for URN {}", piInfo.getIdentifier(), e);
@@ -132,8 +132,8 @@ public class MCRDerivateURNUtils {
             }
 
             LOGGER.debug("Generated URL for urn {} is {}", urn.getIdentifier(), spec);
-            url = new URL(spec);
-        } catch (MalformedURLException e) {
+            url = new URI(spec).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             LOGGER.error("Could not create dfg viewer url", e);
         }
         return url;

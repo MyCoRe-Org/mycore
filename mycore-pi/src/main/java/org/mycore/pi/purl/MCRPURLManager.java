@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -77,7 +79,7 @@ public class MCRPURLManager {
         try {
             purlServerBaseURL = purlServerURL;
             // Get Cookie
-            URL url = new URL(purlServerBaseURL + ADMIN_PATH + "/login/login.bsh?referrer=/docs/index.html");
+            URL url = new URI(purlServerBaseURL + ADMIN_PATH + "/login/login.bsh?referrer=/docs/index.html").toURL();
             conn = (HttpURLConnection) url.openConnection();
             conn.connect();
 
@@ -93,7 +95,7 @@ public class MCRPURLManager {
             String data = "id=" + URLEncoder.encode(user, StandardCharsets.UTF_8);
             data += "&passwd=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
 
-            url = new URL(purlServerBaseURL + ADMIN_PATH + "/login/login-submit.bsh");
+            url = new URI(purlServerBaseURL + ADMIN_PATH + "/login/login-submit.bsh").toURL();
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
@@ -124,7 +126,7 @@ public class MCRPURLManager {
             }
             conn.disconnect();
 
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             if (!e.getMessage().contains(
                 "Server returned HTTP response code: 403 for URL: ")) {
                 LOGGER.error(e);
@@ -143,7 +145,7 @@ public class MCRPURLManager {
         HttpURLConnection conn = null;
         int responseCode = -1;
         try {
-            URL url = new URL(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html");
+            URL url = new URI(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html").toURL();
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
@@ -154,7 +156,7 @@ public class MCRPURLManager {
             }
             responseCode = conn.getResponseCode();
             LOGGER.debug(conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             if (!e.getMessage().contains(
                 "Server returned HTTP response code: 403 for URL: ")) {
                 LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode, e);
@@ -185,7 +187,7 @@ public class MCRPURLManager {
             // urllib.urlencode(dict(type="410", maintainers="admin"))).read().close() #
             // Create a 410 purl
 
-            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
             LOGGER.debug(url.toString());
 
             String data = "target=" + URLEncoder.encode(target, StandardCharsets.UTF_8);
@@ -249,7 +251,7 @@ public class MCRPURLManager {
             strURL += "?target=" + URLEncoder.encode(target, StandardCharsets.UTF_8) + "&maintainers=" + maintainers
                 + "&type=" + type;
 
-            URL url = new URL(strURL);
+            URL url = new URI(strURL).toURL();
             LOGGER.debug(url.toString());
 
             conn = (HttpURLConnection) url.openConnection();
@@ -286,7 +288,7 @@ public class MCRPURLManager {
         int response = 0;
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
             LOGGER.debug(url.toString());
 
             conn = (HttpURLConnection) url.openConnection();
@@ -324,7 +326,7 @@ public class MCRPURLManager {
     public boolean isPURLTargetURLUnchanged(String purl, String targetURL) {
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
             conn = (HttpURLConnection) url.openConnection();
             int response = conn.getResponseCode();
 
@@ -362,7 +364,7 @@ public class MCRPURLManager {
     public Document retrievePURLMetadata(String purl, String targetURL) {
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
             conn = (HttpURLConnection) url.openConnection();
             int response = conn.getResponseCode();
 
@@ -404,7 +406,7 @@ public class MCRPURLManager {
     public boolean existsPURL(String purl) {
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
             conn = (HttpURLConnection) url.openConnection();
             int response = conn.getResponseCode();
             return response == 200;

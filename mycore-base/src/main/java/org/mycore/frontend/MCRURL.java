@@ -20,6 +20,7 @@ package org.mycore.frontend;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +44,11 @@ public class MCRURL {
     private Map<String, List<String>> parameterMap;
 
     public MCRURL(String url) throws MalformedURLException {
-        this.url = new URL(url);
+        try {
+            this.url = new URI(url).toURL();
+        } catch (URISyntaxException e) {
+            throw new MalformedURLException(e.getMessage());
+        }
     }
 
     public Map<String, List<String>> getParameterMap() {
@@ -99,7 +104,7 @@ public class MCRURL {
             if (uri.getFragment() != null) {
                 urlBuffer.append('#').append(uri.getFragment());
             }
-            this.url = new URL(urlBuffer.toString());
+            this.url = new URI(urlBuffer.toString()).toURL();
             if (this.parameterMap != null) {
                 // rebuild parameter map
                 this.parameterMap = buildParameterMap(this.url);
@@ -124,12 +129,12 @@ public class MCRURL {
         urlBuffer.append(this.url.getQuery() == null ? "?" : "&");
         urlBuffer.append(name).append('=').append(value);
         try {
-            this.url = new URL(urlBuffer.toString());
+            this.url = new URI(urlBuffer.toString()).toURL();
             if (this.parameterMap != null) {
                 // rebuild parameter map
                 this.parameterMap = buildParameterMap(this.url);
             }
-        } catch (MalformedURLException exc) {
+        } catch (MalformedURLException | URISyntaxException exc) {
             LOGGER.error("unable to add parameter ({}={}) to url{}", name, value, this.url);
         }
         return this;

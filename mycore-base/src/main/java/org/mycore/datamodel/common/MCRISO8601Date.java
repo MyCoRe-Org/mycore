@@ -79,15 +79,7 @@ public class MCRISO8601Date {
     }
 
     private static Locale getLocale(final String locale) {
-        String lang = "", country = "";
-        final int pos = locale.indexOf("_");
-        if (pos > 0) {
-            lang = locale.substring(0, pos);
-            country = locale.substring(pos + 1);
-        } else {
-            lang = locale;
-        }
-        return new Locale(lang, country);
+        return Locale.forLanguageTag(locale);
     }
 
     public static MCRISO8601Date now() {

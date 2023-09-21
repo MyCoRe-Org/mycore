@@ -21,8 +21,8 @@ package org.mycore.frontend.servlets;
 import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +38,6 @@ import java.util.Properties;
 
 import javax.xml.transform.TransformerException;
 
-import jakarta.servlet.UnavailableException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -59,6 +58,7 @@ import org.xml.sax.SAXParseException;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -604,17 +604,17 @@ public class MCRServlet extends HttpServlet {
     /**
      * Returns the referer of the given request.
      */
-    protected URL getReferer(HttpServletRequest request) {
+    protected URI getReferer(HttpServletRequest request) {
         String referer;
         referer = request.getHeader("Referer");
         if (referer == null) {
             return null;
         }
         try {
-            return new URL(referer);
-        } catch (MalformedURLException e) {
+            return new URI(referer);
+        } catch (URISyntaxException e) {
             //should not happen
-            LOGGER.error("Referer is not a valid URL: {}", referer, e);
+            LOGGER.error("Referer is not a valid URI: {}", referer, e);
             return null;
         }
     }
@@ -624,7 +624,7 @@ public class MCRServlet extends HttpServlet {
      * the application base url.
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        URL referrer = getReferer(request);
+        URI referrer = getReferer(request);
         if (referrer != null) {
             response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
         } else {
@@ -639,7 +639,7 @@ public class MCRServlet extends HttpServlet {
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response, String altURL)
         throws IOException {
-        URL referrer = getReferer(request);
+        URI referrer = getReferer(request);
         if (referrer != null) {
             response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
         } else {

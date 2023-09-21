@@ -68,7 +68,7 @@ public class MCREditorItemComparator implements Comparator<Element> {
     private static MCREditorItemComparator getLangCollator(String lang) {
         MCREditorItemComparator comperator = MY_COLLATORS.get(lang);
         if (comperator == null) {
-            Locale l = new Locale(lang);
+            Locale l = Locale.forLanguageTag(lang);
             Collator collator = Collator.getInstance(l);
             collator.setStrength(Collator.SECONDARY);
             comperator = new MCREditorItemComparator(collator, lang);

@@ -25,10 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -102,15 +100,10 @@ public abstract class MCRContent {
         String fileName = systemId;
         String path = null;
         try {
-            path = new URL(systemId).getPath();
-        } catch (MalformedURLException e) {
-            LogManager.getLogger(getClass()).debug("Could not get file name from URL.", e);
-            try {
-                path = new URI(systemId).getPath();
+            path = new URI(systemId).getPath();
             } catch (URISyntaxException e2) {
                 LogManager.getLogger(getClass()).debug("Could not get file name from URI.", e2);
             }
-        }
         if (path != null) {
             fileName = path;
         }

@@ -201,15 +201,7 @@ public class MCRLanguageFactory {
         Locale locale = Arrays.stream(Locale.getAvailableLocales())
             .filter(l -> l.toString().equals(xmlCode))
             .findFirst()
-            .orElseGet(() -> {
-                String[] codeParts = xmlCode.split("_");
-                return switch (codeParts.length) {
-                    case 1 -> new Locale(codeParts[0]);
-                    case 2 -> new Locale(codeParts[0], codeParts[1]);
-                    default -> new Locale(codeParts[0], codeParts[1], codeParts[2]);
-                };
-
-            });
+            .orElseGet(() -> Locale.forLanguageTag(xmlCode));
         language.setLocale(locale);
         return language;
     }

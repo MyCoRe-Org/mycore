@@ -887,14 +887,14 @@ public class MCRCalendar {
         SimpleDateFormat formatter = null;
         try {
             if (calendar instanceof IslamicCalendar) {
-                formatter = new SimpleDateFormat(format, new Locale("en"));
+                formatter = new SimpleDateFormat(format, Locale.ENGLISH);
             } else if (calendar instanceof GregorianCalendar) {
-                formatter = new SimpleDateFormat(format, new Locale("en"));
+                formatter = new SimpleDateFormat(format, Locale.ENGLISH);
             } else {
-                formatter = new SimpleDateFormat(format, new Locale("en"));
+                formatter = new SimpleDateFormat(format, Locale.ENGLISH);
             }
         } catch (Exception e) {
-            formatter = new SimpleDateFormat("dd.MM.yyyy G", new Locale("en"));
+            formatter = new SimpleDateFormat("dd.MM.yyyy G", Locale.ENGLISH);
         }
         try {
             formatter.setCalendar(calendar);

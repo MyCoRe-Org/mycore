@@ -19,6 +19,7 @@
 package org.mycore.common;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -431,7 +432,7 @@ public class MCRMailer extends MCRServlet {
                 for (String part : mail.parts) {
                     messagePart = new MimeBodyPart();
 
-                    URL url = new URL(part);
+                    URL url = new URI(part).toURL();
                     DataSource source = new URLDataSource(url);
                     messagePart.setDataHandler(new DataHandler(source));
 
