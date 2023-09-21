@@ -266,7 +266,7 @@ public class MCRTranslation {
             language = "in";
             LOGGER.debug("Translation for current locale: {}", language);
         }
-        return new Locale(language);
+        return Locale.forLanguageTag(language);
     }
 
     public static Set<String> getAvailableLanguages() {

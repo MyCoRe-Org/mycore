@@ -99,6 +99,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import jakarta.activation.MimetypesFileTypeMap;
+import jakarta.ws.rs.core.UriBuilder;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -168,10 +169,10 @@ public class MCRXMLFunctions {
         String timeZone) {
         if (LOGGER.isDebugEnabled()) {
             String sb = "isoDate=" + isoDate + ", simpleFormat=" + simpleFormat + ", isoFormat=" + isoFormat
-                + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
+                + ", iso639Language=" + iso639Language + ", timeZone=" + timeZone;
             LOGGER.debug(sb);
         }
-        Locale locale = new Locale(iso639Language);
+        Locale locale = Locale.forLanguageTag(iso639Language);
         MCRISO8601Date mcrdate = new MCRISO8601Date();
         mcrdate.setFormat(isoFormat);
         mcrdate.setDate(isoDate);
@@ -317,11 +318,9 @@ public class MCRXMLFunctions {
         try {
             return new URI(url).toASCIIString();
         } catch (Exception e) {
-            URL testURL = new URL(url);
-            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(),
-                testURL.getPath(),
-                testURL.getQuery(), testURL.getRef());
-            return uri.toASCIIString();
+            return UriBuilder.fromUri(url)
+                .build()
+                .toString();
         }
     }
 

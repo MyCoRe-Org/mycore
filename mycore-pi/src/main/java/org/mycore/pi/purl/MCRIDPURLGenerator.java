@@ -19,6 +19,8 @@
 package org.mycore.pi.purl;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.mycore.datamodel.metadata.MCRBase;
@@ -46,9 +48,9 @@ public class MCRIDPURLGenerator extends MCRPIGenerator<MCRPURL> {
         } while (!replace.equals(before));
 
         try {
-            URL url = new URL(replace);
+            URL url = new URI(replace).toURL();
             return new MCRPURL(url);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new MCRPersistentIdentifierException("Error while creating URL object from string: " + replace, e);
         }
     }

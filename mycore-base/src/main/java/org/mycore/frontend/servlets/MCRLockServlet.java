@@ -18,7 +18,7 @@
 
 package org.mycore.frontend.servlets;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,7 +64,7 @@ public class MCRLockServlet extends MCRServlet {
         String urlValue = getProperty(job.getRequest(), PARAM_REDIRECT);
         if (urlValue == null) {
             LOGGER.debug("Redirect URL is undefined, trying referrer.");
-            URL referer = getReferer(job.getRequest());
+            URI referer = getReferer(job.getRequest());
             urlValue = referer == null ? null : referer.toString();
         }
         if (urlValue == null) {

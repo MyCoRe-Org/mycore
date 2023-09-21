@@ -19,6 +19,8 @@
 package org.mycore.pi.purl;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 
@@ -29,9 +31,9 @@ public class MCRPURLParser implements MCRPIParser {
     @Override
     public Optional parse(String identifier) {
         try {
-            URL url = new URL(identifier);
+            URL url = new URI(identifier).toURL();
             return Optional.of(new MCRPURL(url));
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             return Optional.empty();
         }
     }

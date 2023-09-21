@@ -53,7 +53,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     private static final ThreadLocal<Map<MCRCategoryID, Character>> CATEGORY_WORKSPACE = new ThreadLocal<>();
 
-    private final long threadId = Thread.currentThread().getId();
+    private final String threadId = Thread.currentThread().toString();
 
     private boolean rollbackOnly;
 
