@@ -233,7 +233,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("catchEx", new MCRExceptionAsXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
-        supportedSchemes.put("xslStyleXEditor", new MCRXslStyleXEDitorResolver());
+        supportedSchemes.put("xslStyleXEditor", new MCRXslStyleXEditorResolver());
         supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
         supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
         supportedSchemes.put("xslImport", new MCRXslImportResolver());
@@ -1231,7 +1231,7 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
-    private static class MCRXslStyleXEDitorResolver extends MCRXslStyleResolver {
+    private static class MCRXslStyleXEditorResolver extends MCRXslStyleResolver {
         @Override
         protected MCRXSLTransformer getTransformer(String... stylesheet) {
             String[] stylesheets = new String[stylesheet.length];
