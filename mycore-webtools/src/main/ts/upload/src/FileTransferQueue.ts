@@ -337,30 +337,10 @@ export class FileTransferQueue {
     }
 
     private commitTransfer(uploadID: string) {
-        const xhr = new XMLHttpRequest();
-        const basicURL = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/"+uploadID+"/commit";
-        this.commitStartHandlerList.forEach(handler => handler(uploadID));
-
-        xhr.open('PUT', basicURL, true);
-        xhr.onload = (result) => {
-            if (xhr.status === 204 || xhr.status === 201 || xhr.status == 200) {
-                this.commitHandlerList.forEach(handler => handler(uploadID, false, null, xhr.getResponseHeader("Location")))
-            } else {
-                let message;
-                switch (xhr.responseType) {
-                    case "document":
-                        message = xhr.responseXML.querySelector("message").textContent
-                        break;
-                    case "text":
-                        message = xhr.responseText;
-                        break;
-                    default:
-                        message = xhr.statusText;
-                }
-                this.commitHandlerList.forEach(handler => handler(uploadID, true, message))
-            }
-        };
-
-        xhr.send();
+        this.idTransferSession[uploadID].commit((location) => {
+            this.commitHandlerList.forEach(handler => handler(uploadID, false, null, location))
+        }, (message: string) => {
+            this.commitHandlerList.forEach(handler => handler(uploadID, true, message));
+        });
     }
 }

@@ -73,8 +73,30 @@ export class TransferSession {
         this.request.send();
     }
 
-    public commit(completionHandler: () => void, errorhandler: ()=> void) {
+    public commit(completionHandler: (location:string|null) => void, errorhandler: (message: string)=> void) {
+        const xhr = new XMLHttpRequest();
+        const basicURL = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/"+this.uploadID+"/commit";
 
+        xhr.open('PUT', basicURL, true);
+        xhr.onload = (result) => {
+            if (xhr.status === 204 || xhr.status === 201 || xhr.status == 200) {
+                completionHandler(xhr.getResponseHeader("Location"));
+            } else {
+                let message;
+                switch (xhr.responseType) {
+                    case "document":
+                        message = xhr.responseXML.querySelector("message").textContent
+                        break;
+                    case "text":
+                        message = xhr.responseText;
+                        break;
+                    default:
+                        message = xhr.statusText;
+                }
+                errorhandler(message);
+            }
+        };
+        xhr.send();
     }
 
 }
