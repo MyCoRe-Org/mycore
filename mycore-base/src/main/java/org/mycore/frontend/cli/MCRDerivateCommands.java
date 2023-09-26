@@ -678,7 +678,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
         LOGGER.info("Linking derivate {} to {}", derID, objID);
         MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(derObj);
-        MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink);
+        MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink, derObj.isImportMode());
 
         /* removing link from old parent */
         boolean flag = oldOwner.getStructure().removeDerivate(derID);
@@ -863,6 +863,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                         categoryID.getID()))
                     .collect(Collectors.toList()));
         MCRMetadataManager.update(derivate);
+    }
+
+    @MCRCommand(syntax = "clear derivate export transformer cache",
+        help = "Clears the derivate export transformer cache",
+        order = 200)
+    public static void clearExportTransformerCache() {
+        TRANSFORMER_CACHE.clear();
     }
 
 }

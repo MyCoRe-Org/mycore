@@ -19,7 +19,6 @@ package org.mycore.pi;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +39,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
@@ -160,10 +158,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
 
         String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService;
-        MCRPIMetadataService<T> metadataServiceObj = (MCRPIMetadataService<T>) MCRConfiguration2
-            .getInstanceOf(msProperty)
+        MCRPIMetadataService<T> mdService =  MCRConfiguration2.<MCRPIMetadataService<T>>getInstanceOf(msProperty)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(msProperty));
-        return metadataServiceObj;
+        return mdService;
     }
 
     protected MCRPIGenerator<T> getGenerator() {
@@ -175,7 +172,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .orElseThrow(generatorPropertiesNotSetError);
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
-        MCRPIGenerator<T> generator = (MCRPIGenerator<T>) MCRConfiguration2.getInstanceOf(generatorPropertyKey)
+        MCRPIGenerator<T> generator = MCRConfiguration2.<MCRPIGenerator<T>>getInstanceOf(generatorPropertyKey)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(generatorPropertyKey));
         return generator;
     }
@@ -222,6 +219,17 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return flags.stream().anyMatch(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
             return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
+        });
+    }
+
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream().anyMatch(_stringFlag -> {
+            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+            return flag.getAdditional().equals(additional)
+                && Objects.equals(flag.getService(), piService.getServiceID());
         });
     }
 
@@ -315,10 +323,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<>(() -> {
             this.validateRegistration(obj, additional, updateObject);
             final T identifier = getNewIdentifier(obj, additional);
-            this.registerIdentifier(obj, additional, identifier);
+            MCRPIServiceDates dates = this.registerIdentifier(obj, additional, identifier);
             this.getMetadataService().insertIdentifier(identifier, obj, additional);
 
-            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier);
+            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier, dates);
 
             addFlagToObject(obj, databaseEntry);
 
@@ -343,13 +351,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
     }
 
-    protected Date provideRegisterDate(MCRBase obj, String additional) {
-        return new Date();
-    }
-
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier) {
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier,
+        MCRPIServiceDates registrationDates) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), provideRegisterDate(obj, additional), null);
+            this.getServiceID(), registrationDates);
         MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
     }
@@ -358,12 +363,15 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         Gson gson = MCRPIService.getGson();
         obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
             .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
-            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
-            .forEach(entry -> {
+            .map(entry -> {
                 // disabled: Git does not provide a revision number as integer (see MCR-1393)
                 //           entry.setMcrRevision(MCRCoreVersion.getRevision());
                 entry.setMcrVersion(MCRCoreVersion.getVersion());
                 entry.setMycoreID(obj.getId().toString());
+                return entry;
+            })
+            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
+            .forEach(entry -> {
                 LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
                 MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
             });
@@ -373,7 +381,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return this.type;
     }
 
-    protected abstract void registerIdentifier(MCRBase obj, String additional, T pi)
+    protected abstract MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, T pi)
         throws MCRPersistentIdentifierException;
 
     protected final void onDelete(T identifier, MCRBase obj, String additional)
@@ -513,35 +521,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return getPredicateInstance(predicateProperty);
     }
 
-    @SuppressWarnings("unchecked")
     public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
-        final String clazz = MCRConfiguration2.getStringOrThrow(predicateProperty);
-        final String errorMessageBegin = String.format(Locale.ROOT, "Configured class %s(%s)", clazz,
-            predicateProperty);
-        try {
-            return (Predicate<MCRBase>) MCRClassTools.forName(clazz)
-                .getConstructor(String.class)
-                .newInstance(predicateProperty + ".");
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " was not found!", e);
-        } catch (IllegalAccessException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " has no public constructor!", e);
-        } catch (InstantiationException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " seems to be abstract!", e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " has no default constructor!", e);
-        } catch (InvocationTargetException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " could not be initialized", e);
-        } catch (ClassCastException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " needs to extend the right parent class",
-                e);
-        }
+        return MCRConfiguration2.<Predicate<MCRBase>>getInstanceOf(predicateProperty)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(predicateProperty));
     }
 
 }

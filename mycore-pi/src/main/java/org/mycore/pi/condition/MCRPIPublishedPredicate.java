@@ -21,13 +21,11 @@ package org.mycore.pi.condition;
 /**
  * Just here for backward compatibility
  */
-public class MCRPIPublishedPredicate extends MCRPIStatePredicate {
-    public MCRPIPublishedPredicate(String propertyPrefix) {
-        super(propertyPrefix);
-    }
+public class MCRPIPublishedPredicate extends MCRPIStatePredicateBase {
 
     @Override
     protected String getRequiredState() {
         return "published";
     }
+
 }

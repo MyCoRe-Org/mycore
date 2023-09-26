@@ -18,11 +18,15 @@
 
 package org.mycore.mods;
 
+import static org.mycore.mods.MCRMODSWrapper.LINKED_RELATED_ITEMS;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,8 +46,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
-
-import static org.mycore.mods.MCRMODSWrapper.LINKED_RELATED_ITEMS;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -76,53 +78,88 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
     @Override
     public void distributeMetadata(MCRObject holder) throws MCRPersistenceException {
         MCRMODSWrapper holderWrapper = new MCRMODSWrapper(holder);
-        List<MCRMetaLinkID> children = holder.getStructure().getChildren();
-        if (!children.isEmpty()) {
-            LOGGER.info("Update inherited metadata");
-            for (MCRMetaLinkID childIdRef : children) {
-                MCRObjectID childId = childIdRef.getXLinkHrefID();
-                if (MCRMODSWrapper.isSupported(childId)) {
-                    LOGGER.info("Update: {}", childIdRef);
-                    MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
-                    MCRMODSWrapper childWrapper = new MCRMODSWrapper(child);
-                    inheritToChild(holderWrapper, childWrapper);
-                    LOGGER.info("Saving: {}", childIdRef);
+        distributeInheritedMetadata(holderWrapper);
+        distributeLinkedMetadata(holderWrapper);
+    }
+
+    /**
+     * Distribute metadata from holder to all children. The metadata is inherited to all children that are supported
+     * by this agent. If {@link #runWithLockedObject(List, Consumer)} is implemented, the children are locked before
+     * the metadata is inherited.
+     * @param holderWrapper the mods wrapper which holds the metadata that should be inherited
+     */
+    protected void distributeInheritedMetadata(MCRMODSWrapper holderWrapper) {
+        List<MCRMetaLinkID> children = holderWrapper.getMCRObject().getStructure().getChildren();
+        if (children.isEmpty()) {
+            return;
+        }
+        LOGGER.info("Update inherited metadata");
+        List<MCRObjectID> childIds = children.stream()
+            .map(MCRMetaLinkID::getXLinkHrefID)
+            .filter(MCRMODSWrapper::isSupported)
+            .collect(Collectors.toList());
+        runWithLockedObject(childIds, (childId) -> {
+            LOGGER.info("Update: {}", childId);
+            MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
+            MCRMODSWrapper childWrapper = new MCRMODSWrapper(child);
+            inheritToChild(holderWrapper, childWrapper);
+            LOGGER.info("Saving: {}", childId);
+            try {
+                checkHierarchy(childWrapper);
+                MCRMetadataManager.update(child);
+            } catch (MCRPersistenceException | MCRAccessException e) {
+                throw new MCRPersistenceException("Error while updating inherited metadata", e);
+            }
+        });
+    }
+
+    /**
+     * Distribute metadata from holder to linked objects. The metadata is inherited to all linked objects that are
+     * supported by this agent. If {@link #runWithLockedObject(List, Consumer)} is implemented, the linked objects are
+     * locked before the metadata is inherited.
+     * @param holderWrapper the mods wrapper which holds the metadata that should be inherited
+     */
+    protected void distributeLinkedMetadata(MCRMODSWrapper holderWrapper) {
+        Collection<String> recipientIdsStr = MCRLinkTableManager.instance()
+            .getSourceOf(holderWrapper.getMCRObject().getId(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
+        List<MCRObjectID> recipientIds = recipientIdsStr.stream()
+            .map(MCRObjectID::getInstance)
+            .filter(MCRMODSWrapper::isSupported).toList();
+        if(recipientIds.isEmpty()){
+            return;
+        }
+        runWithLockedObject(recipientIds, (recipientId) -> {
+            LOGGER.info("distribute metadata to {}", recipientId);
+            MCRObject recipient = MCRMetadataManager.retrieveMCRObject(recipientId);
+            MCRMODSWrapper recipientWrapper = new MCRMODSWrapper(recipient);
+            for (Element relatedItem : recipientWrapper.getLinkedRelatedItems()) {
+                String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                if (holderWrapper.getMCRObject().getId().toString().equals(holderId)) {
+                    @SuppressWarnings("unchecked")
+                    Filter<Content> sharedMetadata = (Filter<Content>) Filters.element("part",
+                        MCRConstants.MODS_NAMESPACE).negate();
+                    relatedItem.removeContent(sharedMetadata);
+                    List<Content> newRelatedItemContent = getClearContent(holderWrapper);
+                    relatedItem.addContent(newRelatedItemContent);
+                    LOGGER.info("Saving: {}", recipientId);
                     try {
-                        checkHierarchy(childWrapper);
-                        MCRMetadataManager.update(child);
+                        checkHierarchy(recipientWrapper);
+                        MCRMetadataManager.update(recipient);
                     } catch (MCRPersistenceException | MCRAccessException e) {
-                        throw new MCRPersistenceException("Error while updating inherited metadata", e);
+                        throw new MCRPersistenceException("Error while updating shared metadata", e);
                     }
                 }
             }
-        }
-        Collection<String> recipientIds = MCRLinkTableManager.instance().getSourceOf(holder.getId(),
-            MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
-        for (String rId : recipientIds) {
-            MCRObjectID recipientId = MCRObjectID.getInstance(rId);
-            if (MCRMODSWrapper.isSupported(recipientId)) {
-                LOGGER.info("distribute metadata to {}", rId);
-                MCRObject recipient = MCRMetadataManager.retrieveMCRObject(recipientId);
-                MCRMODSWrapper recipientWrapper = new MCRMODSWrapper(recipient);
-                for (Element relatedItem : recipientWrapper.getLinkedRelatedItems()) {
-                    String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-                    if (holder.getId().toString().equals(holderId)) {
-                        @SuppressWarnings("unchecked")
-                        Filter<Content> sharedMetadata = (Filter<Content>) Filters.element("part",
-                            MCRConstants.MODS_NAMESPACE).negate();
-                        relatedItem.removeContent(sharedMetadata);
-                        relatedItem.addContent(holderWrapper.getMODS().cloneContent());
-                        LOGGER.info("Saving: {}", recipientId);
-                        try {
-                            checkHierarchy(recipientWrapper);
-                            MCRMetadataManager.update(recipient);
-                        } catch (MCRPersistenceException | MCRAccessException e) {
-                            throw new MCRPersistenceException("Error while updating shared metadata", e);
-                        }
-                    }
-                }
-            }
-        }
+        });
+    }
+
+    /**
+     * Determines if the content of the relatedItem should be removed, when it is inserted as related item
+     * @param relatedItem the relatedItem element
+     * @return true if the content should be removed
+     */
+    protected boolean isClearableRelatedItem(Element relatedItem) {
+        return relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE) != null;
     }
 
     /* (non-Javadoc)
@@ -153,13 +190,29 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
             if (MCRMODSWrapper.isSupported(holderObjectID)) {
                 MCRObject targetObject = MCRMetadataManager.retrieveMCRObject(holderObjectID);
                 MCRMODSWrapper targetWrapper = new MCRMODSWrapper(targetObject);
-                relatedItem.addContent(targetWrapper.getMODS().cloneContent());
+                List<Content> inheritedData = getClearContent(targetWrapper);
+                relatedItem.addContent(inheritedData);
             }
         }
         checkHierarchy(childWrapper);
     }
 
-    private void inheritToChild(MCRMODSWrapper parentWrapper, MCRMODSWrapper childWrapper) {
+    /**
+     * @param targetWrapper the wrapper of the target object
+     * @return a list of content that can be added to a relatedItem element as shared metadata
+     */
+    private List<Content> getClearContent(MCRMODSWrapper targetWrapper) {
+        List<Content> inheritedData = targetWrapper.getMODS().cloneContent();
+        inheritedData.stream()
+                .filter(c -> c instanceof Element)
+                .map(Element.class::cast)
+                .filter(element -> element.getName().equals("relatedItem"))
+                .filter(this::isClearableRelatedItem)
+                .forEach(Element::removeContent);
+        return inheritedData;
+    }
+
+    void inheritToChild(MCRMODSWrapper parentWrapper, MCRMODSWrapper childWrapper) {
         LOGGER.info("Inserting inherited Metadata.");
         Element hostContainer = childWrapper.getElement(HOST_SECTION_XPATH);
         if (hostContainer == null) {
@@ -172,7 +225,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         hostContainer.addContent(parentWrapper.getMODS().cloneContent());
     }
 
-    private void checkHierarchy(MCRMODSWrapper mods) throws MCRPersistenceException {
+    void checkHierarchy(MCRMODSWrapper mods) throws MCRPersistenceException {
         final MCRObjectID modsId = Objects.requireNonNull(mods.getMCRObject().getId());
         LOGGER.info("Checking relatedItem hierarchy of {}.", modsId);
         final List<Element> relatedItemLeaves
@@ -208,6 +261,16 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         if (parentElement.getName().equals("relatedItem")) {
             checkHierarchy(parentElement, idCollected);
         }
+    }
+
+    /**
+     * Can be used in inherited classes to lock objects before processing them. The default implementation does nothing,
+     * but calling the {@link Consumer} for each object.
+     * @param objects the objects to lock
+     * @param lockedObjectConsumer the consumer that should be called for each locked object
+     */
+    protected void runWithLockedObject(List<MCRObjectID> objects, Consumer<MCRObjectID> lockedObjectConsumer) {
+        objects.forEach(lockedObjectConsumer);
     }
 
 }

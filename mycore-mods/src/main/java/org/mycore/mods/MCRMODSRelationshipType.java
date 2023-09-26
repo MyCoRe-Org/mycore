@@ -26,5 +26,5 @@ package org.mycore.mods;
  * @since 2015.03
  */
 public enum MCRMODSRelationshipType {
-    host, preceding, original, series, references, reviewOf;
+    host, preceding, original, series, otherVersion, otherFormat, references, reviewOf,
 }

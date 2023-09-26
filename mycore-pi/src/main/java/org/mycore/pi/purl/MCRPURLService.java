@@ -23,15 +23,12 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPURLService extends MCRPIJobService<MCRPURL> {
@@ -123,31 +120,7 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
 
     @Override
     public void deleteJob(Map<String, String> parameters) {
-        // deleting ist not supported
-    }
-
-    @Override
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional,
-        MCRPURL identifier) {
-        Date registrationStarted = null;
-        if (getRegistrationPredicate().test(obj)) {
-            registrationStarted = new Date();
-            startRegisterJob(obj, identifier);
-        }
-
-        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
-        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
-        return databaseEntry;
-    }
-
-    @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRPURL purl)
-        throws MCRPersistentIdentifierException {
-        if (!Objects.equals(additional, "")) {
-            throw new MCRPersistentIdentifierException(
-                getClass().getName() + " doesn't support additional information! (" + additional + ")");
-        }
+        // delete is not supported
     }
 
     @Override
@@ -156,28 +129,17 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     }
 
     @Override
-    protected void update(MCRPURL purl, MCRBase obj, String additional) {
-        if (isRegistered(obj.getId(), additional)) {
-            startUpdateJob(obj, purl);
-        } else if (!hasRegistrationStarted(obj.getId(), additional)
-            && getRegistrationPredicate().test(obj)) {
-            this.updateStartRegistrationDate(obj.getId(), "", new Date());
-            startRegisterJob(obj, purl);
-        }
+    protected boolean validateRegistrationDocument(MCRBase obj, MCRPURL identifier, String additional) {
+        return true;
     }
 
-    private void startUpdateJob(MCRBase obj, MCRPURL purl) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(CONTEXT_PURL, purl.asString());
-        contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());
-        this.addUpdateJob(contextParameters);
-    }
-
-    private void startRegisterJob(MCRBase obj, MCRPURL purl) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(CONTEXT_PURL, purl.asString());
-        contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());
-        this.addRegisterJob(contextParameters);
+    @Override
+    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRPURL purl,
+        String additional) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(CONTEXT_PURL, purl.asString());
+        params.put(CONTEXT_OBJECT, obj.getId().toString());
+        return params;
     }
 
     protected void doWithPURLManager(Consumer<MCRPURLManager> action) {

@@ -28,6 +28,7 @@ import javax.xml.transform.Transformer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Verifier;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -191,14 +192,27 @@ public class MCRParameterCollector {
     }
 
     /**
-     * Copies all MCRConfiguration properties as XSL parameters.
-     * and replaces ":" in property keys with "_"
+     * Copies all MCRConfiguration properties as XSL parameters. Characters that are valid in property names
+     * but invalid in XML names are replaced with an underscore. Colons are replaced with underscores as well,
+     * because this character is used as a namespace separater in namespace-aware XML.
      */
     private void setFromConfiguration() {
         for (Map.Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
-            String key = property.getKey().replace(":", "_");
-            parameters.put(key, property.getValue());
+            parameters.put(xmlSafe(property.getKey()), property.getValue());
         }
+    }
+
+    private String xmlSafe(String key) {
+        StringBuilder builder = new StringBuilder();
+        if (key.length() != 0) {
+            char first = key.charAt(0);
+            builder.append(first == ':' || !Verifier.isXMLNameStartCharacter(first) ? "_" : first);
+            for (int i = 1, n = key.length(); i < n; i++) {
+                char following = key.charAt(i);
+                builder.append(following == ':' || !Verifier.isXMLNameCharacter(following) ? "_" : following);
+            }
+        }
+        return builder.toString();
     }
 
     /**

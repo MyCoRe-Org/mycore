@@ -89,10 +89,14 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     }
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRDigitalObjectIdentifier pi)
-        throws MCRPersistentIdentifierException {
-        final Document resultDocument = transform(obj, pi.asString());
-        validateDocument(obj.getId().toString(), resultDocument);
+    protected boolean validateRegistrationDocument(MCRBase obj, MCRDigitalObjectIdentifier identifier,
+        String additional) {
+        try {
+            validateDocument(obj.getId().toString(), transform(obj, identifier.asString()));
+            return true;
+        } catch (MCRPersistentIdentifierException | MCRConfigurationException e) {
+            return false;
+        }
     }
 
     @Override
@@ -146,7 +150,6 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     protected void updateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         String doi = parameters.get(CONTEXT_DOI);
         String idString = parameters.get(CONTEXT_OBJ);
-
         if (!checkJobValid(idString, PiJobAction.UPDATE)) {
             return;
         }
@@ -154,8 +157,8 @@ public class MCRCrossrefService extends MCRDOIBaseService {
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
         this.validateJobUserRights(objectID);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
-
         Document newCrossrefBatch = transform(object, doi);
+        validateDocument(object.getId().toString(), newCrossrefBatch);
         final MCRCrossrefClient client = new MCRCrossrefClient(getHost(), getUsername(), getPassword());
 
         client.doMDUpload(newCrossrefBatch);

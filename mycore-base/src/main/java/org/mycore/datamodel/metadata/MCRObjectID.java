@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,6 +62,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
+    /** ID pattern with named capturing groups */
+    private static Pattern ID_PATTERN
+        = Pattern.compile("^(?<projectId>[a-zA-Z][a-zA-Z0-9]*)_(?<objectType>[a-zA-Z0-9]+)_(?<numberPart>[0-9]+)$");
+
     private static HashSet<String> VALID_TYPE_LIST;
 
     private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
@@ -69,21 +75,21 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     static {
         final String confPrefix = "MCR.Metadata.Type.";
-        VALID_TYPE_LIST = MCRConfiguration2.getPropertiesMap()
+        VALID_TYPE_LIST = MCRConfiguration2.getSubPropertiesMap(confPrefix)
             .entrySet()
             .stream()
-            .filter(p -> p.getKey().startsWith(confPrefix))
             .filter(p -> Boolean.parseBoolean(p.getValue()))
-            .map(prop -> prop.getKey().substring(confPrefix.length()))
+            .map(prop -> prop.getKey())
             .collect(Collectors.toCollection(HashSet::new));
     }
 
-    // data of the ID
+    // parts of the ID
     private final String projectId;
     private final String objectType;
-    private final String combinedId;
-
     private final int numberPart;
+
+    // complete id as formatted string
+    private final String combinedId;
 
     /**
      * The constructor for MCRObjectID from a given string.
@@ -103,12 +109,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         this.combinedId = formatID(projectId, objectType, numberPart);
     }
 
+    //ID generation methods move to MCRObjectIDGenerator
+    //deprecated in 2023.06
     @Deprecated
     public static MCRObjectID getNextFreeId(String baseId) {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId);
     }
 
-    
     @Deprecated
     public static MCRObjectID getNextFreeId(String projectId, String type) {
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectId, type);
@@ -208,25 +215,26 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (id == null) {
             return false;
         }
-        String mcrId = id.trim();
-        if (mcrId.length() > MAX_LENGTH) {
+        if (id.length() > MAX_LENGTH) {
             return false;
         }
-        String[] idParts = getIDParts(mcrId);
-        if (idParts.length != 3) {
-            return false;
-        }
-        String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
-            LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
-            return false;
-        }
-        try {
-            int numberPart = Integer.parseInt(idParts[2]);
-            if (numberPart < 0) {
+        Matcher m = ID_PATTERN.matcher(id);
+        if (m.matches()) {
+            String objectType = m.group("objectType").toLowerCase(Locale.ROOT).intern();
+            if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
+                LOGGER.warn("Property MCR.Metadata.Type.{} is not set to 'true'. Thus {} cannot be a valid id.",
+                    objectType, id);
                 return false;
             }
-        } catch (NumberFormatException e) {
+            try {
+                int numberPart = Integer.parseInt(m.group("numberPart"));
+                if (numberPart < 0) {
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        } else {
             return false;
         }
         return true;

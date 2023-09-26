@@ -18,6 +18,8 @@
 
 package org.mycore.pi;
 
+import java.util.Date;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -38,8 +40,9 @@ public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
     private boolean updatedCalled = false;
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi) {
+    protected MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi) {
         registerCalled = true;
+        return new MCRPIServiceDates(new Date(), null);
     }
 
     @Override

@@ -433,7 +433,7 @@ public abstract class MCRServletContentHelper {
 
             if (headerValueTime == -1L) {
                 // If the content changed, the complete content is served.
-                if (!eTag.equals(headerValue.trim())) {
+                if (!headerValue.trim().equals(eTag)) {
                     return ContentUtils.FULL;
                 }
             } else {

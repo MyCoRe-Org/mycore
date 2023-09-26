@@ -42,9 +42,9 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -87,7 +87,7 @@ public final class MCRMetadataManager {
     private MCRMetadataManager() {
 
     }
-    
+
     public static MCRObjectIDGenerator getMCRObjectIDGenerator() {
         return MCROBJECTID_GENERATOR;
     }
@@ -266,7 +266,7 @@ public final class MCRMetadataManager {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("adding Derivate in data store");
             }
-            MCRMetadataManager.addOrUpdateDerivateToObject(objectId, der);
+            MCRMetadataManager.addOrUpdateDerivateToObject(objectId, der, mcrDerivate.isImportMode());
         } catch (final Exception e) {
             MCRMetadataManager.restore(mcrDerivate, objectId, objectBackup);
             // throw final exception
@@ -329,7 +329,7 @@ public final class MCRMetadataManager {
             LOGGER.info("Assigned new object id {}", objectId);
 
             // if label was id with 00000000, set label to new id
-            if(Objects.equals(mcrObject.getLabel(), oldId.toString())) {
+            if (Objects.equals(mcrObject.getLabel(), oldId.toString())) {
                 mcrObject.setLabel(objectId.toString());
             }
         }
@@ -821,7 +821,7 @@ public final class MCRMetadataManager {
         // add the link to metadata
         final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance()
             .getDerivateLink(mcrDerivate);
-        addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
+        MCRMetadataManager.addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink, mcrDerivate.isImportMode());
     }
 
     /**
@@ -921,6 +921,22 @@ public final class MCRMetadataManager {
         }
     }
 
+    /**
+     * This method is used to repair the shared metadata of an object. 
+     * It should be only called if something programmatically changed in the shared metadata handling, like a bugfix
+     * or migration.
+     * @param mcrObject the object to repair
+     * @throws MCRAccessException
+     */
+    public static void repairSharedMetadata(final MCRObject mcrObject)
+        throws MCRAccessException {
+        MCRObjectID id = mcrObject.getId();
+        receiveMetadata(mcrObject);
+        MCRMetadataManager.fireUpdateEvent(mcrObject);
+        MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(id);
+        metadataShareAgent.distributeMetadata(mcrObject);
+    }
+
     private static boolean shareableMetadataChanged(final MCRObject mcrObject, MCRObject old) {
         MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(mcrObject.getId());
         return metadataShareAgent.shareableMetadataChanged(old, mcrObject);
@@ -943,6 +959,25 @@ public final class MCRMetadataManager {
         }
         fireEvent(mcrDerivate, retrieveMCRDerivate(mcrDerivate.getId()), MCREvent.EventType.UPDATE);
     }
+    
+    
+    /**
+     * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data
+     * store.
+     * 
+     * @param id
+     *            the object ID
+     * @param link
+     *            a link to a derivate as MCRMetaLinkID
+     * @return True if the link is added or updated, false if nothing changed.
+     * @throws MCRPersistenceException
+     *             if a persistence problem is occurred
+     * @deprecated in 2023.06
+     */
+    @Deprecated
+    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link) {
+        return addOrUpdateDerivateToObject(id, link, false);
+    }
 
     /**
      * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data
@@ -956,13 +991,14 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      *             if a persistence problem is occurred
      */
-    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link)
+    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link,
+        boolean isImportMode)
         throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         if (!object.getStructure().addOrUpdateDerivate(link)) {
             return false;
         }
-        if (!object.isImportMode()) {
+        if (!isImportMode && !object.isImportMode()) {
             object.getService().setDate("modifydate");
         }
         MCRMetadataManager.fireUpdateEvent(object);

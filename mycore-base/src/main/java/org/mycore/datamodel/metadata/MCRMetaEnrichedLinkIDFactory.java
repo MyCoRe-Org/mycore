@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -36,6 +37,8 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
     }
 
     public abstract MCREditableMetaEnrichedLinkID getDerivateLink(MCRDerivate der);
+    
+    public abstract MCREditableMetaEnrichedLinkID fromDom(Element element);
 
     public MCREditableMetaEnrichedLinkID getEmptyLinkID() {
         return new MCREditableMetaEnrichedLinkID();

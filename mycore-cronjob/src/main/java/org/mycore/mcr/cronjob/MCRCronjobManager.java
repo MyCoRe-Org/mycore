@@ -18,17 +18,21 @@
 
 package org.mycore.mcr.cronjob;
 
-import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import jakarta.servlet.ServletContext;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.common.log.MCRTableMessage;
+import org.mycore.common.log.MCRTableMessage.Column;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.mcr.cronjob.MCRCronjob.Context;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Schedules all Cronjobs defined with the property prefix {@link #JOBS_CONFIG_PREFIX}. Couples the execution with the
@@ -82,25 +86,32 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
 
     void startUp(ServletContext servletContext) {
         MCRShutdownHandler.getInstance().addCloseable(this);
-        LOGGER.info("Cron schedule:");
-        List<String> properties = MCRConfiguration2.getInstantiatablePropertyKeys(JOBS_CONFIG_PREFIX).toList();
-        for (String id : properties) {
-            MCRCronjob job = (MCRCronjob) MCRConfiguration2.getInstanceOf(id).orElseThrow();
-            if (job.isActive(getContext(servletContext))) {
-                LOGGER.info("Active - " + job.getDescription() + " " + job.getCronDescription());
-                scheduleNext(job.getID());
-            } else {
-                LOGGER.info("Inactive - " + job.getDescription() + " " + job.getCronDescription());
-            }
-        }
+        MCRTableMessage<Pair<MCRCronjob, Boolean>> schedule = new MCRTableMessage<>(
+            new Column<>("Property", p -> p.getLeft().getProperty()),
+            new Column<>("Description", p -> p.getLeft().getDescription()),
+            new Column<>("State", p -> p.getRight() ? "ACTIVE" : "INACTIVE"),
+            new Column<>("Cron", p -> p.getLeft().getCronDescription())
+        );
+        Context context = getContext(servletContext);
+        MCRConfiguration2.getInstantiatablePropertyKeys(JOBS_CONFIG_PREFIX)
+            .sorted()
+            .map(MCRCronjobManager::toJob)
+            .forEach(job -> {
+                if (job.isActive(context)) {
+                    schedule.add(Pair.of(job, true));
+                    scheduleNextRun(job);
+                } else {
+                    schedule.add(Pair.of(job, false));
+                }
+            });
+        LOGGER.info(schedule.logMessage("Cron schedule"));
     }
 
     private MCRCronjob.Context getContext(ServletContext servletContext) {
         return servletContext != null ? MCRCronjob.Context.WEBAPP : MCRCronjob.Context.CLI;
     }
-
-    private void scheduleNext(String jobID) {
-        MCRCronjob job = getJob(jobID);
+    
+    private void scheduleNextRun(MCRCronjob job) {
         this.processableCollection.add(job.getProcessable());
         job.getNextExecution().ifPresent(next -> {
             if (next > 0) {
@@ -109,7 +120,8 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
                         LOGGER.info("Execute job " + job.getID() + " - " + job.getDescription());
                         job.run();
                         this.processableCollection.remove(job.getProcessable());
-                        scheduleNext(job.getID());
+                        // schedule next run with a fresh instance of the same job 
+                        scheduleNextRun(toJob(job.getProperty()));
                     } catch (Exception ex) {
                         LOGGER.error("Error while executing job " + job.getID() + " " + job.getDescription(), ex);
                         this.processableCollection.remove(job.getProcessable());
@@ -118,12 +130,17 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
             }
         });
     }
-
-    public <T extends MCRCronjob> T getJob(String id) {
-        return (T) MCRConfiguration2.getInstanceOf(JOBS_CONFIG_PREFIX + id).orElseThrow();
+    
+    public MCRCronjob getJob(String id) {
+        return toJob(JOBS_CONFIG_PREFIX + id);    
+    }
+    
+    private static MCRCronjob toJob(String property) {
+        return MCRConfiguration2.<MCRCronjob>getInstanceOf(property).orElseThrow();
     }
 
     private static class MCRCronjobManagerInstanceHelper {
         public static MCRCronjobManager INSTANCE = new MCRCronjobManager();
     }
+
 }

@@ -68,5 +68,10 @@
       </xsl:choose>
     </xsl:for-each>
   </xsl:function>
+
+  <xsl:function name="mcrstring:trim" as="xs:string">
+    <xsl:param name="input" as="xs:string" />
+    <xsl:value-of select="replace($input, '^\s+|\s+$', '')" />
+  </xsl:function>
     
 </xsl:stylesheet>

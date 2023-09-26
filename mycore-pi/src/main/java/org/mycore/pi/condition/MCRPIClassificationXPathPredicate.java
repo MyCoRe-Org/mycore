@@ -22,38 +22,43 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.filter.Filter;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRBase;
 
-public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase implements MCRPICreationPredicate,
-        MCRPIObjectRegistrationPredicate {
+public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase
+    implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    final private XPathExpression<Element> classificationBaseExpression;
+    private XPathExpression<Element> classificationBaseExpression;
 
-    final private XPathExpression<String> classificationIdExpression;
+    private XPathExpression<String> classificationIdExpression;
 
-    final private XPathExpression<String> categoryIdExpression;
+    private XPathExpression<String> categoryIdExpression;
 
-    final private XPathExpression<Boolean> expression;
+    private XPathExpression<Boolean> expression;
 
-    public MCRPIClassificationXPathPredicate(String propertyPrefix) {
-        super(propertyPrefix);
-        XPathFactory factory = XPathFactory.instance();
-        classificationBaseExpression = compileXpath(factory, Filters.element(), requireProperty("BaseXPath"));
-        classificationIdExpression = compileXpath(factory, Filters.fstring(), requireProperty("ClassIdXPath"));
-        categoryIdExpression = compileXpath(factory, Filters.fstring(), requireProperty("CategIdXPath"));
-        expression = compileXpath(factory, Filters.fboolean(), "boolean(" + requireProperty("XPath") + ")");
+    @MCRProperty(name="BaseXPath")
+    public void setClassificationBaseXPath(String xPath) {
+        classificationBaseExpression = compileXpath(xPath, Filters.element());
     }
 
-    private <T> XPathExpression<T> compileXpath(XPathFactory factory, Filter<T> filter, String xPath) {
-        return factory.compile(xPath, filter, null, MCRConstants.getStandardNamespaces());
+    @MCRProperty(name="ClassIdXPath")
+    public void setClassificationIdXPath(String xPath) {
+        classificationIdExpression = compileXpath(xPath, Filters.fstring());
+    }
+
+    @MCRProperty(name="CategIdXPath")
+    public void setCategoryIdXPath(String xPath) {
+        categoryIdExpression = compileXpath(xPath, Filters.fstring());
+    }
+
+    @MCRProperty(name="XPath")
+    public void setXPath(String xPath) {
+        expression = compileXpath("boolean(" + xPath + ")", Filters.fboolean());
     }
 
     @Override
@@ -81,4 +86,5 @@ public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase implem
 
         });
     }
+
 }

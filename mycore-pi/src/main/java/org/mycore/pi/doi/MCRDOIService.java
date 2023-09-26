@@ -224,14 +224,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         super.validateRegistration(obj, additional);
     }
 
-    @Override
-    public void registerIdentifier(MCRBase obj, String additional, MCRDigitalObjectIdentifier newDOI)
-        throws MCRPersistentIdentifierException {
-        if (!additional.equals("")) {
-            throw new MCRPersistentIdentifierException(
-                getClass().getName() + " doesn't support additional information! (" + additional + ")");
-        }
-    }
 
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
         return new URI(this.registerURL + registerURLContext.replaceAll("\\$[iI][dD]", obj.getId().toString()));
@@ -265,6 +257,18 @@ public class MCRDOIService extends MCRDOIBaseService {
 
     public MCRDataciteClient getDataciteClient() {
         return new MCRDataciteClient(host, getUsername(), getPassword());
+    }
+
+    @Override
+    protected boolean validateRegistrationDocument(MCRBase obj, MCRDigitalObjectIdentifier identifier,
+        String additional) {
+        try {
+            transform(obj, identifier.asString());
+            return true;
+        } catch (MCRPersistentIdentifierException e) {
+            LOGGER.error("Error while validating Datacite document!", e);
+            return false;
+        }
     }
 
     @Override
@@ -304,7 +308,7 @@ public class MCRDOIService extends MCRDOIBaseService {
                 HashMap<String, String> contextParameters = new HashMap<>();
                 contextParameters.put(CONTEXT_DOI, doi.asString());
                 contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
-                this.addDeleteJob(contextParameters);
+                this.addJob(PiJobAction.DELETE, contextParameters);
             }
         }
     }

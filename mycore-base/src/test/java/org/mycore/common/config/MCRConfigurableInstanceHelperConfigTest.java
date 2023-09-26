@@ -18,7 +18,6 @@
 
 package org.mycore.common.config;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.annotation.MCRPostConstruction;
@@ -29,10 +28,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-    public static final String INSTANCE_NAME_PREFIX = "MCR.CI.";
+public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
+
+    public static final String INSTANCE_NAME_PREFIX = "MCR.CIH.";
 
     private static final String INSTANCE_1_NAME = INSTANCE_NAME_PREFIX + "Test1";
 
@@ -126,11 +131,16 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
         VALUE_ORDERED_POST_CONSTRUCTION_2
     );
 
+    public static final List<String> VALUES_ORDERED_OVERALL = Stream.concat(
+        VALUES_ORDERED_METHOD.stream(),
+        VALUES_ORDERED_POST_CONSTRUCTION.stream()
+    ).toList();
+
     @Test
     public void test() {
 
         Map<String, ?> instances = MCRConfiguration2.getInstances(INSTANCE_NAME_PREFIX);
-        Assert.assertEquals("Except two instances!", 2, instances.size());
+        assertEquals("Except two instances!", 2, instances.size());
 
         testInstance(INSTANCE_1_NAME, false);
         testInstance(INSTANCE_2_NAME, true);
@@ -142,10 +152,10 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
         String fullInstanceName = withClassSuffix(instanceName, withClassSuffix);
 
         List<String> list = MCRConfiguration2.getInstantiatablePropertyKeys(fullInstanceName).toList();
-        Assert.assertTrue("Properties should contain " + instanceName, list.contains(fullInstanceName));
+        assertTrue("Properties should contain " + instanceName, list.contains(fullInstanceName));
 
         Optional<ConfigurableTestInstance> instance = MCRConfigurableInstanceHelper.getInstance(fullInstanceName);
-        Assert.assertTrue("Test " + fullInstanceName + " should be present", instance.isPresent());
+        assertTrue("Test " + fullInstanceName + " should be present", instance.isPresent());
 
         validateFields(instance.get());
         validateMethods(instance.get());
@@ -155,85 +165,88 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
 
     void validateFields(ConfigurableTestInstance instance) {
 
-        Assert.assertTrue("The map field should contain the assigned test key",
+        assertTrue("The map field should contain the assigned test key",
             instance.map.containsKey(ASSIGNED_KEY));
 
-        Assert.assertEquals("The assigned test property should be present in map field",
+        assertEquals("The assigned test property should be present in map field",
             ASSIGNED_VALUE, instance.map.get(ASSIGNED_KEY));
 
-        Assert.assertFalse("The unassigned test property should not be present in map field",
+        assertFalse("The unassigned test property should not be present in map field",
             instance.map.containsKey(UNASSIGNED_KEY));
 
-        Assert.assertEquals("The required field should match",
+        assertEquals("The required field should match",
             VALUE_REQUIRED_FIELD, instance.required);
 
-        Assert.assertEquals("The required field with default should match",
+        assertEquals("The required field with default should match",
             DEFAULT_VALUE, instance.requiredWithDefault);
 
-        Assert.assertNull("The absent optional field should be null",
+        assertNull("The absent optional field should be null",
             instance.absentOptional);
 
-        Assert.assertEquals("The present optional field should match",
+        assertEquals("The present optional field should match",
             VALUE_PRESENT_OPTIONAL_FIELD, instance.presentOptional);
 
-        Assert.assertEquals("The absent optional field with default should match",
+        assertEquals("The absent optional field with default should match",
             DEFAULT_VALUE, instance.absentOptionalWithDefault);
 
-        Assert.assertEquals("The present optional field with default should match",
+        assertEquals("The present optional field with default should match",
             VALUE_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT, instance.presentOptionalWithDefault);
 
-        Assert.assertEquals("The absolute field should match",
+        assertEquals("The absolute field should match",
             VALUE_ABSOLUTE_FIELD, instance.absolute);
 
     }
 
     void validateMethods(ConfigurableTestInstance instance) {
 
-        Assert.assertTrue("The map method value should contain the assigned test key",
+        assertTrue("The map method value should contain the assigned test key",
             instance.getMap().containsKey(ASSIGNED_KEY));
 
-        Assert.assertEquals("The assigned test property should be present in map method value",
+        assertEquals("The assigned test property should be present in map method value",
             ASSIGNED_VALUE, instance.getMap().get(ASSIGNED_KEY));
 
-        Assert.assertFalse("The unassigned test property should not be present in map method value",
+        assertFalse("The unassigned test property should not be present in map method value",
             instance.getMap().containsKey(UNASSIGNED_KEY));
 
-        Assert.assertEquals("The required method value should match",
+        assertEquals("The required method value should match",
             VALUE_REQUIRED_METHOD, instance.getRequired());
 
-        Assert.assertEquals("The required method value with default should match",
+        assertEquals("The required method value with default should match",
             DEFAULT_VALUE, instance.getRequiredWithDefault());
 
-        Assert.assertNull("The absent optional method value should be null",
+        assertNull("The absent optional method value should be null",
             instance.getAbsentOptional());
 
-        Assert.assertEquals("The present optional method value should match",
+        assertEquals("The present optional method value should match",
             VALUE_PRESENT_OPTIONAL_METHOD, instance.getPresentOptional());
 
-        Assert.assertEquals("The absent optional method value with default should match",
+        assertEquals("The absent optional method value with default should match",
             DEFAULT_VALUE, instance.getAbsentOptionalWithDefault());
 
-        Assert.assertEquals("The present optional method value with default should match",
+        assertEquals("The present optional method value with default should match",
             VALUE_PRESENT_OPTIONAL_METHOD_DEFAULT, instance.getPresentOptionalWithDefault());
 
-        Assert.assertEquals("The absolute method value should match",
+        assertEquals("The absolute method value should match",
             VALUE_ABSOLUTE_METHOD, instance.getAbsolute());
 
-        Assert.assertEquals("The converting method value should match",
+        assertEquals("The converting method value should match",
             VALUE_CONVERTING_METHOD.length(), instance.getConverting());
 
-        Assert.assertEquals("The ordered method values should match",
+        assertEquals("The ordered method values should match",
             VALUES_ORDERED_METHOD, instance.getOrderedMethodValues());
 
     }
 
     void validatePostConstruction(ConfigurableTestInstance instance, String fullInstanceName) {
 
-        Assert.assertEquals("Post construction value should match",
+        assertEquals("Post construction value should match",
             fullInstanceName, instance.postConstructionProperty);
 
-        Assert.assertEquals("The ordered post construction values should match",
+        assertEquals("The ordered post construction values should match",
             VALUES_ORDERED_POST_CONSTRUCTION, instance.getOrderedPostConstructionValues());
+
+        assertEquals("The ordered method and post construction values should match",
+            VALUES_ORDERED_OVERALL, instance.getOrderedOverallValues());
 
     }
 
@@ -324,6 +337,8 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
 
         private final List<String> orderedPostConstructionValues = new ArrayList<>(3);
 
+        private final List<String> orderedOverallValues = new ArrayList<>(6);
+
         public Map<String, String> getMap() {
             return mapMethodValue;
         }
@@ -378,7 +393,6 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
             this.absentOptionalMethodValueWithDefault = absentOptionalValueWithDefault;
         }
 
-
         public String getPresentOptionalWithDefault() {
             return presentOptionalMethodValueWithDefault;
         }
@@ -408,17 +422,22 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
 
         @MCRProperty(name = KEY_ORDERED_METHOD_2, order = 2)
         public void setOrdered2(String orderedValue) {
-            this.orderedMethodValues.add(orderedValue);
+            addOrdered(orderedValue);
         }
 
         @MCRProperty(name = KEY_ORDERED_METHOD_1, order = 1)
         public void setOrdered1(String orderedValue) {
-            this.orderedMethodValues.add(orderedValue);
+            addOrdered(orderedValue);
         }
 
         @MCRProperty(name = KEY_ORDERED_METHOD)
         public void setOrdered(String orderedValue) {
+            addOrdered(orderedValue);
+        }
+
+        private void addOrdered(String orderedValue) {
             this.orderedMethodValues.add(orderedValue);
+            this.orderedOverallValues.add(orderedValue);
         }
 
         public List<String> getOrderedMethodValues() {
@@ -432,21 +451,31 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
 
         @MCRPostConstruction(order = 2)
         public void callPostConstructionOrdered2() {
-            this.orderedPostConstructionValues.add(VALUE_ORDERED_POST_CONSTRUCTION_2);
+            addPostConstructionOrdered(VALUE_ORDERED_POST_CONSTRUCTION_2);
+
         }
 
         @MCRPostConstruction(order = 1)
         public void callPostConstructionOrdered1() {
-            this.orderedPostConstructionValues.add(VALUE_ORDERED_POST_CONSTRUCTION_1);
+            addPostConstructionOrdered(VALUE_ORDERED_POST_CONSTRUCTION_1);
         }
 
         @MCRPostConstruction
         public void callPostConstructionOrdered() {
-            this.orderedPostConstructionValues.add(VALUE_ORDERED_POST_CONSTRUCTION);
+            addPostConstructionOrdered(VALUE_ORDERED_POST_CONSTRUCTION);
+        }
+
+        private void addPostConstructionOrdered(String ordered) {
+            this.orderedPostConstructionValues.add(ordered);
+            this.orderedOverallValues.add(ordered);
         }
 
         public List<String> getOrderedPostConstructionValues() {
             return orderedPostConstructionValues;
+        }
+
+        public List<String> getOrderedOverallValues() {
+            return orderedOverallValues;
         }
 
     }

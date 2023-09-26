@@ -27,11 +27,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation tells which properties need to be assigned to which field
- * or method. All annotated members need to be public. The fields should always have the type {@link String} and if you
- * need a custom type, then you can annotate a method with a single parameter of type {@link String}, which can then
- * create/retrieve the object and assign it to your field.
- *
+ * This annotation is used to mark fields or methods that should be set to or called with a value of type
+ * {@link String} from the configuration properties.
+ * <p>
+ * The field or method needs to be public.
+  *
  * @author Sebastian Hofmann
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
 public @interface MCRProperty {
 
     /**
-     * @return The name of property
+     * @return The name of property, or <code>*</code> for a map of all properties;
      */
     String name();
 

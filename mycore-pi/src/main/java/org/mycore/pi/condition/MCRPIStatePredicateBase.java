@@ -18,30 +18,20 @@
 
 package org.mycore.pi.condition;
 
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.pi.MCRPIJobService;
 
-public abstract class MCRPICombinedPredicate extends MCRPIPredicateBase {
+public abstract class MCRPIStatePredicateBase extends MCRPIPredicateBase
+    implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
 
-    public MCRPICombinedPredicate(String propertyPrefix) {
-        super(propertyPrefix);
+    protected abstract String getRequiredState();
+
+    @Override
+    public final boolean test(MCRBase base) {
+        return Optional.ofNullable(base.getService().getState())
+            .map(state -> state.getID().equals(getRequiredState()))
+            .orElse(false);
     }
 
-    protected Stream<Predicate<MCRBase>> getCombinedPredicates() {
-        final Map<String, String> properties = getProperties();
-        return properties
-            .keySet()
-            .stream()
-            .filter(p -> {
-                return !p.contains("."); // do not handle sub properties
-            })
-            .map(Integer::parseInt)
-            .sorted()
-            .map(Object::toString)
-            .map((subProperty) -> MCRPIJobService.getPredicateInstance(getPropertyPrefix() + subProperty));
-    }
 }

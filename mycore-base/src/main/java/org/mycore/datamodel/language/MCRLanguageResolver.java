@@ -27,6 +27,7 @@ import javax.xml.transform.URIResolver;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.tools.MCRLanguageOrientationHelper;
 
 /**
  * Resolves languages by code. Syntax: language:{ISOCode}
@@ -59,6 +60,9 @@ public class MCRLanguageResolver implements URIResolver {
             MCRLanguageXML.setXMLLangAttribute(entry.getKey(), label);
             xml.addContent(label);
         }
+
+        xml.setAttribute("rtl",
+            MCRLanguageOrientationHelper.isRTL(language.getCode(MCRLanguageCodeType.xmlCode)) ? "true" : "false");
 
         return xml;
     }
