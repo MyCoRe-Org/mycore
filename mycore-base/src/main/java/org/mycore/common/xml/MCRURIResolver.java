@@ -57,6 +57,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -1375,7 +1376,30 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
+            final String baseURI = getParentDirectoryResourceURI(base);
+            // set xslt folder
+            final String xslFolder;
+            if (StringUtils.contains(baseURI, "/xsl/")) {
+                xslFolder = "xsl";
+            } else {
+                xslFolder = "xslt";
+            }
+
+            // check for old import format: xslImport:property:current.xsl and issue a warning
+            final String importXSL;
+            final String importPart = StringUtils.substringAfter(href, ":");
+            if (StringUtils.contains(importPart, ":")) {
+                final String propertyPart = StringUtils.substringBefore(importPart, ":");
+                LOGGER.warn("{} is in old import format change to xslImport:{}!", href, propertyPart);
+
+                importXSL = MCRXMLFunctions.nextImportStep(importPart);
+            } else {
+                final String selfName = StringUtils.substringAfter(baseURI, xslFolder + "/")
+                    + StringUtils.substringAfterLast(base, "/");
+
+                importXSL = MCRXMLFunctions.nextImportStep(importPart, selfName);
+            }
+
             if (importXSL.isEmpty()) {
                 LOGGER.debug("End of import queue: {}", href);
                 Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
@@ -1385,7 +1409,6 @@ public final class MCRURIResolver implements URIResolver {
             }
             LOGGER.debug("xslImport importing {}", importXSL);
 
-            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
             return fallback.resolve("resource:" + xslFolder + "/" + importXSL, base);
         }
     }
