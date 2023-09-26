@@ -96,7 +96,7 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
         } else {
             try {
                 derivateID = MCRUploadHelper.createDerivate(objOrDerivateID, classifications).getId();
-                targetDerivateRoot = MCRPath.getPath(objOrDerivateID.toString(), "/");
+                targetDerivateRoot = MCRPath.getPath(derivateID.toString(), "/");
             } catch (MCRAccessException e) {
                 throw new MCRUploadServerException("mcr.upload.create.derivate.failed", e);
             }
