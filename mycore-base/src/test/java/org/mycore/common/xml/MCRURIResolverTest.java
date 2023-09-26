@@ -1,13 +1,17 @@
 package org.mycore.common.xml;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 
+import javax.xml.transform.Source;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class MCRURIResolverTest {
+public class MCRURIResolverTest extends MCRTestCase {
 
     @Test
     public void testGetParentDirectoryResourceURI() {
@@ -35,5 +39,33 @@ public class MCRURIResolverTest {
             String result = MCRURIResolver.getParentDirectoryResourceURI(entry.getKey());
             Assert.assertEquals(entry.getValue(), result);
         }
+    }
+
+    @Test
+    public void testImportFromSameDirectory() throws Exception {
+        MCRConfiguration2.set("MCR.URIResolver.xslImports.xsl-import", "functions/xsl-1.xsl,functions/xsl-2.xsl");
+
+        Source resolved = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "file:/tmp/xsl/functions/xsl-2.xsl");
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xsl/functions/xsl-1.xsl"));
+
+        resolved = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "file:/tmp/xslt/functions/xsl-2.xsl");
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-1.xsl"));
+
+        // check with new import layout
+        resolved = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import", "file:/tmp/xslt/functions/xsl-2.xsl");
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-1.xsl"));
+
+        // check with new import layout for calling xsl
+        resolved = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import", "file:/tmp/xslt/functions/xsl-parent.xsl");
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-2.xsl"));
+
     }
 }
