@@ -30,9 +30,9 @@ import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.resource.provider.MCRFileSystemResourceProvider;
-import org.mycore.common.resource.provider.MCRResourceProvider;
-import org.mycore.common.resource.provider.MCRResourceProviderMode;
+import org.mycore.resource.provider.MCRFileSystemResourceProvider;
+import org.mycore.resource.provider.MCRResourceProvider;
+import org.mycore.resource.provider.MCRResourceProviderMode;
 
 /**
  * A {@link MCRFileSystemResourceProvider} is a {@link MCRResourceProvider} that looks up web resources

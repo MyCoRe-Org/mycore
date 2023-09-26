@@ -362,7 +362,7 @@
 
   <filter>
     <filter-name>MCRDefaultResourceInterceptFilter</filter-name>
-    <filter-class>org.mycore.common.resource.MCRDefaultResourceInterceptFilter</filter-class>
+    <filter-class>org.mycore.resource.MCRDefaultResourceInterceptFilter</filter-class>
     <init-param>
       <param-name>expiresMinutes</param-name>
       <param-value>1440</param-value>

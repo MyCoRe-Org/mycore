@@ -35,7 +35,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.common.resource.MCRResourceHelper;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.mycore.wcms2.MCRWCMSUtil;
 

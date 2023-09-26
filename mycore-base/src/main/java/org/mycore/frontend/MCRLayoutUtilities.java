@@ -64,7 +64,7 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.common.resource.MCRResourceHelper;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

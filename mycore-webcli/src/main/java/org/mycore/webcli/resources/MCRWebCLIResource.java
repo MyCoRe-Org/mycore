@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.resource.MCRResourceHelper;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 

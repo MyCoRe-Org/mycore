@@ -44,7 +44,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 import org.mycore.common.log4j2.MCRSessionThreadContext;
-import org.mycore.common.resource.MCRResourceHelper;
+import org.mycore.resource.MCRResourceHelper;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;

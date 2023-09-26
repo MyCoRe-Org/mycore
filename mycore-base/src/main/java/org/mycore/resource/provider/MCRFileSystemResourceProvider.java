@@ -1,0 +1,88 @@
+/*
+ *
+ * $Revision$ $Date$
+ *
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ *
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
+ */
+
+package org.mycore.resource.provider;
+
+import java.io.File;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.Level;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.hint.MCRHints;
+import org.mycore.common.log.MCRTreeMessage;
+
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
+
+/**
+ * A {@link MCRFileSystemResourceProvider} is a {@link MCRResourceProvider} that looks up,
+ * depending on the given {@link MCRResourceProviderMode}, resources or web resources in the file system.
+ * It uses a fixed list of base directories for the lookup.
+ */
+@MCRConfigurationProxy(proxyClass = MCRFileSystemResourceProvider.Factory.class)
+public class MCRFileSystemResourceProvider extends MCRFileSystemResourceProviderBase {
+
+    private final List<File> baseDirs;
+
+    public MCRFileSystemResourceProvider(String coverage, MCRResourceProviderMode mode, List<File> baseDirs) {
+        super(coverage, mode);
+        this.baseDirs = Objects.requireNonNull(baseDirs);
+    }
+
+    @Override
+    protected final Stream<File> getBaseDirs(MCRHints hints) {
+        return baseDirs.stream();
+    }
+
+    @Override
+    public MCRTreeMessage compileDescription(Level level) {
+        MCRTreeMessage description = super.compileDescription(level);
+        baseDirs.forEach(baseDir -> description.add("BaseDir", baseDir.getAbsolutePath()));
+        return description;
+    }
+
+    public static class Factory implements Supplier<MCRFileSystemResourceProvider> {
+
+        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.FileSystem.Coverage")
+        public String coverage;
+
+        @MCRProperty(name = "Mode")
+        public String mode;
+
+        @MCRProperty(name = "BaseDirs")
+        public String baseDirs;
+
+        @Override
+        public MCRFileSystemResourceProvider get() {
+            MCRResourceProviderMode mode = MCRResourceProviderMode.valueOf(this.mode);
+            List<File> baseDirs = splitValue(this.baseDirs).map(File::new).collect(Collectors.toList());
+            return new MCRFileSystemResourceProvider(coverage, mode, baseDirs);
+        }
+
+    }
+
+}

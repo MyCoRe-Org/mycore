@@ -25,9 +25,9 @@ package org.mycore.common.hint;
 
 import java.util.Optional;
 
-import org.mycore.common.resource.MCRResourcePath;
-import org.mycore.common.resource.MCRResourceResolver;
-import org.mycore.common.resource.provider.MCRResourceProvider;
+import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.MCRResourceResolver;
+import org.mycore.resource.provider.MCRResourceProvider;
 
 /**
  * An immutable, typed lookup table that is intended to provide configuration values for complex calculations
