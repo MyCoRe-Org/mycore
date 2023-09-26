@@ -16,6 +16,7 @@ import org.mycore.xsonify.serialize.SerializerStyle;
 import org.mycore.xsonify.serialize.Xml2JsonSerializer;
 import org.mycore.xsonify.xml.XmlDocument;
 import org.mycore.xsonify.xml.XmlDocumentLoader;
+import org.mycore.xsonify.xml.XmlEntityResolverDocumentLoader;
 import org.mycore.xsonify.xml.XmlName;
 import org.mycore.xsonify.xml.XmlSaxParser;
 import org.mycore.xsonify.xsd.Xsd;
@@ -117,7 +118,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     @MCRPostConstruction
     public void init() throws ParserConfigurationException, SAXException {
         XmlSaxParser saxParser = new XmlSaxParser();
-        XmlDocumentLoader documentLoader = new XmlDocumentLoader(MCREntityResolver.instance(), saxParser);
+        XmlDocumentLoader documentLoader = new XmlEntityResolverDocumentLoader(MCREntityResolver.instance(), saxParser);
         XsdParser xsdParser = new XsdParser(documentLoader);
         Xsd xsd = xsdParser.parse(this.schema);
 
