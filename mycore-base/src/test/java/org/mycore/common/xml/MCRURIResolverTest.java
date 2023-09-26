@@ -1,6 +1,5 @@
 package org.mycore.common.xml;
 
-import org.glassfish.jersey.server.internal.scanning.FilesScanner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
