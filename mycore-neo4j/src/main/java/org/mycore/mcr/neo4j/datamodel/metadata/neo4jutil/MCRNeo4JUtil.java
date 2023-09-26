@@ -104,7 +104,7 @@ public class MCRNeo4JUtil {
     /**
      * Instantiates Neo4JParserClasses from properties and saves them in a Map.
      *
-     * @param propertiesMap  MAP<string,string> with MCR class keys and class paths to be instantiated
+     * @param propertiesMap  Map of String, String with MCR class keys and class paths to be instantiated
      * @param filterClassKey don't instantiate a class by a given configuration key, to avoid loop instantiation
      * @return Map with parsers for each defined MCR metadata type
      */
