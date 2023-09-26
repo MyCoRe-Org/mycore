@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -167,7 +168,7 @@ public class MCRCommandUtils {
      *            the name of the style to be used when resolving the stylesheet.
      * @param defaultStyle
      *            the name of the default style, ending with <em>.xsl</em> to be used when resolving the stylesheet.
-     *            A corresponding file xsl/<em>defaultStyle</em> must exist.
+     *            A corresponding file [MCR.Layout.Transformer.Factory.XSLFolder]/<em>defaultStyle</em> must exist.
      * @param cache
      *            The transformer cache to be used.
      * @return the transformer
@@ -185,7 +186,8 @@ public class MCRCommandUtils {
         Element element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
         if (element == null) {
             LOGGER.warn("Couldn't find resource {} for style {}, using default.", xslFilePath, style);
-            xslFilePath = "xsl/" + defaultStyle;
+            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+            xslFilePath = xslFolder + "/" + defaultStyle;
             element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
         }
 
