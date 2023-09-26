@@ -19,6 +19,7 @@
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser;
 
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
+import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getMCRNeo4JInstantiatedParserMap;
 import static org.mycore.mcr.neo4j.utils.MCRNeo4JUtilsConfigurationHelper.getConfiguration;
 
 import java.util.ArrayList;
@@ -53,12 +54,11 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
    private static final String LANG_UNSET = "__unset__";
    private final Map<String, MCRNeo4JAbstractDataModelParser> parserMap;
 
+   private static final String CLASS_KEY = "BaseParser";
+
    public MCRNeo4JParser() {
       Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "ParserClass.");
-      parserMap = propertiesMap.entrySet().stream()
-         .collect(Collectors.toMap(Map.Entry::getKey,
-            e -> MCRConfiguration2.getOrThrow(NEO4J_CONFIG_PREFIX + "ParserClass." + e.getKey(),
-               MCRConfiguration2::instantiateClass)));
+      parserMap = getMCRNeo4JInstantiatedParserMap(propertiesMap, CLASS_KEY);
    }
 
    private String parseSourceNodeInformation(MCRObject mcrObject, XPathFactory xpf,

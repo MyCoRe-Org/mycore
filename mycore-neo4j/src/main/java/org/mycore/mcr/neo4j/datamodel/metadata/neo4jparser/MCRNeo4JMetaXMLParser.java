@@ -19,12 +19,11 @@
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser;
 
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
+import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getMCRNeo4JInstantiatedParserMap;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,16 +43,11 @@ public class MCRNeo4JMetaXMLParser extends MCRNeo4JAbstractDataModelParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String CLASS_KEY = "MCRMetaXML";
+
     public MCRNeo4JMetaXMLParser() {
         Map<String, String> propertiesMap = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX + "ParserClass.");
-        parserMap = new HashMap<>();
-        propertiesMap.forEach((k, v) -> {
-            // avoid loop instantiation
-            if (!Objects.equals(k, "MCRMetaXML")) {
-                parserMap.put(k, MCRConfiguration2.getOrThrow(NEO4J_CONFIG_PREFIX + "ParserClass." + k,
-                    MCRConfiguration2::instantiateClass));
-            }
-        });
+        parserMap = getMCRNeo4JInstantiatedParserMap(propertiesMap, CLASS_KEY);
     }
 
     @Override
