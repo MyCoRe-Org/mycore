@@ -65,6 +65,8 @@ public class MCRUploadResource {
 
     private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     @Context
     ContainerRequestContext request;
 
@@ -146,7 +148,7 @@ public class MCRUploadResource {
             try {
                 MCRFileUploadBucket.releaseBucket(bucket.getBucketID());
             } catch (MCRUploadServerException e) {
-                // cant handle that
+                LOGGER.error("Error while releasing bucket " + bucket.getBucketID(), e);
             }
         }
         if (location == null) {
