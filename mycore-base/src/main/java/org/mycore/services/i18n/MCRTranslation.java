@@ -238,8 +238,7 @@ public class MCRTranslation {
     }
 
     /**
-     * provides translation for the given label (property key). The current locale that is needed for translation is
-     * gathered by the language of the current MCRSession.
+     * Provides translation for the given label (property key).
      *
      * @param label property key
      * @param locale target locale of translation
@@ -271,8 +270,7 @@ public class MCRTranslation {
     }
 
     /**
-     * provides translation for the given label (property key). The current locale that is needed for translation is
-     * gathered by the language of the current MCRSession. Be aware that any occurence of ';' and '\' in
+     * Provides translation for the given label (property key). Be aware that any occurence of ';' and '\' in
      * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
      * result in {"foo","bar"} (the array)
      *
