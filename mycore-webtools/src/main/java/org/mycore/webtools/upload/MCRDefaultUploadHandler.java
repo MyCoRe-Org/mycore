@@ -34,6 +34,24 @@ import org.mycore.webtools.upload.exception.MCRMissingParameterException;
 import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
 import org.mycore.webtools.upload.exception.MCRUploadServerException;
 
+/**
+ * Default implementation of the {@link MCRUploadHandler} interface.
+ * This implementation uploads files to a derivate and assigns a mainfile if none is set.
+ *
+ * <dl>
+ *     <dt>{@link #OBJ_OR_DERIVATE_ID_PARAMETER_NAME}</dt>
+ *     <dd>The derivate id where the files should be uploaded to. It can also be an object id, in this case a new
+ *     derivate will be created.</dd>
+ *     <dt>{@link #CLASSIFICATIONS_PARAMETER_NAME}</dt>
+ *     <dd>A comma separated list of classifications that should be added to the new derivate.</dd>
+ * </dl>
+ *
+ * The following configuration properties are used:
+ * <dl>
+ *     <dt>MCR.Upload.NotPreferredFiletypeForMainfile</dt>
+ *     <dd>A comma separated list of file extensions that should not be used as mainfile. </dd>
+ * </dl>
+ */
 public class MCRDefaultUploadHandler implements MCRUploadHandler {
 
     private static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.NotPreferredFiletypeForMainfile";

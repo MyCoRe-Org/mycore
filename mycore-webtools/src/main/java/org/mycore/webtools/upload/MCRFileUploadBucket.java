@@ -47,9 +47,9 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
 
     private final String bucketID;
 
-    private Path root;
+    private final Path root;
 
-    private String sessionID;
+    private final String sessionID;
 
     private final Map<String, List<String>> parameters;
 
@@ -64,10 +64,10 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
         this.bucketID = bucketID;
         this.parameters = parameters;
         this.uploadHandler = uploadHandler;
-        sessionID = MCRSessionMgr.getCurrentSessionID();
+        this.sessionID = MCRSessionMgr.getCurrentSessionID();
 
         try {
-            root = Files.createTempDirectory("mycore_" + bucketID);
+            this.root = Files.createTempDirectory("mycore_" + bucketID);
         } catch (IOException e) {
             throw new MCRUploadServerException("component.webtools.upload.temp.create.failed", e);
         }

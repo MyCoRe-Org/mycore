@@ -65,8 +65,6 @@ public class MCRUploadResource {
 
     private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     @Context
     ContainerRequestContext request;
 
