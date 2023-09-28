@@ -1,5 +1,8 @@
 package org.mycore.webtools.upload.exception;
 
+/**
+ * Should be thrown if a parameter required by an upload handler is missing.
+ */
 public class MCRMissingParameterException extends MCRUploadException {
 
         private final String parameterName;

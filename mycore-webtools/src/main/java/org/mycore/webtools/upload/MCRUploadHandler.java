@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.webtools.upload.exception.MCRBadFileException;
-import org.mycore.webtools.upload.exception.MCRBadUploadParameterException;
+import org.mycore.webtools.upload.exception.MCRInvalidFileException;
+import org.mycore.webtools.upload.exception.MCRInvalidUploadParameterException;
 import org.mycore.webtools.upload.exception.MCRMissingParameterException;
 import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
 import org.mycore.webtools.upload.exception.MCRUploadServerException;
@@ -19,14 +19,13 @@ public interface MCRUploadHandler {
 
     /**
      * Checks if the upload is allowed for the current user and if the parameters are valid
-     * @param uploadID the uploadID which was passed to the upload
      * @param parameters the parameters that were passed to the upload, eg. the {@link MCRObjectID}
      * @throws MCRUploadForbiddenException if the upload is not allowed
      * @throws MCRUploadServerException  if something went wrong serverside while begin
      */
-    void begin(String uploadID, Map<String, List<String>> parameters)
+    String begin(Map<String, List<String>> parameters)
         throws MCRUploadForbiddenException, MCRUploadServerException,
-        MCRMissingParameterException, MCRBadUploadParameterException;
+        MCRMissingParameterException, MCRInvalidUploadParameterException;
 
     /**
      * Traverses the given {@link MCRFileUploadBucket} and creates or updates the corresponding
@@ -44,9 +43,9 @@ public interface MCRUploadHandler {
      * @param name the file name
      * @param size the size of the file
      * @throws MCRUploadForbiddenException if the user is not allowed to upload the file
-     * @throws MCRBadFileException if the file bad
+     * @throws MCRInvalidFileException if the file bad
      * @throws MCRUploadServerException if something went wrong serverside while uploading
      */
     void validateFileMetadata(String name, long size)
-        throws MCRUploadForbiddenException, MCRBadFileException, MCRUploadServerException;
+        throws MCRUploadForbiddenException, MCRInvalidFileException, MCRUploadServerException;
 }

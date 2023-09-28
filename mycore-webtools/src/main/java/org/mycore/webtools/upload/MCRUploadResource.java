@@ -52,8 +52,8 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
-import org.mycore.webtools.upload.exception.MCRBadFileException;
-import org.mycore.webtools.upload.exception.MCRBadUploadParameterException;
+import org.mycore.webtools.upload.exception.MCRInvalidFileException;
+import org.mycore.webtools.upload.exception.MCRInvalidUploadParameterException;
 import org.mycore.webtools.upload.exception.MCRMissingParameterException;
 import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
 import org.mycore.webtools.upload.exception.MCRUploadServerException;
@@ -109,33 +109,32 @@ public class MCRUploadResource {
     }
 
     @PUT
-    @Path("{uploadID}/begin")
-    public Response begin(@PathParam("uploadID") String uploadID,
-        @QueryParam("uploadHandler") String uploadHandlerID) throws MCRUploadServerException {
+    @Path("begin")
+    public Response begin(@QueryParam("uploadHandler") String uploadHandlerID) throws MCRUploadServerException {
         MultivaluedMap<String, String> parameters = request.getUriInfo().getQueryParameters();
 
         MCRUploadHandler uploadHandler = getUploadHandler(uploadHandlerID);
+        String bucketID;
         try {
-            uploadHandler.begin(uploadID, parameters);
+            bucketID = uploadHandler.begin(parameters);
+            MCRFileUploadBucket.createBucket(bucketID, parameters, uploadHandler);
         } catch (MCRUploadForbiddenException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
-        } catch (MCRBadUploadParameterException | MCRMissingParameterException e) {
+        } catch (MCRInvalidUploadParameterException | MCRMissingParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (MCRUploadServerException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
-        MCRFileUploadBucket.createBucket(uploadID, parameters, uploadHandler);
-
-        return Response.noContent().build();
+        return Response.ok().entity(bucketID).build();
     }
 
     @PUT
-    @Path("{uploadID}/commit")
-    public Response commit(@PathParam("uploadID") String uploadID) {
-        final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(uploadID);
+    @Path("{buckedID}/commit")
+    public Response commit(@PathParam("buckedID") String buckedID) {
+        final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(buckedID);
         if (bucket == null) {
-            throw new BadRequestException("uploadID " + uploadID + " is invalid!");
+            throw new BadRequestException("buckedID " + buckedID + " is invalid!");
         }
 
         URI location;
@@ -168,11 +167,10 @@ public class MCRUploadResource {
     }
 
     @GET
-    @Path("{uploadID}/{path:.+}")
+    @Path("{uploadHandler}/{path:.+}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response validateFile(
-        @PathParam("uploadID") String uploadID,
-        @QueryParam("uploadHandler") String uploadHandlerID,
+        @PathParam("uploadHandler") String uploadHandlerID,
         @PathParam("path") String path,
         @QueryParam("size") String size) {
         String fileName = Paths.get(path).getFileName().toString();
@@ -182,7 +180,7 @@ public class MCRUploadResource {
             getUploadHandler(uploadHandlerID).validateFileMetadata(unicodeNormalizedFileName, Long.parseLong(size));
         } catch (MCRUploadForbiddenException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
-        } catch (MCRBadFileException e) {
+        } catch (MCRInvalidFileException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (MCRUploadServerException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -192,22 +190,20 @@ public class MCRUploadResource {
     }
 
     @PUT
-    @Path("{uploadID}/{path:.+}")
+    @Path("{buckedID}/{path:.+}")
     public Response uploadFile(@PathParam("path") String path,
-        @PathParam("uploadID") String uploadID,
+        @PathParam("buckedID") String buckedID,
         InputStream contents)
         throws IOException {
 
-        final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(uploadID);
+        final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(buckedID);
+        if(bucket == null){
+            throw new BadRequestException("buckedID " + buckedID + " is invalid!");
+        }
 
         String unicodeNormalizedPath = Normalizer.normalize(path, Normalizer.Form.NFC);
         final java.nio.file.Path filePath = MCRUtils.safeResolve(bucket.getRoot(), unicodeNormalizedPath);
-        if (filePath.getNameCount() > 1) {
-            java.nio.file.Path parentDirectory = filePath.getParent();
-            if (!Files.exists(parentDirectory)) {
-                Files.createDirectories(parentDirectory);
-            }
-        }
+        createBucketRootIfNotExist(filePath);
 
         String actualStringFileName = bucket.getRoot().relativize(filePath).getFileName().toString();
         MCRUploadHandler uploadHandler = bucket.getUploadHandler();
@@ -218,7 +214,7 @@ public class MCRUploadResource {
             uploadHandler.validateFileMetadata(actualStringFileName, contentLength);
         } catch (MCRUploadForbiddenException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
-        } catch (MCRBadFileException e) {
+        } catch (MCRInvalidFileException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (MCRUploadServerException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -229,7 +225,7 @@ public class MCRUploadResource {
         } else {
             final List<MCRPostUploadFileProcessor> processors = FILE_PROCESSORS.stream()
                 .filter(processor -> processor.isProcessable(unicodeNormalizedPath))
-                .collect(Collectors.toList());
+                .toList();
 
             if (processors.size() == 0) {
                 Files.copy(contents, filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -251,6 +247,15 @@ public class MCRUploadResource {
             }
         }
         return Response.noContent().build();
+    }
+
+    private static void createBucketRootIfNotExist(java.nio.file.Path filePath) throws IOException {
+        if (filePath.getNameCount() > 1) {
+            java.nio.file.Path parentDirectory = filePath.getParent();
+            if (!Files.exists(parentDirectory)) {
+                Files.createDirectories(parentDirectory);
+            }
+        }
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,8 +29,8 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.fileupload.MCRUploadHelper;
-import org.mycore.webtools.upload.exception.MCRBadFileException;
-import org.mycore.webtools.upload.exception.MCRBadUploadParameterException;
+import org.mycore.webtools.upload.exception.MCRInvalidFileException;
+import org.mycore.webtools.upload.exception.MCRInvalidUploadParameterException;
 import org.mycore.webtools.upload.exception.MCRMissingParameterException;
 import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
 import org.mycore.webtools.upload.exception.MCRUploadServerException;
@@ -118,6 +119,10 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
             } catch (MCRAccessException e) {
                 throw new MCRUploadServerException("mcr.upload.create.derivate.failed", e);
             }
+            // check if we have write access to the newly created derivate
+            if (!MCRAccessManager.checkPermission(derivateID, MCRAccessManager.PERMISSION_WRITE)) {
+                throw new MCRUploadServerException("No write access to newly created derivate " + derivateID);
+            }
         }
 
         final MCRTreeCopier copier;
@@ -144,41 +149,63 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
     }
 
     @Override
-    public void validateFileMetadata(String name, long size) throws MCRUploadForbiddenException, MCRBadFileException {
+    public void validateFileMetadata(String name, long size) throws MCRInvalidFileException {
         try {
             MCRUploadHelper.checkPathName(name);
         } catch (MCRException e) {
-            throw new MCRBadFileException(name, e.getMessage());
+            throw new MCRInvalidFileException(name, e.getMessage());
         }
 
         long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
         if (size > maxSize) {
-            throw new MCRBadFileException(name, "Maximum allowed size is " + size);
+            throw new MCRInvalidFileException(name, "Maximum allowed size is " + size);
         }
     }
 
     @Override
-    public void begin(String uploadID, Map<String, List<String>> parameters)
-        throws MCRUploadForbiddenException, MCRMissingParameterException, MCRBadUploadParameterException {
+    public String begin(Map<String, List<String>> parameters)
+        throws MCRUploadForbiddenException, MCRMissingParameterException, MCRInvalidUploadParameterException {
         if (!parameters.containsKey(OBJ_OR_DERIVATE_ID_PARAMETER_NAME)) {
             throw new MCRMissingParameterException(OBJ_OR_DERIVATE_ID_PARAMETER_NAME);
         }
 
         List<String> oidList = parameters.get(OBJ_OR_DERIVATE_ID_PARAMETER_NAME);
         if (oidList.size() != 1) {
-            throw new MCRBadUploadParameterException(OBJ_OR_DERIVATE_ID_PARAMETER_NAME, String.join(",", oidList),
+            throw new MCRInvalidUploadParameterException(OBJ_OR_DERIVATE_ID_PARAMETER_NAME, String.join(",", oidList),
                 "There must be exactly one object or derivate id");
         }
 
         String oidString = oidList.get(0);
         if (!MCRObjectID.isValid(oidString)) {
-            throw new MCRBadUploadParameterException(OBJ_OR_DERIVATE_ID_PARAMETER_NAME, oidString,
+            throw new MCRInvalidUploadParameterException(OBJ_OR_DERIVATE_ID_PARAMETER_NAME, oidString,
                 "Invalid object or derivate id given");
         }
 
         MCRObjectID oid = MCRObjectID.getInstance(oidString);
-        if (!MCRMetadataManager.exists(oid)
-            || !MCRAccessManager.checkPermission(oid, MCRAccessManager.PERMISSION_WRITE)) {
+
+        checkPermissions(oid);
+
+        return UUID.randomUUID().toString();
+    }
+
+    private static void checkPermissions(MCRObjectID oid) throws MCRInvalidUploadParameterException,
+        MCRUploadForbiddenException {
+        if (!MCRMetadataManager.exists(oid)) {
+            throw new MCRInvalidUploadParameterException(OBJ_OR_DERIVATE_ID_PARAMETER_NAME, oid.toString(),
+                "does not exist!");
+        }
+
+        if (!oid.getTypeId().equals("derivate")) {
+            try {
+                String formattedNewDerivateIDString = MCRObjectID.formatID(oid.getProjectId(), "derivate", 0);
+                MCRObjectID newDerivateId = MCRObjectID.getInstance(formattedNewDerivateIDString);
+                MCRMetadataManager.checkCreatePrivilege(newDerivateId);
+            } catch (MCRAccessException e) {
+                throw new MCRUploadForbiddenException("No rights to create derivate for " + oid + "!");
+            }
+        }
+
+        if (!MCRAccessManager.checkPermission(oid, MCRAccessManager.PERMISSION_WRITE)) {
             throw new MCRUploadForbiddenException("No write access to " + oid);
         }
     }

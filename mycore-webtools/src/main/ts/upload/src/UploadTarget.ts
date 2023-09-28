@@ -19,6 +19,7 @@
 import {FileTransfer} from "./FileTransfer";
 import {FileTransferQueue} from "./FileTransferQueue";
 import {Utils} from "./Utils";
+import {TransferSession} from "./TransferSession";
 
 /**
  * A possible target for file drag and drop.
@@ -39,9 +40,9 @@ export class UploadTarget {
         this.uploadHandler = element.getAttribute("data-upload-handler") || "Default";
 
         element.getAttributeNames().forEach((name) => {
-           if(name.startsWith("data-upload-")) {
-               this.attributes[name.substring("data-upload-".length)] = element.getAttribute(name) || "Default";
-           }
+            if(name.startsWith("data-upload-")) {
+                this.attributes[name.substring("data-upload-".length)] = element.getAttribute(name) || "Default";
+            }
         });
 
         const observer = new MutationObserver((mutations => {
@@ -85,20 +86,20 @@ export class UploadTarget {
                     manualToggle.appendChild(fileInput);
                 }
 
-                const uploadID = (Math.random() * 10000).toString(10);
-                FileTransferQueue.getQueue().registerTransferSession(uploadID, this.uploadHandler,this.attributes);
+                let transferSession = FileTransferQueue.getQueue().registerTransferSession(this.uploadHandler,
+                    this.attributes);
 
                 fileInput.setAttribute("type", "file");
                 fileInput.addEventListener('change', async () => {
                     for (let i = 0; i < fileInput.files.length; i++) {
                         let file = fileInput.files.item(i);
-                        const validation = await this.validateTraverse(uploadID, file);
+                        const validation = await this.validateTraverse(file);
                         if (!validation.test) {
                             // TODO: show nice in GUI
                             alert(validation.reason);
                             return true;
                         }
-                        const fileTransfer = new FileTransfer(file, this.target, uploadID, []);
+                        const fileTransfer = new FileTransfer(file, this.target, transferSession, []);
                         FileTransferQueue.getQueue()
                         FileTransferQueue.getQueue().add(fileTransfer);
                     }
@@ -115,8 +116,7 @@ export class UploadTarget {
         event.preventDefault();
         if ("dataTransfer" in event) {
             let items = event.dataTransfer.items;
-            const uploadID = (Math.random() * 10000).toString(10);
-            FileTransferQueue.getQueue().registerTransferSession(uploadID, this.uploadHandler,this.attributes);
+            let ts = FileTransferQueue.getQueue().registerTransferSession(this.uploadHandler,this.attributes);
 
             const webkitEntries: any[] = [];
             for (let i = 0; i < items.length; i++) {
@@ -125,7 +125,7 @@ export class UploadTarget {
 
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
-                const validation = await this.validateTraverse(uploadID, file);
+                const validation = await this.validateTraverse(file);
                 if (!validation.test) {
                     // TODO: show nice in GUI
                     alert(validation.reason);
@@ -134,26 +134,26 @@ export class UploadTarget {
             }
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
-                this.traverse(uploadID, file);
+                this.traverse(ts, file);
             }
         }
 
         return true;
     }
 
-    private async validateTraverse(uploadId: string, fileEntry: any): Promise<{ test: boolean, fileEntry: any, reason: string | null }> {
+    private async validateTraverse(fileEntry: any): Promise<{ test: boolean, fileEntry: any, reason: string | null }> {
         if (fileEntry.isDirectory) {
             let children = await this.readEntries(fileEntry);
             for (let childIndex in children) {
                 const child = children[childIndex];
-                const validation = await this.validateTraverse(uploadId, child);
+                const validation = await this.validateTraverse(child);
                 if (!validation.test) {
                     return validation;
                 }
             }
             return {test: true, fileEntry, reason: null};
         } else {
-            const validation = await this.validateFile(uploadId, fileEntry);
+            const validation = await this.validateFile(fileEntry);
             return {test: validation.valid, fileEntry, reason: validation.reason};
         }
     }
@@ -180,7 +180,7 @@ export class UploadTarget {
      * @param fileEntry the entry which contains the name and size
      * @private
      */
-    private async validateFile(uploadId: string, fileEntry: File|FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
+    private async validateFile(fileEntry: File|FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
         const size = await this.getEntrySize(fileEntry);
         return new Promise((accept, reject) => {
             const isFileSystemEntry = 'fullPath' in fileEntry;
@@ -191,8 +191,7 @@ export class UploadTarget {
             } else {
                 uploadPath = fileEntry.name;
             }
-            const url = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + uploadId + "/" + uploadPath + "?size=" + size+
-                "&uploadHandler=" + this.uploadHandler;
+            const url = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + this.uploadHandler + "/" + uploadPath + "?size=" + size;
             const request = new XMLHttpRequest();
             request.open('GET', url, true);
 
@@ -229,8 +228,8 @@ export class UploadTarget {
         });
     }
 
-    private traverse(uploadID: string, fileEntry: any, parentTransfers: FileTransfer[] = []) {
-        const fileTransfer = new FileTransfer(fileEntry, this.target, uploadID, parentTransfers);
+    private traverse(transferSession: TransferSession, fileEntry: any, parentTransfers: FileTransfer[] = []) {
+        const fileTransfer = new FileTransfer(fileEntry, this.target, transferSession, parentTransfers);
         FileTransferQueue.getQueue().add(fileTransfer);
 
         if (fileEntry.isDirectory) {
@@ -245,7 +244,7 @@ export class UploadTarget {
             const readEntry = (results) => {
                 const result = results;
 
-                result.forEach((e) => this.traverse(uploadID, e, newParentTransfers));
+                result.forEach((e) => this.traverse(transferSession, e, newParentTransfers));
                 if (result.length > 0) {
                     reader.readEntries(readEntry, errorCallback);
                 }
