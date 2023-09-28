@@ -178,16 +178,16 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     public void testNextImportStep() {
         MCRConfiguration2.set("MCR.URIResolver.xslImports.xsl-import", "functions/xsl-1.xsl,functions/xsl-2.xsl");
 
-        // test with old include part
-        String next = MCRXMLFunctions.nextImportStep("xsl-import:functions/xsl-2.xsl");
-        assertEquals("functions/xsl-1.xsl", next);
-
-        // test with new include part
-        next = MCRXMLFunctions.nextImportStep("xsl-import", "functions/xsl-2.xsl");
-        assertEquals("functions/xsl-1.xsl", next);
-
-        // test with new include part and self name not in list (i.e. using base template)
-        next = MCRXMLFunctions.nextImportStep("xsl-import", "xsl-parent.xsl");
+        // test with first stylesheet in chain
+        String next = MCRXMLFunctions.nextImportStep("xsl-import");
         assertEquals("functions/xsl-2.xsl", next);
+
+        // test with include part
+        next = MCRXMLFunctions.nextImportStep("xsl-import:functions/xsl-2.xsl");
+        assertEquals("functions/xsl-1.xsl", next);
+
+        // test with last stylesheet in chain
+        next = MCRXMLFunctions.nextImportStep("xsl-import:functions/xsl-1.xsl");
+        assertEquals("", next);
     }
 }

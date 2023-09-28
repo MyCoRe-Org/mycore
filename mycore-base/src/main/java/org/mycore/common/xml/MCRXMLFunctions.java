@@ -750,21 +750,9 @@ public class MCRXMLFunctions {
             selfName = includePart.substring(border + 1);
             includePart = includePart.substring(0, border);
         }
-        return nextImportStep(includePart, selfName);
-    }
-
-    /**
-     * Helper function for xslImport URI resolver and {@link #hasNextImportStep(String)}
-     *
-     * @param includePart substring after xslImport:
-     * @param selfName    name of the current stylesheet
-     * @return the next stylesheet name to import
-     */
-    public static String nextImportStep(String includePart, String selfName) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("get next import step for {}:{}", includePart, selfName);
+            LOGGER.debug("get next import step for {}", includePart);
         }
-
         // get the parameters from mycore.properties
         List<String> importList = MCRConfiguration2.getString("MCR.URIResolver.xslImports." + includePart)
             .map(MCRConfiguration2::splitValue)
@@ -776,9 +764,6 @@ public class MCRXMLFunctions {
             ListIterator<String> listIterator = importList.listIterator(importList.size());
 
             if (selfName == null && listIterator.hasPrevious()) {
-                return listIterator.previous();
-            }
-            if (!importList.contains(selfName) && listIterator.hasPrevious()) {
                 return listIterator.previous();
             }
 
