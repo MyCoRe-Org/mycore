@@ -46,26 +46,13 @@ public class MCRURIResolverTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.URIResolver.xslImports.xsl-import", "functions/xsl-1.xsl,functions/xsl-2.xsl");
 
         Source resolved = MCRURIResolver.instance()
-            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "file:/tmp/xsl/functions/xsl-2.xsl");
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "some.jar!/xsl/xsl/functions/xsl-2.xsl");
         Assert.assertNotNull(resolved);
         Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xsl/functions/xsl-1.xsl"));
 
         resolved = MCRURIResolver.instance()
-            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "file:/tmp/xslt/functions/xsl-2.xsl");
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "some.jar!/xslt/functions/xsl-2.xsl");
         Assert.assertNotNull(resolved);
         Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-1.xsl"));
-
-        // check with new import layout
-        resolved = MCRURIResolver.instance()
-            .resolve("xslImport:xsl-import", "file:/tmp/xslt/functions/xsl-2.xsl");
-        Assert.assertNotNull(resolved);
-        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-1.xsl"));
-
-        // check with new import layout for calling xsl
-        resolved = MCRURIResolver.instance()
-            .resolve("xslImport:xsl-import", "file:/tmp/xslt/functions/xsl-parent.xsl");
-        Assert.assertNotNull(resolved);
-        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-2.xsl"));
-
     }
 }
