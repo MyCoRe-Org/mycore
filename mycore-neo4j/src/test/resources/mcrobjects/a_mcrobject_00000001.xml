@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="DE0Book_manuscript_00000001" label="Test 0001"
+              version="2020.06.1-SNAPSHOT" xsi:noNamespaceSchemaLocation="datamodel-manuscript.xsd">
+  <structure>
+    <derobjects xmlns:xlink="http://www.w3.org/1999/xlink" class="MCRMetaEnrichedLinkID">
+      <derobject inherited="0" xlink:type="locator" xlink:href="DE0Book_derivate_00000001">
+        <order>1</order>
+        <maindoc>IMG-20190901-WA0004.jpg</maindoc>
+      </derobject>
+    </derobjects>
+  </structure>
+  <metadata xmlns:xlink="http://www.w3.org/1999/xlink" xml:lang="">
+    <def.class_test class="MCRMetaClassification" heritable="false" notinherit="true">
+      <mss42 inherited="0" classid="classification_id" categid="category_1"/>
+      <mss42 inherited="0" classid="classification_id" categid="category_2"/>
+    </def.class_test>
+    <def.unlinked_class class="MCRMetaClassification" heritable="false" notinherit="true">
+      <unlinked_class inherited="0" classid="MyMssProject" categid="hebraica_sbb"/>
+    </def.unlinked_class>
+    <def.linked_class class="MCRMetaClassification" heritable="false" notinherit="true">
+      <linked_class inherited="0" classid="MyMssOwner" categid="owner_de0"/>
+      <linked_class inherited="0" type="doubtful" classid="MyMssOwner" categid="owner_de1"/>
+    </def.linked_class>
+    <def.personname class="MCRMetaPersonName" heritable="false" notinherit="true">
+      <personname xml:lang="de" inherited="0">
+        <fullname>Name DE</fullname>
+      </personname>
+      <personname xml:lang="en" inherited="0">
+        <fullname>Name EN</fullname>
+      </personname>
+      <personname xml:lang="xx" inherited="0">
+        <fullname>Name XX</fullname>
+      </personname>
+    </def.personname>
+    <def.mss01 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss01 inherited="0" form="plain">Test 1</mss01>
+    </def.mss01>
+    <def.mss02 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss02 type="old_catalogue" inherited="0" form="plain">34456</mss02>
+    </def.mss02>
+    <def.mss03 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss03 type="other" inherited="0" form="plain">0001</mss03>
+    </def.mss03>
+    <def.mss82 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss82 xml:lang="de" inherited="0" form="plain">deutscher text 1</mss82>
+      <mss82 xml:lang="de" inherited="0" form="plain">deutscher text 2</mss82>
+      <mss82 xml:lang="de" inherited="0" form="plain">deutscher text 3</mss82>
+      <mss82 xml:lang="en" inherited="0" form="plain">english text</mss82>
+    </def.mss82>
+    <def.mss58 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss58 xml:lang="de" inherited="0" form="plain">cu</mss58>
+    </def.mss58>
+    <def.mss40 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss40 xml:lang="de" inherited="0" form="plain">Jin gang bo re bo luo mi jing</mss40>
+      <mss40 xml:lang="en" type="original" inherited="0" form="plain">金剛般若波羅蜜經</mss40>
+    </def.mss40>
+    <def.mss46 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss46 xml:lang="de" inherited="0" form="plain">1: Jin gang bo re bo luo mi jing:&#13;
+        &#13;
+        Taishō 235 = 8, 749b, 24 - 29
+      </mss46>
+    </def.mss46>
+    <def.mss28 class="MCRMetaHistoryDate" heritable="false" notinherit="true">
+      <mss28 type="copy" inherited="0">
+        <text xml:lang="de">12.11.1603</text>
+        <text xml:lang="en">1603-11-12</text>
+        <calendar>gregorian</calendar>
+        <ivon>2306859</ivon>
+        <von>1603-11-12 AD</von>
+        <ibis>2306859</ibis>
+        <bis>1603-11-12 AD</bis>
+      </mss28>
+    </def.mss28>
+    <def.mss85 class="MCRMetaLinkID" heritable="false" notinherit="true">
+      <mss85 type="isCommentary" inherited="0" xlink:type="locator" xlink:title="Fātiḥat aš-šabāb"
+             xlink:href="MyMssWork_work_00000200"/>
+    </def.mss85>
+    <def.mss30 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss30 type="gnd" inherited="0" form="plain">4066831-9</mss30>
+    </def.mss30>
+    <def.mss29 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss29 xml:lang="de" type="copy" inherited="0" form="plain">Wolfen</mss29>
+    </def.mss29>
+    <def.mss84 class="MCRMetaLangText" heritable="false" notinherit="true">
+      <mss84 xml:lang="de" inherited="0" form="plain">Das ist eine **fett gedruckte Anmerkung**. Und ich kann sie auch
+        _kursiv_ machen oder **_gleichzeitig kursiv und fett_**. Auch [Links](https://www.qalamos.net) sind möglich und
+        können mit **[fett](https://www.qalamos.net)** und _[kursiv](https://www.qalamos.net)_ kombiniert werden.
+        Vielleicht geht sogar der Wechsel zwischen [**fett** und _kursiv_ in einem **_Link_**](https://www.qalamos.net).
+        Schöne neue Welt
+      </mss84>
+    </def.mss84>
+  </metadata>
+  <service>
+    <servdates xmlns:xlink="http://www.w3.org/1999/xlink" class="MCRMetaISO8601Date">
+      <servdate type="modifydate" inherited="0">2023-06-15T08:40:23.034Z</servdate>
+      <servdate type="createdate" inherited="0">2020-11-27T12:53:30.336Z</servdate>
+    </servdates>
+    <servstates xmlns:xlink="http://www.w3.org/1999/xlink" class="MCRMetaClassification">
+      <servstate inherited="0" classid="statusOfWorkflow" categid="STAT0005"/>
+    </servstates>
+    <servflags class="MCRMetaLangText">
+      <servflag xmlns:xlink="http://www.w3.org/1999/xlink" type="createdby" inherited="0" form="plain">
+        2020-11-27 13:53:30 junit
+      </servflag>
+      <servflag xmlns:xlink="http://www.w3.org/1999/xlink" type="modifiedby" inherited="0" form="plain">
+        2020-11-27 13:57:10 junit
+      </servflag>
+      <servflag xmlns:xlink="http://www.w3.org/1999/xlink" type="modifiedby" inherited="0" form="plain">
+        2020-11-27 13:57:10 junit
+      </servflag>
+      <servflag form="plain" inherited="0" type="license">CC BY-NC 4.0</servflag>
+    </servflags>
+  </service>
+</mycoreobject>
