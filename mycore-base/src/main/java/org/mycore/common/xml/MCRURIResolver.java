@@ -1379,27 +1379,15 @@ public final class MCRURIResolver implements URIResolver {
             final String baseURI = getParentDirectoryResourceURI(base);
             // set xslt folder
             final String xslFolder;
-            if (StringUtils.contains(baseURI, "/xsl/")) {
+            if (StringUtils.startsWith(baseURI, "resource:xsl/")) {
                 xslFolder = "xsl";
-            } else {
+            } else if (StringUtils.startsWith(baseURI, "resource:xslt/")) {
                 xslFolder = "xslt";
-            }
-
-            // check for old import format: xslImport:property:current.xsl and issue a warning
-            final String importXSL;
-            final String importPart = StringUtils.substringAfter(href, ":");
-            if (StringUtils.contains(importPart, ":")) {
-                final String propertyPart = StringUtils.substringBefore(importPart, ":");
-                LOGGER.warn("{} is in old import format change to xslImport:{}!", href, propertyPart);
-
-                importXSL = MCRXMLFunctions.nextImportStep(importPart);
             } else {
-                final String selfName = StringUtils.substringAfter(baseURI, xslFolder + "/")
-                    + StringUtils.substringAfterLast(base, "/");
-
-                importXSL = MCRXMLFunctions.nextImportStep(importPart, selfName);
+                xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
             }
 
+            String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
             if (importXSL.isEmpty()) {
                 LOGGER.debug("End of import queue: {}", href);
                 Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
