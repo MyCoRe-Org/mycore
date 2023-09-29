@@ -246,7 +246,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label, Locale locale, Object... arguments) {
-        String msgFormat = translate(label);
+        String msgFormat = translate(label, locale);
         MessageFormat formatter = new MessageFormat(msgFormat, locale);
         String result = formatter.format(arguments);
         LOGGER.debug("Translation for {}={}", label, result);
