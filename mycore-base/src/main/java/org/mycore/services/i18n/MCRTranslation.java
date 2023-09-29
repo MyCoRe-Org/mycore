@@ -238,6 +238,22 @@ public class MCRTranslation {
     }
 
     /**
+     * Provides translation for the given label (property key).
+     *
+     * @param label property key
+     * @param locale target locale of translation
+     * @param arguments Objects that are inserted instead of placeholders in the property values
+     * @return translated String
+     */
+    public static String translate(String label, Locale locale, Object... arguments) {
+        String msgFormat = translate(label);
+        MessageFormat formatter = new MessageFormat(msgFormat, locale);
+        String result = formatter.format(arguments);
+        LOGGER.debug("Translation for {}={}", label, result);
+        return result;
+    }
+
+    /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession. Be aware that any occurence of ';' and '\' in
      * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
@@ -251,6 +267,22 @@ public class MCRTranslation {
      */
     public static String translate(String label, String argument) {
         return translate(label, (Object[]) getStringArray(argument));
+    }
+
+    /**
+     * Provides translation for the given label (property key). Be aware that any occurence of ';' and '\' in
+     * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
+     * result in {"foo","bar"} (the array)
+     *
+     * @param label property key
+     * @param argument
+     *            String that is inserted instead of placeholders in the property values
+     * @param locale target locale of translation
+     * @return translated String
+     * @see #translate(String, Object[])
+     */
+    public static String translate(String label, String argument, Locale locale) {
+        return translate(label, locale, (Object[]) getStringArray(argument));
     }
 
     public static Locale getCurrentLocale() {
