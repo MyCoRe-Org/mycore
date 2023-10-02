@@ -72,7 +72,7 @@ public class MCRTransferPackageCommands {
             throw new FileNotFoundException(directory + " does not exist or is not a directory.");
         }
         List<String> importStatements = new LinkedList<>();
-        try (Stream<Path> stream = Files.find(dir, 0,
+        try (Stream<Path> stream = Files.find(dir, 1,
             (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
             stream.map(Path::toAbsolutePath).map(Path::toString).forEach(path -> {
                 String subCommand = String.format(Locale.ROOT, "import transfer package from tar %s", path);
@@ -80,6 +80,12 @@ public class MCRTransferPackageCommands {
             });
         }
         return importStatements;
+    }
+
+    @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file. ",
+        syntax = "import transfer package from tar {0}")
+    public static List<String> importTransferPackageFromTar(String pathToTar) throws Exception {
+        return importTransferPackageFromTar(pathToTar, null);
     }
 
     @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file. "
@@ -95,7 +101,11 @@ public class MCRTransferPackageCommands {
 
         List<String> commands = new ArrayList<>();
         commands.add("_import transfer package untar " + pathToTar);
-        commands.add("_import transfer package from directory " + targetDirectory + " to " + mycoreTargetId);
+        if (mycoreTargetId != null) {
+            commands.add("_import transfer package from directory " + targetDirectory + " to " + mycoreTargetId);
+        } else {
+            commands.add("_import transfer package from directory " + targetDirectory);
+        }
         commands.add("_import transfer package clean up " + targetDirectory);
         return commands;
     }
@@ -106,6 +116,11 @@ public class MCRTransferPackageCommands {
         Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
         LOGGER.info("Untar {} to {}...", pathToTar, targetDirectory);
         MCRUtils.untar(tar, targetDirectory);
+    }
+
+    @MCRCommand(syntax = "_import transfer package from directory {0}")
+    public static List<String> fromDirectory(String sourceDirectory) throws Exception {
+        return fromDirectory(sourceDirectory, null);
     }
 
     @MCRCommand(syntax = "_import transfer package from directory {0} to {1}")
@@ -133,7 +148,7 @@ public class MCRTransferPackageCommands {
         }
         for (String id : mcrObjects) {
             markManager.mark(MCRObjectID.getInstance(id), Operation.IMPORT);
-            commands.add("_import transfer package object " + id + " from " + sourceDirectory + " to {2}");
+            commands.add("_import transfer package object " + id + " from " + sourceDirectory);
         }
         return commands;
     }
@@ -141,6 +156,11 @@ public class MCRTransferPackageCommands {
     @MCRCommand(syntax = "_import transfer package classification from {0}")
     public static void importObject(String pathToClassification) throws Exception {
         MCRClassificationUtils.fromPath(Paths.get(pathToClassification));
+    }
+
+    @MCRCommand(syntax = "_import transfer package object {0} from {1}")
+    public static List<String> importObject(String objectId, String targetDirectoryPath) throws Exception {
+        return importObject(objectId, targetDirectoryPath, null);
     }
 
     @MCRCommand(syntax = "_import transfer package object {0} from {1} to {2}")
