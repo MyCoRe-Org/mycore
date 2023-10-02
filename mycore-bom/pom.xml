@@ -49,6 +49,7 @@
     <ocfl-java.version>2.0.0</ocfl-java.version>
     <rdf4j.version>4.2.0</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
+    <verapdf.version>1.24.1</verapdf.version>
     <xalan.version>2.7.3</xalan.version>
   </properties>
 
@@ -715,6 +716,11 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-validation</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-viewer</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -802,6 +808,16 @@
             <artifactId>jsch.agentproxy.svnkit-trilead-ssh2</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.verapdf</groupId>
+        <artifactId>core</artifactId>
+        <version>${verapdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.verapdf</groupId>
+        <artifactId>validation-model</artifactId>
+        <version>${verapdf.version}</version>
       </dependency>
       <dependency>
         <groupId>se.jiderhamn.classloader-leak-prevention</groupId>
