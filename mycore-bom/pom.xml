@@ -813,11 +813,23 @@
         <groupId>org.verapdf</groupId>
         <artifactId>core</artifactId>
         <version>${verapdf.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.verapdf</groupId>
         <artifactId>validation-model</artifactId>
         <version>${verapdf.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>se.jiderhamn.classloader-leak-prevention</groupId>
