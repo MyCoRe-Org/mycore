@@ -611,7 +611,7 @@ public class MCRMailer extends MCRServlet {
          * @see MCRMailer.EMail#buildAddress(String)
          */
         private static Optional<List<InternetAddress>> buildAddressList(final List<String> addresses) {
-            return addresses != null ? Optional.ofNullable(addresses.stream().map(address -> {
+            return addresses != null ? Optional.of(addresses.stream().map(address -> {
                 try {
                     return buildAddress(address);
                 } catch (Exception ex) {
@@ -626,7 +626,7 @@ public class MCRMailer extends MCRServlet {
          * @return the text message part
          */
         public Optional<MessagePart> getTextMessage() {
-            return msgParts != null ? Optional.ofNullable(msgParts).get().stream()
+            return msgParts != null ? Optional.of(msgParts).get().stream()
                 .filter(m -> m.type.equals(MessageType.TEXT)).findFirst() : Optional.empty();
         }
 
@@ -636,7 +636,7 @@ public class MCRMailer extends MCRServlet {
          * @return the HTML message part
          */
         public Optional<MessagePart> getHTMLMessage() {
-            return msgParts != null ? Optional.ofNullable(msgParts).get().stream()
+            return msgParts != null ? Optional.of(msgParts).get().stream()
                 .filter(m -> m.type.equals(MessageType.HTML)).findFirst() : Optional.empty();
         }
 

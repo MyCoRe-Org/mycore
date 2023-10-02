@@ -169,8 +169,11 @@ public class MCRRestDerivateContents {
         LogManager.getLogger().info("Updating file: {}", mcrPath);
         int memBuf = getUploadMemThreshold();
         java.io.File uploadDirectory = getUploadTempStorage();
-        try (DeferredFileOutputStream dfos = new DeferredFileOutputStream(memBuf, mcrPath.getOwner(),
-            mcrPath.getFileName().toString(), uploadDirectory);
+        try (DeferredFileOutputStream dfos = DeferredFileOutputStream.builder()
+            .setThreshold(memBuf)
+            .setPrefix(mcrPath.getOwner())
+            .setSuffix(mcrPath.getFileName().toString())
+            .setDirectory(uploadDirectory).get();
             MaxBytesOutputStream mbos = new MaxBytesOutputStream(dfos)) {
             IOUtils.copy(contents, mbos);
             mbos.close(); //required if temporary file was used

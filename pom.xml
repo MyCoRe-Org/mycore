@@ -61,15 +61,15 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <forbiddenapis.version>3.2</forbiddenapis.version>
     <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
     <java.target.version>17</java.target.version>
-    <jetty.version>11.0.8</jetty.version>
-    <log4j.version>2.19.0</log4j.version>
+    <jetty.version>11.0.16</jetty.version>
+    <log4j.version>2.20.0</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <site.suffix />
-    <swagger.version>2.2.2</swagger.version>
+    <swagger.version>2.2.16</swagger.version>
     <uniqueVersion>false</uniqueVersion>
   </properties>
   <build>
@@ -271,7 +271,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-jpamodelgen-jakarta</artifactId>
-            <version>5.6.5.Final</version>
+            <version>5.6.15.Final</version>
           </dependency>
         </dependencies>
         <executions>
@@ -429,6 +429,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
                         <exclude>javax.websocket:javax.websocket-api</exclude>
                         <exclude>com.fasterxml.jackson.module:jackson-module-jaxb-annotations</exclude>
                         <exclude>com.sun.mail:javax.mail</exclude>
+                        <exclude>com.sun.mail:mailapi</exclude>
+                        <exclude>com.sun.activation:jakarta.activation</exclude>
                         <exclude>com.sun.media:jai-codec</exclude>
                         <exclude>javax.media:jai-core</exclude>
                         <exclude>org.apache.geronimo.specs:geronimo-javamail_1.4_spec</exclude>
@@ -486,6 +488,24 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 </configuration>
               </execution>
               <execution>
+                <id>enforce no commons-logging</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <bannedDependencies>
+                      <searchTransitive>true</searchTransitive>
+                      <excludes>
+                        <exclude>commons-logging:commons-logging</exclude>
+                      </excludes>
+                      <message>org.slf4j:jcl-over-slf4j replaces commons-logging</message>
+                    </bannedDependencies>
+                  </rules>
+                  <fail>true</fail>
+                </configuration>
+              </execution>
+              <execution>
                 <id>enforce-managed-deps</id>
                 <goals>
                   <goal>enforce</goal>
@@ -509,9 +529,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <checkTestClasspath>false</checkTestClasspath>
               <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
               <ignoredResourcePatterns>
+                <ignoredResourcePattern>/?\.gitignore$</ignoredResourcePattern>
                 <ignoredResourcePattern>/?\.gitkeep$</ignoredResourcePattern>
                 <ignoredResourcePattern>/?about.html$</ignoredResourcePattern>
                 <ignoredResourcePattern>/?catalog.xml$</ignoredResourcePattern>
+                <ignoredResourcePattern>/?\.cache/formatter-maven-cache.properties$</ignoredResourcePattern>
+                <ignoredResourcePattern>/?mozilla/public-suffix-list.txt$</ignoredResourcePattern>
               </ignoredResourcePatterns>
               <ignoredDependencies>
                 <!-- scope provided -->

@@ -37,7 +37,7 @@ import de.larsgrefer.sass.embedded.importer.CustomImporter;
 import de.larsgrefer.sass.embedded.importer.CustomUrlImporter;
 import de.larsgrefer.sass.embedded.util.SyntaxUtil;
 import jakarta.servlet.ServletContext;
-import sass.embedded_protocol.EmbeddedSass.InboundMessage.ImportResponse.ImportSuccess;
+import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse.ImportSuccess;
 
 /**
  * The MCRResourceImporter class is responsible for importing resources from URLs that start with the "sass:/" prefix.

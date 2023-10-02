@@ -29,6 +29,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessRead;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDDestinationOrAction;
@@ -77,8 +80,9 @@ public class MCRPDFTools implements AutoCloseable {
      *
      */
     public static BufferedImage getThumbnail(int thumbnailSize, Path pdfFile, boolean centered) throws IOException {
-        InputStream fileIS = Files.newInputStream(pdfFile);
-        try (PDDocument pdf = PDDocument.load(fileIS)) {
+        try (InputStream fileIS = Files.newInputStream(pdfFile);
+            RandomAccessRead readBuffer = new RandomAccessReadBuffer(fileIS);
+            PDDocument pdf = Loader.loadPDF(readBuffer)) {
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
             final PDPage page = resolveOpenActionPage(pdf);
             int pageIndex = pdf.getPages().indexOf(page);
