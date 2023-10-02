@@ -22,14 +22,19 @@ import org.w3c.dom.Element;
 
 /**
  * MCRPdfAFunctions is a utility class that uses MCRPdfAValidator to validate multiple PDF files and generates an XML
- * document with detailed information about the validation results for each file.
+ * document with detailed information about the validation results for each file.<br>
  * The class provides a method, 'getResults', which takes a directory path and an object ID as input. It iterates
  * through all PDF files in the specified directory, validates them using MCRPdfAValidator, and records the
  * validation results in an XML format. The resulting XML document has a hierarchical structure as follows:
- * - <derivate>: Root element representing the object with the given ID.
- * - <file>: Element representing each PDF file, containing its name and PDF/A flavor.
- * - <failed>: Element representing each failed check in the validation, containing the test number, clause,
+ * <p>
+ *     <ul>
+ *
+ * <li> &lt;derivate&gt;: Root element representing the object with the given ID.
+ * <li> &lt;file&gt;: Element representing each PDF file, containing its name and PDF/A flavor.
+ * <li> &lt;failed&gt;: Element representing each failed check in the validation, containing the test number, clause,
  * specification, and a link to the official VeraPDF error documentation (depending on the error).
+ *     </ul>
+ * <p>
  * The XML document presents detailed information about each PDF file's validation, including the number of failed
  * checks and links to the official VeraPDF error documentation for further reference. The structure allows users to
  * easily analyze and address validation issues in the PDF files.
