@@ -31,7 +31,6 @@ import org.mycore.frontend.servlets.MCRServlet;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
@@ -84,12 +83,17 @@ public class MCRJWTResource {
     }
 
     public static void validate(String token) throws JWTVerificationException {
-        if (!Optional.of(JWT.require(MCRJWTUtil.getJWTAlgorithm())
+        //JWTClaims is a record that stores a session ID and a user ID
+        record JWTClaims(String sessionId, String userId) {
+        }
+
+        if (Optional.of(JWT.require(MCRJWTUtil.getJWTAlgorithm())
             .withAudience(AUDIENCE)
             .build().verify(token))
-            .map(DecodedJWT::getId)
-            .map(MCRSessionMgr::getSession)
-            .isPresent()) {
+            .map(jwt -> new JWTClaims(jwt.getId(), jwt.getSubject()))
+            .filter(claims -> Optional.ofNullable(MCRSessionMgr.getSession(claims.sessionId))
+                .filter(session -> session.getUserInformation().getUserID().equals(claims.userId)).isPresent())
+            .isEmpty()) {
             throw new JWTVerificationException("MCRSession is invalid.");
         }
     }
