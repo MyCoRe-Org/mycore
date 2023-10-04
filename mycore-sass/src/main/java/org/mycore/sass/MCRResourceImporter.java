@@ -147,6 +147,8 @@ public class MCRResourceImporter extends CustomImporter {
 
     /**
      * Helper class for working with URLs.
+     *
+     * Exposes {@link CustomUrlImporter#isFile(URL)} as a utility method for internal use.
      */
     private static class UrlHelper extends CustomUrlImporter {
 
