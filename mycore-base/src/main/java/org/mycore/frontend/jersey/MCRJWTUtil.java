@@ -20,7 +20,6 @@ package org.mycore.frontend.jersey;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
@@ -39,8 +38,8 @@ import org.mycore.common.events.MCRStartupHandler;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.core.Response;
@@ -54,7 +53,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
 
     public static final String JWT_SESSION_ATTRIBUTE_PREFIX = "mcr:sa:";
 
-    private static final JsonFactory JSON_FACTORY = new JsonFactory();
+    private static final  ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
 
@@ -102,53 +101,35 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
     }
 
     public static Response getJWTLoginSuccessResponse(String jwt) throws IOException {
-        try (StringWriter sw = new StringWriter()) {
-            JsonGenerator jsonGenerator = JSON_FACTORY.createGenerator(sw);
-            jsonGenerator.writeStartObject();
-            jsonGenerator.writeBooleanField("login_success", true);
-            jsonGenerator.writeStringField("access_token", jwt);
-            jsonGenerator.writeStringField("token_type", "Bearer");
-            jsonGenerator.writeEndObject();
-            jsonGenerator.flush();
-            jsonGenerator.close();
-            return Response.status(Response.Status.OK)
-                .header("Authorization", "Bearer " + jwt)
-                .entity(sw.toString())
-                .build();
-        }
+        ObjectNode response = OBJECT_MAPPER.createObjectNode();
+        response.put("login_success", true);
+        response.put("access_token", jwt);
+        response.put("token_type", "Bearer");
+        return Response.status(Response.Status.OK)
+            .header("Authorization", "Bearer " + jwt)
+            .entity(response)
+            .build();
     }
 
     public static Response getJWTRenewSuccessResponse(String jwt) throws IOException {
-        try (StringWriter sw = new StringWriter()) {
-            JsonGenerator jsonGenerator = JSON_FACTORY.createGenerator(sw);
-            jsonGenerator.writeStartObject();
-            jsonGenerator.writeBooleanField("executed", true);
-            jsonGenerator.writeStringField("access_token", jwt);
-            jsonGenerator.writeStringField("token_type", "Bearer");
-            jsonGenerator.writeEndObject();
-            jsonGenerator.flush();
-            jsonGenerator.close();
-            return Response.status(Response.Status.OK)
-                .header("Authorization", "Bearer " + jwt)
-                .entity(sw.toString())
-                .build();
-        }
+        ObjectNode response = OBJECT_MAPPER.createObjectNode();
+        response.put("executed", true);
+        response.put("access_token", jwt);
+        response.put("token_type", "Bearer");
+        return Response.status(Response.Status.OK)
+            .header("Authorization", "Bearer " + jwt)
+            .entity(response)
+            .build();
     }
 
     public static Response getJWTLoginErrorResponse(String errorDescription) throws IOException {
-        try (StringWriter sw = new StringWriter()) {
-            JsonGenerator jsonGenerator = JSON_FACTORY.createGenerator(sw);
-            jsonGenerator.writeStartObject();
-            jsonGenerator.writeBooleanField("login_success", false);
-            jsonGenerator.writeStringField("error", "login_failed");
-            jsonGenerator.writeStringField("error_description", errorDescription);
-            jsonGenerator.writeEndObject();
-            jsonGenerator.flush();
-            jsonGenerator.close();
-            return Response.status(Response.Status.FORBIDDEN)
-                .entity(sw.toString())
-                .build();
-        }
+        ObjectNode response = OBJECT_MAPPER.createObjectNode();
+        response.put("login_success", false);
+        response.put("error", "login_failed");
+        response.put("error_description", errorDescription);
+        return Response.status(Response.Status.FORBIDDEN)
+            .entity(response)
+            .build();
     }
 
     @Override

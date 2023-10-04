@@ -1,0 +1,27 @@
+version: '3.5'
+
+# use the shell script if no networks are configured
+
+services:
+
+  neo4j:
+    image: neo4j:5.1.0-community
+    container_name: neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+      - "7473:7473"
+    environment:
+      - NEO4J_AUTH=neo4j/test
+      - NEO4J_PLUGINS='["apoc", "apoc-core"]'
+    # volumes:
+    #  - ./conf:/conf
+    #  - ./data:/data
+    #  - ./import:/import
+    #  - ./logs:/logs
+    #  - ./plugins:/plugins
+    # networks:
+    #  - net
+
+# networks:
+#  net:
