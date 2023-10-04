@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
  * Note: This implementation assumes that the 'href' parameter follows the 'mcrpdfa:{derivateId}' format, and the 'base'
  * parameter is not used in the resolution process.
  */
-public class MCRPdfAValidatorResolver implements URIResolver {
+public class MCRPDFAValidatorResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -38,7 +38,7 @@ public class MCRPdfAValidatorResolver implements URIResolver {
         String derivateId = hrefParts[1];
         MCRPath rootPath = MCRPath.getRootPath(derivateId);
         try {
-            Document document = MCRPdfAFunctions.getResults(rootPath, derivateId);
+            Document document = MCRPDFAFunctions.getResults(rootPath, derivateId);
             return new DOMSource(document);
         } catch (ParserConfigurationException | IOException e) {
             throw new MCRException(e);

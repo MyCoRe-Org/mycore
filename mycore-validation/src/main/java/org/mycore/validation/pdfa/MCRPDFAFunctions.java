@@ -41,9 +41,9 @@ import org.w3c.dom.Element;
  *
  * @author Antonia Friedrich
  */
-public class MCRPdfAFunctions {
+public class MCRPDFAFunctions {
 
-    private static final MCRPdfAValidator PDF_A_VALIDATOR = new MCRPdfAValidator();
+    private static final MCRPDFAValidator PDF_A_VALIDATOR = new MCRPDFAValidator();
 
     /**
      * Retrieves PDF validation results for files in a given directory and generates an XML document
@@ -64,7 +64,7 @@ public class MCRPdfAFunctions {
                 if (file.getFileName().toString().endsWith(".pdf")) {
                     try {
                         results.put(dir.relativize(file).toString(), PDF_A_VALIDATOR.validate(file));
-                    } catch (MCRPdfAValidationException e) {
+                    } catch (MCRPDFAValidationException e) {
                         throw new MCRException(e);
                     }
                 }

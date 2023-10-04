@@ -19,7 +19,7 @@ import org.verapdf.pdfa.results.ValidationResult;
  *
  * @author Matthias Eichner
  */
-public class MCRPdfAValidator {
+public class MCRPDFAValidator {
 
     private static volatile Boolean INITIALIZED = false;
     private static final Object MUTEX = new Object();
@@ -41,16 +41,16 @@ public class MCRPdfAValidator {
      *
      * @param inputStream the input stream
      * @return result of the validation
-     * @throws MCRPdfAValidationException something went wrong while parsing or validating
+     * @throws MCRPDFAValidationException something went wrong while parsing or validating
      * @throws IOException                i/o exception
      */
-    public ValidationResult validate(InputStream inputStream) throws MCRPdfAValidationException, IOException {
+    public ValidationResult validate(InputStream inputStream) throws MCRPDFAValidationException, IOException {
         initialise();
         try (PDFAParser parser = Foundries.defaultInstance().createParser(inputStream);
              PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false)) {
             return validator.validate(parser);
         } catch (ValidationException | ModelParsingException | EncryptedPdfException e) {
-            throw new MCRPdfAValidationException("unable to validate pdf", e);
+            throw new MCRPDFAValidationException("unable to validate pdf", e);
         }
     }
 
@@ -59,10 +59,10 @@ public class MCRPdfAValidator {
      *
      * @param path path to the pdf document
      * @return result of the validation
-     * @throws MCRPdfAValidationException something went wrong while parsing or validating
+     * @throws MCRPDFAValidationException something went wrong while parsing or validating
      * @throws IOException                i/o exception
      */
-    public ValidationResult validate(Path path) throws MCRPdfAValidationException, IOException {
+    public ValidationResult validate(Path path) throws MCRPDFAValidationException, IOException {
         try (InputStream inputStream = Files.newInputStream(path)) {
             return validate(inputStream);
         }
