@@ -155,6 +155,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <packages>org.mycore.media*</packages>
               </group>
               <group>
+                <title>MyCoRe Component: validation</title>
+                <packages>org.mycore.validation*</packages>
+              </group>
+              <group>
                 <title>MyCoRe Component: METS</title>
                 <packages>org.mycore.mets*</packages>
               </group>
@@ -1208,5 +1212,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-coma</module>
     <module>mycore-cronjob</module>
     <module>mycore-ocfl</module>
+    <module>mycore-validation</module>
   </modules>
 </project>
