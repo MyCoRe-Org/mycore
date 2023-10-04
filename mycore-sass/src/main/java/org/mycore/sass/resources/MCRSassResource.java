@@ -22,15 +22,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.sass.MCRSassCompilerManager;
-import org.mycore.sass.MCRServletContextResourceImporter;
 
 import de.larsgrefer.sass.embedded.SassCompilationFailedException;
-import de.larsgrefer.sass.embedded.importer.CustomImporter;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -67,9 +64,8 @@ public class MCRSassResource {
     public Response getCSS(@PathParam("fileName") String name, @Context Request request) {
         try {
             final String fileName = MCRSassCompilerManager.getRealFileName(name);
-            CustomImporter importer = new MCRServletContextResourceImporter(context, fileName).autoCanonicalize();
             Optional<String> cssFile = MCRSassCompilerManager.getInstance()
-                .getCSSFile(name, List.of(importer));
+                .getCSSFile(name, context);
 
             if (cssFile.isPresent()) {
                 CacheControl cc = new CacheControl();
