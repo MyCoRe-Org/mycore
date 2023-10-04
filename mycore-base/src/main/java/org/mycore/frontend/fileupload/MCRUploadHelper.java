@@ -19,9 +19,18 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.CharBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -30,11 +39,26 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 
 import jakarta.persistence.EntityTransaction;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
 
 /**
  * Common helper class for all services handling file upload.
@@ -53,6 +77,8 @@ public abstract class MCRUploadHelper {
     public static final String FILE_NAME_PATTERN = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN_PROPERTY);
 
     public static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(FILE_NAME_PATTERN).asMatchPredicate();
+
+    public static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.NotPreferredFiletypeForMainfile";
 
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
@@ -191,6 +217,114 @@ public abstract class MCRUploadHelper {
             LOGGER.error("Error while rolling back transaction. Transaction is null.");
         }
         throw e;
+    }
+
+    public static MCRObjectID getNewCreateDerivateID(MCRObjectID objId) {
+        String projectID = objId.getProjectId();
+        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectID + "_derivate");
+    }
+
+    /**
+     * Detects the main file of a derivate. The main file is the first file that is not in the ignore list.
+     * @param rootPath the root path of the derivate
+     * @return the main file
+     * @throws IOException if an I/O error is thrown by a visitor method.
+     */
+    public static Optional<MCRPath> detectMainFile(MCRPath rootPath) throws IOException {
+        List<String> ignoreMainfileList = MCRConfiguration2.getString(IGNORE_MAINFILE_PROPERTY)
+                .map(MCRConfiguration2::splitValue)
+                .map(s -> s.collect(Collectors.toList()))
+                .orElseGet(Collections::emptyList);
+
+        MCRFileCollectingFileVisitor<Path> visitor = new MCRFileCollectingFileVisitor<>();
+        Files.walkFileTree(rootPath, visitor);
+
+        //sort files by name
+        ArrayList<Path> paths = visitor.getPaths();
+        paths.sort(Comparator.comparing(Path::getNameCount)
+                .thenComparing(Path::getFileName));
+        //extract first file, before filtering
+        MCRPath firstPath = MCRPath.toMCRPath(paths.get(0));
+
+        //filter files, remove files that should be ignored for mainfile
+        return paths.stream()
+                .map(MCRPath.class::cast)
+                .filter(p -> ignoreMainfileList.stream().noneMatch(p.getOwnerRelativePath()::endsWith))
+                .findFirst()
+                .or(() -> Optional.of(firstPath));
+    }
+
+    public static MCRDerivate createDerivate(MCRObjectID objectID, List<MCRMetaClassification> classifications)
+        throws MCRPersistenceException, MCRAccessException {
+
+        MCRObjectID derivateID = getNewCreateDerivateID(objectID);
+        MCRDerivate derivate = new MCRDerivate();
+        derivate.setId(derivateID);
+        derivate.getDerivate().getClassifications().addAll(classifications);
+
+        String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
+            .orElse("datamodel-derivate.xml")
+            .replaceAll(".xml", ".xsd");
+        derivate.setSchema(schema);
+
+        MCRMetaLinkID linkId = new MCRMetaLinkID();
+        linkId.setSubTag("linkmeta");
+        linkId.setReference(objectID, null, null);
+        derivate.getDerivate().setLinkMeta(linkId);
+
+        MCRMetaIFS ifs = new MCRMetaIFS();
+        ifs.setSubTag("internal");
+        ifs.setSourcePath(null);
+        derivate.getDerivate().setInternals(ifs);
+
+        MCRMetadataManager.create(derivate);
+
+        setDefaultPermissions(derivateID);
+
+        return derivate;
+    }
+
+    public static void setDefaultPermissions(MCRObjectID derivateID) {
+        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
+            MCRRuleAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
+            for (String permission : configuredPermissions) {
+                MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
+                    "default derivate rule");
+            }
+        }
+    }
+
+    /**
+     * Gets the classifications from the given string.
+     * @param classifications the string
+     * @return the classifications
+     */
+    public static List<MCRMetaClassification> getClassifications(String classifications) {
+        if (classifications == null || classifications.isBlank()) {
+            return Collections.emptyList();
+        }
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final List<MCRCategoryID> categoryIDS = Stream.of(classifications)
+            .filter(Objects::nonNull)
+            .filter(Predicate.not(String::isBlank))
+            .flatMap(c -> Stream.of(c.split(",")))
+            .filter(Predicate.not(String::isBlank))
+            .filter(cv -> cv.contains(":"))
+            .map(classValString -> {
+                final String[] split = classValString.split(":");
+                return new MCRCategoryID(split[0], split[1]);
+            }).collect(Collectors.toList());
+
+        if (!categoryIDS.stream().allMatch(dao::exist)) {
+            final String parsedIDS = categoryIDS.stream().map(Object::toString).collect(Collectors.joining(","));
+            throw new MCRException(String.format(Locale.ROOT, "One of the Categories \"%s\" was not found", parsedIDS));
+        }
+
+        return categoryIDS.stream()
+            .map(category -> new MCRMetaClassification("classification", 0, null, category.getRootID(),
+                category.getID()))
+            .collect(Collectors.toList());
     }
 
 }

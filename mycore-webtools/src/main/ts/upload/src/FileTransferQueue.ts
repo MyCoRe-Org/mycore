@@ -19,10 +19,19 @@
 import {Utils} from "./Utils";
 import {FileTransfer} from "./FileTransfer";
 import {FileTransferHandler} from "./FileTransferHandler";
+import {TransferSession} from "./TransferSession";
+import {TransferSesssionHandler} from "./TransferSesssionHandler";
 
 export class FileTransferQueue {
 
     private static _singleton: FileTransferQueue;
+
+    private beginSessionStartedHandlerList: Array<TransferSesssionHandler> = [];
+
+    private beginSessionFinishedHandlerList: Array<TransferSesssionHandler> = [];
+
+    private beginSessionErrorHandlerList: Array<TransferSesssionHandler> = [];
+
     /**
      * List of all completed file handlers.
      * @type {FileTransferHandler[]}
@@ -76,9 +85,9 @@ export class FileTransferQueue {
      */
     private pendingFileTransferList: Array<FileTransfer> = [];
 
-    private commitHandlerList: Array<(uploadID: string, error: boolean, err?: string) => void> = [];
+    private commitHandlerList: Array<(transfer: TransferSession, error: boolean, err?: string, location?: string) => void> = [];
 
-    private commitStartHandlerList: Array<(uploadID: string) => void> = [];
+    private commitStartHandlerList: Array<(transfer: TransferSession) => void> = [];
 
 
     /**
@@ -141,13 +150,31 @@ export class FileTransferQueue {
             });
         });
 
-        this.decreaseCountForID(transfer.uploadID);
         this.startTransfers();
+    }
+
+    public registerTransferSession(uploadHandler: string, parameter: Record<string, string>) {
+        return new TransferSession(uploadHandler, parameter);
+    }
+
+    public begin(session: TransferSession) {
+        this.beginSessionStartedHandlerList.forEach((handler) => {
+            handler(session);
+        });
+        session.start(()=> {
+            this.startTransfers();
+            this.beginSessionFinishedHandlerList.forEach((handler) => {
+                handler(session);
+            });
+        }, (message: string) => {
+            this.beginSessionErrorHandlerList.forEach((handler) => {
+                handler(session, message);
+            });
+        });
     }
 
     public add(transfer: FileTransfer) {
         this.newFileTransferList.push(transfer);
-        this.increaseCountForID(transfer.uploadID);
         this.addedHandlerList.forEach((handler) => {
             handler(transfer);
         });
@@ -182,12 +209,24 @@ export class FileTransferQueue {
         this.abortHandlerList.push(handler);
     }
 
-    public addStartCommitHandler(handler: (uploadID: string) => void) {
+    public addStartCommitHandler(handler: (session: TransferSession) => void) {
         this.commitStartHandlerList.push(handler);
     }
 
-    public addCommitCompleteHandler(handler: (uploadID: string, error: boolean, err?: string) => void) {
+    public addCommitCompleteHandler(handler: (transfer: TransferSession, error: boolean, err?: string, location?: string) => void) {
         this.commitHandlerList.push(handler);
+    }
+
+    public addBeginSessionStartedHandler(handler: (session: TransferSession) => void) {
+        this.beginSessionStartedHandlerList.push(handler);
+    }
+
+    public addBeginSessionFinishedHandler(handler: (session: TransferSession) => void) {
+        this.beginSessionFinishedHandlerList.push(handler);
+    }
+
+    public addBeginSessionErrorHandler(handler: (session: TransferSession, message: string) => void) {
+        this.beginSessionErrorHandlerList.push(handler);
     }
 
     public abortAll() {
@@ -199,27 +238,15 @@ export class FileTransferQueue {
         })
     }
 
-    private getCountForUploadID(id: string) {
-        if (!(id in this.uploadIDCount)) {
-            this.uploadIDCount[id] = 0;
-        }
-
-        return this.uploadIDCount[id];
-    }
-
-    private increaseCountForID(id: string) {
-        this.uploadIDCount[id] = this.getCountForUploadID(id) + 1;
-    }
-
-    private decreaseCountForID(id: string) {
-        this.uploadIDCount[id] = this.getCountForUploadID(id) - 1;
-    }
-
     private getNextPossibleTransfer() {
         for (const transfer of this.newFileTransferList) {
-            const isIncompleteOrErrored = (requires) => !requires.complete || requires.error;
-            if (!transfer.requires.some(isIncompleteOrErrored)) {
-                return transfer;
+            if(!transfer.transferSession.started && !transfer.transferSession.startPending) {
+                this.begin(transfer.transferSession);
+            } else if(!transfer.started && transfer.transferSession.started) {
+                const isIncompleteOrErrored = (requires) => !requires.complete || requires.error;
+                if (!transfer.requires.some(isIncompleteOrErrored)) {
+                    return transfer;
+                }
             }
         }
         return null;
@@ -233,7 +260,11 @@ export class FileTransferQueue {
             if (newTransfer != null) {
                 this.removeNew(newTransfer);
                 this.pendingFileTransferList.push(newTransfer);
-                newTransfer.start(this.getTransferComplete(newTransfer), this.getTransferError(newTransfer), this.getTransferProgress(newTransfer));
+                newTransfer.start(
+                    this.buildTransferCompleteHandler(newTransfer),
+                    this.buildTransferErrorHandler(newTransfer),
+                    this.getTransferProgress(newTransfer)
+                );
                 this.startedHandlerList.forEach((handler) => {
                     handler(newTransfer);
                 });
@@ -244,23 +275,36 @@ export class FileTransferQueue {
         }
     }
 
-    private getTransferComplete(transfer: FileTransfer): () => void {
+    private transferWithSessionLeft(session: TransferSession) {
+        for (const transfer of this.newFileTransferList) {
+            if (transfer.transferSession == session) {
+                return true;
+            }
+        }
+        for (const transfer of this.pendingFileTransferList) {
+            if (transfer.transferSession == session) {
+                return true;
+            }
+        }
+    }
+
+    private buildTransferCompleteHandler(transfer: FileTransfer): () => void {
         return () => {
             this.removePending(transfer);
-            this.decreaseCountForID(transfer.uploadID);
             this.completeHandlerList.forEach((handler) => {
                 handler(transfer);
             });
-            if (this.getCountForUploadID(transfer.uploadID) == 0) {
-                this.commitTransfer(transfer.uploadID, transfer.uploadHandler, transfer.classifications);
+
+            if(!this.transferWithSessionLeft(transfer.transferSession)) {
+                this.commitTransfer(transfer.transferSession);
             }
+
             this.startTransfers();
         };
     }
 
-    private getTransferError(transfer: FileTransfer): () => void {
+    private buildTransferErrorHandler(transfer: FileTransfer): () => void {
         return () => {
-            this.decreaseCountForID(transfer.uploadID);
             this.removePending(transfer);
         };
     }
@@ -281,36 +325,12 @@ export class FileTransferQueue {
         this.newFileTransferList.splice(transferIndex, 1);
     }
 
-    private commitTransfer(uploadID: string, uploadHandler: string = null, classifications: string = null) {
-        const xhr = new XMLHttpRequest();
-        const uploadHandlerParameter = (uploadHandler != null) ? "&uploadHandler=" + uploadHandler : "";
-        const classificationsParameter = (classifications != null) ? "&classifications=" + classifications : "";
-        const basicURL = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/commit?uploadID=" + uploadID;
-
-        this.commitStartHandlerList.forEach(handler => handler(uploadID));
-
-        xhr.open('PUT', basicURL + uploadHandlerParameter + classificationsParameter, true);
-        xhr.onload = (result) => {
-            if (xhr.status === 204 || xhr.status === 201 || xhr.status == 200) {
-                this.commitHandlerList.forEach(handler => handler(uploadID, false));
-            } else {
-                let message;
-                switch (xhr.responseType) {
-                    case "document":
-                        message = xhr.responseXML.querySelector("message").textContent
-                        break;
-                    case "text":
-                        message = xhr.responseText;
-                        break;
-                    default:
-                        message = xhr.statusText;
-                }
-                this.commitHandlerList.forEach(handler => handler(uploadID, true, message))
-            }
-
-
-        };
-
-        xhr.send();
+    private commitTransfer(transfer: TransferSession) {
+        this.commitStartHandlerList.forEach(handler => handler(transfer));
+        transfer.commit((location) => {
+            this.commitHandlerList.forEach(handler => handler(transfer, false, null, location))
+        }, (message: string) => {
+            this.commitHandlerList.forEach(handler => handler(transfer, true, message));
+        });
     }
 }

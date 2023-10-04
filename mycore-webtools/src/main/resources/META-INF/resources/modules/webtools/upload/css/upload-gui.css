@@ -8,7 +8,18 @@
     height: 33%;
     width: 50%;
     z-index: 25;
+    transition: height 0.5s;
 }
+
+.mcr-upload.minimized {
+    min-height: 50px;
+    height: 50px;
+}
+
+.mcr-upload.minimized .card-body {
+    display: none;
+}
+
 
 .mcr-upload .entry {
     border-bottom: 1px solid lavender;

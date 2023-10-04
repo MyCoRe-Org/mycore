@@ -16,17 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.webtools.upload;
+package org.mycore.webtools.upload.exception;
 
-import org.mycore.services.i18n.MCRTranslation;
+public class MCRUploadServerException extends MCRUploadException {
 
-public class MCRUploadException extends RuntimeException {
 
-    public MCRUploadException(String messageKey) {
-        super(MCRTranslation.translate(messageKey));
+    public MCRUploadServerException(String messageKey) {
+        super(messageKey);
     }
 
-    public MCRUploadException(String messageKey, Throwable throwable) {
-        super(MCRTranslation.translate(messageKey), throwable);
+    public MCRUploadServerException(String messageKey, Throwable throwable) {
+        super(messageKey, throwable);
     }
 }
