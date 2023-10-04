@@ -19,12 +19,18 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.CharBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -51,6 +57,8 @@ import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
 
 /**
  * Common helper class for all services handling file upload.
@@ -69,6 +77,8 @@ public abstract class MCRUploadHelper {
     public static final String FILE_NAME_PATTERN = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN_PROPERTY);
 
     public static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(FILE_NAME_PATTERN).asMatchPredicate();
+
+    public static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.NotPreferredFiletypeForMainfile";
 
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
@@ -212,6 +222,36 @@ public abstract class MCRUploadHelper {
     public static MCRObjectID getNewCreateDerivateID(MCRObjectID objId) {
         String projectID = objId.getProjectId();
         return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectID + "_derivate");
+    }
+
+    /**
+     * Detects the main file of a derivate. The main file is the first file that is not in the ignore list.
+     * @param rootPath the root path of the derivate
+     * @return the main file
+     * @throws IOException if an I/O error is thrown by a visitor method.
+     */
+    public static Optional<MCRPath> detectMainFile(MCRPath rootPath) throws IOException {
+        List<String> ignoreMainfileList = MCRConfiguration2.getString(IGNORE_MAINFILE_PROPERTY)
+                .map(MCRConfiguration2::splitValue)
+                .map(s -> s.collect(Collectors.toList()))
+                .orElseGet(Collections::emptyList);
+
+        MCRFileCollectingFileVisitor<Path> visitor = new MCRFileCollectingFileVisitor<>();
+        Files.walkFileTree(rootPath, visitor);
+
+        //sort files by name
+        ArrayList<Path> paths = visitor.getPaths();
+        paths.sort(Comparator.comparing(Path::getNameCount)
+                .thenComparing(Path::getFileName));
+        //extract first file, before filtering
+        MCRPath firstPath = MCRPath.toMCRPath(paths.get(0));
+
+        //filter files, remove files that should be ignored for mainfile
+        return paths.stream()
+                .map(MCRPath.class::cast)
+                .filter(p -> ignoreMainfileList.stream().noneMatch(p.getOwnerRelativePath()::endsWith))
+                .findFirst()
+                .or(() -> Optional.of(firstPath));
     }
 
     public static MCRDerivate createDerivate(MCRObjectID objectID, List<MCRMetaClassification> classifications)

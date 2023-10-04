@@ -5,14 +5,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +21,6 @@ import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.fileupload.MCRUploadHelper;
 import org.mycore.webtools.upload.exception.MCRInvalidFileException;
@@ -55,7 +49,6 @@ import org.mycore.webtools.upload.exception.MCRUploadServerException;
  */
 public class MCRDefaultUploadHandler implements MCRUploadHandler {
 
-    private static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.NotPreferredFiletypeForMainfile";
 
     public static final String OBJ_OR_DERIVATE_ID_PARAMETER_NAME = "object";
 
@@ -65,35 +58,15 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
 
     public static void setDefaultMainFile(MCRDerivate derivate) {
         MCRPath path = MCRPath.getPath(derivate.getId().toString(), "/");
-        List<String> ignoreMainfileList = MCRConfiguration2.getString(IGNORE_MAINFILE_PROPERTY)
-            .map(MCRConfiguration2::splitValue)
-            .map(s -> s.collect(Collectors.toList()))
-            .orElseGet(Collections::emptyList);
         try {
-            MCRFileCollectingFileVisitor<Path> visitor = new MCRFileCollectingFileVisitor<>();
-            Files.walkFileTree(path, visitor);
-
-            //sort files by name
-            ArrayList<Path> paths = visitor.getPaths();
-            paths.sort(Comparator.comparing(Path::getNameCount)
-                .thenComparing(Path::getFileName));
-            //extract first file, before filtering
-            MCRPath firstPath = MCRPath.toMCRPath(paths.get(0));
-
-            //filter files, remove files that should be ignored for mainfile
-            paths.stream()
-                .map(MCRPath.class::cast)
-                .filter(p -> ignoreMainfileList.stream().noneMatch(p.getOwnerRelativePath()::endsWith))
-                .findFirst()
-                .or(() -> Optional.of(firstPath))
-                .ifPresent(file -> {
-                    derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
-                    try {
-                        MCRMetadataManager.update(derivate);
-                    } catch (MCRPersistenceException | MCRAccessException e) {
-                        LOGGER.error("Could not set main file!", e);
-                    }
-                });
+            MCRUploadHelper.detectMainFile(path).ifPresent(file -> {
+                derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
+                try {
+                    MCRMetadataManager.update(derivate);
+                } catch (MCRPersistenceException | MCRAccessException e) {
+                    LOGGER.error("Could not set main file!", e);
+                }
+            });
         } catch (IOException e) {
             LOGGER.error("Could not set main file!", e);
         }
