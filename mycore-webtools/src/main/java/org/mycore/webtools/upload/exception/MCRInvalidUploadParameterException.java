@@ -5,6 +5,8 @@ package org.mycore.webtools.upload.exception;
  */
 public class MCRInvalidUploadParameterException extends MCRUploadException {
 
+    private static final long serialVersionUID = 1L;
+
     private final String parameterName;
 
     private final String wrongReason;
@@ -12,7 +14,7 @@ public class MCRInvalidUploadParameterException extends MCRUploadException {
     private final String badValue;
 
     public MCRInvalidUploadParameterException(String parameterName, String badValue, String wrongReason) {
-        super("component.webtools.upload.invalid.parameter", parameterName, badValue , wrongReason);
+        super("component.webtools.upload.invalid.parameter", parameterName, badValue, wrongReason);
         this.parameterName = parameterName;
         this.wrongReason = wrongReason;
         this.badValue = badValue;

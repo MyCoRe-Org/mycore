@@ -174,7 +174,7 @@ public class MCRUploadResource {
         @PathParam("path") String path,
         @QueryParam("size") String size) {
         String fileName = Paths.get(path).getFileName().toString();
-        String unicodeNormalizedFileName =  Normalizer.normalize(fileName, Normalizer.Form.NFC);
+        String unicodeNormalizedFileName = Normalizer.normalize(fileName, Normalizer.Form.NFC);
 
         try {
             getUploadHandler(uploadHandlerID).validateFileMetadata(unicodeNormalizedFileName, Long.parseLong(size));
@@ -197,7 +197,7 @@ public class MCRUploadResource {
         throws IOException {
 
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(buckedID);
-        if(bucket == null){
+        if (bucket == null) {
             throw new BadRequestException("buckedID " + buckedID + " is invalid!");
         }
 
@@ -236,7 +236,7 @@ public class MCRUploadResource {
                 for (MCRPostUploadFileProcessor processor : processors) {
                     final java.nio.file.Path tempFile2 = Files.createTempFile("processing", ".temp");
                     final java.nio.file.Path result = processor.processFile(unicodeNormalizedPath, input,
-                            () -> tempFile2);
+                        () -> tempFile2);
                     if (result != null) {
                         Files.deleteIfExists(input);
                         input = result;

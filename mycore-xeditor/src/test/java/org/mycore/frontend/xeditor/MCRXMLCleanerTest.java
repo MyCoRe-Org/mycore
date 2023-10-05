@@ -38,8 +38,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         String xPath1 = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
         cleanAndCompareTo(xPath1, xPath1);
 
-        String xPath2
-            = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']]]";
+        String xPath2 = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']]]";
         cleanAndCompareTo(xPath2, xPath2);
     }
 
@@ -55,13 +54,11 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         String xPath3i = "root[child[@foo='bar']]";
         cleanAndCompareTo(xPath3i, xPath3i);
 
-        String xPath7i
-            = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart]]";
+        String xPath7i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart]]";
         String xPath7o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
         cleanAndCompareTo(xPath7i, xPath7o);
 
-        String xPath8i
-            = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:role/mods:roleTerm[@type]]]";
+        String xPath8i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:role/mods:roleTerm[@type]]]";
         String xPath8o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
         cleanAndCompareTo(xPath8i, xPath8o);
     }
@@ -82,10 +79,8 @@ public class MCRXMLCleanerTest extends MCRTestCase {
 
     @Test
     public void testOverwriteDefaultRules() throws JDOMException, JaxenException {
-        String xPath2i
-            = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
-        String xPath2o
-            = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:relatedItem/@xlink:href='test']]";
+        String xPath2i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
+        String xPath2o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:relatedItem/@xlink:href='test']]";
 
         MCRCleaningRule removeElementsWithoutChildrenOrText = new MCRCleaningRule("//*",
             "* or (string-length(text()) > 0)");

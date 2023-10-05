@@ -120,6 +120,7 @@ public class MCRSwordMultiPartServletDeployer implements AutoExecutable {
     //TODO use Record with JDK17
     private static class ServletConfig {
         String name;
+
         String urlMapping;
 
         Class<? extends HttpServlet> servletClass;

@@ -49,7 +49,6 @@ import org.mycore.webtools.upload.exception.MCRUploadServerException;
  */
 public class MCRDefaultUploadHandler implements MCRUploadHandler {
 
-
     public static final String OBJ_OR_DERIVATE_ID_PARAMETER_NAME = "object";
 
     public static final String CLASSIFICATIONS_PARAMETER_NAME = "classifications";

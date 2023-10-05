@@ -34,6 +34,7 @@ public abstract class MCRValidator {
     private Node ruleElement;
 
     protected String xPath;
+
     protected String relevantIfXPath;
 
     public void init(String baseXPath, Node ruleElement) {

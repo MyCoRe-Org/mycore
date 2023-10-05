@@ -5,6 +5,8 @@ package org.mycore.webtools.upload.exception;
  */
 public class MCRInvalidFileException extends MCRUploadException {
 
+    private static final long serialVersionUID = 1L;
+
     private final String fileName;
 
     private final String reason;

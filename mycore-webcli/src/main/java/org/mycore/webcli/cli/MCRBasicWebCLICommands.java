@@ -44,7 +44,8 @@ public class MCRBasicWebCLICommands {
     }
 
     @MCRCommand(syntax = "show command statistics",
-        help = "Show statistics on number of commands processed and execution time needed per command", order = 30)
+        help = "Show statistics on number of commands processed and execution time needed per command",
+        order = 30)
     public static void showCommandStatistics() {
         MCRCommandStatistics.showCommandStatistics();
     }
