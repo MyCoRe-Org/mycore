@@ -16,7 +16,6 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package org.mycore.restapi.v1;
 
 import java.util.stream.Stream;
