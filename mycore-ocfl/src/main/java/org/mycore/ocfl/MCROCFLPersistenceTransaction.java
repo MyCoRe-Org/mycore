@@ -94,7 +94,8 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
                 LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, categoryID);
                 try {
                     switch (eventType) {
-                        case MCRAbstractMetadataVersion.CREATED, MCRAbstractMetadataVersion.UPDATED -> createOrUpdateOCFLClassification(
+                        case MCRAbstractMetadataVersion.CREATED, 
+                             MCRAbstractMetadataVersion.UPDATED -> createOrUpdateOCFLClassification(
                             categoryID, eventType);
                         case MCRAbstractMetadataVersion.DELETED -> MANAGER.delete(categoryID);
                         default -> throw new IllegalStateException(
