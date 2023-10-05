@@ -18,8 +18,6 @@
 
 package org.mycore.sass;
 
-import static de.larsgrefer.sass.embedded.util.ProtocolUtil.inboundMessage;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -158,7 +156,7 @@ class MCRSassCompiler implements Closeable {
 
     private CompileSuccess execCompileRequest(CompileRequest compileRequest)
         throws IOException, SassCompilationFailedException {
-        OutboundMessage outboundMessage = exec(inboundMessage(compileRequest));
+        OutboundMessage outboundMessage = exec(ProtocolUtil.inboundMessage(compileRequest));
 
         if (!outboundMessage.hasCompileResponse()) {
             throw new IllegalStateException("No compile response");
@@ -239,7 +237,7 @@ class MCRSassCompiler implements Closeable {
             importResponse.setError(getErrorMessage(t));
         }
 
-        connection.sendMessage(compilationId, inboundMessage(importResponse.build()));
+        connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(importResponse.build()));
     }
 
     private void handleCanonicalizeRequest(int compilationId, CanonicalizeRequest canonicalizeRequest)
@@ -260,7 +258,7 @@ class MCRSassCompiler implements Closeable {
             canonicalizeResponse.setError(getErrorMessage(e));
         }
 
-        connection.sendMessage(compilationId, inboundMessage(canonicalizeResponse.build()));
+        connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(canonicalizeResponse.build()));
     }
 
     private void handleFunctionCallRequest(int compilationId, FunctionCallRequest functionCallRequest)
@@ -282,7 +280,7 @@ class MCRSassCompiler implements Closeable {
             response.setError(getErrorMessage(e));
         }
 
-        connection.sendMessage(compilationId, inboundMessage(response.build()));
+        connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(response.build()));
     }
 
     private String getErrorMessage(Throwable t) {
