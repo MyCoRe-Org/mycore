@@ -141,10 +141,10 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     }
 
     private static TransformerFactory getTransformerFactory() throws TransformerFactoryConfigurationError {
-        TransformerFactory transformerFactory
-            = MCRConfiguration2.getString("MCR.LayoutService.FoFormatter.transformerFactoryImpl")
-                .map(impl -> TransformerFactory.newInstance(impl, MCRClassTools.getClassLoader()))
-                .orElseGet(TransformerFactory::newInstance);
+        TransformerFactory transformerFactory = MCRConfiguration2
+            .getString("MCR.LayoutService.FoFormatter.transformerFactoryImpl")
+            .map(impl -> TransformerFactory.newInstance(impl, MCRClassTools.getClassLoader()))
+            .orElseGet(TransformerFactory::newInstance);
         transformerFactory.setURIResolver(MCRURIResolver.instance());
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
         return transformerFactory;

@@ -81,7 +81,6 @@ public abstract class MCRCronjob implements Runnable {
         this.processable.setProgressText("Wait for " + getCronDescription() + "..");
     }
 
-
     /**
      * Whether this Cronjob is enabled as all.  Possible values are: true, false.
      *
@@ -149,7 +148,6 @@ public abstract class MCRCronjob implements Runnable {
     public String getProperty() {
         return property;
     }
-
 
     public Optional<Long> getNextExecution() {
         Cron cron = getCron();

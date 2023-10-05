@@ -20,6 +20,8 @@ package org.mycore.iiif.image.impl;
 
 public class MCRIIIFImageNotFoundException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     private String identifier;
 
     public MCRIIIFImageNotFoundException(String identifier) {
