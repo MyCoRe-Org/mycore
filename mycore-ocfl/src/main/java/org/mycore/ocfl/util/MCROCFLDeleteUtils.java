@@ -34,6 +34,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public final class MCROCFLDeleteUtils {
 
     public static final String PROPERTY_PREFIX = "MCR.OCFL.dropHistory.";
+
     private static final String PP = PROPERTY_PREFIX;
 
     private MCROCFLDeleteUtils() {

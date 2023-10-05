@@ -50,10 +50,12 @@ public class MCROCFLRegexCommands {
 
     private static boolean confirmPurge = false;
 
-    private static String metadataRepositoryKey
-        = MCRConfiguration2.getString("MCR.Metadata.Manager.Repository").orElse(null);
-    private static String classificationRepositoryKey
-        = MCRConfiguration2.getString("MCR.Classification.Manager.Repository").orElse(null);
+    private static String metadataRepositoryKey = MCRConfiguration2.getString("MCR.Metadata.Manager.Repository")
+        .orElse(null);
+
+    private static String classificationRepositoryKey = MCRConfiguration2
+        .getString("MCR.Classification.Manager.Repository").orElse(null);
+
     private static String userRepositoryKey = MCRConfiguration2.getString("MCR.Users.Manager.Repository").orElse(null);
 
     /*
