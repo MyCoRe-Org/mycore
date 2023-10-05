@@ -282,7 +282,7 @@ class MCRSassCompiler implements Closeable {
             response.setError(getErrorMessage(e));
         }
 
-        connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(response.build()));
+        connection.sendMessage(compilationId, inboundMessage(response.build()));
     }
 
     private String getErrorMessage(Throwable t) {
