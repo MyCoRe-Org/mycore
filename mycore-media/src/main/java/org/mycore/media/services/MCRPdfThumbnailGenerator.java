@@ -28,6 +28,9 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessRead;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDDestinationOrAction;
@@ -48,7 +51,9 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
 
     @Override
     public Optional<BufferedImage> getThumbnail(MCRPath path, int size) throws IOException {
-        try (InputStream fileIS = Files.newInputStream(path); PDDocument pdf = PDDocument.load(fileIS)) {
+        try (InputStream fileIS = Files.newInputStream(path);
+            RandomAccessRead readBuffer = new RandomAccessReadBuffer(fileIS);
+            PDDocument pdf = Loader.loadPDF(readBuffer)) {
             final PDPage page = resolveOpenActionPage(pdf);
             float pdfWidth = page.getCropBox().getWidth();
             float pdfHeight = page.getCropBox().getHeight();

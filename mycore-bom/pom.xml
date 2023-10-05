@@ -35,21 +35,19 @@
     <grizzly.version>4.0.0</grizzly.version>
     <hamcrest.version>2.2</hamcrest.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
-    <hibernate.version>5.6.7.Final</hibernate.version>
-    <hk2.version>3.0.2</hk2.version>
-    <httpcomponents.version>4.5.13</httpcomponents.version>
-    <httpcore.version>4.4.15</httpcore.version>
-    <jakarta.activation.version>2.0.1</jakarta.activation.version>
-    <jakarta.mail.version>2.0.1</jakarta.mail.version>
+    <hibernate.version>5.6.15.Final</hibernate.version>
+    <hk2.version>3.0.4</hk2.version>
+    <jakarta.activation.version>2.1.2</jakarta.activation.version>
+    <jakarta.mail.version>2.1.2</jakarta.mail.version>
     <java.target.version>17</java.target.version>
-    <jaxb.version>3.0.2</jaxb.version>
-    <jersey.version>3.1.0</jersey.version>
+    <jaxb.version>4.0.3</jaxb.version>
+    <jersey.version>3.1.3</jersey.version>
     <!-- defined in parent POM: -->
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.6.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.0.0</ocfl-java.version>
-    <rdf4j.version>4.2.0</rdf4j.version>
+    <rdf4j.version>4.3.6</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
     <verapdf.version>1.24.1</verapdf.version>
     <xalan.version>2.7.3</xalan.version>
@@ -60,7 +58,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>2.14.2</version>
+        <version>2.15.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -88,19 +86,19 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.9.0</version>
+        <version>5.10.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
-        <version>3.19.2</version>
+        <version>4.4.0</version>
       </dependency>
       <dependency>
         <groupId>com.cronutils</groupId>
         <artifactId>cron-utils</artifactId>
-        <version>9.2.0</version>
+        <version>9.2.1</version>
       </dependency>
       <dependency>
         <groupId>com.google.closure-stylesheets</groupId>
@@ -116,32 +114,32 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.9.1</version>
+        <version>2.10.1</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>31.1-jre</version>
+        <version>32.1.2-jre</version>
       </dependency>
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.22.3</version>
+        <version>3.24.3</version>
       </dependency>
       <dependency>
         <groupId>com.google.zxing</groupId>
         <artifactId>core</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.2</version>
       </dependency>
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>70.1</version>
+        <version>73.2</version>
       </dependency>
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>html2pdf</artifactId>
-        <version>4.0.3</version>
+        <version>5.0.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -156,7 +154,7 @@
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>kernel</artifactId>
-        <version>7.2.3</version>
+        <version>8.0.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -171,7 +169,7 @@
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>layout</artifactId>
-        <version>7.2.3</version>
+        <version>8.0.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -186,27 +184,33 @@
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.18.0</version>
+        <version>2.1.0</version>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>1.9.4</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.11.0</version>
+        <version>2.13.0</version>
       </dependency>
       <dependency>
         <groupId>de.larsgrefer.sass</groupId>
         <artifactId>sass-embedded-host</artifactId>
-        <version>2.5.0</version>
+        <version>3.2.0</version>
       </dependency>
       <dependency>
         <groupId>de.larsgrefer.sass</groupId>
         <artifactId>sass-embedded-protocol</artifactId>
-        <version>2.5.0</version>
+        <version>3.2.0</version>
       </dependency>
       <dependency>
         <groupId>de.undercouch</groupId>
@@ -216,7 +220,7 @@
       <dependency>
         <groupId>io.bit3</groupId>
         <artifactId>jsass</artifactId>
-        <version>5.10.4</version>
+        <version>5.10.5</version>
       </dependency>
       <dependency>
         <groupId>io.ocfl</groupId>
@@ -256,14 +260,24 @@
         <version>${swagger.version}</version>
       </dependency>
       <dependency>
+        <groupId>jakarta.activation</groupId>
+        <artifactId>jakarta.activation-api</artifactId>
+        <version>${jakarta.activation.version}</version>
+      </dependency>
+      <dependency>
         <groupId>jakarta.annotation</groupId>
         <artifactId>jakarta.annotation-api</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.1</version>
       </dependency>
       <dependency>
         <groupId>jakarta.inject</groupId>
         <artifactId>jakarta.inject-api</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.mail</groupId>
+        <artifactId>jakarta.mail-api</artifactId>
+        <version>${jakarta.mail.version}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.persistence</groupId>
@@ -273,12 +287,17 @@
       <dependency>
         <groupId>jakarta.validation</groupId>
         <artifactId>jakarta.validation-api</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
       </dependency>
       <dependency>
         <groupId>jakarta.websocket</groupId>
         <artifactId>jakarta.websocket-api</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.websocket</groupId>
+        <artifactId>jakarta.websocket-client-api</artifactId>
+        <version>2.1.1</version>
       </dependency>
       <dependency>
         <groupId>jakarta.ws.rs</groupId>
@@ -288,12 +307,12 @@
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>3.0.1</version>
+        <version>4.0.1</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
         <artifactId>jaxen</artifactId>
-        <version>1.2.0</version>
+        <version>2.0.0</version>
         <exclusions>
           <exclusion>
             <groupId>jdom</groupId>
@@ -318,6 +337,10 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-activation_1.1_spec</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -334,12 +357,12 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.21</version>
+        <version>1.24.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.12.0</version>
+        <version>3.13.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -349,22 +372,34 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>${httpcomponents.version}</version>
+        <version>4.5.14</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient-cache</artifactId>
-        <version>${httpcomponents.version}</version>
+        <version>4.5.14</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
-        <version>${httpcore.version}</version>
+        <version>4.4.16</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
-        <version>${httpcomponents.version}</version>
+        <version>4.5.14</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
@@ -374,7 +409,24 @@
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.26</version>
+        <version>3.0.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox-io</artifactId>
+        <version>3.0.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
@@ -415,7 +467,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop-core</artifactId>
-        <version>2.6</version>
+        <version>2.9</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -437,12 +489,16 @@
             <groupId>com.sun.media</groupId>
             <artifactId>jai-codec</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.7</version>
+        <version>2.9</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -451,6 +507,10 @@
           <exclusion>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -543,7 +603,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.15.3</version>
+        <version>1.16.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -573,7 +633,7 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-classifications</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -790,6 +850,10 @@
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>mailapi</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -800,12 +864,12 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.4.3</version>
+        <version>42.6.0</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
         <artifactId>svnkit</artifactId>
-        <version>1.10.4</version>
+        <version>1.10.11</version>
         <exclusions>
           <exclusion>
             <groupId>com.trilead</groupId>
@@ -873,20 +937,7 @@
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>4.7.2</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.activation</groupId>
-        <artifactId>jakarta.activation-api</artifactId>
-        <version>${jakarta.activation.version}</version>
-        <!-- provided by com.sun.activation:jakarta.activation -->
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.mail</groupId>
-        <artifactId>jakarta.mail-api</artifactId>
-        <version>${jakarta.mail.version}</version>
+        <version>4.7.3</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -916,7 +967,7 @@
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.4.0</version>
+        <version>6.5.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -927,35 +978,17 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>com.sun.activation</groupId>
-        <artifactId>jakarta.activation</artifactId>
-        <version>${jakarta.activation.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.mail</groupId>
-        <artifactId>mailapi</artifactId>
-        <version>${jakarta.mail.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.mail</groupId>
-        <artifactId>smtp</artifactId>
-        <version>${jakarta.mail.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <!-- jna 5.7.0 - 5.11.0 do not work with M1 macs and SVNKit -->
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.6.0</version>
+        <version>5.13.0</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
-        <version>11.3</version>
+        <version>12.3</version>
         <scope>runtime</scope>
         <exclusions>
           <exclusion>
@@ -986,13 +1019,23 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>fontbox</artifactId>
-        <version>2.0.26</version>
+        <version>3.0.0</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
@@ -1009,19 +1052,31 @@
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>locales</artifactId>
-        <version>22.7</version>
+        <version>23.9</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>styles</artifactId>
-        <version>22.7</version>
+        <version>23.9</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>stax2-api</artifactId>
         <version>4.2.1</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.angus</groupId>
+        <artifactId>angus-activation</artifactId>
+        <version>2.0.1</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.angus</groupId>
+        <artifactId>angus-mail</artifactId>
+        <version>2.0.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1033,7 +1088,7 @@
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.28.0-GA</version>
+        <version>3.29.2-GA</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1045,7 +1100,7 @@
       <dependency>
         <groupId>com.google.jimfs</groupId>
         <artifactId>jimfs</artifactId>
-        <version>1.2</version>
+        <version>1.3.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1088,7 +1143,7 @@
       <dependency>
         <groupId>org.hsqldb</groupId>
         <artifactId>hsqldb</artifactId>
-        <version>2.6.1</version>
+        <version>2.7.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>

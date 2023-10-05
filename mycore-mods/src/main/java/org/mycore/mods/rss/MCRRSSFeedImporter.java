@@ -19,8 +19,11 @@
 package org.mycore.mods.rss;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,10 +162,14 @@ public class MCRRSSFeedImporter {
         }
     }
 
-    private SyndFeed retrieveFeed() throws IOException, FeedException, URISyntaxException {
-        XmlReader feedReader = new XmlReader(new URI(feedURL).toURL());
-        SyndFeedInput input = new SyndFeedInput();
-        return input.build(feedReader);
+    private SyndFeed retrieveFeed() throws IOException, FeedException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(feedURL)).build();
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        try (InputStream resIS = response.body(); XmlReader feedReader = new XmlReader(resIS)) {
+            SyndFeedInput input = new SyndFeedInput();
+            return input.build(feedReader);
+        }
     }
 
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)
