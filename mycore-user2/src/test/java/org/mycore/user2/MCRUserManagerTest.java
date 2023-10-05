@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jdom2.Document;
@@ -159,6 +160,29 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         assertEquals("There should be one attribute", 1, user.getAttributes().size());
     }
 
+    @Test
+    public final void testCreateUserUpdateBug() {
+        //MCR-2912
+        MCRUser user2Created = new MCRUser("junit2");
+        user2Created.setRealName("Test Case 2");
+        user2Created.setPassword("test2");
+        user2Created.setUserAttribute("junit2", "test2");
+        MCRUserManager.createUser(user2Created);
+
+        user2Created.getAttributes().add(new MCRUserAttribute("junit4", "test3"));
+        user2Created.getAttributes().add(new MCRUserAttribute("junit5", "test4"));
+        MCRUserManager.updateUser(user2Created);
+
+        MCRUser junit2 = MCRUserManager.getUser("junit2", MCRRealmFactory.getLocalRealm());
+        assertEquals(3, junit2.getAttributes().size());
+        startNewTransaction();
+
+        junit2 = MCRUserManager.getUser("junit2", MCRRealmFactory.getLocalRealm());
+        System.out.println(junit2.getAttributes().stream().map(attr -> attr.getName() + "=" + attr.getValue())
+            .collect(Collectors.toList()));
+        assertEquals(3, junit2.getAttributes().size());
+    }
+
     /**
      * Test method for {@link org.mycore.user2.MCRUserManager#deleteUser(java.lang.String, org.mycore.user2.MCRRealm)}.
      */
@@ -284,4 +308,11 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUserManager.createUser(mcrUser);
     }
 
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.URIResolver.CachingResolver.Capacity", "0");
+        testProperties.put("MCR.URIResolver.CachingResolver.MaxAge", "0");
+        return testProperties;
+    }
 }

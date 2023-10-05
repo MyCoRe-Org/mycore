@@ -19,6 +19,7 @@
 package org.mycore.orcid2.work;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -91,24 +92,42 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
-        final T work = transformObject(new MCRJDOMContent(object.createXML()));
-        final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
-        final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
-            .orElse(new MCRORCIDFlagContent());
-        final Map<String, MCRORCIDUser> toDelete = listUserOrcidPairFromFlag(flagContent);
-        toDelete.putAll(listUserOrcidPairFromObject(object));
-        deleteWorks(toDelete, identifiers, flagContent);
+        try {
+            final T work = transformObject(new MCRJDOMContent(object.createXML()));
+            final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
+            final MCRORCIDFlagContent flagContent = Optional
+                .ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object)).orElse(new MCRORCIDFlagContent());
+            final Map<String, MCRORCIDUser> toDelete = listUserOrcidPairFromFlag(flagContent);
+            toDelete.putAll(listUserOrcidPairFromObject(object));
+            deleteWorks(toDelete, identifiers, flagContent);
+            LOGGER.info("Finished deleting {} from ORCID successfully.", objectID);
+        } catch (Exception e) {
+            LOGGER.warn("Error while deleting object {}.", objectID, e);
+        }
     }
 
     @SuppressWarnings("PMD.NPathComplexity")
     private void handlePublication(MCRObject object) {
         final MCRObjectID objectID = object.getId();
+        LOGGER.info("Start publishing {} to ORCID.", objectID);
         if (!MCRMODSWrapper.isSupported(object)) {
+            LOGGER.info("MODS object is required. Skipping {}...", objectID);
             return;
         }
-        LOGGER.info("Start publishing {} to ORCID.", objectID);
+        MCRObject filteredObject = null;
+        try {
+            filteredObject = MCRORCIDUtils.filterObject(object);
+        } catch (MCRORCIDException e) {
+            LOGGER.warn("Error while filtering {}.", objectID);
+            return;
+        }
+        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+            LOGGER.info("Filtered MODS is empty. Skipping {}...", objectID);
+            return;
+        }
         if (!MCRORCIDUtils.checkPublishState(object)) {
             LOGGER.info("Object has wrong state. Skipping {}...", objectID);
+            tryCollectAndSaveExternalPutCodes(filteredObject);
             return;
         }
         if (MCRMetadataManager.exists(objectID)) {
@@ -116,39 +135,47 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             if (MCRXMLHelper.deepEqual(new MCRMODSWrapper(object).getMODS(),
                 new MCRMODSWrapper(outdatedObject).getMODS())) {
                 LOGGER.info("Metadata does not changed. Skipping {}...", objectID);
+                tryCollectAndSaveExternalPutCodes(filteredObject);
                 return;
             }
-        }
-        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
-        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
-            LOGGER.info("Filtered MODS is empty. Skipping {}...", objectID);
-            return;
         }
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils.getORCIDFlagContent(object))
             .orElse(new MCRORCIDFlagContent());
         final Map<String, MCRORCIDUser> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
         final Map<String, MCRORCIDUser> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
-        final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
-        final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
         final Map<String, MCRORCIDUser> toDelete = new HashMap<>(userOrcidPairFromFlag);
         toDelete.keySet().removeAll(userOrcidPairFromObject.keySet());
-        if (!toDelete.isEmpty()) {
-            deleteWorks(toDelete, identifiers, flagContent);
-        }
         final Map<String, MCRORCIDUser> toPublish = new HashMap<>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
-        final Set<String> successfulPublished = new HashSet<>();
-        if (!toPublish.isEmpty()) {
-            publishWorks(toPublish, identifiers, work, flagContent, successfulPublished);
+        if (toDelete.isEmpty() && toPublish.isEmpty()) {
+            LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
+            tryCollectAndSaveExternalPutCodes(filteredObject);
+            return;
         }
-        if (COLLECT_EXTERNAL_PUT_CODES && SAVE_OTHER_PUT_CODES) {
-            final Set<String> matchingOrcids = findMatchingORCIDs(identifiers);
-            matchingOrcids.removeAll(successfulPublished);
-            collectOtherPutCodes(identifiers, new ArrayList(matchingOrcids), flagContent);
+        try {
+            final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
+            final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
+            if (!toDelete.isEmpty()) {
+                deleteWorks(toDelete, identifiers, flagContent);
+            }
+            final Set<String> successfulPublished = new HashSet<>();
+            if (!toPublish.isEmpty()) {
+                publishWorks(toPublish, identifiers, work, flagContent, successfulPublished);
+            }
+            if (COLLECT_EXTERNAL_PUT_CODES && SAVE_OTHER_PUT_CODES) {
+                collectExternalPutCodes(flagContent, identifiers, successfulPublished);
+            }
+            LOGGER.info("Finished publishing {} to ORCID successfully.", objectID);
+        } catch (Exception e) {
+            LOGGER.warn("Error while publishing {} to ORCID.", objectID, e);
+        } finally {
+            try {
+                MCRORCIDMetadataUtils.setORCIDFlagContent(object, flagContent);
+            } catch (MCRORCIDException e) {
+                LOGGER.warn("Error while setting ORCID flag content to {}.", objectID, e);
+            }
         }
-        MCRORCIDMetadataUtils.setORCIDFlagContent(object, flagContent);
-        LOGGER.info("Finished publishing {} to ORCID successfully.", objectID);
     }
 
     private void deleteWorks(Map<String, MCRORCIDUser> userOrcidPair, Set<MCRIdentifier> identifiers,
@@ -295,16 +322,46 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         return userOrcidPair;
     }
 
+    private void tryCollectAndSaveExternalPutCodes(MCRObject object) {
+        if (COLLECT_EXTERNAL_PUT_CODES && SAVE_OTHER_PUT_CODES) {
+            try {
+                collectAndSaveExternalPutCodes(object);
+            } catch (Exception e) {
+                LOGGER.warn("Error while collecting external put codes for {}.", object.getId(), e);
+            }
+        }
+    }
+
+    private void collectAndSaveExternalPutCodes(MCRObject object) {
+        final MCRORCIDFlagContent flagContent = Optional.ofNullable(MCRORCIDMetadataUtils
+            .getORCIDFlagContent(object)).orElse(new MCRORCIDFlagContent());
+        final T work = transformObject(new MCRJDOMContent(object.createXML()));
+        final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
+        collectExternalPutCodes(flagContent, identifiers, Collections.emptySet());
+        MCRORCIDMetadataUtils.setORCIDFlagContent(object, flagContent);
+    }
+
+    private void collectExternalPutCodes(MCRORCIDFlagContent flagContent, Set<MCRIdentifier> identifiers,
+        Set<String> excludeORCIDs) {
+        final Set<String> matchingOrcids = findMatchingORCIDs(identifiers);
+        matchingOrcids.removeAll(excludeORCIDs);
+        collectOtherPutCodes(identifiers, new ArrayList(matchingOrcids), flagContent);
+    }
+
     private void collectOtherPutCodes(Set<MCRIdentifier> identifiers, List<String> orcids,
         MCRORCIDFlagContent flagContent) {
         orcids.forEach(orcid -> {
             try {
                 final MCRORCIDUserInfo userInfo = Optional.ofNullable(flagContent.getUserInfoByORCID(orcid))
-                    .orElseGet(() -> new MCRORCIDUserInfo(orcid));
-                if (userInfo.getWorkInfo() == null) {
+                    .orElse(new MCRORCIDUserInfo(orcid));
+                final MCRORCIDPutCodeInfo workInfo = userInfo.getWorkInfo();
+                if (workInfo == null) {
                     userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
+                    updateWorkInfo(identifiers, userInfo.getWorkInfo(), orcid);
+                } else {
+                    updateWorkInfo(identifiers, workInfo, orcid);
+                    userInfo.getWorkInfo().setOtherPutCodes(workInfo.getOtherPutCodes());
                 }
-                updateWorkInfo(identifiers, userInfo.getWorkInfo(), orcid);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (MCRORCIDException e) {
                 LOGGER.warn("Could not collect put codes for {}.", orcid);

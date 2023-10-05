@@ -282,7 +282,18 @@ public final class MCRURIResolver implements URIResolver {
             String webappPath
                 = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString() : null;
 
-            if (base.contains(".jar!")) {
+            Optional<String> matching = MCRDeveloperTools.getOverridePaths()
+                    .map(Path::toAbsolutePath)
+                    .map(Path::toFile)
+                    .map(File::toURI)
+                    .map(URI::toString)
+                    .filter(base::startsWith)
+                    .findFirst();
+            if (matching.isPresent()) {
+                // in this case the developer mode is active and the file is in the override directory e.G.
+                // /root/workspace/mir/src/main/resources/xsl/mir-accesskey-utils.xsl
+                resolvingBase = base.substring(matching.get().length());
+            } else if (base.contains(".jar!")) {
                 // in this case the file is in a jar file e.G.
                 // /root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl
                 resolvingBase = base.lastIndexOf(".jar!") > 0

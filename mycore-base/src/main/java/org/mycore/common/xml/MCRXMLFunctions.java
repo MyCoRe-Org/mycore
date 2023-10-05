@@ -386,8 +386,12 @@ public class MCRXMLFunctions {
     }
 
     private static boolean checkReadPermissionOfDerivates(MCRObjectID mcrObjectID) {
-        Set<String> displayableDerivates = MCRMetadataManager
-            .getDerivateIds(mcrObjectID, 0, TimeUnit.SECONDS) //need actual data
+        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(mcrObjectID, 0, TimeUnit.SECONDS);
+        if (derivateIds.isEmpty()) {
+            return MCRConfiguration2.getOrThrow("MCR.XMLFunctions.WorldReadableComplete.NoDerivates",
+                Boolean::parseBoolean);
+        }
+        Set<String> displayableDerivates = derivateIds
             .stream()
             .map(MCRObjectID::toString)
             .filter(MCRXMLFunctions::isDisplayedEnabledDerivate)
