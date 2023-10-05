@@ -11,6 +11,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.xsonify.serialize.Json2XmlSerializer;
+import org.mycore.xsonify.serialize.SerializationException;
 import org.mycore.xsonify.serialize.SerializerSettings;
 import org.mycore.xsonify.serialize.SerializerStyle;
 import org.mycore.xsonify.serialize.Xml2JsonSerializer;
@@ -18,8 +19,10 @@ import org.mycore.xsonify.xml.XmlDocument;
 import org.mycore.xsonify.xml.XmlDocumentLoader;
 import org.mycore.xsonify.xml.XmlEntityResolverDocumentLoader;
 import org.mycore.xsonify.xml.XmlName;
+import org.mycore.xsonify.xml.XmlParseException;
 import org.mycore.xsonify.xml.XmlSaxParser;
 import org.mycore.xsonify.xsd.Xsd;
+import org.mycore.xsonify.xsd.XsdParseException;
 import org.mycore.xsonify.xsd.XsdParser;
 import org.xml.sax.SAXException;
 
@@ -85,7 +88,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     public String schema;
 
     /**
-     * Local Name of the root element. By default this is <b>mycoreobject</b>. This setting is only required in the
+     * Local Name of the root element. By default, this is <b>mycoreobject</b>. This setting is only required in the
      * json2xml serialisation process and if {@link SerializerSettings#omitRootElement()} is set to <b>true</b>.
      */
     @MCRProperty(name = "RootName", required = false)
@@ -116,7 +119,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
      * @throws SAXException                 if there is a SAX-related issue.
      */
     @MCRPostConstruction
-    public void init() throws ParserConfigurationException, SAXException {
+    public void init() throws ParserConfigurationException, SAXException, SerializationException, XsdParseException {
         XmlSaxParser saxParser = new XmlSaxParser();
         XmlDocumentLoader documentLoader = new XmlEntityResolverDocumentLoader(MCREntityResolver.instance(), saxParser);
         XsdParser xsdParser = new XsdParser(documentLoader);
@@ -150,10 +153,14 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     @Override
     public MCRContent transform(MCRContent source) throws IOException {
         String mimeType = source.getMimeType().toLowerCase(Locale.ROOT);
-        if (mimeType.endsWith("xml")) {
-            return xml2json(source);
-        } else if (mimeType.endsWith("json")) {
-            return json2xml(source);
+        try {
+            if (mimeType.endsWith("xml")) {
+                return xml2json(source);
+            } else if (mimeType.endsWith("json")) {
+                return json2xml(source);
+            }
+        } catch (SerializationException serializerException) {
+            throw new MCRException("unable to serialize source.", serializerException);
         }
         throw new MCRException(
             "Unable to transform source because mimeType '" + mimeType + "' is neither xml nor json.");
@@ -165,7 +172,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
      * @param source The XML content to be transformed.
      * @return The transformed JSON content.
      */
-    protected MCRContent xml2json(MCRContent source) {
+    protected MCRContent xml2json(MCRContent source) throws SerializationException {
         XmlDocument xml = getXmlDocument(source);
         JsonObject json = this.xml2JsonSerializer.serialize(xml);
         return asContent(json, source.isUsingSession());
@@ -177,7 +184,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
      * @param source The JSON content to be transformed.
      * @return The transformed XML content.
      */
-    protected MCRContent json2xml(MCRContent source) {
+    protected MCRContent json2xml(MCRContent source) throws SerializationException {
         JsonObject json = getJsonObject(source);
         XmlDocument xml = this.json2XmlSerializer.serialize(json);
         return asContent(xml, source.isUsingSession());
@@ -187,7 +194,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
         try {
             XmlSaxParser saxParser = new XmlSaxParser();
             return saxParser.parse(source.getInputStream());
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | XmlParseException e) {
             throw new MCRException("Unable to parse xml source " + source.getName(), e);
         }
     }
