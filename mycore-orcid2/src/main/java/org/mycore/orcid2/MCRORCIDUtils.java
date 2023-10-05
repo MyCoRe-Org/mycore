@@ -48,15 +48,15 @@ import org.mycore.orcid2.util.MCRIdentifier;
  */
 public class MCRORCIDUtils {
 
-    private static final MCRContentTransformer T_ORCID_MODS_FILTER
-        = MCRContentTransformerFactory.getTransformer("ORCIDMODSFilter");
+    private static final MCRContentTransformer T_ORCID_MODS_FILTER = MCRContentTransformerFactory
+        .getTransformer("ORCIDMODSFilter");
 
-    private static final List<String> TRUSTED_IDENTIFIER_TYPES
-        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "Object.TrustedIdentifierTyps").stream()
-          .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
+    private static final List<String> TRUSTED_IDENTIFIER_TYPES = MCRConfiguration2
+        .getString(MCRORCIDConstants.CONFIG_PREFIX + "Object.TrustedIdentifierTyps").stream()
+        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
 
-    private static final List<String> PUBLISH_STATES
-        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "Work.PublishStates").stream()
+    private static final List<String> PUBLISH_STATES = MCRConfiguration2
+        .getString(MCRORCIDConstants.CONFIG_PREFIX + "Work.PublishStates").stream()
         .flatMap(MCRConfiguration2::splitValue).toList();
 
     /**
@@ -116,8 +116,8 @@ public class MCRORCIDUtils {
      */
     public static MCRObject filterObject(MCRObject object) {
         try {
-            final MCRContent filtertedObjectContent
-                = T_ORCID_MODS_FILTER.transform(new MCRJDOMContent(object.createXML()));
+            final MCRContent filtertedObjectContent = T_ORCID_MODS_FILTER
+                .transform(new MCRJDOMContent(object.createXML()));
             return new MCRObject(filtertedObjectContent.asXML());
         } catch (IOException | JDOMException e) {
             throw new MCRORCIDException("Filter transformation failed", e);

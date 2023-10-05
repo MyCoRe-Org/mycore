@@ -40,7 +40,7 @@ public class MCRORCIDConstants {
     /**
      * List of all language codes supported by ORCID.
      */
-    public static final List<String> SUPPORTED_LANGUAGE_CODES
-        = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedLanguageCodes").stream()
+    public static final List<String> SUPPORTED_LANGUAGE_CODES = MCRConfiguration2
+        .getString(CONFIG_PREFIX + "SupportedLanguageCodes").stream()
         .flatMap(MCRConfiguration2::splitValue).toList();
 }

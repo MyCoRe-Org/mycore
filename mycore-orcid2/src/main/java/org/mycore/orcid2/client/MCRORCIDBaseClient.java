@@ -45,8 +45,8 @@ abstract class MCRORCIDBaseClient {
     /**
      * ORCID XML media type.
      */
-    protected static final MediaType ORCID_XML_MEDIA_TYPE
-        = MediaType.valueOf(MCRORCIDClientConstants.ORCID_XML_MEDIA_TYPE);
+    protected static final MediaType ORCID_XML_MEDIA_TYPE = MediaType
+        .valueOf(MCRORCIDClientConstants.ORCID_XML_MEDIA_TYPE);
 
     private final WebTarget baseTarget;
 
@@ -103,8 +103,8 @@ abstract class MCRORCIDBaseClient {
      */
     protected <T> T doFetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes) {
         final String putCodeString = (putCodes == null || putCodes.length == 0) ? "" : StringUtils.join(putCodes, ',');
-        final Response response
-            = fetch(String.format(Locale.ROOT, "%s/%s/%s", orcid, section.getPath(), putCodeString));
+        final Response response = fetch(
+            String.format(Locale.ROOT, "%s/%s/%s", orcid, section.getPath(), putCodeString));
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }

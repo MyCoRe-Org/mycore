@@ -54,8 +54,8 @@ public class MCRORCIDUserUtils {
      * @throws MCRORCIDException if there is more than one matching user
      */
     public static MCRORCIDUser getORCIDUserByORCID(String orcid) {
-        final Set<MCRUser> users
-            = MCRUserManager.getUsers(MCRORCIDUser.ATTR_ORCID_ID, orcid).collect(Collectors.toSet());
+        final Set<MCRUser> users = MCRUserManager.getUsers(MCRORCIDUser.ATTR_ORCID_ID, orcid)
+            .collect(Collectors.toSet());
         if (users.isEmpty()) {
             return null;
         } else if (users.size() == 1) {

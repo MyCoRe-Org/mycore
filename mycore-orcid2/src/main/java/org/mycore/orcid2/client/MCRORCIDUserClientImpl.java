@@ -27,7 +27,6 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
-
 /**
  * See {@link MCRORCIDUserClient}.
  * Write actions require the member API and a corresponding scope.

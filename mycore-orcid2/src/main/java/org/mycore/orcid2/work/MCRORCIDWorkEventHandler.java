@@ -69,11 +69,11 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final boolean COLLECT_EXTERNAL_PUT_CODES
-        = MCRConfiguration2.getBoolean("MCR.ORCID2.WorkEventHandler.CollectExternalPutCodes").orElse(false);
+    private static final boolean COLLECT_EXTERNAL_PUT_CODES = MCRConfiguration2
+        .getBoolean("MCR.ORCID2.WorkEventHandler.CollectExternalPutCodes").orElse(false);
 
-    private static final boolean SAVE_OTHER_PUT_CODES
-        = MCRConfiguration2.getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
+    private static final boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2
+        .getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {

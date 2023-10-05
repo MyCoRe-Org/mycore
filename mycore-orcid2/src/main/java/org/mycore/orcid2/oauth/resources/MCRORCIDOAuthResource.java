@@ -164,8 +164,8 @@ public class MCRORCIDOAuthResource {
 
     private MCRContent handleCode(String code) {
         try {
-            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse
-                = MCRORCIDOAuthClient.getInstance().exchangeCode(code, MCRFrontendUtil.getBaseURL() + redirectURI);
+            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse = MCRORCIDOAuthClient.getInstance()
+                .exchangeCode(code, MCRFrontendUtil.getBaseURL() + redirectURI);
             final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
             final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
             orcidUser.addCredential(accessTokenResponse.getORCID(), credential);

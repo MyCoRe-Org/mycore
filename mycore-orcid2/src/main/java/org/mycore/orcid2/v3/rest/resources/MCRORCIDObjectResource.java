@@ -154,7 +154,7 @@ public class MCRORCIDObjectResource {
         }
         try {
             return MCRMetadataManager.retrieveMCRObject(objectID);
-        } catch(MCRPersistenceException e) {
+        } catch (MCRPersistenceException e) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
     }
