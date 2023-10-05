@@ -31,6 +31,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
 
     private String generatorID;
+
     private Map<String, String> properties;
 
     public final Map<String, String> getProperties() {

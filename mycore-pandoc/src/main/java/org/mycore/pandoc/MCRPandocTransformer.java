@@ -35,6 +35,7 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 public class MCRPandocTransformer extends MCRContentTransformer {
 
     private String inputFormat;
+
     private String outputFormat;
 
     @Override
@@ -48,7 +49,7 @@ public class MCRPandocTransformer extends MCRContentTransformer {
     public MCRContent transform(MCRContent source) throws IOException {
         try {
             Element pandoc = MCRPandocAPI.convertToXML(source.asString(), inputFormat, outputFormat);
-            if(!pandoc.getChildren().isEmpty()) {
+            if (!pandoc.getChildren().isEmpty()) {
                 pandoc = pandoc.getChildren().get(0).detach();
             }
             return new MCRJDOMContent(pandoc);

@@ -158,7 +158,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
 
         String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService;
-        MCRPIMetadataService<T> mdService =  MCRConfiguration2.<MCRPIMetadataService<T>>getInstanceOf(msProperty)
+        MCRPIMetadataService<T> mdService = MCRConfiguration2.<MCRPIMetadataService<T>>getInstanceOf(msProperty)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(msProperty));
         return mdService;
     }

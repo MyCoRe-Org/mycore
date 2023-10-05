@@ -48,7 +48,9 @@ public class MCRPandocAPI {
     private static final String LUA_PATH = MCRConfiguration2.getString("MCR.Pandoc.LuaPath")
         .orElse(Thread.currentThread().getContextClassLoader().getResource("lua").getPath() + "?.lua");
 
-    private enum Action { Reader, Writer }
+    private enum Action {
+        Reader, Writer
+    }
 
     /**
      * Raw Pandoc command invocation
@@ -108,8 +110,8 @@ public class MCRPandocAPI {
     private static String convertFormatToPath(Action action, String format) {
         String property = MCRConfiguration2.getString("MCR.Pandoc." + action + "." + format).orElse("");
         String path = MCRConfiguration2.getString("MCR.Pandoc." + action + "." + format + ".Path").orElse("");
-        if(!property.isEmpty()) {
-            if(path.isEmpty()) {
+        if (!property.isEmpty()) {
+            if (path.isEmpty()) {
                 return Thread.currentThread().getContextClassLoader().getResource(property).getFile();
             } else {
                 return Paths.get(path).resolve(property).toString();
@@ -134,7 +136,7 @@ public class MCRPandocAPI {
             public void run() {
                 try {
                     output = readPandocOutput(istream);
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     String msg = "Exception reading output from Pandoc";
                     throw new MCRPandocException(msg, ex);
                 }
@@ -152,7 +154,7 @@ public class MCRPandocAPI {
             p = pb.start();
             p.getOutputStream().write(input);
             p.getOutputStream().close();
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             String msg = "Exception invoking Pandoc " + String.join(" ", args);
             throw new MCRPandocException(msg, ex);
         }
@@ -163,18 +165,18 @@ public class MCRPandocAPI {
         oThread.start();
         eThread.start();
         try {
-            if(!p.waitFor(TIMEOUT, TimeUnit.SECONDS)) {
+            if (!p.waitFor(TIMEOUT, TimeUnit.SECONDS)) {
                 p.destroy();
                 throw new InterruptedException();
             }
             oThread.join();
             eThread.join();
-        } catch(InterruptedException ex) {
+        } catch (InterruptedException ex) {
             String msg = "Pandoc process " + String.join(" ", args) + " was terminated after reaching a timeout of "
                 + TIMEOUT + " seconds";
             throw new MCRPandocException(msg, ex);
         }
-        if(p.exitValue() != 0) {
+        if (p.exitValue() != 0) {
             String msg = "Pandoc process " + String.join(" ", args) + " terminated with error code " + p.exitValue()
                 + " and error message \n" + new String(errorThread.getOutput(), StandardCharsets.UTF_8);
             p.destroy();
@@ -188,7 +190,7 @@ public class MCRPandocAPI {
         byte[] buffer = new byte[BUFFER_SIZE];
         byte[] output = new byte[0];
         int readBytes;
-        while((readBytes = pandocStream.read(buffer, 0, BUFFER_SIZE)) >= 0) {
+        while ((readBytes = pandocStream.read(buffer, 0, BUFFER_SIZE)) >= 0) {
             byte[] newOutput = new byte[output.length + readBytes];
             System.arraycopy(output, 0, newOutput, 0, output.length);
             System.arraycopy(buffer, 0, newOutput, output.length, readBytes);

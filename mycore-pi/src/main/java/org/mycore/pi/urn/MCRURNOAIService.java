@@ -18,8 +18,6 @@
 
 package org.mycore.pi.urn;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIService;
 import org.mycore.pi.MCRPIServiceDates;
@@ -29,8 +27,6 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * This class registers urn for Metadata.
  */
 public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     public MCRURNOAIService() {
         super(MCRDNBURN.TYPE);

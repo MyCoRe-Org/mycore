@@ -27,6 +27,8 @@ import org.mycore.common.MCRException;
  */
 public class MCRPandocException extends MCRException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new MCRPandocException with message.
      *

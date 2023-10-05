@@ -342,6 +342,9 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     }
 
     public static class MCRPICreationException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
         public MCRPICreationException(String message, Throwable cause) {
             super(message, cause);
         }

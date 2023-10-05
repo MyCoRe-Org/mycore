@@ -74,8 +74,8 @@ public class MCREpicClient {
                 case HttpStatus.SC_NO_CONTENT -> {
                     return;
                 }
-                case HttpStatus.SC_UNAUTHORIZED ->
-                    throw new MCREpicUnauthorizedException("Error while create:" + statusLine.getReasonPhrase());
+                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
+                    "Error while create:" + statusLine.getReasonPhrase());
                 default -> {
                     final String content = new String(entity.getContent().readAllBytes(), StandardCharsets.UTF_8);
                     throw new MCREpicException("Unknown error: " + statusLine.getStatusCode() + " - "
@@ -110,10 +110,10 @@ public class MCREpicClient {
                 case HttpStatus.SC_CREATED, HttpStatus.SC_NO_CONTENT -> {
                     return;
                 }
-                case HttpStatus.SC_PRECONDITION_FAILED ->
-                    throw new MCREpicException("The Precondition failed, which means the handle already exist!");
-                case HttpStatus.SC_UNAUTHORIZED ->
-                    throw new MCREpicUnauthorizedException("Error while create:" + statusLine.getReasonPhrase());
+                case HttpStatus.SC_PRECONDITION_FAILED -> throw new MCREpicException(
+                    "The Precondition failed, which means the handle already exist!");
+                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
+                    "Error while create:" + statusLine.getReasonPhrase());
                 default -> {
                     final String content = new String(entity.getContent().readAllBytes(), StandardCharsets.UTF_8);
                     throw new MCREpicException("Unknown error: " + statusLine.getStatusCode() + " - "
@@ -141,10 +141,9 @@ public class MCREpicClient {
                         return Arrays.asList(handleInfos);
                     }
                 }
-                case HttpStatus.SC_UNAUTHORIZED ->
-                    throw new MCREpicUnauthorizedException("Error while listIds:" + statusLine.getReasonPhrase());
-                default ->
-                    throw new MCREpicException("Error while listIds" + statusLine.getReasonPhrase());
+                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
+                    "Error while listIds:" + statusLine.getReasonPhrase());
+                default -> throw new MCREpicException("Error while listIds" + statusLine.getReasonPhrase());
             }
         }
     }
@@ -164,10 +163,9 @@ public class MCREpicClient {
                         return br.lines().map(prefix2::concat).map(MCRHandle::new).collect(Collectors.toList());
                     }
                 }
-                case HttpStatus.SC_UNAUTHORIZED ->
-                    throw new MCREpicUnauthorizedException("Error while listIds:" + statusLine.getReasonPhrase());
-                default ->
-                    throw new MCREpicException("Error while listIds" + statusLine.getReasonPhrase());
+                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
+                    "Error while listIds:" + statusLine.getReasonPhrase());
+                default -> throw new MCREpicException("Error while listIds" + statusLine.getReasonPhrase());
             }
         }
     }

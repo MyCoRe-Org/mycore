@@ -20,6 +20,8 @@ package org.mycore.pi.handle;
 
 public class MCREpicUnauthorizedException extends MCREpicException {
 
+    private static final long serialVersionUID = 1L;
+
     public MCREpicUnauthorizedException(String message) {
         super(message);
     }
