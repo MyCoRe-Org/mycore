@@ -129,6 +129,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
     private static class MCRExceptionContainer {
         private Exception exception;
 
+        @SuppressWarnings("unused")
         private MCRExceptionContainer() {
             //required for JAXB
         }

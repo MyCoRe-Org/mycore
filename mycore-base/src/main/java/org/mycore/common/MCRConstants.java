@@ -104,13 +104,13 @@ public final class MCRConstants {
 
     public static final Namespace EPICURLITE_NAMESPACE = Namespace.getNamespace("epicurlite",
         "http://nbn-resolving.org/epicurlite");
-    
+
     public static final Namespace ALTO_NAMESPACE = Namespace
         .getNamespace("alto", "http://www.loc.gov/standards/alto/ns-v2#");
-    
+
     public static final Namespace SKOS_NAMESPACE = Namespace
         .getNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
-    
+
     public static final Namespace RDF_NAMESPACE = Namespace
         .getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 

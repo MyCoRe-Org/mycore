@@ -21,6 +21,9 @@ package org.mycore.crypt;
 import java.io.FileNotFoundException;
 
 public class MCRCryptKeyFileNotFoundException extends FileNotFoundException {
+
+    private static final long serialVersionUID = 1L;
+
     private String errorCode;
 
     public MCRCryptKeyFileNotFoundException(String errorMessage) {

@@ -483,7 +483,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
-
     private static void exportDerivate(File dir, Transformer trans, String extension, String nid)
         throws TransformerException, IOException {
         // store the XML file

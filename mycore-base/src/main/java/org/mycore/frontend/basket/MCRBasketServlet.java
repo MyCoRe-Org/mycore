@@ -71,7 +71,10 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Frank L\u00fctzenkirchen
  **/
 public class MCRBasketServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
+
     public static final String ALLOW_LIST_PROPERTY_NAME = "MCR.Basket.Resolver.AllowList";
 
     private static final List<String> URI_ALLOW_LIST = MCRConfiguration2

@@ -19,6 +19,9 @@
 package org.mycore.parsers.bool;
 
 public class MCRParseException extends org.mycore.common.MCRException {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRParseException(String text) {
         super(text);
     }

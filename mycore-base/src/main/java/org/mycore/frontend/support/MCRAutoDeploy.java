@@ -240,7 +240,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                         LOGGER.info("Register Servlet {} ({})...", name, className);
                                         ServletRegistration.Dynamic sr = servletContext.addServlet(name, className);
 
-                                        if(sr != null) {
+                                        if (sr != null) {
                                             mapping.getChildren("url-pattern", ns).forEach(url -> {
                                                 LOGGER.info("...add url mapping: {}", url.getTextTrim());
                                                 sr.addMapping(url.getTextTrim());

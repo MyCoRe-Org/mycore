@@ -43,6 +43,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
+    private static final long serialVersionUID = 1L;
+
     private static final int CACHE_TIME = 24 * 60 * 60;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRDerivateContentTransformerServlet.class);

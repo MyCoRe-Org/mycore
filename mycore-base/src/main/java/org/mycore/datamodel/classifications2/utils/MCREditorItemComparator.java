@@ -50,7 +50,6 @@ public class MCREditorItemComparator implements Comparator<Element> {
         return myCollator.compare(getCurrentLangLabel(o1, language), getCurrentLangLabel(o2, language));
     }
 
-    @SuppressWarnings("unchecked")
     private static String getCurrentLangLabel(Element item, String language) {
         List<Element> labels = item.getChildren("label");
         for (Element label : labels) {

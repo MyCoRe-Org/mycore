@@ -101,6 +101,7 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
      */
     private class RemappedKey implements SingletonKey {
         private K key;
+
         private int seed;
 
         RemappedKey(K key) {

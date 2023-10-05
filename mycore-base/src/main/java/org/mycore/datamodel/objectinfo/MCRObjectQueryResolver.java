@@ -64,8 +64,8 @@ public interface MCRObjectQueryResolver {
     class InstanceHolder {
         private static final String QUERY_RESOLVER_CLASS_PROPERTY = "MCR.Object.QueryResolver.Class";
 
-        private static final MCRObjectQueryResolver RESOLVER
-            = MCRConfiguration2.<MCRObjectQueryResolver>getSingleInstanceOf(QUERY_RESOLVER_CLASS_PROPERTY)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(QUERY_RESOLVER_CLASS_PROPERTY));
+        private static final MCRObjectQueryResolver RESOLVER = MCRConfiguration2
+            .<MCRObjectQueryResolver>getSingleInstanceOf(QUERY_RESOLVER_CLASS_PROPERTY)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(QUERY_RESOLVER_CLASS_PROPERTY));
     }
 }

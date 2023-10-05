@@ -28,12 +28,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Robert Stephan
  *
  */
- // code was moved from MCRObjectID into this class
+// code was moved from MCRObjectID into this class
 public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
-    
+
     // counter for the next IDs per project base ID
     private HashMap<String, Integer> lastNumber = new HashMap<>();
-    
+
     /**
      * First invocation may return MCR.Metadata.ObjectID.InitialNumberDistance if set,
      * following invocations will return MCR.Metadata.ObjectID.NumberDistance.
@@ -42,7 +42,6 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
     private int numberDistance = MCRConfiguration2.getInt("MCR.Metadata.ObjectID.InitialNumberDistance")
         .orElse(MCRConfiguration2.getInt("MCR.Metadata.ObjectID.NumberDistance").orElse(1));
 
-   
     /**
      * Returns a MCRObjectID from a given base ID string
      * The additional parameter acts as a
@@ -81,7 +80,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
         lastNumber.put(baseId, next);
         return MCRObjectID.getInstance(MCRObjectID.formatID(baseId, next));
     }
-    
+
     /**
      * Returns the last ID used or reserved for the given object base type.
      *
@@ -95,7 +94,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
         }
         return MCRObjectID.getInstance(MCRObjectID.formatID(baseId, lastIDNumber));
     }
-    
+
     /**
      * Returns the last ID number used or reserved for the given object base
      * type. This may return the value 0 when there is no ID last used or in the

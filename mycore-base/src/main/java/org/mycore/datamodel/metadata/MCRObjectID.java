@@ -63,15 +63,15 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
     /** ID pattern with named capturing groups */
-    private static Pattern ID_PATTERN
-        = Pattern.compile("^(?<projectId>[a-zA-Z][a-zA-Z0-9]*)_(?<objectType>[a-zA-Z0-9]+)_(?<numberPart>[0-9]+)$");
+    private static Pattern ID_PATTERN = Pattern
+        .compile("^(?<projectId>[a-zA-Z][a-zA-Z0-9]*)_(?<objectType>[a-zA-Z0-9]+)_(?<numberPart>[0-9]+)$");
 
     private static HashSet<String> VALID_TYPE_LIST;
 
-    private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID
-        = Comparator.comparing(MCRObjectID::getProjectId)
-            .thenComparing(MCRObjectID::getTypeId)
-            .thenComparingInt(MCRObjectID::getNumberAsInteger);
+    private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID = Comparator
+        .comparing(MCRObjectID::getProjectId)
+        .thenComparing(MCRObjectID::getTypeId)
+        .thenComparingInt(MCRObjectID::getNumberAsInteger);
 
     static {
         final String confPrefix = "MCR.Metadata.Type.";
@@ -85,7 +85,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     // parts of the ID
     private final String projectId;
+
     private final String objectType;
+
     private final int numberPart;
 
     // complete id as formatted string

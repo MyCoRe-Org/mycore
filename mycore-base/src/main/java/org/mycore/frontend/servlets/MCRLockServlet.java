@@ -38,6 +38,9 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 public class MCRLockServlet extends MCRServlet {
+
+    private static final long serialVersionUID = 1L;
+
     private static final String OBJECT_ID_KEY = MCRLockServlet.class.getCanonicalName() + ".MCRObjectID";
 
     private static final String ACTION_KEY = MCRLockServlet.class.getCanonicalName() + ".Action";

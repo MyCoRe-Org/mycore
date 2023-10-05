@@ -338,7 +338,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if (fileExtension != null && !getDefaultExtension().equals(fileExtension)) {
             return fileExtension;
         }
-       return MCRXSLTransformerUtils.getFileExtension(getOutputProperties(), getDefaultExtension());
+        return MCRXSLTransformerUtils.getFileExtension(getOutputProperties(), getDefaultExtension());
     }
 
     static class MCRTransformedContent extends MCRWrappedContent {

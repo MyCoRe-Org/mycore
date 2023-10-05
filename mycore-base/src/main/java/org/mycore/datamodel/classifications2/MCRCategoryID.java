@@ -44,10 +44,6 @@ import jakarta.persistence.Transient;
  * @author Thomas Scheffler (yagee)
  * @since 2.0
  */
-/**
- * @author mcradmin
- *
- */
 @Embeddable
 @Access(AccessType.FIELD)
 @JsonFormat(shape = JsonFormat.Shape.STRING)

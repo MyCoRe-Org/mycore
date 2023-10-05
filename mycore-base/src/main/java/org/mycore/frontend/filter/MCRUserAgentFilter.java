@@ -54,8 +54,10 @@ import jakarta.servlet.http.HttpSession;
 public class MCRUserAgentFilter implements Filter {
     private static final int MIN_USER_AGENT_LENGTH = MCRConfiguration2
         .getOrThrow("MCR.Filter.UserAgent.MinLength", Integer::parseInt);
+
     private static final boolean ACCEPT_INVALID_USER_AGENTS = MCRConfiguration2
         .getOrThrow("MCR.Filter.UserAgent.AcceptInvalid", Boolean::parseBoolean);
+
     private static Pattern agentPattern;
 
     private static final Logger LOGGER = LogManager.getLogger();

@@ -25,9 +25,9 @@ package org.mycore.datamodel.classifications2;
  */
 public enum MCRClassificationUpdateType {
     REPLACE, MOVE;
-    
+
     /**
      * Key to use in event properties
      */
-    public static final String KEY="type";
+    public static final String KEY = "type";
 }

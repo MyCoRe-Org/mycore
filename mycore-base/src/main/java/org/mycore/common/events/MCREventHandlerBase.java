@@ -110,8 +110,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     case DELETE -> handlePathDeleted(evt, path, attrs);
                     case REPAIR -> handlePathRepaired(evt, path, attrs);
                     case INDEX -> updatePathIndex(evt, path, attrs);
-                    default ->
-                        logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
+                    default -> logger.warn("Can't find method for Path data handler for event type {}",
+                        evt.getEventType());
                 }
                 return;
             }
@@ -205,8 +205,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     case UPDATE -> undoPathUpdated(evt, path, attrs);
                     case DELETE -> undoPathDeleted(evt, path, attrs);
                     case REPAIR -> undoPathRepaired(evt, path, attrs);
-                    default ->
-                        logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
+                    default -> logger.warn("Can't find method for Path data handler for event type {}",
+                        evt.getEventType());
                 }
                 return;
             }

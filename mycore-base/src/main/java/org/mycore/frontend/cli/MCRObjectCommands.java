@@ -707,7 +707,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 k++;
             }
         } catch (Exception ex) {
-            LOGGER.error("Exception while storing object to " +  dir.getAbsolutePath(), ex);
+            LOGGER.error("Exception while storing object to " + dir.getAbsolutePath(), ex);
             return;
         }
         LOGGER.info("{} Object's stored under {}.", k, dir.getAbsolutePath());
@@ -808,8 +808,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @return true if the store was okay (see description), else return false
      */
     private static boolean exportObject(File dir, String extension,
-                                        FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
-                                        String nid) throws IOException, MCRException {
+        FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
+        String nid) throws IOException, MCRException {
         MCRContent content;
         try {
             // if object doesn't exist - no exception is caught!
@@ -1373,11 +1373,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-            syntax = "repair shared metadata for the ID {0}",
-            help = "Retrieves the MCRObject with the MCRObjectID {0} and repairs the shared metadata.",
-            order = 172)
+        syntax = "repair shared metadata for the ID {0}",
+        help = "Retrieves the MCRObject with the MCRObjectID {0} and repairs the shared metadata.",
+        order = 172)
     public static void repairSharedMetadata(String id) throws MCRAccessException {
-        if(!MCRObjectID.isValid(id)) {
+        if (!MCRObjectID.isValid(id)) {
             LOGGER.error("The String {} is not a MCRObjectID.", id);
             return;
         }

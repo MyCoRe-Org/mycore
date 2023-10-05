@@ -42,9 +42,12 @@ import java.util.Map;
  */
 public class MCRConfigHelperServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String PROPERTIES_INIT_PARAM = "Properties";
 
     private Date lastChange;
+
     private String resultJson;
 
     @Override
