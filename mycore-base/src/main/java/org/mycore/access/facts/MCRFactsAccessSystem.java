@@ -160,7 +160,13 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         if (checkID == null) {
             cacheKey = action;
         } else {
-            if (MCRObjectID.isValid(checkID)) {
+            if (checkID.startsWith("webpage")) {
+                target = "webpage";
+            } else if (checkID.startsWith("solr")) {
+                target = "solr";
+            } else if (isCategory(checkID)) {
+                target = "category";
+            } else if (MCRObjectID.isValid(checkID)) {
                 MCRObjectID mcrId = MCRObjectID.getInstance(checkID);
                 target = "derivate".equals(mcrId.getTypeId()) ? "files" : "metadata";
 
@@ -177,12 +183,6 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                 } else {
                     LOGGER.debug("There is no object or derivate with id " + mcrId.toString() + " in metadata store");
                 }
-            } else if (checkID.startsWith("webpage")) {
-                target = "webpage";
-            } else if (checkID.startsWith("solr")) {
-                target = "solr";
-            } else if (isCategory(checkID)) {
-                target = "category";
             } else {
                 target = "unknown";
             }
