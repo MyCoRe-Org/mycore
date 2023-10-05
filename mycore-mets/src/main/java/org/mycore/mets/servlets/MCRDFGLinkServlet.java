@@ -116,7 +116,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         switch (imageNumber) {
             case -1 -> response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
-                    "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
+                "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
             case -2 -> response.sendRedirect("https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL);
             default -> response.sendRedirect(
                 "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber);

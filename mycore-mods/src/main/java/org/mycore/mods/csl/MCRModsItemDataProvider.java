@@ -74,6 +74,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     public static final String MODS_ORIGIN_INFO_PUBLICATION = "mods:originInfo[@eventType='publication' or not" +
         "(@eventType)]";
+
     public static final String NONE_TYPE = "none";
 
     public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/";
@@ -433,8 +434,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 case "ill" -> idb.illustrator(cslNames);
                 case "trl" -> idb.translator(cslNames);
                 case "cmp" -> idb.composer(cslNames);
-                case "conference-name", "pup" ->
-                    idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
+                case "conference-name", "pup" -> idb
+                    .event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
                 default -> {
                     if (KNOWN_UNMAPPED_PERSON_ROLES.contains(role)) {
                         LOGGER.trace("Unmapped person role " + role + " in " + this.id);

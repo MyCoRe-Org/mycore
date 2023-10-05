@@ -61,15 +61,14 @@ public class MCRHyphenNormalizer {
 
     private static final char FULLWIDTH_HYPHEN_MINUS = '\uFF0D';
 
-    private static final char[] ALL_HYPHEN_VARIANTS = {HYPHEN_MINUS, SOFT_HYPHEN, ARMENIAN_HYPHEN,
-            HEBREW_PUNCTUATION_MAQAF, HYPHEN, NON_BREAKING_HYPHEN, FIGURE_DASH, EN_DASH, EM_DASH, HORIZONTAL_BAR,
-            MINUS_SIGN, TWO_EM_DASH, THREE_EM_DASH, SMALL_EM_DASH, SMALL_HYPHEN_MINUS, FULLWIDTH_HYPHEN_MINUS};
+    private static final char[] ALL_HYPHEN_VARIANTS = { HYPHEN_MINUS, SOFT_HYPHEN, ARMENIAN_HYPHEN,
+        HEBREW_PUNCTUATION_MAQAF, HYPHEN, NON_BREAKING_HYPHEN, FIGURE_DASH, EN_DASH, EM_DASH, HORIZONTAL_BAR,
+        MINUS_SIGN, TWO_EM_DASH, THREE_EM_DASH, SMALL_EM_DASH, SMALL_HYPHEN_MINUS, FULLWIDTH_HYPHEN_MINUS };
 
-    private static final String ALL_HYPHEN_VARIANTS_REGEX =
-            new String(ALL_HYPHEN_VARIANTS)
-                    .chars()
-                    .mapToObj(variant -> Pattern.quote(Character.toString((char) variant)))
-                    .collect(Collectors.joining("", "[", "]"));
+    private static final String ALL_HYPHEN_VARIANTS_REGEX = new String(ALL_HYPHEN_VARIANTS)
+        .chars()
+        .mapToObj(variant -> Pattern.quote(Character.toString((char) variant)))
+        .collect(Collectors.joining("", "[", "]"));
 
     private static final Pattern ALL_HYPHEN_VARIANTS_PATTERN = Pattern.compile(ALL_HYPHEN_VARIANTS_REGEX);
 

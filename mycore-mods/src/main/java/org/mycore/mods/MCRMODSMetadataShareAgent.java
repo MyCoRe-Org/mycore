@@ -125,7 +125,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         List<MCRObjectID> recipientIds = recipientIdsStr.stream()
             .map(MCRObjectID::getInstance)
             .filter(MCRMODSWrapper::isSupported).toList();
-        if(recipientIds.isEmpty()){
+        if (recipientIds.isEmpty()) {
             return;
         }
         runWithLockedObject(recipientIds, (recipientId) -> {
@@ -204,11 +204,11 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
     private List<Content> getClearContent(MCRMODSWrapper targetWrapper) {
         List<Content> inheritedData = targetWrapper.getMODS().cloneContent();
         inheritedData.stream()
-                .filter(c -> c instanceof Element)
-                .map(Element.class::cast)
-                .filter(element -> element.getName().equals("relatedItem"))
-                .filter(this::isClearableRelatedItem)
-                .forEach(Element::removeContent);
+            .filter(c -> c instanceof Element)
+            .map(Element.class::cast)
+            .filter(element -> element.getName().equals("relatedItem"))
+            .filter(this::isClearableRelatedItem)
+            .forEach(Element::removeContent);
         return inheritedData;
     }
 
@@ -228,8 +228,8 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
     void checkHierarchy(MCRMODSWrapper mods) throws MCRPersistenceException {
         final MCRObjectID modsId = Objects.requireNonNull(mods.getMCRObject().getId());
         LOGGER.info("Checking relatedItem hierarchy of {}.", modsId);
-        final List<Element> relatedItemLeaves
-            = mods.getElements(".//" + LINKED_RELATED_ITEMS + "[not(mods:relatedItem)]");
+        final List<Element> relatedItemLeaves = mods
+            .getElements(".//" + LINKED_RELATED_ITEMS + "[not(mods:relatedItem)]");
         try {
             relatedItemLeaves.forEach(e -> checkHierarchy(e, new HashSet<>(Set.of(modsId))));
         } catch (MCRPersistenceException e) {

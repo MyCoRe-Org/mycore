@@ -104,5 +104,4 @@ public class MCRTextNormalizer {
         return normalizedText;
     }
 
-
 }
