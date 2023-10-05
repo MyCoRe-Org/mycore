@@ -285,6 +285,22 @@ public class MCRTranslation {
         return translate(label, locale, (Object[]) getStringArray(argument));
     }
 
+    /**
+     * Provides translation for the given label (property key). Be aware that any occurence of ';' and '\' in
+     * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
+     * result in {"foo","bar"} (the array)
+     *
+     * @param label property key
+     * @param argument
+     *            String that is inserted instead of placeholders in the property values
+     * @param locale target locale of translation
+     * @return translated String
+     * @see #translate(String, Object[])
+     */
+    public static String translate(String label, String argument, String locale) {
+        return translate(label, argument, MCRTranslation.getLocale(locale));
+    }
+
     public static Locale getCurrentLocale() {
         String currentLanguage = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         return getLocale(currentLanguage);
