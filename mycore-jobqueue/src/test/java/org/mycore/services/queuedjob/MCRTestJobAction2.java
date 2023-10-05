@@ -31,6 +31,7 @@ import org.mycore.common.MCRException;
 public class MCRTestJobAction2 extends MCRJobAction {
 
     public static final String ERROR_MESSAGE = "Error parameter was set to true";
+
     private static Logger LOGGER = LogManager.getLogger(MCRTestJobAction2.class);
 
     /**

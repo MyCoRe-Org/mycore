@@ -53,6 +53,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
      * The job to execute.
      */
     protected final MCRJob job;
+
     private final MCRJobConfig config;
 
     private final List<MCRJobStatusListener> listeners;
@@ -73,8 +74,9 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
         this.job = job;
         this.config = config;
         this.actionInstance = actionInstance;
-        this.listeners
-            = Stream.of(additionalListeners, config.jobStatusListeners(job.getAction())).flatMap(List::stream).toList();
+        this.listeners = Stream.of(additionalListeners,
+            config.jobStatusListeners(job.getAction()))
+            .flatMap(List::stream).toList();
         setName(this.job.getId() + " - " + this.job.getAction().getSimpleName());
         setStatus(MCRProcessableStatus.created);
         job.getParameters().forEach((k, v) -> this.getProperties().put(k, v));

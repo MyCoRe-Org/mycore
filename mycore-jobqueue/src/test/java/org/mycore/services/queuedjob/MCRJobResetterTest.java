@@ -44,15 +44,15 @@ public class MCRJobResetterTest extends MCRJPATestCase {
         // create resetter with mockDAO and reset queues
         MCRJobResetter resetter = new MCRJobResetter(mockDAO, (action) -> {
             switch (action.getSimpleName()) {
-            case "MCRTestJobAction" -> {
-                return reset1;
-            }
-            case "MCRTestJobAction2" -> {
-                return reset2;
-            }
-            default -> {
-                return null;
-            }
+                case "MCRTestJobAction" -> {
+                    return reset1;
+                }
+                case "MCRTestJobAction2" -> {
+                    return reset2;
+                }
+                default -> {
+                    return null;
+                }
             }
         }, config);
 

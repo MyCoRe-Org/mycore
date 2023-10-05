@@ -55,21 +55,31 @@ import jakarta.persistence.RollbackException;
 public class MCRJobThreadStarter implements Runnable, Closeable {
 
     private static final long ONE_MINUTE_IN_MS = TimeUnit.MINUTES.toMillis(1);
+
     private static final Logger LOGGER = LogManager.getLogger(MCRJobThreadStarter.class);
 
     private final MCRJobQueue jobQueue;
+
     private final ThreadPoolExecutor jobExecutor;
+
     private final Class<? extends MCRJobAction> action;
 
     private volatile boolean running = true;
+
     private final MCRProcessableDefaultCollection processableCollection;
+
     private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+
     private final ReentrantLock runLock;
+
     private final ListenerNotifier listener;
+
     private MCRProcessableExecutor processableExecutor;
 
     private final AtomicInteger activeThreads = new AtomicInteger();
+
     private final int maxJobThreadCount;
+
     private final MCRJobConfig config;
 
     MCRJobThreadStarter(Class<? extends MCRJobAction> action, MCRJobConfig config, MCRJobQueue jobQueue) {

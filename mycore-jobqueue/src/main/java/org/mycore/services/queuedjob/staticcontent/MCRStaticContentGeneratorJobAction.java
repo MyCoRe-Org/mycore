@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 public class MCRStaticContentGeneratorJobAction extends MCRJobAction {
 
     public static final String CONFIG_ID_PARAMETER = "configID";
+
     public static final String OBJECT_ID_PARAMETER = "objectID";
 
     /**
