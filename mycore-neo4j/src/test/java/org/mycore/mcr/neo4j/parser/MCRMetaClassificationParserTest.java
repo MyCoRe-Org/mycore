@@ -38,7 +38,7 @@ public class MCRMetaClassificationParserTest extends AbstractNeo4JParserTest {
 
         assertNull(nodes.get(0).lang());
         assertEquals("classification_id_-_category_1", nodes.get(0).text());
-        
+
         assertNull(nodes.get(1).lang());
         assertEquals("classification_id_-_category_2", nodes.get(1).text());
     }

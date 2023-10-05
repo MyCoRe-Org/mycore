@@ -35,22 +35,22 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
  */
 public class MCRNeo4JMetaLangTextParser extends MCRNeo4JAbstractDataModelParser {
 
-   @Override
-   public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
-      return Collections.emptyList();
-   }
+    @Override
+    public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
+        return Collections.emptyList();
+    }
 
-   @Override
-   public List<Neo4JNode> parse(Element rootTag) {
-      final List<Neo4JNode> nodes = new ArrayList<>();
+    @Override
+    public List<Neo4JNode> parse(Element rootTag) {
+        final List<Neo4JNode> nodes = new ArrayList<>();
 
-      for (Element element : rootTag.getChildren()) {
-         if (element != null) {
-            final String lang = element.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-            final String text = StringUtils.replace(element.getTextTrim(), "'", "");
-            nodes.add(new Neo4JNode(lang, text));
-         }
-      }
-      return nodes;
-   }
+        for (Element element : rootTag.getChildren()) {
+            if (element != null) {
+                final String lang = element.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+                final String text = StringUtils.replace(element.getTextTrim(), "'", "");
+                nodes.add(new Neo4JNode(lang, text));
+            }
+        }
+        return nodes;
+    }
 }

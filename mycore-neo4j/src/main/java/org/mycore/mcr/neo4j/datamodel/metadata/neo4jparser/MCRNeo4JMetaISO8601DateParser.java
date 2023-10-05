@@ -37,7 +37,9 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
 public class MCRNeo4JMetaISO8601DateParser extends MCRNeo4JAbstractDataModelParser {
 
     SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
+
     SimpleDateFormat deFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.ROOT);
+
     SimpleDateFormat enFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ROOT);
 
     @Override

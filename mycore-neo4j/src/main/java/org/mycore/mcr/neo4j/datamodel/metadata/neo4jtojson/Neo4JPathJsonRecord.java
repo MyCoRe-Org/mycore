@@ -29,9 +29,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonRootName("p")
 public record Neo4JPathJsonRecord(
-      @JsonProperty("nodes") List<Neo4JNodeJsonRecord> nodes,
+    @JsonProperty("nodes") List<Neo4JNodeJsonRecord> nodes,
 
-      @JsonProperty("relationships") List<Neo4JRelationShipJsonRecord> relationships
+    @JsonProperty("relationships") List<Neo4JRelationShipJsonRecord> relationships
 // List<Neo4JSegment> segments
 ) {
 }
