@@ -44,7 +44,9 @@ import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse.ImportSucce
  */
 public class MCRResourceImporter extends CustomImporter {
     private static final Logger LOGGER = LogManager.getLogger();
+
     static final String SASS_URL_PREFIX = "sass:/";
+
     private final ServletContext servletContext;
 
     private static final UrlHelper URL_HELPER = new UrlHelper();

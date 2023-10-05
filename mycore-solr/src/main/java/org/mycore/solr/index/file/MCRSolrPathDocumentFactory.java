@@ -93,8 +93,7 @@ public class MCRSolrPathDocumentFactory {
      * @see MCRSolrFilesIndexHandler
      * @see MCRSolrIndexHandlerFactory
      */
-    public SolrInputDocument getDocument(Path input, BasicFileAttributes attr) throws
-        MCRPersistenceException {
+    public SolrInputDocument getDocument(Path input, BasicFileAttributes attr) throws MCRPersistenceException {
         SolrInputDocument doc = new SolrInputDocument();
 
         Consumer<? super MCRSolrFileIndexAccumulator> accumulate = (accumulator) -> {

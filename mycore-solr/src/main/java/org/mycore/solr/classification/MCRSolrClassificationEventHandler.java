@@ -38,7 +38,7 @@ import org.mycore.datamodel.classifications2.MCRClassificationUpdateType;
 public class MCRSolrClassificationEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    
+
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {

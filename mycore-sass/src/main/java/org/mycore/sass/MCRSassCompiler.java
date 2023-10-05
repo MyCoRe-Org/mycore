@@ -63,18 +63,31 @@ import jakarta.servlet.ServletContext;
 
 class MCRSassCompiler implements Closeable {
     private static final Logger LOGGER = LogManager.getLogger();
+
     private final ServletContext servletContext;
+
     private OutputStyle outputStyle;
+
     private boolean generateSourceMaps;
+
     private boolean alertColor;
+
     private boolean alertAscii;
+
     private boolean verbose;
+
     private boolean quietDeps;
+
     private boolean sourceMapIncludeSources;
+
     private boolean emitCharset;
+
     private final CompilerConnection connection;
+
     private static final AtomicInteger COMPILE_REQUEST_IDS = new AtomicInteger();
+
     private final Map<Integer, CustomImporter> customImporters;
+
     private LoggingHandler loggingHandler;
 
     MCRSassCompiler(CompilerConnection connection, ServletContext servletContext) {
@@ -99,10 +112,9 @@ class MCRSassCompiler implements Closeable {
         builder.setSourceMap(generateSourceMaps);
 
         for (Importer value : customImporters.values()) {
-            CompileRequest.Importer importer
-                = CompileRequest.Importer.newBuilder()
-                    .setImporterId(value.getId())
-                    .build();
+            CompileRequest.Importer importer = CompileRequest.Importer.newBuilder()
+                .setImporterId(value.getId())
+                .build();
             builder.addImporters(importer);
         }
 
@@ -206,13 +218,13 @@ class MCRSassCompiler implements Closeable {
                         return outboundMessage;
                     }
                     case LOG_EVENT -> this.loggingHandler.handle(outboundMessage.getLogEvent());
-                    case CANONICALIZE_REQUEST ->
-                        this.handleCanonicalizeRequest(compilationId, outboundMessage.getCanonicalizeRequest());
+                    case CANONICALIZE_REQUEST -> this.handleCanonicalizeRequest(compilationId,
+                        outboundMessage.getCanonicalizeRequest());
                     case IMPORT_REQUEST -> this.handleImportRequest(compilationId, outboundMessage.getImportRequest());
                     case FILE_IMPORT_REQUEST -> throw new IllegalStateException(
                         "No file import request supported: " + outboundMessage.getFileImportRequest().getUrl());
-                    case FUNCTION_CALL_REQUEST ->
-                        this.handleFunctionCallRequest(compilationId, outboundMessage.getFunctionCallRequest());
+                    case FUNCTION_CALL_REQUEST -> this.handleFunctionCallRequest(compilationId,
+                        outboundMessage.getFunctionCallRequest());
                     case MESSAGE_NOT_SET -> throw new IllegalStateException("No message set");
                     default -> throw new IllegalStateException(
                         "Unknown OutboundMessage: " + outboundMessage.getMessageCase());
@@ -223,7 +235,7 @@ class MCRSassCompiler implements Closeable {
 
     private void handleImportRequest(int compilationId, ImportRequest importRequest) throws IOException {
         ImportResponse.Builder importResponse = ImportResponse.newBuilder()
-                .setId(importRequest.getId());
+            .setId(importRequest.getId());
 
         CustomImporter customImporter = customImporters.get(importRequest.getImporterId());
 
@@ -243,13 +255,13 @@ class MCRSassCompiler implements Closeable {
     private void handleCanonicalizeRequest(int compilationId, CanonicalizeRequest canonicalizeRequest)
         throws IOException {
         CanonicalizeResponse.Builder canonicalizeResponse = CanonicalizeResponse.newBuilder()
-                .setId(canonicalizeRequest.getId());
+            .setId(canonicalizeRequest.getId());
 
         CustomImporter customImporter = customImporters.get(canonicalizeRequest.getImporterId());
 
         try {
-            String canonicalize
-                = customImporter.canonicalize(canonicalizeRequest.getUrl(), canonicalizeRequest.getFromImport());
+            String canonicalize = customImporter.canonicalize(canonicalizeRequest.getUrl(),
+                canonicalizeRequest.getFromImport());
             if (canonicalize != null) {
                 canonicalizeResponse.setUrl(canonicalize);
             }
@@ -264,7 +276,7 @@ class MCRSassCompiler implements Closeable {
     private void handleFunctionCallRequest(int compilationId, FunctionCallRequest functionCallRequest)
         throws IOException {
         FunctionCallResponse.Builder response = FunctionCallResponse.newBuilder()
-                .setId(functionCallRequest.getId());
+            .setId(functionCallRequest.getId());
 
         try {
             switch (functionCallRequest.getIdentifierCase()) {
