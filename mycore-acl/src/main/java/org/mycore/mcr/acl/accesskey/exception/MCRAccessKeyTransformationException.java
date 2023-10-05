@@ -22,6 +22,9 @@ package org.mycore.mcr.acl.accesskey.exception;
  * Exception that refers to an error during transformation of an access key.
  */
 public class MCRAccessKeyTransformationException extends MCRAccessKeyException {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRAccessKeyTransformationException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.transformation");
     }

@@ -25,6 +25,8 @@ import org.mycore.common.MCRException;
  */
 public class MCRAccessKeyException extends MCRException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Reference for error messages for i18n.
     */
