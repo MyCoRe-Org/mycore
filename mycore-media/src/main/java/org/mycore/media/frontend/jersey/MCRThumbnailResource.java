@@ -84,7 +84,7 @@ public class MCRThumbnailResource {
         List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRJerseyUtil.getID(documentId),
             1, TimeUnit.MINUTES);
         for (MCRObjectID derivateId : derivateIds) {
-            if (MCRAccessManager.checkPermissionForReadingDerivate(derivateId.toString())) {
+            if (MCRAccessManager.checkDerivateDisplayPermission(derivateId.toString())) {
                 String nameOfMainFile = MCRMetadataManager.retrieveMCRDerivate(derivateId).getDerivate().getInternals()
                     .getMainDoc();
                 if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
