@@ -97,7 +97,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     /**
      * Map of namespaces. This setting is required for the json2xml serialisation process if the
      * {@link SerializerSettings#namespaceHandling()} is set to <b>OMIT</b>.
-     * TODO: Map<> property doesn't seem to work right now
+     * TODO: Map property doesn't seem to work right now
      */
     //@MCRProperty(name = "Namespaces", required = false)
     //public Map<String, String> namespaces;
