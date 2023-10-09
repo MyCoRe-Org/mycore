@@ -29,10 +29,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
@@ -174,20 +174,20 @@ public class MCRConfigurationInputStream extends InputStream {
      * return an enumeration of input streams of configuration files
      * found in MyCoRe components and modules, respecting the proper loading order 
      */
-    public static List<byte[]> getConfigFileContents(String filename) throws IOException {
-        ArrayList<byte[]> cList = new ArrayList<>();
+    public static LinkedHashMap<String, byte[]> getConfigFileContents(String filename) throws IOException {
+        LinkedHashMap<String, byte[]> map = new LinkedHashMap<>();
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             try (InputStream is = component.getConfigFileStream(filename)) {
                 if (is != null) {
-                    cList.add(IOUtils.toByteArray(is));
+                    map.put(component.getName(), is.readAllBytes());
                 }
             }
         }
         // load config file from classpath
-        try (InputStream configStream = getConfigFileStream(filename)) {
+        try (InputStream configStream = MCRConfigurationInputStream.getConfigFileStream(filename)) {
             if (configStream != null) {
                 LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
-                cList.add(IOUtils.toByteArray(configStream));
+                map.put("classpath_" + filename, configStream.readAllBytes());
             }
         }
 
@@ -196,10 +196,10 @@ public class MCRConfigurationInputStream extends InputStream {
         if (localConfigFile != null && localConfigFile.canRead()) {
             LogManager.getLogger().debug("Loaded config file from config dir: " + filename);
             try (FileInputStream fis = new FileInputStream(localConfigFile)) {
-                cList.add(IOUtils.toByteArray(fis));
+                map.put("configdir_" + filename, fis.readAllBytes());
             }
         }
-        return cList;
+        return map;
     }
 
     /**
