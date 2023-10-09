@@ -371,6 +371,18 @@
       <artifactId>jsoup</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mycore.xsonify</groupId>
+      <artifactId>xsonify-serializer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.xsonify</groupId>
+      <artifactId>xsonify-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.xsonify</groupId>
+      <artifactId>xsonify-xsd</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>
       <artifactId>svnkit</artifactId>
     </dependency>
