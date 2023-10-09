@@ -20,15 +20,15 @@ package org.mycore.orcid2.oauth;
 
 import java.util.Objects;
 
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.orcid2.MCRORCIDConstants;
+import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
+
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.Response;
-
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.orcid2.MCRORCIDConstants;
-import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 
 /**
  * Client for the OAuth2 API of orcid.org.

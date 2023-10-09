@@ -23,6 +23,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import org.mycore.orcid2.client.MCRORCIDClientConstants;
+
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.MediaType;
@@ -30,8 +32,6 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-
-import org.mycore.orcid2.client.MCRORCIDClientConstants;
 
 /**
  * Transforms request body to ORCID XML.

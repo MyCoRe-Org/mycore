@@ -32,6 +32,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
+import org.mycore.webtools.upload.exception.MCRInvalidFileException;
+import org.mycore.webtools.upload.exception.MCRInvalidUploadParameterException;
+import org.mycore.webtools.upload.exception.MCRMissingParameterException;
+import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
+import org.mycore.webtools.upload.exception.MCRUploadServerException;
+
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -39,24 +51,12 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
-
-import jakarta.ws.rs.container.ContainerRequestContext;
-import org.mycore.webtools.upload.exception.MCRInvalidFileException;
-import org.mycore.webtools.upload.exception.MCRInvalidUploadParameterException;
-import org.mycore.webtools.upload.exception.MCRMissingParameterException;
-import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
-import org.mycore.webtools.upload.exception.MCRUploadServerException;
 
 @Path("files/upload/")
 public class MCRUploadResource {

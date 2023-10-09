@@ -22,10 +22,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
+import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;

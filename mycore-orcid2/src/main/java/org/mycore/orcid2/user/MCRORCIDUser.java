@@ -27,10 +27,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -45,6 +41,10 @@ import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Provides functionality to interact with MCRUser that is also an ORCID user.

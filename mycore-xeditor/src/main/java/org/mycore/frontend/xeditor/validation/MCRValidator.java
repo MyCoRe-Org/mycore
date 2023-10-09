@@ -18,14 +18,14 @@
 
 package org.mycore.frontend.xeditor.validation;
 
+import java.util.List;
+
 import org.jaxen.JaxenException;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
-import java.util.List;
 
 public abstract class MCRValidator {
 

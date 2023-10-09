@@ -18,6 +18,8 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.function.Supplier;
 
 import org.junit.Test;
@@ -25,8 +27,6 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-
-import static org.junit.Assert.assertNotNull;
 
 public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 

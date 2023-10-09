@@ -18,6 +18,10 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,10 +33,6 @@ import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 

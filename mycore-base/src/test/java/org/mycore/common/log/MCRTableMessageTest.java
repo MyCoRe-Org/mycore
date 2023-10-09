@@ -18,14 +18,13 @@
 
 package org.mycore.common.log;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Optional;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.log.MCRTableMessage.Column;
-
-
-import static org.junit.Assert.assertEquals;
 
 public class MCRTableMessageTest extends MCRTestCase {
 

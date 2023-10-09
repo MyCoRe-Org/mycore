@@ -18,6 +18,11 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
@@ -25,11 +30,6 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRProperty;
 
 import jakarta.inject.Singleton;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Thomas Scheffler (yagee)

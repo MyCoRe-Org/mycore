@@ -39,6 +39,7 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JNodeJsonRecord;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JPathJsonRecord;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JRelationShipJsonRecord;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver;
+import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -47,7 +48,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 
 /**
  * Proxy Servlet for accessing and querying Neo4J

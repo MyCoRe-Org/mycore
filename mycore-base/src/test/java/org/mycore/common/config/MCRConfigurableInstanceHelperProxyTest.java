@@ -18,6 +18,9 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.function.Supplier;
 
 import org.junit.Test;
@@ -26,9 +29,6 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
 

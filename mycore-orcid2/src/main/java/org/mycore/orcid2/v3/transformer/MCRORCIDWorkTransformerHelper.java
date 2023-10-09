@@ -21,10 +21,6 @@ package org.mycore.orcid2.v3.transformer;
 import java.io.IOException;
 import java.util.Objects;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
@@ -41,6 +37,10 @@ import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.v3.release.record.Citation;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 
 /**
  * Provides helper functions to transform between Work or WorkSummary and MODS MCRContent.

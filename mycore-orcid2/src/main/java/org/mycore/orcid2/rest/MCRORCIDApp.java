@@ -25,11 +25,11 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
 import org.mycore.restapi.MCRCORSResponseFilter;
 import org.mycore.restapi.MCRIgnoreClientAbortInterceptor;
-
-import jakarta.ws.rs.ApplicationPath;
 import org.mycore.restapi.MCRSessionFilter;
 import org.mycore.restapi.MCRTransactionFilter;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
+
+import jakarta.ws.rs.ApplicationPath;
 
 /**
  * ORCID API REST app.

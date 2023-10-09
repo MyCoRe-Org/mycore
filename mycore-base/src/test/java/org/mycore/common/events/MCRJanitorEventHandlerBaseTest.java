@@ -18,6 +18,8 @@
 
 package org.mycore.common.events;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRException;
@@ -26,8 +28,6 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.datamodel.metadata.MCRObject;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
 

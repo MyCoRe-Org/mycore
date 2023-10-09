@@ -40,7 +40,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.user2.MCRUser;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDInvalidScopeException;
@@ -55,6 +54,7 @@ import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.user2.MCRUser;
 import org.orcid.jaxb.model.message.ScopeConstants;
 
 /**

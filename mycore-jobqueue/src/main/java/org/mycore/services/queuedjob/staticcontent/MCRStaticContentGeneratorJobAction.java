@@ -18,14 +18,14 @@
 
 package org.mycore.services.queuedjob.staticcontent;
 
+import java.util.concurrent.ExecutionException;
+
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
 import org.mycore.services.staticcontent.MCRObjectStaticContentGenerator;
-
-import java.util.concurrent.ExecutionException;
 
 public class MCRStaticContentGeneratorJobAction extends MCRJobAction {
 

@@ -25,7 +25,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 
-
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.w3c.dom.Document;

@@ -46,8 +46,6 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
-
-import jakarta.persistence.EntityTransaction;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -59,6 +57,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
+
+import jakarta.persistence.EntityTransaction;
 
 /**
  * Common helper class for all services handling file upload.

@@ -18,9 +18,9 @@
 
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record Neo4JMetaData(
     @JsonProperty String title,

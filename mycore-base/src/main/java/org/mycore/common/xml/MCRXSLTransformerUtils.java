@@ -18,12 +18,13 @@
 
 package org.mycore.common.xml;
 
-import org.mycore.common.config.MCRConfiguration2;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import java.util.Map;
-import java.util.Properties;
+
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRXSLTransformerUtils {
 

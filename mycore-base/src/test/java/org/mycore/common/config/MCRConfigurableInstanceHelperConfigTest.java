@@ -18,10 +18,10 @@
 
 package org.mycore.common.config;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 
 public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
 

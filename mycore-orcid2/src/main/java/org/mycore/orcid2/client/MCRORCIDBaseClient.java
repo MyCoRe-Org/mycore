@@ -24,17 +24,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import org.apache.commons.lang3.StringUtils;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.client.filter.MCRORCIDAuthenticationFilter;
 import org.mycore.orcid2.client.filter.MCRORCIDXMLReader;
 import org.mycore.orcid2.client.filter.MCRORCIDXMLWriter;
+
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Basic ORCID client.

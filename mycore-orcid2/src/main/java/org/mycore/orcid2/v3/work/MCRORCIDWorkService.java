@@ -25,8 +25,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.core.Response;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRJDOMContent;
@@ -53,6 +51,8 @@ import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.search.Search;
+
+import jakarta.ws.rs.core.Response;
 
 /**
  * Provides functionalities to create, update or delete works in ORCID profile.

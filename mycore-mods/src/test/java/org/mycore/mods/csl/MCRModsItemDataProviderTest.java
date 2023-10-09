@@ -18,8 +18,9 @@
 
 package org.mycore.mods.csl;
 
-import de.undercouch.citeproc.csl.CSLItemData;
-import de.undercouch.citeproc.csl.CSLItemDataBuilder;
+import java.io.IOException;
+import java.io.StringReader;
+
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -27,8 +28,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
-import java.io.IOException;
-import java.io.StringReader;
+import de.undercouch.citeproc.csl.CSLItemData;
+import de.undercouch.citeproc.csl.CSLItemDataBuilder;
 
 public class MCRModsItemDataProviderTest extends MCRTestCase {
 

@@ -22,15 +22,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Handles metadata for ORCID stuff.

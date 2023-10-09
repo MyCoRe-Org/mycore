@@ -21,7 +21,6 @@ package org.mycore.pandoc;
 import java.io.IOException;
 
 import org.jdom2.Element;
-
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;

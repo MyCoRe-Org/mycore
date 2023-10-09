@@ -17,10 +17,10 @@
  */
 package org.mycore.access;
 
+import java.util.Collection;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-
-import java.util.Collection;
 
 /**
  * This serves as an interface to an underlying access controll system.

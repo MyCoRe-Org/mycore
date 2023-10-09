@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
-
 import org.mycore.viewer.alto.model.MCRAltoChangeSet;
 import org.mycore.viewer.alto.model.MCRStoredChangeSet;
 import org.mycore.viewer.alto.service.MCRAltoChangeSetStore;

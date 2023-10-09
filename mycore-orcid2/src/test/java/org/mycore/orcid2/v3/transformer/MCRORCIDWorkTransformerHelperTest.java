@@ -22,8 +22,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
 
-import jakarta.xml.bind.JAXBContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -32,6 +30,8 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRJDOMContent;
 import org.orcid.jaxb.model.v3.release.record.Work;
+
+import jakarta.xml.bind.JAXBContext;
 
 public class MCRORCIDWorkTransformerHelperTest extends MCRTestCase {
 

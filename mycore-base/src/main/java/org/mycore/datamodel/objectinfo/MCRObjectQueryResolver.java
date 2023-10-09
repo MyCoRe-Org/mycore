@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.objectinfo;
 
+import java.util.List;
+
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import java.util.List;
 
 /**
  * Allows to query objects using {@link MCRObjectQuery}.

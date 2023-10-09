@@ -18,6 +18,8 @@
 
 package org.mycore.mcr.neo4j.frontend.cli;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -30,10 +32,8 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JDatabaseDriver;
-import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JManager;
-
-import java.util.List;
+import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 
 @MCRCommandGroup(name = "Commands to handle Neo4J")
 @SuppressWarnings("unused")

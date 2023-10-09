@@ -18,8 +18,6 @@
 
 package org.mycore.mcr.neo4j.index;
 
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants;
-
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,6 +34,7 @@ import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 import org.mycore.util.concurrent.MCRDelayedRunnable;
 import org.mycore.util.concurrent.MCRTransactionableRunnable;

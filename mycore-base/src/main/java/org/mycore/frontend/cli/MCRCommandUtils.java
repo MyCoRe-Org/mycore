@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -34,9 +37,6 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 
 /**
  * Utilities intended to reduce redundant code when writing variants of CLI commands.

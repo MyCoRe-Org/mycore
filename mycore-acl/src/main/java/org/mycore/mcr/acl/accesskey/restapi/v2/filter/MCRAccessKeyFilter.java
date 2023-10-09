@@ -18,13 +18,6 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2.filter;
 
-import jakarta.annotation.Priority;
-import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.ext.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -32,6 +25,13 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
 import org.mycore.restapi.v2.MCRRestAuthorizationFilter;
+
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION + 1)

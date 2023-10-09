@@ -44,8 +44,8 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 
 /**
  * REST API for messages.

@@ -20,16 +20,6 @@ package org.mycore.orcid2.v3.rest.resources;
 
 import java.util.Set;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
@@ -53,6 +43,16 @@ import org.mycore.orcid2.v3.work.MCRORCIDWorkService;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.orcid.jaxb.model.v3.release.record.Work;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Basic resource for general methods.

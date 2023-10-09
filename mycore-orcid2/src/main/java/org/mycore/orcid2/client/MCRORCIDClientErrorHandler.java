@@ -18,9 +18,9 @@
 
 package org.mycore.orcid2.client;
 
-import jakarta.ws.rs.core.Response;
-
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
+
+import jakarta.ws.rs.core.Response;
 
 /**
  * Handles client error.

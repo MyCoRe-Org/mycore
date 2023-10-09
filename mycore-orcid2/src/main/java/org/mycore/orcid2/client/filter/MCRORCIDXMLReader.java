@@ -18,10 +18,12 @@
 
 package org.mycore.orcid2.client.filter;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+
+import org.mycore.orcid2.client.MCRORCIDClientConstants;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.ProcessingException;
@@ -31,8 +33,6 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-
-import org.mycore.orcid2.client.MCRORCIDClientConstants;
 
 /**
  * Transforms response body to respective object.

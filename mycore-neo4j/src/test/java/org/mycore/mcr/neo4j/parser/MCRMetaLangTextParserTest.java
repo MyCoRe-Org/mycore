@@ -18,15 +18,15 @@
 
 package org.mycore.mcr.neo4j.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import java.util.List;
+
 import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaLangTextParser;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class MCRMetaLangTextParserTest extends AbstractNeo4JParserTest {
     @Test

@@ -18,12 +18,12 @@
 
 package org.mycore.iview2.services;
 
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
-
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
 
 public class MCRIview2URIResolver implements URIResolver {
     @Override

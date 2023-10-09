@@ -19,8 +19,8 @@
 package org.mycore.pandoc;
 
 import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
-
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
