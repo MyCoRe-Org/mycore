@@ -21,8 +21,8 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,7 +131,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command adds a new classification from URL {0} to the system.",
         order = 15)
     public static void loadFromURL(String fileURL) throws IOException, URISyntaxException, JDOMException {
-        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URI(fileURL).toURL()));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
     }
@@ -168,7 +168,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 25)
     public static void updateFromURL(String fileURL)
         throws IOException, URISyntaxException, JDOMException {
-        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URI(fileURL).toURL()));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
             DAO.replaceCategory(category);

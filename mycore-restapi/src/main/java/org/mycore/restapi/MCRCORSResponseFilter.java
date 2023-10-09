@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
@@ -76,6 +77,11 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         if (requestHeaders != null) {
             //todo: may be restricted?
             responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_HEADERS, requestHeaders);
+            //check if the request is a preflight request and the Authorization header will be sent
+            if (StringUtils.containsIgnoreCase(requestHeaders,HttpHeaders.AUTHORIZATION)) {
+                responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
+                responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, requestContext.getHeaderString(ORIGIN));
+            }
         }
         long cacheSeconds = TimeUnit.DAYS.toSeconds(1);
         responseHeaders.putSingle(ACCESS_CONTROL_MAX_AGE, cacheSeconds);
@@ -89,7 +95,9 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         if (origin == null) {
             return; //No CORS Request
         }
-        boolean authenticatedRequest = requestContext.getSecurityContext().getAuthenticationScheme() != null;
+        boolean authenticatedRequest = requestContext.getSecurityContext().getAuthenticationScheme() != null
+            //check if the Authorization header was sent
+            || requestContext.getHeaderString(HttpHeaders.AUTHORIZATION) != null;
         MultivaluedMap<String, Object> responseHeaders = responseContext.getHeaders();
         if (authenticatedRequest) {
             responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
@@ -100,6 +108,9 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
             ArrayList<String> exposedHeaders = new ArrayList<>();
             if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
                 exposedHeaders.add(HttpHeaders.AUTHORIZATION);
+            }
+            if ("ServiceWorker".equals(requestContext.getHeaderString("X-Requested-With"))) {
+                exposedHeaders.add(HttpHeaders.WWW_AUTHENTICATE);
             }
             Optional.ofNullable(resourceInfo)
                 .map(ResourceInfo::getResourceMethod)

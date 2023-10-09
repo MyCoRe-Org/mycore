@@ -83,7 +83,7 @@ public class MCRISO8601DateTest {
         String simpleFormat = "yyyy";
         String language = "de";
         //simulate MCRXMLFunctions.format();
-        Locale locale = new Locale(language);
+        Locale locale = Locale.forLanguageTag(language);
         MCRISO8601Date mcrdate = new MCRISO8601Date();
         mcrdate.setFormat((String) null);
         mcrdate.setDate(year);

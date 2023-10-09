@@ -18,12 +18,11 @@
 
 package org.mycore.common.content;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
-import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRURIResolver;
-import org.w3c.dom.Node;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -33,10 +32,13 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRURIResolver;
+import org.w3c.dom.Node;
 
 import jakarta.xml.bind.util.JAXBSource;
 
@@ -99,9 +101,9 @@ public class MCRSourceContent extends MCRWrappedContent {
                 baseContent = new MCRStreamContent(inputStream);
             } else {
                 try {
-                    URL url = new URL(source.getSystemId());
-                    baseContent = new MCRURLContent(url);
-                } catch (MalformedURLException e) {
+                    URI uri = new URI(source.getSystemId());
+                    baseContent = new MCRURLContent(uri.toURL());
+                } catch (URISyntaxException | MalformedURLException e) {
                     throw new MCRException("Could not create instance of MCRURLContent for SYSTEMID: "
                         + source.getSystemId(), e);
                 }

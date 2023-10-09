@@ -24,6 +24,8 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -104,15 +106,15 @@ public class MCRSolrURL {
     public URL getUrl() {
         try {
             if (this.urlQuery == null) {
-                return new URL(
+                return new URI(
                     solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&q=" + URLEncoder
                         .encode(q, StandardCharsets.UTF_8)
                         + "&start=" + start
                         + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, StandardCharsets.UTF_8)
                         + (returnScore ? "&fl=*,score" : "")
-                        + (wt != null ? "&wt=" + wt : ""));
+                        + (wt != null ? "&wt=" + wt : "")).toURL();
             } else {
-                return new URL(solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&" + urlQuery);
+                return new URI(solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&" + urlQuery).toURL();
             }
         } catch (Exception urlException) {
             LOGGER.error("Error building solr url", urlException);
@@ -129,8 +131,8 @@ public class MCRSolrURL {
      */
     public URL getLukeURL() {
         try {
-            return new URL(solrClient.getBaseURL() + "/admin/luke");
-        } catch (MalformedURLException e) {
+            return new URI(solrClient.getBaseURL() + "/admin/luke").toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             LOGGER.error("Error building solr luke url", e);
         }
         return null;

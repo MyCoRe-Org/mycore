@@ -32,30 +32,30 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.protobuf.ByteString;
+import com.sass_lang.embedded_protocol.InboundMessage;
+import com.sass_lang.embedded_protocol.InboundMessage.CanonicalizeResponse;
+import com.sass_lang.embedded_protocol.InboundMessage.CompileRequest;
+import com.sass_lang.embedded_protocol.InboundMessage.FunctionCallResponse;
+import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse;
+import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse.ImportSuccess;
+import com.sass_lang.embedded_protocol.OutboundMessage;
+import com.sass_lang.embedded_protocol.OutboundMessage.CanonicalizeRequest;
+import com.sass_lang.embedded_protocol.OutboundMessage.FunctionCallRequest;
+import com.sass_lang.embedded_protocol.OutboundMessage.ImportRequest;
+import com.sass_lang.embedded_protocol.OutputStyle;
+import com.sass_lang.embedded_protocol.Syntax;
 
+import de.larsgrefer.sass.embedded.CompileSuccess;
 import de.larsgrefer.sass.embedded.SassCompilationFailedException;
 import de.larsgrefer.sass.embedded.SassProtocolErrorException;
 import de.larsgrefer.sass.embedded.connection.CompilerConnection;
+import de.larsgrefer.sass.embedded.connection.Packet;
 import de.larsgrefer.sass.embedded.importer.CustomImporter;
 import de.larsgrefer.sass.embedded.importer.Importer;
 import de.larsgrefer.sass.embedded.logging.Log4jLoggingHandler;
 import de.larsgrefer.sass.embedded.logging.LoggingHandler;
 import de.larsgrefer.sass.embedded.util.ProtocolUtil;
 import jakarta.servlet.ServletContext;
-import sass.embedded_protocol.EmbeddedSass.InboundMessage;
-import sass.embedded_protocol.EmbeddedSass.InboundMessage.CanonicalizeResponse;
-import sass.embedded_protocol.EmbeddedSass.InboundMessage.CompileRequest;
-import sass.embedded_protocol.EmbeddedSass.InboundMessage.FunctionCallResponse;
-import sass.embedded_protocol.EmbeddedSass.InboundMessage.ImportResponse;
-import sass.embedded_protocol.EmbeddedSass.InboundMessage.ImportResponse.ImportSuccess;
-import sass.embedded_protocol.EmbeddedSass.OutboundMessage;
-import sass.embedded_protocol.EmbeddedSass.OutboundMessage.CanonicalizeRequest;
-import sass.embedded_protocol.EmbeddedSass.OutboundMessage.CompileResponse;
-import sass.embedded_protocol.EmbeddedSass.OutboundMessage.CompileResponse.CompileSuccess;
-import sass.embedded_protocol.EmbeddedSass.OutboundMessage.FunctionCallRequest;
-import sass.embedded_protocol.EmbeddedSass.OutboundMessage.ImportRequest;
-import sass.embedded_protocol.EmbeddedSass.OutputStyle;
-import sass.embedded_protocol.EmbeddedSass.Syntax;
 
 /**
  * A forked version of {@link de.larsgrefer.sass.embedded.SassCompiler} to support inputs from different artifacts.
@@ -95,7 +95,6 @@ class MCRSassCompiler implements Closeable {
     protected CompileRequest.Builder compileRequestBuilder() {
         CompileRequest.Builder builder = CompileRequest.newBuilder();
 
-        builder.setId(Math.abs(COMPILE_REQUEST_IDS.incrementAndGet()));
         builder.setStyle(outputStyle);
         builder.setSourceMap(generateSourceMaps);
 
@@ -157,44 +156,63 @@ class MCRSassCompiler implements Closeable {
 
     private CompileSuccess execCompileRequest(CompileRequest compileRequest)
         throws IOException, SassCompilationFailedException {
-        OutboundMessage outboundMessage = this.exec(ProtocolUtil.inboundMessage(compileRequest));
+        OutboundMessage outboundMessage = exec(ProtocolUtil.inboundMessage(compileRequest));
+
         if (!outboundMessage.hasCompileResponse()) {
             throw new IllegalStateException("No compile response");
+        }
+
+        OutboundMessage.CompileResponse compileResponse = outboundMessage.getCompileResponse();
+
+        if (compileResponse.hasSuccess()) {
+            return new CompileSuccess(compileResponse);
+        } else if (compileResponse.hasFailure()) {
+            throw new SassCompilationFailedException(compileResponse);
         } else {
-            CompileResponse compileResponse = outboundMessage.getCompileResponse();
-            if (compileResponse.getId() != compileRequest.getId()) {
-                throw new IllegalStateException(
-                    String.format(Locale.ENGLISH, "Compilation ID mismatch: expected %d, but got %d",
-                    compileRequest.getId(), compileResponse.getId()));
-            } else if (compileResponse.hasSuccess()) {
-                return compileResponse.getSuccess();
-            } else if (compileResponse.hasFailure()) {
-                throw new SassCompilationFailedException(compileResponse.getFailure());
-            } else {
-                throw new IllegalStateException("Neither success nor failure");
-            }
+            throw new IllegalStateException("Neither success nor failure");
         }
     }
 
     private OutboundMessage exec(InboundMessage inboundMessage) throws IOException {
+        int compilationId;
+
+        if (inboundMessage.hasVersionRequest()) {
+            compilationId = 0;
+        } else if (inboundMessage.hasCompileRequest()) {
+            compilationId = Math.abs(COMPILE_REQUEST_IDS.incrementAndGet());
+        } else {
+            throw new IllegalArgumentException("Invalid message type: " + inboundMessage.getMessageCase());
+        }
+
+        Packet<InboundMessage> request = new Packet<>(compilationId, inboundMessage);
+
         synchronized (this.connection) {
-            this.connection.sendMessage(inboundMessage);
+            this.connection.sendMessage(request);
 
             while (true) {
-                OutboundMessage outboundMessage = this.connection.readResponse();
+                Packet<OutboundMessage> response = connection.readResponse();
+
+                if (response.getCompilationId() != compilationId) {
+                    //Should never happen
+                    throw new IllegalStateException(
+                        String.format(Locale.ENGLISH, "Compilation ID mismatch: expected %d, but got %d", compilationId,
+                            response.getCompilationId()));
+                }
+
+                OutboundMessage outboundMessage = response.getMessage();
                 switch (outboundMessage.getMessageCase()) {
                     case ERROR -> throw new SassProtocolErrorException(outboundMessage.getError());
                     case COMPILE_RESPONSE, VERSION_RESPONSE -> {
                         return outboundMessage;
                     }
                     case LOG_EVENT -> this.loggingHandler.handle(outboundMessage.getLogEvent());
-                    case CANONICALIZE_REQUEST
-                        -> this.handleCanonicalizeRequest(outboundMessage.getCanonicalizeRequest());
-                    case IMPORT_REQUEST -> this.handleImportRequest(outboundMessage.getImportRequest());
+                    case CANONICALIZE_REQUEST ->
+                        this.handleCanonicalizeRequest(compilationId, outboundMessage.getCanonicalizeRequest());
+                    case IMPORT_REQUEST -> this.handleImportRequest(compilationId, outboundMessage.getImportRequest());
                     case FILE_IMPORT_REQUEST -> throw new IllegalStateException(
                         "No file import request supported: " + outboundMessage.getFileImportRequest().getUrl());
-                    case FUNCTION_CALL_REQUEST
-                        -> this.handleFunctionCallRequest(outboundMessage.getFunctionCallRequest());
+                    case FUNCTION_CALL_REQUEST ->
+                        this.handleFunctionCallRequest(compilationId, outboundMessage.getFunctionCallRequest());
                     case MESSAGE_NOT_SET -> throw new IllegalStateException("No message set");
                     default -> throw new IllegalStateException(
                         "Unknown OutboundMessage: " + outboundMessage.getMessageCase());
@@ -203,7 +221,7 @@ class MCRSassCompiler implements Closeable {
         }
     }
 
-    private void handleImportRequest(ImportRequest importRequest) throws IOException {
+    private void handleImportRequest(int compilationId, ImportRequest importRequest) throws IOException {
         ImportResponse.Builder importResponse = ImportResponse.newBuilder()
                 .setId(importRequest.getId());
 
@@ -219,10 +237,10 @@ class MCRSassCompiler implements Closeable {
             importResponse.setError(getErrorMessage(t));
         }
 
-        connection.sendMessage(ProtocolUtil.inboundMessage(importResponse.build()));
+        connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(importResponse.build()));
     }
 
-    private void handleCanonicalizeRequest(CanonicalizeRequest canonicalizeRequest)
+    private void handleCanonicalizeRequest(int compilationId, CanonicalizeRequest canonicalizeRequest)
         throws IOException {
         CanonicalizeResponse.Builder canonicalizeResponse = CanonicalizeResponse.newBuilder()
                 .setId(canonicalizeRequest.getId());
@@ -240,10 +258,11 @@ class MCRSassCompiler implements Closeable {
             canonicalizeResponse.setError(getErrorMessage(e));
         }
 
-        connection.sendMessage(ProtocolUtil.inboundMessage(canonicalizeResponse.build()));
+        connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(canonicalizeResponse.build()));
     }
 
-    private void handleFunctionCallRequest(FunctionCallRequest functionCallRequest) throws IOException {
+    private void handleFunctionCallRequest(int compilationId, FunctionCallRequest functionCallRequest)
+        throws IOException {
         FunctionCallResponse.Builder response = FunctionCallResponse.newBuilder()
                 .setId(functionCallRequest.getId());
 
@@ -261,7 +280,7 @@ class MCRSassCompiler implements Closeable {
             response.setError(getErrorMessage(e));
         }
 
-        connection.sendMessage(ProtocolUtil.inboundMessage(response.build()));
+        connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(response.build()));
     }
 
     private String getErrorMessage(Throwable t) {

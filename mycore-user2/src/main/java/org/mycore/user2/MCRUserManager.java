@@ -272,7 +272,6 @@ public class MCRUserManager {
         }
         inDb.ifPresent(db -> {
             user.internalID = db.internalID;
-            em.detach(db);
             em.merge(user);
             MCRRoleManager.unassignRoles(user);
             MCRRoleManager.storeRoleAssignments(user);

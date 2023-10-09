@@ -20,7 +20,8 @@ package org.mycore.restapi.v1;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -144,7 +145,7 @@ public class MCRRestAPISearch {
             url.append("&json.wrf=").append(jsonWrf);
         }
 
-        try (InputStream is = new URL(url.toString()).openStream()) {
+        try (InputStream is = new URI(url.toString()).toURL().openStream()) {
             try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
                 String text = scanner.useDelimiter("\\A").next();
 
@@ -159,7 +160,7 @@ public class MCRRestAPISearch {
                     .build();
 
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             LOGGER.error(e);
         }
 

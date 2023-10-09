@@ -19,7 +19,8 @@
 package org.mycore.pi.purl;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,8 +88,8 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
         String purlString = parameters.get(CONTEXT_PURL);
 
         try {
-            return new MCRPURL(new URL(purlString));
-        } catch (MalformedURLException e) {
+            return new MCRPURL(new URI(purlString).toURL());
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new MCRPersistentIdentifierException("Cannot parse " + purlString);
         }
     }
@@ -102,9 +103,8 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
         MCRPURL purl;
 
         try {
-            purl = new MCRPURL(
-                new URL(purlString));
-        } catch (MalformedURLException e) {
+            purl = new MCRPURL(new URI(purlString).toURL());
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new MCRPersistentIdentifierException("Could not parse purl: " + purlString, e);
         }
 

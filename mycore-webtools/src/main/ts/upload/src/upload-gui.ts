@@ -22,15 +22,20 @@ import {FileTransferQueue} from "./FileTransferQueue";
 import {FileTransfer} from "./FileTransfer";
 import {Utils} from "./Utils";
 import {I18N} from "./I18N";
-
+import {TransferSession} from "./TransferSession";
+interface FileTransferProgress {
+    transfer: FileTransfer,
+    loaded:number,
+    total: number
+}
 export class FileTransferGUI {
 
 
     private _uploadBox: HTMLElement = null;
-    private _idEntryMap: {} = {};
-    private completedCount: number = 0;
-    private tpMap = {};
-    private runningCommitList: Array<string> = [];
+    private _transferElementMap: Map<FileTransfer, HTMLElement> = new Map<FileTransfer, HTMLElement>();
+    private _entryFileTransferMap: Map<HTMLElement, FileTransfer> = new Map<HTMLElement, FileTransfer>();
+    private transferProgressMap = new Map<FileTransfer, FileTransferProgress>();
+    private runningCommitList: Array<TransferSession> = [];
 
     constructor() {
         this.registerEventHandler();
@@ -47,6 +52,10 @@ export class FileTransferGUI {
 
         (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-abort")).addEventListener('click', () => {
             FileTransferQueue.getQueue().abortAll();
+        });
+
+        this._uploadBox.querySelector('.minimize').addEventListener('click', () => {
+            this._uploadBox.classList.toggle('minimized');
         });
     }
 
@@ -81,39 +90,42 @@ export class FileTransferGUI {
             this.handleTransferAbort(ft);
         });
 
-        queue.addStartCommitHandler((uploadID: string) => {
-            this.handleCommitStartet(uploadID);
+        queue.addStartCommitHandler((session: TransferSession) => {
+            this.handleCommitStartet(session);
         });
 
-        queue.addCommitCompleteHandler((uploadID: string, error: boolean, message: string) => {
-            this.handleCommitCompleted(uploadID, error, message);
+        queue.addCommitCompleteHandler((session: TransferSession, error: boolean, message: string, location: string) => {
+            this.handleCommitCompleted(session, error, message, location);
         });
 
         queue.addProgressHandler((ft) => this.handleTransferProgress(ft));
 
-        window.setInterval(() => {
-            for (let id in this.tpMap) {
-                let progress = this.tpMap[id];
-                this.setTransferProgress(this.getEntry(progress.transfer), progress.loaded, progress.total);
-            }
-        }, 500);
+        queue.addBeginSessionErrorHandler((session, message) => {
+           this.handleSessionBeginError(session, message);
+        });
 
-        let lastLoaded = {};
+        window.setInterval(() => {
+            this.transferProgressMap.forEach((progress) => {
+                this.setTransferProgress(this.getEntry(progress.transfer), progress.loaded, progress.total);
+            });
+        }, 250);
+
+        let lastLoaded:Map<FileTransfer, number> = new Map<FileTransfer, number>();
         window.setInterval(() => {
             let allRate = 0;
-            for (let id in this.tpMap) {
-                let progress = this.tpMap[id];
-                if (id in lastLoaded) {
-                    let bytesInSecond = progress.loaded - lastLoaded[id];
+
+            this.transferProgressMap.forEach((progress) => {
+                if (lastLoaded.has(progress.transfer)) {
+                    let bytesInSecond = (progress.loaded - lastLoaded.get(progress.transfer))*2;
                     allRate += bytesInSecond;
                     this.setTransferRate(this.getEntry(progress.transfer), bytesInSecond);
                 }
-                lastLoaded[id] = progress.loaded;
-            }
+                lastLoaded.set(progress.transfer, progress.loaded);
+            })
+
 
             this.setAllProgress(allRate);
-
-        }, 1000);
+        }, 500);
 
     }
 
@@ -144,7 +156,7 @@ export class FileTransferGUI {
     }
 
     private getEntry(transfer: FileTransfer) {
-        return <HTMLElement>this._idEntryMap[transfer.transferID];
+        return this._transferElementMap.get(transfer);
     }
 
     private handleTransferCompleted(transfer: FileTransfer) {
@@ -153,8 +165,11 @@ export class FileTransferGUI {
 
     private removeTransferEntry(transfer: FileTransfer) {
         const entry = this.getEntry(transfer);
+        this._entryFileTransferMap.delete(entry);
         entry.remove();
-        delete this.tpMap[transfer.transferID];
+        if(this.transferProgressMap.has(transfer)){
+            this.transferProgressMap.delete(transfer);
+        }
     }
 
     private handleTransferError(transfer: FileTransfer) {
@@ -166,31 +181,23 @@ export class FileTransferGUI {
     }
 
     private handleTransferAbort(transfer: FileTransfer) {
-        if (transfer.transferID in this.tpMap) {
-            delete this.tpMap[transfer.transferID];
-        }
         this.removeTransferEntry(transfer);
     }
 
     private handleTransferProgress(transfer: FileTransfer) {
-        const transID = transfer.transferID;
-        this.tpMap[transID] =
+        this.transferProgressMap.set(transfer,
             {
                 transfer: transfer,
                 loaded: transfer.loaded,
                 total: transfer.total
-            };
+            });
     }
 
-    private setFileName(entry: HTMLElement | string, name: string) {
-        if (entry instanceof HTMLElement) {
-            (<HTMLElement>entry.querySelector(".mcr-upload-file-name")).innerText = name;
-        } else if (Helper.isString(entry)) {
-            this.setFileName(this._idEntryMap[entry], name);
-        }
+    private setFileName(entry: HTMLElement, name: string) {
+        (entry.querySelector(".mcr-upload-file-name") as HTMLElement).innerText = name;
     }
 
-    private setTransferProgress(entry: HTMLElement | string, current: number, all: number) {
+    private setTransferProgress(entry: HTMLElement, current: number, all: number) {
         if (entry instanceof HTMLElement) {
             const sizeStr = Helper.formatBytes(all, 1);
             const currentStr = Helper.formatBytes(current, 1);
@@ -200,18 +207,14 @@ export class FileTransferGUI {
             const progressBarElement = (<HTMLElement>entry.querySelector(".mcr-upload-progressbar"));
             progressBarElement.style.width = percent + "%";
             progressBarElement.setAttribute("aria-valuenow", percent);
-        } else if (Helper.isString(entry)) {
-            this.setFileName(this._idEntryMap[entry], entry);
         }
     }
 
     private createFileTransferEntry(transfer: FileTransfer): HTMLElement {
         const newEntry = Helper.htmlToElement(FileTransferGUITemplates.entryTemplate);
-        this._idEntryMap[transfer.transferID] = newEntry;
+        this._transferElementMap.set(transfer, newEntry);
         this.setFileName(newEntry, transfer.fileName);
-
-        newEntry.setAttribute("data-id", transfer.transferID);
-
+        this._entryFileTransferMap.set(newEntry, transfer);
         (<HTMLElement>newEntry.querySelector(".mcr-upload-abort-transfer")).addEventListener("click", () => {
             FileTransferQueue.getQueue().abort(transfer);
         });
@@ -219,11 +222,10 @@ export class FileTransferGUI {
         return newEntry;
     }
 
-    private setTransferRate(entry: HTMLElement | string, bytesInSecond: number) {
+    private setTransferRate(entry: HTMLElement, bytesInSecond: number) {
         if (entry instanceof HTMLElement) {
-            (<HTMLElement>entry.querySelector(".mcr-upload-transfer-rate")).innerText = Helper.formatBytes(bytesInSecond, 1) + "/s";
-        } else if (Helper.isString(entry)) {
-            this.setFileName(this._idEntryMap[entry], entry);
+            const rateText = Helper.formatBytes(bytesInSecond, 1) + "/s";
+            (entry.querySelector(".mcr-upload-transfer-rate") as HTMLElement).innerText = rateText;
         }
     }
 
@@ -234,25 +236,30 @@ export class FileTransferGUI {
         }
     }
 
-    private handleCommitStartet(uploadID: string) {
-        this.runningCommitList.push(uploadID);
+    private handleCommitStartet(session: TransferSession) {
+        this.runningCommitList.push(session);
         this.showCommitWarning(true);
     }
 
-    private handleCommitCompleted(uploadID: string, error: boolean, message: string) {
-        this.runningCommitList.splice(this.runningCommitList.indexOf(uploadID), 1);
+    private handleCommitCompleted(session: TransferSession, error: boolean, message: string, location: string) {
+        this.runningCommitList.splice(this.runningCommitList.indexOf(session), 1);
         if (!error) {
             if (this.runningCommitList.length === 0) {
                 this.showCommitWarning(false);
-                window.location.reload();
+
+                if (!location) {
+                    window.location.reload();
+                } else {
+                    window.location.assign(location);
+                }
             }
         } else {
             this.showCommitWarning(false);
-            this.showCommitError(message);
+            this.showError(message);
         }
     }
 
-    private showCommitError(message: string) {
+    private showError(message: string) {
         const error = this._uploadBox.querySelector(".mcr-commit-error");
         if (error.classList.contains("d-none")) {
             error.classList.remove("d-none");
@@ -270,6 +277,10 @@ export class FileTransferGUI {
         } else if (!show && !warning.classList.contains("d-none")) {
             warning.classList.add("d-none");
         }
+    }
+
+    private handleSessionBeginError(session: TransferSession, message: string) {
+        this.showError(message);
     }
 }
 
@@ -306,7 +317,7 @@ class FileTransferGUITemplates {
     <div class="card" style="height: 100%;">
         <div class="card-header">
             <span class="mcr-upload-title" data-i18n="component.webtools.upload.title"></span>
-            <span class="fas fa-window-minimize float-right" style="font-size: 11px;line-height: 22px;"></span></div>
+            <span class="fas fa-window-minimize minimize float-right" style="font-size: 11px;line-height: 22px;"></span></div>
         <div class="card-body mcr-upload-entry-list" style="overflow-y:  scroll;">
             <div class="container-fluid">
                 <div class="row d-none mcr-commit-error bg-danger">

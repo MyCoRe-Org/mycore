@@ -127,10 +127,12 @@
             <exclude>**/*$*</exclude>
             <exclude>${excludes.test}</exclude>
           </excludes>
-          <property>
-            <name>known.issues</name>
-            <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
-          </property>
+          <properties>
+            <property>
+              <name>known.issues</name>
+              <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
+            </property>
+          </properties>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
       </plugin>
@@ -208,18 +210,6 @@
       <artifactId>jsch</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>jakarta.activation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>mailapi</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>smtp</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
     </dependency>
@@ -248,6 +238,10 @@
       <artifactId>jakarta.mail-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.mail</groupId>
+      <artifactId>jakarta.mail-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
     </dependency>
@@ -258,6 +252,10 @@
     <dependency>
       <groupId>jakarta.websocket</groupId>
       <artifactId>jakarta.websocket-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
@@ -325,6 +323,14 @@
       <artifactId>stax2-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-activation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-mail</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.hk2</groupId>
       <artifactId>hk2-api</artifactId>
     </dependency>
@@ -363,6 +369,18 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.xsonify</groupId>
+      <artifactId>xsonify-serializer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.xsonify</groupId>
+      <artifactId>xsonify-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.xsonify</groupId>
+      <artifactId>xsonify-xsd</artifactId>
     </dependency>
     <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>

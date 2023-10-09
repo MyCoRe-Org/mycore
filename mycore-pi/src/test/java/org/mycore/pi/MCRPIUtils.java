@@ -19,6 +19,8 @@
 package org.mycore.pi;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.UUID;
 
@@ -70,8 +72,8 @@ public class MCRPIUtils {
     public static URL getUrl(MCRPIRegistrationInfo info) {
         String url = "http://localhost:8291/deriv_0001/" + info.getAdditional();
         try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
+            return new URI(url).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
             LOGGER.error("Malformed URL: {}", url);
         }
