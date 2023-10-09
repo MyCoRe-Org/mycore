@@ -112,7 +112,8 @@ public class MCRSolrURL {
                         + "&start=" + start
                         + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, StandardCharsets.UTF_8)
                         + (returnScore ? "&fl=*,score" : "")
-                        + (wt != null ? "&wt=" + wt : "")).toURL();
+                        + (wt != null ? "&wt=" + wt : ""))
+                    .toURL();
             } else {
                 return new URI(solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&" + urlQuery).toURL();
             }

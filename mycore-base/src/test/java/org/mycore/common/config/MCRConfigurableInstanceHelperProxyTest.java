@@ -38,8 +38,7 @@ public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Property2", string = "Value2")
-        }
-    )
+        })
     public void annotated() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -49,7 +48,6 @@ public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
         assertEquals("Value1-Value2", instance.value());
 
     }
-
 
     @MCRConfigurationProxy(proxyClass = TestClassWithConfigurationProxy.Factory.class)
     public static class TestClassWithConfigurationProxy {

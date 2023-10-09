@@ -58,9 +58,9 @@ public class DefaultApplicationController extends ApplicationController {
     @Override
     public void setUpDerivate(WebDriver webdriver, TestDerivate testDerivate) {
         Path target = Paths.get(webpath);
-        if(!Files.exists(target)){
-            try(InputStream is = MCRSeleniumTestBase.class.getClassLoader().getResourceAsStream("testFiles.zip");
-                ZipInputStream zis = new ZipInputStream(is)){
+        if (!Files.exists(target)) {
+            try (InputStream is = MCRSeleniumTestBase.class.getClassLoader().getResourceAsStream("testFiles.zip");
+                ZipInputStream zis = new ZipInputStream(is)) {
                 extractZip(target.getParent().toAbsolutePath().toString(), zis);
             } catch (IOException e) {
                 LOGGER.error("Could not unzip testFiles.zip", e);
@@ -136,7 +136,7 @@ public class DefaultApplicationController extends ApplicationController {
                 localFile.mkdir();
             } else {
                 localFile.createNewFile();
-                try(FileOutputStream localFileOutputStream = new FileOutputStream(localFile)){
+                try (FileOutputStream localFileOutputStream = new FileOutputStream(localFile)) {
                     IOUtils.copyLarge(zipInputStream, localFileOutputStream, 0, nextEntry.getSize());
                 }
 

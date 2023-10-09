@@ -30,7 +30,6 @@ public class MCRTableMessageTest extends MCRTestCase {
 
     private static final String SEPARATOR = System.lineSeparator();
 
-
     @Test
     public void emptyTable() {
 

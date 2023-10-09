@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package org.mycore.orcid2.metadata;
 
 import static org.junit.Assert.assertEquals;

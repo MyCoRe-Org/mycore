@@ -36,7 +36,6 @@ import org.mycore.common.MCRCatchException;
  */
 public class MCRActiveLinkException extends MCRCatchException {
 
-
     private static final long serialVersionUID = 1L;
 
     Map<String, Collection<String>> linkTable = new ConcurrentHashMap<>();

@@ -87,6 +87,7 @@ public class MCRPDFAFunctions {
                 }
                 return FileVisitResult.CONTINUE;
             }
+
             @Override
             public FileVisitResult visitFileFailed(Path file, IOException exc) {
                 return FileVisitResult.CONTINUE;
@@ -94,7 +95,6 @@ public class MCRPDFAFunctions {
         });
         return createXML(objectId, results);
     }
-
 
     /**
      * Creates an XML Document representing the validation results for the PDF files.
@@ -105,7 +105,7 @@ public class MCRPDFAFunctions {
      * @throws ParserConfigurationException If there is a configuration issue with the XML document builder.
      */
     private static Document createXML(String objectId, Map<String, ValidationResult> results)
-            throws ParserConfigurationException {
+        throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
@@ -125,7 +125,7 @@ public class MCRPDFAFunctions {
      * @param resultEntry     A map entry containing the file name and its validation result.
      */
     private static void createXMLTag(Element derivateElement, Document document,
-                                     Map.Entry<String, ValidationResult> resultEntry) {
+        Map.Entry<String, ValidationResult> resultEntry) {
         String fileName = resultEntry.getKey();
         ValidationResult result = resultEntry.getValue();
         Element fileElement = createFileElement(document, fileName, result);
@@ -159,8 +159,8 @@ public class MCRPDFAFunctions {
         fileElement.setAttribute("flavour", result.getPDFAFlavour().toString());
 
         result.getFailedChecks().keySet().stream()
-                .map(rid -> createFailedElement(document, rid))
-                .forEach(fileElement::appendChild);
+            .map(rid -> createFailedElement(document, rid))
+            .forEach(fileElement::appendChild);
 
         return fileElement;
     }
@@ -205,6 +205,6 @@ public class MCRPDFAFunctions {
 
         String secondPart = ruleId.getClause().replaceAll("\\.", "");
         return "https://github.com/veraPDF/veraPDF-validation-profiles/wiki/" + firstPart + "#rule-" + secondPart + "-"
-                + ruleId.getTestNumber();
+            + ruleId.getTestNumber();
     }
 }

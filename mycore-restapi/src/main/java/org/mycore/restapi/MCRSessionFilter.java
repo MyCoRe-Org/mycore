@@ -289,11 +289,11 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     private static boolean doNotWWWAuthenticate(ContainerRequestContext requestContext) {
         return !"ServiceWorker".equals(requestContext.getHeaderString("X-Requested-With")) &&
             ("XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With")) ||
-            requestContext.getAcceptableMediaTypes()
-                .stream()
-                .findFirst()
-                .filter(m -> "image".equals(m.getType()))
-                .isPresent());
+                requestContext.getAcceptableMediaTypes()
+                    .stream()
+                    .findFirst()
+                    .filter(m -> "image".equals(m.getType()))
+                    .isPresent());
     }
 
     private static void closeSessionIfNeeded() {

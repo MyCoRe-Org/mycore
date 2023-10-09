@@ -149,7 +149,7 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRProperty(name = "Foo", required = false)
         public String foo;
 
-         public String getFoo() {
+        public String getFoo() {
             return foo;
         }
 

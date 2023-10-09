@@ -71,7 +71,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
             Object oNumberFormat = mInitNumberformat.invoke(null);
             fNumberformat.set(null, oNumberFormat);
         } catch (Exception e) {
-             Assert.fail(e.getMessage());
+            Assert.fail(e.getMessage());
         }
     }
 }
