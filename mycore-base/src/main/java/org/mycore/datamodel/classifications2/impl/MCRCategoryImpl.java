@@ -127,7 +127,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategory.rootIds", query = "SELECT cat.id FROM MCRCategoryImpl cat WHERE cat.left = 0"),
     @NamedQuery(name = "MCRCategory.childCount",
         query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE "
-            + "children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE "
+            + "children.parent.internalID=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE "
             + "cat.id.rootID=:classID and (cat.id.id=:categID OR cat.id.id IS NULL AND :categID IS NULL))"),
 })
 

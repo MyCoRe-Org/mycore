@@ -112,11 +112,11 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     public final void delete(String from, String to, String type) {
         from = checkAttributeIsNotEmpty(from, "from");
         StringBuilder sb = new StringBuilder();
-        sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append('\'');
+        sb.append("from ").append(classname).append(" where key.mcrfrom = '").append(from).append('\'');
         MCRUtils.filterTrimmedNotEmpty(to)
-            .ifPresent(trimmedTo -> sb.append(" and MCRTO = '").append(trimmedTo).append('\''));
+            .ifPresent(trimmedTo -> sb.append(" and key.mcrto = '").append(trimmedTo).append('\''));
         MCRUtils.filterTrimmedNotEmpty(type)
-            .ifPresent(trimmedType -> sb.append(" and MCRTYPE = '").append(trimmedType).append('\''));
+            .ifPresent(trimmedType -> sb.append(" and key.mcrtype = '").append(trimmedType).append('\''));
         LOGGER.debug("Deleting {} from database MCRLINKHREF", from);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.createQuery(sb.toString(), MCRLINKHREF.class)
@@ -143,17 +143,17 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         Number returns;
         StringBuilder qBf = new StringBuilder(1024);
-        qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ").append('\'')
+        qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where key.mcrto like ").append('\'')
             .append(to).append('\'');
 
         if (type != null && type.length() != 0) {
-            qBf.append(" and MCRTYPE = '").append(type).append('\'');
+            qBf.append(" and key.mcrtype = '").append(type).append('\'');
         }
         if (restriction != null && restriction.length() != 0) {
-            qBf.append(" and MCRTO like '").append(restriction).append('\'');
+            qBf.append(" and key.mcrto like '").append(restriction).append('\'');
         }
         if (fromtype != null && fromtype.length() != 0) {
-            qBf.append(" and MCRFROM like '%_").append(fromtype).append("_%'");
+            qBf.append(" and key.mcrfrom like '%_").append(fromtype).append("_%'");
         }
 
         TypedQuery<Number> q = em.createQuery(qBf.toString(), Number.class);
