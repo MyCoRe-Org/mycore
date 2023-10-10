@@ -60,7 +60,6 @@ public abstract class MCRPath implements Path {
 
     private int[] offsets;
 
-
     MCRPath(final String root, final String path) {
         this.root = root;
         this.path = normalizeAndCheck(Objects.requireNonNull(path, "path may not be null"));

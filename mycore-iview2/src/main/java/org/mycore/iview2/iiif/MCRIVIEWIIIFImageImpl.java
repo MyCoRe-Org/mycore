@@ -152,8 +152,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             case bitonal -> BufferedImage.TYPE_BYTE_BINARY;
             case gray -> BufferedImage.TYPE_BYTE_GRAY;
             //color is also default case
-            default
-                -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR : BufferedImage.TYPE_3BYTE_BGR;
+            default -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR
+                : BufferedImage.TYPE_3BYTE_BGR;
         };
 
         BufferedImage targetImage = new BufferedImage(width, height, imageType);

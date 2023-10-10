@@ -18,7 +18,12 @@
 
 package org.mycore.mods.csl;
 
-import de.undercouch.citeproc.csl.CSLItemData;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -30,11 +35,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
+import de.undercouch.citeproc.csl.CSLItemData;
 
 /**
  * Does the same as @{@link MCRModsItemDataProvider} but you can provide multiple objects

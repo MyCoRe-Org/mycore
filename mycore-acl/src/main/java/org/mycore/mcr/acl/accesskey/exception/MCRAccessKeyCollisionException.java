@@ -23,6 +23,9 @@ package org.mycore.mcr.acl.accesskey.exception;
  * This refers to value duplicates.
  */
 public class MCRAccessKeyCollisionException extends MCRAccessKeyException {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRAccessKeyCollisionException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.collision");
     }

@@ -59,23 +59,21 @@ public class MCRRuntimeComponentDetector {
 
     private static final Name ATT_MCR_ARTIFACT_ID = new Name("MCR-Artifact-Id");
 
-    private static final SortedSet<MCRComponent> ALL_COMPONENTS_LOW_TO_HIGH =
-        Collections.unmodifiableSortedSet(getConfiguredComponents());
+    private static final SortedSet<MCRComponent> ALL_COMPONENTS_LOW_TO_HIGH
+        = Collections.unmodifiableSortedSet(getConfiguredComponents());
 
-    private static final SortedSet<MCRComponent> ALL_COMPONENTS_HIGH_TO_LOW =
-        reverseOf(ALL_COMPONENTS_LOW_TO_HIGH);
+    private static final SortedSet<MCRComponent> ALL_COMPONENTS_HIGH_TO_LOW = reverseOf(ALL_COMPONENTS_LOW_TO_HIGH);
 
-    private static final SortedSet<MCRComponent> MYCORE_COMPONENTS_LOW_TO_HIGH =
-        subsetOf(ALL_COMPONENTS_LOW_TO_HIGH, MCRComponent::isMyCoReComponent);
+    private static final SortedSet<MCRComponent> MYCORE_COMPONENTS_LOW_TO_HIGH
+        = subsetOf(ALL_COMPONENTS_LOW_TO_HIGH, MCRComponent::isMyCoReComponent);
 
-    private static final SortedSet<MCRComponent> MYCORE_COMPONENTS_HIGH_TO_LOW =
-        reverseOf(MYCORE_COMPONENTS_LOW_TO_HIGH);
+    private static final SortedSet<MCRComponent> MYCORE_COMPONENTS_HIGH_TO_LOW
+        = reverseOf(MYCORE_COMPONENTS_LOW_TO_HIGH);
 
-    private static final SortedSet<MCRComponent> APP_MODULES_LOW_TO_HIGH =
-        subsetOf(ALL_COMPONENTS_LOW_TO_HIGH, MCRComponent::isAppModule);
+    private static final SortedSet<MCRComponent> APP_MODULES_LOW_TO_HIGH
+        = subsetOf(ALL_COMPONENTS_LOW_TO_HIGH, MCRComponent::isAppModule);
 
-    private static final SortedSet<MCRComponent> APP_MODULES_HIGH_TO_LOW =
-        reverseOf(APP_MODULES_LOW_TO_HIGH);
+    private static final SortedSet<MCRComponent> APP_MODULES_HIGH_TO_LOW = reverseOf(APP_MODULES_LOW_TO_HIGH);
 
     private static <T extends Comparable<T>> SortedSet<T> reverseOf(SortedSet<T> set) {
         return Collections.unmodifiableSortedSet(

@@ -22,10 +22,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
+import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -54,8 +54,8 @@ public class MCRORCIDUserUtils {
      * @throws MCRORCIDException if there is more than one matching user
      */
     public static MCRORCIDUser getORCIDUserByORCID(String orcid) {
-        final Set<MCRUser> users
-            = MCRUserManager.getUsers(MCRORCIDUser.ATTR_ORCID_ID, orcid).collect(Collectors.toSet());
+        final Set<MCRUser> users = MCRUserManager.getUsers(MCRORCIDUser.ATTR_ORCID_ID, orcid)
+            .collect(Collectors.toSet());
         if (users.isEmpty()) {
             return null;
         } else if (users.size() == 1) {

@@ -20,6 +20,9 @@ package org.mycore.pi.exceptions;
 
 public class MCRIdentifierUnresolvableException extends MCRDatacenterException {
 
+    private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("unused")
     private final String identifier;
 
     public MCRIdentifierUnresolvableException(String identifier, String message) {

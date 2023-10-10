@@ -18,10 +18,10 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-import static org.junit.Assert.assertEquals;
 
 public class MCRInstanceNameTest extends MCRTestCase {
 

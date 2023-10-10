@@ -41,22 +41,22 @@ public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase
 
     private XPathExpression<Boolean> expression;
 
-    @MCRProperty(name="BaseXPath")
+    @MCRProperty(name = "BaseXPath")
     public void setClassificationBaseXPath(String xPath) {
         classificationBaseExpression = compileXpath(xPath, Filters.element());
     }
 
-    @MCRProperty(name="ClassIdXPath")
+    @MCRProperty(name = "ClassIdXPath")
     public void setClassificationIdXPath(String xPath) {
         classificationIdExpression = compileXpath(xPath, Filters.fstring());
     }
 
-    @MCRProperty(name="CategIdXPath")
+    @MCRProperty(name = "CategIdXPath")
     public void setCategoryIdXPath(String xPath) {
         categoryIdExpression = compileXpath(xPath, Filters.fstring());
     }
 
-    @MCRProperty(name="XPath")
+    @MCRProperty(name = "XPath")
     public void setXPath(String xPath) {
         expression = compileXpath("boolean(" + xPath + ")", Filters.fboolean());
     }
@@ -69,7 +69,7 @@ public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase
             String classificationId = classificationIdExpression.evaluateFirst(baseElement);
             String categoryId = categoryIdExpression.evaluateFirst(baseElement);
 
-           if (classificationId == null || categoryId == null) {
+            if (classificationId == null || categoryId == null) {
                 return false;
             }
 

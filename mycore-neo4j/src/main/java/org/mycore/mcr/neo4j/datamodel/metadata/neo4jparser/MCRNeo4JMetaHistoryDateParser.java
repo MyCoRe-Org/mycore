@@ -35,23 +35,23 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
  */
 public class MCRNeo4JMetaHistoryDateParser extends MCRNeo4JAbstractDataModelParser {
 
-   @Override
-   public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
-      return Collections.emptyList();
-   }
+    @Override
+    public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
+        return Collections.emptyList();
+    }
 
-   @Override
-   public List<Neo4JNode> parse(Element rootTag) {
-      List<Neo4JNode> values = new ArrayList<>();
-      for (Element element : rootTag.getChildren()) {
-         for (Element text : element.getChildren("text")) {
-            final String lang = text.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-            final String content = StringUtils.replace(text.getTextTrim(), "'", "");
+    @Override
+    public List<Neo4JNode> parse(Element rootTag) {
+        List<Neo4JNode> values = new ArrayList<>();
+        for (Element element : rootTag.getChildren()) {
+            for (Element text : element.getChildren("text")) {
+                final String lang = text.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+                final String content = StringUtils.replace(text.getTextTrim(), "'", "");
 
-            values.add(new Neo4JNode(lang, content));
-         }
-      }
+                values.add(new Neo4JNode(lang, content));
+            }
+        }
 
-      return values;
-   }
+        return values;
+    }
 }

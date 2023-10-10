@@ -21,10 +21,6 @@ package org.mycore.orcid2.v3.transformer;
 import java.io.IOException;
 import java.util.Objects;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
@@ -42,19 +38,23 @@ import org.orcid.jaxb.model.v3.release.record.Citation;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+
 /**
  * Provides helper functions to transform between Work or WorkSummary and MODS MCRContent.
  */
 public class MCRORCIDWorkTransformerHelper {
 
-    private static final MCRContentTransformer T_MODS_WORK
-        = MCRContentTransformerFactory.getTransformer("MODS2ORCIDv3Work");
+    private static final MCRContentTransformer T_MODS_WORK = MCRContentTransformerFactory
+        .getTransformer("MODS2ORCIDv3Work");
 
-    private static final MCRContentTransformer T_WORK_MODS
-        = MCRContentTransformerFactory.getTransformer("BaseORCIDv3Work2MODS");
+    private static final MCRContentTransformer T_WORK_MODS = MCRContentTransformerFactory
+        .getTransformer("BaseORCIDv3Work2MODS");
 
-    private static final MCRContentTransformer T_SUMMARY_MODS
-        = MCRContentTransformerFactory.getTransformer("BaseORCIDv3WorkSummary2MODS");
+    private static final MCRContentTransformer T_SUMMARY_MODS = MCRContentTransformerFactory
+        .getTransformer("BaseORCIDv3WorkSummary2MODS");
 
     private static JAXBContext context = null;
 
@@ -76,7 +76,7 @@ public class MCRORCIDWorkTransformerHelper {
     public static Work transformContent(MCRContent content) {
         try {
             return unmarshalWork(new MCRJDOMContent(MCRXMLParserFactory.getValidatingParser()
-				    .parseXML(T_MODS_WORK.transform(content))));
+                .parseXML(T_MODS_WORK.transform(content))));
         } catch (IOException | JDOMException e) {
             throw new MCRORCIDTransformationException(e);
         }
@@ -133,7 +133,7 @@ public class MCRORCIDWorkTransformerHelper {
         try {
             final Unmarshaller unmarshaller = context.createUnmarshaller();
             return (Work) unmarshaller.unmarshal(content.getInputSource());
-        } catch(IOException | JAXBException e) {
+        } catch (IOException | JAXBException e) {
             throw new MCRORCIDTransformationException(e);
         }
     }

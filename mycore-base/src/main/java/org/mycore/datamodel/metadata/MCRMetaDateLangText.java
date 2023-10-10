@@ -18,13 +18,14 @@
 
 package org.mycore.datamodel.metadata;
 
-import com.google.gson.JsonObject;
+import java.util.Objects;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRISO8601Format;
 
-import java.util.Objects;
+import com.google.gson.JsonObject;
 
 /**
  * This class implements all method for handling with the MCRMetaDateLangText part

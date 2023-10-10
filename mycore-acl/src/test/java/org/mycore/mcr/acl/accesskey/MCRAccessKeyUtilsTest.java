@@ -18,9 +18,9 @@
 
 package org.mycore.mcr.acl.accesskey;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 

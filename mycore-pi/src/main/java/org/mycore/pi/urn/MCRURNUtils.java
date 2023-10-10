@@ -46,18 +46,17 @@ public class MCRURNUtils {
         return getDNBRegisterDate(dnburn.asString());
     }
 
-    public static Date getDNBRegisterDate(String identifier) throws
-        ParseException {
+    public static Date getDNBRegisterDate(String identifier) throws ParseException {
 
         String date = MCRDNBURNRestClient.getRegistrationInfo(identifier)
-                .map(info -> info.get("created"))
-                .map(JsonElement::getAsString)
-                .orElse(null);
+            .map(info -> info.get("created"))
+            .map(JsonElement::getAsString)
+            .orElse(null);
 
         if (date == null) {
             return null;
         }
-        
+
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.GERMAN).parse(date);
     }
 

@@ -18,11 +18,11 @@
 
 package org.mycore.common;
 
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
-
 import java.lang.annotation.Annotation;
 import java.util.Optional;
+
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 public class MCRTestAnnotationWatcher<A extends Annotation> extends TestWatcher {
 

@@ -26,10 +26,10 @@ import java.util.Optional;
 
 import org.mycore.pi.MCRPIParser;
 
-public class MCRPURLParser implements MCRPIParser {
+public class MCRPURLParser implements MCRPIParser<MCRPURL> {
 
     @Override
-    public Optional parse(String identifier) {
+    public Optional<MCRPURL> parse(String identifier) {
         try {
             URL url = new URI(identifier).toURL();
             return Optional.of(new MCRPURL(url));

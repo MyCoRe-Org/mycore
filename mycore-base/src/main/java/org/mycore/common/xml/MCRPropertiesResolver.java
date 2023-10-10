@@ -18,14 +18,14 @@
 
 package org.mycore.common.xml;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.URIResolver;
+
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.config.MCRConfiguration2;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.URIResolver;
 
 /**
  * Resolves the property values for the given key or key prefix.<br><br>

@@ -19,6 +19,9 @@
 package org.mycore.iiif.image.impl;
 
 public class MCRIIIFImageProvidingException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRIIIFImageProvidingException(String message, Throwable cause, boolean enableSuppression,
         boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);

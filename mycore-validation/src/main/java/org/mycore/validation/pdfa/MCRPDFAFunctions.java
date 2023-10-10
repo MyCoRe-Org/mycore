@@ -1,3 +1,20 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.mycore.validation.pdfa;
 
 import java.io.IOException;
@@ -70,6 +87,7 @@ public class MCRPDFAFunctions {
                 }
                 return FileVisitResult.CONTINUE;
             }
+
             @Override
             public FileVisitResult visitFileFailed(Path file, IOException exc) {
                 return FileVisitResult.CONTINUE;
@@ -77,7 +95,6 @@ public class MCRPDFAFunctions {
         });
         return createXML(objectId, results);
     }
-
 
     /**
      * Creates an XML Document representing the validation results for the PDF files.
@@ -88,7 +105,7 @@ public class MCRPDFAFunctions {
      * @throws ParserConfigurationException If there is a configuration issue with the XML document builder.
      */
     private static Document createXML(String objectId, Map<String, ValidationResult> results)
-            throws ParserConfigurationException {
+        throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
@@ -108,7 +125,7 @@ public class MCRPDFAFunctions {
      * @param resultEntry     A map entry containing the file name and its validation result.
      */
     private static void createXMLTag(Element derivateElement, Document document,
-                                     Map.Entry<String, ValidationResult> resultEntry) {
+        Map.Entry<String, ValidationResult> resultEntry) {
         String fileName = resultEntry.getKey();
         ValidationResult result = resultEntry.getValue();
         Element fileElement = createFileElement(document, fileName, result);
@@ -142,8 +159,8 @@ public class MCRPDFAFunctions {
         fileElement.setAttribute("flavour", result.getPDFAFlavour().toString());
 
         result.getFailedChecks().keySet().stream()
-                .map(rid -> createFailedElement(document, rid))
-                .forEach(fileElement::appendChild);
+            .map(rid -> createFailedElement(document, rid))
+            .forEach(fileElement::appendChild);
 
         return fileElement;
     }
@@ -188,6 +205,6 @@ public class MCRPDFAFunctions {
 
         String secondPart = ruleId.getClause().replaceAll("\\.", "");
         return "https://github.com/veraPDF/veraPDF-validation-profiles/wiki/" + firstPart + "#rule-" + secondPart + "-"
-                + ruleId.getTestNumber();
+            + ruleId.getTestNumber();
     }
 }

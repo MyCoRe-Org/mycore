@@ -22,6 +22,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCREpicException extends MCRPersistentIdentifierException {
 
+    private static final long serialVersionUID = 1L;
+
     public MCREpicException(String message) {
         super(message);
     }

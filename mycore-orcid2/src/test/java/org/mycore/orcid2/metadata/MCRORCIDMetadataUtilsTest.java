@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-package org.mycore.orcid2.metadata;
 
-import java.util.List;
-import java.util.Map;
+package org.mycore.orcid2.metadata;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;

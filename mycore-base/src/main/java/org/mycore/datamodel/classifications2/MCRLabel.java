@@ -195,19 +195,19 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
 
     @Override
     public int compareTo(MCRLabel other) {
-            if (other == null) {
-                return 1;
-            }
-            //both are not null
-            if (this.getLang() == other.getLang()) { // this intentionally uses == to allow for both null
-                return 0;
-            }
-            if (this.getLang() == null) {
-                return -1;
-            }
-            if (other.getLang() == null) {
-                return 1;
-            }
-            return this.getLang().compareTo(other.getLang());
+        if (other == null) {
+            return 1;
+        }
+        //both are not null
+        if (this.getLang() == other.getLang()) { // this intentionally uses == to allow for both null
+            return 0;
+        }
+        if (this.getLang() == null) {
+            return -1;
+        }
+        if (other.getLang() == null) {
+            return 1;
+        }
+        return this.getLang().compareTo(other.getLang());
     }
 }

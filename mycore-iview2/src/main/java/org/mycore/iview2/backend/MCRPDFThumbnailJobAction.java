@@ -43,6 +43,7 @@ import org.mycore.services.queuedjob.MCRJobAction;
 public class MCRPDFThumbnailJobAction extends MCRJobAction {
 
     public static final String DERIVATE_PARAMETER = "derivate";
+
     public MCRPDFThumbnailJobAction(MCRJob job) {
         super(job);
     }
@@ -58,7 +59,7 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
     }
 
     @Override
-    public void execute()  {
+    public void execute() {
         final String derivateIDString = this.job.getParameter(DERIVATE_PARAMETER);
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDString);
         if (!MCRMetadataManager.exists(derivateID)) {

@@ -18,6 +18,8 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.function.Supplier;
 
 import org.junit.Test;
@@ -26,16 +28,13 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 
-import static org.junit.Assert.assertNotNull;
-
 public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConstructor.class)
-        }
-    )
+        })
     public void constructorFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -49,8 +48,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithFactory.class)
-        }
-    )
+        })
     public void factory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -64,8 +62,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithoutConstructorOrFactory.class)
-        }
-    )
+        })
     public void noConstructorOrFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -77,8 +74,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMultipleFactories.class)
-        }
-    )
+        })
     public void multipleFactories() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -91,8 +87,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Value", string = "Value")
-        }
-    )
+        })
     public void proxyFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -131,7 +126,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     }
 
-    @SuppressWarnings({"InstantiationOfUtilityClass", "unused"})
+    @SuppressWarnings({ "InstantiationOfUtilityClass", "unused" })
     public static class TestClassWithMultipleFactories {
 
         private TestClassWithMultipleFactories() {
@@ -148,10 +143,9 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     }
 
-    @SuppressWarnings({"unused"})
+    @SuppressWarnings({ "unused" })
     @MCRConfigurationProxy(proxyClass = TestClassWithConfigurationProxy.Factory.class)
     public static class TestClassWithConfigurationProxy {
-
 
         public TestClassWithConfigurationProxy() {
         }

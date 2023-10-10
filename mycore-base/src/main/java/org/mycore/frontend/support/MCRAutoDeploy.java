@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import jakarta.servlet.ServletRegistration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -50,6 +49,7 @@ import org.mycore.common.events.MCRStartupHandler;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
 
 /**
  * This StartupHandler deploys web resources and register filters/servlets to web container server,
@@ -240,7 +240,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                         LOGGER.info("Register Servlet {} ({})...", name, className);
                                         ServletRegistration.Dynamic sr = servletContext.addServlet(name, className);
 
-                                        if(sr != null) {
+                                        if (sr != null) {
                                             mapping.getChildren("url-pattern", ns).forEach(url -> {
                                                 LOGGER.info("...add url mapping: {}", url.getTextTrim());
                                                 sr.addMapping(url.getTextTrim());

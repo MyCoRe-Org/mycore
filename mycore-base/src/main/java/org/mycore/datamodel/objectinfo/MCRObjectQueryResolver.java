@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.objectinfo;
 
+import java.util.List;
+
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import java.util.List;
 
 /**
  * Allows to query objects using {@link MCRObjectQuery}.
@@ -64,8 +64,8 @@ public interface MCRObjectQueryResolver {
     class InstanceHolder {
         private static final String QUERY_RESOLVER_CLASS_PROPERTY = "MCR.Object.QueryResolver.Class";
 
-        private static final MCRObjectQueryResolver RESOLVER
-            = MCRConfiguration2.<MCRObjectQueryResolver>getSingleInstanceOf(QUERY_RESOLVER_CLASS_PROPERTY)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(QUERY_RESOLVER_CLASS_PROPERTY));
+        private static final MCRObjectQueryResolver RESOLVER = MCRConfiguration2
+            .<MCRObjectQueryResolver>getSingleInstanceOf(QUERY_RESOLVER_CLASS_PROPERTY)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(QUERY_RESOLVER_CLASS_PROPERTY));
     }
 }

@@ -14,8 +14,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
  */
 const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
 const CSL_EXPORT_STANDALONE_ROWS = "MCR.Export.Standalone.Rows";

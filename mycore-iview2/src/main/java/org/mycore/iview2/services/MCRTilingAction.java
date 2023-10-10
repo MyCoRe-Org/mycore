@@ -18,8 +18,12 @@
 
 package org.mycore.iview2.services;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -31,11 +35,8 @@ import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTileEventHandler;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicReference;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 /**
  * A slave thread of {@link MCRImageTiler}

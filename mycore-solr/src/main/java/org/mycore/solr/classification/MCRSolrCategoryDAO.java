@@ -80,15 +80,11 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
         MCRSolrClassificationUtil.solrDelete(id, parent);
     }
 
-   
-
     @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         super.moveCategory(id, newParentID, index);
         MCRSolrClassificationUtil.solrMove(id, newParentID);
     }
-
-    
 
     @Override
     public Collection<MCRCategoryImpl> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {

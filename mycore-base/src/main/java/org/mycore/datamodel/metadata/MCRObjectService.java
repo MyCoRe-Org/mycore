@@ -549,7 +549,7 @@ public class MCRObjectService {
      *            a type as string
      */
     public final void removeFlags(String type) {
-        flags.removeIf(f -> StringUtils.equals(type,  f.getType()));
+        flags.removeIf(f -> StringUtils.equals(type, f.getType()));
     }
 
     /**
@@ -1058,8 +1058,8 @@ public class MCRObjectService {
         String lType = StringUtils.trim(type);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(messageValue -> {
-                MCRMetaDateLangText message
-                    = new MCRMetaDateLangText("servmessage", null, lType, 0, form, messageValue);
+                MCRMetaDateLangText message = new MCRMetaDateLangText("servmessage", null, lType, 0, form,
+                    messageValue);
                 message.setDate(MCRISO8601Date.now());
                 return message;
             })
@@ -1309,7 +1309,7 @@ public class MCRObjectService {
      */
     public final void removeClassifications(String type) {
         String lType = StringUtils.trim(type);
-        classifications.removeIf(c -> StringUtils.equals(lType,  c.getType()));
+        classifications.removeIf(c -> StringUtils.equals(lType, c.getType()));
     }
 
 }

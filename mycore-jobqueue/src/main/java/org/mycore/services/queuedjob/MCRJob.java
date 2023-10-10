@@ -196,12 +196,11 @@ public class MCRJob implements Cloneable {
         this.finished = finished;
     }
 
-
     /**
      * Returns the number of retries.
-
+    
      */
-    @Column(name="tries")
+    @Column(name = "tries")
     public Integer getTries() {
         return tries;
     }

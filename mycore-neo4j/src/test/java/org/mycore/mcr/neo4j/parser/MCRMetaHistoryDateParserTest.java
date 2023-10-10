@@ -18,13 +18,13 @@
 
 package org.mycore.mcr.neo4j.parser;
 
-import org.junit.Test;
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaHistoryDateParser;
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaHistoryDateParser;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
 
 public class MCRMetaHistoryDateParserTest extends AbstractNeo4JParserTest {
     @Test

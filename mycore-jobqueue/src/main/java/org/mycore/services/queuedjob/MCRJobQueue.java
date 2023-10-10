@@ -45,9 +45,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
     private final Class<? extends MCRJobAction> action;
 
     private final ReentrantLock pollLock;
+
     private final MCRJobConfig config;
+
     private final MCRJobDAO dao;
+
     private final List<MCRJobQueueEventListener> listeners;
+
     private boolean running;
 
     /**
@@ -224,9 +228,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
         if (!running) {
             return Collections.emptyIterator();
         }
-        List<MCRJob> jobs
-            = dao.getJobs(action, Collections.emptyMap(), Stream.ofNullable(status).collect(Collectors.toList()), null,
-                null);
+        List<MCRJob> jobs = dao.getJobs(action, Collections.emptyMap(),
+            Stream.ofNullable(status).collect(Collectors.toList()),
+            null, null);
 
         return jobs.listIterator();
     }

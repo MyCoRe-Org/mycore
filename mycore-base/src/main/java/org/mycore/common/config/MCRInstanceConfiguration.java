@@ -49,7 +49,7 @@ public class MCRInstanceConfiguration {
     private final Map<String, String> fullProperties;
 
     private MCRInstanceConfiguration(MCRInstanceName name, String className, Map<String, String> properties,
-                                     Map<String, String> fullProperties) {
+        Map<String, String> fullProperties) {
         this.name = name;
         this.className = className;
         this.properties = properties;
@@ -130,7 +130,7 @@ public class MCRInstanceConfiguration {
     }
 
     private static Map<String, String> reduceProperties(MCRInstanceName name, String prefix,
-                                                        Map<String, String> properties) {
+        Map<String, String> properties) {
         Map<String, String> reducedProperties = new HashMap<>();
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();

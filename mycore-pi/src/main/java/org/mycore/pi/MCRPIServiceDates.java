@@ -26,5 +26,5 @@ import java.util.Date;
  *
  */
 public record MCRPIServiceDates(Date registered, Date registrationStarted) {
-    
+
 }

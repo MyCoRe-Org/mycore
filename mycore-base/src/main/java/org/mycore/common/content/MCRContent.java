@@ -101,9 +101,9 @@ public abstract class MCRContent {
         String path = null;
         try {
             path = new URI(systemId).getPath();
-            } catch (URISyntaxException e2) {
-                LogManager.getLogger(getClass()).debug("Could not get file name from URI.", e2);
-            }
+        } catch (URISyntaxException e2) {
+            LogManager.getLogger(getClass()).debug("Could not get file name from URI.", e2);
+        }
         if (path != null) {
             fileName = path;
         }

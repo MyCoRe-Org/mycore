@@ -44,7 +44,6 @@ public class MCRDerivateLinkServlet extends MCRServlet {
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        @SuppressWarnings("unchecked")
         Map<String, String[]> pMap = job.getRequest().getParameterMap();
         String webpage = pMap.get("subselect.webpage")[0];
         String mcrId = getSubParameterValueOfBrowserAddressParameter(webpage, "mcrid");

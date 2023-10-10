@@ -38,36 +38,37 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
  * @author Michael Becker
  */
 public class MCRNeo4JMetaClassificationParser extends MCRNeo4JAbstractDataModelParser {
-   @Override
-   public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
-      final List<Neo4JRelation> relations = new ArrayList<>(classElement.getChildren().size());
-      final String sourceNodeID = sourceID.toString();
+    @Override
+    public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
+        final List<Neo4JRelation> relations = new ArrayList<>(classElement.getChildren().size());
+        final String sourceNodeID = sourceID.toString();
 
-      for (Element element : classElement.getChildren()) {
-         final String classID = element.getAttributeValue("classid");
-         final String categID = element.getAttributeValue("categid");
-         final String relationshipType = classID + ":" + categID;
+        for (Element element : classElement.getChildren()) {
+            final String classID = element.getAttributeValue("classid");
+            final String categID = element.getAttributeValue("categid");
+            final String relationshipType = classID + ":" + categID;
 
-         if (StringUtils.isBlank(classID) || StringUtils.isBlank(categID)) {
-            continue;
-         }
+            if (StringUtils.isBlank(classID) || StringUtils.isBlank(categID)) {
+                continue;
+            }
 
-         final Optional<String> href = getClassLabel(classID, categID, "x-mcrid");
-         href.ifPresent(targetNodeID -> relations.add(new Neo4JRelation(sourceNodeID, targetNodeID, relationshipType)));
-      }
+            final Optional<String> href = getClassLabel(classID, categID, "x-mcrid");
+            href.ifPresent(
+                targetNodeID -> relations.add(new Neo4JRelation(sourceNodeID, targetNodeID, relationshipType)));
+        }
 
-      return relations;
-   }
+        return relations;
+    }
 
-   @Override
-   public List<Neo4JNode> parse(Element rootTag) {
-      List<Neo4JNode> values = new ArrayList<>();
-      for (Element element : rootTag.getChildren()) {
-         String classidString = element.getAttributeValue("classid");
-         String categidString = element.getAttributeValue("categid");
+    @Override
+    public List<Neo4JNode> parse(Element rootTag) {
+        List<Neo4JNode> values = new ArrayList<>();
+        for (Element element : rootTag.getChildren()) {
+            String classidString = element.getAttributeValue("classid");
+            String categidString = element.getAttributeValue("categid");
 
-         values.add(new Neo4JNode(null, classidString + NEO4J_PARAMETER_SEPARATOR + categidString));
-      }
-      return values;
-   }
+            values.add(new Neo4JNode(null, classidString + NEO4J_PARAMETER_SEPARATOR + categidString));
+        }
+        return values;
+    }
 }

@@ -54,7 +54,8 @@ public class MCRSword {
                 .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
                 .map(prop -> prop.substring(lenghtOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
                 .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
-                .filter(array -> array.length == 2) // remove all whith no workspace or collection name
+                .filter(
+                    array -> array.length == 2) // remove all whith no workspace or collection name
                 .forEach(wsCol -> initWorkspaceCollection(wsCol[0], wsCol[1]));
 
             addCollectionShutdownHook();

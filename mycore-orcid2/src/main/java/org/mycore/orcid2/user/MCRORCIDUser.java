@@ -27,10 +27,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -46,6 +42,10 @@ import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Provides functionality to interact with MCRUser that is also an ORCID user.
  * Handles the updating of user.
@@ -55,9 +55,9 @@ public class MCRORCIDUser {
     /**
      * List of trusted name identifier types.
      */
-    public static final List<String> TRUSTED_NAME_IDENTIFIER_TYPES
-        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "User.TrustedNameIdentifierTypes").stream()
-            .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
+    public static final List<String> TRUSTED_NAME_IDENTIFIER_TYPES = MCRConfiguration2
+        .getString(MCRORCIDConstants.CONFIG_PREFIX + "User.TrustedNameIdentifierTypes").stream()
+        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
 
     /**
      * Id prefix for user attributes.
@@ -81,17 +81,17 @@ public class MCRORCIDUser {
 
     private static final String WORK_EVENT_HANDLER_PROPERTY_PREFIX = "MCR.ORCID2.WorkEventHandler.";
 
-    private static final boolean ALWAYS_UPDATE
-        = MCRConfiguration2.getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "AlwaysUpdateWork").orElse(false);
+    private static final boolean ALWAYS_UPDATE = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "AlwaysUpdateWork").orElse(false);
 
-    private static final boolean CREATE_FIRST
-        = MCRConfiguration2.getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateFirstWork").orElse(false);
+    private static final boolean CREATE_FIRST = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateFirstWork").orElse(false);
 
-    private static final boolean CREATE_OWN_DUPLICATE
-        = MCRConfiguration2.getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateDuplicateWork").orElse(false);
+    private static final boolean CREATE_OWN_DUPLICATE = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateDuplicateWork").orElse(false);
 
-    private static final boolean RECREATE_DELETED
-        = MCRConfiguration2.getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "RecreateDeletedWork").orElse(false);
+    private static final boolean RECREATE_DELETED = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "RecreateDeletedWork").orElse(false);
 
     private final MCRUser user;
 
@@ -162,7 +162,6 @@ public class MCRORCIDUser {
         }
         user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
     }
-
 
     /**
      * Removes all MCRORCIDCredential attributes.
@@ -266,8 +265,7 @@ public class MCRORCIDUser {
             throw new MCRORCIDException("Cannot check publication", e);
         }
         // TODO uniqueness of IDs
-        final Set<MCRIdentifier> nameIdentifiers
-            = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object));
+        final Set<MCRIdentifier> nameIdentifiers = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object));
         nameIdentifiers.retainAll(getTrustedIdentifiers());
         return !nameIdentifiers.isEmpty();
     }
@@ -319,7 +317,7 @@ public class MCRORCIDUser {
      * 
      * @param orcid the ORCID iD
      * @param userProperties the MCRORCIDUserProperties
-     */ 
+     */
     public void setUserProperties(String orcid, MCRORCIDUserProperties userProperties) {
         String userPropertiesString = null;
         try {

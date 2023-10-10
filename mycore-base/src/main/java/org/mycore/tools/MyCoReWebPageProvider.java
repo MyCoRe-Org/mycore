@@ -151,8 +151,8 @@ public class MyCoReWebPageProvider {
         if (title != null && !title.equals("")) {
             section.setAttribute(XML_TITLE, title);
         }
-        for(Content content : contentList) {
-            if(content instanceof Text) {
+        for (Content content : contentList) {
+            if (content instanceof Text) {
                 // MyCoReWebPage.xsl ignores single text content -> wrap it in a p
                 section.addContent(new Element("p").addContent(content));
             } else {

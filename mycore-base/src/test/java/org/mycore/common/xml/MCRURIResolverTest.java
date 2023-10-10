@@ -1,13 +1,13 @@
 package org.mycore.common.xml;
 
+import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfigurationDir;
-
-import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class MCRURIResolverTest extends MCRTestCase {
 

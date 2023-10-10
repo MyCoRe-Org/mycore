@@ -18,9 +18,9 @@
 
 package org.mycore.orcid2.client.exception;
 
-import jakarta.ws.rs.core.Response;
-
 import org.mycore.orcid2.exception.MCRORCIDException;
+
+import jakarta.ws.rs.core.Response;
 
 /**
  * This class is used if a request fails.

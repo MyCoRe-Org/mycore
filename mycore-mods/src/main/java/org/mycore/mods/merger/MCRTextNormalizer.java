@@ -18,11 +18,11 @@
 
 package org.mycore.mods.merger;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.Locale;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Normalizes text to be fault-tolerant when matching for duplicates.
@@ -103,6 +103,5 @@ public class MCRTextNormalizer {
 
         return normalizedText;
     }
-
 
 }

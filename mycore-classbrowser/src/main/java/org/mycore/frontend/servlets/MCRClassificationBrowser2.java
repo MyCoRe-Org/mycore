@@ -116,7 +116,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             if ((settings.removeEmptyLeaves()) && (numResults < 1)) {
                 continue;
             }
-            if(settings.excludeCategories().contains(child.getId().getID())) {
+            if (settings.excludeCategories().contains(child.getId().getID())) {
                 continue;
             }
 
@@ -284,8 +284,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             s.countResults = Boolean.parseBoolean(req.getParameter("countresults"));
             s.addClassId = Boolean.parseBoolean(req.getParameter("addclassid"));
             s.excludeCategories = Arrays.asList(
-                    Optional.ofNullable(req.getParameter("excludeCategories")).orElse("").split(",")
-            );
+                Optional.ofNullable(req.getParameter("excludeCategories")).orElse("").split(","));
             s.addUri = Boolean.parseBoolean(req.getParameter("adduri"));
             s.removeEmptyLeaves = !MCRUtils.filterTrimmedNotEmpty(req.getParameter("emptyleaves"))
                 .map(Boolean::valueOf)

@@ -22,6 +22,9 @@ package org.mycore.mcr.acl.accesskey.exception;
  * Exception that refers to an invalid permission type.
  */
 public class MCRAccessKeyInvalidTypeException extends MCRAccessKeyException {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRAccessKeyInvalidTypeException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.invalidType");
     }

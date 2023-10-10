@@ -129,7 +129,7 @@ public class MCRORCIDWorkUtils {
                     .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
                 Set<MCRIdentifier> bIds = b.getExternalIdentifier().stream()
                     .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
-                if(!Objects.equals(aIds, bIds)) {
+                if (!Objects.equals(aIds, bIds)) {
                     return false;
                 }
             }
@@ -165,7 +165,8 @@ public class MCRORCIDWorkUtils {
                      * by Object.equals() */
                     if (!Objects.equals(ca.getContributorOrcid(), cb.getContributorOrcid()) ||
                         (ca.getContributorOrcid() == null && cb.getContributorOrcid() == null &&
-                        !Objects.equals(ca.getCreditName(), cb.getCreditName())) ||
+                            !Objects.equals(ca.getCreditName(), cb.getCreditName()))
+                        ||
                         !Objects.equals(ca.getContributorEmail(), cb.getContributorEmail()) ||
                         !equalContributorAttributes(ca.getContributorAttributes(), cb.getContributorAttributes())) {
                         return false;

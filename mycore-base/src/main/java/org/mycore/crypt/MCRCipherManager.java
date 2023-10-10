@@ -18,10 +18,11 @@
 
 package org.mycore.crypt;
 
+import java.security.InvalidKeyException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
-import java.security.InvalidKeyException;
 
 /**
  * Create Instances of MCRCipher as configured in mycore.properties.

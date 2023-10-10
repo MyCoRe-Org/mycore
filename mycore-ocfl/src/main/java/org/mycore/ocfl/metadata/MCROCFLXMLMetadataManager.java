@@ -329,9 +329,9 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public int getHighestStoredID(String project, String type) {
         int highestStoredID = 0;
         int maxDepth = Integer.MAX_VALUE;
-        MCROCFLRepositoryProvider oclfRepoProvider
-            = MCRConfiguration2.getSingleInstanceOf("MCR.OCFL.Repository." + repositoryKey)
-                .map(MCROCFLRepositoryProvider.class::cast).orElseThrow();
+        MCROCFLRepositoryProvider oclfRepoProvider = MCRConfiguration2
+            .getSingleInstanceOf("MCR.OCFL.Repository." + repositoryKey)
+            .map(MCROCFLRepositoryProvider.class::cast).orElseThrow();
 
         OcflExtensionConfig config = oclfRepoProvider.getExtensionConfig();
         Path basePath = null;
@@ -402,8 +402,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     private int traverseMCRStorageDirectory(Path path, int depth) {
         int max = -1;
         Path newPath = path;
-        try (DirectoryStream<Path> ds
-            = Files.newDirectoryStream(path, p -> p.getFileName().toString().matches("^.*\\d+$"))) {
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(path,
+            p -> p.getFileName().toString().matches("^.*\\d+$"))) {
             for (Path entry : ds) {
                 int current = Integer.parseInt(entry.getFileName().toString().replaceAll("^.*_", ""));
                 if (max < current) {

@@ -139,8 +139,7 @@ public class MCRJobDAOJPAImpl implements MCRJobDAO {
         List<MCRJobStatus> status, Integer maxResults, Integer offset) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRJob> q
-            = buildQuery(cb, action, params, status, CriteriaQuery::select);
+        CriteriaQuery<MCRJob> q = buildQuery(cb, action, params, status, CriteriaQuery::select);
         TypedQuery<MCRJob> tq = em.createQuery(q);
         if (maxResults != null) {
             tq.setMaxResults(maxResults);
@@ -177,8 +176,7 @@ public class MCRJobDAOJPAImpl implements MCRJobDAO {
     public MCRJob getJob(Class<? extends MCRJobAction> action, Map<String, String> params, List<MCRJobStatus> status) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRJob> q
-            = buildQuery(cb, action, params, status, CriteriaQuery::select);
+        CriteriaQuery<MCRJob> q = buildQuery(cb, action, params, status, CriteriaQuery::select);
         TypedQuery<MCRJob> tq = em.createQuery(q);
         try {
             return tq.getSingleResult();

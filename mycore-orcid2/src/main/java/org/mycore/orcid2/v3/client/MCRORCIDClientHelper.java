@@ -21,16 +21,16 @@ package org.mycore.orcid2.v3.client;
 import java.util.Locale;
 import java.util.Objects;
 
-import jakarta.ws.rs.core.Response;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.client.MCRORCIDClientFactory;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
+import org.mycore.orcid2.exception.MCRORCIDException;
+import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.orcid.jaxb.model.v3.release.error.OrcidError;
+
+import jakarta.ws.rs.core.Response;
 
 /**
  * Provides utility methods for v3 client.

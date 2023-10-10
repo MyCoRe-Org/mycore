@@ -31,7 +31,7 @@ public class MCRORCIDUserInfo {
     private String orcid;
 
     private MCRORCIDPutCodeInfo workInfo;
-    
+
     /**
      * Initialises new MCRORCIDUserInfo with ORCID iD.
      * 

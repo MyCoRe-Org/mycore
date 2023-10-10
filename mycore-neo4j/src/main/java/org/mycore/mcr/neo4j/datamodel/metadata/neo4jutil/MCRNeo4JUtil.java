@@ -73,7 +73,7 @@ public class MCRNeo4JUtil {
      */
     public static Optional<String> getClassLabel(final String classID, final String categID, final String lang) {
         final MCRCategory category = MCRCategoryDAOFactory.getInstance()
-                .getCategory(new MCRCategoryID(classID, categID), 1);
+            .getCategory(new MCRCategoryID(classID, categID), 1);
 
         if (null == category) {
             // LOGGER.warn("Category {}:{} not found!", classID, categID);
@@ -81,8 +81,8 @@ public class MCRNeo4JUtil {
         }
 
         return category
-                .getLabel(lang)
-                .map(label -> StringUtils.replace(label.getText(), "'", ""));
+            .getLabel(lang)
+            .map(label -> StringUtils.replace(label.getText(), "'", ""));
     }
 
     public static String removeIllegalRelationshipTypeCharacters(String linkType) {
@@ -109,14 +109,14 @@ public class MCRNeo4JUtil {
      * @return Map with parsers for each defined MCR metadata type
      */
     public static Map<String, MCRNeo4JAbstractDataModelParser> getMCRNeo4JInstantiatedParserMap(
-            Map<String, String> propertiesMap, String filterClassKey) {
+        Map<String, String> propertiesMap, String filterClassKey) {
         final Map<String, MCRNeo4JAbstractDataModelParser> parserMap;
         parserMap = new HashMap<>();
         propertiesMap.forEach((k, v) -> {
             // avoid loop instantiation
             if (!Objects.equals(k, filterClassKey)) {
                 parserMap.put(k, MCRConfiguration2.getOrThrow(NEO4J_CONFIG_PREFIX + "ParserClass." + k,
-                        MCRConfiguration2::instantiateClass));
+                    MCRConfiguration2::instantiateClass));
             }
         });
         return parserMap;

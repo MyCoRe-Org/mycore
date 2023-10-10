@@ -18,8 +18,8 @@
 
 package org.mycore.mods.merger;
 
-import java.nio.charset.StandardCharsets;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 import org.jdom2.Element;

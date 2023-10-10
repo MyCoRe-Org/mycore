@@ -46,8 +46,6 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
-
-import jakarta.persistence.EntityTransaction;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -59,6 +57,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
+
+import jakarta.persistence.EntityTransaction;
 
 /**
  * Common helper class for all services handling file upload.
@@ -86,7 +86,7 @@ public abstract class MCRUploadHelper {
      */
     private static final String RESERVERD_CHARACTERS = new String(
         new char[] { ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
-                ')', '*', ',', ';', '=', '\'', '+', '\\' });
+            ')', '*', ',', ';', '=', '\'', '+', '\\' });
 
     private static final String WINDOWS_RESERVED_CHARS = "<>:\"|?*";
 
@@ -232,9 +232,9 @@ public abstract class MCRUploadHelper {
      */
     public static Optional<MCRPath> detectMainFile(MCRPath rootPath) throws IOException {
         List<String> ignoreMainfileList = MCRConfiguration2.getString(IGNORE_MAINFILE_PROPERTY)
-                .map(MCRConfiguration2::splitValue)
-                .map(s -> s.collect(Collectors.toList()))
-                .orElseGet(Collections::emptyList);
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
 
         MCRFileCollectingFileVisitor<Path> visitor = new MCRFileCollectingFileVisitor<>();
         Files.walkFileTree(rootPath, visitor);
@@ -242,16 +242,16 @@ public abstract class MCRUploadHelper {
         //sort files by name
         ArrayList<Path> paths = visitor.getPaths();
         paths.sort(Comparator.comparing(Path::getNameCount)
-                .thenComparing(Path::getFileName));
+            .thenComparing(Path::getFileName));
         //extract first file, before filtering
         MCRPath firstPath = MCRPath.toMCRPath(paths.get(0));
 
         //filter files, remove files that should be ignored for mainfile
         return paths.stream()
-                .map(MCRPath.class::cast)
-                .filter(p -> ignoreMainfileList.stream().noneMatch(p.getOwnerRelativePath()::endsWith))
-                .findFirst()
-                .or(() -> Optional.of(firstPath));
+            .map(MCRPath.class::cast)
+            .filter(p -> ignoreMainfileList.stream().noneMatch(p.getOwnerRelativePath()::endsWith))
+            .findFirst()
+            .or(() -> Optional.of(firstPath));
     }
 
     public static MCRDerivate createDerivate(MCRObjectID objectID, List<MCRMetaClassification> classifications)

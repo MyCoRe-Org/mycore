@@ -26,7 +26,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public interface MCRNeo4JMetaParser {
 
-   String createNeo4JQuery(MCRObject mcrObject);
+    String createNeo4JQuery(MCRObject mcrObject);
 
-   String createNeo4JUpdateQuery(MCRObject mcrObject);
+    String createNeo4JUpdateQuery(MCRObject mcrObject);
 }

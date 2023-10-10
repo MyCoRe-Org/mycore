@@ -37,7 +37,6 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRDeleteObjectServlet extends MCRPersistenceServlet {
 
-
     private static final long serialVersionUID = 3148314720092349972L;
 
     @Override

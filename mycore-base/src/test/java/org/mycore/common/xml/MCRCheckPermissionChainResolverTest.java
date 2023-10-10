@@ -18,6 +18,11 @@
 
 package org.mycore.common.xml;
 
+import java.util.Map;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
@@ -26,10 +31,6 @@ import org.junit.Test;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRAccessMock;
 import org.mycore.common.MCRTestCase;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import java.util.Map;
 
 public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
 

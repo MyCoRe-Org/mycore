@@ -25,8 +25,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.core.Response;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRJDOMContent;
@@ -53,6 +51,8 @@ import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.search.Search;
+
+import jakarta.ws.rs.core.Response;
 
 /**
  * Provides functionalities to create, update or delete works in ORCID profile.
@@ -91,14 +91,14 @@ public class MCRORCIDWorkService {
             throw new MCRORCIDException("Filtered MODS is empty.");
         }
         try {
-            final MCRORCIDUserInfo userInfo
-                = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
-                    .orElse(new MCRORCIDUserInfo(orcid));
+            final MCRORCIDUserInfo userInfo = Optional
+                .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                .orElse(new MCRORCIDUserInfo(orcid));
             if (userInfo.getWorkInfo() == null) {
                 userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
             }
-            final Work work
-                = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(filteredObject.createXML()));
+            final Work work = MCRORCIDWorkTransformerHelper
+                .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> trustedIdentifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
             doUpdateWorkInfo(trustedIdentifiers, userInfo.getWorkInfo(), orcid, credential);
             if (userInfo.getWorkInfo().hasOwnPutCode()) {
@@ -122,15 +122,15 @@ public class MCRORCIDWorkService {
      */
     public void deleteWork(MCRObject object) {
         try {
-            final MCRORCIDUserInfo userInfo
-                = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
-                    .orElse(new MCRORCIDUserInfo(orcid));
+            final MCRORCIDUserInfo userInfo = Optional
+                .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                .orElse(new MCRORCIDUserInfo(orcid));
             if (userInfo.getWorkInfo() == null) {
                 userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
             }
             final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
-            final Work work
-                = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(filteredObject.createXML()));
+            final Work work = MCRORCIDWorkTransformerHelper
+                .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             // do not trust user/work info
             doUpdateWorkInfo(MCRORCIDWorkUtils.listTrustedIdentifiers(work), userInfo.getWorkInfo(), orcid, credential);
             doDeleteWork(userInfo.getWorkInfo(), orcid, credential);
@@ -283,8 +283,8 @@ public class MCRORCIDWorkService {
     private static void updateWork(Work work, String orcid, MCRORCIDCredential credential, long putCode) {
         checkScope(credential);
         try {
-            final MCRORCIDUserClient memberClient
-                = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid, credential);
+            final MCRORCIDUserClient memberClient = MCRORCIDClientHelper.getClientFactory().createUserClient(orcid,
+                credential);
             work.setPutCode(putCode);
             memberClient.update(MCRORCIDSectionImpl.WORK, putCode, work);
         } catch (MCRORCIDRequestException e) {

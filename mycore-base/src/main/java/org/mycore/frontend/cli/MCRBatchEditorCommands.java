@@ -80,8 +80,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "edit {0} at {1} if {2} {3} add {4} {5}",
         help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, "
-            + "add field {4} with value {5}"
-    )
+            + "add field {4} with value {5}")
     public static void batchAddIf(String oid, String level, String fieldIf, String valueIf, String field2Add,
         String value2Add)
         throws JaxenException, MCRPersistenceException, MCRAccessException, IOException {
@@ -98,8 +97,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "edit {0} at {1} if {2} {3} remove {4} {5}",
         help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, "
-            + "remove field {4} where value is {5}"
-    )
+            + "remove field {4} where value is {5}")
     public static void batchRemoveIf(String oid, String level, String fieldIf, String valueIf, String field2Rem,
         String value2Rem)
         throws MCRPersistenceException, MCRAccessException, JaxenException, IOException {
@@ -107,8 +105,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "edit {0} at {1} replace {2} {3} with {4} {5}",
-        help = "Edit XML elements in object {0} at level {1}, replace field {2} value {3} by field {4} with value {5}"
-    )
+        help = "Edit XML elements in object {0} at level {1}, replace field {2} value {3} by field {4} with value {5}")
     public static void batchReplace(String oid, String level, String oldField, String oldValue, String newField,
         String newValue)
         throws JaxenException, MCRPersistenceException, MCRAccessException, IOException {

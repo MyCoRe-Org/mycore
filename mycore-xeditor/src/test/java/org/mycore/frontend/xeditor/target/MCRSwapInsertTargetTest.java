@@ -79,8 +79,8 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
 
     @Test
     public void testBuildInsert() throws JaxenException, JDOMException {
-        String x
-            = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
+        String x = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2']"
+            + "[mods:name[@type='corporate']='c1']";
         Element template = new MCRNodeBuilder().buildElement(x, null, null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
@@ -110,8 +110,8 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
 
     @Test
     public void testCloneInsert() throws JaxenException, JDOMException {
-        String x
-            = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
+        String x = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2']"
+            + "[mods:name[@type='corporate']='c1']";
         Element template = new MCRNodeBuilder().buildElement(x, null, null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
@@ -141,8 +141,8 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
 
     @Test
     public void testBuildInsertParam() throws JaxenException, JDOMException {
-        String x
-            = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
+        String x = "mods:mods[mods:name[@type='personal']='p1']"
+            + "[mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
         Element template = new MCRNodeBuilder().buildElement(x, null, null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
@@ -165,8 +165,8 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
 
     @Test
     public void testCloneInsertParam() throws JaxenException, JDOMException {
-        String x
-            = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
+        String x = "mods:mods[mods:name[@type='personal']='p1']"
+            + "[mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
         Element template = new MCRNodeBuilder().buildElement(x, null, null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);

@@ -338,7 +338,7 @@ public class MCRRestDerivates {
     private Response doCreateDerivate(@BeanParam DerivateMetadata der) {
         LOGGER.debug(der);
         String projectID = mcrId.getProjectId();
-        MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectID.formatID(projectID + "_derivate",0));
+        MCRObjectID zeroId = MCRObjectID.getInstance(MCRObjectID.formatID(projectID + "_derivate", 0));
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(zeroId);
 
@@ -369,7 +369,6 @@ public class MCRRestDerivates {
         ifs.setSourcePath(null);
         ifs.setMainDoc(der.getMainDoc());
         derivate.getDerivate().setInternals(ifs);
-
 
         try {
             MCRMetadataManager.create(derivate);

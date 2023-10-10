@@ -37,7 +37,7 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
     }
 
     public abstract MCREditableMetaEnrichedLinkID getDerivateLink(MCRDerivate der);
-    
+
     public abstract MCREditableMetaEnrichedLinkID fromDom(Element element);
 
     public MCREditableMetaEnrichedLinkID getEmptyLinkID() {

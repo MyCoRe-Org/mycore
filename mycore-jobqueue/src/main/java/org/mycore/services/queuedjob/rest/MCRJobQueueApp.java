@@ -30,7 +30,6 @@ import org.mycore.restapi.MCRTransactionFilter;
 
 import jakarta.ws.rs.ApplicationPath;
 
-
 /**
  * @author Sebastian Hofmann
  */

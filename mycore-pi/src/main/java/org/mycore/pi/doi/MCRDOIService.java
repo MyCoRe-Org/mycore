@@ -224,7 +224,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         super.validateRegistration(obj, additional);
     }
 
-
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
         return new URI(this.registerURL + registerURLContext.replaceAll("\\$[iI][dD]", obj.getId().toString()));
     }

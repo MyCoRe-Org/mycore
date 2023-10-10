@@ -33,6 +33,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRSwordCollectionServlet extends MCRSwordServlet {
 
+    private static final long serialVersionUID = 1L;
+
     private CollectionAPI api;
 
     public void init() {

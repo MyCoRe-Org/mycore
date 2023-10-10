@@ -53,7 +53,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
 
     public static final String JWT_SESSION_ATTRIBUTE_PREFIX = "mcr:sa:";
 
-    private static final  ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
 

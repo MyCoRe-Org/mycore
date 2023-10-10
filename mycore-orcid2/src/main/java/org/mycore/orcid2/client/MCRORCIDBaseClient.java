@@ -24,17 +24,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import org.apache.commons.lang3.StringUtils;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.client.filter.MCRORCIDAuthenticationFilter;
 import org.mycore.orcid2.client.filter.MCRORCIDXMLReader;
 import org.mycore.orcid2.client.filter.MCRORCIDXMLWriter;
+
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Basic ORCID client.
@@ -45,8 +45,8 @@ abstract class MCRORCIDBaseClient {
     /**
      * ORCID XML media type.
      */
-    protected static final MediaType ORCID_XML_MEDIA_TYPE
-        = MediaType.valueOf(MCRORCIDClientConstants.ORCID_XML_MEDIA_TYPE);
+    protected static final MediaType ORCID_XML_MEDIA_TYPE = MediaType
+        .valueOf(MCRORCIDClientConstants.ORCID_XML_MEDIA_TYPE);
 
     private final WebTarget baseTarget;
 
@@ -103,8 +103,8 @@ abstract class MCRORCIDBaseClient {
      */
     protected <T> T doFetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes) {
         final String putCodeString = (putCodes == null || putCodes.length == 0) ? "" : StringUtils.join(putCodes, ',');
-        final Response response
-            = fetch(String.format(Locale.ROOT, "%s/%s/%s", orcid, section.getPath(), putCodeString));
+        final Response response = fetch(
+            String.format(Locale.ROOT, "%s/%s/%s", orcid, section.getPath(), putCodeString));
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }

@@ -18,6 +18,10 @@
 
 package org.mycore.frontend.cli;
 
+import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
@@ -40,10 +44,6 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-
-import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * This class provides a set of commands for the org.mycore.access management

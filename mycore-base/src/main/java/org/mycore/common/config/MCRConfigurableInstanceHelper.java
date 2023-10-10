@@ -268,16 +268,14 @@ class MCRConfigurableInstanceHelper {
                 throw new MCRConfigurationException("Class " + targetClass.getName()
                     + " has no public, parameterless constructor and no suitable"
                     + " (public, static, matching return type, parameterless, name containing 'instance')"
-                    + " factory method"
-                );
+                    + " factory method");
             }
 
             if (factoryMethods.size() != 1) {
                 throw new MCRConfigurationException("Class " + targetClass.getName()
                     + " has no public, parameterless constructor but multiple suitable"
                     + " (public, static, matching return type, parameterless, name containing 'instance')"
-                    + " factory methods (" + methodNames(factoryMethods) + ")"
-                );
+                    + " factory methods (" + methodNames(factoryMethods) + ")");
             }
 
             return factoryMethods.get(0);
@@ -415,7 +413,7 @@ class MCRConfigurableInstanceHelper {
 
         METHOD(1);
 
-       public final int order;
+        public final int order;
 
         TargetType(int order) {
             this.order = order;
@@ -604,7 +602,6 @@ class MCRConfigurableInstanceHelper {
 
         }),
 
-
         INSTANCE_LIST(0, new AnnotationMapper<MCRInstanceList>() {
 
             @Override
@@ -641,7 +638,7 @@ class MCRConfigurableInstanceHelper {
             this.order = order;
             this.mapper = mapper;
         }
-        
+
     }
 
     private abstract static class AnnotationMapper<A extends Annotation> {

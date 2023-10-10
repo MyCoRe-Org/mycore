@@ -115,7 +115,6 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
         return mcrObject.getId();
     }
 
-
     /**
      * redirects to new mcrobject form.
      *
