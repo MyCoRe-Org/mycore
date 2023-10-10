@@ -64,7 +64,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
             MCRMetaHistoryItem.class);
         query.setParameter("from", from);
         query.setParameter("until", until.orElseGet(Instant::now));
-        query.setParameter("eventType", MCRMetadataHistoryEventType.Delete);
+        query.setParameter("eventType", MCRMetadataHistoryEventType.Delete.getAbbr());
         return query.getResultList()
             .stream()
             .collect(Collectors.toMap(MCRMetaHistoryItem::getId, MCRMetaHistoryItem::getTime));
@@ -74,7 +74,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Instant> query = em.createNamedQuery("MCRMetaHistory.getLastOfType", Instant.class);
         query.setParameter("id", identifier);
-        query.setParameter("type", MCRMetadataHistoryEventType.Delete);
+        query.setParameter("type", MCRMetadataHistoryEventType.Delete.getAbbr());
         return Optional.ofNullable(query.getSingleResult());
     }
 

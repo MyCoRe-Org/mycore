@@ -22,8 +22,6 @@ import java.io.Serializable;
 import java.time.Instant;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -52,11 +50,11 @@ import jakarta.persistence.Table;
     })
 @NamedQueries({
     @NamedQuery(name = "MCRMetaHistory.getLastOfType",
-        query = "SELECT MAX(time) FROM MCRMetaHistoryItem i WHERE i.id=:id and i.eventType=:type"),
+        query = "SELECT MAX(time) FROM MCRMetaHistoryItem i WHERE i.id=:id and i.eventTypeChar=:type"),
     @NamedQuery(name = "MCRMetaHistory.getLastEventByID",
         query = "SELECT a FROM MCRMetaHistoryItem a "
             + "WHERE a.time BETWEEN :from AND :until "
-            + "AND a.eventType=:eventType "
+            + "AND a.eventTypeChar=:eventType "
             + "ORDER BY a.time DESC "
             + "FETCH FIRST 1 ROWS ONLY"),
     @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem"),
@@ -67,22 +65,22 @@ import jakarta.persistence.Table;
         query = "SELECT c"
             + " FROM MCRMetaHistoryItem c"
             + " WHERE (:afterID is null or c.id >:afterID)"
-            + "   AND c.eventType='Created'"
+            + "   AND c.eventTypeChar='Created'"
             + "   AND (:kind!='object' OR CAST(c.id as string) NOT LIKE '%\\_derivate\\_%')"
             + "   AND (:kind!='derivate' OR CAST(c.id as string) LIKE '%\\_derivate\\_%')"
-            + "   AND (NOT EXISTS (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType ='Deleted' AND c.id=d.id)"
+            + "   AND (NOT EXISTS (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventTypeChar ='d' AND c.id=d.id)"
             + "        OR c.time > ALL (SELECT d.time FROM MCRMetaHistoryItem d "
-            + "                         WHERE d.eventType ='Deleted' AND c.id=d.id))"
+            + "                         WHERE d.eventTypeChar ='d' AND c.id=d.id))"
             + " ORDER by c.id"),
     @NamedQuery(name = "MCRMetaHistory.countActiveIDs",
         query = "SELECT count(c)"
             + " FROM MCRMetaHistoryItem c"
-            + " WHERE c.eventType='Created'"
+            + " WHERE c.eventTypeChar='Created'"
             + "   AND (:kind!='object' OR CAST(c.id as string) NOT LIKE '%\\_derivate\\_%')"
             + "   AND (:kind!='derivate' OR CAST(c.id as string) LIKE '%\\_derivate\\_%')"
-            + "   AND (NOT EXISTS (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType ='Deleted' AND c.id=d.id)"
+            + "   AND (NOT EXISTS (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventTypeChar ='d' AND c.id=d.id)"
             + "        OR c.time > ALL (SELECT d.time FROM MCRMetaHistoryItem d "
-            + "                         WHERE d.eventType ='Deleted' AND c.id=d.id))")
+            + "                         WHERE d.eventTypeChar ='d' AND c.id=d.id))")
 })
 public class MCRMetaHistoryItem implements Serializable {
 
@@ -97,9 +95,8 @@ public class MCRMetaHistoryItem implements Serializable {
 
     private Instant time;
 
-    @Column(length = 16)
-    @Enumerated(EnumType.STRING)
-    private MCRMetadataHistoryEventType eventType;
+    @Column(length = 1, name = "eventType")
+    private char eventTypeChar;
 
     private String userID;
 
@@ -153,11 +150,11 @@ public class MCRMetaHistoryItem implements Serializable {
     }
 
     public MCRMetadataHistoryEventType getEventType() {
-        return this.eventType;
+        return MCRMetadataHistoryEventType.fromAbbr(getEventTypeChar());
     }
 
     public void setEventType(MCRMetadataHistoryEventType eventType) {
-        this.eventType = eventType;
+        setEventTypeChar(eventType.getAbbr());
     }
 
     public String getUserID() {
@@ -176,10 +173,18 @@ public class MCRMetaHistoryItem implements Serializable {
         this.userIP = ip;
     }
 
+    public char getEventTypeChar() {
+        return eventTypeChar;
+    }
+
+    public void setEventTypeChar(char eventTypeChar) {
+        this.eventTypeChar = eventTypeChar;
+    }
+
     @Override
     public String toString() {
-        return "MCRMetaHistoryItem [eventType=" + eventType + ", id=" + id + ", time=" + time + ", userID=" + userID
-            + ", userIP=" + userIP + "]";
+        return "MCRMetaHistoryItem [eventType=" + getEventType() + ", id=" + id + ", time=" + time + ", userID="
+            + userID + ", userIP=" + userIP + "]";
     }
 
 }
