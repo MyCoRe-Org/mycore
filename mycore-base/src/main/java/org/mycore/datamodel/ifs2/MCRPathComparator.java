@@ -24,6 +24,8 @@ import java.util.Comparator;
 
 class MCRPathComparator implements Comparator<Path>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int compare(Path o1, Path o2) {
         String path1 = o1.getFileName().toString();

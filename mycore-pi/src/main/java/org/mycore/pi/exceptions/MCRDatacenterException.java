@@ -20,6 +20,8 @@ package org.mycore.pi.exceptions;
 
 public class MCRDatacenterException extends MCRPersistentIdentifierException {
 
+    private static final long serialVersionUID = 1L;
+
     public MCRDatacenterException(String message) {
         super(message);
     }

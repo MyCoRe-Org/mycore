@@ -387,8 +387,8 @@ public class MCRDataciteClient {
                         + " - " + statusLine.getReasonPhrase() + " - " + responseString);
                 case HttpStatus.SC_UNAUTHORIZED -> // no login
                     throw new MCRDatacenterAuthenticationException();
-                default ->
-                    throw new MCRDatacenterException("Unknown return status: " + statusLine.getStatusCode() + " - "
+                default -> throw new MCRDatacenterException(
+                    "Unknown return status: " + statusLine.getStatusCode() + " - "
                         + statusLine.getReasonPhrase() + " - " + responseString);
             }
         } catch (IOException | URISyntaxException e) {
@@ -409,8 +409,8 @@ public class MCRDataciteClient {
                     return;
                 }
                 case HttpStatus.SC_UNAUTHORIZED -> throw new MCRDatacenterAuthenticationException();
-                case HttpStatus.SC_NOT_FOUND ->
-                    throw new MCRIdentifierUnresolvableException(doi.asString(), doi.asString() + " was not found!");
+                case HttpStatus.SC_NOT_FOUND -> throw new MCRIdentifierUnresolvableException(doi.asString(),
+                    doi.asString() + " was not found!");
                 default -> throw new MCRDatacenterException(
                     "Unknown return status: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase());
             }

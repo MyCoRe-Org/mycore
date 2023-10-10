@@ -273,25 +273,24 @@ public final class MCRURIResolver implements URIResolver {
         } else {
             String resolvingBase = null;
 
-            String configurationResourceDir
-                = MCRConfigurationDir.getConfigurationDirectory().toPath()
-                    .toAbsolutePath()
-                    .normalize()
-                    .resolve("resources")
-                    .toFile()
-                    .toURI()
-                    .toString();
+            String configurationResourceDir = MCRConfigurationDir.getConfigurationDirectory().toPath()
+                .toAbsolutePath()
+                .normalize()
+                .resolve("resources")
+                .toFile()
+                .toURI()
+                .toString();
 
-            String webappPath
-                = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString() : null;
+            String webappPath = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString()
+                : null;
 
             Optional<String> matching = MCRDeveloperTools.getOverridePaths()
-                    .map(Path::toAbsolutePath)
-                    .map(Path::toFile)
-                    .map(File::toURI)
-                    .map(URI::toString)
-                    .filter(base::startsWith)
-                    .findFirst();
+                .map(Path::toAbsolutePath)
+                .map(Path::toFile)
+                .map(File::toURI)
+                .map(URI::toString)
+                .filter(base::startsWith)
+                .findFirst();
             if (matching.isPresent()) {
                 // in this case the developer mode is active and the file is in the override directory e.G.
                 // /root/workspace/mir/src/main/resources/xsl/mir-accesskey-utils.xsl
@@ -300,7 +299,8 @@ public final class MCRURIResolver implements URIResolver {
                 // in this case the file is in a jar file e.G.
                 // /root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl
                 resolvingBase = base.lastIndexOf(".jar!") > 0
-                    ? base.substring(base.lastIndexOf(".jar!") + ".jar!".length()) : base;
+                    ? base.substring(base.lastIndexOf(".jar!") + ".jar!".length())
+                    : base;
             } else if (base.startsWith(configurationResourceDir)) {
                 // in this case the file is in the configuration directory e.G.
                 // file:/root/.mycore/dev-mir/resources/xsl/mir-accesskey-utils.xsl
@@ -593,12 +593,12 @@ public final class MCRURIResolver implements URIResolver {
 
         private String getCacheDebugMsg(URI hrefURI, HttpCacheContext context) {
             return hrefURI.toASCIIString() + ": " +
-            switch (context.getCacheResponseStatus()) {
-                case CACHE_HIT -> "A response was generated from the cache with no requests sent upstream";
-                case CACHE_MODULE_RESPONSE -> "The response was generated directly by the caching module";
-                case CACHE_MISS -> "The response came from an upstream server";
-                case VALIDATED -> "The response was generated from the cache after validating the entry "
-                    + "with the origin server";
+                switch (context.getCacheResponseStatus()) {
+                    case CACHE_HIT -> "A response was generated from the cache with no requests sent upstream";
+                    case CACHE_MODULE_RESPONSE -> "The response was generated directly by the caching module";
+                    case CACHE_MISS -> "The response came from an upstream server";
+                    case VALIDATED -> "The response was generated from the cache after validating the entry "
+                        + "with the origin server";
                 };
         }
 
@@ -1579,14 +1579,15 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             String versionType = href.substring(href.indexOf(":") + 1);
             final Element versionElement = new Element("version");
-            versionElement.setText(switch (versionType) {
-            case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
-            case "abbrev" -> MCRCoreVersion.getAbbrev();
-            case "branch" -> MCRCoreVersion.getBranch();
-            case "version" -> MCRCoreVersion.getVersion();
-            case "revision" -> MCRCoreVersion.getRevision();
-            default -> MCRCoreVersion.getCompleteVersion();
-            });
+            versionElement.setText(
+                switch (versionType) {
+                    case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
+                    case "abbrev" -> MCRCoreVersion.getAbbrev();
+                    case "branch" -> MCRCoreVersion.getBranch();
+                    case "version" -> MCRCoreVersion.getVersion();
+                    case "revision" -> MCRCoreVersion.getRevision();
+                    default -> MCRCoreVersion.getCompleteVersion();
+                });
             return new JDOMSource(versionElement);
         }
     }

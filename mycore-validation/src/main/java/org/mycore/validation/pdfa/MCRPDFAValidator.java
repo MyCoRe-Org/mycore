@@ -1,3 +1,20 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.mycore.validation.pdfa;
 
 import java.io.IOException;
@@ -22,6 +39,7 @@ import org.verapdf.pdfa.results.ValidationResult;
 public class MCRPDFAValidator {
 
     private static volatile Boolean INITIALIZED = false;
+
     private static final Object MUTEX = new Object();
 
     private static void initialise() {
@@ -47,7 +65,7 @@ public class MCRPDFAValidator {
     public ValidationResult validate(InputStream inputStream) throws MCRPDFAValidationException, IOException {
         initialise();
         try (PDFAParser parser = Foundries.defaultInstance().createParser(inputStream);
-             PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false)) {
+            PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false)) {
             return validator.validate(parser);
         } catch (ValidationException | ModelParsingException | EncryptedPdfException e) {
             throw new MCRPDFAValidationException("unable to validate pdf", e);

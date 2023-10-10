@@ -102,4 +102,3 @@ public class MCRDNBURNRegistrationCheckCronjob extends MCRCronjob {
     }
 
 }
-

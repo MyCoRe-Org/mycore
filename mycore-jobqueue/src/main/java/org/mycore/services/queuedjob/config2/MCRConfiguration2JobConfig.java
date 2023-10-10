@@ -57,11 +57,11 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     @Override
     public Optional<Duration> timeTillReset(Class<? extends MCRJobAction> action) {
         return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_TIME_TILL_RESET)
-                .map(Duration::ofMinutes);
+            .map(Duration::ofMinutes);
     }
 
     @Override
-    public Optional<Integer> maxTryCount(Class<? extends MCRJobAction> action)  {
+    public Optional<Integer> maxTryCount(Class<? extends MCRJobAction> action) {
         return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_MAX_TRY);
     }
 
@@ -70,9 +70,8 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
         return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_JOB_THREADS);
     }
 
-
     @Override
-    public Optional<Boolean> activated(Class<? extends MCRJobAction> action){
+    public Optional<Boolean> activated(Class<? extends MCRJobAction> action) {
         return MCRConfiguration2.getBoolean(getActionConfigPrefix(action) + CONFIG_ACTIVATED);
     }
 
@@ -80,28 +79,30 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     public Integer maxJobThreadCount() {
         String property = CONFIG_PREFIX + CONFIG_JOB_THREADS;
         return MCRConfiguration2.getInt(property)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
+
     @Override
-    public Duration timeTillReset()  {
+    public Duration timeTillReset() {
         String property = CONFIG_PREFIX + CONFIG_TIME_TILL_RESET;
         return MCRConfiguration2.getInt(property)
-                .map(Duration::ofMinutes)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
+            .map(Duration::ofMinutes)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
 
     @Override
     public Integer maxTryCount() {
         String property = CONFIG_PREFIX + CONFIG_MAX_TRY;
         return MCRConfiguration2.getInt(property)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
 
     @Override
     public Boolean activated() {
         String property = MCRConfiguration2JobConfig.CONFIG_PREFIX + MCRConfiguration2JobConfig.CONFIG_ACTIVATED;
         return MCRConfiguration2.getBoolean(property)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));    }
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
+    }
 
     @Override
     public List<MCRJobStatusListener> jobStatusListeners(Class<? extends MCRJobAction> action) {

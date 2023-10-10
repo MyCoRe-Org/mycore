@@ -39,7 +39,6 @@ public class MCRJobQueueCommands {
 
     static MCRJobDAOJPAImpl dao = new MCRJobDAOJPAImpl();
 
-
     /**
      * Lists all jobs with status MAX_TRIES.
      */
@@ -88,14 +87,14 @@ public class MCRJobQueueCommands {
         help = "Reset all jobs with status MAX_TRIES and action {0} to status NEW",
         order = 30)
     public static void resetMaxTryJobsWithAction(String action) {
-        if(action == null || action.isEmpty()) {
+        if (action == null || action.isEmpty()) {
             LOGGER.error("Action is required!");
             return;
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         int count = em.createQuery(
             "UPDATE MCRJob SET status = :status, tries = 0, exception = null WHERE status = :maxTriesStatus " +
-                    "AND action = :action")
+                "AND action = :action")
             .setParameter("status", MCRJobStatus.NEW)
             .setParameter("maxTriesStatus", MCRJobStatus.MAX_TRIES)
             .setParameter("action", action)
@@ -113,14 +112,14 @@ public class MCRJobQueueCommands {
         help = "reset all jobs with status MAX_TRIES and id {0} to status NEW",
         order = 40)
     public static void resetMaxTryJobsWithId(String id) {
-        if(id == null || id.isEmpty()) {
+        if (id == null || id.isEmpty()) {
             LOGGER.error("Id is required!");
             return;
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         int count = em.createQuery(
             "UPDATE MCRJob SET status = :status, tries = 0, exception = null WHERE status = :maxTriesStatus " +
-                    "AND id = :id")
+                "AND id = :id")
             .setParameter("status", MCRJobStatus.NEW)
             .setParameter("maxTriesStatus", MCRJobStatus.MAX_TRIES)
             .setParameter("id", id)

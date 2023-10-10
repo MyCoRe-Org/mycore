@@ -49,8 +49,8 @@ public class MCRTestCase {
     public static TemporaryFolder junitFolder = new TemporaryFolder();
 
     @Rule
-    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher =
-        new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
+    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher
+        = new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
 
     @BeforeClass
     public static void initBaseDir() throws IOException {
@@ -86,12 +86,10 @@ public class MCRTestCase {
     private Map<String, String> getCombinedTestProperties() {
         Map<String, String> testProperties = new HashMap<>();
         getClassLevelTestConfigurations().descendingIterator().forEachRemaining(
-            testConfiguration -> extendTestProperties(testProperties, testConfiguration)
-        );
+            testConfiguration -> extendTestProperties(testProperties, testConfiguration));
         testProperties.putAll(getTestProperties());
         getMethodLevelTestConfiguration().ifPresent(
-            testConfiguration -> extendTestProperties(testProperties, testConfiguration)
-        );
+            testConfiguration -> extendTestProperties(testProperties, testConfiguration));
         return testProperties;
     }
 
@@ -113,9 +111,8 @@ public class MCRTestCase {
     }
 
     private void extendTestProperties(Map<String, String> testProperties, MCRTestConfiguration testConfiguration) {
-        Arrays.stream(testConfiguration.properties()).forEach(testProperty ->
-            extendTestProperties(testProperties, testProperty)
-        );
+        Arrays.stream(testConfiguration.properties())
+            .forEach(testProperty -> extendTestProperties(testProperties, testProperty));
     }
 
     private static void extendTestProperties(Map<String, String> testProperties, MCRTestProperty testProperty) {
@@ -138,12 +135,10 @@ public class MCRTestCase {
 
     }
 
-
     @After
     public void tearDown() throws Exception {
         MCRTestCaseHelper.after();
     }
-
 
     /**
      * Creates a temporary properties file if the system variable MCR.Configuration.File is not set.

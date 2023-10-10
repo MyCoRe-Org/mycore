@@ -20,9 +20,9 @@ package org.mycore.restapi.v2.access;
 
 import java.util.Arrays;
 
-import jakarta.ws.rs.HttpMethod;
-
 import org.mycore.access.MCRAccessManager;
+
+import jakarta.ws.rs.HttpMethod;
 
 /**
  * The REST API access permissions (read, write, delete)

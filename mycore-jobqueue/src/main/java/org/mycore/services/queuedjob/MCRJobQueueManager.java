@@ -38,8 +38,11 @@ public class MCRJobQueueManager {
     private static final Logger LOGGER = LogManager.getLogger();
 
     final Map<String, MCRJobQueue> queueInstances = new ConcurrentHashMap<>();
+
     final Map<String, MCRJobThreadStarter> jobThreadStartInstances = new ConcurrentHashMap<>();
+
     private final MCRJobDAO dao;
+
     private final MCRJobConfig config;
 
     MCRJobQueueManager(MCRJobDAO dao, MCRJobConfig config) {
@@ -65,8 +68,8 @@ public class MCRJobQueueManager {
 
         MCRJobQueue queue = queueInstances.computeIfAbsent(key, k -> {
             MCRJobQueue queue1 = new MCRJobQueue(action, config, getJobDAO());
-            long count
-                = MCRJobResetter.resetJobsWithAction(action, config, getJobDAO(), queue1, MCRJobStatus.PROCESSING);
+            long count = MCRJobResetter.resetJobsWithAction(action, config, getJobDAO(), queue1,
+                MCRJobStatus.PROCESSING);
             if (count > 0) {
                 LOGGER.info("Resetted {} processing jobs for action {} on startup!", count, action.getName());
             }
@@ -133,8 +136,8 @@ public class MCRJobQueueManager {
     }
 
     private static class InstanceHolder {
-        private static final MCRJobQueueManager INSTANCE
-            = new MCRJobQueueManager(new MCRJobDAOJPAImpl(), new MCRConfiguration2JobConfig());
+        private static final MCRJobQueueManager INSTANCE = new MCRJobQueueManager(new MCRJobDAOJPAImpl(),
+            new MCRConfiguration2JobConfig());
     }
 
 }

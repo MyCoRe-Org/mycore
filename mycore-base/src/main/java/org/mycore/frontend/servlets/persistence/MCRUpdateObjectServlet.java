@@ -43,7 +43,6 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
 
-
     private static final long serialVersionUID = -7507356414480350102L;
 
     @Override

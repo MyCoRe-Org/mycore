@@ -87,6 +87,7 @@ public class MCRServlet extends HttpServlet {
 
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration2.getBoolean("MCR.Servlet.BrowserCache.enable")
         .orElse(false);
+
     private static MCRLayoutService LAYOUT_SERVICE;
 
     private static String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";

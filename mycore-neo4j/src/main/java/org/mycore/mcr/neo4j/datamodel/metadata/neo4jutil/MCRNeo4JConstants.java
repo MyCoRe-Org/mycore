@@ -24,16 +24,16 @@ package org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil;
  */
 public class MCRNeo4JConstants {
 
-   public static final String NEO4J_CONFIG_PREFIX = "MCR.Neo4J.";
+    public static final String NEO4J_CONFIG_PREFIX = "MCR.Neo4J.";
 
-   public static final String DEFAULT_NEO4J_SERVER_URL = NEO4J_CONFIG_PREFIX + "ServerURL";
+    public static final String DEFAULT_NEO4J_SERVER_URL = NEO4J_CONFIG_PREFIX + "ServerURL";
 
-   public static final String NEO4J_PARAMETER_SEPARATOR = "_-_";
+    public static final String NEO4J_PARAMETER_SEPARATOR = "_-_";
 
-   public static final String NEO4J_CLASSID_CATEGID_SEPARATOR = "__";
+    public static final String NEO4J_CLASSID_CATEGID_SEPARATOR = "__";
 
-   private MCRNeo4JConstants() {
-      throw new IllegalStateException("Utility class");
-   }
+    private MCRNeo4JConstants() {
+        throw new IllegalStateException("Utility class");
+    }
 
 }

@@ -256,7 +256,7 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
-    @MCRAccessControlExposeHeaders({HEADER_X_TOTAL_COUNT, HttpHeaders.LINK})
+    @MCRAccessControlExposeHeaders({ HEADER_X_TOTAL_COUNT, HttpHeaders.LINK })
     public Response listObjects(
         @QueryParam(PARAM_AFTER_ID) MCRObjectID afterID,
         @QueryParam(PARAM_OFFSET) Integer offset,

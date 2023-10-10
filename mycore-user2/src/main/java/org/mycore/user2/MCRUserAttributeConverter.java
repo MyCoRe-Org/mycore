@@ -33,6 +33,5 @@ public interface MCRUserAttributeConverter<ValueType, BoundType> {
      * @param valueMapping the value mapping or <code>null</code>
      * @return the converted value of type <code>&lt;BoundType&gt;</code>
      */
-    BoundType convert(ValueType value, String separator, Map<String, String> valueMapping)
-    ;
+    BoundType convert(ValueType value, String separator, Map<String, String> valueMapping);
 }

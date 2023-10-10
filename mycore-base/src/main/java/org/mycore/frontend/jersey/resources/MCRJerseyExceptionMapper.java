@@ -37,8 +37,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -129,6 +129,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
     private static class MCRExceptionContainer {
         private Exception exception;
 
+        @SuppressWarnings("unused")
         private MCRExceptionContainer() {
             //required for JAXB
         }

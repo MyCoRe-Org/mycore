@@ -18,10 +18,10 @@
 
 package org.mycore.common.config;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 
 public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
 
@@ -116,8 +116,7 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     public static final List<String> VALUES_ORDERED_METHOD = Arrays.asList(
         VALUE_ORDERED_METHOD,
         VALUE_ORDERED_METHOD_1,
-        VALUE_ORDERED_METHOD_2
-    );
+        VALUE_ORDERED_METHOD_2);
 
     private static final String VALUE_ORDERED_POST_CONSTRUCTION = "ValueOrderedPostConstruction";
 
@@ -128,13 +127,11 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     public static final List<String> VALUES_ORDERED_POST_CONSTRUCTION = Arrays.asList(
         VALUE_ORDERED_POST_CONSTRUCTION,
         VALUE_ORDERED_POST_CONSTRUCTION_1,
-        VALUE_ORDERED_POST_CONSTRUCTION_2
-    );
+        VALUE_ORDERED_POST_CONSTRUCTION_2);
 
     public static final List<String> VALUES_ORDERED_OVERALL = Stream.concat(
         VALUES_ORDERED_METHOD.stream(),
-        VALUES_ORDERED_POST_CONSTRUCTION.stream()
-    ).toList();
+        VALUES_ORDERED_POST_CONSTRUCTION.stream()).toList();
 
     @Test
     public void test() {

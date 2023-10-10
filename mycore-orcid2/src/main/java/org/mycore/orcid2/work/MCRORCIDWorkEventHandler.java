@@ -40,7 +40,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.user2.MCRUser;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDInvalidScopeException;
@@ -55,6 +54,7 @@ import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.user2.MCRUser;
 import org.orcid.jaxb.model.message.ScopeConstants;
 
 /**
@@ -69,11 +69,11 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final boolean COLLECT_EXTERNAL_PUT_CODES
-        = MCRConfiguration2.getBoolean("MCR.ORCID2.WorkEventHandler.CollectExternalPutCodes").orElse(false);
+    private static final boolean COLLECT_EXTERNAL_PUT_CODES = MCRConfiguration2
+        .getBoolean("MCR.ORCID2.WorkEventHandler.CollectExternalPutCodes").orElse(false);
 
-    private static final boolean SAVE_OTHER_PUT_CODES
-        = MCRConfiguration2.getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
+    private static final boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2
+        .getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {

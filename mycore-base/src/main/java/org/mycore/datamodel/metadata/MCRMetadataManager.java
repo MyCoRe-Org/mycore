@@ -959,8 +959,7 @@ public final class MCRMetadataManager {
         }
         fireEvent(mcrDerivate, retrieveMCRDerivate(mcrDerivate.getId()), MCREvent.EventType.UPDATE);
     }
-    
-    
+
     /**
      * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data
      * store.

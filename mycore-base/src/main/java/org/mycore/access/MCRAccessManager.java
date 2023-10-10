@@ -59,7 +59,7 @@ public class MCRAccessManager {
     public static final String PERMISSION_VIEW = "view";
 
     public static final String PERMISSION_HISTORY_VIEW = "view-history";
-    
+
     public static final String PERMISSION_HISTORY_READ = "read-history";
 
     public static final String PERMISSION_HISTORY_DELETE = "delete-history";

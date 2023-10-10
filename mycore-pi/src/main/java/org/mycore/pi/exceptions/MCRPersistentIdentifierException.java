@@ -24,6 +24,8 @@ import org.mycore.common.MCRCatchException;
 
 public class MCRPersistentIdentifierException extends MCRCatchException {
 
+    private static final long serialVersionUID = 1L;
+
     private final String translatedAdditionalInformation;
 
     private final Integer code;

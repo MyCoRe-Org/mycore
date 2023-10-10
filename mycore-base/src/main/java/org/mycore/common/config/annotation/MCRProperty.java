@@ -18,13 +18,13 @@
 
 package org.mycore.common.config.annotation;
 
-import org.mycore.common.config.MCRConfigurationException;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * This annotation is used to mark fields or methods that should be set to or called with a value of type

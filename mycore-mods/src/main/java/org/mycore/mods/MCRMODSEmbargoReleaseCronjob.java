@@ -74,7 +74,6 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                 params.set("fl", "id");
                 params.set("q", query);
 
-
                 solrClient.query(params)
                     .getResults()
                     .stream()

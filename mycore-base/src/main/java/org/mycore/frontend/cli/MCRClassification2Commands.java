@@ -317,7 +317,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "{1}-classification.xsl. For {1}, the default is xsl/save.",
         order = 70)
     public static List<String> exportAll(String dirname, String style) throws Exception {
-         return DAO.getRootCategoryIDs().stream()
+        return DAO.getRootCategoryIDs().stream()
             .map(id -> "export classification " + id + " to directory " + dirname + " with stylesheet " + style)
             .collect(Collectors.toList());
     }
@@ -412,10 +412,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
             + "where cat3.parentid=cat1.parentid) group by cat1.parentid";
 
-        for (List<Object[]> parentWithErrorsList = em.createNativeQuery(sqlQuery)
-            .getResultList(); !parentWithErrorsList
-                .isEmpty();
-            parentWithErrorsList = em.createNativeQuery(sqlQuery).getResultList()) {
+        for (List<Object[]> parentWithErrorsList = em.createNativeQuery(sqlQuery).getResultList(); !parentWithErrorsList
+            .isEmpty(); parentWithErrorsList = em.createNativeQuery(sqlQuery).getResultList()) {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];

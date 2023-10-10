@@ -251,7 +251,7 @@ public abstract class MCRSolrClassificationUtil {
     public static String encodeCategoryId(MCRCategoryID classId) {
         return classId.toString().replaceAll(":", "\\\\:");
     }
-    
+
     protected static void solrDelete(MCRCategoryID id, MCRCategory parent) {
         try {
             // remove all descendants and itself

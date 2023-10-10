@@ -32,19 +32,21 @@ import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.config.MCRConfigurationDir;
 
 import com.google.protobuf.ByteString;
+import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse.ImportSuccess;
 
 import de.larsgrefer.sass.embedded.importer.CustomImporter;
 import de.larsgrefer.sass.embedded.importer.CustomUrlImporter;
 import de.larsgrefer.sass.embedded.util.SyntaxUtil;
 import jakarta.servlet.ServletContext;
-import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse.ImportSuccess;
 
 /**
  * The MCRResourceImporter class is responsible for importing resources from URLs that start with the "sass:/" prefix.
  */
 public class MCRResourceImporter extends CustomImporter {
     private static final Logger LOGGER = LogManager.getLogger();
+
     static final String SASS_URL_PREFIX = "sass:/";
+
     private final ServletContext servletContext;
 
     private static final UrlHelper URL_HELPER = new UrlHelper();

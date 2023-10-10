@@ -18,6 +18,8 @@
 
 package org.mycore.frontend.cli;
 
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -32,8 +34,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.i18n.MCRTranslation;
-
-import java.util.Map;
 
 /**
  * This class contains commands that may be helpful during development.

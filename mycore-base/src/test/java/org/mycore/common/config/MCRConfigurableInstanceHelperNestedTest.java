@@ -18,6 +18,10 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +34,6 @@ import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     @Test
@@ -43,8 +43,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.Nested", classNameOf = NestedClass.class),
             @MCRTestProperty(key = "Foo.Nested.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Nested.Property2", string = "Value2")
-        }
-    )
+        })
     public void nested() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -61,8 +60,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedClass.class),
-        }
-    )
+        })
     public void nestedNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -77,8 +75,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.Nested", classNameOf = NestedClass.class),
             @MCRTestProperty(key = "Foo.Nested.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Nested.Property2", string = "Value2")
-        }
-    )
+        })
     public void nestedOptional() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -95,8 +92,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalNestedClass.class),
-        }
-    )
+        })
     public void nestedOptionalNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -115,8 +111,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.Nested.Nested", classNameOf = NestedClass.class),
             @MCRTestProperty(key = "Foo.Nested.Nested.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Nested.Nested.Property2", string = "Value2")
-        }
-    )
+        })
     public void nestedNested() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -138,8 +133,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.EntryA.OneProperty", string = "OneValue"),
             @MCRTestProperty(key = "Foo.EntryB", classNameOf = OtherKindOfEntry.class),
             @MCRTestProperty(key = "Foo.EntryB.OtherProperty", string = "OtherValue"),
-        }
-    )
+        })
     public void nestedMap() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -165,8 +159,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedMap.class),
-        }
-    )
+        })
     public void nestedMapNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -182,8 +175,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.EntryA.OneProperty", string = "OneValue"),
             @MCRTestProperty(key = "Foo.EntryB", classNameOf = OtherKindOfEntry.class),
             @MCRTestProperty(key = "Foo.EntryB.OtherProperty", string = "OtherValue"),
-        }
-    )
+        })
     public void nestedOptionalMap() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -209,8 +201,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalNestedMap.class),
-        }
-    )
+        })
     public void nestedOptionalMapNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -230,8 +221,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.Map1.Entry.OneProperty", string = "OneValue"),
             @MCRTestProperty(key = "Foo.Map2.Entry", classNameOf = OtherKindOfEntry.class),
             @MCRTestProperty(key = "Foo.Map2.Entry.OtherProperty", string = "OtherValue"),
-        }
-    )
+        })
     public void nestedMapWithPrefix() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -263,8 +253,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.23.OneProperty", string = "OneValue"),
             @MCRTestProperty(key = "Foo.42", classNameOf = OtherKindOfEntry.class),
             @MCRTestProperty(key = "Foo.42.OtherProperty", string = "OtherValue"),
-        }
-    )
+        })
     public void nestedList() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -290,8 +279,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedList.class),
-        }
-    )
+        })
     public void nestedListNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -307,8 +295,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.23.OneProperty", string = "OneValue"),
             @MCRTestProperty(key = "Foo.42", classNameOf = OtherKindOfEntry.class),
             @MCRTestProperty(key = "Foo.42.OtherProperty", string = "OtherValue"),
-        }
-    )
+        })
     public void nestedOptionalList() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -334,8 +321,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalNestedList.class),
-        }
-    )
+        })
     public void nestedOptionalListNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -355,8 +341,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo.List1.23.OneProperty", string = "OneValue"),
             @MCRTestProperty(key = "Foo.List2.23", classNameOf = OtherKindOfEntry.class),
             @MCRTestProperty(key = "Foo.List2.23.OtherProperty", string = "OtherValue"),
-        }
-    )
+        })
     public void nestedListWithPrefix() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -422,7 +407,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         @MCRProperty(name = "OneProperty")
         public String string;
 
-
         @Override
         public String get() {
             return string;
@@ -434,7 +418,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
         @MCRProperty(name = "OtherProperty")
         public String string;
-
 
         @Override
         public String get() {
@@ -485,7 +468,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
         @MCRInstanceList(name = "List1", valueClass = Entry.class)
         public List<Entry> list1;
-
 
         @MCRInstanceList(name = "List2", valueClass = Entry.class)
         public List<Entry> list2;

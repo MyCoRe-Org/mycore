@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordServiceDocumentServlet extends MCRSwordServlet {
+    private static final long serialVersionUID = 1L;
 
     private ServiceDocumentAPI api;
 

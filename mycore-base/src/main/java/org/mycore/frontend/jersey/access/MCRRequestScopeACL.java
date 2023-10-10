@@ -21,10 +21,10 @@ package org.mycore.frontend.jersey.access;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import jakarta.ws.rs.container.ContainerRequestContext;
-
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.common.MCRUserInformation;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 public interface MCRRequestScopeACL extends MCRAccessInterface {
 

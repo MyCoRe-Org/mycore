@@ -50,11 +50,11 @@ public class MCRJobQueueInitializer implements MCRStartupHandler.AutoExecutable 
         if (MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
             && MCREntityManagerProvider.getEntityManagerFactory() != null) {
 
-            new MCRTransactionableRunnable(()-> {
+            new MCRTransactionableRunnable(() -> {
                 MCRJobQueueManager manager = MCRJobQueueManager.getInstance();
 
                 manager.getJobDAO().getActions().stream().peek(q -> LOGGER.info("Initialize job queue {}", q))
-                        .forEach(manager::getJobQueue);
+                    .forEach(manager::getJobQueue);
             }).run();
 
         }

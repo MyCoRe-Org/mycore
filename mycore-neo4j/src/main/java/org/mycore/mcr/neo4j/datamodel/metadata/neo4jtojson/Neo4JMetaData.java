@@ -18,12 +18,12 @@
 
 package org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
-public record Neo4JMetaData(
-      @JsonProperty String title,
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-      @JsonProperty List<String> content) {
+public record Neo4JMetaData(
+    @JsonProperty String title,
+
+    @JsonProperty List<String> content) {
 }

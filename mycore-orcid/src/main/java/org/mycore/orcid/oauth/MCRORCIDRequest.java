@@ -18,14 +18,14 @@
 
 package org.mycore.orcid.oauth;
 
+import org.mycore.common.config.MCRConfigurationException;
+
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Represents a request against the OAuth2 API of orcid.org.

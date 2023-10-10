@@ -94,8 +94,9 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
                 LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, categoryID);
                 try {
                     switch (eventType) {
-                        case MCRAbstractMetadataVersion.CREATED, MCRAbstractMetadataVersion.UPDATED ->
-                            createOrUpdateOCFLClassification(categoryID, eventType);
+                        case MCRAbstractMetadataVersion.CREATED,
+                            MCRAbstractMetadataVersion.UPDATED -> createOrUpdateOCFLClassification(
+                                categoryID, eventType);
                         case MCRAbstractMetadataVersion.DELETED -> MANAGER.delete(categoryID);
                         default -> throw new IllegalStateException(
                             "Unsupported type in classification found: " + eventType + ", " + categoryID);
@@ -167,8 +168,8 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }
         switch (type) {
-            case MCRAbstractMetadataVersion.CREATED, MCRAbstractMetadataVersion.DELETED ->
-                CATEGORY_WORKSPACE.get().put(id, type);
+            case MCRAbstractMetadataVersion.CREATED, MCRAbstractMetadataVersion.DELETED -> CATEGORY_WORKSPACE.get()
+                .put(id, type);
             case MCRAbstractMetadataVersion.UPDATED -> {
                 final char oldType = CATEGORY_WORKSPACE.get().getOrDefault(id, '0');
                 switch (oldType) {
@@ -185,8 +186,8 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
                             "Unsupported type in classification found: " + oldType + ", " + id);
                 }
             }
-            default ->
-                throw new IllegalStateException("Unsupported event type for classification found: " + type + ", " + id);
+            default -> throw new IllegalStateException(
+                "Unsupported event type for classification found: " + type + ", " + id);
         }
     }
 

@@ -22,6 +22,9 @@ package org.mycore.mcr.acl.accesskey.exception;
  * Exception that refers to an unknown access key.
  */
 public class MCRAccessKeyNotFoundException extends MCRAccessKeyException {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRAccessKeyNotFoundException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.unknownKey");
     }

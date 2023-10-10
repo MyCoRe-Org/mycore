@@ -18,22 +18,24 @@
 
 package org.mycore.frontend.servlets;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet to map the properties defined in the init param "Properties" to a JSON object with the property name as key
@@ -42,9 +44,12 @@ import java.util.Map;
  */
 public class MCRConfigHelperServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String PROPERTIES_INIT_PARAM = "Properties";
 
     private Date lastChange;
+
     private String resultJson;
 
     @Override

@@ -18,12 +18,12 @@
 
 package org.mycore.orcid2.v3.client;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ProcessingException;
-
 import org.mycore.orcid2.client.MCRORCIDClientErrorHandler;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.orcid.jaxb.model.v3.release.error.OrcidError;
+
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
 
 /**
  * See {@link org.mycore.orcid2.client.MCRORCIDClientErrorHandler}.

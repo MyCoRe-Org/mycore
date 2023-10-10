@@ -1,5 +1,10 @@
 package org.mycore.mods.csl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Assert;
@@ -7,11 +12,6 @@ import org.junit.Test;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class MCRListModsItemDataProviderTest extends MCRMODSCSLTest {
 

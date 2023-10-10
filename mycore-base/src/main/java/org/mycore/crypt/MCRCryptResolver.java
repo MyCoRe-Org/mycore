@@ -18,15 +18,17 @@
 
 package org.mycore.crypt;
 
+import java.util.Set;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
-import java.util.Set;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
 
 /**
  * This class provides an URIResolver for encryption and decryption.

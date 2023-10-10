@@ -296,8 +296,7 @@ public class MCRConfiguration2 {
         return getInstantiatablePropertyKeys(prefix)
             .collect(Collectors.toMap(
                 k -> MCRInstanceName.of(k).canonical(),
-                v -> () -> (T) getInstanceOf(v).orElse(null)
-            ));
+                v -> () -> (T) getInstanceOf(v).orElse(null)));
     }
 
     /**
@@ -447,7 +446,7 @@ public class MCRConfiguration2 {
 
     }
 
-    interface SingletonKey{
+    interface SingletonKey {
         String property();
 
         String classname();

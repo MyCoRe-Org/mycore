@@ -20,6 +20,8 @@ package org.mycore.iiif.image.impl;
 
 public class MCRIIIFUnsupportedFormatException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     public MCRIIIFUnsupportedFormatException(String unsupportedFormat) {
         super("The format " + unsupportedFormat + " is not supported!");
     }

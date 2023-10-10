@@ -25,10 +25,10 @@ import org.junit.Before;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 

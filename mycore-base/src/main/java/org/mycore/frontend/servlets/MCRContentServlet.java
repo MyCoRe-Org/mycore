@@ -39,6 +39,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 public abstract class MCRContentServlet extends MCRServlet {
+
     private static final long serialVersionUID = 1L;
 
     private static Logger LOGGER = LogManager.getLogger(MCRContentServlet.class);

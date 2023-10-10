@@ -39,8 +39,8 @@ public class MCRORCIDClientFactory {
 
     private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "Client.";
 
-    private static final String READ_PUBLIC_TOKEN
-        = MCRConfiguration2.getString(CONFIG_PREFIX + "ReadPublicToken").orElse(null);
+    private static final String READ_PUBLIC_TOKEN = MCRConfiguration2.getString(CONFIG_PREFIX + "ReadPublicToken")
+        .orElse(null);
 
     private static Map<String, MCRORCIDClientFactory> factories = new HashMap<>();
 
@@ -149,5 +149,5 @@ public class MCRORCIDClientFactory {
 
     enum ReadClientMode {
         PUBLIC, MEMBER
-    } 
+    }
 }

@@ -144,6 +144,7 @@ public class MCREvent {
         this.customObjectType = Objects.requireNonNull(customObjectType);
         this.customEventType = Objects.requireNonNull(customEventType);
     }
+
     private MCREvent(ObjectType objType, String customEventType) {
         checkNonCustomObjectType(objType);
         initTypes(objType, EventType.CUSTOM);
@@ -167,7 +168,6 @@ public class MCREvent {
     public static MCREvent customEvent(String otherObjectType, EventType evtType) {
         return new MCREvent(otherObjectType, evtType);
     }
-
 
     /**
      * Returns the object type of this event

@@ -31,9 +31,9 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
  */
 public abstract class MCRNeo4JAbstractDataModelParser {
 
-   public abstract List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID);
+    public abstract List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID);
 
-   /**
+    /**
     * The corresponding DataModel Parser extracts the information within the {@code <rootTag>}
     * and return the information as {@code <T>}
     * <p>
@@ -44,5 +44,5 @@ public abstract class MCRNeo4JAbstractDataModelParser {
     * @param rootTag jdom2 Element
     * @return {@code <T>} Handled by the calling MCRNeo4JMetaParser implementation
     */
-   public abstract List<Neo4JNode> parse(Element rootTag);
+    public abstract List<Neo4JNode> parse(Element rootTag);
 }

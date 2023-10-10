@@ -76,7 +76,7 @@ public class MCREnrichmentTest extends MCRTestCase {
         //String debugFile = "testResolvingIteration-debug.xml";
         assertTrue(test(enricherID, xPath, resultFile, null));
     }
-    
+
     @Ignore
     public boolean test(String enricherID, String xPath, String resultFile, String debugFile)
         throws JaxenException, IOException {

@@ -19,6 +19,9 @@
 package org.mycore.datamodel.ifs2;
 
 public class MCRStoreAlreadyExistsException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRStoreAlreadyExistsException(String msg) {
         super(msg);
     }

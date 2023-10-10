@@ -33,8 +33,8 @@ import org.mycore.orcid2.exception.MCRORCIDTransformationException;
  */
 public class MCRORCIDTransformerHelper {
 
-    private static final MCRContentTransformer T_BIBTEX2MODS
-        = MCRContentTransformerFactory.getTransformer("BibTeX2MODS");
+    private static final MCRContentTransformer T_BIBTEX2MODS = MCRContentTransformerFactory
+        .getTransformer("BibTeX2MODS");
 
     /**
      * Converts BibTeX String to MODS.

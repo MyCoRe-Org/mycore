@@ -61,8 +61,8 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
         MCRDNBURNRestClient client = new MCRDNBURNRestClient(getBundleProvider(), getUsernamePasswordCredentials());
 
         try {
-            List<MCRPI> unregisteredURNs
-                = MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, batchSize);
+            List<MCRPI> unregisteredURNs = MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE,
+                batchSize);
 
             for (MCRPI urn : unregisteredURNs) {
                 client.register(urn).ifPresent(date -> setRegisterDate(urn, date));
@@ -97,4 +97,3 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
         return Optional.of(new UsernamePasswordCredentials(username, password));
     }
 }
-

@@ -36,7 +36,7 @@ public class MCRORCIDFlagContent {
      * @param userInfos List of MCRORCIDUserInfo
      */
     public MCRORCIDFlagContent(List<MCRORCIDUserInfo> userInfos) {
-        this.userInfos = userInfos; 
+        this.userInfos = userInfos;
     }
 
     /**

@@ -22,6 +22,7 @@ import java.io.IOException;
 
 public class MCRObjectIDFileSystemDate extends MCRObjectIDDateImpl {
 
+    @SuppressWarnings("unused")
     private MCRObjectIDFileSystemDate() {
         //JAXB requirement
     }

@@ -20,18 +20,6 @@ package org.mycore.orcid2.rest.resources;
 
 import java.util.Map;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.mycore.frontend.jersey.access.MCRRequireLogin;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.orcid2.exception.MCRORCIDException;
@@ -41,6 +29,18 @@ import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.user2.MCRUserManager;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Base resource for ORCID methods.

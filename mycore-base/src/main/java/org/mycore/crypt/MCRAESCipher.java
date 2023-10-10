@@ -47,8 +47,11 @@ public class MCRAESCipher extends MCRCipher {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private String keyFile;
+
     private SecretKey secretKey;
+
     private Cipher encryptCipher;
+
     private Cipher decryptCipher;
 
     @MCRProperty(name = "KeyFile")

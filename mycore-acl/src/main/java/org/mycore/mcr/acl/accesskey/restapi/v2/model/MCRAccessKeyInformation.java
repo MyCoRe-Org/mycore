@@ -20,9 +20,9 @@ package org.mycore.mcr.acl.accesskey.restapi.v2.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MCRAccessKeyInformation {
 

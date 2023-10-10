@@ -78,7 +78,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
             //todo: may be restricted?
             responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_HEADERS, requestHeaders);
             //check if the request is a preflight request and the Authorization header will be sent
-            if (StringUtils.containsIgnoreCase(requestHeaders,HttpHeaders.AUTHORIZATION)) {
+            if (StringUtils.containsIgnoreCase(requestHeaders, HttpHeaders.AUTHORIZATION)) {
                 responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
                 responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, requestContext.getHeaderString(ORIGIN));
             }

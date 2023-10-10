@@ -106,7 +106,7 @@ public class MCRConfigurationTest extends MCRTestCase {
 
         int a;
         int b;
-        
+
         int i = 0;
 
         // Generate Conflict
@@ -144,7 +144,7 @@ public class MCRConfigurationTest extends MCRTestCase {
             b = 15 & b;
             i++;
         } while (a != b);
-        
+
         LogManager.getLogger().info("Colliding Strings:");
         LogManager.getLogger().info(classNameA + " " + propertyA + " => " + a);
         LogManager.getLogger().info(classNameB + " " + propertyB + " => " + b);

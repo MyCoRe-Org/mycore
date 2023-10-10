@@ -167,7 +167,7 @@ public class MCRDerivateServlet extends MCRServlet {
 
         try {
             MCRUploadHelper.checkPathName(pathTo.getRoot().relativize(pathTo).toString(), true);
-        } catch (MCRException ex){
+        } catch (MCRException ex) {
             String translatedMessage = MCRTranslation.translate("IFS.invalid.fileName", pathTo.getOwnerRelativePath());
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, translatedMessage);
             return;
@@ -208,7 +208,7 @@ public class MCRDerivateServlet extends MCRServlet {
             String mainDoc = internals.getMainDoc();
 
             // the getOwnerRelativePath() method returns with a leading slash, but the mainDoc not.
-            return mainDoc!=null &&  mainDoc.equals(pathFrom.getOwnerRelativePath().substring(1));
+            return mainDoc != null && mainDoc.equals(pathFrom.getOwnerRelativePath().substring(1));
         }
         return false;
     }

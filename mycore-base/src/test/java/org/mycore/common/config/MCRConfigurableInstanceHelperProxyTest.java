@@ -18,6 +18,9 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.function.Supplier;
 
 import org.junit.Test;
@@ -27,9 +30,6 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
 
     @Test
@@ -38,8 +38,7 @@ public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Property1", string = "Value1"),
             @MCRTestProperty(key = "Foo.Property2", string = "Value2")
-        }
-    )
+        })
     public void annotated() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
@@ -49,7 +48,6 @@ public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
         assertEquals("Value1-Value2", instance.value());
 
     }
-
 
     @MCRConfigurationProxy(proxyClass = TestClassWithConfigurationProxy.Factory.class)
     public static class TestClassWithConfigurationProxy {

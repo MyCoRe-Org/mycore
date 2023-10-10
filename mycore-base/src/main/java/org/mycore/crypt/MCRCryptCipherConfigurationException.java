@@ -21,6 +21,9 @@ package org.mycore.crypt;
 import org.mycore.common.config.MCRConfigurationException;
 
 public class MCRCryptCipherConfigurationException extends MCRConfigurationException {
+
+    private static final long serialVersionUID = 1L;
+
     private String errorCode;
 
     public MCRCryptCipherConfigurationException(String errorMessage) {

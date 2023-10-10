@@ -90,8 +90,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
             new Column<>("Property", p -> p.getLeft().getProperty()),
             new Column<>("Description", p -> p.getLeft().getDescription()),
             new Column<>("State", p -> p.getRight() ? "ACTIVE" : "INACTIVE"),
-            new Column<>("Cron", p -> p.getLeft().getCronDescription())
-        );
+            new Column<>("Cron", p -> p.getLeft().getCronDescription()));
         Context context = getContext(servletContext);
         MCRConfiguration2.getInstantiatablePropertyKeys(JOBS_CONFIG_PREFIX)
             .sorted()
@@ -110,7 +109,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     private MCRCronjob.Context getContext(ServletContext servletContext) {
         return servletContext != null ? MCRCronjob.Context.WEBAPP : MCRCronjob.Context.CLI;
     }
-    
+
     private void scheduleNextRun(MCRCronjob job) {
         this.processableCollection.add(job.getProcessable());
         job.getNextExecution().ifPresent(next -> {
@@ -130,11 +129,11 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
             }
         });
     }
-    
+
     public MCRCronjob getJob(String id) {
-        return toJob(JOBS_CONFIG_PREFIX + id);    
+        return toJob(JOBS_CONFIG_PREFIX + id);
     }
-    
+
     private static MCRCronjob toJob(String property) {
         return MCRConfiguration2.<MCRCronjob>getInstanceOf(property).orElseThrow();
     }

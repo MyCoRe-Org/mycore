@@ -468,12 +468,12 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     private void checkDirectoryAccessModes(AccessMode... modes) throws AccessDeniedException {
         for (AccessMode mode : modes) {
             switch (mode) {
-            case READ:
-            case WRITE:
-            case EXECUTE:
-                break;
-            default:
-                throw new AccessDeniedException("Unsupported AccessMode: " + mode);
+                case READ:
+                case WRITE:
+                case EXECUTE:
+                    break;
+                default:
+                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
             }
         }
     }
@@ -481,14 +481,14 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     private void checkFile(MCRFile file, AccessMode... modes) throws AccessDeniedException {
         for (AccessMode mode : modes) {
             switch (mode) {
-            case READ:
-            case WRITE:
-                break;
-            case EXECUTE:
-                throw new AccessDeniedException(MCRFileSystemUtils.toPath(file).toString(), null,
-                    "Unsupported AccessMode: " + mode);
-            default:
-                throw new AccessDeniedException("Unsupported AccessMode: " + mode);
+                case READ:
+                case WRITE:
+                    break;
+                case EXECUTE:
+                    throw new AccessDeniedException(MCRFileSystemUtils.toPath(file).toString(), null,
+                        "Unsupported AccessMode: " + mode);
+                default:
+                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
             }
         }
     }

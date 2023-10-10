@@ -49,9 +49,13 @@ import org.mycore.solr.search.MCRSolrURL;
 public class MCRSolrQueryResolver implements URIResolver {
 
     public static final String QUERY_GROUP_NAME = "query";
+
     public static final String CORE_GROUP_NAME = "core";
+
     private static final String REQUEST_HANDLER_QUALIFIER = "requestHandler";
+
     public static final String REQUEST_HANDLER_GROUP_NAME = REQUEST_HANDLER_QUALIFIER;
+
     // not allowed chars for cores are / \ and : according to
     // https://stackoverflow.com/questions/29977519/what-makes-an-invalid-core-name
     // assume they are the same for the requestHandler

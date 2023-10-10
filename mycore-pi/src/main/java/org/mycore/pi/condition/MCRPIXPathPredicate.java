@@ -28,7 +28,7 @@ public class MCRPIXPathPredicate extends MCRPIPredicateBase
 
     private XPathExpression<Boolean> expression;
 
-    @MCRProperty(name="XPath")
+    @MCRProperty(name = "XPath")
     public void setXPath(String xPath) {
         expression = compileXpath("boolean(" + xPath + ")", Filters.fboolean());
     }

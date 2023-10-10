@@ -103,6 +103,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRVueRootServlet extends MCRContentServlet {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();

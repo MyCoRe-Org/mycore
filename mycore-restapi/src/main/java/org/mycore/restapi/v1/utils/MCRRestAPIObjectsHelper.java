@@ -671,27 +671,27 @@ public class MCRRestAPIObjectsHelper {
                 return responseBuilder.build();
             }
             switch (format) {
-            case MCRRestAPIObjects.FORMAT_XML:
-                Document docOut = listDerivateContentAsXML(derObj, path, depth, info, app);
-                try (StringWriter sw = new StringWriter()) {
-                    XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                    xout.output(docOut, sw);
-                    return response(sw.toString(), "application/xml", lastModified);
-                } catch (IOException e) {
+                case MCRRestAPIObjects.FORMAT_XML:
+                    Document docOut = listDerivateContentAsXML(derObj, path, depth, info, app);
+                    try (StringWriter sw = new StringWriter()) {
+                        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+                        xout.output(docOut, sw);
+                        return response(sw.toString(), "application/xml", lastModified);
+                    } catch (IOException e) {
+                        throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                            new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG,
+                                e.getMessage()));
+                    }
+                case MCRRestAPIObjects.FORMAT_JSON:
+                    if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
+                        String result = listDerivateContentAsJson(derObj, path, depth, info, app);
+                        return response(result, "application/json", lastModified);
+                    }
+                default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                        new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG,
-                            e.getMessage()));
-                }
-            case MCRRestAPIObjects.FORMAT_JSON:
-                if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-                    String result = listDerivateContentAsJson(derObj, path, depth, info, app);
-                    return response(result, "application/json", lastModified);
-                }
-            default:
-                throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
-                        "Unexepected program flow termination.",
-                        "Please contact a developer!"));
+                        new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
+                            "Unexepected program flow termination.",
+                            "Please contact a developer!"));
             }
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(

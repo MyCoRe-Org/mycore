@@ -20,6 +20,8 @@ package org.mycore.pi.exceptions;
 
 public class MCRDatacenterAuthenticationException extends MCRDatacenterException {
 
+    private static final long serialVersionUID = 1L;
+
     public MCRDatacenterAuthenticationException() {
         super("Error with authentication!");
     }

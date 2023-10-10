@@ -59,8 +59,8 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
             .forEach((serviceToRegister) -> {
                 try {
                     serviceToRegister.register(obj, "", false);
-                } catch (MCRAccessException | MCRPersistentIdentifierException | ExecutionException |
-                         InterruptedException e) {
+                } catch (MCRAccessException | MCRPersistentIdentifierException | ExecutionException
+                    | InterruptedException e) {
                     throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
                 }
             });

@@ -22,6 +22,9 @@ package org.mycore.mcr.acl.accesskey.exception;
  * Exception that refers to an expired access key.
  */
 public class MCRAccessKeyExpiredException extends MCRAccessKeyException {
+
+    private static final long serialVersionUID = 1L;
+
     public MCRAccessKeyExpiredException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.expired");
     }

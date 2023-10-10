@@ -36,42 +36,42 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
  */
 public class MCRNeo4JMetaLinkIDParser extends MCRNeo4JAbstractDataModelParser {
 
-   private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-   @Override
-   public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
-      List<Neo4JRelation> relations = new ArrayList<>();
+    @Override
+    public List<Neo4JRelation> parse(Element classElement, MCRObjectID sourceID) {
+        List<Neo4JRelation> relations = new ArrayList<>();
 
-      for (Element element : classElement.getChildren()) {
-         String linkType = element.getAttributeValue("type");
-         String linkHref = element.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-         if (linkHref != null && linkHref.trim().length() > 0) {
-            try {
-               MCRObjectID.getInstance(linkHref);
-               LOGGER.debug("Got MCRObjectID from {}", linkHref);
-            } catch (Exception e) {
-               LOGGER.warn("The xlink:href is not a MCRObjectID");
-               continue;
+        for (Element element : classElement.getChildren()) {
+            String linkType = element.getAttributeValue("type");
+            String linkHref = element.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+            if (linkHref != null && linkHref.trim().length() > 0) {
+                try {
+                    MCRObjectID.getInstance(linkHref);
+                    LOGGER.debug("Got MCRObjectID from {}", linkHref);
+                } catch (Exception e) {
+                    LOGGER.warn("The xlink:href is not a MCRObjectID");
+                    continue;
+                }
             }
-         }
 
-         if (linkHref == null) {
-            LOGGER.error("No relationship target for node {}", sourceID);
-            continue;
-         }
+            if (linkHref == null) {
+                LOGGER.error("No relationship target for node {}", sourceID);
+                continue;
+            }
 
-         if (linkType == null || linkType.trim().length() == 0) {
-            LOGGER.warn("Set default link type reference for {}", sourceID);
-            linkType = "reference";
-         }
+            if (linkType == null || linkType.trim().length() == 0) {
+                LOGGER.warn("Set default link type reference for {}", sourceID);
+                linkType = "reference";
+            }
 
-         relations.add(new Neo4JRelation(sourceID.getTypeId(), linkHref, linkType));
-      }
-      return relations;
-   }
+            relations.add(new Neo4JRelation(sourceID.getTypeId(), linkHref, linkType));
+        }
+        return relations;
+    }
 
-   @Override
-   public List<Neo4JNode> parse(Element rootTag) {
-      return Collections.emptyList();
-   }
+    @Override
+    public List<Neo4JNode> parse(Element rootTag) {
+        return Collections.emptyList();
+    }
 }

@@ -132,8 +132,8 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         if (HttpMethod.OPTIONS.equals(method)) {
             return;
         }
-        final MCRRestRequiredPermission annotation
-            = resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class);
+        final MCRRestRequiredPermission annotation = resourceInfo.getResourceMethod()
+            .getAnnotation(MCRRestRequiredPermission.class);
         final MCRRestAPIACLPermission permission = Optional.ofNullable(annotation)
             .map(MCRRestRequiredPermission::value)
             .orElseGet(() -> MCRRestAPIACLPermission.fromMethod(method));
