@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -163,8 +164,8 @@ public class MCRSolrSchemaReloader {
 
         LOGGER.info("Load schema definitions for core " + coreID + " using configuration " + configType);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            List<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
-                "solr/" + configType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME);
+            Collection<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
+                "solr/" + configType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME).values();
             for (byte[] schemaFileData : schemaFileContents) {
                 InputStreamReader schemaReader = new InputStreamReader(new ByteArrayInputStream(schemaFileData),
                     StandardCharsets.UTF_8);
