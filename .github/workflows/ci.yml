@@ -37,7 +37,9 @@ jobs:
     - name: Set up test dependencies
       run: |
         # PPA by Mozilla for ESR releases
-        sudo add-apt-repository ppa:mozillateam/ppa
+        # replace 'sudo add-apt-repository ppa:mozillateam/ppa' with simple commands as workaround for https://github.com/orgs/community/discussions/69720
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0AB215679C571D1C8325275B9BDB3D89CE49EC21
+        sudo add-apt-repository "deb https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu/ focal main"
 
         sudo apt update
         sudo apt install firefox-esr chromium-browser chromium-chromedriver dbus-x11
