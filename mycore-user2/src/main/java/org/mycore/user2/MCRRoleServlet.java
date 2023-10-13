@@ -119,7 +119,7 @@ public class MCRRoleServlet extends MCRServlet {
             if (category == null) {
                 continue;
             }
-            role.setAttribute("label", category.getCurrentLabel().map(MCRLabel::getText).orElse(categID.getID()));
+            role.setAttribute("label", category.getCurrentLabel().map(MCRLabel::getText).orElse(categID.getId()));
             list.add(role);
         }
         return list;
@@ -143,7 +143,7 @@ public class MCRRoleServlet extends MCRServlet {
         Element rootElement = getRootElement(request);
         rootElement.setAttribute("classID", categoryID.getRootID());
         if (!categoryID.isRootID()) {
-            rootElement.setAttribute("categID", categoryID.getID());
+            rootElement.setAttribute("categID", categoryID.getId());
         }
         request.setAttribute(LAYOUT_ELEMENT_KEY, new Document(rootElement));
     }

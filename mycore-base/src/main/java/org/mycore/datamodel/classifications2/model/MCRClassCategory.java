@@ -100,7 +100,7 @@ public class MCRClassCategory {
     public static MCRClassCategory getInstance(MCRCategory from) {
         MCRClassCategory categ = new MCRClassCategory();
         MCRCategoryID categoryID = from.getId();
-        categ.setID(categoryID.isRootID() ? categoryID.getRootID() : categoryID.getID());
+        categ.setID(categoryID.isRootID() ? categoryID.getRootID() : categoryID.getId());
         categ.setUrl(MCRClassURL.getInstance(from.getURI()));
         categ.getCategory()
             .addAll(getInstance(from.getChildren()));

@@ -20,6 +20,7 @@ package org.mycore.mcr.acl.accesskey.model;
 
 import java.util.Date;
 
+import jakarta.persistence.Basic;
 import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -127,6 +128,7 @@ public class MCRAccessKey {
         length = MCRObjectID.MAX_LENGTH,
         nullable = false)
     @Convert(converter = MCRObjectIDConverter.class)
+    @Basic
     public MCRObjectID getObjectId() {
         return objectId;
     }

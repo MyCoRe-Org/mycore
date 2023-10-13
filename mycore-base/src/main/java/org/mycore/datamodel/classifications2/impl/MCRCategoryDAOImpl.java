@@ -264,7 +264,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Query parentQuery = entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "parentQuery")
             .setParameter("classID", id.getRootID())
-            .setParameter("categID", id.getID())
+            .setParameter("categID", id.getId())
             .setParameter("left", leftRight.leftValue)
             .setParameter("right", leftRight.rightValue);
         @SuppressWarnings("unchecked")
@@ -616,7 +616,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         TypedQuery<MCRCategoryImpl> naturalIDQuery = entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "byNaturalId", MCRCategoryImpl.class)
             .setParameter("classID", id.getRootID())
-            .setParameter("categID", id.getID());
+            .setParameter("categID", id.getId());
         return getSingleResult(naturalIDQuery);
     }
 
@@ -650,7 +650,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return getSingleResult(entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "childCount")
             .setParameter("classID", id.getRootID())
-            .setParameter("categID", id.getID()));
+            .setParameter("categID", id.getId()));
     }
 
     private static void updateLeftRightValue(EntityManager entityManager, String classID, int left,

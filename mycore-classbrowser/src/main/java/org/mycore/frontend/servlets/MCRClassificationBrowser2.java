@@ -104,7 +104,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         Optional<MCRQueryAdapter> queryAdapter = configureQueryAdapter(req, settings, xml);
 
         Function<MCRCategoryID, String> toIdSearchValue = settings.addClassId() ? MCRCategoryID::toString
-            : MCRCategoryID::getID;
+            : MCRCategoryID::getId;
         List<Element> data = new ArrayList<>();
         for (MCRCategory child : category.getChildren()) {
             queryAdapter.ifPresent(qa -> qa.setCategory(toIdSearchValue.apply(child.getId())));
@@ -116,7 +116,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             if ((settings.removeEmptyLeaves()) && (numResults < 1)) {
                 continue;
             }
-            if (settings.excludeCategories().contains(child.getId().getID())) {
+            if (settings.excludeCategories().contains(child.getId().getId())) {
                 continue;
             }
 
@@ -139,7 +139,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             categoryE.setAttribute("numResults", String.valueOf(numResults));
         }
 
-        categoryE.setAttribute("id", category.getId().getID());
+        categoryE.setAttribute("id", category.getId().getId());
         categoryE.setAttribute("children", Boolean.toString(category.hasChildren()));
 
         if (settings.addUri() && (category.getURI() != null)) {

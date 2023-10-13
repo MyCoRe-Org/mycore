@@ -44,7 +44,7 @@ public class MCRDerivateDefaultClassEventHandler extends MCREventHandlerBase {
 
     private static MCRMetaClassification asMetaClassification(MCRCategoryID categoryId) {
         return new MCRMetaClassification("classification", 0, null,
-            categoryId.getRootID(), categoryId.getID());
+            categoryId.getRootID(), categoryId.getId());
     }
 
     @Override

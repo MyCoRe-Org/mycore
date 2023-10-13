@@ -326,7 +326,7 @@ public abstract class MCRUploadHelper {
 
         return categoryIDS.stream()
             .map(category -> new MCRMetaClassification("classification", 0, null, category.getRootID(),
-                category.getID()))
+                category.getId()))
             .collect(Collectors.toList());
     }
 

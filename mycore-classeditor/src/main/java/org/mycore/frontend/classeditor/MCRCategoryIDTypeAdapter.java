@@ -50,7 +50,7 @@ public class MCRCategoryIDTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryID> 
     @Override
     public JsonElement serialize(MCRCategoryID id, Type typeOfSrc, JsonSerializationContext context) {
         String rootID = id.getRootID();
-        String categID = id.getID();
+        String categID = id.getId();
 
         JsonObject idJsonObj = new JsonObject();
         idJsonObj.addProperty(PROP_ROOTID, rootID);

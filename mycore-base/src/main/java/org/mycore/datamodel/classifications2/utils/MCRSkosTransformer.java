@@ -177,7 +177,7 @@ public class MCRSkosTransformer {
             return MCRFrontendUtil.getBaseURL() + "open-data/classification/" + categ.getId().getRootID();
         }
         return MCRFrontendUtil.getBaseURL() + "open-data/classification/" + categ.getId().getRootID() + "/"
-            + categ.getId().getID();
+            + categ.getId().getId();
     }
 
 }

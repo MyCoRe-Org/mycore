@@ -77,7 +77,7 @@ public class MCRCategoryID implements Serializable {
      */
     public MCRCategoryID(String rootID, String id) {
         this();
-        setID(id);
+        setId(id);
         setRootID(rootID);
     }
 
@@ -105,7 +105,7 @@ public class MCRCategoryID implements Serializable {
 
     @Transient
     public boolean isRootID() {
-        return id == null || id.equals("");
+        return id == null || id.isEmpty();
     }
 
     /*
@@ -140,10 +140,10 @@ public class MCRCategoryID implements Serializable {
         }
         final MCRCategoryID other = (MCRCategoryID) obj;
         if (id == null) {
-            if (other.id != null && other.id.length() > 0) {
+            if (other.id != null && !other.id.isEmpty()) {
                 return false;
             }
-        } else if (!id.equals(other.id) && (id.length() > 0 || other.id != null && other.id.length() >= 0)) {
+        } else if (!id.equals(other.id) && (!id.isEmpty() || other.id != null && other.id.length() >= 0)) {
             return false;
         }
         if (rootID == null) {
@@ -154,9 +154,18 @@ public class MCRCategoryID implements Serializable {
     }
 
     /**
+     * @deprecated Use {@link #getId()} instead.
+     */
+    @Deprecated
+    @Transient
+    public String getID(){
+        return getId();
+    }
+
+    /**
      * @return the ID
      */
-    public String getID() {
+    public String getId() {
         return id == null ? "" : id;
     }
 
@@ -164,8 +173,8 @@ public class MCRCategoryID implements Serializable {
      * @param id
      *            the ID to set
      */
-    private void setID(String id) {
-        if (id != null && id.length() > 0) {
+    private void setId(String id) {
+        if (id != null && !id.isEmpty()) {
             if (!VALID_ID.matcher(id).matches()) {
                 throw new MCRException("category ID '" + id + "' is invalid and does not match: " + VALID_ID);
             }
@@ -225,7 +234,7 @@ public class MCRCategoryID implements Serializable {
     @Override
     @JsonValue
     public String toString() {
-        if (id == null || id.length() == 0) {
+        if (id == null || id.isEmpty()) {
             return rootID;
         }
         return rootID + ':' + id;

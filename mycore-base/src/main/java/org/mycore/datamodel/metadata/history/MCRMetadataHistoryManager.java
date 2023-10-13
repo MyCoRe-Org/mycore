@@ -187,7 +187,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
             LogManager.getLogger().debug("{} is visible as it does not use a service state.", obj.getId());
             return false;
         }
-        boolean hidden = !"published".equals(state.getID());
+        boolean hidden = !"published".equals(state.getId());
         LogManager.getLogger().debug("{} is hidden due to service state '{}': {}", obj.getId(), state, hidden);
         return hidden;
     }

@@ -43,7 +43,7 @@ public class MCRCategUtils {
 
     public static String maskCategID(MCRCategoryID categoryID) {
         String rootID = categoryID.getRootID();
-        String id = categoryID.getID();
+        String id = categoryID.getId();
         return rootID + "." + (id == null ? "" : id);
     }
 

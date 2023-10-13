@@ -116,7 +116,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * @return the categId
      */
     public final String getCategId() {
-        return category.getID();
+        return category.getId();
     }
 
     /**
@@ -186,7 +186,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
     public JsonObject createJSON() {
         JsonObject obj = super.createJSON();
         obj.addProperty("classid", category.getRootID());
-        obj.addProperty("categid", category.getID());
+        obj.addProperty("categid", category.getId());
         return obj;
     }
 

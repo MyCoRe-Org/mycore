@@ -346,7 +346,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         setCacheable(q);
         setReadOnly(q);
         q.setParameter("rootID", id.getRootID());
-        q.setParameter("categID", id.getID());
+        q.setParameter("categID", id.getId());
         q.setParameter("objectID", reference.getObjectID());
         q.setParameter("type", reference.getType());
         return !q.getResultList().isEmpty();

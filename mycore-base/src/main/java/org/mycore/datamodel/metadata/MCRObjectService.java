@@ -856,8 +856,8 @@ public class MCRObjectService {
         // state
         Optional.ofNullable(getState()).ifPresent(stateId -> {
             JsonObject state = new JsonObject();
-            if (stateId.getID() != null) {
-                state.addProperty("id", stateId.getID());
+            if (stateId.getId() != null) {
+                state.addProperty("id", stateId.getId());
             }
             state.addProperty("rootId", stateId.getRootID());
         });
@@ -1262,7 +1262,7 @@ public class MCRObjectService {
      */
     public final void replaceClassification(int index, MCRCategoryID value) throws IndexOutOfBoundsException {
         updateClassification(index,
-            classificationValue -> classificationValue.setValue(value.getRootID(), value.getID()));
+            classificationValue -> classificationValue.setValue(value.getRootID(), value.getId()));
     }
 
     /**

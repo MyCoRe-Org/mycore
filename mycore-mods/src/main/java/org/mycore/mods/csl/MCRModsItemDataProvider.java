@@ -321,7 +321,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             if (categoryID == null) {
                 return null;
             }
-            return categoryID.getID();
+            return categoryID.getId();
         } else {
             return genre.getText();
         }

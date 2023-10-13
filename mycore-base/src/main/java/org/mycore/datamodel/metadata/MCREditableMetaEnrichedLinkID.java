@@ -39,7 +39,7 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
         list.stream().map(clazz -> {
             final Element classElement = new Element(CLASSIFICATION_ELEMENT_NAME);
             classElement.setAttribute(CLASSID_ATTRIBUTE_NAME, clazz.getRootID());
-            classElement.setAttribute(CATEGID_ATTRIBUTE_NAME, clazz.getID());
+            classElement.setAttribute(CATEGID_ATTRIBUTE_NAME, clazz.getId());
             return classElement;
         }).forEach(getContentList()::add);
     }
