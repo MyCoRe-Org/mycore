@@ -101,6 +101,8 @@ export class FileTransferQueue {
      * Counts how much transfers are left for a specific upload id.
      */
     private uploadIDCount: {} = {};
+    private _validating: boolean;
+    private validatingHandlerList:Array<(validating: boolean) => void > = [];
 
     constructor() {
     }
@@ -181,6 +183,15 @@ export class FileTransferQueue {
         this.startTransfers();
     }
 
+    public setValidating(validating: boolean) {
+        this._validating = validating;
+        this.validatingHandlerList.forEach(handler => handler(validating));
+    }
+
+    public isValidating() {
+        return this._validating;
+    }
+
     public addCompleteHandler(handler: FileTransferHandler) {
         this.completeHandlerList.push(handler);
     }
@@ -227,6 +238,10 @@ export class FileTransferQueue {
 
     public addBeginSessionErrorHandler(handler: (session: TransferSession, message: string) => void) {
         this.beginSessionErrorHandlerList.push(handler);
+    }
+
+    public addValidatingHandler(handler: (validating: boolean) => void) {
+        this.validatingHandlerList.push(handler);
     }
 
     public abortAll() {

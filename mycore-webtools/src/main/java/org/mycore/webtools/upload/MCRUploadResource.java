@@ -193,6 +193,7 @@ public class MCRUploadResource {
     @Path("{buckedID}/{path:.+}")
     public Response uploadFile(@PathParam("path") String path,
         @PathParam("buckedID") String buckedID,
+        @QueryParam(("isDirectory")) boolean isDirectory,
         InputStream contents)
         throws IOException {
 
@@ -220,7 +221,7 @@ public class MCRUploadResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
-        if (contentLength == 0) {
+        if (isDirectory) {
             Files.createDirectory(filePath);
         } else {
             final List<MCRPostUploadFileProcessor> processors = FILE_PROCESSORS.stream()

@@ -77,6 +77,7 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
         MCRPath path = MCRPath.getPath(derivate.getId().toString(), "/");
         try {
             MCRUploadHelper.detectMainFile(path).ifPresent(file -> {
+                LOGGER.info("Setting main file to {}", file.toUri().toString());
                 derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
                 try {
                     MCRMetadataManager.update(derivate);
