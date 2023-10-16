@@ -1,7 +1,8 @@
 package org.mycore.common.content.transformer;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.inject.Singleton;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRInstance;
@@ -80,6 +81,8 @@ import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStra
  */
 @Singleton
 public class MCRXsonifyTransformer extends MCRContentTransformer {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Path to the XSD in the classpath.
@@ -174,7 +177,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
      */
     protected MCRContent xml2json(MCRContent source) throws SerializationException {
         XmlDocument xml = getXmlDocument(source);
-        JsonObject json = this.xml2JsonSerializer.serialize(xml);
+        ObjectNode json = this.xml2JsonSerializer.serialize(xml);
         return asContent(json, source.isUsingSession());
     }
 
@@ -185,7 +188,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
      * @return The transformed XML content.
      */
     protected MCRContent json2xml(MCRContent source) throws SerializationException {
-        JsonObject json = getJsonObject(source);
+        ObjectNode json = getJsonObject(source);
         XmlDocument xml = this.json2XmlSerializer.serialize(json);
         return asContent(xml, source.isUsingSession());
     }
@@ -199,17 +202,19 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
         }
     }
 
-    protected JsonObject getJsonObject(MCRContent source) {
+    protected ObjectNode getJsonObject(MCRContent source) {
         try {
-            return JsonParser.parseString(source.asString()).getAsJsonObject();
+            JsonNode jsonNode = MAPPER.readTree(source.asString());
+            if (jsonNode.isObject()) {
+                return (ObjectNode) jsonNode;
+            }
+            throw new MCRException("json is not a json object '" + jsonNode + "'");
         } catch (IOException ioException) {
             throw new MCRException("Unable to parse json source", ioException);
-        } catch (IllegalStateException illegalStateException) {
-            throw new MCRException("json is not a json object", illegalStateException);
         }
     }
 
-    protected MCRContent asContent(JsonObject json, boolean usingSession) {
+    protected MCRContent asContent(ObjectNode json, boolean usingSession) {
         MCRContent result = new MCRStringContent(json.toString());
         result.setMimeType("application/json");
         result.setUsingSession(usingSession);
