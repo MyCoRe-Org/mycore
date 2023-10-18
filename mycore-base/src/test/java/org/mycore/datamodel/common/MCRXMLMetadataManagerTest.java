@@ -188,9 +188,13 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     @Test
     public void listIDs() {
-        assertTrue(getStore().listIDsForBase("foo_bar").isEmpty());
-        assertTrue(getStore().listIDsOfType("bar").isEmpty());
+        assertTrue(getStore().listIDsForBase("MyCoRe_document").isEmpty());
+        assertTrue(getStore().listIDsOfType("document").isEmpty());
         assertTrue(getStore().listIDs().isEmpty());
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void testMCR2985() {
+        assertTrue(getStore().listIDsForBase("foo_bar").isEmpty());
     }
 
     private static class XMLInfo {

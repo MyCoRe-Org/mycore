@@ -323,6 +323,11 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     private void setupStore(String project, String objectType, String configPrefix, boolean readOnly)
         throws ReflectiveOperationException {
         String baseID = getStoryKey(project, objectType);
+        String testID = MCRObjectID.formatID(baseID, 1);
+        if (!MCRObjectID.isValid(testID)) {
+            throw new IllegalArgumentException(
+                String.format(Locale.ENGLISH, "Illegal values for project '%s' and type '%s'.", project, objectType));
+        }
         Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore>getClass(configPrefix + "Class")
             .orElseGet(() -> {
                 MCRConfiguration2.set(configPrefix + "Class", defaultClass.getName());
