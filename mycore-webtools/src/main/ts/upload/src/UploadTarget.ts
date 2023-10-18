@@ -86,14 +86,17 @@ export class UploadTarget {
                     manualToggle.appendChild(fileInput);
                 }
 
-                let transferSession = FileTransferQueue.getQueue().registerTransferSession(this.uploadHandler,
-                    this.attributes);
+
 
                 fileInput.setAttribute("type", "file");
                 fileInput.addEventListener('change', async () => {
+                    let transferSession = FileTransferQueue.getQueue().registerTransferSession(this.uploadHandler,
+                        this.attributes);
                     for (let i = 0; i < fileInput.files.length; i++) {
                         let file = fileInput.files.item(i);
+                        FileTransferQueue.getQueue().setValidating(true);
                         const validation = await this.validateTraverse(file);
+                        FileTransferQueue.getQueue().setValidating(false);
                         if (!validation.test) {
                             // TODO: show nice in GUI
                             alert(validation.reason);
@@ -125,7 +128,9 @@ export class UploadTarget {
 
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
+                FileTransferQueue.getQueue().setValidating(true);
                 const validation = await this.validateTraverse(file);
+                FileTransferQueue.getQueue().setValidating(false);
                 if (!validation.test) {
                     // TODO: show nice in GUI
                     alert(validation.reason);
@@ -144,14 +149,16 @@ export class UploadTarget {
     private async validateTraverse(fileEntry: any): Promise<{ test: boolean, fileEntry: any, reason: string | null }> {
         if (fileEntry.isDirectory) {
             let children = await this.readEntries(fileEntry);
+            const promises: Array<Promise<{ test: boolean, fileEntry: any, reason: string | null }>> = [];
             for (let childIndex in children) {
                 const child = children[childIndex];
-                const validation = await this.validateTraverse(child);
-                if (!validation.test) {
-                    return validation;
-                }
+                const validation = this.validateTraverse(child);
+                promises.push(validation);
             }
-            return {test: true, fileEntry, reason: null};
+
+            const results = await Promise.all(promises);
+            const failed = results.find((result) => !result.test);
+            return failed || {test: true, fileEntry, reason: null};
         } else {
             const validation = await this.validateFile(fileEntry);
             return {test: validation.valid, fileEntry, reason: validation.reason};
