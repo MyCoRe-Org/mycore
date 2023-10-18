@@ -121,17 +121,17 @@ export class FileTransfer {
 
     public send(file?: File): void {
         let uploadPath;
+        const isDirectory = !(this._entry instanceof File) && this._entry.isDirectory;
         if (this._entry instanceof File) {
             uploadPath = this.entry.name;
         } else {
             uploadPath = this._entry.fullPath[0] == '/' ? this._entry.fullPath.substr(1) : this._entry.fullPath;
-
         }
 
         this.request = new XMLHttpRequest();
 
         this.request.open('PUT', Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" +
-            this.transferSession.bucketID + this.target + uploadPath, true);
+            this.transferSession.bucketID + this.target + uploadPath + "?isDirectory=" + isDirectory, true);
 
         this.request.onreadystatechange = (result) => {
             if (this.request.readyState === 4 && this.request.status === 204) {

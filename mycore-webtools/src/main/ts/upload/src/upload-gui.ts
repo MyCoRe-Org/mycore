@@ -36,6 +36,7 @@ export class FileTransferGUI {
     private _entryFileTransferMap: Map<HTMLElement, FileTransfer> = new Map<HTMLElement, FileTransfer>();
     private transferProgressMap = new Map<FileTransfer, FileTransferProgress>();
     private runningCommitList: Array<TransferSession> = [];
+    private elementsToAddQueue: Array<HTMLElement> = [];
 
     constructor() {
         this.registerEventHandler();
@@ -65,6 +66,11 @@ export class FileTransferGUI {
 
     private registerEventHandler(): void {
         const queue = FileTransferQueue.getQueue();
+
+        queue.addValidatingHandler((validating) => {
+           this.handleTransferValidating(validating);
+        });
+
 
         queue.addAddedHandler((ft) => {
             this.handleTransferAdded(ft);
@@ -129,14 +135,24 @@ export class FileTransferGUI {
 
     }
 
+    private handleTransferValidating(validating: boolean) {
+        if (this._uploadBox == null) {
+            this.inititalizeBox();
+        }
+        const validatingMessageElement = this._uploadBox.querySelector(".mcr-validating");
+
+        if (validating && validatingMessageElement.classList.contains("d-none")) {
+            validatingMessageElement.classList.remove("d-none");
+        } else if (!validating && !validatingMessageElement.classList.contains("d-none")) {
+            validatingMessageElement.classList.add("d-none");
+        }
+    }
+
     private handleTransferAdded(transfer: FileTransfer) {
         if (this._uploadBox == null) {
             this.inititalizeBox();
         }
-
-        const newEntry = this.createFileTransferEntry(transfer);
-        const entryList = this.getEntryListElement();
-        entryList.appendChild(newEntry);
+        this.createFileTransferEntry(transfer);
     }
 
     private getEntryListElement() {
@@ -149,8 +165,6 @@ export class FileTransferGUI {
 
     private handleTransferStarted(transfer: FileTransfer) {
         const entry = this.getEntry(transfer);
-        entry.remove();
-
         const markerElement = this.getActiveInsertMarkerElement();
         markerElement.parentElement.insertBefore(entry, markerElement);
     }
@@ -326,6 +340,9 @@ class FileTransferGUITemplates {
                 </div>
                 <div class="row d-none mcr-commit-warn bg-info">
                     <div class="col-12" data-i18n="component.webtools.upload.processing"></div>
+                </div>
+                <div class="row d-none mcr-validating bg-info">
+                    <div class="col-12" data-i18n="component.webtools.upload.validating"></div>
                 </div>
                 <div class="row status">
                     <div class="col mcr-upload-transfer-all-progress"></div>
