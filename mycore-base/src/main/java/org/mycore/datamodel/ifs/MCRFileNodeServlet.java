@@ -44,12 +44,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * This servlet delivers the contents of an MCRFilesystemNode to the client
- * browser. If the node is a ordinary MCRFile, the contents of that file will be
- * sent to the browser. If the node is an MCRFile with a MCRAudioVideoExtender,
- * the message that starts the associated streaming player will be delivered. If
- * the node is a MCRDirectory, the contents of that directory will be forwareded
- * to MCRLayoutService as XML data to display a detailed directory listing.
+ * This servlet delivers the contents of an {@link MCRPath} to the client
+ * browser. If the node is a ordinary file, the contents of that file will be
+ * sent to the browser. If the node is a directory, the contents of that
+ * directory will be forwareded to MCRLayoutService as XML data to display a
+ * detailed directory listing.
  * 
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
