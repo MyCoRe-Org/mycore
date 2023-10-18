@@ -614,7 +614,7 @@
     -->
   <xsl:template name="formatFileSize">
     <xsl:param name="size" />
-    <xsl:value-of xmlns:ifsnode="xalan://org.mycore.datamodel.ifs.MCRFilesystemNode" select="ifsnode:getSizeFormatted($size)" />
+    <xsl:value-of xmlns:mcrutils="xalan://org.mycore.common.MCRUtils" select="mcrutils:getSizeFormatted($size)" />
   </xsl:template>
 
     <!-- ====================================================================================={
