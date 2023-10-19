@@ -44,8 +44,8 @@ define([
 		if(item.fakeRoot || item.id == null) {
 			return "";
 		}
-		var id = item.id.rootid;
-		if(item.id.categid != null && item.id.categid != "") {
+		let id = item.id.rootid;
+		if(item.id.categid != null && item.id.categid !== "") {
 			id += ":" + item.id.categid;
 		}
 		return id;

@@ -17,13 +17,13 @@
  */
 
 define([
-	"dojo/_base/declare", // declare
-	"dojo/store/JsonRest",
-	"dojo/_base/lang", // hitch, clone
-	"dojo/_base/array", // forEach
-	"dojo/request/xhr",
-	"mycore/classification/Util"
-], function(declare, JsonRest, lang, array, xhr, classUtil) {
+  "dojo/_base/declare", // declare
+  "dojo/store/JsonRest",
+  "dojo/_base/lang", // hitch, clone
+  "dojo/_base/array", // forEach
+  "dojo/request/xhr",
+  "mycore/classification/Util"
+], function (declare, JsonRest, lang, array, xhr, classUtil) {
 
 return declare("mycore.classification.RestStore", JsonRest, {
 
@@ -31,12 +31,14 @@ return declare("mycore.classification.RestStore", JsonRest, {
 
 	rootQuery: null,
 
-	getRoot: function(onItem, onError) {
-		if(this.root) {
+	childLoader: {},
+
+	getRoot: function (onItem, onError) {
+		if (this.root) {
 			onItem(this.root);
 		} else {
-			this.get(this.rootQuery).then(lang.hitch(this, function(items) {
-				if(lang.isArray(items)) {
+			this.get(this.rootQuery).then(lang.hitch(this, function (items) {
+				if (lang.isArray(items)) {
 					this.root = {
 						id: "_placeboid_",
 						labels: [
@@ -50,62 +52,78 @@ return declare("mycore.classification.RestStore", JsonRest, {
 					this.root = items;
 				}
 				onItem(this.root);
-			}), lang.hitch(this, function(err) {
+			}), lang.hitch(this, function (err) {
 				this.onRootLoadError(err);
-				if(onError != null) {
+				if (onError != null) {
 					onError(err);
 				}
 			}));
 		}
 	},
 
-	onRootLoadError: function(err) {
+	onRootLoadError: function (err) {
 		console.log("Unable to load node.");
 		console.log(err);
 	},
 
-	onNodeLoadError: function() {
+	onNodeLoadError: function () {
 		alert("Unable to load node.");
 	},
 
-	getIdentity: function(item) {
+	getIdentity: function (item) {
 		return classUtil.toString(item);
 	},
 
-	mayHaveChildren: function(object) {
+	mayHaveChildren: function (object) {
 		return "children" in object || object.haschildren;
 	},
 
-	resolveChildren: function(object, onComplete, onError) {
-		if(!this.mayHaveChildren(object) || "children" in object) {
+	resolveChildren: function (object, onComplete, onError) {
+		// children already loaded -> return immediately
+		if (!this.mayHaveChildren(object) || "children" in object) {
 			onComplete(object);
 			return;
 		}
-		this.get(this.getIdentity(object)).then(function(resolvedObject) {
+		const id = classUtil.formatId(object);
+		// check if child loader is already loading
+		if(this.childLoader[id] !== undefined) {
+			this.childLoader[id].push([onComplete, onError]);
+			return;
+		}
+		// create child loader
+		this.childLoader[id] = [[onComplete, onError]];
+		// load
+		this.get(this.getIdentity(object)).then((resolvedObject) => {
 			object.children = resolvedObject.children;
-			onComplete(object);
-		}, lang.hitch(this, function(err) {
-			if(onError) {
-				onError(err)
-			}
+			this.childLoader[id].map(callbacks => callbacks[0]).forEach(onComplete => {
+				onComplete(object);
+			});
+			delete this.childLoader[id];
+		}, lang.hitch(this,  (err) => {
+			this.childLoader[id].map(callbacks => callbacks[1]).forEach(onError => {
+				if(onError) {
+					onError(object);
+				}
+			});
+			delete this.childLoader[id];
 			this.onNodeLoadError(err);
-		}), function(evt) {
+		}), function (evt) {
 			console.log(evt);
 		});
 	},
 
-	getChildren: function(object, onComplete, onError) {
-		this.resolveChildren(object, function() {
+	getChildren: function (object, onComplete, onError) {
+		this.resolveChildren(object, function () {
 			onComplete(object.children);
 		}, onError);
 	},
 
-	pasteItem: function(child, oldParent, newParent, copy, insertIndex) {
-		if(!copy) {
+	pasteItem: function (child, oldParent, newParent, copy, insertIndex) {
+		if (!copy) {
 			// remove from oldParent
-			if(!this._remove(child, oldParent)) {
+			if (!this._remove(child, oldParent)) {
 				console.log("unable to paste item " + classUtil.toString(child) + " from "
-						+ classUtil.toString(oldParent) + " to " + classUtil.toString(newParent) + ". Abort DnD!");
+					+ classUtil.toString(oldParent) + " to " + classUtil.toString(newParent) + ". Abort DnD!");
 				return;
 			}
 		} else {
@@ -115,72 +133,72 @@ return declare("mycore.classification.RestStore", JsonRest, {
 			child.id.categid = child.id.categid + "_copy";
 		}
 		// append to newParent
-		this.resolveChildren(newParent, lang.hitch(this, function() {
+		this.resolveChildren(newParent, lang.hitch(this, function () {
 			this._insert(child, newParent, insertIndex);
-			if(!copy) {
+			if (!copy) {
 				this.onChildrenChange(oldParent, oldParent.children);
 			}
 			this.onChildrenChange(newParent, newParent.children);
-		}), function(err) {
+		}), function (err) {
 			console.log("unable to resolve children of object " + classUtil.toString(newParent));
 			console.log(err);
 		});
 	},
 
-	insert: function(child, parent, index) {
-		this.resolveChildren(parent, lang.hitch(this, function() {
+	insert: function (child, parent, index) {
+		this.resolveChildren(parent, lang.hitch(this, function () {
 			this._insert(child, parent, index);
 			this.onChildrenChange(parent, parent.children);
-		}), function(err) {
+		}), function (err) {
 			console.log("unable to resolve children of object " + classUtil.toString(parent));
 			console.log(err);
 		});
 	},
 
-	remove: function(item) {
+	remove: function (item) {
 		var parent = this.getParent(item);
-		if(parent == null) {
+		if (parent == null) {
 			console.log("unable to get parent of item " + classUtil.toString(item));
 			return;
 		}
-		if(this._remove(item, parent)) {
+		if (this._remove(item, parent)) {
 			this.onChildrenChange(parent, parent.children);
 		} else {
 			console.log("unable to remove item " + item.id + " of parent " + classUtil.toString(parent));
 		}
 	},
 
-	getParent: function(child) {
+	getParent: function (child) {
 		return this._getParent(this.root, child);
 	},
 
-	_getParent: function(parent, toFind) {
-		if(parent.children == null) {
+	_getParent: function (parent, toFind) {
+		if (parent.children == null) {
 			return null;
 		}
-		for(var i = 0; i < parent.children.length; i++) {
+		for (var i = 0; i < parent.children.length; i++) {
 			var child = parent.children[i];
-			if(classUtil.isIdEqual(child.id, toFind.id)) {
+			if (classUtil.isIdEqual(child.id, toFind.id)) {
 				return parent;
 			}
 			var possibleParent = this._getParent(child, toFind);
-			if(possibleParent != null) {
+			if (possibleParent != null) {
 				return possibleParent;
 			}
 		}
 	},
 
-	_remove: function(child, parent) {
-		return array.some(parent.children, function(oldChild, i) {
-			if(classUtil.isIdEqual(child.id, oldChild.id)) {
+	_remove: function (child, parent) {
+		return array.some(parent.children, function (oldChild, i) {
+			if (classUtil.isIdEqual(child.id, oldChild.id)) {
 				parent.children.splice(i, 1);
 				return true;
 			}
 		});
 	},
 
-	_insert: function(child, parent, index) {
-		if(!parent.children) {
+	_insert: function (child, parent, index) {
+		if (!parent.children) {
 			parent.children = [];
 		}
 		parent.children.splice(index || 0, 0, child);
@@ -189,14 +207,14 @@ return declare("mycore.classification.RestStore", JsonRest, {
 	/**
 	 * Checks if an item is an descendant of another item.
 	 */
-	isDescendant: function(/*dojo.data.item*/ item, /*dojo.data.item*/ ancestor) {
+	isDescendant: function (/*dojo.data.item*/ item, /*dojo.data.item*/ ancestor) {
 		// same item
-		if(item.id == ancestor.id)
+		if (item.id == ancestor.id)
 			return false;
-		if(ancestor.children && (typeof ancestor.children[0]) != "boolean") {
-			for(var i = 0; i < ancestor.children.length; i++) {
+		if (ancestor.children && (typeof ancestor.children[0]) != "boolean") {
+			for (var i = 0; i < ancestor.children.length; i++) {
 				var childItem = ancestor.children[i];
-				if(item.id == childItem.id || this.isDescendant(item, childItem)) {
+				if (item.id == childItem.id || this.isDescendant(item, childItem)) {
 					return true;
 				}
 			}
@@ -204,12 +222,12 @@ return declare("mycore.classification.RestStore", JsonRest, {
 		return false;
 	},
 
-	getDescendants: function(item) {
+	getDescendants: function (item) {
 		var descendants = [];
-		if(item.children == null) {
+		if (item.children == null) {
 			return descendants;
 		}
-		for(var i = 0; i < item.children.length; i++) {
+		for (var i = 0; i < item.children.length; i++) {
 			var child = item.children[i];
 			descendants.push(child);
 			descendants.push.apply(descendants, this.getDescendants(child));
@@ -219,57 +237,57 @@ return declare("mycore.classification.RestStore", JsonRest, {
 
 	/**
 	 * Returns the index position of the item.
-	 * 
+	 *
 	 * @param item
 	 * @param parent
 	 * @return position as integer
 	 */
-    indexAt: function(item, parent) {
-    	parent = (parent != null) ? parent : this.getParent(item);
-    	if(parent != null) {
-			for(var index = 0; index < parent.children.length; index++) {
+	indexAt: function (item, parent) {
+		parent = (parent != null) ? parent : this.getParent(item);
+		if (parent != null) {
+			for (var index = 0; index < parent.children.length; index++) {
 				var childItem = parent.children[index];
-				if(classUtil.isIdEqual(childItem.id, item.id)) {
+				if (classUtil.isIdEqual(childItem.id, item.id)) {
 					return index;
 				}
 			}
-    	}
+		}
 		return -1;
-    },
+	},
 
-	getLevel: function(item) {
-    	if(classUtil.isIdEqual(this.root.id, item.id)) {
-    		return 0;
-    	}
-    	return this._getLevel(1, item, this.root);
-    },
+	getLevel: function (item) {
+		if (classUtil.isIdEqual(this.root.id, item.id)) {
+			return 0;
+		}
+		return this._getLevel(1, item, this.root);
+	},
 
-    _getLevel: function (level, item, ancestor) {
-		if(!ancestor.children)
+	_getLevel: function (level, item, ancestor) {
+		if (!ancestor.children)
 			return -1;
-    	for(var i = 0; i < ancestor.children.length; i++) {
-    		var child = ancestor.children[i];
-			if(classUtil.isIdEqual(child.id, item.id)) {
+		for (var i = 0; i < ancestor.children.length; i++) {
+			var child = ancestor.children[i];
+			if (classUtil.isIdEqual(child.id, item.id)) {
 				return level;
 			}
 			var ancestorLevel = this._getLevel(level + 1, item, child);
-			if(ancestorLevel != -1) {
+			if (ancestorLevel != -1) {
 				return ancestorLevel;
 			}
-    	}
-    	return -1;
-    },
+		}
+		return -1;
+	},
 
-    /**
-     * Removes "added" and "modified" attributes from all items.
-     */
-    reset: function() {
-    	var items = this.getDescendants(this.root);
-		for(var i = 0; i < items.length; i++) {
+	/**
+	 * Removes "added" and "modified" attributes from all items.
+	 */
+	reset: function () {
+		var items = this.getDescendants(this.root);
+		for (var i = 0; i < items.length; i++) {
 			delete (items[i].added);
 			delete (items[i].modified);
 		}
-    }
+	}
 
 });
 });
