@@ -43,7 +43,7 @@ import org.mycore.resource.MCRResourcePath;
  */
 public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger(getClass());
 
     private final String coverage;
 

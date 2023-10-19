@@ -42,7 +42,7 @@ import org.mycore.resource.MCRResourcePath;
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger(getClass());
 
     public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
         logger.debug("Locating resource URLs for path {}", path);

@@ -39,7 +39,7 @@ import org.mycore.common.log.MCRTreeMessage;
  */
 public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
 
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger(getClass());
 
     @Override
     public List<URL> select(List<URL> resourceUrls, MCRHints hints) {
