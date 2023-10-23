@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,6 +35,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -246,6 +248,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("https", restResolver);
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("cache", new MCRCachingResolver());
+        supportedSchemes.put("function", new MCRFunctionResolver());
         return supportedSchemes;
     }
 
@@ -1826,4 +1829,46 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
+    /**
+     * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type {@link java.lang.String}.
+     * <br/><br/>
+     * <strong>Invocation</strong><pre><code>function:&lt;class name&gt;:&lt;method name&gt;:&lt;param1&gt;:&lt;param2&gt;</code></pre>
+     * <br/>
+     * <strong>Example</strong><pre><code>function:de.uni_jena.thunibib.user.ThUniBibUtils:getLeadId:id_connection:foobar;</code></pre>
+     *
+     * @author shermann (Silvio Hermann)
+     * */
+    private static class MCRFunctionResolver implements URIResolver {
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            LOGGER.debug("Resolving {}", href);
+
+            String[] parts = href.split(":");
+            String className = parts[1];
+            String methodName = parts[2];
+
+            int numParams = parts.length - 3;
+
+            Object[] params = new Object[numParams];
+            if (numParams > 0) {
+                System.arraycopy(parts, 3, params, 0, numParams);
+            }
+
+            try {
+                Class[] types = new Class[numParams];
+                Arrays.fill(types, String.class);
+
+                Object result = null;
+                Method method = MCRClassTools.forName(className).getMethod(methodName, types);
+                result = method.invoke(null, params);
+
+                Element string = new Element("string");
+                string.setText(result == null ? "" : String.valueOf(result));
+
+                return new JDOMSource(string);
+            } catch (Exception e) {
+                throw new TransformerException(e);
+            }
+        }
+    }
 }
