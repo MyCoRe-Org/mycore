@@ -266,23 +266,23 @@ public final class MCRURIResolver implements URIResolver {
 
             String configurationResourceDir
                 = MCRConfigurationDir.getConfigurationDirectory().toPath()
-                    .toAbsolutePath()
-                    .normalize()
-                    .resolve("resources")
-                    .toFile()
-                    .toURI()
-                    .toString();
+                .toAbsolutePath()
+                .normalize()
+                .resolve("resources")
+                .toFile()
+                .toURI()
+                .toString();
 
             String webappPath
                 = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString() : null;
 
             Optional<String> matching = MCRDeveloperTools.getOverridePaths()
-                    .map(Path::toAbsolutePath)
-                    .map(Path::toFile)
-                    .map(File::toURI)
-                    .map(URI::toString)
-                    .filter(base::startsWith)
-                    .findFirst();
+                .map(Path::toAbsolutePath)
+                .map(Path::toFile)
+                .map(File::toURI)
+                .map(URI::toString)
+                .filter(base::startsWith)
+                .findFirst();
             if (matching.isPresent()) {
                 // in this case the developer mode is active and the file is in the override directory e.G.
                 // /root/workspace/mir/src/main/resources/xsl/mir-accesskey-utils.xsl
@@ -291,7 +291,7 @@ public final class MCRURIResolver implements URIResolver {
                 // in this case the file is in a jar file e.G.
                 // /root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl
                 resolvingBase = base.lastIndexOf(".jar!") > 0
-                    ? base.substring(base.lastIndexOf(".jar!") + ".jar!".length()) : base;
+                                ? base.substring(base.lastIndexOf(".jar!") + ".jar!".length()) : base;
             } else if (base.startsWith(configurationResourceDir)) {
                 // in this case the file is in the configuration directory e.G.
                 // file:/root/.mycore/dev-mir/resources/xsl/mir-accesskey-utils.xsl
@@ -581,21 +581,21 @@ public final class MCRURIResolver implements URIResolver {
         private String getCacheDebugMsg(URI hrefURI, HttpCacheContext context) {
             String msg = hrefURI.toASCIIString() + ": ";
             switch (context.getCacheResponseStatus()) {
-            case CACHE_HIT:
-                msg += "A response was generated from the cache with " +
-                    "no requests sent upstream";
-                break;
-            case CACHE_MODULE_RESPONSE:
-                msg += "The response was generated directly by the " +
-                    "caching module";
-                break;
-            case CACHE_MISS:
-                msg += "The response came from an upstream server";
-                break;
-            case VALIDATED:
-                msg += "The response was generated from the cache " +
-                    "after validating the entry with the origin server";
-                break;
+                case CACHE_HIT:
+                    msg += "A response was generated from the cache with " +
+                        "no requests sent upstream";
+                    break;
+                case CACHE_MODULE_RESPONSE:
+                    msg += "The response was generated directly by the " +
+                        "caching module";
+                    break;
+                case CACHE_MISS:
+                    msg += "The response came from an upstream server";
+                    break;
+                case VALIDATED:
+                    msg += "The response was generated from the cache " +
+                        "after validating the entry with the origin server";
+                    break;
             }
             return msg;
         }
@@ -629,8 +629,8 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.instance();
                 MCRContent content = params.containsKey("r")
-                    ? xmlmm.retrieveContent(mcrid, params.get("r"))
-                    : xmlmm.retrieveContent(mcrid);
+                                     ? xmlmm.retrieveContent(mcrid, params.get("r"))
+                                     : xmlmm.retrieveContent(mcrid);
                 if (content == null) {
                     return null;
                 }
@@ -1750,12 +1750,12 @@ public final class MCRURIResolver implements URIResolver {
          * returns the boolean value for the given ACL permission.
          *
          * Syntax: <code>checkPermission:{id}:{permission}</code> or <code>checkPermission:{permission}</code>
-         * 
+         *
          * @param href
          *            URI in the syntax above
          * @param base
          *            not used
-         * 
+         *
          * @return the root element "boolean" of the XML document with content string true of false
          * @see javax.xml.transform.URIResolver
          */
@@ -1764,15 +1764,15 @@ public final class MCRURIResolver implements URIResolver {
             final String[] split = href.split(":");
             boolean permission;
             switch (split.length) {
-            case 2:
-                permission = MCRAccessManager.checkPermission(split[1]);
-                break;
-            case 3:
-                permission = MCRAccessManager.checkPermission(split[1], split[2]);
-                break;
-            default:
-                throw new IllegalArgumentException(
-                    "Invalid format of uri for retrieval of checkPermission: " + href);
+                case 2:
+                    permission = MCRAccessManager.checkPermission(split[1]);
+                    break;
+                case 3:
+                    permission = MCRAccessManager.checkPermission(split[1], split[2]);
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                        "Invalid format of uri for retrieval of checkPermission: " + href);
             }
             Element root = new Element("boolean");
             root.setText(Boolean.toString(permission));
@@ -1850,15 +1850,10 @@ public final class MCRURIResolver implements URIResolver {
             String className = parts[1];
             String methodName = parts[2];
 
-            int numParams = parts.length - 3;
-
-            Object[] params = new Object[numParams];
-            if (numParams > 0) {
-                System.arraycopy(parts, 3, params, 0, numParams);
-            }
+            Object[] params = Arrays.stream(parts).skip(3).toArray(String[]::new);
 
             try {
-                Class[] types = new Class[numParams];
+                Class[] types = new Class[params.length];
                 Arrays.fill(types, String.class);
 
                 Object result = null;
