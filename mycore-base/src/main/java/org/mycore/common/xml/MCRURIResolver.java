@@ -1830,11 +1830,14 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type {@link java.lang.String}.
+     * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type
+     * {@link java.lang.String}.
      * <br/><br/>
-     * <strong>Invocation</strong><pre><code>function:&lt;class name&gt;:&lt;method name&gt;:&lt;param1&gt;:&lt;param2&gt;</code></pre>
+     * <strong>Invocation</strong>
+     * <pre><code>function:&lt;class name&gt;:&lt;method name&gt;:&lt;param1&gt;:&lt;param2&gt;</code></pre>
      * <br/>
-     * <strong>Example</strong><pre><code>function:de.uni_jena.thunibib.user.ThUniBibUtils:getLeadId:id_connection:foobar;</code></pre>
+     * <strong>Example</strong>
+     * <pre><code>function:de.uni_jena.thunibib.user.ThUniBibUtils:getLeadId:id_connection:foobar;</code></pre>
      *
      * @author shermann (Silvio Hermann)
      * */
