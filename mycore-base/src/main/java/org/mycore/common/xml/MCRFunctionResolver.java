@@ -25,7 +25,7 @@ import java.util.Arrays;
  * @author shermann (Silvio Hermann)
  * */
 public class MCRFunctionResolver implements URIResolver {
-    private Logger LOGGER = LogManager.getLogger(MCRFunctionResolver.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRFunctionResolver.class);
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
