@@ -20,7 +20,9 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,6 +43,7 @@ import org.jdom2.Parent;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -76,6 +79,10 @@ public class MCRXEditorTransformer {
 
     private boolean withinSelectMultiple = false;
 
+    private static final List<String> DISALLOWED_URI_SCHEMAS = MCRConfiguration2.getOrThrow(
+        "MCR.XEditor.MCRXEditorTransformer.URISchema.disallowList",
+        MCRConfiguration2::splitValue).collect(Collectors.toList());
+
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
@@ -107,7 +114,23 @@ public class MCRXEditorTransformer {
     }
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+        String uriRe = editorSession.replaceParameters(uri);
+
+        if (!validateURI(uriRe)) {
+            throw new TransformerException("URI '" + uriRe + "' contains illegal uri scheme");
+        }
+
         editorSession.setEditedXML(uri);
+    }
+
+    protected boolean validateURI(String uri) {
+        for (String scheme : MCRXEditorTransformer.DISALLOWED_URI_SCHEMAS) {
+            if (uri.contains(scheme)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void setCancelURL(String cancelURL) {
