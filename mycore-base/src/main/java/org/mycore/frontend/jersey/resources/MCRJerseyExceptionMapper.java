@@ -48,7 +48,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- * Handles jersey web application exceptions. By default this class
+ * Handles jersey web application exceptions. By default, this class
  * just forwards the exception. Only if the request accepts HTML a
  * custom error page is generated.
  *
@@ -57,7 +57,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @Provider
 public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Context
     HttpHeaders headers;
@@ -77,6 +77,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         } else {
             LOGGER.warn(() -> "Error while processing request " + uriInfo.getRequestUri(), exc);
         }
+        MCRTransactionHelper.setRollbackOnly();
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
             if (!MCRSessionMgr.isLocked() && !MCRTransactionHelper.isTransactionActive()) {

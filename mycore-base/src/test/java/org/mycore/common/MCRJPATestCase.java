@@ -24,12 +24,18 @@ import java.io.StringWriter;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
+import org.hibernate.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
@@ -126,11 +132,11 @@ public class MCRJPATestCase extends MCRTestCase {
         }
     }
 
-    protected Optional<String> getDefaultSchema() {
+    public static Optional<String> getDefaultSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-            .getEntityManagerFactory()
-            .getProperties()
-            .get("hibernate.default_schema"))
+                .getEntityManagerFactory()
+                .getProperties()
+                .get("hibernate.default_schema"))
             .map(Object::toString);
     }
 
@@ -186,6 +192,53 @@ public class MCRJPATestCase extends MCRTestCase {
         beginTransaction();
         // clear from cache
         getEntityManager().ifPresent(EntityManager::clear);
+    }
+
+    public static String getTableName(String table) {
+        return getDefaultSchema().map(s -> s + ".").orElse("") + table;
+    }
+
+    public static void printTable(String table) {
+        queryTable(table, (resultSet) -> {
+            try {
+                printResultSet(resultSet, System.out);
+            } catch (SQLException e) {
+                LogManager.getLogger().warn("Error while printing result set for table " + table, e);
+            }
+        });
+    }
+
+    public static void queryTable(String table, Consumer<ResultSet> consumer) {
+        executeQuery("SELECT * FROM " + getTableName(table), consumer);
+    }
+
+    public static void executeQuery(String query, Consumer<ResultSet> consumer) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.unwrap(Session.class).doWork(connection -> {
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(query);
+                consumer.accept(resultSet);
+            } catch (SQLException e) {
+                LogManager.getLogger().warn("Error while querying '" + query + "'", e);
+            }
+        });
+    }
+
+    public static void executeUpdate(String sql) {
+        executeUpdate(sql, (ignore) -> {
+        });
+    }
+
+    public static void executeUpdate(String sql, Consumer<Integer> consumer) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.unwrap(Session.class).doWork(connection -> {
+            try (Statement statement = connection.createStatement()) {
+                int updateCount = statement.executeUpdate(sql);
+                consumer.accept(updateCount);
+            } catch (SQLException e) {
+                LogManager.getLogger().warn("Error while update '" + sql + "'", e);
+            }
+        });
     }
 
 }

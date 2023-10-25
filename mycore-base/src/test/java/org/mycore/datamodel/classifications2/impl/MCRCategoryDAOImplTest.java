@@ -100,7 +100,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
                     LogManager.getLogger().error("Error while checking left, right an level values in database.");
                     new XMLOutputter(Format.getPrettyFormat())
                         .output(MCRCategoryTransformer.getMetaDataDocument(rootNode, false), System.out);
-                    printCategoryTable();
+                    printTable("MCRCategory");
                     throw e;
                 }
             }
@@ -312,7 +312,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         assertEquals("Root does not match", origSubCategory.getRoot().getId(), subCategory.getRoot().getId());
         MCRCategory germanyResource = find(category, "Germany").get();
         MCRCategory germanyDB = DAO.getCategory(germanyResource.getId(), 1);
-        printCategoryTable();
+        printTable("MCRCategory");
         assertEquals("Children of Level 1 do not match", germanyResource.getChildren().size(), germanyDB.getChildren()
             .size());
     }
@@ -420,7 +420,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         DAO.addCategory(null, root);
         endTransaction();
         startNewTransaction();
-        printCategoryTable();
+        printTable("MCRCategory");
         endTransaction();
         assertLeftRightVal(rootID, 0, 7);
         assertLeftRightVal(child1ID, 1, 2);
@@ -432,7 +432,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         DAO.moveCategory(child3ID, child1ID, 1);
         endTransaction();
         startNewTransaction();
-        printCategoryTable();
+        printTable("MCRCategory");
         endTransaction();
         assertLeftRightVal(rootID, 0, 7);
         assertLeftRightVal(child1ID, 1, 6);
@@ -462,7 +462,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         DAO.moveCategory(child2ID, rootID);
         endTransaction();
         startNewTransaction();
-        printCategoryTable();
+        printTable("MCRCategory");
         endTransaction();
         assertLeftRightVal(rootID, 0, 5);
         assertLeftRightVal(child1ID, 1, 2);
@@ -726,19 +726,6 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         }
         assertEquals("Right value did not match on ID: " + node.getId(), ++curValue, node.getRight());
         return curValue;
-    }
-
-    private void printCategoryTable() {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        em.unwrap(Session.class).doWork(connection -> {
-            try (Statement statement = connection.createStatement()) {
-                String tableName = getDefaultSchema().map(s -> s + ".").orElse("") + "MCRCategory";
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-                printResultSet(resultSet, System.out);
-            } catch (SQLException e1) {
-                LogManager.getLogger().warn("Error while querying MCRCategory", e1);
-            }
-        });
     }
 
     private Optional<MCRCategory> find(MCRCategory base, String id) {

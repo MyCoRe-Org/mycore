@@ -18,27 +18,21 @@
 
 package org.mycore.frontend.classeditor.resources;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRJSONManager;
+import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -54,13 +48,22 @@ import org.mycore.frontend.classeditor.mocks.CategoryLinkServiceMock;
 import org.mycore.frontend.classeditor.mocks.LinkTableStoreMock;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
-import org.mycore.frontend.jersey.resources.MCRJerseyTest;
+import org.mycore.frontend.jersey.resources.MCRJerseyTestFeature;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
-public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class MCRClassificationEditorResourceTest extends MCRTestCase {
+
+    private MCRJerseyTestFeature jersey;
+
     private CategoryDAOMock categDAO;
 
     static Logger LOGGER = LogManager.getLogger(MCRClassificationEditorResourceTest.class);
@@ -68,25 +71,29 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> map = super.getTestProperties();
-        map.put("MCR.Metadata.Type.jpclassi", "true");
         map.put("MCR.Metadata.Store.BaseDir", "/tmp");
         map.put("MCR.Metadata.Store.SVNBase", "/tmp/versions");
-        map.put("MCR.IFS2.Store.jportal_jpclassi.ForceXML", "true");
-        map.put("MCR.IFS2.Store.jportal_jpclassi.BaseDir", "jimfs:");
-        map.put("MCR.IFS2.Store.jportal_jpclassi.SlotLayout", "4-2-2");
-        map.put("MCR.IFS2.Store.jportal_jpclassi.SVNRepositoryURL", "jimfs:");
+        map.put("MCR.IFS2.Store.ClasseditorTempStore.BaseDir", "jimfs:");
+        map.put("MCR.IFS2.Store.ClasseditorTempStore.SlotLayout", "4-2-2");
         map.put("MCR.EventHandler.MCRObject.2.Class",
             "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
         map.put("MCR.Persistence.LinkTable.Store.Class", LinkTableStoreMock.class.getName());
         map.put("MCR.Category.DAO", CategoryDAOMock.class.getName());
-        map.put("ClassificationResouce.useSession", "false");
         map.put("MCR.Category.LinkService", CategoryLinkServiceMock.class.getName());
         map.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
+        map.put("MCR.Access.Cache.Size", "200");
         return map;
     }
 
     @Before
-    public void init() {
+    public void init() throws Exception {
+        jersey = new MCRJerseyTestFeature();
+        jersey.setUp(Set.of(
+            MCRClassificationEditorResource.class,
+            MCRSessionHookFilter.class,
+            MultiPartFeature.class
+        ));
+
         MCRJSONManager mg = MCRJSONManager.instance();
         mg.registerAdapter(new MCRCategoryTypeAdapter());
         mg.registerAdapter(new MCRCategoryIDTypeAdapter());
@@ -94,9 +101,9 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         mg.registerAdapter(new MCRCategoryListTypeAdapter());
 
         try {
-            MCRStoreManager.createStore("jportal_jpclassi", MCRMetadataStore.class);
+            MCRStoreManager.createStore("ClasseditorTempStore", MCRMetadataStore.class);
         } catch (ReflectiveOperationException e) {
-            LOGGER.error("while creating store jportal_jpclassi", e);
+            LOGGER.error("while creating store ClasseditorTempStore", e);
         }
 
         try {
@@ -107,30 +114,19 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
             categDAO = (CategoryDAOMock) MCRCategoryDAOFactory.getInstance();
             categDAO.init();
         } catch (Exception exc) {
-            assertTrue(false);
+            fail();
         }
     }
 
     @After
-    public void cleanUp() {
-        MCRStoreManager.removeStore("jportal_jpclassi");
-    }
-
-    @Override
-    protected void configureClient(ClientConfig config) {
-        config.register(MultiPartFeature.class);
-    }
-
-    @BeforeClass
-    public static void register() {
-        JERSEY_CLASSES.add(MCRClassificationEditorResource.class);
-        JERSEY_CLASSES.add(MCRSessionHookFilter.class);
-        JERSEY_CLASSES.add(MultiPartFeature.class);
+    public void cleanUp() throws Exception {
+        MCRStoreManager.removeStore("ClasseditorTempStore");
+        this.jersey.tearDown();
     }
 
     @Test
-    public void getRootCategories() throws Exception {
-        final String categoryJsonStr = target("classifications").request().get(String.class);
+    public void getRootCategories() {
+        final String categoryJsonStr = jersey.target("classifications").request().get(String.class);
         MCRCategoryListWrapper categListWrapper = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
             MCRCategoryListWrapper.class);
         List<MCRCategory> categList = categListWrapper.getList();
@@ -138,21 +134,21 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     }
 
     @Test
-    public void getSingleCategory() throws Exception {
+    public void getSingleCategory() {
         Collection<MCRCategory> categs = categDAO.getCategs();
         for (MCRCategory mcrCategory : categs) {
             MCRCategoryID id = mcrCategory.getId();
             String path = id.getRootID();
             String categID = id.getID();
-            if (categID != null && !"".equals(categID)) {
+            if (categID != null && !categID.isEmpty()) {
                 path = path + "/" + categID;
             }
-            String categoryJsonStr = target("/classifications/" + path).request().get(String.class);
+            String categoryJsonStr = jersey.target("/classifications/" + path).request().get(String.class);
             MCRJSONCategory retrievedCateg = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
                 MCRJSONCategory.class);
             String errorMsg = new MessageFormat("We want to retrieve the category {0} but it was {1}", Locale.ROOT)
                 .format(new Object[] { id, retrievedCateg.getId() });
-            assertTrue(errorMsg, id.equals(retrievedCateg.getId()));
+            assertEquals(errorMsg, id, retrievedCateg.getId());
         }
     }
 
@@ -161,7 +157,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/classiEditor_OneClassification.xml"));
         String json = doc.getRootElement().getText();
-        Response response = target("/classifications/save").request().post(Entity.json(json));
+        Response response = jersey.target("/classifications/save").request().post(Entity.json(json));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
@@ -170,7 +166,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/classiEditor_ClassiSub.xml"));
         String json = doc.getRootElement().getText();
-        Response response = target("/classifications/save").request().post(Entity.json(json));
+        Response response = jersey.target("/classifications/save").request().post(Entity.json(json));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
@@ -179,7 +175,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/classiEditor_Classi2Sub.xml"));
         String json = doc.getRootElement().getText();
-        Response response = target("/classifications/save").request().post(Entity.json(json));
+        Response response = jersey.target("/classifications/save").request().post(Entity.json(json));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
@@ -188,8 +184,23 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/classiEditor_Classi2Sub_JsonErr.xml"));
         String json = doc.getRootElement().getText();
-        Response response = target("/classifications/save").request().post(Entity.json(json));
+        Response response = jersey.target("/classifications/save").request().post(Entity.json(json));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void forceException() {
+        String json = """
+                [{
+                  "item":{"id":{"rootid":"rootID_01","categid":"categ_01"}},
+                  "state":"update",
+                  "parentId":{"rootid":"rootID_02"},
+                  "depthLevel":3,
+                  "index":-1
+                }]
+            """;
+        Response response = jersey.target("/classifications/save").request().post(Entity.json(json));
+        Assert.assertEquals(500, response.getStatus());
     }
 
 }

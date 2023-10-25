@@ -58,9 +58,18 @@ public interface MCRPersistenceTransaction {
     boolean getRollbackOnly();
 
     /**
+     * Mark the current resource transaction so that the only possible outcome of the transaction is for the
+     * transaction to be rolled back.
+     *
+     * @throws IllegalStateException if <code>isActive()</code> is false
+     */
+    void setRollbackOnly() throws IllegalStateException;
+
+    /**
      * Indicate whether a transaction is in progress.
      * @return boolean indicating whether transaction is
      *         in progress
      */
     boolean isActive();
+
 }
