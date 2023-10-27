@@ -16,11 +16,11 @@ export const useAuthStore = defineStore('auth', {
       try {
         const jwt: JWT = await fetchJWT(webApplicationBaseURL, objectId, isSessionEnabled, derivateId);
         if (!jwt.login_success) {
-          throw new Error('unauthorizedError');
+          throw new Error('noPermission');
         }
         this.accessToken = jwt.access_token;
       } catch (error) {
-        throw new Error('unauthorizedError');
+        throw new Error('noPermission');
       }
     },
   },

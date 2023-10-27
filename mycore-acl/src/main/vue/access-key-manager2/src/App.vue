@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <template v-if="isBooted && !(errorCode === 'unauthorizedError' || errorCode === 'noObjectId')">
+    <template v-if="isBooted && !(errorCode === 'noPermission' || errorCode === 'noObjectId')">
       <div class="row pb-2">
         <div class="col">
           <div class="text-right">
@@ -108,7 +108,7 @@ const handleCreated = async (secret, reference) => {
 onMounted(async () => {
   if (store.objectId) {
     try {
-      configStore.fetchConfig();
+      await configStore.fetchConfig();
       if (process.env.NODE_ENV === 'production') {
         await authStore.login(store.objectId, store.derivateId);
       }
