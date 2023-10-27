@@ -56,8 +56,12 @@ export function urlEncode(value: string): string {
     .replace(/\//g, '_');
 }
 
-export async function fetchJWT(webApplicationBaseURL: string, objectID: string,
-  derivateID: string, includeSession: boolean): Promise<AxiosResponse> {
+export async function fetchJWT(
+  webApplicationBaseURL: string,
+  objectID: string,
+  derivateID: string,
+  includeSession: boolean,
+): Promise<AxiosResponse> {
   const params = new URLSearchParams();
   params.append('ua', `acckey_${objectID}`);
   if (derivateID) {
