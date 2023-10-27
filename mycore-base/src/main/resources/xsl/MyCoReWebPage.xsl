@@ -139,4 +139,9 @@
 
   <!-- =============================================================================== -->
 
+  <!-- Dynamic includes -->
+
+  <xsl:template match="xinclude">
+    <xsl:apply-templates select="document(@uri)/*" />
+  </xsl:template>
 </xsl:stylesheet>
