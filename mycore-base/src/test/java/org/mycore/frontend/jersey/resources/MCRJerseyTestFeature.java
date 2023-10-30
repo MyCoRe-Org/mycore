@@ -18,8 +18,8 @@
 
 package org.mycore.frontend.jersey.resources;
 
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Application;
+import java.util.Set;
+
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -32,7 +32,8 @@ import org.glassfish.jersey.test.spi.TestContainerException;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
 import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 
-import java.util.Set;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Application;
 
 /**
  * Jersey test feature.

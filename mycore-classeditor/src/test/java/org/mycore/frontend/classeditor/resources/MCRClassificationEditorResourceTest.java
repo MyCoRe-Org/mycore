@@ -18,9 +18,16 @@
 
 package org.mycore.frontend.classeditor.resources;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -49,15 +56,9 @@ import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 import org.mycore.frontend.jersey.resources.MCRJerseyTestFeature;
 
-import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class MCRClassificationEditorResourceTest extends MCRTestCase {
 
@@ -90,8 +91,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
         jersey.setUp(Set.of(
             MCRClassificationEditorResource.class,
             MCRSessionHookFilter.class,
-            MultiPartFeature.class
-        ));
+            MultiPartFeature.class));
 
         MCRJSONManager mg = MCRJSONManager.instance();
         mg.registerAdapter(new MCRCategoryTypeAdapter());

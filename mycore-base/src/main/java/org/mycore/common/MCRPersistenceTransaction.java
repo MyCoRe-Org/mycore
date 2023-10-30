@@ -71,5 +71,4 @@ public interface MCRPersistenceTransaction {
      *         in progress
      */
     boolean isActive();
-
 }

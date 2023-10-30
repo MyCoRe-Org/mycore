@@ -20,6 +20,8 @@ package org.mycore.frontend.jersey.resources;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,33 +30,14 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
-import java.util.Set;
-
 public class MCRJerseyResourceTest {
 
     private MCRJerseyTestFeature jersey;
 
-    @Path("hello")
-    public static class TestCase {
-
-        @GET
-        public String get() {
-            return "Hello World!";
-        }
-
-        @GET
-        @Path("logout/{id}")
-        public String logout(@PathParam("id") String id) {
-            return "GoodBye " + id + "!";
-        }
-    }
-
     @Before
     public void setUpJersey() throws Exception {
         jersey = new MCRJerseyTestFeature();
-        jersey.setUp(Set.of(
-            TestCase.class
-        ));
+        jersey.setUp(Set.of(TestCase.class));
     }
 
     @After
@@ -70,6 +53,21 @@ public class MCRJerseyResourceTest {
 
         final String logout = jersey.target("hello/logout/Peter").request().get(String.class);
         assertEquals("GoodBye Peter!", logout);
+    }
+
+    @Path("hello")
+    public static class TestCase {
+
+        @GET
+        public String get() {
+            return "Hello World!";
+        }
+
+        @GET
+        @Path("logout/{id}")
+        public String logout(@PathParam("id") String id) {
+            return "GoodBye " + id + "!";
+        }
     }
 
 }

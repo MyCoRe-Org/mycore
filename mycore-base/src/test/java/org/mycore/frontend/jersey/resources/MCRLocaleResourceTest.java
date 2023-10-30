@@ -18,20 +18,21 @@
 
 package org.mycore.frontend.jersey.resources;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
-import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mycore.common.MCRTestCase;
+import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 
 public class MCRLocaleResourceTest extends MCRTestCase {
 
@@ -43,8 +44,7 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         jersey = new MCRJerseyTestFeature();
         jersey.setUp(Set.of(
             MCRSessionHookFilter.class,
-            MCRLocaleResource.class
-        ));
+            MCRLocaleResource.class));
     }
 
     @After

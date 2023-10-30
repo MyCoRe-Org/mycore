@@ -18,19 +18,6 @@
 
 package org.mycore.common;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
-import jakarta.persistence.Query;
-import jakarta.persistence.RollbackException;
-import org.apache.logging.log4j.LogManager;
-import org.hibernate.Session;
-import org.junit.After;
-import org.junit.Before;
-import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.backend.jpa.MCRJPABootstrapper;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
@@ -43,6 +30,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.apache.logging.log4j.LogManager;
+import org.hibernate.Session;
+import org.junit.After;
+import org.junit.Before;
+import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.MCRJPABootstrapper;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.Query;
+import jakarta.persistence.RollbackException;
 
 public class MCRJPATestCase extends MCRTestCase {
 
@@ -128,11 +129,11 @@ public class MCRJPATestCase extends MCRTestCase {
         }
     }
 
-    public static Optional<String> getDefaultSchema() {
+    protected static Optional<String> getDefaultSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-                .getEntityManagerFactory()
-                .getProperties()
-                .get("hibernate.default_schema"))
+            .getEntityManagerFactory()
+            .getProperties()
+            .get("hibernate.default_schema"))
             .map(Object::toString);
     }
 
@@ -190,11 +191,11 @@ public class MCRJPATestCase extends MCRTestCase {
         getEntityManager().ifPresent(EntityManager::clear);
     }
 
-    public static String getTableName(String table) {
+    protected static String getTableName(String table) {
         return getDefaultSchema().map(s -> s + ".").orElse("") + table;
     }
 
-    public static void printTable(String table) {
+    protected static void printTable(String table) {
         queryTable(table, (resultSet) -> {
             try {
                 printResultSet(resultSet, System.out);
@@ -204,11 +205,11 @@ public class MCRJPATestCase extends MCRTestCase {
         });
     }
 
-    public static void queryTable(String table, Consumer<ResultSet> consumer) {
+    protected static void queryTable(String table, Consumer<ResultSet> consumer) {
         executeQuery("SELECT * FROM " + getTableName(table), consumer);
     }
 
-    public static void executeQuery(String query, Consumer<ResultSet> consumer) {
+    protected static void executeQuery(String query, Consumer<ResultSet> consumer) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.unwrap(Session.class).doWork(connection -> {
             try (Statement statement = connection.createStatement()) {
@@ -220,12 +221,12 @@ public class MCRJPATestCase extends MCRTestCase {
         });
     }
 
-    public static void executeUpdate(String sql) {
+    protected static void executeUpdate(String sql) {
         executeUpdate(sql, (ignore) -> {
         });
     }
 
-    public static void executeUpdate(String sql, Consumer<Integer> consumer) {
+    protected static void executeUpdate(String sql, Consumer<Integer> consumer) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.unwrap(Session.class).doWork(connection -> {
             try (Statement statement = connection.createStatement()) {

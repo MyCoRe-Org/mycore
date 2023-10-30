@@ -1,9 +1,9 @@
 package org.mycore.frontend.jersey.resources;
 
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.core.Response;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,9 +17,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.filter.MCRDBTransactionFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Set;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Response;
 
 public class MCRJerseyJPATest extends MCRStoreTestCase {
 
@@ -32,8 +33,7 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
             MCRSessionHookFilter.class,
             MCRDBTransactionFilter.class,
             ObjectResource.class,
-            MCRJerseyExceptionMapper.class
-        ));
+            MCRJerseyExceptionMapper.class));
     }
 
     @After
