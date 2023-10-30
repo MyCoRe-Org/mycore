@@ -18,6 +18,19 @@
 
 package org.mycore.common;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.Query;
+import jakarta.persistence.RollbackException;
+import org.apache.logging.log4j.LogManager;
+import org.hibernate.Session;
+import org.junit.After;
+import org.junit.Before;
+import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.MCRJPABootstrapper;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
@@ -28,25 +41,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.apache.logging.log4j.LogManager;
-import org.hibernate.Session;
-import org.junit.After;
-import org.junit.Before;
-import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.backend.jpa.MCRJPABootstrapper;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
-import jakarta.persistence.Query;
-import jakarta.persistence.RollbackException;
 
 public class MCRJPATestCase extends MCRTestCase {
 

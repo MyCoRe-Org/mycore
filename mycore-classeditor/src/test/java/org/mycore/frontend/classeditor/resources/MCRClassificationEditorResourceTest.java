@@ -27,7 +27,6 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
@@ -200,7 +199,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
                 }]
             """;
         Response response = jersey.target("/classifications/save").request().post(Entity.json(json));
-        Assert.assertEquals(500, response.getStatus());
+        assertEquals(500, response.getStatus());
     }
 
 }

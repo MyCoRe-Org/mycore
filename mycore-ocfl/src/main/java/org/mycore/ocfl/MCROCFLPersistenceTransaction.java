@@ -162,7 +162,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         if (!isActive()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE");
         }
-        this.rollbackOnly = true;
+        rollbackOnly = true;
     }
 
     @Override

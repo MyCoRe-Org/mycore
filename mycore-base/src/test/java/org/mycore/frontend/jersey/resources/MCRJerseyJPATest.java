@@ -25,35 +25,6 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
 
     private MCRJerseyTestFeature jersey;
 
-    @Path("object")
-    public static class ObjectResource {
-
-        @Path("create/{id}")
-        @POST
-        public void create(@PathParam("id") String id) throws MCRAccessException {
-            MCRObjectID mcrId = MCRObjectID.getInstance(id);
-            MCRObject root = createObject(mcrId.toString());
-            MCRMetadataManager.create(root);
-        }
-
-        @Path("break/{id}")
-        @POST
-        public void breakIt(@PathParam("id") String id) {
-            String tableName = getTableName("MCRObject");
-            executeUpdate("UPDATE " + tableName + " SET CREATEDATE=null WHERE ID='" + id + "'");
-            printTable("MCRObject");
-            throw new RuntimeException("Breaking!!!");
-        }
-
-        private MCRObject createObject(String id) {
-            MCRObject object = new MCRObject();
-            object.setId(MCRObjectID.getInstance(id));
-            object.setSchema("noSchema");
-            return object;
-        }
-
-    }
-
     @Before
     public void setUpJersey() throws Exception {
         jersey = new MCRJerseyTestFeature();
@@ -101,6 +72,43 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
                 Assert.fail("Unable to query MCRObject table");
             }
         });
+    }
+
+    @Path("object")
+    public static class ObjectResource {
+
+        @Path("create/{id}")
+        @POST
+        public void create(@PathParam("id") String id) throws MCRAccessException {
+            MCRObjectID mcrId = MCRObjectID.getInstance(id);
+            MCRObject root = createObject(mcrId.toString());
+            MCRMetadataManager.create(root);
+        }
+
+        @Path("break/{id}")
+        @POST
+        public void breakIt(@PathParam("id") String id) {
+            String tableName = getTableName("MCRObject");
+            executeUpdate("UPDATE " + tableName + " SET CREATEDATE=null WHERE ID='" + id + "'");
+            printTable("MCRObject");
+            throw new APIException("Breaking!!!");
+        }
+
+        private MCRObject createObject(String id) {
+            MCRObject object = new MCRObject();
+            object.setId(MCRObjectID.getInstance(id));
+            object.setSchema("noSchema");
+            return object;
+        }
+
+    }
+
+    private static final class APIException extends RuntimeException {
+
+        public APIException(String message) {
+            super(message);
+        }
+
     }
 
 }
