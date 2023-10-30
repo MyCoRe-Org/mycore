@@ -51,15 +51,14 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
     @Test
     public void rollback() throws MCRAccessException, InterruptedException {
         MCRObjectID id = MCRObjectID.getInstance("mycore_object_00000001");
-        try (Response ignore = jersey.target("object/create/" + id).request().post(null)) {
+        try (Response ignored = jersey.target("object/create/" + id).request().post(null)) {
+            printTable("MCRObject");
+            assertCreateDate("create date should not be null after creation");
         }
-        printTable("MCRObject");
-        assertCreateDate("create date should not be null after creation");
-        try (Response ignore = jersey.target("object/break/" + id).request().post(null)) {
+        try (Response ignored = jersey.target("object/break/" + id).request().post(null)) {
+            printTable("MCRObject");
+            assertCreateDate("create date should be rolled back and not be null");
         }
-        Thread.sleep(100); // need to wait for write response? not sure why
-        printTable("MCRObject");
-        assertCreateDate("create date should be rolled back and not be null");
     }
 
     private void assertCreateDate(String message) {
@@ -105,7 +104,7 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
 
     private static final class APIException extends RuntimeException {
 
-        public APIException(String message) {
+        APIException(String message) {
             super(message);
         }
 
