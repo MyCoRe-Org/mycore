@@ -102,7 +102,7 @@ return declare("mycore.classification.RestStore", JsonRest, {
     }, lang.hitch(this, (err) => {
       this.childLoader[id].map(callbacks => callbacks[1]).forEach(onError => {
         if (onError) {
-          onError(object);
+          onError(err);
         }
       });
       delete this.childLoader[id];
