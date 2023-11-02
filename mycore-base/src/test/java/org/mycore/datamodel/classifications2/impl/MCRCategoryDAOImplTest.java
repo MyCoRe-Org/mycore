@@ -729,16 +729,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     private void printCategoryTable() {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        em.unwrap(Session.class).doWork(connection -> {
-            try (Statement statement = connection.createStatement()) {
-                String tableName = getDefaultSchema().map(s -> s + ".").orElse("") + "MCRCategory";
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-                printResultSet(resultSet, System.out);
-            } catch (SQLException e1) {
-                LogManager.getLogger().warn("Error while querying MCRCategory", e1);
-            }
-        });
+        printTable("MCRCategory");
     }
 
     private Optional<MCRCategory> find(MCRCategory base, String id) {

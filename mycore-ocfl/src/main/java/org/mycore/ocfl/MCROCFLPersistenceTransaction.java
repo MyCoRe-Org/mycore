@@ -157,6 +157,15 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     }
 
     @Override
+    public void setRollbackOnly() throws IllegalStateException {
+        LOGGER.debug("TRANSACTION {} SET ROLLBACK - {}", threadId, rollbackOnly);
+        if (!isActive()) {
+            throw new IllegalStateException("TRANSACTION NOT ACTIVE");
+        }
+        rollbackOnly = true;
+    }
+
+    @Override
     public boolean isActive() {
         LOGGER.debug("TRANSACTION {} ACTIVE CHECK - {}", threadId, active);
         return active;
