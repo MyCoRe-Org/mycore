@@ -6,7 +6,7 @@
   xmlns:fn="http://www.w3.org/2005/xpath-functions">
   
   <!-- should really be last stylesheet to be imported -->
-  <xsl:import href="xslImport:solr-document-3:solr/indexing/solr-basetemplate-3.xsl" />
+  <xsl:import href="xslImport:solr-document:solr/indexing/solr-basetemplate.xsl" />
   
   <xsl:template match="text()" />
 

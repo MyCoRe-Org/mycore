@@ -57,6 +57,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -233,6 +234,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("catchEx", new MCRExceptionAsXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
+        supportedSchemes.put("xslStyleXEditor", new MCRXslStyleXEditorResolver());
         supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
         supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
         supportedSchemes.put("xslImport", new MCRXslImportResolver());
@@ -266,7 +268,8 @@ public final class MCRURIResolver implements URIResolver {
     static String getParentDirectoryResourceURI(String base) {
         if (base == null) {
             // the file was not included from another file, so we need to use the default resource directory
-            return "resource:xsl/";
+            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+            return "resource:" + xslFolder + "/";
         } else {
             String resolvingBase = null;
 
@@ -381,7 +384,9 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         // new relative include did not work, now fall back to old behaviour and print a warning if it works
-        Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve("resource:xsl/" + href, base);
+        final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+        Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource")
+            .resolve("resource:" + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
             LOGGER.warn("The Stylesheet {} has include {} which only works with an old absolute include " +
                 "mechanism. Please change the include to relative!", base, href);
@@ -1228,7 +1233,19 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-        private MCRXSLTransformer getTransformer(String... stylesheet) {
+        protected MCRXSLTransformer getTransformer(String... stylesheet) {
+            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+            String[] stylesheets = new String[stylesheet.length];
+            for (int i = 0; i < stylesheets.length; i++) {
+                stylesheets[i] = xslFolder + "/" + stylesheet[i] + ".xsl";
+            }
+            return MCRXSLTransformer.getInstance(stylesheets);
+        }
+    }
+
+    private static class MCRXslStyleXEditorResolver extends MCRXslStyleResolver {
+        @Override
+        protected MCRXSLTransformer getTransformer(String... stylesheet) {
             String[] stylesheets = new String[stylesheet.length];
             for (int i = 0; i < stylesheets.length; i++) {
                 stylesheets[i] = "xsl/" + stylesheet[i] + ".xsl";
@@ -1340,10 +1357,12 @@ public final class MCRURIResolver implements URIResolver {
                     .orElseGet(Collections::emptyList);
             }
 
+            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
             for (String include : propValue) {
                 // create a new include element
                 Element includeElement = new Element("include", xslNamespace);
-                includeElement.setAttribute("href", include.contains(":") ? include : "resource:xsl/" + include);
+                includeElement.setAttribute("href",
+                    include.contains(":") ? include : "resource:" + xslFolder + "/" + include);
                 root.addContent(includeElement);
                 LOGGER.debug("Resolved XSL include: {}", include);
             }
@@ -1368,6 +1387,17 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
+            final String baseURI = getParentDirectoryResourceURI(base);
+            // set xslt folder
+            final String xslFolder;
+            if (StringUtils.startsWith(baseURI, "resource:xsl/")) {
+                xslFolder = "xsl";
+            } else if (StringUtils.startsWith(baseURI, "resource:xslt/")) {
+                xslFolder = "xslt";
+            } else {
+                xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+            }
+
             String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
             if (importXSL.isEmpty()) {
                 LOGGER.debug("End of import queue: {}", href);
@@ -1377,7 +1407,8 @@ public final class MCRURIResolver implements URIResolver {
                 return new JDOMSource(root);
             }
             LOGGER.debug("xslImport importing {}", importXSL);
-            return fallback.resolve("resource:xsl/" + importXSL, base);
+
+            return fallback.resolve("resource:" + xslFolder + "/" + importXSL, base);
         }
     }
 

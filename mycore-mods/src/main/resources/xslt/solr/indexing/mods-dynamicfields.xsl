@@ -6,9 +6,9 @@
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mcrmods="http://www.mycore.de/xslt/mods">
   
-  <xsl:import href="xslImport:solr-document-3:solr/indexing/mods-dynamicfields-3.xsl" />
+  <xsl:import href="xslImport:solr-document:solr/indexing/mods-dynamicfields.xsl" />
 
-  <xsl:import href="resource:xsl/functions/mods.xsl" />
+  <xsl:import href="resource:xslt/functions/mods.xsl" />
 
   <xsl:param name="MCR.Solr.DynamicFields" select="'false'" />
   <xsl:param name="MCR.Solr.DynamicFields.excludes" select="''" />

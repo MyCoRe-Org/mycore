@@ -34,7 +34,7 @@
 >
     &html-output;
 
-    <xsl:include href="MyCoReLayout-3.xsl" />
+    <xsl:include href="MyCoReLayout.xsl" />
 
     <xsl:param name="FormTarget" select="concat($ServletsBaseURL,'MCRLoginServlet')" />
 

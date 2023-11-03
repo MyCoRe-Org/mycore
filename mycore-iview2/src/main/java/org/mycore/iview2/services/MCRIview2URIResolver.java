@@ -39,6 +39,10 @@ public class MCRIview2URIResolver implements URIResolver {
                 boolean completelyTiled = MCRIView2Tools.isCompletelyTiled(params[2]);
                 return new JDOMSource(new Element(String.valueOf(completelyTiled)));
             }
+            case "isFileSupported" -> {
+                final boolean supported = MCRIView2Tools.isFileSupported(params[2]);
+                return new JDOMSource(new Element(String.valueOf(supported)));
+            }
             default -> throw new TransformerException("Invalid href: " + href);
         }
     }

@@ -8,7 +8,7 @@
                 exclude-result-prefixes="xsl mcri18n mcracl"
 >
 
-  <xsl:include href="MyCoReLayout-3.xsl"/>
+  <xsl:include href="MyCoReLayout.xsl"/>
 
   <xsl:variable name="PageID" select="'show-user'"/>
 
