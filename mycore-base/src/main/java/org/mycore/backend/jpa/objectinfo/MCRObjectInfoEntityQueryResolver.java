@@ -113,7 +113,8 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
                     cl.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.OBJECT_ID),
                     oe.get(MCRObjectInfoEntity_.ID));
 
-                Predicate categoryToLink = criteriaBuilder.equal(cl.get(MCRCategoryLinkImpl_.CATEGORY),
+                Predicate categoryToLink = criteriaBuilder.equal(
+                    cl.get(MCRCategoryLinkImpl_.CATEGORY).get(MCRCategoryImpl_.INTERNAL_ID),
                     c.get(MCRCategoryImpl_.INTERNAL_ID));
 
                 Predicate between = criteriaBuilder.between(

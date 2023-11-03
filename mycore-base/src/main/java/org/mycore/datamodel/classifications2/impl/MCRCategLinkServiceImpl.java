@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.annotations.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
@@ -346,7 +346,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         setCacheable(q);
         setReadOnly(q);
         q.setParameter("rootID", id.getRootID());
-        q.setParameter("categID", id.getID());
+        q.setParameter("categID", id.getId());
         q.setParameter("objectID", reference.getObjectID());
         q.setParameter("type", reference.getType());
         return !q.getResultList().isEmpty();
@@ -363,7 +363,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             .createQuery(
                 query.select(objectReferencePath)
                     .where(cb.equal(objectReferencePath.get(MCRCategLinkReference_.type), type)))
-            .setHint(QueryHints.READ_ONLY, "true")
+            .setHint(AvailableHints.HINT_READ_ONLY, "true")
             .getResultList();
     }
 

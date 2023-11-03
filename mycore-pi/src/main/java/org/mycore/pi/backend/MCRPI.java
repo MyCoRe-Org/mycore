@@ -72,7 +72,7 @@ import jakarta.persistence.UniqueConstraint;
             + "where u.type = :type "
             + "and u.registered is null"),
     @NamedQuery(name = "Update.PI.Registered.Date",
-        query = "update from MCRPI u "
+        query = "update MCRPI u "
             + "set u.registered = :date "
             + "where u.id = :id")
 })

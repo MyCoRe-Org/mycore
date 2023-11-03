@@ -60,9 +60,9 @@ public class MCRStateCondition extends MCRStringCondition {
             Optional<MCRObject> optMcrObj = idc.get().getObject();
             if (optMcrObj.isPresent()) {
                 MCRCategoryID state = optMcrObj.get().getService().getState();
-                if (getTerm().equals(state.getID())) {
+                if (getTerm().equals(state.getId())) {
                     MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
-                    fact.setValue(state.getID());
+                    fact.setValue(state.getId());
                     facts.add(fact);
                     return Optional.of(fact);
                 }

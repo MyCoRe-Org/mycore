@@ -144,7 +144,7 @@ class MCREventHandler {
             event.addProperty("id", obj.getId().toString());
             event.addProperty("uri", uriResolver.apply(getPathURI("objects/" + obj.getId())).toString());
             Optional.ofNullable(obj.getService().getState())
-                .ifPresent(s -> event.addProperty("state", s.getID()));
+                .ifPresent(s -> event.addProperty("state", s.getId()));
             copyFlagToProperty(obj, event, "createdby", "createdBy");
             copyServiceDateToProperty(obj, event, "createdate", "created");
             copyFlagToProperty(obj, event, "modifiedby", "modifiedBy");

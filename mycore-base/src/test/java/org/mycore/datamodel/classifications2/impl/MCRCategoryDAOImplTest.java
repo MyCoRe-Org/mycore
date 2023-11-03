@@ -713,7 +713,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     private static int countNodes(MCRCategory category) {
-        return (int) MCRStreamUtils.flatten(category, MCRCategory::getChildren, Collection::parallelStream)
+        return (int) MCRStreamUtils.flatten(category, MCRCategory::getChildren, Collection::stream)
             .count();
     }
 

@@ -60,7 +60,7 @@ public class MCRClassificationUtils {
             .filter(categID -> categID.getRootID()
                 .equals(MCRConstants.COLLECTION_CLASS_ID.getRootID()))
             .findFirst()
-            .map(MCRCategoryID::getID)
+            .map(MCRCategoryID::getId)
             .orElse(null);
     }
 

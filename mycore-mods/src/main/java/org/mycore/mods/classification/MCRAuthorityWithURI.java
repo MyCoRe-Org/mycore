@@ -118,7 +118,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
      * Returns the value URI for the given category and authority URI
      */
     protected static String getValueURI(MCRCategory category, String authorityURI) {
-        String defaultURI = authorityURI + "#" + category.getId().getID();
+        String defaultURI = authorityURI + "#" + category.getId().getId();
         return getLabel(category, LABEL_LANG_URI, defaultURI);
     }
 

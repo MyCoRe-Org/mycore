@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
-import org.hibernate.annotations.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryLink;
@@ -55,7 +55,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.NumberPerClassID",
         query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
-            + "  WHERE cattree.internalID = link.category"
+            + "  WHERE cattree.internalID = link.category.internalID"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.id.rootID=:classID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right"
@@ -63,7 +63,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.NumberPerChildOfParentID",
         query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
-            + "  WHERE cattree.internalID = link.category"
+            + "  WHERE cattree.internalID = link.category.internalID"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.parent.internalID=:parentID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right"
@@ -77,7 +77,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.NumberByTypePerClassID",
         query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
-            + "  WHERE cattree.internalID = link.category"
+            + "  WHERE cattree.internalID = link.category.internalID"
             + "    AND link.objectReference.type=:type"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.id.rootID=:classID"
@@ -86,7 +86,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.NumberByTypePerChildOfParentID",
         query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
-            + "  WHERE cattree.internalID = link.category"
+            + "  WHERE cattree.internalID = link.category.internalID"
             + "    AND link.objectReference.type=:type"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.parent.internalID=:parentID"
@@ -97,17 +97,17 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.CategoryAndObjectID",
         query = "SELECT link.objectReference.objectID"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
-            + "  WHERE cattree.internalID = link.category"
+            + "  WHERE cattree.internalID = link.category.internalID"
             + "    AND link.objectReference.objectID=:objectID"
             + "    AND link.objectReference.type=:type"
             + "    AND cattree.id.rootID=:rootID"
             + "    AND cat.id.rootID=:rootID"
             + "    AND cat.id.id=:categID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right",
-        hints = { @QueryHint(name = QueryHints.READ_ONLY, value = "true") }),
+        hints = { @QueryHint(name = AvailableHints.HINT_READ_ONLY, value = "true") }),
     @NamedQuery(name = "MCRCategoryLink.linkedClassifications",
         query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link "
-            + "where node.internalID = link.category"),
+            + "where node.internalID = link.category.internalID"),
     @NamedQuery(name = "MCRCategoryLink.types",
         query = "SELECT DISTINCT(objectReference.type) FROM MCRCategoryLinkImpl"),
     @NamedQuery(name = "MCRCategoryLink.links",

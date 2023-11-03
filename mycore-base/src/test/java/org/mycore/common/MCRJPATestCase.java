@@ -71,11 +71,11 @@ public class MCRJPATestCase extends MCRTestCase {
 
     private static void exportSchema(String action) throws IOException {
         Map<String, Object> schemaProperties = new HashMap<>();
-        schemaProperties.put("javax.persistence.schema-generation.database.action", action);
+        schemaProperties.put("jakarta.persistence.schema-generation.database.action", action);
         try (StringWriter output = new StringWriter()) {
             if (LogManager.getLogger().isDebugEnabled()) {
-                schemaProperties.put("javax.persistence.schema-generation.scripts.action", action);
-                schemaProperties.put("javax.persistence.schema-generation.scripts." + action + "-target", output);
+                schemaProperties.put("jakarta.persistence.schema-generation.scripts.action", action);
+                schemaProperties.put("jakarta.persistence.schema-generation.scripts." + action + "-target", output);
             }
             Persistence.generateSchema(getCurrentComponentName(), schemaProperties);
             LogManager.getLogger().debug(() -> "invoked '" + action + "' sql script:\n" + output);

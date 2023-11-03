@@ -373,7 +373,7 @@ public class MCRClassificationEditorResource {
         JsonObject error = new JsonObject();
         error.addProperty("type", errorType);
         error.addProperty("rootid", mcrCategoryID.getRootID());
-        error.addProperty("categid", mcrCategoryID.getID());
+        error.addProperty("categid", mcrCategoryID.getId());
         return gson.toJson(error);
     }
 

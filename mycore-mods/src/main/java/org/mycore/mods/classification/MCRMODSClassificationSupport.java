@@ -110,7 +110,7 @@ public final class MCRMODSClassificationSupport {
 
         String id;
         try {
-            id = MCRXMLFunctions.encodeURIPath(category.getID());
+            id = MCRXMLFunctions.encodeURIPath(category.getId());
         } catch (URISyntaxException e) {
             /* This should be impossible! */
             throw new MCRException(e);
@@ -133,7 +133,7 @@ public final class MCRMODSClassificationSupport {
 
         String id;
         try {
-            id = MCRXMLFunctions.encodeURIPath(category.getID());
+            id = MCRXMLFunctions.encodeURIPath(category.getId());
         } catch (URISyntaxException e) {
             /* This should be impossible! */
             throw new MCRException(e);

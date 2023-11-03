@@ -30,7 +30,7 @@ public abstract class MCRPIStatePredicateBase extends MCRPIPredicateBase
     @Override
     public final boolean test(MCRBase base) {
         return Optional.ofNullable(base.getService().getState())
-            .map(state -> state.getID().equals(getRequiredState()))
+            .map(state -> state.getId().equals(getRequiredState()))
             .orElse(false);
     }
 

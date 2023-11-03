@@ -48,7 +48,7 @@ public class MCRCategoryIDTest extends MCRTestCase {
         MCRCategoryID categID;
         categID = new MCRCategoryID(validRootID, validCategID);
         assertEquals("RootIDs do not match", validRootID, categID.getRootID());
-        assertEquals("CategIDs do not match", validCategID, categID.getID());
+        assertEquals("CategIDs do not match", validCategID, categID.getId());
     }
 
     @Test

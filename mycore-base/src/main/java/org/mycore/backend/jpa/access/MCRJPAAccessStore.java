@@ -127,7 +127,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.createQuery(
-            "delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '"
+            "delete MCRACCESS " + "where key.acpool = '" + rulemapping.getPool() + "'" + " AND key.objid = '"
                 + rulemapping.getObjId() + "'")
             .executeUpdate();
         MCRAccessManager.invalidAllPermissionCachesById(rulemapping.getObjId());
@@ -188,7 +188,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     public ArrayList<String> getMappedObjectId(String pool) {
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        List<MCRACCESS> l = em.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'", MCRACCESS.class)
+        List<MCRACCESS> l = em.createQuery("from MCRACCESS where key.acpool = '" + pool + "'", MCRACCESS.class)
             .getResultList();
         return l.stream()
             .map(aL -> aL.getKey().getObjid())
@@ -199,7 +199,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     public ArrayList<String> getPoolsForObject(String objid) {
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        List<MCRACCESS> l = em.createQuery("from MCRACCESS where OBJID = '" + objid + "'", MCRACCESS.class)
+        List<MCRACCESS> l = em.createQuery("from MCRACCESS where key.objid = '" + objid + "'", MCRACCESS.class)
             .getResultList();
         return l.stream()
             .map(access -> access.getKey().getAcpool())
