@@ -20,14 +20,40 @@ package org.mycore.frontend.jersey.resources;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.BeforeClass;
+import java.util.Set;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
-public class MCRJerseyResourceTest extends MCRJerseyTest {
+public class MCRJerseyResourceTest {
+
+    private MCRJerseyTestFeature jersey;
+
+    @Before
+    public void setUpJersey() throws Exception {
+        jersey = new MCRJerseyTestFeature();
+        jersey.setUp(Set.of(TestCase.class));
+    }
+
+    @After
+    public void tearDownJersey() throws Exception {
+        jersey.tearDown();
+    }
+
+    @Test
+    public void test() {
+        System.out.println("Running test");
+        final String hello = jersey.target("hello").request().get(String.class);
+        assertEquals("Hello World!", hello);
+
+        final String logout = jersey.target("hello/logout/Peter").request().get(String.class);
+        assertEquals("GoodBye Peter!", logout);
+    }
 
     @Path("hello")
     public static class TestCase {
@@ -42,21 +68,6 @@ public class MCRJerseyResourceTest extends MCRJerseyTest {
         public String logout(@PathParam("id") String id) {
             return "GoodBye " + id + "!";
         }
-    }
-
-    @BeforeClass
-    public static void register() {
-        JERSEY_CLASSES.add(TestCase.class);
-    }
-
-    @Test
-    public void test() {
-        System.out.println("Running test");
-        final String hello = target("hello").request().get(String.class);
-        assertEquals("Hello World!", hello);
-
-        final String logout = target("hello/logout/Peter").request().get(String.class);
-        assertEquals("GoodBye Peter!", logout);
     }
 
 }

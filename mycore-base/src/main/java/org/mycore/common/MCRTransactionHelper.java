@@ -79,13 +79,23 @@ public class MCRTransactionHelper {
     }
 
     /**
-     * forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
+     * Forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
      * returns true.
      */
     public static void rollbackTransaction() {
         if (isTransactionActive()) {
             TRANSACTION.get().forEach(MCRPersistenceTransaction::rollback);
             TRANSACTION.remove();
+        }
+    }
+
+    /**
+     * Mark the current resource transaction so that the only possible outcome of the transaction is for the
+     * transaction to be rolled back.
+     */
+    public static void setRollbackOnly() {
+        if (isTransactionActive()) {
+            TRANSACTION.get().forEach(MCRPersistenceTransaction::setRollbackOnly);
         }
     }
 

@@ -19,25 +19,38 @@
 package org.mycore.frontend.jersey.resources;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
-public class MCRLocaleResourceTest extends MCRJerseyTest {
+public class MCRLocaleResourceTest extends MCRTestCase {
 
-    @BeforeClass
-    public static void register() {
-        JERSEY_CLASSES.add(MCRSessionHookFilter.class);
-        JERSEY_CLASSES.add(MCRLocaleResource.class);
+    private MCRJerseyTestFeature jersey;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        jersey = new MCRJerseyTestFeature();
+        jersey.setUp(Set.of(
+            MCRSessionHookFilter.class,
+            MCRLocaleResource.class));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+        jersey.tearDown();
     }
 
     @Override
@@ -49,15 +62,16 @@ public class MCRLocaleResourceTest extends MCRJerseyTest {
 
     @Test
     public void language() {
-        final String language = target("locale/language").request().acceptLanguage(Locale.ITALY).get(String.class);
+        final String language = jersey.target("locale/language").request().acceptLanguage(Locale.ITALY)
+            .get(String.class);
         assertEquals("it", language);
     }
 
     @Test
     public void languages() {
-        final String languagesString = target("locale/languages").request().get(String.class);
+        final String languagesString = jersey.target("locale/languages").request().get(String.class);
         JsonArray languages = JsonParser.parseString(languagesString).getAsJsonArray();
-        assertTrue(languages.size() == 3);
+        assertEquals(3, languages.size());
     }
 
 }

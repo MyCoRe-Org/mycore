@@ -156,6 +156,9 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Index should be greater than 0.");
+        }
     }
 
     @Override
