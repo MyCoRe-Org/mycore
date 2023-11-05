@@ -279,7 +279,7 @@ public class MCRBasicCommands {
         List<Element> properties = ePersistenceUnit.getChild("properties", nsPersistence)
             .getContent(Filters.element("property", nsPersistence));
         for (Element p : properties) {
-            if ("javax.persistence.jdbc.url".equals(p.getAttributeValue("name"))
+            if ("jakarta.persistence.jdbc.url".equals(p.getAttributeValue("name"))
                 && PERSISTENCE_DEFAULT_H2_URL.equals(p.getAttributeValue("value"))) {
                 File databaseFile = MCRConfigurationDir.getConfigFile("data/h2/mycore");
                 if (databaseFile != null) {
