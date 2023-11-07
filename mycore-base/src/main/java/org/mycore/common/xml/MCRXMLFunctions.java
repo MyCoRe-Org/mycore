@@ -669,7 +669,7 @@ public class MCRXMLFunctions {
             return false;
         }
 
-        if (!(classificationId.length() < 32)) {
+        if (classificationId.length() > 32) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId);
             return false;
         }
