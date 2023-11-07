@@ -368,6 +368,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     private void applyIdentifier(CSLItemDataBuilder idb, Element identifierElement, boolean parent) {
         final String type = identifierElement.getAttributeValue("type");
         final String identifier = identifierElement.getTextNormalize();
+
+        if(type == null){
+            LOGGER.info("Type is null for identifier {}", identifier);
+            return;
+        }
+
         switch (type) {
             case "doi" -> idb.DOI(identifier);
             case "isbn" -> idb.ISBN(identifier);
