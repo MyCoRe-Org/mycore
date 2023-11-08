@@ -79,6 +79,7 @@
 <script setup lang="ts">
 import {
   Component,
+  inject,
   ref,
   getCurrentInstance,
   onErrorCaptured,
@@ -105,12 +106,10 @@ import {
 } from 'bootstrap-vue';
 import * as yup from 'yup';
 import { getI18nKey, generateRandomString } from '@/utils';
+import { objectIdKey, derivateIdKey } from '@/keys';
 
-const props = defineProps({
-  objectId: String,
-  derivateId: String,
-});
-
+const objectId = inject(objectIdKey);
+const derivateId = inject(derivateIdKey);
 const emit = defineEmits(['accessKeyCreated']);
 const { t } = useI18n();
 const tc = (key: string, obj?) => t(getI18nKey(key), obj);
@@ -145,8 +144,8 @@ const handleError = (code) => {
 const instance: Component = getCurrentInstance();
 const onSubmit = handleSubmit(async (values) => {
   const bvModal = instance.ctx._bv__modal as BvModal;
-  const reference = (props.derivateId) ? await addDerivateAccessKey(props.objectId, props.derivateId, values)
-    : await addObjectAccessKey(props.objectId, values);
+  const reference = (derivateId) ? await addDerivateAccessKey(objectId, derivateId, values)
+    : await addObjectAccessKey(objectId, values);
   emit('accessKeyCreated', values.secret, reference);
   bvModal.hide('create-access-key-modal');
 });

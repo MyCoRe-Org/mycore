@@ -22,13 +22,12 @@ import {
   getWebApplicationBaseURL,
   fetchI18n,
 } from '@/utils';
+import { objectIdKey, derivateIdKey } from '@/keys';
 import ContactManager from '@/App.vue';
 
 library.add(faEye, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft);
 
 const webApplicationBaseURL = getWebApplicationBaseURL() as string;
-const objectId = getObjectId();
-const derivateId = getDerivateId();
 
 (async () => {
   const data = await fetchI18n(webApplicationBaseURL);
@@ -39,9 +38,11 @@ const derivateId = getDerivateId();
     },
     warnHtmlInMessage: 'off',
   });
-  const app = createApp(ContactManager, { objectId, derivateId });
+  const app = createApp(ContactManager);
   app.use(createPinia());
   const configStore = useConfigStore();
+  app.provide(objectIdKey, getObjectId());
+  app.provide(derivateIdKey, getDerivateId());
   configStore.webApplicationBaseURL = webApplicationBaseURL;
   app.use(i18n);
   app.use(ModalPlugin);

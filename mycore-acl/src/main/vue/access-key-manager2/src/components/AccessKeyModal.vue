@@ -76,7 +76,12 @@
   </b-modal>
 </template>
 <script setup lang="ts">
-import { ref, onErrorCaptured, nextTick } from 'vue';
+import {
+  inject,
+  ref,
+  onErrorCaptured,
+  nextTick,
+} from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
 import {
@@ -96,10 +101,11 @@ import {
 } from 'bootstrap-vue';
 import { updateDerivateAccessKey, updateObjectAccessKey } from '@/api/service';
 import { getI18nKey } from '@/utils';
+import { objectIdKey, derivateIdKey } from '@/keys';
 
+const objectId = inject(objectIdKey);
+const derivateId = inject(derivateIdKey);
 const props = defineProps({
-  objectId: String,
-  derivateId: String,
   accessKey: Object,
 });
 const emit = defineEmits(['accessKeyUpdated']);
@@ -151,8 +157,8 @@ const updateAccessKey = handleSubmit(async (values) => {
   if (values.expiration) {
     result.expiration = new Date(values.expiration).valueOf();
   }
-  if (!props.derivateId) await updateObjectAccessKey(props.objectId, result);
-  else await updateDerivateAccessKey(props.objectId, props.derivateId, result);
+  if (!derivateId) await updateObjectAccessKey(objectId, result);
+  else await updateDerivateAccessKey(objectId, derivateId, result);
   handleInfo('update');
   emit('accessKeyUpdated', result);
 });

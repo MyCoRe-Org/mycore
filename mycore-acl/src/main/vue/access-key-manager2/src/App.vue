@@ -38,16 +38,15 @@
         </div>
       </div>
     </template>
-    <create-access-key-modal :objectId="props.objectId" :derivateId="props.derivateId"
-      @accessKeyCreated="handleAccessKeyCreated" />
-    <access-key-modal :objectId="props.objectId" :derivateId="props.derivateId"
-      :accessKey="viewAccessKey" @accessKeyUpdated="handleAccessKeyUpdated" />
+    <create-access-key-modal @accessKeyCreated="handleAccessKeyCreated" />
+    <access-key-modal :accessKey="viewAccessKey" @accessKeyUpdated="handleAccessKeyUpdated" />
   </div>
 </template>
 <script setup lang="ts">
 import {
   Component,
   h,
+  inject,
   ref,
   onMounted,
   getCurrentInstance,
@@ -73,16 +72,15 @@ import {
   removeDerivateAccessKey,
   removeObjectAccessKey,
 } from '@/api/service';
+import { objectIdKey, derivateIdKey } from '@/keys';
 import AccessKeyTable from '@/components/VRTable.vue';
 import LoadingOverlay from '@/components/LoadingOverlay.vue';
 import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
 import AccessKeyModal from '@/components/AccessKeyModal.vue';
 
 const emit = defineEmits(['bv::show::modal']);
-const props = defineProps({
-  objectId: String,
-  derivateId: String,
-});
+const objectId = inject(objectIdKey);
+const derivateId = inject(derivateIdKey);
 const instance: Component = getCurrentInstance();
 const { t } = useI18n();
 const tc = (key: string, obj?) => t(getI18nKey(key), obj);
@@ -148,9 +146,9 @@ const handleError = (code) => {
 const fetch = async (): Promise<void> => {
   const offset = (currentPage.value - 1) * perPage;
   try {
-    const accessKeyInformation: AccessKeyInformation = (!props.derivateId)
-      ? await fetchObjectAccessKeys(props.objectId, offset, perPage)
-      : await fetchDerivateAccessKeys(props.objectId, props.derivateId, offset, perPage);
+    const accessKeyInformation: AccessKeyInformation = (!derivateId)
+      ? await fetchObjectAccessKeys(objectId, offset, perPage)
+      : await fetchDerivateAccessKeys(objectId, derivateId, offset, perPage);
     accessKeys.value = accessKeyInformation.items;
     totalCount.value = accessKeyInformation.totalResults;
   } catch (err) {
@@ -164,16 +162,16 @@ const handlePageChange = async (page): Promise<void> => {
   loading.value = false;
 };
 const handleAccessKeyUpdated = async (accessKey: AccessKey): Promise<void> => {
-  const result = (!props.derivateId) ? await fetchObjectAccessKey(props.objectId, accessKey.secret)
-    : await fetchDerivateAccessKey(props.objectId, props.derivateId, accessKey);
+  const result = (!derivateId) ? await fetchObjectAccessKey(objectId, accessKey.secret)
+    : await fetchDerivateAccessKey(objectId, derivateId, accessKey);
   const index = accessKeys.value.findIndex((k) => k.secret === accessKey.secret);
   accessKeys.value[index] = result;
 };
 const handleAccessKeyCreated = async (secret: string, reference: string): Promise<void> => {
   const offset = (currentPage.value - 1) * perPage;
   if ((totalCount.value % perPage === 0) || ((totalCount.value - perPage) < offset)) {
-    const result = (!props.derivateId) ? await fetchObjectAccessKey(props.objectId, reference)
-      : await fetchDerivateAccessKey(props.objectId, props.derivateId, reference);
+    const result = (!derivateId) ? await fetchObjectAccessKey(objectId, reference)
+      : await fetchDerivateAccessKey(objectId, derivateId, reference);
     if (totalCount.value % perPage === 0) {
       accessKeys.value = [result];
       currentPage.value = (totalCount.value / perPage) + 1;
@@ -186,7 +184,7 @@ const handleAccessKeyCreated = async (secret: string, reference: string): Promis
     await fetch();
   }
   const url = configStore.webApplicationBaseURL + tc('success.add.url.format2', {
-    objectId: props.objectId,
+    objectId,
     secret: encodeURIComponent(secret),
   });
   const messageVNode = h('div', [
@@ -221,8 +219,8 @@ const handleRemoveAccessKey = async (accessKey: AccessKey): Promise<void> => {
   });
   if (value) {
     try {
-      if (!props.derivateId) await removeObjectAccessKey(props.objectId, accessKey.secret);
-      else await removeDerivateAccessKey(props.objectId, props.derivateId, accessKey.secret);
+      if (!derivateId) await removeObjectAccessKey(objectId, accessKey.secret);
+      else await removeDerivateAccessKey(objectId, derivateId, accessKey.secret);
       bvModal.msgBoxOk(tc('success.remove'), {
         title: tc('title.remove'),
       });
@@ -242,11 +240,11 @@ const handleRemoveAccessKey = async (accessKey: AccessKey): Promise<void> => {
   }
 };
 onMounted(async () => {
-  if (props.objectId) {
+  if (objectId) {
     try {
       await configStore.fetchConfig();
       if (process.env.NODE_ENV === 'production') {
-        await authStore.login(props.objectId, props.derivateId);
+        await authStore.login(objectId, derivateId);
       }
       await fetch();
     } catch (err) {
