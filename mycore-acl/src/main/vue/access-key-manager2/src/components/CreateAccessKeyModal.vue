@@ -83,9 +83,9 @@ import {
   getCurrentInstance,
   onErrorCaptured,
 } from 'vue';
-import { useApplicationStore } from '@/stores';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
+import { addDerivateAccessKey, addObjectAccessKey } from '@/api/service';
 import {
   BButton,
   BCol,
@@ -106,10 +106,14 @@ import {
 import * as yup from 'yup';
 import { getI18nKey, generateRandomString } from '@/utils';
 
+const props = defineProps({
+  objectId: String,
+  derivateId: String,
+});
+
 const emit = defineEmits(['accessKeyCreated']);
 const { t } = useI18n();
 const tc = (key: string, obj?) => t(getI18nKey(key), obj);
-const store = useApplicationStore();
 const errorCode = ref();
 const {
   errors,
@@ -141,9 +145,10 @@ const handleError = (code) => {
 const instance: Component = getCurrentInstance();
 const onSubmit = handleSubmit(async (values) => {
   const bvModal = instance.ctx._bv__modal as BvModal;
-  const reference = await store.createAccessKey(values);
-  bvModal.hide('create-access-key-modal');
+  const reference = (props.derivateId) ? await addDerivateAccessKey(props.objectId, props.derivateId, values)
+    : await addObjectAccessKey(props.objectId, values);
   emit('accessKeyCreated', values.secret, reference);
+  bvModal.hide('create-access-key-modal');
 });
 onErrorCaptured((err) => {
   handleError(err.message);

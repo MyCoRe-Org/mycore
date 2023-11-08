@@ -4,7 +4,7 @@ import { ModalPlugin, PaginationPlugin } from 'bootstrap-vue';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { useConfigStore, useApplicationStore } from '@/stores';
+import { useConfigStore } from '@/stores';
 import {
   faEye,
   faTimes,
@@ -37,14 +37,12 @@ const derivateId = getDerivateId();
     messages: {
       _: data,
     },
+    warnHtmlInMessage: 'off',
   });
-  const app = createApp(ContactManager);
+  const app = createApp(ContactManager, { objectId, derivateId });
   app.use(createPinia());
   const configStore = useConfigStore();
   configStore.webApplicationBaseURL = webApplicationBaseURL;
-  const applicationStore = useApplicationStore();
-  applicationStore.objectId = objectId;
-  applicationStore.derivateId = derivateId;
   app.use(i18n);
   app.use(ModalPlugin);
   app.use(PaginationPlugin);

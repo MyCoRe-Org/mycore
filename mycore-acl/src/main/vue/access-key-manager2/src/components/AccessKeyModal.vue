@@ -21,7 +21,7 @@
                 <b-link id="popover-type">
                   <font-awesome-icon icon="info-circle" class="text-secondary" />
                 </b-link>
-                <b-popover target="popover-type" :title="$t(getI18nKey('title.popover'))" triggers="hover">
+                <b-popover target="popover-type" :title="tc('title.popover')" triggers="hover">
                   <span v-html="tc('popover.type')" />
                 </b-popover>
               </template>
@@ -61,7 +61,7 @@
           {{ tc('label.created') }}:
         </b-col>
         <b-col>
-          {{ accessKey.createdBy }} ({{ new Date(accessKey.created).toLocaleString() }})
+          {{ props.accessKey.createdBy }} ({{ new Date(props.accessKey.created).toLocaleString() }})
         </b-col>
       </b-row>
       <b-row>
@@ -69,15 +69,14 @@
           {{ tc('label.lastModified') }}:
         </b-col>
         <b-col>
-          {{ accessKey.lastModifiedBy }} ({{ new Date(accessKey.lastModified).toLocaleString() }})
+          {{ props.accessKey.lastModifiedBy }} ({{ new Date(props.accessKey.lastModified).toLocaleString() }})
         </b-col>
       </b-row>
     </div>
   </b-modal>
 </template>
 <script setup lang="ts">
-import { computed, ref, onErrorCaptured } from 'vue';
-import { useApplicationStore } from '@/stores';
+import { ref, onErrorCaptured, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
 import {
@@ -95,17 +94,24 @@ import {
   BPopover,
   BRow,
 } from 'bootstrap-vue';
-import { getI18nKey, AccessKey } from '@/utils';
+import { updateDerivateAccessKey, updateObjectAccessKey } from '@/api/service';
+import { getI18nKey } from '@/utils';
 
+const props = defineProps({
+  objectId: String,
+  derivateId: String,
+  accessKey: Object,
+});
+const emit = defineEmits(['accessKeyUpdated']);
 const { t } = useI18n();
 const tc = (key: string, obj?) => t(getI18nKey(key), obj);
-const store = useApplicationStore();
 const options = [
   { value: 'read', text: tc('label.type.read') },
   { value: 'writedb', text: tc('label.type.writedb') },
 ];
 const errorCode = ref();
 const infoCode = ref();
+const title = ref();
 const {
   meta,
   setFieldValue,
@@ -113,21 +119,19 @@ const {
   resetForm,
   defineInputBinds,
 } = useForm();
-
-const accessKey: AccessKey = computed(() => store.modalData);
-const title = ref();
-const show = () => {
-  const expiration = accessKey.value.expiration ? new Date(accessKey.value.expiration) : null;
-  title.value = accessKey.value.secret;
+const show = async () => {
+  await nextTick();
+  title.value = props.accessKey.secret;
+  const expiration = props.accessKey.expiration ? new Date(props.accessKey.expiration) : null;
   errorCode.value = null;
   infoCode.value = null;
   resetForm(
     {
       values: {
-        secret: accessKey.value.secret,
-        type: accessKey.value.type,
-        isActive: accessKey.value.isActive,
-        comment: accessKey.value.comment,
+        secret: props.accessKey.secret,
+        type: props.accessKey.type,
+        isActive: props.accessKey.isActive,
+        comment: props.accessKey.comment,
         expiration,
       },
     },
@@ -147,9 +151,10 @@ const updateAccessKey = handleSubmit(async (values) => {
   if (values.expiration) {
     result.expiration = new Date(values.expiration).valueOf();
   }
-  await store.updateAccessKey(result);
-  show();
+  if (!props.derivateId) await updateObjectAccessKey(props.objectId, result);
+  else await updateDerivateAccessKey(props.objectId, props.derivateId, result);
   handleInfo('update');
+  emit('accessKeyUpdated', result);
 });
 onErrorCaptured((err) => {
   handleError(err.message);
