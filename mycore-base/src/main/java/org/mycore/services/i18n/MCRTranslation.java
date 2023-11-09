@@ -245,7 +245,7 @@ public class MCRTranslation {
      * @param arguments Objects that are inserted instead of placeholders in the property values
      * @return translated String
      */
-    public static String translate(String label, Locale locale, Object... arguments) {
+    public static String translateToLocale(String label, Locale locale, Object... arguments) {
         String msgFormat = translate(label, locale);
         MessageFormat formatter = new MessageFormat(msgFormat, locale);
         String result = formatter.format(arguments);
@@ -281,7 +281,7 @@ public class MCRTranslation {
      * @return translated String
      * @see #translate(String, Object[])
      */
-    public static String translate(String label, String argument, Locale locale) {
+    public static String translateToLocale(String label, String argument, Locale locale) {
         return translate(label, locale, (Object[]) getStringArray(argument));
     }
 
