@@ -298,8 +298,8 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-        syntax = "resolve binary resource {0} with encoder {1}",
-        help = "Resolve binary resource {0} with encoder {1}",
+        syntax = "resolve binary web resource {0} with encoder {1}",
+        help = "Resolve binary web resource {0} with encoder {1}",
         order = 101)
     public static void resolveBinaryWebResource(String path, String encoder) {
         resolveBinaryResource(MCRResourcePath.ofWebPath(path), encoder);
@@ -347,8 +347,8 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-        syntax = "resolve binary resource {0}",
-        help = "Resolve binary resource {0}",
+        syntax = "resolve binary web resource {0}",
+        help = "Resolve binary web resource {0}",
         order = 106)
     public static void resolveBinaryWebResource(String path) {
         resolveBinaryWebResource(path, Encoder.BASE_64.name());
