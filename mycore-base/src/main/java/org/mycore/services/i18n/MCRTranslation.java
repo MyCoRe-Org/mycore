@@ -138,6 +138,18 @@ public class MCRTranslation {
     }
 
     /**
+     * Provides translation for the given label (property key) and locale.
+     *
+     * @param label property key
+     * @param locale
+     *            target locale of translation
+     * @return translated String
+     */
+    public static String translateToLocale(String label, String locale) {
+        return translate(label, getLocale(locale), MESSAGES_BUNDLE);
+    }
+
+    /**
      * provides translation for the given label (property key).
      * 
      * @param label property key
