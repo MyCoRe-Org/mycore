@@ -297,7 +297,7 @@ public class MCRTranslation {
      * @return translated String
      * @see #translate(String, Object[])
      */
-    public static String translate(String label, String argument, String locale) {
+    public static String translateToLocale(String label, String argument, String locale) {
         return translate(label, argument, MCRTranslation.getLocale(locale));
     }
 
