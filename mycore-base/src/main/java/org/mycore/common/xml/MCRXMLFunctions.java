@@ -863,6 +863,8 @@ public class MCRXMLFunctions {
 
     /**
      * Returns the x-mapping for the given mapping prefix.
+     * <br/>
+     * Example: <code>getXMapping("mir_genres", "article", "schemaOrg")</code> will return <code>ScholarlyArticle</code>
      *
      * @param classificationId
      * @param categoryId

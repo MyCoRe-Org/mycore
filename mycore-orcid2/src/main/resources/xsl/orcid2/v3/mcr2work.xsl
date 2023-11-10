@@ -3,15 +3,33 @@
 <!-- Transforms MyCoRe object with MODS to ORCID works XML schema -->
 
 <xsl:stylesheet version="3.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:work="http://www.orcid.org/ns/work"
-  exclude-result-prefixes="xsl mods">
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:mods="http://www.loc.gov/mods/v3"
+                xmlns:work="http://www.orcid.org/ns/work"
+                xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                exclude-result-prefixes="xsl mods fn">
 
-  <xsl:import href="resource:xsl/orcid2/v3/mcr2work_generic.xsl" />
+  <xsl:import href="resource:xsl/orcid2/v3/mcr2work_generic.xsl"/>
+
+  <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification"/>
+  <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix"/>
+  <xsl:param name="MCR.ORCID2.Genre.Mapping.Default.Genre"/>
 
   <xsl:template name="workType">
-    <work:type>journal-article</work:type> <!-- TODO -->
+    <xsl:choose>
+      <xsl:when test="$MCR.ORCID2.Genre.Mapping.Classification">
+        <work:type>
+          <xsl:call-template name="mapGenre">
+            <xsl:with-param name="mods.genre" select="//modsContainer/mods:mods/mods:genre[@type= 'intern'][1]"/>
+          </xsl:call-template>
+        </work:type>
+      </xsl:when>
+      <xsl:otherwise>
+        <work:type>
+          <xsl:value-of select="$MCR.ORCID2.Genre.Mapping.Default.Genre"/>
+        </work:type>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="journal-title">
@@ -32,4 +50,17 @@
 
   <xsl:template name="workCitation"/>
 
+  <xsl:template name="mapGenre">
+    <xsl:param name="mods.genre"/>
+    <xsl:variable name="orcid.genre"
+                  select="fn:document(fn:concat('callJava:org.mycore.common.xml.MCRXMLFunctions:getXMapping:', $MCR.ORCID2.Genre.Mapping.Classification, ':', $mods.genre,':', $MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix))"/>
+    <xsl:choose>
+      <xsl:when test="fn:string-length($orcid.genre) &gt; 0">
+        <xsl:value-of select="$orcid.genre"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$MCR.ORCID2.Genre.Mapping.Default.Genre"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
