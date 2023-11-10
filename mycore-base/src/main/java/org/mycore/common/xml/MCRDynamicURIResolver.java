@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Objects;
 
 import javax.xml.transform.URIResolver;
 
@@ -94,10 +95,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
     }
 
     public Element resolveElement(String uri) {
-        if (xmlFile == null) {
-            throw new NullPointerException("No xml file set in '" + this.getClass().getName() + "'!");
-        }
-
+        Objects.requireNonNull(xmlFile, "No xml file set in '" + this.getClass().getName() + "'!");
         Element rootElement = getRootElement();
         Hashtable<String, String> variablesMap = createVariablesMap(uri);
         resolveVariablesFromElement(rootElement, variablesMap);

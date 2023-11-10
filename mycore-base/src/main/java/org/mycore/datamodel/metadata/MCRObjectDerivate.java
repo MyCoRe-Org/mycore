@@ -245,9 +245,8 @@ public class MCRObjectDerivate {
     }
 
     private MCRFileMetadata getOrCreateFileMetadata(String path, String urn, String handle) {
-        if (path == null) {
-            throw new NullPointerException("path may not be null");
-        }
+        Objects.requireNonNull(path, "path may not be null");
+
         int fileCount = files.size();
         for (int i = 0; i < fileCount; i++) {
             MCRFileMetadata fileMetadata = files.get(i);

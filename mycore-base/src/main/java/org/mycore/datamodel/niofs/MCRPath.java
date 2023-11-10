@@ -85,9 +85,7 @@ public abstract class MCRPath implements Path {
     }
 
     public static MCRPath toMCRPath(final Path other) {
-        if (other == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(other);
         if (!(other instanceof MCRPath)) {
             throw new ProviderMismatchException("other is not an instance of MCRPath: " + other.getClass());
         }
