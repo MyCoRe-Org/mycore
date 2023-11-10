@@ -33,6 +33,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -858,6 +859,42 @@ public class MCRXMLFunctions {
             res.insert(m.start(), stripHtml(m.group(m.groupCount() - 1)));
         }
         return StringEscapeUtils.unescapeHtml4(res.toString()).replaceAll(TAG_SELF_CLOSING, "");
+    }
+
+    /**
+     * Returns the x-mapping for the given mapping prefix.
+     *
+     * @param classificationId
+     * @param categoryId
+     * @param mappingPrefix
+     *
+     * @return the mapping or an empty string when there is no such mapping for the given parameters
+     * */
+    public static String getXMapping(String classificationId, String categoryId, String mappingPrefix) {
+        MCRCategory category = null;
+        try {
+            MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            category = dao.getCategory(categID, 0);
+            Optional<MCRLabel> label = category.getLabel("x-mapping");
+            if (label.isEmpty()) {
+                return "";
+            }
+            MCRLabel xmapping = label.get();
+            if (!xmapping.getText().contains(mappingPrefix)) {
+                return "";
+            }
+
+            Optional<String> result = Arrays.stream(xmapping.getText().split(" "))
+                .filter(mapping -> mapping.startsWith(mappingPrefix))
+                .findFirst();
+
+            return result.isPresent() ? result.get().split(":")[1] : null;
+        } catch (Throwable e) {
+            LOGGER.error("Could not load {}:{}", classificationId, categoryId, e);
+        }
+
+        return "";
     }
 
     /**
