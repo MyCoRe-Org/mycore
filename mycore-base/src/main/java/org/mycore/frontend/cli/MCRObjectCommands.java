@@ -51,6 +51,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -125,7 +126,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
 
     /** Default transformer script */
-    public static final String DEFAULT_STYLE = "save-object.xsl";
+    public static final String DEFAULT_STYLE
+        = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder")
+            + "/save-object.xsl";
 
     /** Static compiled transformer stylesheets */
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
@@ -579,7 +582,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND,
         help = "Stores the object with the MCRObjectID {0} to the directory {1}" +
-            " with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
+            " with the stylesheet {2}. "
+            + "The default for {2} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-object.xsl'.",
         order = 110)
     public static void exportWithStylesheet(String id, String dirname, String style) {
         exportWithStylesheet(id, id, dirname, style);
@@ -622,10 +626,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "export objects from {0} to {1} to directory {2} with stylesheet {3}",
         help = "Stores all objects with MCRObjectID's between {0} and {1} to the directory {2} "
-            + "with the stylesheet {3}-object.xsl. For {3}, the default is xsl/save.",
+            + "with the stylesheet {3}. "
+            + "The default for {3} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-object.xsl'.",
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
-        Transformer transformer = getTransformer(style != null ? style + "-object" : null);
+        Transformer transformer
+            = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(transformer, "xml");
         exportWith(fromID, toID, dirname, extension, (content, out) -> {
             StreamResult sr = new StreamResult(out);
@@ -727,8 +733,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export all objects of type {0} to directory {1} with stylesheet {2}",
-        help = "Stores all objects of type {0} to directory {1} " +
-            "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
+        help = "Stores all objects of type {0} to directory {1} with the stylesheet {2} ."
+            + "The default for {2} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-object.xsl'.",
         order = 120)
     public static List<String> exportAllObjectsOfTypeWithStylesheet(String type, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
@@ -749,8 +755,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export all objects of base {0} to directory {1} with stylesheet {2}",
-        help = "Stores all objects of base {0} to directory {1} " +
-            "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
+        help = "Stores all objects of base {0} to directory {1} with the stylesheet {2} ."
+            + "The default for {2} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-object.xsl'.",
         order = 130)
     public static List<String> exportAllObjectsOfBaseWithStylesheet(String base, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
@@ -769,18 +775,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             cmds.add(command);
         }
         return cmds;
-    }
-
-    /**
-     * This method searches for the stylesheet <em>style</em>.xsl and builds the transformer. Default is
-     * <em>save-object.xsl</em> if no stylesheet is given or the stylesheet couldn't be resolved.
-     *
-     * @param style
-     *            the name of the style to be used when resolving the stylesheet
-     * @return the transformer
-     */
-    private static Transformer getTransformer(String style) {
-        return MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
     }
 
     /**
@@ -1247,21 +1241,21 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the name of a stylesheet that the object should be transformed with before validation
      */
     @MCRCommand(
-        syntax = "validate object schema for ID {0} after transformer {1}",
+        syntax = "validate object schema for ID {0} after transformation with stylesheet {1}",
         help = "Checks if object {0} validates against its specified schema, "
-            + "after being transformed through {1}.xsl.",
+            + "after being transformed through stylesheet {1}",
         order = 403)
-    public static void validateObjectWithTransformer(String objectID, String transformerType) {
+    public static void validateObjectWithTransformer(String objectID, String style) {
         if (objectID == null || objectID.length() == 0) {
             throw new MCRException("ID of an object required to check its schema validity.");
         }
         LOGGER.info("validate object schema for ID " + objectID);
         Transformer trafo = null;
-        if (transformerType != null) {
+        if (style != null) {
             // getTransformer with non-existent input successfully returns a working transformer
             // that "successfully transforms", an error would be preferable 
-            trafo = getTransformer(transformerType);
-            LOGGER.debug("Transformer {} has been loaded.", transformerType);
+            trafo = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
+            LOGGER.debug("Transformer for stylesheet {} has been loaded.", style);
         }
         MCRObjectID objID = MCRObjectID.getInstance(objectID);
         try {

@@ -41,6 +41,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -54,6 +55,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
@@ -97,7 +99,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();
 
     /** Default transformer script */
-    public static final String DEFAULT_STYLE = "save-derivate.xsl";
+    public static final String DEFAULT_STYLE
+        = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder")
+            + "/save-derivate.xsl";
 
     /** Static compiled transformer stylesheets */
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
@@ -373,8 +377,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export derivate {0} to directory {1} with stylesheet {2}",
-        help = "Stores the derivate with the MCRObjectID {0} to the directory {1}" +
-            " with the stylesheet {2}-derivate.xsl. For {2}, the default is xsl/save.",
+        help = "Stores the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}. "
+            + "The default for {2} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-derivate.xsl'.",
         order = 90)
     public static void exportWithStylesheet(String id, String dirname, String style) {
         exportWithStylesheet(id, id, dirname, style);
@@ -396,8 +400,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the name of the stylesheet, prefix of <em>style</em>-derivate.xsl
      */
     @MCRCommand(syntax = "export derivates from {0} to {1} to directory {2} with stylesheet {3}",
-        help = "Stores all derivates with MCRObjectID's between {0} and {1} to the directory {2}"
-            + " with the stylesheet {3}-derivate.xsl. For {3}, the default is xsl/save.",
+        help = "Stores all derivates with MCRObjectID's between {0} and {1} to the directory {2} "
+            + "with the stylesheet {3}. "
+            + "The default for {3} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-derivate.xsl'.",
         order = 80)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
 
@@ -426,7 +431,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
 
-        Transformer trans = getTransformer(style != null ? style + "-derivate" : null);
+        Transformer trans
+            = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         int k = 0;
@@ -454,8 +460,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @return a list of export commands, one for each derivate
      */
     @MCRCommand(syntax = "export all derivates to directory {0} with stylesheet {1}",
-        help = "Stores all derivates to the directory {0} with the stylesheet {1}-derivate.xsl."
-            + " For {1}, the default is xsl/save.",
+        help = "Stores all derivates to the directory {0} with the stylesheet {1}. "
+            + "The default for {1} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-derivate.xsl'.",
         order = 100)
     public static List<String> exportAllDerivatesWithStylesheet(String dirname, String style) {
         return MCRCommandUtils.getIdsForType("derivate")
@@ -474,8 +480,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @return a list of export commands, one for each derivate
      */
     @MCRCommand(syntax = "export all derivates of project {0} to directory {1} with stylesheet {2}",
-        help = "Stores all derivates of project {0} to the directory {1} with the stylesheet {2}-derivate.xsl."
-            + " For {2}, the default is xsl/save.",
+        help = "Stores all derivates of project {0} to the directory {1} with the stylesheet {2}. "
+            + "The default for {2} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-derivate.xsl'.",
         order = 110)
     public static List<String> exportAllDerivatesOfProjectWithStylesheet(String project, String dirname, String style) {
         return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
@@ -537,18 +543,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         Files.walkFileTree(rootPath, new MCRTreeCopier(rootPath, dir.toPath()));
 
         LOGGER.info("Derivate {} saved under {} and {}.", nid, dir, xmlOutput);
-    }
-
-    /**
-     * This method searches for the stylesheet <em>style</em>.xsl and builds the transformer. Default is
-     * <em>save-derivate.xsl</em> if no stylesheet is given or the stylesheet couldn't be resolved.
-     *
-     * @param style
-     *            the name of the style to be used when resolving the stylesheet
-     * @return the transformer
-     */
-    private static Transformer getTransformer(String style) {
-        return MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
     }
 
     /**

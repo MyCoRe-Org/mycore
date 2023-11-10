@@ -33,7 +33,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -173,38 +172,25 @@ public class MCRCommandUtils {
      *            The transformer cache to be used.
      * @return the transformer
      */
-    public static Transformer getTransformer(String style, String defaultStyle, Map<String, Transformer> cache) {
-        String xslFilePath = defaultStyle;
-        if (style != null && style.trim().length() != 0) {
-            xslFilePath = style.trim() + ".xsl";
-        }
-        Transformer transformer = cache.get(style);
-        if (transformer != null) {
-            return transformer;
+    public static Transformer getTransformer(String style, Map<String, Transformer> cache) {
+        if (cache.containsKey(style)) {
+            return cache.get(style);
         }
 
-        Element element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
-        if (element == null) {
-            LOGGER.warn("Couldn't find resource {} for style {}, using default.", xslFilePath, style);
-            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
-            xslFilePath = xslFolder + "/" + defaultStyle;
-            element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
-        }
-
+        Element element = MCRURIResolver.instance().resolve("resource:" + style);
         try {
             if (element != null) {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 transformerFactory.setURIResolver(MCRURIResolver.instance());
-                transformer = transformerFactory.newTransformer(new JDOMSource(element));
+                Transformer transformer = transformerFactory.newTransformer(new JDOMSource(element));
                 cache.put(style, transformer);
-                LOGGER.info("Loaded transformer from resource {} for style {}.", xslFilePath, style);
+                LOGGER.info("Loaded transformer from resource {}.", style);
                 return transformer;
             } else {
-                LOGGER.warn("Couldn't load transformer from resource {} for style {}.", xslFilePath, style);
+                LOGGER.warn("Couldn't load transformer from resource {}.", style);
             }
         } catch (Exception e) {
-            LOGGER.warn("Error while loading transformer from resource " + xslFilePath
-                + " for style " + style + ".", e);
+            LOGGER.warn("Error while loading transformer from resource " + style + ".", e);
         }
         return null;
     }

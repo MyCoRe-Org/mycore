@@ -37,6 +37,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -47,6 +48,7 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -78,7 +80,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /** Default transformer script */
-    public static final String DEFAULT_STYLE = "save-classification.xsl";
+    public static final String DEFAULT_STYLE
+        = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder")
+            + "/save-classification.xsl";
 
     /** Static compiled transformer stylesheets */
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
@@ -261,8 +265,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *            the name of the stylesheet, prefix of <em>style</em>-classification.xsl
      */
     @MCRCommand(syntax = "export classification {0} to directory {1} with stylesheet {2}",
-        help = "Stores the classification with MCRObjectID {0} as xml file to directory {1} "
-            + "with the stylesheet {2}-classification.xsl. For {2}, the default is xsl/save.",
+        help = "Stores the classification with MCRObjectID {0} as xml file to directory {1} with the stylesheet {2}. "
+            + "The default for {2} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-classification.xsl'.",
         order = 60)
     public static void export(String id, String dirname, String style) throws Exception {
 
@@ -275,7 +279,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(id), -1);
         Document classDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
 
-        Transformer trans = getTransformer(style != null ? style + "-classification" : null);
+        Transformer trans
+            = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         File xmlOutput = new File(dir, id + "." + extension);
@@ -292,18 +297,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     /**
-     * This method searches for the stylesheet <em>style</em>.xsl and builds the transformer. Default is
-     * <em>save-classification.xsl</em> if no stylesheet is given or the stylesheet couldn't be resolved.
-     *
-     * @param style
-     *            the name of the style to be used when resolving the stylesheet
-     * @return the transformer
-     */
-    private static Transformer getTransformer(String style) {
-        return MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
-    }
-
-    /**
      * Save all MCRClassifications.
      *
      * @param dirname
@@ -313,8 +306,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @return a list of export commands, one for each classification
      */
     @MCRCommand(syntax = "export all classifications to directory {0} with stylesheet {1}",
-        help = "The command store all classifications to the directory with name {0} with the stylesheet "
-            + "{1}-classification.xsl. For {1}, the default is xsl/save.",
+        help = "The command store all classifications to the directory with name {0} with the stylesheet {1}. "
+            + "The default for {1} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-classification.xsl'.",
         order = 70)
     public static List<String> exportAll(String dirname, String style) throws Exception {
         return DAO.getRootCategoryIDs().stream()
