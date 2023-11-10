@@ -55,7 +55,7 @@ public class MCRJWTResource {
     @MCRStaticContent
     @MCRCacheControl(noTransform = true,
         noStore = true,
-        private_ = @MCRCacheControl.FieldArgument(active = true),
+        codeIsPrivate = @MCRCacheControl.FieldArgument(active = true),
         noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response getTokenFromSession() throws IOException {
         if (!Optional.ofNullable(request.getSession(false))

@@ -89,7 +89,7 @@ public class MCRRestAPIAuthentication {
     @Path("/login")
     @MCRCacheControl(noTransform = true,
         noStore = true,
-        private_ = @MCRCacheControl.FieldArgument(active = true),
+        codeIsPrivate = @MCRCacheControl.FieldArgument(active = true),
         noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response authorize(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
         if (authorization.startsWith("Basic ")) {
@@ -121,7 +121,7 @@ public class MCRRestAPIAuthentication {
     @MCRRestrictedAccess(MCRRequireLogin.class)
     @MCRCacheControl(noTransform = true,
         noStore = true,
-        private_ = @MCRCacheControl.FieldArgument(active = true),
+        codeIsPrivate = @MCRCacheControl.FieldArgument(active = true),
         noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response renew(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
         if (authorization.startsWith("Bearer ")) {
