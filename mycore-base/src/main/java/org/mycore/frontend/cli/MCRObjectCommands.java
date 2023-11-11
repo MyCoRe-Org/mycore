@@ -1237,7 +1237,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *
      * @param objectID
      *            the ID of an object to check
-     * @param transformerType
+     * @param style
      *            the name of a stylesheet that the object should be transformed with before validation
      */
     @MCRCommand(

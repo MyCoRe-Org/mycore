@@ -21,6 +21,7 @@ package org.mycore.frontend.cli;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -165,9 +166,6 @@ public class MCRCommandUtils {
      *
      * @param style
      *            the name of the style to be used when resolving the stylesheet.
-     * @param defaultStyle
-     *            the name of the default style, ending with <em>.xsl</em> to be used when resolving the stylesheet.
-     *            A corresponding file [MCR.Layout.Transformer.Factory.XSLFolder]/<em>defaultStyle</em> must exist.
      * @param cache
      *            The transformer cache to be used.
      * @return the transformer
