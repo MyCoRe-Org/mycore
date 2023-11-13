@@ -202,7 +202,7 @@ public class MCREditorOutValidator {
 
     public static String checkMetaObjectWithLinks(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         if (datasubtag.getAttributeValue("href") == null
-            && datasubtag.getAttributeValue("href", XLINK_NAMESPACE) == null) {
+            || datasubtag.getAttributeValue("href", XLINK_NAMESPACE) == null) {
             return datasubtag.getName() + " has no href attribute defined";
         }
         if (datasubtag.getAttribute("xtype") != null) {
