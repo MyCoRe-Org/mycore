@@ -22,19 +22,16 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfigurationDir;
-import org.mycore.common.xml.MCREntityResolver;
-import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLResource;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * Represents an XSL file that will be used in XSL transformation and which is loaded
@@ -60,14 +57,11 @@ public class MCRTemplatesSource {
 
     /** Have to use SAX here to resolve entities */
     public SAXSource getSource() throws SAXException, ParserConfigurationException {
-        XMLReader reader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
-        reader.setEntityResolver(MCREntityResolver.instance());
-        URL resourceURL = MCRConfigurationDir.getConfigResource(resource);
-        if (resourceURL == null) {
-            throw new SAXException("Could not find resource: " + resource);
+        try {
+            return (SAXSource) MCRURIResolver.instance().resolve("resource:" + resource, null);
+        } catch (TransformerException e) {
+            throw new SAXException(e);
         }
-        InputSource input = new InputSource(resourceURL.toString());
-        return new SAXSource(reader, input);
     }
 
     /** Returns the path to the XSL file, for use as a caching key */
