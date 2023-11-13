@@ -1063,10 +1063,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
         switch (resultName) {
-        case MCRObject.ROOT_NAME -> MCRMetadataManager.update(new MCRObject(resultDocument));
-        case MCRDerivate.ROOT_NAME -> MCRMetadataManager.update(new MCRDerivate(resultDocument));
-        default -> LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId,
-            resultName);
+            case MCRObject.ROOT_NAME -> MCRMetadataManager.update(new MCRObject(resultDocument));
+            case MCRDerivate.ROOT_NAME -> MCRMetadataManager.update(new MCRDerivate(resultDocument));
+            default -> LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId,
+                resultName);
         }
     }
 
