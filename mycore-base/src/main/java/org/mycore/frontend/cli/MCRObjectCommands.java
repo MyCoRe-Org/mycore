@@ -51,7 +51,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -631,7 +630,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
         Transformer transformer
-            = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
+            = MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(transformer, "xml");
         exportWith(fromID, toID, dirname, extension, (content, out) -> {
             StreamResult sr = new StreamResult(out);
@@ -1254,7 +1253,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (style != null) {
             // getTransformer with non-existent input successfully returns a working transformer
             // that "successfully transforms", an error would be preferable 
-            trafo = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
+            trafo = MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
             LOGGER.debug("Transformer for stylesheet {} has been loaded.", style);
         }
         MCRObjectID objID = MCRObjectID.getInstance(objectID);

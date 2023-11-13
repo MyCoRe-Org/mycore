@@ -37,7 +37,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -280,7 +279,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         Document classDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
 
         Transformer trans
-            = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
+            = MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         File xmlOutput = new File(dir, id + "." + extension);

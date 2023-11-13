@@ -41,7 +41,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -432,7 +431,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         Transformer trans
-            = MCRCommandUtils.getTransformer(StringUtils.defaultIfEmpty(style, DEFAULT_STYLE), TRANSFORMER_CACHE);
+            = MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         int k = 0;

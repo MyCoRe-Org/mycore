@@ -169,12 +169,16 @@ public class MCRCommandUtils {
      *            The transformer cache to be used.
      * @return the transformer
      */
-    public static Transformer getTransformer(String style, Map<String, Transformer> cache) {
+    public static Transformer getTransformer(String style, String defaultStyle, Map<String, Transformer> cache) {
         if (cache.containsKey(style)) {
             return cache.get(style);
         }
 
         Element element = MCRURIResolver.instance().resolve("resource:" + style);
+        if(element == null) {
+            LOGGER.warn("Could not load transformer from resource {}, trying default {}.", style, defaultStyle);
+            element = MCRURIResolver.instance().resolve("resource:" + defaultStyle);
+        }
         try {
             if (element != null) {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -184,7 +188,7 @@ public class MCRCommandUtils {
                 LOGGER.info("Loaded transformer from resource {}.", style);
                 return transformer;
             } else {
-                LOGGER.warn("Couldn't load transformer from resource {}.", style);
+                LOGGER.warn("Could not load transformer from resource {}.", style);
             }
         } catch (Exception e) {
             LOGGER.warn("Error while loading transformer from resource " + style + ".", e);
