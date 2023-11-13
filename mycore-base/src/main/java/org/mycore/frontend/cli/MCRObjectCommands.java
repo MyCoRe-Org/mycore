@@ -579,8 +579,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND,
         help = "Stores the object with the MCRObjectID {0} to the directory {1}" +
-            " with the stylesheet {2}-object.xsl. For {2}, the default is "+
-            "MCR.Layout.Transformer.Factory.XSLFolder/save.",
+            " with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 110)
     public static void exportWithStylesheet(String id, String dirname, String style) {
         exportWithStylesheet(id, id, dirname, style);
@@ -623,8 +622,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "export objects from {0} to {1} to directory {2} with stylesheet {3}",
         help = "Stores all objects with MCRObjectID's between {0} and {1} to the directory {2} "
-            + "with the stylesheet {3}-object.xsl. For {3}, the default is "+
-            "MCR.Layout.Transformer.Factory.XSLFolder/save.",
+            + "with the stylesheet {3}-object.xsl. For {3}, the default is xsl/save.",
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
         Transformer transformer = getTransformer(style != null ? style + "-object" : null);
@@ -730,8 +728,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "export all objects of type {0} to directory {1} with stylesheet {2}",
         help = "Stores all objects of type {0} to directory {1} " +
-            "with the stylesheet {2}-object.xsl. For {2}, the default is "+
-            "MCR.Layout.Transformer.Factory.XSLFolder/save.",
+            "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 120)
     public static List<String> exportAllObjectsOfTypeWithStylesheet(String type, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
@@ -753,8 +750,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "export all objects of base {0} to directory {1} with stylesheet {2}",
         help = "Stores all objects of base {0} to directory {1} " +
-            "with the stylesheet {2}-object.xsl. For {2}, the default is "+
-            "MCR.Layout.Transformer.Factory.XSLFolder/save.",
+            "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 130)
     public static List<String> exportAllObjectsOfBaseWithStylesheet(String base, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
@@ -1067,10 +1063,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
         switch (resultName) {
-            case MCRObject.ROOT_NAME -> MCRMetadataManager.update(new MCRObject(resultDocument));
-            case MCRDerivate.ROOT_NAME -> MCRMetadataManager.update(new MCRDerivate(resultDocument));
-            default -> LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId,
-                resultName);
+        case MCRObject.ROOT_NAME -> MCRMetadataManager.update(new MCRObject(resultDocument));
+        case MCRDerivate.ROOT_NAME -> MCRMetadataManager.update(new MCRDerivate(resultDocument));
+        default -> LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId,
+            resultName);
         }
     }
 
