@@ -920,7 +920,7 @@ public final class MCRURIResolver implements URIResolver {
             }
 
             Element container = new Element("servacls").setAttribute("class", "MCRMetaAccessRule");
-            try {
+            if(MCRAccessManager.implementsRulesInterface()) {
                 if (action.equals("all")) {
                     for (String permission : MCRAccessManager.getPermissionsForID(objId)) {
                         // one pool Element under access per defined AccessRule in pool for (Object-)ID
@@ -930,12 +930,7 @@ public final class MCRURIResolver implements URIResolver {
                 } else {
                     addRule(container, action, MCRAccessManager.requireRulesInterface().getRule(objId, action));
                 }
-            } catch (MCRException e) {
-                // catches MCRException: 
-                // interface ...MCRAccessInterface is no interface ...MCRRuleAccessInterface
-                LOGGER.debug(e.getMessage());
             }
-
             return new JDOMSource(container);
         }
 
