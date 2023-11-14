@@ -3,7 +3,7 @@
                 version="3.0"
 >
 
-    <xsl:include href="functions/i18n.xsl" />
+    <xsl:include href="resource:xslt/functions/i18n.xsl" />
 
     <xsl:template match="properties-analyze">
         <site title="Properties">
