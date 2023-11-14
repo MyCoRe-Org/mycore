@@ -660,17 +660,17 @@ public class MCRXMLFunctions {
 
     public static boolean isCategoryID(String classificationId, String categoryId) {
         if (classificationId == null || classificationId.isEmpty()) {
-            LOGGER.error("Classification identifier is null or empty");
+            LOGGER.debug("Classification identifier is null or empty");
             return false;
         }
 
         if (categoryId == null || categoryId.isEmpty()) {
-            LOGGER.error("Category identifier is null or empty");
+            LOGGER.debug("Category identifier is null or empty");
             return false;
         }
 
         if (classificationId.length() > 32) {
-            LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId);
+            LOGGER.debug("Could not determine state for classification id {} and category id {}", classificationId);
             return false;
         }
 
