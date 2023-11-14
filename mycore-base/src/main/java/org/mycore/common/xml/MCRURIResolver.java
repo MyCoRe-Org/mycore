@@ -920,18 +920,17 @@ public final class MCRURIResolver implements URIResolver {
             }
 
             Element container = new Element("servacls").setAttribute("class", "MCRMetaAccessRule");
-
-            if (action.equals("all")) {
-                for (String permission : MCRAccessManager.getPermissionsForID(objId)) {
-                    // one pool Element under access per defined AccessRule in
-                    // Pool
-                    // for (Object-)ID
-                    addRule(container, permission, MCRAccessManager.requireRulesInterface().getRule(objId, permission));
+            if(MCRAccessManager.implementsRulesInterface()) {
+                if (action.equals("all")) {
+                    for (String permission : MCRAccessManager.getPermissionsForID(objId)) {
+                        // one pool Element under access per defined AccessRule in pool for (Object-)ID
+                        addRule(container, permission,
+                            MCRAccessManager.requireRulesInterface().getRule(objId, permission));
+                    }
+                } else {
+                    addRule(container, action, MCRAccessManager.requireRulesInterface().getRule(objId, action));
                 }
-            } else {
-                addRule(container, action, MCRAccessManager.requireRulesInterface().getRule(objId, action));
             }
-
             return new JDOMSource(container);
         }
 
