@@ -891,12 +891,11 @@ public class MCRXMLFunctions {
                 .filter(mapping -> mapping.startsWith(mappingPrefix))
                 .findFirst();
 
-            return result.isPresent() ? result.get().split(":")[1] : null;
+            return result.isPresent() ? result.get().split(":")[1] : "";
         } catch (Throwable e) {
             LOGGER.error("Could not load {}:{}", classificationId, categoryId, e);
+            return "";
         }
-
-        return "";
     }
 
     /**
