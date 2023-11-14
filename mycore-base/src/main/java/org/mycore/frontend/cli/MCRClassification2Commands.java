@@ -47,7 +47,6 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -77,11 +76,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     private static Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
-
-    /** Default transformer script */
-    public static final String DEFAULT_STYLE
-        = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder")
-            + "/save-classification.xsl";
 
     /** Static compiled transformer stylesheets */
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
@@ -279,7 +273,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         Document classDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
 
         Transformer trans
-            = MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
+            = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         File xmlOutput = new File(dir, id + "." + extension);

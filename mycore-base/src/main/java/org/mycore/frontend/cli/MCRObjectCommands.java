@@ -124,11 +124,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /** The logger */
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
 
-    /** Default transformer script */
-    public static final String DEFAULT_STYLE
-        = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder")
-            + "/save-object.xsl";
-
     /** Static compiled transformer stylesheets */
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
 
@@ -630,7 +625,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
         Transformer transformer
-            = MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
+            = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(transformer, "xml");
         exportWith(fromID, toID, dirname, extension, (content, out) -> {
             StreamResult sr = new StreamResult(out);
@@ -1253,7 +1248,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (style != null) {
             // getTransformer with non-existent input successfully returns a working transformer
             // that "successfully transforms", an error would be preferable 
-            trafo = MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
+            trafo = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
             LOGGER.debug("Transformer for stylesheet {} has been loaded.", style);
         }
         MCRObjectID objID = MCRObjectID.getInstance(objectID);
