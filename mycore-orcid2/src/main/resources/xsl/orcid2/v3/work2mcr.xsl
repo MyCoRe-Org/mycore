@@ -13,13 +13,13 @@
   <!--
     To map an orcid type to mods:genre provide a classification containing the mapping. For each category provide a
     label[@xml:lang='x-mapping']. The text attribute of that label contains the actual mapping like
-    $MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix:$ORCID-Work-Type e.g. orcid:other
+    $MCR.ORCID2.Genre.Mapping.Classification.Prefix:$ORCID-Work-Type e.g. orcid:other
 
     To determine the correct mods:genre of the host provide a mapping in a label[@xml:lang='x-hosts'] of each category.
     The x-hosts attribute should only contain valid category ids with respect to the $MCR.ORCID2.Genre.Mapping.Classification.
   -->
   <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification"/>
-  <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix"/>
+  <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification.Prefix"/>
   <xsl:param name="MCR.ORCID2.Genre.Mapping.Default.Genre"/>
   <xsl:param name="MCR.ORCID2.Genre.Mapping.Standalone.xHost" select="'standalone'"/>
 
@@ -30,7 +30,7 @@
   <xsl:template match="work:type">
     <xsl:variable name="orcid-work-type" select="text()"/>
     <xsl:variable name="x-mapping"
-                  select="fn:concat($MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix, ':', $orcid-work-type)"/>
+                  select="fn:concat($MCR.ORCID2.Genre.Mapping.Classification.Prefix, ':', $orcid-work-type)"/>
     <xsl:variable name="genre-mapped-from-classification"
                   select="$mapping-classification//category[1][label[@xml:lang='x-mapping' and contains(@text, $x-mapping)]][not(descendant::category[label[@xml:lang='x-mapping' and contains(@text, $x-mapping)]])]/@ID"/>
 
@@ -111,7 +111,7 @@
   <xsl:template name="determine-x-host">
     <xsl:param name="orcid-work-type"/>
     <xsl:variable name="lookup"
-                  select="fn:concat($MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix, ':', $orcid-work-type)"/>
+                  select="fn:concat($MCR.ORCID2.Genre.Mapping.Classification.Prefix, ':', $orcid-work-type)"/>
 
     <xsl:variable name="x-hosts"
                   select="$mapping-classification//category[1][label[@xml:lang = 'x-mapping'][contains(@text, $lookup)]][not(descendant::category[label[@xml:lang = 'x-mapping'][contains(@text, $lookup)]])]/label[@xml:lang='x-hosts']/@text"/>

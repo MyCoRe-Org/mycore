@@ -14,10 +14,10 @@
   <!--
     To map an orcid type to mods:genre provide a classification containing the mapping. For each category provide a
     label[@xml:lang='x-mapping']. The text attribute of that label contains the actual mapping like
-    $MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix:$ORCID-Work-Type e.g. orcid:other
+    $MCR.ORCID2.Genre.Mapping.Classification.Prefix:$ORCID-Work-Type e.g. orcid:other
   -->
   <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification"/>
-  <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix"/>
+  <xsl:param name="MCR.ORCID2.Genre.Mapping.Classification.Prefix"/>
   <xsl:param name="MCR.ORCID2.Genre.Mapping.Default.Genre"/>
 
   <xsl:template name="workType">
@@ -58,7 +58,7 @@
   <xsl:template name="map-mods-genre-to-orcid-work-type">
     <xsl:param name="mods.genre"/>
     <xsl:variable name="orcid.genre"
-                  select="fn:document(fn:concat('callJava:org.mycore.common.xml.MCRXMLFunctions:getXMapping:', $MCR.ORCID2.Genre.Mapping.Classification, ':', $mods.genre,':', $MCR.ORCID2.Genre.Mapping.Classification.Mapping.Prefix))"/>
+                  select="fn:document(fn:concat('callJava:org.mycore.common.xml.MCRXMLFunctions:getXMapping:', $MCR.ORCID2.Genre.Mapping.Classification, ':', $mods.genre,':', $MCR.ORCID2.Genre.Mapping.Classification.Prefix))"/>
     <xsl:choose>
       <xsl:when test="fn:string-length($orcid.genre) &gt; 0">
         <xsl:value-of select="$orcid.genre"/>
