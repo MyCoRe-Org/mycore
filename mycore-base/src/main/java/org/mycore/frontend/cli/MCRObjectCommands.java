@@ -624,8 +624,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             + "The default for {3} is '{MCR.Layout.Transformer.Factory.XSLFolder}/save-object.xsl'.",
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
-        Transformer transformer
-            = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
+        Transformer transformer = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(transformer, "xml");
         exportWith(fromID, toID, dirname, extension, (content, out) -> {
             StreamResult sr = new StreamResult(out);

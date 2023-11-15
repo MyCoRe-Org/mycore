@@ -424,8 +424,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
 
-        Transformer trans
-            = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
+        Transformer trans = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         int k = 0;

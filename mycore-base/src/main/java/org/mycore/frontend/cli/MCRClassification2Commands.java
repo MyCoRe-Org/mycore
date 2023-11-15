@@ -272,8 +272,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(id), -1);
         Document classDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
 
-        Transformer trans
-            = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
+        Transformer trans = MCRCommandUtils.getTransformer(style, TRANSFORMER_CACHE);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
 
         File xmlOutput = new File(dir, id + "." + extension);
