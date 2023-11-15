@@ -783,21 +783,25 @@ public class MCRXMLFunctions {
      */
     public static String nextImportStep(String includePart) {
         int border = includePart.indexOf(':');
+        String includePartSubString;
         String selfName = null;
         if (border > 0) {
             selfName = includePart.substring(border + 1);
-            includePart = includePart.substring(0, border);
+            includePartSubString = includePart.substring(0, border);
+        } else {
+            includePartSubString = includePart;
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("get next import step for {}", includePart);
+            LOGGER.debug("get next import step for {}", includePartSubString);
         }
         // get the parameters from mycore.properties
-        List<String> importList = MCRConfiguration2.getString("MCR.URIResolver.xslImports." + includePart)
+        List<String> importList = MCRConfiguration2.getString
+                        ("MCR.URIResolver.xslImports." + includePartSubString)
             .map(MCRConfiguration2::splitValue)
             .map(s -> s.collect(Collectors.toList()))
             .orElseGet(Collections::emptyList);
         if (importList.isEmpty()) {
-            LOGGER.info("MCR.URIResolver.xslImports.{} has no Stylesheets defined", includePart);
+            LOGGER.info("MCR.URIResolver.xslImports.{} has no Stylesheets defined", includePartSubString);
         } else {
             ListIterator<String> listIterator = importList.listIterator(importList.size());
 
@@ -900,14 +904,15 @@ public class MCRXMLFunctions {
      * @throws IllegalArgumentException if there is no way to convert the string to an NCName
      */
     public static String toNCName(String name) {
-        while (name.length() > 0 && !XMLChar.isNameStart(name.charAt(0))) {
-            name = name.substring(1);
+        String remainingName = name;
+        while (remainingName.length() > 0 && !XMLChar.isNameStart(remainingName.charAt(0))) {
+            remainingName = remainingName.substring(1);
         }
-        name = toNCNameSecondPart(name);
-        if (name.length() == 0) {
-            throw new IllegalArgumentException("Unable to convert '" + name + "' to valid NCName.");
+        String validNCName = toNCNameSecondPart(remainingName);
+        if (validNCName.length() == 0) {
+            throw new IllegalArgumentException("Unable to convert '" + validNCName + "' to valid NCName.");
         }
-        return name;
+        return validNCName;
     }
 
     /**

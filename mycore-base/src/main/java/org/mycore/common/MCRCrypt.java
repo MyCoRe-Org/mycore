@@ -309,11 +309,15 @@ public class MCRCrypt {
         return b >= 0 ? (int) b : b + 256;
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private static int fourBytesToInt(byte[] b, int offset) {
-        return byteToUnsigned(b[offset++]) | byteToUnsigned(b[offset++]) << 8 | byteToUnsigned(b[offset++]) << 16
-            | byteToUnsigned(b[offset]) << 24;
+        return byteToUnsigned(b[offset++])
+                | byteToUnsigned(b[offset++]) << 8
+                | byteToUnsigned(b[offset++]) << 16
+                | byteToUnsigned(b[offset]) << 24;
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private static void intToFourBytes(int iValue, byte[] b, int offset) {
         b[offset++] = (byte) (iValue & 0xff);
         b[offset++] = (byte) (iValue >>> 8 & 0xff);
@@ -323,22 +327,16 @@ public class MCRCrypt {
 
     private static void permOp(int a, int b, int n, int m, int[] results) {
         int t;
-
         t = (a >>> n ^ b) & m;
-        a ^= t << n;
-        b ^= t;
-
-        results[0] = a;
-        results[1] = b;
+        results[0] = a ^ t << n;
+        results[1] = b ^ t;
     }
 
     private static int hpermOp(int a, int n, int m) {
         int t;
 
         t = (a << 16 - n ^ a) & m;
-        a = a ^ t ^ t >>> 16 - n;
-
-        return a;
+        return a ^ t ^ t >>> 16 - n;
     }
 
     private static int[] desSetKey(byte[] key) {
@@ -415,12 +413,13 @@ public class MCRCrypt {
         t = v ^ v << 16 ^ r ^ ss[s + 1];
         t = t >>> 4 | t << 28;
 
-        l ^= SPTRANS[1][t & 0x3f] | SPTRANS[3][t >>> 8 & 0x3f] | SPTRANS[5][t >>> 16 & 0x3f]
+        int result = l^( SPTRANS[1][t & 0x3f] | SPTRANS[3][t >>> 8 & 0x3f] | SPTRANS[5][t >>> 16 & 0x3f]
             | SPTRANS[7][t >>> 24 & 0x3f]
             | SPTRANS[0][u & 0x3f] | SPTRANS[2][u >>> 8 & 0x3f] | SPTRANS[4][u >>> 16 & 0x3f]
-            | SPTRANS[6][u >>> 24 & 0x3f];
+            | SPTRANS[6][u >>> 24 & 0x3f]);
 
-        return l;
+        return result;
+
     }
 
     private static int[] body(int[] schedule, int eswap0, int eswap1) {
@@ -495,14 +494,15 @@ public class MCRCrypt {
     public static String crypt(String salt, String original) {
         // wwb -- Should do some sanity checks: salt needs to be 2 chars, in
         // alpha.
-        while (salt.length() < 2) {
-            salt += "A";
+        String adjustedSalt = salt;
+        while (adjustedSalt.length() < 2) {
+            adjustedSalt += "A";
         }
 
         char[] buffer = new char[13];
 
-        char charZero = salt.charAt(0);
-        char charOne = salt.charAt(1);
+        char charZero = adjustedSalt.charAt(0);
+        char charOne = adjustedSalt.charAt(1);
 
         buffer[0] = charZero;
         buffer[1] = charOne;

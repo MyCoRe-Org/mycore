@@ -1333,31 +1333,30 @@ public final class MCRURIResolver implements URIResolver {
 
         private static void constructElement(Element current, String xpath, String value) {
             StringTokenizer st = new StringTokenizer(xpath, "/");
+            Element currentToken = current;
             String name = null;
             while (st.hasMoreTokens()) {
                 name = st.nextToken();
                 if (name.startsWith("@")) {
                     break;
                 }
-
                 String localName = getLocalName(name);
                 Namespace namespace = getNamespace(name);
 
-                Element child = current.getChild(localName, namespace);
+                Element child = currentToken.getChild(localName, namespace);
                 if (child == null) {
                     child = new Element(localName, namespace);
-                    current.addContent(child);
+                    currentToken.addContent(child);
                 }
-                current = child;
+                currentToken = child;
             }
-
             if (name.startsWith("@")) {
                 name = name.substring(1);
                 String localName = getLocalName(name);
                 Namespace namespace = getNamespace(name);
-                current.setAttribute(localName, value, namespace);
+                currentToken.setAttribute(localName, value, namespace);
             } else {
-                current.setText(value);
+                currentToken.setText(value);
             }
         }
 

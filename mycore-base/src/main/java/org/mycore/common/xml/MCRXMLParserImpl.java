@@ -157,17 +157,17 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             if (baseURI == null) {
                 return systemId;
             }
-            baseURI = normalize(baseURI);
-            int pos = baseURI.lastIndexOf('/');
-            String prefix = baseURI.substring(0, pos + 1);
+            String normalizedBaseURI = normalize(baseURI);
+            int pos = normalizedBaseURI.lastIndexOf('/');
+            String prefix = normalizedBaseURI.substring(0, pos + 1);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("prefix of baseURI ''{}'' is: {}", baseURI, prefix);
+                LOGGER.debug("prefix of baseURI ''{}'' is: {}", normalizedBaseURI, prefix);
                 LOGGER.debug("systemId: {} prefixed? {}", systemId, systemId.startsWith(prefix));
             }
             if (prefix.length() > 0 && systemId.startsWith(prefix)) {
-                systemId = systemId.substring(prefix.length());
-                LOGGER.debug("new systemId: {}", systemId);
-                return systemId;
+                String systemIdSub = systemId.substring(prefix.length());
+                LOGGER.debug("new systemId: {}", systemIdSub);
+                return systemIdSub;
             }
             return systemId;
         }

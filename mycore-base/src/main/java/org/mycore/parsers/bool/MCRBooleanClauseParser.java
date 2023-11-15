@@ -122,120 +122,129 @@ public class MCRBooleanClauseParser<T> {
 
     /**
      * Parse a complex or simple condition in String format and put it in an condition object.
-     * 
+     *
      * @param s a MyCoRe condition object in String format
      * @return a MyCoRe condition object in the MCRCondition format
      */
     public MCRCondition<T> parse(String s) throws MCRParseException {
-        s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
+        String cleanedString = s
+                .replaceAll("\t", " ")
+                .replaceAll("\n", " ")
+                .replaceAll("\r", " ");
 
-        if (s.trim().length() == 0 || s.equals("()")) {
+        if (cleanedString.trim().length() == 0 || cleanedString.equals("()")) {
             return defaultRule();
         }
 
-        return parse(s, null);
+        return parse(cleanedString, null);
     }
 
     private MCRCondition<T> parse(String s, List<String> l) throws MCRParseException {
         // initialize if start parsing
+        List<String> list;
         if (l == null) {
-            l = new ArrayList<>();
+            list = new ArrayList<>();
+        }else{
+            list= l;
         }
 
         // a empty condition
-        s = s.trim();
-        if (s.equals("()")) {
-            s = "(true)";
+        String stringTrimmed = s.trim();
+        if (stringTrimmed.equals("()")) {
+            stringTrimmed = "(true)";
         }
 
         while (true) {
             // replace all bracket expressions with $n
-            while (s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'
-                && s.substring(1, s.length() - 1).indexOf('(') < 0 && s.substring(1, s.length() - 1).indexOf(')') < 0) {
-                s = s.trim().substring(1, s.length() - 1).trim();
+            while (stringTrimmed.charAt(0) == '(' && stringTrimmed.charAt(stringTrimmed.length() - 1) == ')'
+                    && stringTrimmed.substring(1, stringTrimmed.length() - 1).indexOf('(') < 0
+                    && stringTrimmed.substring(1, stringTrimmed.length() - 1).indexOf(')') < 0) {
+                stringTrimmed = stringTrimmed.trim().substring(1, stringTrimmed.length() - 1).trim();
             }
 
             // replace brackets in texts inside "..." with temporary strings 
-            Matcher a = apostrophe.matcher(s); // find bracket pairs
+            Matcher a = apostrophe.matcher(stringTrimmed); // find bracket pairs
             if (a.find()) {
                 String clause = a.group();
                 clause = clause.replaceAll("\\(", opening_bracket);
                 clause = clause.replaceAll("\\)", closing_bracket);
-                s = s.substring(0, a.start()) + clause + s.substring(a.end());
+                stringTrimmed = stringTrimmed.substring(0, a.start()) + clause + stringTrimmed.substring(a.end());
             }
 
             // find bracket pairs and replace text inside brackets with  @<number>@
-            Matcher m = bracket.matcher(s);
+            Matcher m = bracket.matcher(stringTrimmed);
             if (m.find()) {
                 String clause = m.group();
-                s = s.substring(0, m.start()) + "@<" + l.size() + ">@" + s.substring(m.end());
-                l.add(extendClauses(clause, l));
+                stringTrimmed = stringTrimmed.substring(0, m.start())
+                        + "@<" + list.size() + ">@" + stringTrimmed.substring(m.end());
+                list.add(extendClauses(clause, list));
             } else {
                 break;
             }
         }
 
         // after replacing bracket pairs check for unmatched parenthis
-        if ((s.indexOf('(') >= 0) ^ (s.indexOf(')') >= 0)) { // missing opening or closing bracket?
-            throw new MCRParseException("Syntax error: missing bracket in \"" + s + "\"");
+        if ((stringTrimmed.indexOf('(') >= 0) ^ (stringTrimmed.indexOf(')') >= 0)) {
+            // missing opening or closing bracket?
+            throw new MCRParseException("Syntax error: missing bracket in \"" + stringTrimmed + "\"");
         }
 
         /* handle OR */
-        Matcher m = or.matcher(s);
+        Matcher m = or.matcher(stringTrimmed);
         int last = 0;
         MCROrCondition<T> orclause = new MCROrCondition<>();
         while (m.find()) {
             int l1 = m.start();
             if (last >= l1) {
-                throw new MCRParseException("subclause of OR missing while parsing \"" + s + "\"");
+                throw new MCRParseException("subclause of OR missing while parsing \"" + stringTrimmed + "\"");
             }
-            MCRCondition<T> c = parse(extendClauses(s.substring(last, l1), l), l);
+            MCRCondition<T> c = parse(extendClauses(stringTrimmed.substring(last, l1), list), list);
             last = m.end();
             orclause.addChild(c);
         }
         if (last != 0) {
-            MCRCondition<T> c = parse(extendClauses(s.substring(last), l), l);
+            MCRCondition<T> c = parse(extendClauses(stringTrimmed.substring(last), list), list);
             orclause.addChild(c);
             return orclause;
         }
 
         /* handle AND */
-        m = and.matcher(s);
+        m = and.matcher(stringTrimmed);
         last = 0;
         MCRAndCondition<T> andclause = new MCRAndCondition<>();
         while (m.find()) {
             int l1 = m.start();
             if (last >= l1) {
-                throw new MCRParseException("subclause of AND missing while parsing \"" + s + "\"");
+                throw new MCRParseException("subclause of AND missing while parsing \"" + stringTrimmed + "\"");
             }
-            MCRCondition<T> c = parse(extendClauses(s.substring(last, l1), l), l);
+            MCRCondition<T> c = parse(extendClauses(stringTrimmed.substring(last, l1), list), list);
             last = m.end();
             andclause.addChild(c);
         }
         if (last != 0) {
-            MCRCondition<T> c = parse(extendClauses(s.substring(last), l), l);
+            MCRCondition<T> c = parse(extendClauses(stringTrimmed.substring(last), list), list);
             andclause.addChild(c);
             return andclause;
         }
 
         /* handle NOT */
-        s = s.trim();
-        if (s.toLowerCase(Locale.ROOT).startsWith("not ")) {
-            MCRCondition<T> inverse = parse(extendClauses(s.substring(4), l), l);
+        stringTrimmed = stringTrimmed.trim();
+        if (stringTrimmed.toLowerCase(Locale.ROOT).startsWith("not ")) {
+            MCRCondition<T> inverse = parse(extendClauses(stringTrimmed.substring(4), list), list);
             return new MCRNotCondition<>(inverse);
         }
 
         // expands tokens with previously analysed expressions
-        s = extendClauses(s, l);
+        stringTrimmed = extendClauses(stringTrimmed, list);
 
         // recusion ONLY if parenthis (can) match
-        if ((s.indexOf('(') >= 0) && (s.indexOf(')') >= 0)) {
-            return parse(s, l);
+        if ((stringTrimmed.indexOf('(') >= 0) && (stringTrimmed.indexOf(')') >= 0)) {
+            return parse(stringTrimmed, list);
         } else {
             // replace back brackets in apostrophe
-            s = s.replaceAll(opening_bracket, "(");
-            s = s.replaceAll(closing_bracket, ")");
-            return parseSimpleCondition(s);
+            stringTrimmed = stringTrimmed.replaceAll(opening_bracket, "(");
+            stringTrimmed = stringTrimmed.replaceAll(closing_bracket, ")");
+            return parseSimpleCondition(stringTrimmed);
         }
     }
 

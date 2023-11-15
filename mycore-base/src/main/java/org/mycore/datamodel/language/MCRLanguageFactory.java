@@ -116,16 +116,18 @@ public class MCRLanguageFactory {
     }
 
     private MCRLanguage lookupLanguage(String code) {
+        String languageCode;
         if ((!languageByCode.containsKey(code)) && code.contains("-") && !code.startsWith("x-")) {
-            code = code.split("-")[0];
+            languageCode = code.split("-")[0];
+        }else{
+            languageCode=code;
+        }
+        if (!languageByCode.containsKey(languageCode)) {
+            LOGGER.warn("Unknown language: {}", languageCode);
+            buildLanguage(languageCode, languageCode.length() > 2 ? languageCode : null, null);
         }
 
-        if (!languageByCode.containsKey(code)) {
-            LOGGER.warn("Unknown language: {}", code);
-            buildLanguage(code, code.length() > 2 ? code : null, null);
-        }
-
-        return languageByCode.get(code);
+        return languageByCode.get(languageCode);
     }
 
     /**
@@ -142,14 +144,14 @@ public class MCRLanguageFactory {
         if (code == null) {
             return false;
         }
-        code = code.trim();
-        if (code.length() == 0) {
+        String codeTrimmed = code.trim();
+        if (codeTrimmed.length() == 0) {
             return false;
         }
-        if (code.startsWith("x-") || code.startsWith("i-")) {
+        if (codeTrimmed.startsWith("x-") || codeTrimmed.startsWith("i-")) {
             return true;
         }
-        return languageByCode.containsKey(code);
+        return languageByCode.containsKey(codeTrimmed);
     }
 
     /**

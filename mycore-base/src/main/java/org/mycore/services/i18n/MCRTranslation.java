@@ -314,14 +314,17 @@ public class MCRTranslation {
     }
 
     public static Locale getLocale(String language) {
+        String adjustedLanguage;
         if (language.equals("id")) {
             // workaround for bug with indonesian
             // INDONESIAN      ID     OCEANIC/INDONESIAN [*Changed 1989 from original ISO 639:1988, IN]
             // Java doesn't work with id
-            language = "in";
-            LOGGER.debug("Translation for current locale: {}", language);
+            adjustedLanguage = "in";
+            LOGGER.debug("Translation for current locale: {}", adjustedLanguage);
+        }else {
+            adjustedLanguage= language;
         }
-        return Locale.forLanguageTag(language);
+        return Locale.forLanguageTag(adjustedLanguage);
     }
 
     public static Set<String> getAvailableLanguages() {

@@ -158,15 +158,13 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         nis.reallyClose();
     }
 
-    private String convertAbsolutePathToRelativePath(String path) {
-        int pos = path.indexOf(":");
-        if (pos >= 0) {
-            path = path.substring(pos + 1);
+    private String convertAbsolutePathToRelativePath(String absolutePath) {
+        int pos = absolutePath.indexOf(":");
+        String relativePath = (pos >= 0) ? absolutePath.substring(pos + 1) : absolutePath;
+        while (relativePath.startsWith("\\") || relativePath.startsWith("/")) {
+            relativePath = relativePath.substring(1);
         }
-        while (path.startsWith("\\") || path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        return path;
+        return relativePath;
     }
 
 }

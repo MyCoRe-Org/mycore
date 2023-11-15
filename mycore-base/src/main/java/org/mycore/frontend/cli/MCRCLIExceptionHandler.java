@@ -88,8 +88,7 @@ public class MCRCLIExceptionHandler {
     }
 
     private static void showCauseOf(Throwable ex) {
-        ex = ex.getCause();
-        if (ex == null) {
+        if (ex.getCause() == null) {
             return;
         }
 

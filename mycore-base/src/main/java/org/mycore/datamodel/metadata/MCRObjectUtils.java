@@ -71,11 +71,12 @@ public abstract class MCRObjectUtils {
      */
     public static List<MCRObject> getAncestors(MCRObject mcrObject) {
         List<MCRObject> ancestorList = new ArrayList<>();
-        while (mcrObject.hasParent()) {
-            MCRObjectID parentID = mcrObject.getStructure().getParentID();
+        MCRObject currentAncestor= mcrObject;
+        while (currentAncestor.hasParent()) {
+            MCRObjectID parentID = currentAncestor.getStructure().getParentID();
             MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
             ancestorList.add(parent);
-            mcrObject = parent;
+            currentAncestor = parent;
         }
         return ancestorList;
     }

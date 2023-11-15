@@ -277,18 +277,22 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
     public MCRMetadataVersion getRevision(long revision) throws IOException {
         try {
+            long lastPresentRevision;
             if (revision < 0) {
-                revision = getLastPresentRevision();
-                if (revision < 0) {
+                lastPresentRevision = getLastPresentRevision();
+                if (lastPresentRevision < 0) {
                     LOGGER.warn("Metadata object {} in store {} has no last revision!", getID(), getStore().getID());
                     return null;
                 }
+            } else {
+                lastPresentRevision = revision;
             }
             SVNRepository repository = getStore().getRepository();
             String path = getFilePath();
             String dir = getDirectory();
             @SuppressWarnings("unchecked")
-            Collection<SVNLogEntry> log = repository.log(new String[] { dir }, null, revision, revision, true, true);
+            Collection<SVNLogEntry> log = repository.log(new String[]{dir},
+                    null, lastPresentRevision, lastPresentRevision, true, true);
             for (SVNLogEntry logEntry : log) {
                 SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {

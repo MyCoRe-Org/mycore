@@ -438,9 +438,7 @@ public abstract class MCRStore {
      * @return the ID of that data
      */
     int slot2id(String slot) {
-        slot = slot.substring(prefix.length());
-        slot = slot.substring(0, idLength);
-        return Integer.parseInt(slot);
+        return Integer.parseInt(slot.substring(prefix.length()).substring(0, idLength));
     }
 
     /**

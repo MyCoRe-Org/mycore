@@ -123,30 +123,32 @@ public class MCRLinkTableManager {
      *            the optional attribute of the reference as String
      */
     public void addReferenceLink(String from, String to, String type, String attr) {
-        from = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
-        if (from == null) {
+        String fromTrimmed = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
+        if (fromTrimmed == null) {
             LOGGER.warn("The from value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        to = MCRUtils.filterTrimmedNotEmpty(to).orElse(null);
-        if (to == null) {
+        String toTrimmed = MCRUtils.filterTrimmedNotEmpty(to).orElse(null);
+        if (toTrimmed == null) {
             LOGGER.warn("The to value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        type = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
-        if (type == null) {
+        String typeTrimmed = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
+        if (typeTrimmed == null) {
             LOGGER.warn("The type value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        attr = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
+        String attrTrimmed = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
 
-        LOGGER.debug("Link in table {} add for {}<-->{} with {} and {}", type, from, to, type, attr);
+        LOGGER.debug("Link in table {} add for {}<-->{} with {} and {}",
+                typeTrimmed, fromTrimmed, toTrimmed, typeTrimmed, attrTrimmed);
 
         try {
-            linkTableInstance.create(from, to, type, attr);
+            linkTableInstance.
+                    create(fromTrimmed, toTrimmed, typeTrimmed, attrTrimmed);
         } catch (Exception e) {
             LOGGER.warn("An error occured while adding a dataset from the reference link table, adding not succesful.",
                 e);
@@ -170,17 +172,17 @@ public class MCRLinkTableManager {
      *            the source of the reference as String
      */
     public void deleteReferenceLink(String from) {
-        from = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
-        if (from == null) {
+        String fromTrimmed = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
+        if (fromTrimmed == null) {
             LOGGER
                 .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
 
         try {
-            linkTableInstance.delete(from, null, null);
+            linkTableInstance.delete(fromTrimmed, null, null);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while deleting a dataset from the" + from
+            LOGGER.warn("An error occured while deleting a dataset from the" + fromTrimmed
                 + " reference link table, deleting could be not succesful.", e);
         }
     }
@@ -196,14 +198,14 @@ public class MCRLinkTableManager {
      *            the type of the reference as String
      */
     public void deleteReferenceLink(String from, String to, String type) {
-        from = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
-        if (from == null) {
+        String fromTrimmed = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
+        if (fromTrimmed == null) {
             LOGGER
                 .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
         try {
-            linkTableInstance.delete(from, to, type);
+            linkTableInstance.delete(fromTrimmed, to, type);
         } catch (Exception e) {
             LOGGER.warn("An error occured while deleting a dataset from the"
                 + " reference link table, deleting is not succesful.", e);
@@ -229,17 +231,17 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceLinkTo(String to) {
-        to = MCRUtils.filterTrimmedNotEmpty(to).orElse(null);
-        if (to == null) {
+        String toTrimmed = MCRUtils.filterTrimmedNotEmpty(to).orElse(null);
+        if (toTrimmed == null) {
             LOGGER.warn("The to value of a reference link is false, the link was " + "not added to the link table");
 
             return 0;
         }
 
         try {
-            return linkTableInstance.countTo(null, to, null, null);
+            return linkTableInstance.countTo(null, toTrimmed, null, null);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while searching for references of " + to + ".", e);
+            LOGGER.warn("An error occured while searching for references of " + toTrimmed + ".", e);
         }
 
         return 0;

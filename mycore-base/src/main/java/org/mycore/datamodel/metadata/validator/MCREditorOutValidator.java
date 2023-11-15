@@ -369,20 +369,23 @@ public class MCREditorOutValidator {
     }
 
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
+        Element validatedService;
         if (service == null) {
-            service = new Element("service");
+            validatedService = new Element("service");
             root.addContent(service);
+        }else{
+            validatedService= service;
         }
-        List<Element> servicelist = service.getChildren();
+        List<Element> servicelist = validatedService.getChildren();
         for (Element datatag : servicelist) {
             checkMetaTags(datatag);
         }
 
-        if (service.getChild("servacls") == null &&
+        if (validatedService.getChild("servacls") == null &&
             MCRAccessManager.getAccessImpl() instanceof MCRRuleAccessInterface) {
             Collection<String> li = MCRAccessManager.getPermissionsForID(id.toString());
             if (li == null || li.isEmpty()) {
-                setDefaultObjectACLs(service);
+                setDefaultObjectACLs(validatedService);
             }
         }
     }

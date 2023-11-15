@@ -127,15 +127,16 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
+        String textTrimmed;
         if (text.length() <= MCRHISTORYDATE_MAX_TEXT) {
-            text = text.trim();
+            textTrimmed = text.trim();
         } else {
-            text = text.substring(0, MCRHISTORYDATE_MAX_TEXT);
+            textTrimmed = text.substring(0, MCRHISTORYDATE_MAX_TEXT);
         }
         if (lang == null || lang.length() == 0) {
-            addText(text, this.lang);
+            addText(textTrimmed, this.lang);
         } else {
-            addText(text, lang);
+            addText(textTrimmed, lang);
         }
     }
 

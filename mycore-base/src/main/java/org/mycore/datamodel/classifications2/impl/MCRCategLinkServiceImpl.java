@@ -96,13 +96,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         //have to use rootID here if childrenOnly=false
         //old classification browser/editor could not determine links correctly otherwise
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategory parentRoot=parent;
         if (!childrenOnly) {
-            parent = parent.getRoot();
+            parentRoot = parent.getRoot();
         } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
-            parent = MCRCategoryDAOImpl.getByNaturalID(em, parent.getId());
+            parentRoot = MCRCategoryDAOImpl.getByNaturalID(em, parent.getId());
         }
-        LOGGER.info("parentID:{}", parent.getId());
-        String classID = parent.getId().getRootID();
+        LOGGER.info("parentID:{}", parentRoot.getId());
+        String classID = parentRoot.getId().getRootID();
         TypedQuery<Object[]> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + queryName, Object[].class);
         // query can take long time, please cache result
         setCacheable(q);

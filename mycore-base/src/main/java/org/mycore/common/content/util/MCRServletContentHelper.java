@@ -392,12 +392,12 @@ public abstract class MCRServletContentHelper {
 
     private static String extractFileName(String filename) {
         int filePosition = filename.lastIndexOf('/') + 1;
-        filename = filename.substring(filePosition);
-        filePosition = filename.lastIndexOf('.');
+        String filenameSubstring = filename.substring(filePosition);
+        filePosition = filenameSubstring.lastIndexOf('.');
         if (filePosition > 0) {
-            filename = filename.substring(0, filePosition);
+            filenameSubstring = filenameSubstring.substring(0, filePosition);
         }
-        return filename;
+        return filenameSubstring;
     }
 
     private static String getFileName(final HttpServletRequest req, final MCRContent content) {

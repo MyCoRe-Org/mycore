@@ -121,24 +121,24 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         }
 
         if (s.startsWith("group")) {
-            s = s.substring(5).trim();
-            if (s.startsWith("!=")) {
-                return new MCRGroupClause(s.substring(2).trim(), true);
-            } else if (s.startsWith("=")) {
-                return new MCRGroupClause(s.substring(1).trim(), false);
+            String sTrimmed = s.substring(5).trim();
+            if (sTrimmed.startsWith("!=")) {
+                return new MCRGroupClause(sTrimmed.substring(2).trim(), true);
+            } else if (sTrimmed.startsWith("=")) {
+                return new MCRGroupClause(sTrimmed.substring(1).trim(), false);
             } else {
-                throw new MCRParseException("syntax error: " + s);
+                throw new MCRParseException("syntax error: " + sTrimmed);
             }
         }
 
         if (s.startsWith("user")) {
-            s = s.substring(4).trim();
-            if (s.startsWith("!=")) {
-                return new MCRUserClause(s.substring(2).trim(), true);
-            } else if (s.startsWith("=")) {
-                return new MCRUserClause(s.substring(1).trim(), false);
+            String sTrimmed = s.substring(4).trim();
+            if (sTrimmed.startsWith("!=")) {
+                return new MCRUserClause(sTrimmed.substring(2).trim(), true);
+            } else if (sTrimmed.startsWith("=")) {
+                return new MCRUserClause(sTrimmed.substring(1).trim(), false);
             } else {
-                throw new MCRParseException("syntax error: " + s);
+                throw new MCRParseException("syntax error: " + sTrimmed);
             }
         }
 
@@ -147,17 +147,17 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         }
 
         if (s.startsWith("date ")) {
-            s = s.substring(5).trim();
-            if (s.startsWith(">=")) {
-                return new MCRDateAfterClause(parseDate(s.substring(2).trim(), false));
-            } else if (s.startsWith("<=")) {
-                return new MCRDateBeforeClause(parseDate(s.substring(2).trim(), true));
-            } else if (s.startsWith(">")) {
-                return new MCRDateAfterClause(parseDate(s.substring(1).trim(), true));
-            } else if (s.startsWith("<")) {
-                return new MCRDateBeforeClause(parseDate(s.substring(1).trim(), false));
+            String sTrimmed  = s.substring(5).trim();
+            if (sTrimmed.startsWith(">=")) {
+                return new MCRDateAfterClause(parseDate(sTrimmed.substring(2).trim(), false));
+            } else if (sTrimmed.startsWith("<=")) {
+                return new MCRDateBeforeClause(parseDate(sTrimmed.substring(2).trim(), true));
+            } else if (sTrimmed.startsWith(">")) {
+                return new MCRDateAfterClause(parseDate(sTrimmed.substring(1).trim(), true));
+            } else if (sTrimmed.startsWith("<")) {
+                return new MCRDateBeforeClause(parseDate(sTrimmed.substring(1).trim(), false));
             } else {
-                throw new MCRParseException("syntax error: " + s);
+                throw new MCRParseException("syntax error: " + sTrimmed);
             }
         }
         return null;
