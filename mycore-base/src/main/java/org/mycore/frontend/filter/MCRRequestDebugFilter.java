@@ -106,7 +106,7 @@ public class MCRRequestDebugFilter implements Filter {
                     .append(header)
                     .append(": ")
                     .append(value)
-                    .append("\n")));
+                    .append('\n')));
         sb.append("HEADERS END \n\n");
     }
 
@@ -141,7 +141,7 @@ public class MCRRequestDebugFilter implements Filter {
                 .append(" created at: ")
                 .append(LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()),
                     ZoneId.systemDefault()))
-                .append("\n");
+                .append('\n');
             sb.append("SESSION ATTRIBUTES: \n");
             MCRStreamUtils
                 .asStream(session.getAttributeNames())
@@ -151,7 +151,7 @@ public class MCRRequestDebugFilter implements Filter {
                     .append(": ")
                     .append(getValue(attrName,
                         Optional.ofNullable(session.getAttribute(attrName))))
-                    .append("\n"));
+                    .append('\n'));
             sb.append("SESSION ATTRIBUTES END \n\n");
         }
     }
@@ -196,7 +196,7 @@ public class MCRRequestDebugFilter implements Filter {
                     sb.append(s);
                     sb.append(", ");
                 }
-                sb.append("\n");
+                sb.append('\n');
             });
         sb.append("REQUEST PARAMETERS END \n\n");
     }

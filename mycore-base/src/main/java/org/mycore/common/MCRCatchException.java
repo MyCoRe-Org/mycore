@@ -99,7 +99,7 @@ public class MCRCatchException extends Exception {
         sb.append(getStackTraceAsString());
 
         if (getCause() != null) {
-            sb.append("\n");
+            sb.append('\n');
             sb.append("This exception was thrown because of the following underlying exception:\n\n");
             sb.append(getCause().getClass().getName());
             sb.append("\n\n");

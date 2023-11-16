@@ -915,7 +915,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 log.append(revision.getType()).append(' ');
                 log.append(sdf.format(revision.getDate())).append(' ');
                 log.append(revision.getUser());
-                log.append("\n");
+                log.append('\n');
             }
             LOGGER.info(log.toString());
         } catch (Exception exc) {
