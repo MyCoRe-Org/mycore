@@ -44,7 +44,8 @@ import org.mycore.parsers.bool.MCRSetCondition;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
-
+    /** Pattern for MCRQueryConditions expressed as String */
+    private static Pattern pattern = Pattern.compile("([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
     /**
      * Parses XML element containing a simple query condition
      *
@@ -129,8 +130,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             .format(DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY));
     }
 
-    /** Pattern for MCRQueryConditions expressed as String */
-    private static Pattern pattern = Pattern.compile("([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
+
 
     /**
      * Parses a String containing a simple query condition, for example: (title

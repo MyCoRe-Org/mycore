@@ -37,6 +37,9 @@ package org.mycore.common;
 public class MCRCrypt {
 
     private static final int ITERATIONS = 16;
+    public static final String ALPHABET = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    private static final char[] CHARS = ALPHABET.toCharArray();
 
     private static final boolean[] SHIFTS_2 = { false, false, true, true, true, true, true, true, false, true, true,
         true, true, true, true,
@@ -476,9 +479,7 @@ public class MCRCrypt {
         return out;
     }
 
-    public static final String ALPHABET = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    private static final char[] CHARS = ALPHABET.toCharArray();
 
     /**
      * This method encrypts a string given a cleartext string and a "salt".

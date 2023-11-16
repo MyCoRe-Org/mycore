@@ -31,6 +31,8 @@ package org.mycore.common;
  * @see java.lang.Exception
  */
 public class MCRCatchException extends Exception {
+    /** Counter to prevent a recursion between getStackTrace() and toString() */
+    private int toStringInvocationCounter = 0;
     private static final long serialVersionUID = -2244850451757768863L;
 
     /**
@@ -70,8 +72,7 @@ public class MCRCatchException extends Exception {
         return MCRException.getStackTraceAsString(this);
     }
 
-    /** Counter to prevent a recursion between getStackTrace() and toString() */
-    private int toStringInvocationCounter = 0;
+
 
     /**
      * Returns a String representation of this exception and all its properties

@@ -44,6 +44,8 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Heiko Helmbrecht
  */
 public class MCRAccessControlSystem extends MCRAccessBaseImpl {
+    private static MCRAccessControlSystem singleton;
+    private static HashMap<String, Integer> nextFreeRuleID;
 
     public static final String SYSTEM_RULE_PREFIX = "SYSTEMRULE";
 
@@ -78,9 +80,9 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 
-    private static MCRAccessControlSystem singleton;
 
-    private static HashMap<String, Integer> nextFreeRuleID;
+
+
 
     // extended methods
     public static synchronized MCRRuleAccessInterface instance() {
