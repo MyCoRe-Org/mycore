@@ -1398,7 +1398,7 @@ public final class MCRURIResolver implements URIResolver {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 constructElement(root, entry.getKey(), entry.getValue());
             }
-            if (root == defaultRoot && root.getChildren().size() > 1) {
+            if (root.equals(defaultRoot) && root.getChildren().size() > 1) {
                 LOGGER.warn("More than 1 root node defined, returning first");
                 return new JDOMSource(root.getChildren().getFirst().detach());
             }

@@ -78,7 +78,7 @@ public abstract class MCRServletContentHelper {
     }
 
     public static boolean isServeContent(final HttpServletRequest request) {
-        return request.getAttribute(ATT_SERVE_CONTENT) != Boolean.FALSE;
+        return Objects.equals(request.getAttribute(ATT_SERVE_CONTENT),Boolean.FALSE);
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class MCRServletContentHelper {
             }
 
             if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null
-                || ranges == ContentUtils.FULL) {
+                || ranges.equals(ContentUtils.FULL)) {
                 //No ranges
                 if (contentType != null) {
                     if (LOGGER.isDebugEnabled()) {

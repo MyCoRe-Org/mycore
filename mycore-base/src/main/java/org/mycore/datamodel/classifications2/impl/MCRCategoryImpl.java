@@ -345,7 +345,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     static MCRCategoryImpl wrapCategory(MCRCategory category, MCRCategory parent, MCRCategory root) {
         MCRCategory rootCategory=root;
-        if (category.getParent() != null && category.getParent() != parent) {
+        if (category.getParent() != null && !category.getParent().equals(parent)) {
             throw new MCRException("MCRCategory is already attached to a different parent.");
         }
         if (category instanceof MCRCategoryImpl catImpl) {

@@ -196,7 +196,7 @@ public abstract class MCRPath implements Path {
             return false;
         }
         final MCRPath that = (MCRPath) other;
-        if (this == that) {
+        if (this.equals(that)) {
             return true;
         }
         final int thatOffsetCount = that.offsets.length;
@@ -597,7 +597,7 @@ public abstract class MCRPath implements Path {
             return false;
         }
         final MCRPath that = (MCRPath) other;
-        if (this == that) {
+        if (this.equals(that)) {
             return true;
         }
         final int thatOffsetCount = that.offsets.length;

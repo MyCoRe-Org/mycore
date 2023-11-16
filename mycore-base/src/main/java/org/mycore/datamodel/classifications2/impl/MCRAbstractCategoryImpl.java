@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -140,7 +141,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public void setParent(MCRCategory parent) {
-        if (this.parent == parent) {
+        if (Objects.equals(this.parent,parent)) {
             return;
         }
         detachFromParent();

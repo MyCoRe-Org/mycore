@@ -98,7 +98,7 @@ public class MCRSessionMgr {
     public static void setCurrentSession(MCRSession theSession) {
         if (hasCurrentSession()) {
             MCRSession currentSession = getCurrentSession();
-            if (currentSession != theSession && currentSession.getID() != null) {
+            if (!currentSession.equals(theSession) && currentSession.getID() != null) {
                 LOGGER.error("Current session will be released: " + currentSession,
                     new MCRException("Current thread already has a session attached!"));
                 releaseCurrentSession();

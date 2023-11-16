@@ -460,11 +460,11 @@ public class MCRDataURL implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder(SCHEME);
 
-        if (!DEFAULT_MIMETYPE.equals(mimeType) || charset != StandardCharsets.US_ASCII) {
+        if (!DEFAULT_MIMETYPE.equals(mimeType) || !charset.equals(StandardCharsets.US_ASCII)) {
             sb.append(mimeType);
         }
 
-        if (charset != StandardCharsets.US_ASCII) {
+        if (!charset.equals(StandardCharsets.US_ASCII)) {
             sb.append(TOKEN_SEPARATOR + CHARSET_PARAM + PARAM_SEPARATOR).append(charset.name());
         }
 
