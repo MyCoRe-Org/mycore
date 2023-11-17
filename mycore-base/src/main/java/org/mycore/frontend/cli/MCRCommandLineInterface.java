@@ -198,7 +198,7 @@ public class MCRCommandLineInterface {
             addCommandsToQueue(commandsReturned);
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
-            rollbackTransaction(session);
+            rollbackTransaction();
             if (SKIP_FAILED_COMMAND) {
                 saveFailedCommand(command);
             } else {
@@ -230,7 +230,7 @@ public class MCRCommandLineInterface {
         return expandedCommand;
     }
 
-    private static void rollbackTransaction(MCRSession session) {
+    private static void rollbackTransaction() {
         output("Command failed. Performing transaction rollback...");
 
         if (MCRTransactionHelper.isTransactionActive()) {

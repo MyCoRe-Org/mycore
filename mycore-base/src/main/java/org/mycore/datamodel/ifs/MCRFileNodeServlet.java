@@ -104,7 +104,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
             }
         }
         if (attr.isRegularFile()) {
-            return sendFile(request, response, mcrPath);
+            return new MCRPathContent(mcrPath);
         }
         response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not a file or directory: " + mcrPath);
         return null;
@@ -153,11 +153,6 @@ public class MCRFileNodeServlet extends MCRContentServlet {
             return "/";
         }
         return path;
-    }
-
-    private MCRContent sendFile(HttpServletRequest request, HttpServletResponse response, MCRPath mcrPath) {
-        // TODO: Does MCRFileNodeServlet really has to handle IFS1 AudioVideoExtender support? (last rev: 30037))
-        return new MCRPathContent(mcrPath);
     }
 
     /**

@@ -117,7 +117,9 @@ public class MCRLayoutService {
             MCRParameterCollector parameter = new MCRParameterCollector(req);
             MCRContentTransformer transformer = getContentTransformer(docType, parameter);
             String filename = getFileName(req, parameter);
-            return transform(transformer, source, parameter, filename);
+            MCRContent transformed = transform(transformer, source, parameter);
+            transformed.setName(filename);
+            return transformed;
         } catch (IOException | TransformerException | SAXException ex) {
             throw ex;
         } catch (MCRException ex) {
@@ -225,8 +227,8 @@ public class MCRLayoutService {
         }
     }
 
-    private MCRContent transform(MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter,
-        String filename) throws IOException, TransformerException, SAXException {
+    private MCRContent transform(MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter)
+        throws IOException, TransformerException, SAXException {
         LOGGER.debug("MCRLayoutService starts to output {}", getMimeType(transformer));
         long start = System.currentTimeMillis();
         try {
