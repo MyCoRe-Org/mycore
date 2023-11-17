@@ -21,6 +21,7 @@ package org.mycore.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Hashtable;
 
@@ -125,7 +126,7 @@ public class MCRTextResolverTest extends MCRTestCase {
         } catch (CircularDependencyExecption cde) {
             return;
         }
-        assertFalse("No circular dependency occurred", true);
+        fail("No circular dependency occurred");
     }
 
     public static class UppercaseTerm extends Term {
