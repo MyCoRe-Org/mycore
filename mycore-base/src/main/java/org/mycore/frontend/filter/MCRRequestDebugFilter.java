@@ -78,7 +78,8 @@ public class MCRRequestDebugFilter implements Filter {
 
     private String getLogMsg(ServletRequest request) {
         HttpServletRequest req = (HttpServletRequest) request;
-        StringBuilder sb = new StringBuilder("REQUEST (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("REQUEST (").append(req.getMethod()).append(") URI: ").append(req.getRequestURI()).append('\n');
         logCookies(req, sb);
         logRequestParameters(request, sb);
         logSessionAttributes(req, sb);
@@ -88,7 +89,8 @@ public class MCRRequestDebugFilter implements Filter {
 
     private String getLogMsg(ServletRequest request, ServletResponse response) {
         HttpServletRequest req = (HttpServletRequest) request;
-        StringBuilder sb = new StringBuilder("RESPONSE (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("RESPONSE (").append(req.getMethod()).append(") URI: ").append(req.getRequestURI()).append('\n');
         HttpServletResponse res = (HttpServletResponse) response;
         sb.append("Status: ").append(res.getStatus()).append('\n');
         logHeader(res.getHeaderNames().stream(), s -> res.getHeaders(s).stream(), sb);
