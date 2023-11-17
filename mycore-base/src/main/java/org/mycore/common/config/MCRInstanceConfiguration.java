@@ -135,12 +135,10 @@ public class MCRInstanceConfiguration {
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            if (key.startsWith(prefix)) {
-                if (key.length() != prefix.length() && key.charAt(prefix.length()) == '.') {
+            if (key.startsWith(prefix)&&key.length() != prefix.length() && key.charAt(prefix.length()) == '.') {
                     String reducedKey = key.substring(prefix.length() + 1);
                     if (!name.ignoredKeys().contains(reducedKey)) {
                         reducedProperties.put(reducedKey, value);
-                    }
                 }
             }
         }

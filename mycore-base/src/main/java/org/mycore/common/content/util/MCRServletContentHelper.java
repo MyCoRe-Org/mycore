@@ -274,9 +274,7 @@ public abstract class MCRServletContentHelper {
 
         final String eTag = content.getETag();
         final String headerValue = request.getHeader("If-Match");
-        if (headerValue != null) {
-            if (headerValue.indexOf('*') == -1) {
-
+        if (headerValue != null&&headerValue.indexOf('*') == -1) {
                 final StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
                 boolean conditionSatisfied = false;
 
@@ -293,7 +291,6 @@ public abstract class MCRServletContentHelper {
                     return false;
                 }
 
-            }
         }
         return true;
     }
@@ -307,16 +304,15 @@ public abstract class MCRServletContentHelper {
         try {
             final long headerValue = request.getDateHeader("If-Modified-Since");
             final long lastModified = content.lastModified();
-            if (headerValue != -1) {
+            if (headerValue != -1&&request.getHeader("If-None-Match") == null && lastModified < headerValue + 1000) {
 
                 // If an If-None-Match header has been specified, if modified since
                 // is ignored.
-                if (request.getHeader("If-None-Match") == null && lastModified < headerValue + 1000) {
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                     response.setHeader("ETag", content.getETag());
 
                     return false;
-                }
+
             }
         } catch (final IllegalArgumentException illegalArgument) {
             return true;
@@ -372,12 +368,10 @@ public abstract class MCRServletContentHelper {
         try {
             final long lastModified = resource.lastModified();
             final long headerValue = request.getDateHeader("If-Unmodified-Since");
-            if (headerValue != -1) {
-                if (lastModified >= headerValue + 1000) {
+            if (headerValue != -1&&lastModified >= headerValue + 1000) {
                     // The content has been modified.
                     response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                     return false;
-                }
             }
         } catch (final IllegalArgumentException illegalArgument) {
             return true;

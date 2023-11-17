@@ -234,10 +234,8 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @return true if it is compare, else return false
      */
     public final boolean compare(MCRMetaLink input) {
-        if (linktype.equals("locator")) {
-            if (linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
+        if (linktype.equals("locator")&&linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
                 return true;
-            }
         }
 
         if (linktype.equals("arc")) {
@@ -404,10 +402,8 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if (label != null && label.length() > 0) {
-            if (!XMLChar.isValidNCName(label)) {
+        if (label != null && label.length() > 0&&!XMLChar.isValidNCName(label)) {
                 throw new MCRException(getSubTag() + ": label is no valid NCName:" + label);
-            }
         }
         if (linktype == null) {
             throw new MCRException(getSubTag() + ": linktype is null");
@@ -428,10 +424,8 @@ public class MCRMetaLink extends MCRMetaDefault {
                 throw new MCRException(getSubTag() + ": to is no valid NCName:" + to);
             }
         }
-        if (linktype.equals("locator")) {
-            if (href == null || href.length() == 0) {
+        if (linktype.equals("locator")&&(href == null || href.length() == 0)) {
                 throw new MCRException(getSubTag() + ": href is null or empty");
-            }
         }
     }
 

@@ -81,12 +81,13 @@ public class MCRSecureTokenV2Filter implements Filter {
         if (filterEnabled) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             String pathInfo = httpServletRequest.getPathInfo();
-            if (pathInfo != null && MCRSecureTokenV2FilterConfig.requireHash(pathInfo)) {
-                if (!validateSecureToken(httpServletRequest)) {
+            if (pathInfo != null
+                    && MCRSecureTokenV2FilterConfig.requireHash(pathInfo)
+                    &&!validateSecureToken(httpServletRequest)) {
                     ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
                     LOGGER.warn("Access to {} forbidden by secure token check.", pathInfo);
                     return;
-                }
+
             }
         }
         chain.doFilter(request, response);
