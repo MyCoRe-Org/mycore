@@ -20,6 +20,7 @@ package org.mycore.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Hashtable;
 
@@ -79,8 +80,8 @@ public class MCRTextResolverTest extends MCRTestCase {
         resolver.removeVariable("f2");
         resolver.removeVariable("f3");
         assertEquals("v1, v4", resolver.resolve("[{f1}][, {f2}][, {f3}][, {f4}]"));
-        assertEquals(true, resolver.containsVariable("f1"));
-        assertEquals(false, resolver.containsVariable("f2"));
+        assertTrue(resolver.containsVariable("f1"));
+        assertFalse(resolver.containsVariable("f2"));
     }
 
     @Test

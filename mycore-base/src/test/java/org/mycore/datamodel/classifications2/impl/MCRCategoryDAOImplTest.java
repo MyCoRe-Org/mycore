@@ -167,7 +167,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
             .longValue();
         // category + india
         assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
-        assertTrue("No root category present", rootCategory.getRoot() != null);
+        assertNotNull("No root category present", rootCategory.getRoot());
     }
 
     /**

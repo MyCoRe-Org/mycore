@@ -20,6 +20,7 @@ package org.mycore.datamodel.ifs2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -82,7 +83,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         assertEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         byte[] content = "Hello World".getBytes(StandardCharsets.UTF_8);
         file.setContent(new MCRByteContent(content, System.currentTimeMillis()));
-        assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
+        assertNotEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         MCRFileCollection col2 = getStore().retrieve(col.getID());
         MCRFile child = (MCRFile) col2.getChild("foo.txt");
         assertEquals(file.getMD5(), child.getMD5());
@@ -114,7 +115,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
             new ByteArrayInputStream(content).transferTo(fo);
         }
         file.setContent(new MCRFileContent(src));
-        assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
+        assertNotEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         assertEquals(11, file.getSize());
         file.getContent().sendTo(src);
         assertEquals(11, src.length());
@@ -125,7 +126,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         MCRFile file = col.createFile("foo.xml");
         Document xml = new Document(new Element("root"));
         file.setContent(new MCRJDOMContent(xml));
-        assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
+        assertNotEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         Document xml2 = file.getContent().asXML();
         assertEquals("root", xml2.getRootElement().getName());
     }
