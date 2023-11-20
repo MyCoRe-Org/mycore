@@ -69,7 +69,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.debug(e.getMessage());
             }
             logger.debug("This class is here: {}", getSource(this.getClass()));
         }
