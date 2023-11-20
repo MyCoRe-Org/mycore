@@ -24,6 +24,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
@@ -272,8 +273,8 @@ public class MCRDataURL implements Serializable {
                     .map(s -> s.split(PARAM_SEPARATOR, 2)).collect(Collectors.toMap(sl -> sl[0], sl -> {
                         try {
                             return decode(sl[1], StandardCharsets.UTF_8);
-                        } catch (Exception e) {
-                            throw new RuntimeException("Error encoding the parameter value \"" + sl[1]
+                        } catch (UnsupportedCharsetException e) {
+                            throw new UnsupportedCharsetException("Error encoding the parameter value \"" + sl[1]
                                 + "\". Error: " + e.getMessage());
                         }
                     }));

@@ -18,6 +18,8 @@
 
 package org.mycore.frontend.support;
 
+import org.mycore.common.MCRException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -60,7 +62,7 @@ public class MCRSecureTokenV2 {
         try {
             this.contentPath = new URI(null, null, this.contentPath, null).getRawPath();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
         buildHash();
     }
@@ -74,7 +76,7 @@ public class MCRSecureTokenV2 {
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);//should never happen for 'SHA-256'
+            throw new MCRException(e);//should never happen for 'SHA-256'
         }
         digest.update(URI.create(forHashing).toASCIIString().getBytes(StandardCharsets.US_ASCII));
         byte[] sha256 = digest.digest();

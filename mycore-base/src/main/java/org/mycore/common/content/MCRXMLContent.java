@@ -58,7 +58,7 @@ public abstract class MCRXMLContent extends MCRContent {
         try {
             this.setEncoding(MCRConstants.DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 

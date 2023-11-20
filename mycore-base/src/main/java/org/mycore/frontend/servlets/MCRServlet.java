@@ -56,7 +56,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServlet;
@@ -336,7 +335,7 @@ public class MCRServlet extends HttpServlet {
             if (isHandleExceptionComplete(req, ex)) {
                 return;
             }
-            throw new RuntimeException(ex);
+            throw new MCRException(ex);
         } finally {
             cleanupMCRSession(req, getServletName());
         }

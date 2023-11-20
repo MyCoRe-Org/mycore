@@ -111,6 +111,7 @@ public interface MCRThrowFunction<T, R, E extends Throwable> {
      * Returns a Function that applies &lt;T&gt; and catches any exception and wraps it into a {@link RuntimeException} if needed.
      * Use this if you just want no specific exception handling.
      */
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     default Function<T, R> toFunction() {
         return toFunction((t, e) -> {
             if (e instanceof RuntimeException rte) {

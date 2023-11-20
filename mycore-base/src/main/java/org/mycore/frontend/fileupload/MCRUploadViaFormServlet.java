@@ -32,6 +32,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -80,7 +81,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
 
     private void guardWebsiteCurrentlyReadOnly() {
         if (MCRWebsiteWriteProtection.isActive()) {
-            throw new RuntimeException("System is currently in read-only mode");
+            throw new MCRConfigurationException("System is currently in read-only mode");
         }
     }
 

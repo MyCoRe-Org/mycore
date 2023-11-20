@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.mycore.common.MCRException;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
 public class MCRPrioritySupplierTest {
@@ -85,7 +86,7 @@ public class MCRPrioritySupplierTest {
                 Thread.sleep(100);
                 return id;
             } catch (Exception exc) {
-                throw new RuntimeException(exc);
+                throw new MCRException(exc);
             }
         }
 

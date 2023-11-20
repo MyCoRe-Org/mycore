@@ -726,7 +726,7 @@ public abstract class MCRPath implements Path {
             }
             return new URI(null, null, path, null);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 

@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -509,7 +510,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             // build JDOM
             xml = obj.createXML();
 
-        } catch (MCRException ex) {
+        } catch (IllegalArgumentException ex) {
             LOGGER.warn("Could not read {}, continue with next ID", nid);
             return;
         }
@@ -646,11 +647,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRObjectID objID = MCRObjectID.getInstance(objectId);
 
         if (!MCRMetadataManager.exists(objID)) {
-            throw new Exception("The object with id " + objID + " does not exist");
+            throw new NoSuchElementException("The object with id " + objID + " does not exist");
         }
 
         if (!MCRMetadataManager.exists(derID)) {
-            throw new Exception("The derivate with id " + derID + " does not exist");
+            throw new NoSuchElementException("The derivate with id " + derID + " does not exist");
         }
 
         MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(derID);
