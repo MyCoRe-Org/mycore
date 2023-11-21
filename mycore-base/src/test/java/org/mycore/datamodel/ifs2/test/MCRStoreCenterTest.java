@@ -113,10 +113,6 @@ public class MCRStoreCenterTest {
 
     }
 
-    private String getPropName(String storeID, String propType) {
-        return new MessageFormat("MCR.IFS2.Store.{0}.{1}", Locale.ROOT).format(new Object[] { storeID, propType });
-    }
-
     public static class FakeStore extends MCRStore {
         private String msg = "Fake Store";
 
