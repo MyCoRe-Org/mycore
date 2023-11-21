@@ -31,6 +31,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.processing.MCRAbstractProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
 
@@ -108,14 +109,14 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
             }
             if (executionException == null) {
                 //execute job
-                transaction.begin();
+                MCRTransactionHelper.beginTransaction();
                 localJob = em.merge(localJob);
                 try {
                     actionInstance.execute();
-                    transaction.commit();
+                    MCRTransactionHelper.commitTransaction();
                 } catch (Exception ex) {
                     executionException = ex;
-                    transaction.rollback();
+                    MCRTransactionHelper.rollbackTransaction();
                     try {
                         actionInstance.rollback();
                     } catch (RuntimeException e) {
