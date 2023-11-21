@@ -205,7 +205,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <link>https://docs.oracle.com/en/java/javase/17/docs/api/</link>
               <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
-              <link>https://logging.apache.org/log4j/2.x/log4j-api/</link>
+              <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>
               <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
               <!--
