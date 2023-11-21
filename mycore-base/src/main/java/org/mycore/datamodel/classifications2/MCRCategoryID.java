@@ -51,11 +51,11 @@ public class MCRCategoryID implements Serializable {
 
     private static final long serialVersionUID = -5672923571406252855L;
 
-    private static final Pattern VALID_ID = Pattern.compile("[^:$\\{\\}]+");
+    public static final Pattern VALID_ID = Pattern.compile("[^:$\\{\\}]+");
 
-    private static final int ROOT_ID_LENGTH = 32;
+    public static final int ROOT_ID_LENGTH = 32;
 
-    private static final int CATEG_ID_LENGTH = 128;
+    public static final int CATEG_ID_LENGTH = 128;
 
     @Basic
     @Column(name = "ClassID", length = ROOT_ID_LENGTH, nullable = false, updatable = false)
