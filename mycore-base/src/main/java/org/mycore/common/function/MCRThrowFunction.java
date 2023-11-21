@@ -88,10 +88,11 @@ public interface MCRThrowFunction<T, R, E extends Throwable> {
      * Returns a function that catches &lt;E&gt; and forwards it to the <code>throwableHandler</code> together with the Exception.
      * 
      * Use this method if you want to react on the certain Exceptions and return a result
-     * or rethrow a specific RuntimeExption.
+     * or rethrow a specific RuntimeException.
      * @param throwableHandler a BiFunction that handles original Input and caught Exception
      * @param exClass class of exception to catch
      */
+    @SuppressWarnings("PMD.AvoidCatchingThrowable")
     default Function<T, R> toFunction(BiFunction<T, E, R> throwableHandler, Class<? super E> exClass) {
         return t -> {
             try {

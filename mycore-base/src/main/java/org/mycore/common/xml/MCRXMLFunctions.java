@@ -25,11 +25,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.file.FileStore;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.Normalizer;
@@ -69,6 +67,7 @@ import org.jdom2.output.DOMOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
@@ -270,20 +269,6 @@ public class MCRXMLFunctions {
             LOGGER.warn("Could not apply regular expression. Returning source string ({}).", source);
             return source;
         }
-    }
-
-    /**
-     * Get the string matching the regular expression from the source paramater.
-     *
-     * @param source the string to search
-     * @param regex the regular expression
-     *
-     * @return the string matching in the source parameter matching the given regular expression
-     */
-    public static String getMatchingString(String source, String regex) {
-        Pattern pattern = Pattern.compile(regex);
-        Matcher m = pattern.matcher(source);
-        return m.find() ? m.group() : "";
     }
 
     public static boolean classAvailable(String className) {
@@ -530,16 +515,8 @@ public class MCRXMLFunctions {
         if (f == null) {
             return "application/octet-stream";
         }
-
-        if (MIMETYPE_MAP == null) {
-            synchronized (MCRXMLFunctions.class) {
-                if (MIMETYPE_MAP == null) {
-                    MIMETYPE_MAP = new MimetypesFileTypeMap();
-                }
-            }
-        }
-
-        return MIMETYPE_MAP.getContentType(f.toLowerCase(Locale.ROOT));
+        MimetypesFileTypeMap mTypes = new MimetypesFileTypeMap();
+        return mTypes.getContentType(f.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -640,7 +617,7 @@ public class MCRXMLFunctions {
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
             return MCRCategLinkServiceHolder.INSTANCE.isInCategory(reference, categID);
-        } catch (Throwable e) {
+        } catch (MCRException e) {
             LOGGER.error("Error while checking if object is in category", e);
             return false;
         }
@@ -671,7 +648,7 @@ public class MCRXMLFunctions {
                 .map(Optional::get)
                 .map(MCRLabel::getText)
                 .orElse("");
-        } catch (Throwable e) {
+        } catch (MCRException e) {
             LOGGER.error("Could not determine display name for classification id {} and category id {}",
                 classificationId, categoryId, e);
             return "";
@@ -699,7 +676,7 @@ public class MCRXMLFunctions {
             MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             category = dao.getCategory(categID, 0);
-        } catch (Throwable e) {
+        } catch (MCRException e) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
                 categoryId, e);
         }
@@ -878,20 +855,6 @@ public class MCRXMLFunctions {
             res.insert(m.start(), stripHtml(m.group(m.groupCount() - 1)));
         }
         return StringEscapeUtils.unescapeHtml4(res.toString()).replaceAll(TAG_SELF_CLOSING, "");
-    }
-
-    /**
-     * Returns approximately the usable space in the MCR.datadir in bytes as in {@link FileStore#getUsableSpace()}.
-     *
-     * @return approximately the usable space in the MCR.datadir
-     * @throws IOException
-     * */
-    public static long getUsableSpace() throws IOException{
-        Path dataDir = Paths.get(MCRConfiguration2.getStringOrThrow("MCR.datadir"));
-        dataDir = dataDir.toRealPath();
-        FileStore fs = Files.getFileStore(dataDir);
-
-        return fs.getUsableSpace();
     }
 
     /**

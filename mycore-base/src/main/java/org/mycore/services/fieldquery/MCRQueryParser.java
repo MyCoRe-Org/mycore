@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdom2.Element;
+import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
@@ -304,7 +305,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
         try {
             MCRCondition<Void> cond = new MCRQueryParser().parse(query);
             return cond != null;
-        } catch (Throwable t) {
+        } catch (MCRException t) {
             return false;
         }
     }
