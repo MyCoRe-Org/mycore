@@ -352,7 +352,11 @@ public final class MCRURIResolver implements URIResolver {
 
         URIResolver uriResolver = SUPPORTED_SCHEMES.get(scheme);
         if (uriResolver != null) {
-            return uriResolver.resolve(href, base);
+            Source resolved = uriResolver.resolve(href, base);
+            if (resolved.getSystemId() == null) {
+                resolved.setSystemId(href);
+            }
+            return resolved;
         } else { // try to handle as URL, use default resolver for file:// and
             try {
                 InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
