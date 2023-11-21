@@ -133,7 +133,7 @@ public class MCRTranslation {
      *            target locale of translation
      * @return translated String
      */
-    public static String translate(String label, Locale locale) {
+    public static String translateToLocale(String label, Locale locale) {
         return translate(label, locale, MESSAGES_BUNDLE);
     }
 
@@ -159,7 +159,7 @@ public class MCRTranslation {
      *            a fully qualified class name
      * @return translated String
      */
-    public static String translate(String label, Locale locale, String baseName) {
+    public static String translateToLocale(String label, Locale locale, String baseName) {
         LOGGER.debug("Translation for current locale: {}", locale.getLanguage());
         ResourceBundle message;
         try {
@@ -205,7 +205,7 @@ public class MCRTranslation {
      */
     public static Map<String, String> translatePrefix(String prefix) {
         Locale currentLocale = getCurrentLocale();
-        return translatePrefix(prefix, currentLocale);
+        return translatePrefixToLocale(prefix, currentLocale);
     }
 
     /**
@@ -217,7 +217,7 @@ public class MCRTranslation {
      *            target locale of translation
      * @return map of labels with translated values
      */
-    public static Map<String, String> translatePrefix(String prefix, Locale locale) {
+    public static Map<String, String> translatePrefixToLocale(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: {}", locale.getLanguage());
         HashMap<String, String> map = new HashMap<>();
         ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);

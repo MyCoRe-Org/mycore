@@ -94,7 +94,7 @@ public class MCRRestAPIMessages {
 
         Properties data = new MCRProperties();
         for (String prefix : check) {
-            data.putAll(MCRTranslation.translatePrefix(prefix, locale));
+            data.putAll(MCRTranslation.translatePrefixToLocale(prefix, locale));
         }
         try {
             if (FORMAT_PROPERTY.equals(format)) {
