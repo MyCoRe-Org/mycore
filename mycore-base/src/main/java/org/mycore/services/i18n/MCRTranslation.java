@@ -89,8 +89,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label) {
-        Locale currentLocale = getCurrentLocale();
-        return translate(label, currentLocale);
+        return translateToLocale(label, getCurrentLocale());
     }
 
     /**
@@ -121,8 +120,7 @@ public class MCRTranslation {
      */
 
     public static String translateWithBaseName(String label, String baseName) {
-        Locale currentLocale = getCurrentLocale();
-        return translate(label, currentLocale, baseName);
+        return translateToLocale(label, getCurrentLocale(), baseName);
     }
 
     /**
@@ -134,7 +132,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translateToLocale(String label, Locale locale) {
-        return translate(label, locale, MESSAGES_BUNDLE);
+        return translateToLocale(label, locale, MESSAGES_BUNDLE);
     }
 
     /**
@@ -146,7 +144,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translateToLocale(String label, String locale) {
-        return translate(label, getLocale(locale), MESSAGES_BUNDLE);
+        return translateToLocale(label, getLocale(locale), MESSAGES_BUNDLE);
     }
 
     /**
@@ -204,8 +202,7 @@ public class MCRTranslation {
      * @return map of labels with translated values
      */
     public static Map<String, String> translatePrefix(String prefix) {
-        Locale currentLocale = getCurrentLocale();
-        return translatePrefixToLocale(prefix, currentLocale);
+        return translatePrefixToLocale(prefix, getCurrentLocale());
     }
 
     /**
@@ -241,12 +238,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label, Object... arguments) {
-        Locale currentLocale = getCurrentLocale();
-        String msgFormat = translate(label);
-        MessageFormat formatter = new MessageFormat(msgFormat, currentLocale);
-        String result = formatter.format(arguments);
-        LOGGER.debug("Translation for {}={}", label, result);
-        return result;
+        return translateToLocale(label, getCurrentLocale(), arguments);
     }
 
     /**
