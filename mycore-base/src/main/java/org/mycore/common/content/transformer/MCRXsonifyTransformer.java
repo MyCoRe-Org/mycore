@@ -44,7 +44,7 @@ import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_PLAIN_TEXT
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_XS_ANY_NAMESPACE_STRATEGY;
 import static org.mycore.xsonify.serialize.SerializerSettings.JsonStructure;
 import static org.mycore.xsonify.serialize.SerializerSettings.MixedContentHandling;
-import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceHandling;
+import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceDeclaration;
 import static org.mycore.xsonify.serialize.SerializerSettings.PlainTextHandling;
 import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
 import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
@@ -99,7 +99,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
 
     /**
      * Map of namespaces. This setting is required for the json2xml serialisation process if the
-     * {@link SerializerSettings#namespaceHandling()} is set to <b>OMIT</b>.
+     * {@link SerializerSettings#namespaceDeclaration()} is set to <b>OMIT</b>.
      * TODO: Map property doesn't seem to work right now
      */
     //@MCRProperty(name = "Namespaces", required = false)
@@ -237,8 +237,8 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
         @MCRProperty(name = "OmitRootElement", required = false)
         public String omitRootElement = String.valueOf(Boolean.valueOf(DEFAULT_OMIT_ROOT_ELEMENT));
 
-        @MCRProperty(name = "NamespaceHandling", required = false)
-        public String namespaceHandling = DEFAULT_NAMESPACE_HANDLING.name();
+        @MCRProperty(name = "NamespaceDeclaration", required = false)
+        public String namespaceDeclaration = DEFAULT_NAMESPACE_HANDLING.name();
 
         @MCRProperty(name = "NormalizeText", required = false)
         public String normalizeText = String.valueOf(Boolean.valueOf(DEFAULT_NORMALIZE_TEXT));
@@ -267,7 +267,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
         public SerializerSettings get() {
             return new SerializerSettings(
                 Boolean.parseBoolean(omitRootElement),
-                NamespaceHandling.valueOf(namespaceHandling),
+                NamespaceDeclaration.valueOf(namespaceDeclaration),
                 Boolean.parseBoolean(normalizeText),
                 PrefixHandling.valueOf(elementPrefixHandling),
                 PrefixHandling.valueOf(attributePrefixHandling),
@@ -296,23 +296,23 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
         @MCRProperty(name = "TextKey", required = false)
         public String textKey = new SerializerStyle().textKey();
 
-        @MCRProperty(name = "NamespacePrefixKey", required = false)
-        public String namespacePrefixKey = new SerializerStyle().namespacePrefixKey();
-
         @MCRProperty(name = "MixedContentKey", required = false)
         public String mixedContentKey = new SerializerStyle().mixedContentKey();
 
         @MCRProperty(name = "MixedContentElementNameKey", required = false)
         public String mixedContentElementNameKey = new SerializerStyle().mixedContentElementNameKey();
 
+        @MCRProperty(name = "IndexKey", required = false)
+        public String indexKey = new SerializerStyle().indexKey();
+
         public SerializerStyle get() {
             return new SerializerStyle(
                 attributePrefix,
                 xmlnsPrefix,
                 textKey,
-                namespacePrefixKey,
                 mixedContentKey,
-                mixedContentElementNameKey
+                mixedContentElementNameKey,
+                indexKey
             );
         }
 
