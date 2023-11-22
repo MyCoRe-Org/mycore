@@ -53,16 +53,16 @@ public class MCRAccessException extends MCRCatchException {
         StringBuilder sb = new StringBuilder();
         switch (privilege.length) {
             case 0 ->
-                //no privilige but permission was missing
+                //no privilege but permission was missing
                 sb.append("You do not have the permission '").append(permission).append("' on '").append(oid)
                     .append('\'');
             case 1 -> sb.append("You do not have the privilege '").append(privilege[0]).append('\'');
             default -> sb.append(
                 Stream.of(privilege).collect(
-                    Collectors.joining("', '", "You do not have any of the required privileges ( '", ")")));
+                    Collectors.joining("', '", "You do not have any of the required privileges ('", "')")));
         }
         sb.append(
-            action.map(s -> " to perfom: " + s).orElse("."));
+            action.map(s -> " to perform: " + s).orElse("."));
         return sb.toString();
     }
 
