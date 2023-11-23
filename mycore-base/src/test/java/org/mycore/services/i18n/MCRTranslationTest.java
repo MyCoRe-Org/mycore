@@ -41,7 +41,7 @@ public class MCRTranslationTest extends MCRTestCase {
         // default locale should be 'de'
         assertEquals("Hallo Welt", MCRTranslation.translate("junit.hello"));
         // fall back to 'de'
-        assertEquals("Hallo Welt", MCRTranslation.translate("junit.hello", Locale.FRENCH));
+        assertEquals("Hallo Welt", MCRTranslation.translateToLocale("junit.hello", Locale.FRENCH));
     }
 
     /*
@@ -67,7 +67,7 @@ public class MCRTranslationTest extends MCRTestCase {
     @Test
     public void getDeprecatedMessageKeys() {
         assertEquals("Depreacted I18N keys do not work", "MyCoRe ID",
-            MCRTranslation.translate("oldLabel", Locale.ENGLISH));
+            MCRTranslation.translateToLocale("oldLabel", Locale.ENGLISH));
     }
 
 }
