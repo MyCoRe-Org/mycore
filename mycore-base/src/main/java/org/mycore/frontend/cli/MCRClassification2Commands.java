@@ -360,7 +360,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         int level = categ.getLevel();
         String space = " ".repeat(level * 2);
         if (categ.isCategory()) {
-            LOGGER.info("{}  ID    : {}", space, categ.getId().getID());
+            LOGGER.info("{}  ID    : {}", space, categ.getId().getId());
         }
         for (MCRLabel label : categ.getLabels()) {
             LOGGER.info("{}  Label : ({}) {}", space, label.getLang(), label.getText());

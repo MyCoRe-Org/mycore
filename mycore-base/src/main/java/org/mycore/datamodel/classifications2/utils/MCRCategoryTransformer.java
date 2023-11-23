@@ -151,7 +151,7 @@ public class MCRCategoryTransformer {
 
         static Element getElement(MCRCategory category, Map<MCRCategoryID, Number> countMap) {
             Element ce = new Element("category");
-            ce.setAttribute("ID", category.getId().getID());
+            ce.setAttribute("ID", category.getId().getId());
             Number number = countMap == null ? null : countMap.get(category.getId());
             if (number != null) {
                 ce.setAttribute("counter", Integer.toString(number.intValue()));
@@ -246,7 +246,7 @@ public class MCRCategoryTransformer {
             }
 
             Element ce = new Element("item");
-            ce.setAttribute("value", completeId ? category.getId().toString() : category.getId().getID());
+            ce.setAttribute("value", completeId ? category.getId().toString() : category.getId().getId());
             parent.addContent(ce);
 
             for (MCRLabel label : category.getLabels()) {
@@ -273,7 +273,7 @@ public class MCRCategoryTransformer {
             } catch (RuntimeException e) {
                 throw new RuntimeException("Error while inserting '" + labtext + "' into: " + labelFormat, e);
             }
-            text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getID());
+            text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getId());
             text = DESCR_PATTERN.matcher(text)
                 .replaceAll(label.getDescription().replace("\\", "\\\\").replace("$", "\\$"));
             int num = countMap == null ? -1 : countMap.get(cat.getId()).intValue();

@@ -870,7 +870,7 @@ public class MCRRestObjects {
             return Response.noContent().build();
         }
         return Response.temporaryRedirect(
-            uriInfo.resolve(URI.create("classifications/" + state.getRootID() + "/" + state.getID())))
+            uriInfo.resolve(URI.create("classifications/" + state.getRootID() + "/" + state.getId())))
             .build();
     }
 

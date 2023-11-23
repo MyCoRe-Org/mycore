@@ -157,7 +157,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-hikaricp</artifactId>
       <scope>test</scope>
     </dependency>

@@ -517,7 +517,8 @@ public class MCRMailer extends MCRServlet {
     private static Document transform(Document input, String stylesheet, Map<String, String> parameters)
         throws Exception {
         MCRJDOMContent source = new MCRJDOMContent(input);
-        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/" + stylesheet + ".xsl");
+        final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance(xslFolder + "/" + stylesheet + ".xsl");
         MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();
         parameterCollector.setParameters(parameters);
         MCRContent result = transformer.transform(source, parameterCollector);

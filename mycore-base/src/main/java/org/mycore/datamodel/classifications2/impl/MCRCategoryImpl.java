@@ -127,7 +127,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategory.rootIds", query = "SELECT cat.id FROM MCRCategoryImpl cat WHERE cat.left = 0"),
     @NamedQuery(name = "MCRCategory.childCount",
         query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE "
-            + "children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE "
+            + "children.parent.internalID=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE "
             + "cat.id.rootID=:classID and (cat.id.id=:categID OR cat.id.id IS NULL AND :categID IS NULL))"),
 })
 
@@ -269,7 +269,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
                 .getChildren()
                 .stream()
                 .map(MCRCategory::getId)
-                .map(MCRCategoryID::getID)
+                .map(MCRCategoryID::getId)
                 .collect(Collectors.joining(", ")));
     }
 
@@ -465,14 +465,14 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         if (getId() == null) {
             setId(MCRCategoryID.rootID(rootID));
         } else if (!getId().getRootID().equals(rootID)) {
-            setId(new MCRCategoryID(rootID, getId().getID()));
+            setId(new MCRCategoryID(rootID, getId().getId()));
         }
     }
 
     public void setCategID(String categID) {
         if (getId() == null) {
             setId(new MCRCategoryID(null, categID));
-        } else if (!getId().getID().equals(categID)) {
+        } else if (!getId().getId().equals(categID)) {
             setId(new MCRCategoryID(getId().getRootID(), categID));
         }
     }

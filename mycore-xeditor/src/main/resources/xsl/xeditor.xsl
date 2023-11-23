@@ -8,7 +8,7 @@
 
   <xsl:strip-space elements="xed:*" />
 
-  <xsl:include href="copynodes.xsl" />
+  <xsl:include href="resource:xsl/copynodes.xsl" />
   <xsl:include href="xslInclude:xeditor" />
 
   <xsl:param name="ServletsBaseURL" />

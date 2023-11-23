@@ -8,7 +8,8 @@
 <!-- ============================================== -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="xlink xalan i18n">
+  xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrwebpage="http://www.mycore.de/MyCoReWebPage"
+  exclude-result-prefixes="xlink xalan i18n mcrwebpage">
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="xslInclude:MyCoReWebPage" />
@@ -139,4 +140,9 @@
 
   <!-- =============================================================================== -->
 
+  <!-- Dynamic includes -->
+
+  <xsl:template match="mcrwebpage:xinclude">
+    <xsl:apply-templates select="document(@uri)/*" />
+  </xsl:template>
 </xsl:stylesheet>

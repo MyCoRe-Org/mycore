@@ -48,6 +48,7 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
@@ -57,8 +58,8 @@ import org.xml.sax.SAXException;
 
 /**
  * Lists all *.xsl stylesheets in the web application located in any 
- * WEB-INF/lib/*.jar or WEB-INF/classes/xsl/ or in {@link MCRConfigurationDir}, outputs the
- * dependencies (import/include) and contained templates.
+ * WEB-INF/lib/*.jar or WEB-INF/classes/[MCR.Layout.Transformer.Factory.XSLFolder]/ or in {@link MCRConfigurationDir},
+ * outputs the dependencies (import/include) and contained templates.
  * 
  * @author Frank Lützenkirchen
  */
@@ -69,6 +70,8 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     private final Map<String, Stylesheet> stylesheets = new HashMap<>();
 
     private final Set<String> unknown = new HashSet<>();
+    private final String xslFolder =
+        MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder") + "/";
 
     protected void doGetPost(MCRServletJob job) throws Exception {
         if ("true".equals(job.getRequest().getParameter("reload"))) {
@@ -202,7 +205,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
             for (ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
                 String name = ze.getName();
-                if (name.startsWith("xsl/") && name.endsWith(".xsl")) {
+                if (name.startsWith(xslFolder) && name.endsWith(".xsl")) {
                     foundStylesheet(name, pathOfJarFile);
                 }
                 zis.closeEntry();
@@ -211,7 +214,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private void findXSLinClassesDir() {
-        String base = "/WEB-INF/classes/xsl/";
+        String base = "/WEB-INF/classes/" + xslFolder;
         for (String path : diveInto(base)) {
             if (path.endsWith(".xsl")) {
                 foundStylesheet(path, base);
@@ -220,7 +223,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private void foundStylesheet(String path, String source) {
-        String file = path.substring(path.lastIndexOf("xsl/") + 4);
+        String file = path.substring(path.lastIndexOf(xslFolder) + 4);
         LOGGER.info("Found {} in {}", file, source);
         Stylesheet stylesheet = getStylesheet(file);
         if (source.startsWith("/WEB-INF/")) {
@@ -260,7 +263,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         }
 
         private void resolveXSL() {
-            String uri = "resource:xsl/" + name;
+            String uri = "resource:" + xslFolder + name;
             resolveXSL(uri);
             if (xsl == null) {
                 resolveXSL(name);

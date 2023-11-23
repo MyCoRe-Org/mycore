@@ -459,9 +459,13 @@ public class MCRAccessManager {
     }
 
     public static MCRRuleAccessInterface requireRulesInterface() {
-        if (!(getAccessImpl() instanceof MCRRuleAccessInterface)) {
+        if (!implementsRulesInterface()) {
             throw new MCRException(MCRAccessInterface.class + " is no " + MCRRuleAccessInterface.class);
         }
         return getAccessImpl();
+    }
+    
+    public static boolean implementsRulesInterface() {
+        return getAccessImpl() instanceof MCRRuleAccessInterface;
     }
 }

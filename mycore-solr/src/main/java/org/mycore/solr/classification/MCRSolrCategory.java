@@ -44,7 +44,7 @@ public class MCRSolrCategory {
         doc.setField("classification", id.getRootID());
         doc.setField("type", "node");
         if (category.isCategory()) {
-            doc.setField("category", id.getID());
+            doc.setField("category", id.getId());
         }
         // labels
         Set<MCRLabel> labels = category.getLabels();

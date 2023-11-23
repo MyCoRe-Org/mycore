@@ -85,7 +85,7 @@
       </div>
       <div class="jobqueue" v-else-if="model.status === 'loaded'">
         <div class="jobqueue-search-wrapper">
-          <JobSearch v-on:search="executeSearch" :parameter="parameter"/>
+          <JobSearch v-on:search="executeSearch" v-if="parameter != undefined" :parameter="parameter"/>
         </div>
 
         <div class="jobqueue-pagination-wrapper">
@@ -107,7 +107,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="job in model.queues.job">
+            <tr v-for="job in model.queues?.job">
               <th scope="row">
                 {{ job.id }}
               </th>

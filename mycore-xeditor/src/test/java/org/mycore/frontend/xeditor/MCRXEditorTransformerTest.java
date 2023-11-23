@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -189,5 +190,15 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     public void testSelect() throws IOException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testSelect-editor.xml", "testSelect-source.xml", "testSelect-transformed.xml");
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        final Map<String, String> properties = super.getTestProperties();
+
+        properties.put("MCR.URIResolver.CachingResolver.Capacity", "100");
+        properties.put("MCR.URIResolver.CachingResolver.MaxAge", "3600000");
+
+        return properties;
     }
 }

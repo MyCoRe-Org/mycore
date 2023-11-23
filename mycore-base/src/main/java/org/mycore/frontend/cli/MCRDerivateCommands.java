@@ -846,7 +846,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         final String nonExistingCategoriesCommaList = derivateTypes.stream()
             .filter(Predicate.not(categoryDAO::exist))
-            .map(MCRCategoryID::getID)
+            .map(MCRCategoryID::getId)
             .collect(Collectors.joining(", "));
         if (!nonExistingCategoriesCommaList.isEmpty()) {
             throw new MCRPersistenceException("Categories do not exist: " + nonExistingCategoriesCommaList);
@@ -859,7 +859,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             .addAll(
                 derivateTypes.stream()
                     .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID.getRootID(),
-                        categoryID.getID()))
+                        categoryID.getId()))
                     .collect(Collectors.toList()));
         MCRMetadataManager.update(derivate);
     }

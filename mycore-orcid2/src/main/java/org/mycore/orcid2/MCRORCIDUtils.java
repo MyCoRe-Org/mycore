@@ -213,6 +213,6 @@ public class MCRORCIDUtils {
     }
 
     private static Optional<String> getStateValue(MCRObject object) {
-        return Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getID);
+        return Optional.ofNullable(object.getService().getState()).map(MCRCategoryID::getId);
     }
 }

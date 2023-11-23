@@ -153,7 +153,7 @@ public class MCRUserManager {
         mcrUser.getExternalRoleIDs().clear();
         for (MCRCategoryID roleID : roleIDs) {
             if (roleID.getRootID().equals(MCRUser2Constants.ROLE_CLASSID.getRootID())) {
-                mcrUser.getSystemRoleIDs().add(roleID.getID());
+                mcrUser.getSystemRoleIDs().add(roleID.getId());
             } else {
                 mcrUser.getExternalRoleIDs().add(roleID.toString());
             }

@@ -28,16 +28,15 @@ import jakarta.persistence.PersistenceException;
  * @author René Adler (eagle)
  */
 @Converter
-public class MCRJobActionConverter implements AttributeConverter<Object, String> {
+public class MCRJobActionConverter implements AttributeConverter<Class<? extends MCRJobAction>, String> {
 
-    @SuppressWarnings("unchecked")
     @Override
-    public String convertToDatabaseColumn(Object actionClass) {
-        return ((Class<? extends MCRJobAction>) actionClass).getName();
+    public String convertToDatabaseColumn(Class<? extends MCRJobAction> actionClass) {
+        return actionClass.getName();
     }
 
     @Override
-    public Object convertToEntityAttribute(String actionClassString) {
+    public Class<? extends MCRJobAction> convertToEntityAttribute(String actionClassString) {
         try {
             return MCRClassTools.forName(actionClassString);
         } catch (ClassNotFoundException e) {

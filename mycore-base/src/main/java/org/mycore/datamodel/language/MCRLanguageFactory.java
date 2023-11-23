@@ -249,7 +249,7 @@ public class MCRLanguageFactory {
      * Builds a new language object from the given category
      */
     private void buildLanguage(MCRCategory category) {
-        String xmlCode = category.getId().getID();
+        String xmlCode = category.getId().getId();
         String termCode = category.getLabel("x-term").map(MCRLabel::getText).orElse(null);
         String biblCode = category.getLabel("x-bibl").map(MCRLabel::getText).orElse(termCode);
 

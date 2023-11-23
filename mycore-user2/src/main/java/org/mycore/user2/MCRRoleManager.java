@@ -75,7 +75,7 @@ public class MCRRoleManager {
         rolesList.clear();
         if (roleCategory != null) {
             for (MCRCategory child : roleCategory.getChildren()) {
-                String name = child.getId().getID();
+                String name = child.getId().getId();
                 MCRRole role = new MCRRole(name, child.getLabels());
                 rolesByName.put(name, role);
                 rolesList.add(role);

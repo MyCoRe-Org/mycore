@@ -138,7 +138,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
         for (MCRCategory mcrCategory : categs) {
             MCRCategoryID id = mcrCategory.getId();
             String path = id.getRootID();
-            String categID = id.getID();
+            String categID = id.getId();
             if (categID != null && !categID.isEmpty()) {
                 path = path + "/" + categID;
             }

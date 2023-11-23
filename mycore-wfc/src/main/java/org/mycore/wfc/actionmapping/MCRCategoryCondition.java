@@ -64,7 +64,7 @@ public class MCRCategoryCondition implements MCRCondition<MCRWorkflowData> {
 
     @Override
     public String toString() {
-        return fieldName + (not ? " != " : " = ") + mcrCategoryID.getID() + " ";
+        return fieldName + (not ? " != " : " = ") + mcrCategoryID.getId() + " ";
     }
 
     /* (non-Javadoc)
@@ -75,7 +75,7 @@ public class MCRCategoryCondition implements MCRCondition<MCRWorkflowData> {
         Element cond = new Element("condition");
         cond.setAttribute("field", fieldName);
         cond.setAttribute("operator", (not ? "!=" : "="));
-        cond.setAttribute("value", mcrCategoryID.getID());
+        cond.setAttribute("value", mcrCategoryID.getId());
         return cond;
     }
 

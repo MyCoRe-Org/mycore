@@ -4,9 +4,13 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.xml.transform.Source;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 
 public class MCRURIResolverTest extends MCRTestCase {
@@ -51,5 +55,20 @@ public class MCRURIResolverTest extends MCRTestCase {
         properties.put("MCR.Developer.Resource.Override", TEST_DEVELOPER_FOLDER_STRING);
 
         return properties;
+    }
+
+    @Test
+    public void testImportFromSameDirectory() throws Exception {
+        MCRConfiguration2.set("MCR.URIResolver.xslImports.xsl-import", "functions/xsl-1.xsl,functions/xsl-2.xsl");
+
+        Source resolved = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "some.jar!/xsl/xsl/functions/xsl-2.xsl");
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xsl/functions/xsl-1.xsl"));
+
+        resolved = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "some.jar!/xslt/functions/xsl-2.xsl");
+        Assert.assertNotNull(resolved);
+        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-1.xsl"));
     }
 }

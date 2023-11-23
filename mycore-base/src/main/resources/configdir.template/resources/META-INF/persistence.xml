@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
-             version="2.2">
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
   <persistence-unit name="MyCoRe" transaction-type="RESOURCE_LOCAL">
     <!-- http://stackoverflow.com/questions/3211138/jpa-eclipselink-how-to-change-default-schema -->
     <!--
@@ -17,26 +17,26 @@
     
     <properties>
       <!-- H2 -->
-      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE" />
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE" />
       <!-- PostgreSQL -->
       <!--
       <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
-      <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1/mycore?currentSchema=mycore" />
+      <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver" />
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1/mycore?currentSchema=mycore" />
       -->
       <!-- MySQL -->
       <!--
-      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1/mycore?useUnicode=true&amp;characterEncoding=UTF-8" />
+      <property name="jakarta.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1/mycore?useUnicode=true&amp;characterEncoding=UTF-8" />
       -->
       <!-- DB2 -->
       <!--
-      <property name="javax.persistence.jdbc.driver" value="com.ibm.db2.jcc.DB2Driver" />
-      <property name="javax.persistence.jdbc.url" value="jdbc:db2://localhost:50000/mycore" />
+      <property name="jakarta.persistence.jdbc.driver" value="com.ibm.db2.jcc.DB2Driver" />
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:db2://localhost:50000/mycore" />
       -->
-      <property name="javax.persistence.jdbc.user" value="sa" />
-      <property name="javax.persistence.jdbc.password" value="" />
+      <property name="jakarta.persistence.jdbc.user" value="sa" />
+      <property name="jakarta.persistence.jdbc.password" value="" />
       
       <!-- any jpa provider properties (still require hibernate) -->
       <property name="hibernate.cache.use_second_level_cache" value="false" />

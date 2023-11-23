@@ -28,11 +28,12 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
-import org.hibernate.dialect.PostgreSQL9Dialect;
+import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.internal.SessionFactoryImpl;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.persister.entity.AbstractEntityPersister;
+import org.hibernate.metamodel.MappingMetamodel;
+import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.persister.entity.SingleTableEntityPersister;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -50,7 +51,7 @@ public class MCRHibernateConfigHelper {
     public static void checkEntityManagerFactoryConfiguration(EntityManagerFactory entityManagerFactory) {
         try {
             SessionFactoryImpl sessionFactoryImpl = entityManagerFactory.unwrap(SessionFactoryImpl.class);
-            if (PostgreSQL9Dialect.class
+            if (PostgreSQLDialect.class
                 .isInstance(sessionFactoryImpl.getServiceRegistry().getService(JdbcServices.class).getDialect())) {
                 //fix ClassLeftUnique and ClassRightUnique, as PostgreSQL cannot evaluate them on statement level
                 modifyConstraints(sessionFactoryImpl);
@@ -62,9 +63,9 @@ public class MCRHibernateConfigHelper {
     }
 
     private static void modifyConstraints(SessionFactoryImpl sessionFactoryImpl) {
-        ClassMetadata classMetadata = sessionFactoryImpl.getClassMetadata(MCRCategoryImpl.class);
-        AbstractEntityPersister aep = (AbstractEntityPersister) classMetadata;
-        String qualifiedTableName = aep.getTableName();
+        MappingMetamodel mappingMetamodel = sessionFactoryImpl.getMappingMetamodel();
+        EntityPersister entityPersister = mappingMetamodel.findEntityDescriptor(MCRCategoryImpl.class);
+        String qualifiedTableName = ((SingleTableEntityPersister) entityPersister).getTableName();
         try (Session session = sessionFactoryImpl.openSession()) {
             session.doWork(connection -> {
                 String updateStmt = Stream.of("ClassLeftUnique", "ClassRightUnique")

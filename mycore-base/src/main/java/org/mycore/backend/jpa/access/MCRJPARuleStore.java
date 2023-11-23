@@ -139,7 +139,9 @@ public class MCRJPARuleStore extends MCRRuleStore {
     @Override
     public void deleteRule(String ruleid) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        em.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
+        em.createQuery("delete MCRACCESSRULE where rid = :rid")
+            .setParameter("rid", ruleid)
+            .executeUpdate();
         ruleCache.invalidate(ruleid);
     }
 
@@ -185,18 +187,16 @@ public class MCRJPARuleStore extends MCRRuleStore {
         int ret = 1;
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         List<String> l = em
-            .createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'", String.class)
+            .createQuery("select max(rid) from MCRACCESSRULE where rid like :like", String.class)
+            .setParameter("like", prefix + "%")
             .getResultList();
-        if (l.size() > 0) {
-            String max = l.get(0);
-            if (max == null) {
-                ret = 1;
-            } else {
-                int lastNumber = Integer.parseInt(max.substring(prefix.length()));
-                ret = lastNumber + 1;
-            }
-        } else {
+        if (l.isEmpty()) {
             return 1;
+        }
+        String max = l.get(0);
+        if (max != null) {
+            int lastNumber = Integer.parseInt(max.substring(prefix.length()));
+            ret = lastNumber + 1;
         }
         return ret;
     }
