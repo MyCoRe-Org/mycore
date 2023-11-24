@@ -64,7 +64,7 @@ public class MCRDeveloperCommands {
         help = "Show messages with key prefix {0} for locale {1}",
         order = 20)
     public static void showMessages(String keyPrefix, String lang) {
-        Map<String, String> values = MCRTranslation.translatePrefix(keyPrefix, MCRTranslation.getLocale(lang));
+        Map<String, String> values = MCRTranslation.translatePrefixToLocale(keyPrefix, MCRTranslation.getLocale(lang));
         if (values.isEmpty()) {
             LOGGER.info("Found no messages for key prefix {}", keyPrefix);
         } else {
@@ -77,7 +77,7 @@ public class MCRDeveloperCommands {
         help = "Show all messages for locale {0}",
         order = 30)
     public static void showMessages(String lang) {
-        Map<String, String> values = MCRTranslation.translatePrefix("", MCRTranslation.getLocale(lang));
+        Map<String, String> values = MCRTranslation.translatePrefixToLocale("", MCRTranslation.getLocale(lang));
         if (values.isEmpty()) {
             LOGGER.info("Found no messages");
         } else {

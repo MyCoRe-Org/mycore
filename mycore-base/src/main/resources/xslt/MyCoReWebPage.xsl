@@ -9,6 +9,7 @@
 
 <xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+                xmlns:mcrwebpage="http://www.mycore.de/MyCoReWebPage"
 >
   &html-output;
 
@@ -145,4 +146,8 @@
 
   <!-- =============================================================================== -->
 
+  <!-- Dynamic includes -->
+  <xsl:template match="mcrwebpage:xinclude">
+    <xsl:apply-templates select="document(@uri)/*" />
+  </xsl:template>
 </xsl:stylesheet>

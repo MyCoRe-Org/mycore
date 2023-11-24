@@ -186,6 +186,11 @@
         <version>2.1.0</version>
       </dependency>
       <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>5.0.1</version>
+      </dependency>
+      <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>1.9.4</version>
@@ -1110,12 +1115,6 @@
         <artifactId>h2</artifactId>
         <!-- version 1.4.200 does not work with MCRJPATestCase -->
         <version>2.2.224</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-        <version>5.0.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>

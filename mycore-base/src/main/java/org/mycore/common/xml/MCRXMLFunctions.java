@@ -659,6 +659,21 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isCategoryID(String classificationId, String categoryId) {
+        if (classificationId == null || classificationId.isEmpty()) {
+            LOGGER.debug("Classification identifier is null or empty");
+            return false;
+        }
+
+        if (categoryId == null || categoryId.isEmpty()) {
+            LOGGER.debug("Category identifier is null or empty");
+            return false;
+        }
+
+        if (classificationId.length() > MCRCategoryID.ROOT_ID_LENGTH) {
+            LOGGER.debug("Could not determine state for classification id {} and category id {}", classificationId);
+            return false;
+        }
+
         MCRCategory category = null;
         try {
             MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
