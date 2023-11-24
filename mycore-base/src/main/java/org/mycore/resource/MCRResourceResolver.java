@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHints;
@@ -85,7 +86,7 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  */
 public final class MCRResourceResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = StatusLogger.getLogger();
 
     private static final MCRResourceResolver INSTANCE = new MCRResourceResolver(getProvider());
 
