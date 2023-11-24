@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -294,8 +293,8 @@ public final class MCRResourceResolver {
     /**
      * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}. 
      */
-    public Optional<MCRResourcePath> reverse(URL resourceUrl, boolean performConsistencyCheck) {
-        return this.reverse(resourceUrl, defaultHints(), performConsistencyCheck);
+    public Optional<MCRResourcePath> reverse(URL resourceUrl) {
+        return this.reverse(resourceUrl, defaultHints());
     }
 
     /**
@@ -303,13 +302,13 @@ public final class MCRResourceResolver {
      * performs a consistency check by resolving the calculated {@link MCRResourcePath} and comparing the 
      * result of this resolution against the given resource URL. 
      */
-    public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints, boolean performConsistencyCheck) {
+    public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints) {
         LOGGER.debug("Reversing resource URL {}", resourceUrl);
-        Set<PrefixStripper> strippers = provider.prefixPatterns(hints);
+        Set<PrefixStripper> strippers = provider.prefixStrippers(hints);
         for (PrefixStripper stripper : strippers) {
             Optional<MCRResourcePath> potentialPath = stripper.strip(resourceUrl);
             if (potentialPath.isPresent()) {
-                if (performConsistencyCheck && !isConsistent(resourceUrl, potentialPath.get(), hints)) {
+                if (!isConsistent(resourceUrl, potentialPath.get(), hints)) {
                     continue;
                 }
                 return potentialPath;

@@ -24,6 +24,7 @@
 package org.mycore.resource.provider;
 
 import java.net.URL;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -64,8 +65,11 @@ public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
-        return JarUrlPrefixStripper.INSTANCE_SET;
+    public Set<PrefixStripper> prefixStrippers(MCRHints hints) {
+        Set<PrefixStripper> strippers = new LinkedHashSet<>(JarUrlPrefixStripper.INSTANCE_SET);
+        hints.get(MCRResourceHintKeys.CLASS_LOADER).ifPresent(classLoader ->
+            strippers.addAll(BaseDirPrefixStripper.ofClassLoader(classLoader)));
+        return strippers;
     }
 
     public static class Factory implements Supplier<MCRClassLoaderResourceProvider> {

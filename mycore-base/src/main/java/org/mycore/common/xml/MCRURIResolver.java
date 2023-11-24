@@ -258,21 +258,21 @@ public final class MCRURIResolver implements URIResolver {
     /**
      * Tries to calculate the resource uri to the directory of the stylesheet that includes the given file.
      * @param base the base uri of the stylesheet that includes the given file
-     * @param performConsistencyCheck whether to check if the calculated resource path actually is the resources path 
      * @return the resource uri to the directory of the stylesheet that includes the given file.
      */
-    static String getParentDirectoryResourceURI(String base, boolean performConsistencyCheck) {
+    static String getParentDirectoryResourceURI(String base) {
         if (base == null) {
             // the file was not included from another file, so we need to use the default resource directory
             final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
             return "resource:" + xslFolder + "/";
         } else {
             String resolvingBase = null;
-            MCRResourcePath resourcePath = MCRResourceHelper.getResourcePath(base, performConsistencyCheck);
+            MCRResourcePath resourcePath = MCRResourceHelper.getResourcePath(base);
             if (resourcePath != null) {
                 String path = resourcePath.asRelativePath();
                 resolvingBase = "resource:" + path.substring(0, path.lastIndexOf('/') + 1);
             }
+
             return resolvingBase;
         }
     }
@@ -331,7 +331,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private Source tryResolveXSL(String href, String base) throws TransformerException {
-        String baseURI = getParentDirectoryResourceURI(base, true);
+        String baseURI = getParentDirectoryResourceURI(base);
         final String uri = baseURI + href;
         LOGGER.debug("Trying to resolve {} from uri {}", href, uri);
         Source newResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve(uri, base);
@@ -1204,7 +1204,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            final String baseURI = getParentDirectoryResourceURI(base, true);
+            final String baseURI = getParentDirectoryResourceURI(base);
             // set xslt folder
             final String xslFolder;
             if (StringUtils.startsWith(baseURI, "resource:xsl/")) {
@@ -1223,7 +1223,7 @@ public final class MCRURIResolver implements URIResolver {
                 root.setAttribute("version", "1.0");
                 return new JDOMSource(root);
             }
-            LOGGER.debug("xslImport importing {}", importXSL);
+            LOGGER.info("xslImport importing {}", importXSL);
 
             return fallback.resolve("resource:" + xslFolder + "/" + importXSL, base);
         }

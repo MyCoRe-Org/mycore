@@ -111,12 +111,12 @@ public final class MCRResourceHelper {
     }
 
     /**
-     * Shorthand for {@link MCRResourceResolver#reverse(URL, boolean)} returning <code>null</code>
+     * Shorthand for {@link MCRResourceResolver#reverse(URL)} returning <code>null</code>
      * instead of an empty {@link java.util.Optional} and taking a String instead of an {@link URL} the .
      */
-    public static MCRResourcePath getResourcePath(String resourceUrl, boolean performConsistencyCheck) {
+    public static MCRResourcePath getResourcePath(String resourceUrl) {
         try {
-            return MCRResourceResolver.instance().reverse(new URL(resourceUrl), performConsistencyCheck).orElse(null);
+            return MCRResourceResolver.instance().reverse(new URL(resourceUrl)).orElse(null);
         } catch (MalformedURLException e) {
             throw new MCRException("Unable to convert string tu URL", e);
         }

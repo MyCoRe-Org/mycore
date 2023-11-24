@@ -24,8 +24,10 @@
 package org.mycore.resource.provider;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +37,8 @@ import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+
+import io.github.classgraph.ClassGraph;
 
 /**
  * A {@link MCRResourceProvider} implements a resource lookup strategy.
@@ -52,7 +56,7 @@ public interface MCRResourceProvider {
      */
     List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
 
-    Set<PrefixStripper> prefixPatterns(MCRHints hints);
+    Set<PrefixStripper> prefixStrippers(MCRHints hints);
 
     /**
      * Returns a description of this {@link MCRResourceProvider}.
@@ -110,6 +114,25 @@ public interface MCRResourceProvider {
             return null;
         }
 
+        @Override
+        public String toString() {
+            return prefix;
+        }
+
+        public static Set<PrefixStripper> ofClassLoader(ClassLoader classLoader) {
+            Set<PrefixStripper> strippers = new LinkedHashSet<>();
+            List<URI> classpath = new ClassGraph().overrideClassLoaders(classLoader).getClasspathURIs();
+            classpath.forEach(uri -> {
+                if (uri.getScheme().equals("file")) {
+                    File file = new File(uri.getPath());
+                    if (file.isDirectory()) {
+                        strippers.add(new BaseDirPrefixStripper(file));
+                    }
+                }
+            });
+            return strippers;
+        }
+
     }
 
     final class JarUrlPrefixStripper extends PrefixStripperBase {
@@ -130,6 +153,11 @@ public interface MCRResourceProvider {
                 }
             }
             return null;
+        }
+
+        @Override
+        public String toString() {
+            return "jar:.*!";
         }
 
     }

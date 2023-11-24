@@ -78,8 +78,8 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
-        return provider.prefixPatterns(hints);
+    public Set<PrefixStripper> prefixStrippers(MCRHints hints) {
+        return provider.prefixStrippers(hints);
     }
 
     @Override

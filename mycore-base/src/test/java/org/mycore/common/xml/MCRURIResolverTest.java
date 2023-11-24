@@ -1,69 +1,86 @@
 package org.mycore.common.xml;
 
-import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 import javax.xml.transform.Source;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.resource.MCRResourceHelper;
 
 public class MCRURIResolverTest extends MCRTestCase {
 
-    public static final String TEST_DEVELOPER_FOLDER_STRING = "/home/workspace";
+    @Test
+    public void testGetParentDirectoryResourceURI() throws IOException {
+
+        // obtain resource URLs
+        URL myFileResourceUrl = MCRResourceHelper.getResourceUrl("/xsl/myfile.xsl");
+        URL nestedMyFileResourceUrl = MCRResourceHelper.getResourceUrl("/xsl/directory/myfile.xsl");
+
+        // check resource URLs
+        checkParentDirectoryResourceUri(myFileResourceUrl.toString(), "resource:xsl/");
+        checkParentDirectoryResourceUri(nestedMyFileResourceUrl.toString(), "resource:xsl/directory/");
+
+        // obtain test directories (${configDir}/resources/xsl[/directory])
+        File configurationXslDirectory = getConfigurationXslDirectory();
+        File nestedConfigurationXslDirectory = new File(configurationXslDirectory, "directory");
+        boolean dirsCreated = nestedConfigurationXslDirectory.mkdirs();
+        assert dirsCreated;
+
+        // obtain files in test directories
+        File myFileFile = new File(configurationXslDirectory ,"myfile.xsl");
+        File nestedMyFileFile = new File(nestedConfigurationXslDirectory, "myfile.xsl");
+
+        // create actual files in test directories
+        long bytesCopied = IOUtils.copy(myFileResourceUrl, myFileFile);
+        long nestedBytesCopied = IOUtils.copy(nestedMyFileResourceUrl, nestedMyFileFile);
+        assert bytesCopied != 0 && nestedBytesCopied != 0;
+
+        // check file URLs
+        checkParentDirectoryResourceUri(myFileFile.toURI().toString(), "resource:xsl/");
+        checkParentDirectoryResourceUri(nestedMyFileFile.toURI().toString(), "resource:xsl/directory/");
+
+    }
+
+    private void checkParentDirectoryResourceUri(String uri, String expectedParentDirectoryResourceUri) {
+        String actualParentDirectoryResourceURI = MCRURIResolver.getParentDirectoryResourceURI(uri);
+        Assert.assertEquals(expectedParentDirectoryResourceUri, actualParentDirectoryResourceURI);
+    }
+
+    private static File getConfigurationXslDirectory() {
+        return MCRConfigurationDir.getConfigurationDirectory().toPath()
+            .resolve("resources")
+            .resolve("xsl")
+            .toFile();
+    }
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.Developer.Resource.Override", string = TEST_DEVELOPER_FOLDER_STRING)
+        @MCRTestProperty(
+            key = "MCR.URIResolver.xslImports.xsl-import", string = "functions/xsl-1.xsl,functions/xsl-2.xsl")
     })
-    public void testGetParentDirectoryResourceURI() {
-        Map<String, String> testData = new LinkedHashMap<>();
-
-        testData.put("jar:file:///root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl",
-            "resource:xsl/directory/");
-        testData.put("jar:file:///root/.m2/repository/some/directory/some.jar!/xsl/myfile.xsl",
-            "resource:xsl/");
-
-        String configurationXSLDirectory
-            = MCRConfigurationDir.getConfigurationDirectory().toPath()
-                .resolve("resources")
-                .resolve("xsl")
-                .toFile()
-                .toURI()
-                .toString();
-        testData.put(configurationXSLDirectory + "/mir-accesskey-utils.xsl", "resource:xsl/");
-
-        testData.put(configurationXSLDirectory + "/directory/mir-accesskey-utils.xsl",
-            "resource:xsl/directory/");
-
-        testData.put(Paths.get(TEST_DEVELOPER_FOLDER_STRING).toAbsolutePath().toFile().toURI()
-            + "/directory/mir-accesskey-utils.xsl", "resource:directory/");
-
-        for (Map.Entry<String, String> entry : testData.entrySet()) {
-            String result = MCRURIResolver.getParentDirectoryResourceURI(entry.getKey(), false);
-            Assert.assertEquals(entry.getValue(), result);
-        }
-    }
-
-    @Test
     public void testImportFromSameDirectory() throws Exception {
-        MCRConfiguration2.set("MCR.URIResolver.xslImports.xsl-import", "functions/xsl-1.xsl,functions/xsl-2.xsl");
 
-        Source resolved = MCRURIResolver.instance()
-            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "some.jar!/xsl/xsl/functions/xsl-2.xsl");
-        Assert.assertNotNull(resolved);
-        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xsl/functions/xsl-1.xsl"));
+        String xslResourceUrl = MCRResourceHelper.getResourceUrl("/xsl/functions/xsl-2.xsl").toString();
+        Source xslSource = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xslResourceUrl);
+        Assert.assertNotNull(xslSource);
+        Assert.assertTrue(StringUtils.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
 
-        resolved = MCRURIResolver.instance()
-            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", "some.jar!/xslt/functions/xsl-2.xsl");
-        Assert.assertNotNull(resolved);
-        Assert.assertTrue(StringUtils.endsWith(resolved.getSystemId(), "/xslt/functions/xsl-1.xsl"));
+        String xsltResourceUrl = MCRResourceHelper.getResourceUrl("/xslt/functions/xsl-2.xsl").toString();
+        Source xsltSource = MCRURIResolver.instance()
+            .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xsltResourceUrl);
+        Assert.assertNotNull(xsltSource);
+        Assert.assertTrue(StringUtils.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));
+
     }
+
 }

@@ -26,6 +26,7 @@ package org.mycore.resource.locator;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -35,7 +36,9 @@ import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.hint.MCRResourceHintKeys;
-import org.mycore.resource.provider.MCRResourceProvider;
+import org.mycore.resource.provider.MCRResourceProvider.BaseDirPrefixStripper;
+import org.mycore.resource.provider.MCRResourceProvider.JarUrlPrefixStripper;
+import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 
 /**
  * A {@link MCRClassLoaderResourceLocator} is a {@link MCRResourceLocator} that uses
@@ -66,8 +69,11 @@ public class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
     }
 
     @Override
-    public Set<MCRResourceProvider.PrefixStripper> prefixPatterns(MCRHints hints) {
-        return MCRResourceProvider.JarUrlPrefixStripper.INSTANCE_SET;
+    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
+        Set<PrefixStripper> strippers = new LinkedHashSet<>(JarUrlPrefixStripper.INSTANCE_SET);
+        hints.get(MCRResourceHintKeys.CLASS_LOADER).ifPresent(classLoader ->
+            strippers.addAll(BaseDirPrefixStripper.ofClassLoader(classLoader)));
+        return strippers;
     }
 
 }

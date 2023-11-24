@@ -26,7 +26,7 @@ package org.mycore.resource.provider;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -86,9 +86,9 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
-        Set<PrefixStripper> strippers = new HashSet<>();
-        providers.forEach(provider -> strippers.addAll(provider.prefixPatterns(hints)));
+    public Set<PrefixStripper> prefixStrippers(MCRHints hints) {
+        Set<PrefixStripper> strippers = new LinkedHashSet<>();
+        providers.forEach(provider -> strippers.addAll(provider.prefixStrippers(hints)));
         return strippers;
     }
 

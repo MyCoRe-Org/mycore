@@ -26,7 +26,7 @@ package org.mycore.resource.provider;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -192,8 +192,8 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
     }
 
     @Override
-    public final Set<PrefixStripper> prefixPatterns(MCRHints hints) {
-        Set<PrefixStripper> strippers = new HashSet<>();
+    public final Set<PrefixStripper> prefixStrippers(MCRHints hints) {
+        Set<PrefixStripper> strippers = new LinkedHashSet<>();
         getBaseDirs(hints).forEach(baseDir -> strippers.add(new BaseDirPrefixStripper(baseDir)));
         return strippers;
     }

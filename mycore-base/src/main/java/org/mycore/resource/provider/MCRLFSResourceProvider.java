@@ -94,7 +94,7 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public Set<PrefixStripper> prefixPatterns(MCRHints hints) {
+    public Set<PrefixStripper> prefixStrippers(MCRHints hints) {
         return locator.prefixPatterns(hints);
     }
 
