@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -77,8 +78,12 @@ public class MCRMODSEmbargoUtils {
         if (embargo != null) {
             return embargo == EMPTY_VALUE ? null : embargo;
         }
-        MCRMODSWrapper modsWrapper = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(objectId));
-        embargo = modsWrapper.getElementValue("mods:accessCondition[@type='embargo']");
+        try {
+            MCRMODSWrapper modsWrapper = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(objectId));
+            embargo = modsWrapper.getElementValue("mods:accessCondition[@type='embargo']");
+        } catch (MCRPersistenceException e) {
+            LOGGER.error(() -> "Could not read object " + objectId, e);
+        }
         embargoCache.put(objectId, embargo != null ? embargo : EMPTY_VALUE);
         return embargo;
     }

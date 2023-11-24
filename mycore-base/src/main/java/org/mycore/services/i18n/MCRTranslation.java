@@ -89,8 +89,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label) {
-        Locale currentLocale = getCurrentLocale();
-        return translate(label, currentLocale);
+        return translateToLocale(label, getCurrentLocale());
     }
 
     /**
@@ -121,8 +120,7 @@ public class MCRTranslation {
      */
 
     public static String translateWithBaseName(String label, String baseName) {
-        Locale currentLocale = getCurrentLocale();
-        return translate(label, currentLocale, baseName);
+        return translateToLocale(label, getCurrentLocale(), baseName);
     }
 
     /**
@@ -133,8 +131,20 @@ public class MCRTranslation {
      *            target locale of translation
      * @return translated String
      */
-    public static String translate(String label, Locale locale) {
-        return translate(label, locale, MESSAGES_BUNDLE);
+    public static String translateToLocale(String label, Locale locale) {
+        return translateToLocale(label, locale, MESSAGES_BUNDLE);
+    }
+
+    /**
+     * Provides translation for the given label (property key) and locale.
+     *
+     * @param label property key
+     * @param locale
+     *            target locale of translation
+     * @return translated String
+     */
+    public static String translateToLocale(String label, String locale) {
+        return translateToLocale(label, getLocale(locale), MESSAGES_BUNDLE);
     }
 
     /**
@@ -147,7 +157,7 @@ public class MCRTranslation {
      *            a fully qualified class name
      * @return translated String
      */
-    public static String translate(String label, Locale locale, String baseName) {
+    public static String translateToLocale(String label, Locale locale, String baseName) {
         LOGGER.debug("Translation for current locale: {}", locale.getLanguage());
         ResourceBundle message;
         try {
@@ -192,8 +202,7 @@ public class MCRTranslation {
      * @return map of labels with translated values
      */
     public static Map<String, String> translatePrefix(String prefix) {
-        Locale currentLocale = getCurrentLocale();
-        return translatePrefix(prefix, currentLocale);
+        return translatePrefixToLocale(prefix, getCurrentLocale());
     }
 
     /**
@@ -205,7 +214,7 @@ public class MCRTranslation {
      *            target locale of translation
      * @return map of labels with translated values
      */
-    public static Map<String, String> translatePrefix(String prefix, Locale locale) {
+    public static Map<String, String> translatePrefixToLocale(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: {}", locale.getLanguage());
         HashMap<String, String> map = new HashMap<>();
         ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);
@@ -229,12 +238,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label, Object... arguments) {
-        Locale currentLocale = getCurrentLocale();
-        String msgFormat = translate(label);
-        MessageFormat formatter = new MessageFormat(msgFormat, currentLocale);
-        String result = formatter.format(arguments);
-        LOGGER.debug("Translation for {}={}", label, result);
-        return result;
+        return translateToLocale(label, getCurrentLocale(), arguments);
     }
 
     /**
@@ -245,8 +249,8 @@ public class MCRTranslation {
      * @param arguments Objects that are inserted instead of placeholders in the property values
      * @return translated String
      */
-    public static String translate(String label, Locale locale, Object... arguments) {
-        String msgFormat = translate(label, locale);
+    public static String translateToLocale(String label, Locale locale, Object... arguments) {
+        String msgFormat = translateToLocale(label, locale);
         MessageFormat formatter = new MessageFormat(msgFormat, locale);
         String result = formatter.format(arguments);
         LOGGER.debug("Translation for {}={}", label, result);
@@ -281,8 +285,24 @@ public class MCRTranslation {
      * @return translated String
      * @see #translate(String, Object[])
      */
-    public static String translate(String label, String argument, Locale locale) {
-        return translate(label, locale, (Object[]) getStringArray(argument));
+    public static String translateToLocale(String label, String argument, Locale locale) {
+        return translateToLocale(label, locale, (Object[]) getStringArray(argument));
+    }
+
+    /**
+     * Provides translation for the given label (property key). Be aware that any occurence of ';' and '\' in
+     * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
+     * result in {"foo","bar"} (the array)
+     *
+     * @param label property key
+     * @param argument
+     *            String that is inserted instead of placeholders in the property values
+     * @param locale target locale of translation
+     * @return translated String
+     * @see #translate(String, Object[])
+     */
+    public static String translateToLocale(String label, String argument, String locale) {
+        return translateToLocale(label, argument, MCRTranslation.getLocale(locale));
     }
 
     public static Locale getCurrentLocale() {
