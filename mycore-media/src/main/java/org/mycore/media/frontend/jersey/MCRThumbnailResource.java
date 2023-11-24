@@ -57,6 +57,7 @@ public class MCRThumbnailResource {
      * This method returns a thumbnail for a given document with a given size in pixel for the shortest side.
      * @param documentId the documentID you want the thumbnail from
      * @param size the size of the shortest side in pixel
+     * @param ext  the extension of the new image file (jpg ord png)
      * @return the thumbnail as png, jpg or error 404 if if there is no derivate or no generator for filetype
      */
     @GET
@@ -70,6 +71,7 @@ public class MCRThumbnailResource {
     /**
      * This method returns a thumbnail for a given document with a default size in pixel for the shortest side.
      * @param documentId the documentID you want the thumbnail from
+     * @param ext  the extension of the new image file (jpg ord png)
      * @return the thumbnail as png, jpg or error 404 if if there is no derivate or no generator for filetype
      */
     @GET
