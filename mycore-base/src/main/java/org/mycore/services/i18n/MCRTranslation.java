@@ -238,6 +238,9 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label, Object... arguments) {
+        if (arguments.length > 0 && arguments[0] instanceof Locale) {
+            LOGGER.warn("MCR-2970, MCR-2978: seems like you want to call translateToLocale() instead");
+        }
         return translateToLocale(label, getCurrentLocale(), arguments);
     }
 
