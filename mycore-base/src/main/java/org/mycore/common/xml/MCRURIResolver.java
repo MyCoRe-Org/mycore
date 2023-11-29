@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -137,6 +138,20 @@ public final class MCRURIResolver implements URIResolver {
     static final String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
+
+    private static final boolean MESSAGE_KEY_CACHE_ENABLED =
+        MCRConfiguration2.getBoolean(CONFIG_PREFIX + "MessageKeyCache.Enabled").orElse(false);
+
+    private static final int MESSAGE_KEY_CACHE_CAPACITY =
+        MCRConfiguration2.getInt(CONFIG_PREFIX + "MessageKeyCache.Capacity").orElse(1000);
+
+    private static final Set<String> MESSAGE_KEY_CACHE = Collections.newSetFromMap(new LinkedHashMap<>() {
+
+        protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
+            return size() > MESSAGE_KEY_CACHE_CAPACITY;
+        }
+
+    });
 
     private static Map<String, URIResolver> SUPPORTED_SCHEMES;
 
@@ -392,8 +407,12 @@ public final class MCRURIResolver implements URIResolver {
         Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource")
             .resolve("resource:" + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
-            LOGGER.warn("The Stylesheet {} has include {} which only works with an old absolute include " +
-                "mechanism. Please change the include to relative!", base, href);
+            String messageKey = href + "@" + base;
+            if (!MESSAGE_KEY_CACHE_ENABLED || !MESSAGE_KEY_CACHE.contains(messageKey)) {
+                MESSAGE_KEY_CACHE.add(messageKey);
+                LOGGER.warn("The Stylesheet {} has include {} which only works with an old absolute include " +
+                    "mechanism. Please change the include to relative!", base, href);
+            }
         }
         return oldResolveMethodResult;
     }
