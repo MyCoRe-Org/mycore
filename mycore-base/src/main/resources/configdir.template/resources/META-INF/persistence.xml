@@ -40,6 +40,8 @@
       <!-- Set batch_size to "0" in case of SQL batch Errors -->
       <property name="hibernate.jdbc.batch_size" value="2000" />
       <property name="hibernate.default_batch_fetch_size" value="100" />
+      <!-- Automatically quote database identifiers that are keywords -->
+      <property name="hibernate.auto_quote_keyword" value="true" />
       <!-- Echo all executed SQL to stdout -->
       <property name="hibernate.show_sql" value="false" />
 
@@ -47,7 +49,7 @@
       <!-- disabled -->
       <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.internal.NoCachingRegionFactory" />
       <property name="hibernate.cache.use_second_level_cache" value="false" />
-      <property name="hibernate.cache.use_query_cache" value="false"/>
+      <property name="hibernate.cache.use_query_cache" value="false" />
       <!-- net/sf/ehcache/hibernate/Provider -->
       <!--
       <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory />

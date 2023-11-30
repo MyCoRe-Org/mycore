@@ -1118,7 +1118,6 @@
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <!-- version 1.4.200 does not work with MCRJPATestCase -->
         <version>2.2.224</version>
         <scope>test</scope>
       </dependency>
@@ -1144,12 +1143,6 @@
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-core</artifactId>
         <version>${hamcrest.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>2.7.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>

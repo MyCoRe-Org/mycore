@@ -134,7 +134,18 @@ public class MCRJPATestCase extends MCRTestCase {
             .getEntityManagerFactory()
             .getProperties()
             .get("hibernate.default_schema"))
-            .map(Object::toString);
+            .map(Object::toString)
+            .map(schema -> quoteSchema() ? '"' + schema + '"' : schema);
+    }
+
+    protected static boolean quoteSchema() {
+        return Optional.ofNullable(MCREntityManagerProvider
+            .getEntityManagerFactory()
+            .getProperties()
+            .get("hibernate.globally_quoted_identifiers"))
+            .map(Object::toString)
+            .map(Boolean::parseBoolean)
+            .orElse(Boolean.FALSE);
     }
 
     public void dropSchema() throws IOException {
