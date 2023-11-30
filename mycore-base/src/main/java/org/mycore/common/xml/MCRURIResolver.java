@@ -68,6 +68,8 @@ import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -137,6 +139,8 @@ public final class MCRURIResolver implements URIResolver {
     static final String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
+
+    private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
 
     private static Map<String, URIResolver> SUPPORTED_SCHEMES;
 
@@ -392,8 +396,8 @@ public final class MCRURIResolver implements URIResolver {
         Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource")
             .resolve("resource:" + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
-            LOGGER.warn("The Stylesheet {} has include {} which only works with an old absolute include " +
-                "mechanism. Please change the include to relative!", base, href);
+            LOGGER.warn(UNIQUE_MARKER, "The Stylesheet {} has include {} which only works with an old " +
+                "absolute include mechanism. Please change the include to relative!", base, href);
         }
         return oldResolveMethodResult;
     }
