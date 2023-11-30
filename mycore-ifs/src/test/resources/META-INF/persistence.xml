@@ -17,9 +17,10 @@
       <property name="hibernate.jdbc.batch_size" value="0" />
       <property name="hibernate.show_sql" value="false" />
       <property name="hibernate.format_sql" value="true" />
+      <property name="hibernate.globally_quoted_identifiers" value="true" />
+      <property name="hibernate.globally_quoted_identifiers_skip_column_definitions" value="true" />
       <!-- We better always test with defined schema -->
       <property name="hibernate.default_schema" value="junit" />
-
     </properties>
   </persistence-unit>
 </persistence>
