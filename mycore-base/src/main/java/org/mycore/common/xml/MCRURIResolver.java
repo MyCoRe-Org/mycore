@@ -139,16 +139,16 @@ public final class MCRURIResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private static final boolean MESSAGE_KEY_CACHE_ENABLED =
-        MCRConfiguration2.getBoolean(CONFIG_PREFIX + "MessageKeyCache.Enabled").orElse(false);
+    private static final boolean DUPLICATE_MESSAGE_FILTER_ENABLED =
+        MCRConfiguration2.getBoolean(CONFIG_PREFIX + "DuplicateMessageFilter.Enabled").orElse(false);
 
-    private static final int MESSAGE_KEY_CACHE_CAPACITY =
-        MCRConfiguration2.getInt(CONFIG_PREFIX + "MessageKeyCache.Capacity").orElse(1000);
+    private static final int DUPLICATE_MESSAGE_FILTER_CACHE_SIZE =
+        MCRConfiguration2.getInt(CONFIG_PREFIX + "DuplicateMessageFilter.CacheSize").orElse(1000);
 
-    private static final Set<String> MESSAGE_KEY_CACHE = Collections.newSetFromMap(new LinkedHashMap<>() {
+    private static final Set<String> DUPLICATE_MESSAGE_FILTER_CACHE = Collections.newSetFromMap(new LinkedHashMap<>() {
 
         protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
-            return size() > MESSAGE_KEY_CACHE_CAPACITY;
+            return size() > DUPLICATE_MESSAGE_FILTER_CACHE_SIZE;
         }
 
     });
@@ -408,8 +408,8 @@ public final class MCRURIResolver implements URIResolver {
             .resolve("resource:" + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
             String messageKey = href + "@" + base;
-            if (!MESSAGE_KEY_CACHE_ENABLED || !MESSAGE_KEY_CACHE.contains(messageKey)) {
-                MESSAGE_KEY_CACHE.add(messageKey);
+            if (!DUPLICATE_MESSAGE_FILTER_ENABLED || !DUPLICATE_MESSAGE_FILTER_CACHE.contains(messageKey)) {
+                DUPLICATE_MESSAGE_FILTER_CACHE.add(messageKey);
                 LOGGER.warn("The Stylesheet {} has include {} which only works with an old absolute include " +
                     "mechanism. Please change the include to relative!", base, href);
             }
