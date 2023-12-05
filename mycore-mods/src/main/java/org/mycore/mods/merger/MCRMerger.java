@@ -118,33 +118,35 @@ public class MCRMerger {
             .stream().map(child -> MCRMergerFactory.buildFrom(child)).collect(Collectors.toList());
 
         for (MCRMerger newEntry : newEntries) {
-            MCRMerger matchingEntry = findAndMergeMatch(oldEntries, newEntry);
+            MCRMerger matchingEntry = mergeIntoExistingEntries(oldEntries, newEntry);
 
-            if (matchingEntry == null) { // no match found, add as new element
-                element.addContent(newEntry.element.clone());
-            } else { // match found, do not compare that element with any others further 
+            if (matchingEntry != null) {
                 oldEntries.remove(matchingEntry);
             }
         }
     }
 
     /**
-     * Find the entry that is identical or probably the same in the list of given entries.
-     * If a non-identical match is found, the new entry is merged into the old one. 
+     * Given a list of MCRMergers which represent the current content, merges a new entry into it.
+     * 
+     * @return the old entry that matched the given new entry, or null
      **/
-    private MCRMerger findAndMergeMatch(List<MCRMerger> oldEntries, MCRMerger newEntry) {
+    private MCRMerger mergeIntoExistingEntries(List<MCRMerger> oldEntries, MCRMerger newEntry) {
         for (MCRMerger oldEntry : oldEntries) {
             // Only same MODS element type can be a match
-            if( oldEntry.sameElementName(newEntry) ) {
-                if (oldEntry.equals(newEntry)) { // found identical element
-                    return oldEntry;
+            if (oldEntry.sameElementName(newEntry)) {
+                if (oldEntry.equals(newEntry)) { 
+                    return oldEntry; // found identical element
                 }
-                if (newEntry.isProbablySameAs(oldEntry)) { // found element to merge 
-                    oldEntry.mergeFrom(newEntry);
+                if (newEntry.isProbablySameAs(oldEntry)) {  
+                    oldEntry.mergeFrom(newEntry); // found element to merge
                     return oldEntry;
                 }
             }
         }
+        
+        // No match found, add as new element
+        element.addContent(newEntry.element.clone());
         return null;
     }
 
