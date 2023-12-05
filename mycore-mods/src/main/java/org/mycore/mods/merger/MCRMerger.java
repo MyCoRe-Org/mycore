@@ -18,10 +18,10 @@
 
 package org.mycore.mods.merger;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
@@ -107,33 +107,42 @@ public class MCRMerger {
      * This is done by building MCRMerger instances for each child element and comparing them.
      */
     protected void mergeElements(MCRMerger other) {
-        List<MCRMerger> entries = new ArrayList<>();
-        for (Element child : this.element.getChildren()) {
-            entries.add(MCRMergerFactory.buildFrom(child));
-        }
+        List<MCRMerger> oldEntries = this.element.getChildren()
+            .stream().map(child -> MCRMergerFactory.buildFrom(child)).collect(Collectors.toList());
+        List<MCRMerger> newEntries = other.element.getChildren()
+            .stream().map(child -> MCRMergerFactory.buildFrom(child)).collect(Collectors.toList());
 
-        for (Element child : other.element.getChildren()) {
-            mergeIntoExistingEntries(entries, MCRMergerFactory.buildFrom(child));
+        for (MCRMerger newEntry : newEntries) {
+            MCRMerger matchingEntry = findAndMergeMatch(oldEntries, newEntry);
+
+            if (matchingEntry == null) { // no match found, add as new element
+                element.addContent(newEntry.element.clone());
+            } else { // match found, do not compare that element with any others further 
+                oldEntries.remove(matchingEntry);
+            }
         }
     }
 
     /**
-     * Given a list of MCRMergers which represent the current content, merges a new entry into it.
-     *
-     * @param entries a list of existing mergers, each wrapping an element
-     * @param newEntry the merger for the new element that should be merged into the existing entries
-     */
-    private void mergeIntoExistingEntries(List<MCRMerger> entries, MCRMerger newEntry) {
-        for (MCRMerger existingEntry : entries) {
-            if (newEntry.equals(existingEntry)) {
-                return;
-            } else if (newEntry.isProbablySameAs(existingEntry)) {
-                existingEntry.mergeFrom(newEntry);
-                return;
+     * Find the entry that is identical or probably the same in the list of given entries.
+     * If a non-identical match is found, the new entry is merged into the old one. 
+     **/
+    private MCRMerger findAndMergeMatch(List<MCRMerger> oldEntries, MCRMerger newEntry) {
+        String newEntryType = newEntry.element.getName();
+
+        for (MCRMerger oldEntry : oldEntries) {
+            // Only same MODS element type can be a match
+            if (oldEntry.element.getName().equals(newEntryType)) {
+                if (oldEntry.equals(newEntry)) { // found identical element
+                    return oldEntry;
+                }
+                if (newEntry.isProbablySameAs(oldEntry)) { // found element to merge 
+                    oldEntry.mergeFrom(newEntry);
+                    return oldEntry;
+                }
             }
         }
-        entries.add(newEntry);
-        element.addContent(newEntry.element.clone());
+        return null;
     }
 
     /**
