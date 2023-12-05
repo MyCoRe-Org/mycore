@@ -205,10 +205,10 @@
       </xsl:if>
 
       <!-- dateCreated -->
-      <xsl:if test="mods:originInfo[@eventType='creation']/mods:dateModified[@encoding='w3cdtf' and not(@type)]">
-        <fn:string key="dateModified">
+      <xsl:if test="mods:originInfo[@eventType='creation']/mods:dateCreated[@encoding='w3cdtf' and not(@type)]">
+        <fn:string key="dateCreated">
           <xsl:value-of
-            select="mods:originInfo[@eventType='creation']/mods:dateModified[@encoding='w3cdtf' and not(@type)]" />
+            select="mods:originInfo[@eventType='creation']/mods:dateCreated[@encoding='w3cdtf' and not(@type)]" />
         </fn:string>
       </xsl:if>
 
