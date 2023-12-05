@@ -18,8 +18,6 @@
 
 package org.mycore.mods.merger;
 
-import org.jdom2.Element;
-
 /**
  * Compares and merges mods:relatedItem elements.
  * Two related items are only probably same
@@ -28,10 +26,6 @@ import org.jdom2.Element;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRRelatedItemMerger extends MCRMerger {
-
-    public void setElement(Element element) {
-        super.setElement(element);
-    }
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {

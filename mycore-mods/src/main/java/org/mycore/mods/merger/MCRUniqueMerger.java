@@ -28,10 +28,6 @@ import org.jdom2.Element;
  */
 public class MCRUniqueMerger extends MCRMerger {
 
-    public void setElement(Element element) {
-        super.setElement(element);
-    }
-
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
         return (other.element.getName().equals(this.element.getName()));

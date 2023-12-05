@@ -72,10 +72,15 @@ public class MCRMerger {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MCRMerger) {
-            return MCRXMLHelper.deepEqual(this.element, ((MCRMerger) obj).element);
+            MCRMerger other = (MCRMerger) obj;
+            return sameElementName(other) && MCRXMLHelper.deepEqual(this.element, other.element);
         } else {
-            return super.equals(obj);
+            return false;
         }
+    }
+    
+    protected boolean sameElementName(MCRMerger other) {
+        return this.element.getName().equals(other.element.getName());
     }
 
     /**
@@ -128,11 +133,9 @@ public class MCRMerger {
      * If a non-identical match is found, the new entry is merged into the old one. 
      **/
     private MCRMerger findAndMergeMatch(List<MCRMerger> oldEntries, MCRMerger newEntry) {
-        String newEntryType = newEntry.element.getName();
-
         for (MCRMerger oldEntry : oldEntries) {
             // Only same MODS element type can be a match
-            if (oldEntry.element.getName().equals(newEntryType)) {
+            if( oldEntry.sameElementName(newEntry) ) {
                 if (oldEntry.equals(newEntry)) { // found identical element
                     return oldEntry;
                 }
