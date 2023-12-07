@@ -175,11 +175,13 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      *            if a persistence problem is occurred
      * @throws MCRAccessException
-     *            if write permission to object is missing
+     *            if write permission to object is missing or create permission to derivate is missing
      */
     public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
 
         MCRObjectID derivateId = mcrDerivate.getId();
+
+        checkCreatePrivilege(derivateId);
 
         if (MCRMetadataManager.exists(derivateId)) {
             throw new MCRPersistenceException("The derivate " + derivateId + " already exists, nothing done.");
