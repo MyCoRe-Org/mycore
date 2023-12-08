@@ -17,5 +17,15 @@
     <xsl:variable name="entryDoc" select="fn:document(concat('property:', $key))"/>
     <xsl:value-of select="$entryDoc/entry/text()"/>
   </xsl:function>
+  
+  <xsl:function name="mcrproperty:map" as="map(xs:string, xs:string)">
+    <xsl:param name="keyPrefix" as="xs:string"/>
+    <xsl:variable name="propDoc" select="fn:document(concat('property:', $keyPrefix, '*'))" />
+    <xsl:map>
+      <xsl:for-each select="$propDoc/properties/entry">
+        <xsl:map-entry key="fn:string(@key)" select="fn:string(./text())" />
+      </xsl:for-each>
+    </xsl:map>
+  </xsl:function>
 
 </xsl:stylesheet>
