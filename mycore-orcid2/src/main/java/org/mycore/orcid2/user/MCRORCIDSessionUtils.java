@@ -23,6 +23,9 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * Provides ORCID session utilities.
  */
@@ -37,14 +40,15 @@ public class MCRORCIDSessionUtils {
      */
     public static MCRORCIDUser getCurrentUser() {
         final MCRSession session = MCRSessionMgr.getCurrentSession();
-        String userID = session.getUserInformation().getUserID();
+        final String userID = session.getUserInformation().getUserID();
         // refetch user because of rest issues
         final MCRUser user = MCRUserManager.getUser(userID);
-        MCRORCIDUser orcidUser = (MCRORCIDUser) session.get(KEY_ORCID_USER);
-        if ((orcidUser == null) || !orcidUser.getUser().equals(user)) {
-            orcidUser = new MCRORCIDUser(user);
-            session.put(KEY_ORCID_USER, orcidUser);
-        }
+
+        final MCRORCIDUser orcidUser = Optional.ofNullable((MCRORCIDUser) session.get(KEY_ORCID_USER))
+            .filter(u -> !Objects.equals(u.getUser(), user))
+            .orElse(new MCRORCIDUser(user));
+
+        session.put(KEY_ORCID_USER, orcidUser);
         return orcidUser;
     }
 }
