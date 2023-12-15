@@ -149,7 +149,7 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
 
         long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
         if (size > maxSize) {
-            throw new MCRInvalidFileException(name, "Maximum allowed size is " + size);
+            throw new MCRInvalidFileException(name, "Maximum allowed size is " + maxSize + ", size is " + size);
         }
     }
 
