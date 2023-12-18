@@ -73,6 +73,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
                         break loop;
                     }
 
+                    LOGGER.debug(ds + " with " + id + " starting call...");
                     Element result = idResolver.resolve(id.getValue());
                     if (result != null) {
                         gotResults = true;

@@ -18,8 +18,6 @@
 
 package org.mycore.mods.merger;
 
-import org.jdom2.Element;
-
 /**
  * Merges MODS elements that must occur only once per type.
  * So if they have the same name and the same type attribute value,
@@ -29,17 +27,13 @@ import org.jdom2.Element;
  */
 public class MCRUniqueTypeMerger extends MCRMerger {
 
-    public void setElement(Element element) {
-        super.setElement(element);
-    }
-
     private String getType() {
         return this.element.getAttributeValue("type", "");
     }
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRUniqueTypeMerger)) {
+        if (!sameElementName(other)) {
             return false;
         } else {
             return this.getType().equals(((MCRUniqueTypeMerger) other).getType());

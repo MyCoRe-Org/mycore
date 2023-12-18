@@ -18,7 +18,6 @@
 
 package org.mycore.mods.merger;
 
-import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 
 /**
@@ -27,10 +26,6 @@ import org.mycore.common.MCRConstants;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRExtentMerger extends MCRMerger {
-
-    public void setElement(Element element) {
-        super.setElement(element);
-    }
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {

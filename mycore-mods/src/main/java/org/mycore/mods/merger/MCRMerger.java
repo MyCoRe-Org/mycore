@@ -18,10 +18,10 @@
 
 package org.mycore.mods.merger;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
@@ -72,10 +72,15 @@ public class MCRMerger {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MCRMerger) {
-            return MCRXMLHelper.deepEqual(this.element, ((MCRMerger) obj).element);
+            MCRMerger other = (MCRMerger) obj;
+            return sameElementName(other) && MCRXMLHelper.deepEqual(this.element, other.element);
         } else {
-            return super.equals(obj);
+            return false;
         }
+    }
+    
+    protected boolean sameElementName(MCRMerger other) {
+        return this.element.getName().equals(other.element.getName());
     }
 
     /**
@@ -107,33 +112,42 @@ public class MCRMerger {
      * This is done by building MCRMerger instances for each child element and comparing them.
      */
     protected void mergeElements(MCRMerger other) {
-        List<MCRMerger> entries = new ArrayList<>();
-        for (Element child : this.element.getChildren()) {
-            entries.add(MCRMergerFactory.buildFrom(child));
-        }
+        List<MCRMerger> oldEntries = this.element.getChildren()
+            .stream().map(child -> MCRMergerFactory.buildFrom(child)).collect(Collectors.toList());
+        List<MCRMerger> newEntries = other.element.getChildren()
+            .stream().map(child -> MCRMergerFactory.buildFrom(child)).collect(Collectors.toList());
 
-        for (Element child : other.element.getChildren()) {
-            mergeIntoExistingEntries(entries, MCRMergerFactory.buildFrom(child));
+        for (MCRMerger newEntry : newEntries) {
+            MCRMerger matchingEntry = mergeIntoExistingEntries(oldEntries, newEntry);
+
+            if (matchingEntry != null) {
+                oldEntries.remove(matchingEntry);
+            }
         }
     }
 
     /**
      * Given a list of MCRMergers which represent the current content, merges a new entry into it.
-     *
-     * @param entries a list of existing mergers, each wrapping an element
-     * @param newEntry the merger for the new element that should be merged into the existing entries
-     */
-    private void mergeIntoExistingEntries(List<MCRMerger> entries, MCRMerger newEntry) {
-        for (MCRMerger existingEntry : entries) {
-            if (newEntry.equals(existingEntry)) {
-                return;
-            } else if (newEntry.isProbablySameAs(existingEntry)) {
-                existingEntry.mergeFrom(newEntry);
-                return;
+     * 
+     * @return the old entry that matched the given new entry, or null
+     **/
+    private MCRMerger mergeIntoExistingEntries(List<MCRMerger> oldEntries, MCRMerger newEntry) {
+        for (MCRMerger oldEntry : oldEntries) {
+            // Only same MODS element type can be a match
+            if (oldEntry.sameElementName(newEntry)) {
+                if (oldEntry.equals(newEntry)) { 
+                    return oldEntry; // found identical element
+                }
+                if (newEntry.isProbablySameAs(oldEntry)) {  
+                    oldEntry.mergeFrom(newEntry); // found element to merge
+                    return oldEntry;
+                }
             }
         }
-        entries.add(newEntry);
+        
+        // No match found, add as new element
         element.addContent(newEntry.element.clone());
+        return null;
     }
 
     /**
