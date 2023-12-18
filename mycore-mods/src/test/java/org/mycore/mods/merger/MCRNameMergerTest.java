@@ -180,11 +180,11 @@ public class MCRNameMergerTest extends MCRTestCase {
 
     @Test
     public void testPrioritizeMergeNonConflictingIDs() throws JaxenException, IOException {
-        String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']" 
+        String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
             + "[mods:nameIdentifier[@type='scopus']='1']]";
-        String b = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']" 
+        String b = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
             + "[mods:nameIdentifier[@type='scopus']='2']]";
-        String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']" 
+        String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
             + "[mods:nameIdentifier[@type='scopus']='1'][mods:nameIdentifier[@type='scopus']='2']]";
         MCRMergerTest.test(a, b, e);
     }
