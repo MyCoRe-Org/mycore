@@ -165,6 +165,8 @@ public class MCRNameMergerTest extends MCRTestCase {
         String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
             + "[mods:nameIdentifier[@type='scopus']='1']][mods:name[@type='personal'][mods:namePart='Thomas Müller']"
             + "[mods:nameIdentifier[@type='gnd']='2'][mods:nameIdentifier[@type='scopus']='2']]";
+        MCRMergerTest.test(a, b, e);
+    }
 
     @Test
     public void testDontMergeConflictingIDs() throws JaxenException, IOException {
