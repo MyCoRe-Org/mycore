@@ -154,6 +154,43 @@ public class MCRNameMergerTest extends MCRTestCase {
         MCRMergerTest.test(a, b, b);
     }
 
+    @Test
+    public void testRetainSame() throws JaxenException, IOException {
+        String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='gnd']='1']][mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='gnd']='2']]";
+        String b = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='1']][mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='2']]";
+        String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
+            + "[mods:nameIdentifier[@type='scopus']='1']][mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='gnd']='2'][mods:nameIdentifier[@type='scopus']='2']]";
+        MCRMergerTest.test(a, b, e);
+    }
+
+    @Test
+    public void testDontMergeConflictingIDs() throws JaxenException, IOException {
+        String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='1']]";
+        String b = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='2']]";
+        String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='1']][mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='2']]";
+        MCRMergerTest.test(a, b, e);
+    }
+
+    @Test
+    public void testPrioritizeMergeNonConflictingIDs() throws JaxenException, IOException {
+        String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
+            + "[mods:nameIdentifier[@type='scopus']='1']]";
+        String b = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
+            + "[mods:nameIdentifier[@type='scopus']='2']]";
+        String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:nameIdentifier[@type='gnd']='1']"
+            + "[mods:nameIdentifier[@type='scopus']='1'][mods:nameIdentifier[@type='scopus']='2']]";
+        MCRMergerTest.test(a, b, e);
+    }
+
     private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {
         Element modsName = new MCRNodeBuilder().buildElement("mods:name[@type='personal']" + predicates, null, null);
         MCRNameMerger ne = new MCRNameMerger();

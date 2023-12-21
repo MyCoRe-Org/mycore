@@ -20,10 +20,12 @@ package org.mycore.mods.merger;
 
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
 
 import org.jdom2.Element;
@@ -44,6 +46,8 @@ public class MCRNameMerger extends MCRMerger {
 
     private Set<String> allNames = new HashSet<>();
 
+    private Map<String,Set<String>> nameIds = new HashMap<String,Set<String>>();
+
     public void setElement(Element element) {
         super.setElement(element);
 
@@ -52,6 +56,8 @@ public class MCRNameMerger extends MCRMerger {
         if (familyName == null) {
             setFromDisplayForm(element);
         }
+
+        collectNameIds(element);
     }
 
     private void setFromDisplayForm(Element element) {
@@ -161,7 +167,9 @@ public class MCRNameMerger extends MCRMerger {
             return false;
         }
 
-        if (this.allNames.equals(other.allNames)) {
+        if (haveContradictingNameIds(this.nameIds, other.nameIds)) {
+            return false;
+        } else if (this.allNames.equals(other.allNames)) {
             return true;
         } else if (!Objects.equals(familyName, other.familyName)) {
             return false;
@@ -180,6 +188,39 @@ public class MCRNameMerger extends MCRMerger {
         Set<String> intersection = new HashSet<>(a);
         intersection.retainAll(b);
         return !intersection.isEmpty();
+    }
+
+    private boolean haveContradictingNameIds(Map<String, Set<String>> a, Map<String, Set<String>> b) {
+        Set<String> intersection = null;
+        boolean foundContradictingNameIds = false;
+        for (String type : a.keySet()) {
+            intersection = new HashSet<>(a.get(type));
+            if(b.get(type) != null) {
+                intersection.retainAll(b.get(type));
+                if(!intersection.isEmpty()) {
+                    return false;
+                } else {
+                    foundContradictingNameIds = true;
+                }
+            }
+        }
+        return foundContradictingNameIds;
+    }
+
+    private void collectNameIds(Element modsName) {
+        for (Element nameId : modsName.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE)) {
+            String type = nameId.getAttributeValue("type");
+            String id = nameId.getText();
+
+            Set<String> ids = null;
+            if(nameIds.containsKey(type)) {
+                ids = nameIds.get(type);
+            } else {
+                ids = new HashSet<String>();
+            }
+            ids.add(id);
+            nameIds.put(type, ids);
+        }
     }
 
     public String toString() {

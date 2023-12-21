@@ -22,8 +22,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
-import org.jdom2.Element;
-
 /**
  * Compares and merges mods:identifier elements.
  * Two identifiers are assumed to be the same when they are equals, neglecting any hyphens.
@@ -32,11 +30,6 @@ import org.jdom2.Element;
  * @author Frank Lützenkirchen
  */
 public class MCRIdentifierMerger extends MCRMerger {
-
-    @Override
-    public void setElement(Element element) {
-        super.setElement(element);
-    }
 
     private String getType() {
         return this.element.getAttributeValue("type", "");
