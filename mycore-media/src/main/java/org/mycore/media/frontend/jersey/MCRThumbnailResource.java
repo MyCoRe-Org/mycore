@@ -57,6 +57,7 @@ public class MCRThumbnailResource {
      * This method returns a thumbnail for a given document with a given size in pixel for the shortest side.
      * @param documentId the documentID you want the thumbnail from
      * @param size the size of the shortest side in pixel
+     * @param ext  the extension of the new image file (jpg ord png)
      * @return the thumbnail as png, jpg or error 404 if if there is no derivate or no generator for filetype
      */
     @GET
@@ -70,6 +71,7 @@ public class MCRThumbnailResource {
     /**
      * This method returns a thumbnail for a given document with a default size in pixel for the shortest side.
      * @param documentId the documentID you want the thumbnail from
+     * @param ext  the extension of the new image file (jpg ord png)
      * @return the thumbnail as png, jpg or error 404 if if there is no derivate or no generator for filetype
      */
     @GET
@@ -84,7 +86,7 @@ public class MCRThumbnailResource {
         List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRJerseyUtil.getID(documentId),
             1, TimeUnit.MINUTES);
         for (MCRObjectID derivateId : derivateIds) {
-            if (MCRAccessManager.checkPermissionForReadingDerivate(derivateId.toString())) {
+            if (MCRAccessManager.checkDerivateDisplayPermission(derivateId.toString())) {
                 String nameOfMainFile = MCRMetadataManager.retrieveMCRDerivate(derivateId).getDerivate().getInternals()
                     .getMainDoc();
                 if (nameOfMainFile != null && !nameOfMainFile.equals("")) {

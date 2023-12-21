@@ -129,6 +129,9 @@ public class MCRUserAttributeMapper {
                     for (Attribute attribute : attribs) {
                         if (attributes.containsKey(attribute.mapping)) {
                             Object value = attributes.get(attribute.mapping);
+                            if(value == null){
+                                LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
+                            }
 
                             MCRUserAttributeJavaConverter aConv = null;
 

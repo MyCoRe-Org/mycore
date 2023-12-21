@@ -125,7 +125,7 @@ public class MCRLocaleResource {
     @MCRStaticContent
     public String translateText(@PathParam("lang") String lang, @PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
-        return MCRTranslation.translate(key, MCRTranslation.getLocale(lang));
+        return MCRTranslation.translateToLocale(key, MCRTranslation.getLocale(lang));
     }
 
     /**

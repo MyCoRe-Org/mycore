@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.ws.rs.core.MediaType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,6 +73,17 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         final String languagesString = jersey.target("locale/languages").request().get(String.class);
         JsonArray languages = JsonParser.parseString(languagesString).getAsJsonArray();
         assertEquals(3, languages.size());
+    }
+
+    @Test
+    public void translate() {
+        String hello = jersey.target("locale/translate/junit.hello").request().get(String.class);
+        assertEquals("Hallo Welt", hello);
+    }
+    @Test
+    public void translateToLocale() {
+        String hello = jersey.target("locale/translate/en/junit.hello").request(MediaType.TEXT_PLAIN).get(String.class);
+        assertEquals("Hello World", hello);
     }
 
 }

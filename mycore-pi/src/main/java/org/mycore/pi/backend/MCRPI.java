@@ -79,11 +79,11 @@ import jakarta.persistence.UniqueConstraint;
 @Table(
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "identifier", "type" }),
-        @UniqueConstraint(columnNames = { "mycoreid", "service", "additional" })
+        @UniqueConstraint(columnNames = { "mycoreID", "service", "additional" })
     },
     indexes = {
         @Index(name = "Identifier", columnList = "identifier"),
-        @Index(name = "MCRIdentifierService", columnList = "mycoreid, service")
+        @Index(name = "MCRIdentifierService", columnList = "mycoreID, service")
     })
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 

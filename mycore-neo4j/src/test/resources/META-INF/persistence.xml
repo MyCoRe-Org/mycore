@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
-             version="3.1">
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
     <persistence-unit name="mycore-neo4j" transaction-type="RESOURCE_LOCAL">
         <!-- http://stackoverflow.com/questions/15026302/multiple-jars-single-persistence-unit-solution -->
         <mapping-file>META-INF/mycore-base-mappings.xml</mapping-file>
         <properties>
-            <!-- hsqldb -->
-            <!-- <property name="jakarta.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:hsqldb:mem:mycore" /> -->
-
             <!-- postgres -->
             <!--       <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver" /> -->
             <!--       <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/postgres" /> -->
             <!-- h2 -->
-            <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:mycore"/>
+            <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:mycore" />
 
-            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
-            <property name="jakarta.persistence.jdbc.password" value="junit"/>
-            <property name="hibernate.cache.use_second_level_cache" value="false"/>
-            <property name="hibernate.jdbc.batch_size" value="0"/>
-            <property name="hibernate.show_sql" value="false"/>
-            <property name="hibernate.format_sql" value="true"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres" />
+            <property name="jakarta.persistence.jdbc.password" value="junit" />
+            <property name="hibernate.cache.use_second_level_cache" value="false" />
+            <property name="hibernate.jdbc.batch_size" value="0" />
+            <property name="hibernate.show_sql" value="false" />
+            <property name="hibernate.format_sql" value="true" />
+            <property name="hibernate.globally_quoted_identifiers" value="true" />
+            <property name="hibernate.globally_quoted_identifiers_skip_column_definitions" value="true" />
             <!-- We better always test with defined schema -->
-            <property name="hibernate.default_schema" value="junit"/>
+            <property name="hibernate.default_schema" value="junit" />
         </properties>
     </persistence-unit>
 </persistence>

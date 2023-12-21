@@ -29,7 +29,7 @@ public class MCRDFNDisplayNameConverter implements MCRUserAttributeConverter<Str
 
     @Override
     public String convert(String value, String separator, Map<String, String> valueMapping) {
-        return new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        return value != null ? new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8) : null;
     }
 
 }

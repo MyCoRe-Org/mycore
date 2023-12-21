@@ -2,14 +2,13 @@
 <configuration status="OFF">
   <appenders>
     <Console name="Console" target="SYSTEM_OUT">
-<!--       <PatternLayout pattern="%-5p %c{1} %m%n"/> -->
-      <PatternLayout pattern="%C{1}.%M %m %ex%n"/>
+      <PatternLayout pattern="%highlight{%p %C{1}.%M: %m%ex}{STYLE=Logback}%style{%n}{Normal}" />
     </Console>
   </appenders>
   <loggers>
     <root level="info">
       <appender-ref ref="Console"/>
     </root>
-    <logger name="org.hibernate" level="error" />
+    <logger name="org.hibernate" level="warning" />
   </loggers>
 </configuration>
