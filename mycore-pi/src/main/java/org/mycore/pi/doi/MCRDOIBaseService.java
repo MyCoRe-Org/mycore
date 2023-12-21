@@ -130,7 +130,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
             && getRegistrationPredicate().test(obj)) {
             // validate
             transform(obj, doi.asString());
-            this.updateStartRegistrationDate(obj.getId(), "", new Date());
+            this.updateStartRegistrationDate(obj.getId(), additional, new Date());
             startRegisterJob(obj, doi);
         }
     }
