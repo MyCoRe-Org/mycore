@@ -49,7 +49,7 @@
     <selenium.version>3.141.59</selenium.version>
     <verapdf.version>1.24.1</verapdf.version>
     <xalan.version>2.7.3</xalan.version>
-    <xsonify.version>1.0-SNAPSHOT</xsonify.version>
+    <xsonify.version>1.0</xsonify.version>
   </properties>
 
   <dependencyManagement>
