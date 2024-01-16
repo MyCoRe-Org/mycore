@@ -20,15 +20,14 @@ package org.mycore.common;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.log.MCRListMessage;
 
 /**
@@ -38,11 +37,18 @@ import org.mycore.common.log.MCRListMessage;
  * {@link MCRUserInformationResolver#getSpecification(String, String)}.
  * <p>
  * Multiple instances of {@link MCRUserInformationProvider} can be configured as a comma separated list of fully
- * qualified class names with the configuration property {@link MCRUserInformationResolver#PROVIDERS_KEY}.
- * Each user information provider has a fixed schema and implements a strategy to create or look up user information
- * for a given user ID.
+ * qualified class names with the configuration property prefix {@link MCRUserInformationResolver#PROVIDERS_KEY}.
+ * Each user information provider implements a strategy to create or look up user information for a given user ID
+ * and uses the configured name as its scheme.
  * <p>
- * A possible use case is to have the ability of storing the user information required for e.g. 
+ * Example: 
+ * <pre>
+ * MCR.UserInformation.Resolver.Providers.foo.Class=my.package.FooUserInformationProvider
+ * </pre>
+ * This will create an instance of <code>FooUserInformationProvider</code> and make it available with the schema 
+ * <code>foo</code>.
+ * <p>
+ * A possible use case is to have the ability of storing the user information required for e.g.
  * {@link org.mycore.util.concurrent.MCRFixedUserCallable} as a string in a configuration property.
  */
 public final class MCRUserInformationResolver {
@@ -61,34 +67,27 @@ public final class MCRUserInformationResolver {
 
     private static Map<String, MCRUserInformationProvider> getProviders() {
 
-        List<MCRUserInformationProvider> providers = MCRConfiguration2
-            .getOrThrow(PROVIDERS_KEY, MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::<MCRUserInformationProvider>instantiateClass)
-            .toList();
+        String prefix = PROVIDERS_KEY + ".";
+        Map<String, Callable<MCRUserInformationProvider>> providerFactoriesByProperty =
+            MCRConfiguration2.getInstances(prefix);
 
         MCRListMessage description = new MCRListMessage();
         Map<String, MCRUserInformationProvider> providersBySchema = new HashMap<>();
-
-        providers.forEach(provider -> {
-            checkIsUniqueSchema(providersBySchema, provider);
-            description.add(provider.getSchema(), provider.getClass().getName());
-            providersBySchema.put(provider.getSchema(), provider);
-        });
+        for (String property : providerFactoriesByProperty.keySet()) {
+            try {
+                String schema = property.substring(prefix.length());
+                MCRUserInformationProvider provider = providerFactoriesByProperty.get(property).call();
+                description.add(schema, provider.getClass().getName());
+                providersBySchema.put(schema, provider);
+            } catch (Exception e) {
+                throw new MCRException("Failed to instantiate provider configured in: " + property);
+            }
+        }
 
         LOGGER.info(description.logMessage("Resolving user information with providers:"));
 
         return Collections.unmodifiableMap(providersBySchema);
 
-    }
-
-    private static void checkIsUniqueSchema(Map<String, MCRUserInformationProvider> providersBySchema,
-        MCRUserInformationProvider provider) {
-        String schema = provider.getSchema();
-        if (providersBySchema.containsKey(schema)) {
-            throw new MCRConfigurationException("Multiple user information providers with schema '"
-                + schema + "' configured: " + providersBySchema.get(schema).getClass().getName()
-                + ", " + provider.getClass().getName());
-        }
     }
 
     public static MCRUserInformationResolver instance() {

@@ -61,7 +61,7 @@ public class MCRUserUserInformationProviderTest extends MCRUserTestCase {
     }
 
     private Optional<MCRUserInformation> get(String userId) {
-        return MCRUserInformationResolver.instance().get(MCRUserUserInformationProvider.SCHEMA, userId);
+        return MCRUserInformationResolver.instance().get("user", userId);
     }
 
 }

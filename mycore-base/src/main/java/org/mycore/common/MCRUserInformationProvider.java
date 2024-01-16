@@ -25,8 +25,6 @@ import java.util.Optional;
  */
 public interface MCRUserInformationProvider {
 
-    String getSchema();
-
     Optional<MCRUserInformation> get(String userId);
 
 }

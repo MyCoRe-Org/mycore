@@ -24,18 +24,10 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationProvider;
 
 /**
- * A {@link MCRUserUserInformationProvider} is a {@link MCRUserInformationProvider} that has the scheme
- * {@link MCRUserUserInformationProvider#SCHEMA} and looks up user information with 
+ * A {@link MCRUserUserInformationProvider} is a {@link MCRUserInformationProvider} that looks up user information with 
  * {@link MCRUserManager#getUser(String)}.
  */
 public final class MCRUserUserInformationProvider implements MCRUserInformationProvider {
-
-    public static final String SCHEMA = "user";
-
-    @Override
-    public String getSchema() {
-        return SCHEMA;
-    }
 
     @Override
     public Optional<MCRUserInformation> get(String userId) {

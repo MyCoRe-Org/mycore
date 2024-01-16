@@ -21,11 +21,10 @@ package org.mycore.common;
 import java.util.Optional;
 
 /**
- * A {@link MCRSystemUserInformationProvider} is a {@link MCRUserInformationProvider} that has the scheme
- * {@link MCRSystemUserInformationProvider#SCHEMA} and looks up user information defined in
- * {{@link MCRSystemUserInformation}}.
+ * A {@link MCRSystemUserInformationProvider} is a {@link MCRUserInformationProvider} that looks up user
+ * information defined in {{@link MCRSystemUserInformation}}.
  * <p>
- * Possible user IDs are
+ * Possible user IDs are:
  * <ul>
  *     <li> {@link MCRSystemUserInformationProvider#GUEST}</li>
  *     <li >{@link MCRSystemUserInformationProvider#JANITOR}</li>
@@ -35,8 +34,6 @@ import java.util.Optional;
  */
 public final class MCRSystemUserInformationProvider implements MCRUserInformationProvider {
 
-    public static final String SCHEMA = "system";
-
     public static final String GUEST = "GUEST";
 
     public static final String JANITOR = "JANITOR";
@@ -44,11 +41,6 @@ public final class MCRSystemUserInformationProvider implements MCRUserInformatio
     public static final String SYSTEM_USER = "SYSTEM_USER";
 
     public static final String SUPER_USER = "SUPER_USER";
-
-    @Override
-    public String getSchema() {
-        return SCHEMA;
-    }
 
     @Override
     public Optional<MCRUserInformation> get(String userId) {
