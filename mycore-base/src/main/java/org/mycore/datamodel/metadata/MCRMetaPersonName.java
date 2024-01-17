@@ -121,11 +121,8 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the first name text element.
      */
     public void setFirstName(String firstname) {
-        if (firstname != null) {
-            this.firstname = firstname.trim();
-        } else {
-            this.firstname = "";
-        }
+        this.firstname = firstname != null ? firstname.trim() : "";
+        updateName();
     }
 
     /**
@@ -141,11 +138,8 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the call name text element.
      */
     public void setCallName(String callname) {
-        if (callname != null) {
-            this.callname = callname.trim();
-        } else {
-            this.callname = "";
-        }
+        this.callname = callname != null ? callname.trim() : "";
+        updateName();
     }
 
     /**
@@ -161,11 +155,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the surname text element.
      */
     public void setSurName(String surname) {
-        if (surname != null) {
-            this.surname = surname.trim();
-        } else {
-            this.surname = "";
-        }
+        this.surname = surname != null ? surname.trim() : "";
     }
 
     /**
@@ -181,11 +171,8 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the full name text element.
      */
     public void setFullName(String fullname) {
-        if (fullname != null) {
-            this.fullname = fullname.trim();
-        } else {
-            this.fullname = "";
-        }
+        this.fullname = fullname != null ? fullname.trim() : "";
+        updateName();
     }
 
     /**
@@ -201,11 +188,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the academic text element.
      */
     public void setAcademic(String academic) {
-        if (academic != null) {
-            this.academic = academic.trim();
-        } else {
-            this.academic = "";
-        }
+        this.academic = academic != null ? academic.trim() : "";
     }
 
     /**
@@ -221,11 +204,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the peerage text element.
      */
     public void setPeerage(String peerage) {
-        if (peerage != null) {
-            this.peerage = peerage.trim();
-        } else {
-            this.peerage = "";
-        }
+        this.peerage = peerage != null ? peerage.trim() : "";
     }
 
     /**
@@ -241,11 +220,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the numeration text element.
      */
     public void setNumeration(String numeration) {
-        if (numeration != null) {
-            this.numeration = numeration.trim();
-        } else {
-            this.numeration = "";
-        }
+        this.numeration = numeration != null ? numeration.trim() : "";
     }
 
     /**
@@ -261,11 +236,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the title text element.
      */
     public void setTitle(String title) {
-        if (title != null) {
-            this.title = title.trim();
-        } else {
-            this.title = "";
-        }
+        this.title = title != null ? title.trim() : "";
     }
 
     /**
@@ -281,11 +252,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the prefix text element.
      */
     public void setPrefix(String prefix) {
-        if (prefix != null) {
-            this.prefix = prefix.trim();
-        } else {
-            this.prefix = "";
-        }
+        this.prefix = prefix != null ? prefix.trim() : "";
     }
 
     /**
@@ -301,10 +268,22 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method set the affix text element.
      */
     public void setAffix(String affix) {
-        if (affix != null) {
-            this.affix = affix.trim();
-        } else {
-            this.affix = "";
+        this.affix = affix != null ? affix.trim() : "";
+    }
+
+    private void updateName() {
+        firstname = firstname.trim();
+        if (firstname.isEmpty()) {
+            firstname = callname;
+        }
+        callname = callname.trim();
+        if (callname.isEmpty()) {
+            callname = firstname;
+        }
+        fullname = fullname.trim();
+        if (fullname.isEmpty()) {
+            String sb = academic + ' ' + peerage + ' ' + firstname + ' ' + prefix + ' ' + surname;
+            fullname = sb.trim();
         }
     }
 
@@ -373,28 +352,13 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
         if (firstname == null || callname == null || fullname == null) {
             throw new MCRException(getSubTag() + ": one of fullname, callname or firstname is null.");
         }
-        firstname = firstname.trim();
-        if (firstname.length() == 0) {
-            firstname = callname;
-        }
-        callname = callname.trim();
-        if (callname.length() == 0) {
-            callname = firstname;
-        }
-        fullname = fullname.trim();
-        if (fullname.length() == 0) {
-            String sb = academic + ' ' + peerage + ' ' + firstname + ' ' + prefix + ' ' + surname;
-            fullname = sb.trim();
-            if (fullname.length() == 0) {
-                throw new MCRException(getSubTag() + ": full name / first name or surname is empty");
-            }
+        if (fullname.trim().isEmpty()) {
+            throw new MCRException(getSubTag() + ": full name is empty");
         }
     }
 
     /**
-     * clone of this instance
-     * 
-     * you will get a (deep) clone of this element
+     * Clone of this instance. You will get a (deep) clone of this element.
      * 
      * @see java.lang.Object#clone()
      */

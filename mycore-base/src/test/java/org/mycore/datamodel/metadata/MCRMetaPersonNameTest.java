@@ -59,4 +59,15 @@ public class MCRMetaPersonNameTest extends MCRTestCase {
         MCRMetaPersonName person_clone = person_read.clone();
         assertEquals("cloned object should be equal with original", person_read, person_clone);
     }
+
+    @Test
+    public void testCreateXMLDoesNotChange() {
+        final MCRMetaPersonName name = new MCRMetaPersonName("tag", 0);
+        name.setFirstName("firstname");
+        assertEquals("firstname", name.getFirstName());
+        assertEquals("firstname", name.getCallName());
+        name.createXML();
+        assertEquals("firstname", name.getCallName());
+    }
+
 }
