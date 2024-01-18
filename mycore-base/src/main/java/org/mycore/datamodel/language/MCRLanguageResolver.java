@@ -24,6 +24,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
@@ -31,14 +33,21 @@ import org.mycore.tools.MCRLanguageOrientationHelper;
 
 /**
  * Resolves languages by code. Syntax: language:{ISOCode}
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRLanguageResolver implements URIResolver {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public Source resolve(String href, String base) throws TransformerException {
         try {
-            String code = href.split(":")[1];
+            String[] hrefContent = href.split(":");
+            if (hrefContent.length < 2) {
+                LOGGER.warn("Empty language code found while resolving URI 'language:'. Returning empty language tag.");
+                return new JDOMSource(new Document(new Element("language")));
+            }
+            String code = hrefContent[1];
             MCRLanguage language = MCRLanguageFactory.instance().getLanguage(code);
             Document doc = new Document(buildXML(language));
             return new JDOMSource(doc);
@@ -66,4 +75,5 @@ public class MCRLanguageResolver implements URIResolver {
 
         return xml;
     }
+
 }
