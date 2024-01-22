@@ -77,7 +77,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
             .flatMap(s -> s.getStoredIDs()
                 .mapToObj(
                     i -> MCRObjectID.formatID(s.getID().substring(MCRFileSystemUtils.STORE_ID_PREFIX.length()), i)))
-            .map(owner -> MCRAbstractFileSystem.getPath(owner, "/", this))
+            .map(owner -> getPath(owner, "/", this))
             .map(Path.class::cast)::iterator;
     }
 

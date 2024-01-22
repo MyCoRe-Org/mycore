@@ -261,7 +261,7 @@ public class MCRAccessKeyUtils {
             for (final MCRUser user : users) {
                 final List<MCRUserAttribute> attributes = user.getAttributes()
                     .stream()
-                    .filter(attribute -> attribute.getName().startsWith(MCRAccessKeyUtils.ACCESS_KEY_PREFIX))
+                    .filter(attribute -> attribute.getName().startsWith(ACCESS_KEY_PREFIX))
                     .filter(attribute -> !validAttributes.contains(attribute))
                     .collect(Collectors.toList());
                 for (MCRUserAttribute attribute : attributes) {
@@ -269,12 +269,12 @@ public class MCRAccessKeyUtils {
                     final MCRObjectID objectId = MCRObjectID.getInstance(attributeName.substring(
                         attributeName.indexOf("_") + 1));
                     if (deadAttributes.contains(attribute)) {
-                        MCRAccessKeyUtils.removeAccessKeySecret(user, objectId);
+                        removeAccessKeySecret(user, objectId);
                     } else {
                         if (MCRAccessKeyManager.getAccessKeyWithSecret(objectId, attribute.getValue()) != null) {
                             validAttributes.add(attribute);
                         } else {
-                            MCRAccessKeyUtils.removeAccessKeySecret(user, objectId);
+                            removeAccessKeySecret(user, objectId);
                             deadAttributes.add(attribute);
                         }
                     }

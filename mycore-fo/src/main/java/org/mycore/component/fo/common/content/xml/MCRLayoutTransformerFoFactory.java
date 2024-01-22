@@ -53,8 +53,7 @@ public class MCRLayoutTransformerFoFactory extends MCRLayoutTransformerFactory {
         return transformers.computeIfAbsent(id, (transformerId) -> {
             try {
                 MCRContentTransformer transformer = super.getTransformer(transformerId);
-                if (MCRLayoutTransformerFactory.NOOP_TRANSFORMER.equals(transformer) ||
-                    getConfiguredTransformer(id).isPresent()) {
+                if (NOOP_TRANSFORMER.equals(transformer) || getConfiguredTransformer(id).isPresent()) {
                     return transformer;
                 }
 

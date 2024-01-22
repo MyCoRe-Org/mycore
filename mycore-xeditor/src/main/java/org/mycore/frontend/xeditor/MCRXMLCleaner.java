@@ -143,11 +143,8 @@ class MCRCleaningRule {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRCleaningRule cleaningRule) {
-            return xPathExprNodesToInspect.equals(cleaningRule.xPathExprNodesToInspect);
-        } else {
-            return false;
-        }
+        return obj instanceof MCRCleaningRule cleaningRule
+            && xPathExprNodesToInspect.equals(cleaningRule.xPathExprNodesToInspect);
     }
 
     @Override
