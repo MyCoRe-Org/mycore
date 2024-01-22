@@ -60,7 +60,7 @@ import org.xml.sax.SAXParseException;
  */
 public abstract class MCRTransferPackageUtil {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackageUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The default lookup path appendix (the subdirectory in the tar where the metadata resides).
@@ -93,7 +93,7 @@ public abstract class MCRTransferPackageUtil {
         MCRUtils.untar(pathToTar, targetDirectory);
 
         // import the data from the extracted tar
-        MCRTransferPackageUtil.importFromDirectory(targetDirectory);
+        importFromDirectory(targetDirectory);
 
         // delete the extracted files, but keep the tar
         LOGGER.info("Deleting expanded tar in {}", targetDirectory);

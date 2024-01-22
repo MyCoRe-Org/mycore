@@ -172,11 +172,8 @@ public class MCRIncludeHandler {
     }
 
     private boolean hasOrIncludesID(Element e, String id) {
-        if (id.equals(e.getAttributeValue(ATTR_ID))) {
-            return true;
-        } else {
-            return "include".equals(e.getName()) && id.equals(e.getAttributeValue(ATTR_REF));
-        }
+        return id.equals(e.getAttributeValue(ATTR_ID))
+            || "include".equals(e.getName()) && id.equals(e.getAttributeValue(ATTR_REF));
     }
 
     private void handleInclude(Element container, Element includeRule) {
