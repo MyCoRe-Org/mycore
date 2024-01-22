@@ -58,18 +58,19 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <changes.version>2024.05</changes.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
-    <forbiddenapis.version>3.2</forbiddenapis.version>
     <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
     <hibernate.base.version>6.3</hibernate.base.version>
     <hibernate.version>${hibernate.base.version}.1.Final</hibernate.version>
-    <java.target.version>17</java.target.version>
+    <java.target.version>21</java.target.version>
     <jetty.version>12.0.8</jetty.version>
     <log4j.version>2.19.0</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
+    <maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <pmd.failOnViolation>true</pmd.failOnViolation>
+    <pmd.version>7.0.0</pmd.version>
     <site.suffix />
     <swagger.version>2.2.16</swagger.version>
     <uniqueVersion>false</uniqueVersion>
@@ -78,6 +79,42 @@ Applications based on MyCoRe use a common core, which provides the functionality
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>${maven-pmd-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-compat6</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-core</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-java</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-javascript</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-jsp</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-xml</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
         <plugin>
           <groupId>org.mycore.plugins</groupId>
           <artifactId>datamodel-plugin</artifactId>
@@ -773,8 +810,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 </group>
               </groups>
               <links>
-                <link>https://docs.oracle.com/en/java/javase/17/docs/api/</link>
-                <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
+                <link>https://docs.oracle.com/en/java/javase/21/docs/api/</link>
+                <link>https://jakarta.ee/specifications/platform/10/apidocs/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-api/</link>
                 <link>http://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>

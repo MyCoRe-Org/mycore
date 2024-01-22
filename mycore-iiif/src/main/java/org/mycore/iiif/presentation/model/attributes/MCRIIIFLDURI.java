@@ -25,12 +25,12 @@ public class MCRIIIFLDURI extends MCRIIIFBase {
     private String format = null;
 
     public MCRIIIFLDURI(String uri, String type, String format) {
-        super(uri, type, MCRIIIFBase.API_PRESENTATION_2);
+        super(uri, type, API_PRESENTATION_2);
         this.format = format;
     }
 
     public MCRIIIFLDURI(String uri, String type) {
-        super(uri, type, MCRIIIFBase.API_PRESENTATION_2);
+        super(uri, type, API_PRESENTATION_2);
     }
 
     public String getFormat() {

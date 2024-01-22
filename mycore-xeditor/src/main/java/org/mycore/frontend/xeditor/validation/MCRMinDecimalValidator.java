@@ -45,10 +45,6 @@ public class MCRMinDecimalValidator extends MCRDecimalValidator {
     @Override
     protected boolean isValid(String value) {
         Double d = converter.string2double(value);
-        if (d == null) {
-            return false;
-        } else {
-            return min <= d;
-        }
+        return d != null && min <= d;
     }
 }
