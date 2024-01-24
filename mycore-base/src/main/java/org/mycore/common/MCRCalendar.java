@@ -898,15 +898,12 @@ public class MCRCalendar {
         }
         try {
             formatter.setCalendar(calendar);
-            if (calendar instanceof IslamicCalendar) {
-                return formatter.format(calendar.getTime()) + " h.";
-            } else if (calendar instanceof CopticCalendar) {
-                return formatter.format(calendar.getTime()) + " A.M.";
-            } else if (calendar instanceof EthiopicCalendar) {
-                return formatter.format(calendar.getTime()) + " E.E.";
-            } else {
-                return formatter.format(calendar.getTime());
-            }
+            return switch (calendar) {
+                case IslamicCalendar islamicCalendar -> formatter.format(calendar.getTime()) + " h.";
+                case CopticCalendar copticCalendar -> formatter.format(calendar.getTime()) + " A.M.";
+                case EthiopicCalendar ethiopicCalendar -> formatter.format(calendar.getTime()) + " E.E.";
+                default -> formatter.format(calendar.getTime());
+            };
         } catch (Exception e) {
             return "";
         }
@@ -953,23 +950,16 @@ public class MCRCalendar {
         if (calendar == null) {
             return "";
         }
-        if (calendar instanceof IslamicCalendar) {
-            return TAG_ISLAMIC;
-        } else if (calendar instanceof BuddhistCalendar) {
-            return TAG_BUDDHIST;
-        } else if (calendar instanceof CopticCalendar) {
-            return TAG_COPTIC;
-        } else if (calendar instanceof EthiopicCalendar) {
-            return TAG_ETHIOPIC;
-        } else if (calendar instanceof HebrewCalendar) {
-            return TAG_HEBREW;
-        } else if (calendar instanceof JapaneseCalendar) {
-            return TAG_JAPANESE;
-        } else if (calendar instanceof GregorianCalendar) {
-            return TAG_GREGORIAN;
-        } else {
-            return TAG_JULIAN;
-        }
+        return switch (calendar) {
+            case IslamicCalendar islamicCalendar -> TAG_ISLAMIC;
+            case BuddhistCalendar buddhistCalendar -> TAG_BUDDHIST;
+            case CopticCalendar copticCalendar -> TAG_COPTIC;
+            case EthiopicCalendar ethiopicCalendar -> TAG_ETHIOPIC;
+            case HebrewCalendar hebrewCalendar -> TAG_HEBREW;
+            case JapaneseCalendar japaneseCalendar -> TAG_JAPANESE;
+            case GregorianCalendar gregorianCalendar -> TAG_GREGORIAN;
+            default -> TAG_JULIAN;
+        };
     }
 
     /**

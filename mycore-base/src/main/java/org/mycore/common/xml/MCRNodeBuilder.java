@@ -224,15 +224,12 @@ public class MCRNodeBuilder {
     public String getValueOf(String xPath, Parent parent) {
         Object result = evaluateFirst(xPath, parent);
 
-        if (result instanceof String s) {
-            return s;
-        } else if (result instanceof Element e) {
-            return e.getText();
-        } else if (result instanceof Attribute a) {
-            return a.getValue();
-        } else {
-            return null;
-        }
+        return switch (result) {
+            case String s -> s;
+            case Element e -> e.getText();
+            case Attribute a -> a.getValue();
+            case null, default -> null;
+        };
     }
 
     private Object assignLiteral(Expr expression, LiteralExpr literal, Parent parent) throws JaxenException {
