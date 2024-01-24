@@ -100,13 +100,13 @@ public class NavigationTest {
         assertEquals("main title", navigation.getMainTitle());
         assertEquals("history title", navigation.getHistoryTitle());
         // test menu
-        MCRNavigationMenuItem menu = (MCRNavigationMenuItem) navigation.getChildren().get(0);
+        MCRNavigationMenuItem menu = (MCRNavigationMenuItem) navigation.getChildren().getFirst();
         assertEquals("main", menu.getId());
         assertEquals("/content/main", menu.getDir());
         assertEquals("Hauptmenü links", menu.getLabel("de"));
         assertEquals("Main menu left", menu.getLabel("en"));
         // test item
-        MCRNavigationItem searchItem = (MCRNavigationItem) menu.getChildren().get(0);
+        MCRNavigationItem searchItem = (MCRNavigationItem) menu.getChildren().getFirst();
         assertEquals("{tenantPath}/content/main/search.xml", searchItem.getHref());
         assertEquals(MCRNavigationItem.Type.intern, searchItem.getType());
         assertEquals(MCRNavigationItem.Target._self, searchItem.getTarget());
@@ -120,7 +120,7 @@ public class NavigationTest {
         MCRNavigationGroup group = (MCRNavigationGroup) menu.getChildren().get(2);
         assertEquals("foo", group.getId());
         assertEquals("Foo-Gruppe", group.getLabel("de"));
-        MCRNavigationItem foo1 = (MCRNavigationItem) group.getChildren().get(0);
+        MCRNavigationItem foo1 = (MCRNavigationItem) group.getChildren().getFirst();
         assertEquals("{tenantPath}/content/main/foo1.xml", foo1.getHref());
         assertEquals("Foo1", foo1.getLabel("de"));
     }

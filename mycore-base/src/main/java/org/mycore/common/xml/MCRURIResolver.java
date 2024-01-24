@@ -1329,7 +1329,7 @@ public final class MCRURIResolver implements URIResolver {
             }
             if (root == defaultRoot && root.getChildren().size() > 1) {
                 LOGGER.warn("More than 1 root node defined, returning first");
-                return new JDOMSource(root.getChildren().get(0).detach());
+                return new JDOMSource(root.getChildren().getFirst().detach());
             }
             return new JDOMSource(root);
         }

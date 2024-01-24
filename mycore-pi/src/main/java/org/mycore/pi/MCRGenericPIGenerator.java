@@ -315,7 +315,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         return Optional.ofNullable(mapping)
             .map(mappingStr -> mappingStr.split(","))
             .map(Arrays::asList)
-            .filter(o -> o.get(0).equals(typeID))
+            .filter(o -> o.getFirst().equals(typeID))
             .map(o -> o.get(1))
             .orElse(typeID);
     }
@@ -327,7 +327,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         return Optional.ofNullable(mapping)
             .map(mappingStr -> mappingStr.split(","))
             .map(Arrays::asList)
-            .filter(o -> o.get(0).equals(projectID))
+            .filter(o -> o.getFirst().equals(projectID))
             .map(o -> o.get(1))
             .orElse(projectID);
     }

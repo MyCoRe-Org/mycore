@@ -312,7 +312,7 @@ class MCRConfigurableInstanceHelper {
                     + " factory methods (" + methodNames(factoryMethods) + ")");
             }
 
-            return factoryMethods.get(0);
+            return factoryMethods.getFirst();
 
         }
 
@@ -358,7 +358,7 @@ class MCRConfigurableInstanceHelper {
                     + ") in configured class " + targetClass.getName());
             }
 
-            Source<?, ?> source = sources.get(0);
+            Source<?, ?> source = sources.getFirst();
 
             if (!source.allowedTargetTypes().contains(target.type())) {
                 throw new MCRConfigurationException("Target " + targetTypeName(target) + " '"

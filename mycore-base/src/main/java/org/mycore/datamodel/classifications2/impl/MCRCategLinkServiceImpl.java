@@ -313,7 +313,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                     .orderBy(cb.desc(internalId)))
             .getResultList();
 
-        int maxSize = result.size() == 0 ? 1 : result.get(0).intValue() + 1;
+        int maxSize = result.size() == 0 ? 1 : result.getFirst().intValue() + 1;
         BitSet linkSet = new BitSet(maxSize);
         for (Number internalID : result) {
             linkSet.set(internalID.intValue(), true);

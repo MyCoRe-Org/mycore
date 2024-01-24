@@ -49,7 +49,7 @@ public class MCRPandocTransformer extends MCRContentTransformer {
         try {
             Element pandoc = MCRPandocAPI.convertToXML(source.asString(), inputFormat, outputFormat);
             if (!pandoc.getChildren().isEmpty()) {
-                pandoc = pandoc.getChildren().get(0).detach();
+                pandoc = pandoc.getChildren().getFirst().detach();
             }
             return new MCRJDOMContent(pandoc);
         } catch (Exception ex) {

@@ -280,7 +280,7 @@ public class MCRDataURL implements Serializable {
                         }
                     }));
 
-                final String mimeType = !token.isEmpty() ? token.get(0) : null;
+                final String mimeType = !token.isEmpty() ? token.getFirst() : null;
 
                 if (mimeType != null && !mimeType.isEmpty() && !PATTERN_MIMETYPE.matcher(mimeType).matches()) {
                     throw new MalformedURLException("Unknown mime type.");

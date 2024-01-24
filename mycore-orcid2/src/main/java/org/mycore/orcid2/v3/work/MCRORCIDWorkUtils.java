@@ -199,7 +199,7 @@ public class MCRORCIDWorkUtils {
      * @return merged Element
      */
     private static Element mergeElements(List<Element> elements) {
-        final Element result = elements.get(0);
+        final Element result = elements.getFirst();
         elements.stream().skip(1).forEach(e -> MCRMergeTool.merge(result, e));
         return result;
     }

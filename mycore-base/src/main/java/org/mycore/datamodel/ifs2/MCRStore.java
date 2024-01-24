@@ -323,7 +323,7 @@ public abstract class MCRStore {
                     return 0;
                 }
 
-                final Path first = files.remove(0);
+                final Path first = files.removeFirst();
                 // checks basename length against prefix (projectId_typeId), file suffix (.xml) and configured id length
                 // if they match it should be a parseable id
                 String fileName = first.getFileName().toString();

@@ -263,7 +263,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         assertNotNull(instance.list);
         assertEquals(2, instance.list.size());
 
-        Entry oneEntry = instance.list.get(0);
+        Entry oneEntry = instance.list.getFirst();
         assertNotNull(oneEntry);
         assertEquals(OneKindOfEntry.class, oneEntry.getClass());
         assertEquals("OneValue", oneEntry.get());
@@ -305,7 +305,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         assertNotNull(instance.list);
         assertEquals(2, instance.list.size());
 
-        Entry oneEntry = instance.list.get(0);
+        Entry oneEntry = instance.list.getFirst();
         assertNotNull(oneEntry);
         assertEquals(OneKindOfEntry.class, oneEntry.getClass());
         assertEquals("OneValue", oneEntry.get());
@@ -353,12 +353,12 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         assertEquals(1, instance.list1.size());
         assertEquals(1, instance.list2.size());
 
-        Entry oneEntry = instance.list1.get(0);
+        Entry oneEntry = instance.list1.getFirst();
         assertNotNull(oneEntry);
         assertEquals(OneKindOfEntry.class, oneEntry.getClass());
         assertEquals("OneValue", oneEntry.get());
 
-        Entry otherEntry = instance.list2.get(0);
+        Entry otherEntry = instance.list2.getFirst();
         assertNotNull(otherEntry);
         assertEquals(OtherKindOfEntry.class, otherEntry.getClass());
         assertEquals("OtherValue", otherEntry.get());
