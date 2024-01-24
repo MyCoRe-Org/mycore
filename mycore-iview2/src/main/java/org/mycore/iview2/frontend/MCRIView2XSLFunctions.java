@@ -74,7 +74,7 @@ public class MCRIView2XSLFunctions {
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
         List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
         if (derivates.size() > 0) {
-            return derivates.get(0) + "/" + ADAPTER.getSupportedMainFile(derivates.get(0).toString());
+            return derivates.getFirst() + "/" + ADAPTER.getSupportedMainFile(derivates.getFirst().toString());
         }
         return null;
     }

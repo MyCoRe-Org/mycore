@@ -170,7 +170,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         MCRObjectQuery createdBeforeTwoWeeksAgo = new MCRObjectQuery().createdBefore(TWO_WEEKS_AGO);
         List<MCRObjectInfo> result = instance.getInfos(createdBeforeTwoWeeksAgo);
         Assert.assertEquals("The only result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(createdBeforeTwoWeeksAgo);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -182,7 +182,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         List<MCRObjectInfo> result = instance.getInfos(createdAfterTwoWeeksAgo);
 
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(createdAfterTwoWeeksAgo);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -193,7 +193,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         MCRObjectQuery modifiedBeforeOneWeekAgo = new MCRObjectQuery().modifiedBefore(ONE_WEEK_AGO);
         List<MCRObjectInfo> result = instance.getInfos(modifiedBeforeOneWeekAgo);
         Assert.assertEquals("The only result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(modifiedBeforeOneWeekAgo);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -204,7 +204,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         MCRObjectQuery modifiedAfterOneWeekAgo = new MCRObjectQuery().modifiedAfter(ONE_WEEK_AGO);
         List<MCRObjectInfo> result = instance.getInfos(modifiedAfterOneWeekAgo);
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(modifiedAfterOneWeekAgo);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -215,7 +215,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         MCRObjectQuery createdByTestUser1 = new MCRObjectQuery().createdBy(TEST_USER_1);
         List<MCRObjectInfo> result = instance.getInfos(createdByTestUser1);
         Assert.assertEquals("The only result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(createdByTestUser1);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -223,7 +223,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         MCRObjectQuery createdByTestUser2 = new MCRObjectQuery().createdBy(TEST_USER_2);
         result = instance.getInfos(createdByTestUser2);
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         count = instance.count(createdByTestUser2);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -236,7 +236,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
             .getNumberAsInteger());
         List<MCRObjectInfo> result = instance.getInfos(numberGreaterTestID1);
         Assert.assertEquals("The only result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(numberGreaterTestID1);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -245,7 +245,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
             .getNumberAsInteger());
         result = instance.getInfos(numberLessTestID2);
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         count = instance.count(numberLessTestID2);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -256,7 +256,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         MCRObjectQuery typeTest = new MCRObjectQuery().type(MCRObjectID.getInstance(TEST_ID_1).getTypeId());
         List<MCRObjectInfo> result = instance.getInfos(typeTest);
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(typeTest);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -265,7 +265,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
 
         result = instance.getInfos(typeFoo);
         Assert.assertEquals("The only result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         count = instance.count(typeFoo);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -276,7 +276,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         MCRObjectQuery state1 = new MCRObjectQuery().status(TEST_STATE_1);
         List<MCRObjectInfo> result = instance.getInfos(state1);
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(state1);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -285,7 +285,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
 
         result = instance.getInfos(state2);
         Assert.assertEquals("The only result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         count = instance.count(state2);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -298,7 +298,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         List<MCRObjectInfo> result = instance.getInfos(category1);
 
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         int count = instance.count(category1);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -308,7 +308,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         result = instance.getInfos(category2);
 
         Assert.assertEquals("The only result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         count = instance.count(category2);
         Assert.assertEquals("Only one object should match", 1, count);
@@ -332,7 +332,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         result = instance.getInfos(category1and3);
 
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-            result.get(0).getId());
+            result.getFirst().getId());
 
         count = instance.count(category1and3);
         Assert.assertEquals("Only one object should match", 1, count);

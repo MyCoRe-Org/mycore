@@ -75,13 +75,13 @@ public class MCRCategoryImplTest extends MCRTestCase {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
-        MCRCategoryImpl germany = (MCRCategoryImpl) europe.getChildren().get(0);
+        MCRCategoryImpl germany = (MCRCategoryImpl) europe.getChildren().getFirst();
         assertEquals("Did not get Europe as left sibling of Asia", europe.getId(),
             asia.getLeftSiblingOrOfAncestor().getId());
         assertEquals("Did not get World as left sibling or ancestor of Germany", category.getId(),
             germany.getLeftSiblingOrOfAncestor().getId());
         MCRCategoryImpl america = buildNode(new MCRCategoryID(category.getRootID(), "America"));
-        category.getChildren().add(0, america);
+        category.getChildren().addFirst(america);
         assertEquals("Did not get America as left sibling or ancestor of Germany", america.getId(),
             germany.getLeftSiblingOrOfAncestor().getId());
     }
@@ -91,7 +91,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
-        MCRCategoryImpl germany = (MCRCategoryImpl) europe.getChildren().get(0);
+        MCRCategoryImpl germany = (MCRCategoryImpl) europe.getChildren().getFirst();
         assertEquals("Did not get Europe as left sibling of Asia", europe.getId(),
             asia.getLeftSiblingOrParent().getId());
         assertEquals("Did not get Europa as left sibling or ancestor of Germany", europe.getId(),

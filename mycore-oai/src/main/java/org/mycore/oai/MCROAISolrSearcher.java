@@ -89,7 +89,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             QueryResponse response = solrClient.query(query);
             SolrDocumentList results = response.getResults();
             if (!results.isEmpty()) {
-                return Optional.of(toHeader(results.get(0), getSetResolver(results)));
+                return Optional.of(toHeader(results.getFirst(), getSetResolver(results)));
             }
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
@@ -258,7 +258,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             QueryResponse response = solrClient.query(params);
             SolrDocumentList list = response.getResults();
             if (list.size() >= 1) {
-                Date date = (Date) list.get(0).getFieldValue(fieldName);
+                Date date = (Date) list.getFirst().getFieldValue(fieldName);
                 return Optional.of(date.toInstant());
             }
         } catch (Exception exc) {

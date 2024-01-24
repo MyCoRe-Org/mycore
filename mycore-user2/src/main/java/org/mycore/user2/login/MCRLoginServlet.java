@@ -165,7 +165,7 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private void redirectToUniqueRealm(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        String realmID = MCRRealmFactory.listRealms().iterator().next().getID();
+        String realmID = MCRRealmFactory.listRealms().getFirst().getID();
         loginToRealm(req, res, realmID);
     }
 

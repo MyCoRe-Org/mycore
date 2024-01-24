@@ -292,7 +292,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         List<MCRCategoryDTO> resultList = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "rootCategs")
             .getResultList();
         BiConsumer<List<MCRCategory>, MCRCategoryImpl> merge = (l, c) -> {
-            MCRCategoryImpl last = (MCRCategoryImpl) l.get(l.size() - 1);
+            MCRCategoryImpl last = (MCRCategoryImpl) l.getLast();
             if (last.getInternalID() != c.getInternalID()) {
                 l.add(c);
             } else {
@@ -315,7 +315,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                     if (r.isEmpty()) {
                         return l;
                     }
-                    MCRCategoryImpl first = (MCRCategoryImpl) r.get(0);
+                    MCRCategoryImpl first = (MCRCategoryImpl) r.getFirst();
                     merge.accept(l, first);
                     l.addAll(r.subList(1, r.size()));
                     return l;
@@ -330,7 +330,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                     return c;
                 }
                 List<MCRCategory> parents = getParents(baseID);
-                MCRCategory parent = parents.get(0);
+                MCRCategory parent = parents.getFirst();
                 c.getChildren()
                     .stream()
                     .collect(Collectors.toList())
@@ -339,7 +339,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                     .peek(MCRCategoryImpl::detachFromParent)
                     .forEachOrdered(parent.getChildren()::add);
                 // return root node
-                return parents.get(parents.size() - 1);
+                return parents.getLast();
             })
             .orElse(null);
     }

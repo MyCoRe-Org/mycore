@@ -60,7 +60,7 @@ public class MCRMODSGenreCondition extends MCRStringCondition {
                 MCRMODSWrapper wrapper = new MCRMODSWrapper(optMCRObject.get());
                 List<Element> e = wrapper.getElements(XPATH_COLLECTION);
                 if ((e != null) && !(e.isEmpty())) {
-                    String value = e.get(0).getAttributeValue("valueURI").split("#")[1];
+                    String value = e.getFirst().getAttributeValue("valueURI").split("#")[1];
                     if (value.equals(getTerm())) {
                         MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
                         fact.setValue(value);

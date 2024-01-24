@@ -64,6 +64,6 @@ public class MCRXMLFunctions {
             return null;
         }
 
-        return queryResponse.getResults().get(0).get("id").toString();
+        return queryResponse.getResults().getFirst().get("id").toString();
     }
 }

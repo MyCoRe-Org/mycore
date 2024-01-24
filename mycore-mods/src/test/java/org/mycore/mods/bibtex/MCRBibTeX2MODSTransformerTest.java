@@ -47,7 +47,7 @@ public class MCRBibTeX2MODSTransformerTest extends MCRTestCase {
 
             // Transform BibTeX to MODS
             MCRJDOMContent resultingContent = new MCRBibTeX2MODSTransformer().transform(bibTeX);
-            Element resultingMODS = resultingContent.asXML().getRootElement().getChildren().get(0).detach();
+            Element resultingMODS = resultingContent.asXML().getRootElement().getChildren().getFirst().detach();
             removeSourceExtension(resultingMODS);
 
             // Read expected MODS

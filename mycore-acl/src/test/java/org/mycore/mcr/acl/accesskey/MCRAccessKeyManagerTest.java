@@ -98,7 +98,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
         final MCRAccessKey accessKeyNew = new MCRAccessKey(null, PERMISSION_WRITE);
         MCRAccessKeyManager.updateAccessKey(objectId, MCRAccessKeyManager.hashSecret(READ_KEY, objectId),
             accessKeyNew);
-        final MCRAccessKey accessKeyUpdated = MCRAccessKeyManager.listAccessKeys(objectId).get(0);
+        final MCRAccessKey accessKeyUpdated = MCRAccessKeyManager.listAccessKeys(objectId).getFirst();
         assertEquals(accessKeyNew.getType(), accessKeyUpdated.getType());
     }
 
@@ -108,11 +108,11 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
         MCRAccessKeyManager.createAccessKey(objectId, accessKey);
         accessKey.setIsActive(false);
         MCRAccessKeyManager.updateAccessKey(objectId, MCRAccessKeyManager.hashSecret(READ_KEY, objectId), accessKey);
-        accessKey = MCRAccessKeyManager.listAccessKeys(objectId).get(0);
+        accessKey = MCRAccessKeyManager.listAccessKeys(objectId).getFirst();
         assertEquals(accessKey.getIsActive(), false);
         accessKey.setIsActive(true);
         MCRAccessKeyManager.updateAccessKey(objectId, MCRAccessKeyManager.hashSecret(READ_KEY, objectId), accessKey);
-        accessKey = MCRAccessKeyManager.listAccessKeys(objectId).get(0);
+        accessKey = MCRAccessKeyManager.listAccessKeys(objectId).getFirst();
         assertEquals(accessKey.getIsActive(), true);
     }
 

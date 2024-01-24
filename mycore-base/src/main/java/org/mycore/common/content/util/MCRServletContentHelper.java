@@ -225,7 +225,7 @@ public abstract class MCRServletContentHelper {
 
                 if (ranges.size() == 1) {
 
-                    final Range range = ranges.get(0);
+                    final Range range = ranges.getFirst();
                     response.addHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
                     final long length = range.end - range.start + 1;
                     setContentLengthLong(response, length);

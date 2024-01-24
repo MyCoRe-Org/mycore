@@ -79,8 +79,8 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
             SERVICE = new MCRCategLinkServiceImpl();
         }
         loadWorldClassification();
-        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
-        MCRCategoryImpl uk = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(1);
+        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().getFirst().getChildren().get(0);
+        MCRCategoryImpl uk = (MCRCategoryImpl) category.getChildren().getFirst().getChildren().get(1);
         DAO.addCategory(null, category);
         testLinks = new ArrayList<>();
         testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Jena", "city")));
@@ -204,12 +204,12 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
-        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId())
+        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().getFirst().getId())
             .intValue());
         assertEquals("Count of Germany links does not match.", 5,
-            map.get(category.getChildren().get(0).getChildren().get(0).getId()).intValue());
+            map.get(category.getChildren().getFirst().getChildren().getFirst().getId()).intValue());
         map = SERVICE.countLinks(category, true);
-        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId())
+        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().getFirst().getId())
             .intValue());
     }
 
@@ -224,13 +224,13 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
-        assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId())
+        assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().getFirst().getId())
             .intValue());
     }
 
     @Test
     public void hasLinks() {
-        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
+        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().getFirst().getChildren().getFirst();
         assertFalse("Classification should not be in use", SERVICE.hasLinks(category).get(category.getId()));
         assertFalse("Classification should not be in use", SERVICE.hasLinks(null).get(category.getId()));
         assertFalse("Category should not be in use", SERVICE.hasLinks(germany).get(germany.getId()));
@@ -243,7 +243,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     @Test
     public void isInCategory() {
-        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
+        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().getFirst();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
         MCRCategLinkReference jena = new MCRCategLinkReference("Jena", "city");

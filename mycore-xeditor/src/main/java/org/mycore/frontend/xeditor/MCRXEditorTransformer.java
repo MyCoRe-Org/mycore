@@ -169,7 +169,7 @@ public class MCRXEditorTransformer {
     private Element createRootElement(String xPath) throws JaxenException {
         BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
         LocationPath lp = (LocationPath) (baseXPath.getRootExpr());
-        NameStep nameStep = (NameStep) (lp.getSteps().get(0));
+        NameStep nameStep = (NameStep) (lp.getSteps().getFirst());
         String prefix = nameStep.getPrefix();
         Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRConstants.getStandardNamespace(prefix);
         return new Element(nameStep.getLocalName(), ns);

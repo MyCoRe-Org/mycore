@@ -90,7 +90,7 @@ public class MCRRepeatBinding extends MCRBinding {
         Expr rootExpr = baseXPath.getRootExpr();
         LocationPath locationPath = (LocationPath) rootExpr;
         List<Step> steps = locationPath.getSteps();
-        Step lastStep = steps.get(steps.size() - 1);
+        Step lastStep = steps.getLast();
         return MCRNodeBuilder.simplify(lastStep.getText());
     }
 

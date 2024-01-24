@@ -188,9 +188,9 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         String pattern = "<?xed-foo ?>";
         Document doc = new Document(new Element("document").addContent(new Element("child").setText(pattern)));
         MCRChangeTracker tracker = new MCRChangeTracker();
-        tracker.track(MCRRemoveElement.remove(doc.getRootElement().getChildren().get(0)));
+        tracker.track(MCRRemoveElement.remove(doc.getRootElement().getChildren().getFirst()));
         tracker.undoChanges(doc);
-        assertEquals(pattern, doc.getRootElement().getChildren().get(0).getText());
+        assertEquals(pattern, doc.getRootElement().getChildren().getFirst().getText());
     }
 
     @Test

@@ -152,7 +152,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
             if (solrResponse != null) {
                 SolrDocumentList solrResults = solrResponse.getResults();
                 if (solrResults.getNumFound() == 1) {
-                    return String.valueOf(solrResults.get(0).getFieldValue("id"));
+                    return String.valueOf(solrResults.getFirst().getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
                     throw new NotFoundException("No MyCoRe Derivate ID found for query " + derid);
@@ -185,7 +185,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
             if (solrResponse != null) {
                 SolrDocumentList solrResults = solrResponse.getResults();
                 if (solrResults.getNumFound() == 1) {
-                    return String.valueOf(solrResults.get(0).getFieldValue("id"));
+                    return String.valueOf(solrResults.getFirst().getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
                     throw new NotFoundException("No MyCoRe ID found for query " + mcrid);

@@ -49,7 +49,7 @@ public class MCRURLTest extends MCRTestCase {
         List<String> b = p.get("b");
         assertEquals(2, a.size());
         assertEquals(1, b.size());
-        assertEquals("mycore", b.get(0));
+        assertEquals("mycore", b.getFirst());
         assertTrue(a.contains("hallo"));
         assertTrue(a.contains(""));
     }

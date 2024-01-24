@@ -70,7 +70,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
                 @SuppressWarnings("unchecked")
                 MCRSolrInputDocumentList input = ((MCRXSL2JAXBTransformer<MCRSolrInputDocumentList>) transformer)
                     .getJAXBObject(content, param);
-                document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input.getDoc().iterator().next());
+                document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input.getDoc().getFirst());
             } else {
                 MCRContent result = transformer.transform(content);
                 document = MCRSolrInputDocumentGenerator.getSolrInputDocument(result.asXML().getRootElement());

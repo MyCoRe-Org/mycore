@@ -546,7 +546,7 @@ public class MCRMetsSave {
         List<PhysicalSubDiv> childs = ((PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE)).getDivContainer()
             .getChildren();
         for (PhysicalSubDiv divChild : childs) {
-            String idMets = divChild.getChildren().get(0).getFileId();
+            String idMets = divChild.getChildren().getFirst().getFileId();
 
             // check if there is a URN for the file
             String file = "/" + URLDecoder.decode(idFileMap.get(idMets), StandardCharsets.UTF_8);
@@ -785,7 +785,7 @@ public class MCRMetsSave {
             // get first physical div
             List<PhysicalSubDiv> physicalChildren = physicalStructMap.getDivContainer().getChildren();
             String firstPhysicalID = physicalChildren.isEmpty() ? physicalStructMap.getDivContainer().getId()
-                : physicalChildren.get(0).getId();
+                : physicalChildren.getFirst().getId();
 
             // a logical div is not linked anymore -> link with first physical div
             unlinkedLogicalIds.forEach(from -> structLink.addSmLink(new SmLink(from, firstPhysicalID)));
@@ -794,7 +794,7 @@ public class MCRMetsSave {
         // get last logical div
         LogicalDiv divContainer = mets.getLogicalStructMap().getDivContainer();
         List<LogicalDiv> descendants = divContainer.getDescendants();
-        LogicalDiv lastLogicalDiv = descendants.isEmpty() ? divContainer : descendants.get(descendants.size() - 1);
+        LogicalDiv lastLogicalDiv = descendants.isEmpty() ? divContainer : descendants.getLast();
 
         // add files
         addedFiles.forEach(href -> {

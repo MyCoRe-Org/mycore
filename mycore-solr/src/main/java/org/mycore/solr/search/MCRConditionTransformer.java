@@ -329,7 +329,7 @@ public class MCRConditionTransformer {
     protected static MCRCondition buildSubCondition(List<MCRCondition> conditions, boolean and, boolean not) {
         MCRCondition subCond;
         if (conditions.size() == 1) {
-            subCond = conditions.get(0);
+            subCond = conditions.getFirst();
         } else if (and) {
             subCond = new MCRAndCondition().addAll(conditions);
         } else {
