@@ -108,7 +108,7 @@ public class MCROAISearchManager {
         runListRecordsParallel = MCRConfiguration2
             .getOrThrow(MCROAIAdapter.PREFIX + "RunListRecordsParallel", Boolean::parseBoolean);
         if (runListRecordsParallel) {
-            executorService = Executors.newWorkStealingPool();
+            executorService = Executors.newVirtualThreadPerTaskExecutor();
             MCRShutdownHandler.getInstance().addCloseable(executorService::shutdownNow);
         }
     }
