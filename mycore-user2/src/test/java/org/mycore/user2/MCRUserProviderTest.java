@@ -27,7 +27,7 @@ import org.mycore.common.MCRUserInformationResolver;
 
 import static org.junit.Assert.assertEquals;
 
-public class MCRUserUserInformationProviderTest extends MCRUserTestCase {
+public class MCRUserProviderTest extends MCRUserTestCase {
 
     private MCRUser userWithoutRealm;
 

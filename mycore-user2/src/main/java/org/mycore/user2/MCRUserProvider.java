@@ -24,10 +24,10 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationProvider;
 
 /**
- * A {@link MCRUserUserInformationProvider} is a {@link MCRUserInformationProvider} that looks up user information with 
- * {@link MCRUserManager#getUser(String)}.
+ * A {@link MCRUserProvider} is a {@link MCRUserInformationProvider} that looks up user information of type
+ * {@link MCRUser} with {@link MCRUserManager#getUser(String)}.
  */
-public final class MCRUserUserInformationProvider implements MCRUserInformationProvider {
+public final class MCRUserProvider implements MCRUserInformationProvider {
 
     @Override
     public Optional<MCRUserInformation> get(String userId) {

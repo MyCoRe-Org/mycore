@@ -22,7 +22,7 @@ import java.util.Optional;
 
 /**
  * A {@link MCRSystemUserInformationProvider} is a {@link MCRUserInformationProvider} that looks up user
- * information defined in {{@link MCRSystemUserInformation}}.
+ * information of type {@link MCRSystemUserInformation} defined in {{@link MCRSystemUserInformation}}.
  * <p>
  * Possible user IDs are:
  * <ul>
