@@ -143,7 +143,6 @@ public final class MCRURIResolver implements URIResolver {
 
     private static ServletContext context;
 
-    MCRHTTPClient http_client;
     static {
         try {
             EXT_RESOLVER = getExternalResolverProvider();

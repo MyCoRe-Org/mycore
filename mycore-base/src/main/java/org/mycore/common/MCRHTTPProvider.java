@@ -21,6 +21,21 @@ import org.mycore.services.http.MCRHttpUtils;
 public class MCRHTTPProvider {
     private static org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
+    public static MCRHTTPClient getMCRHTTPClient() {
+        String className = MCRConfiguration2.getString("MCR.HTTPClient.Class").orElse(null);
+        if (className == null) {
+            return new MCRDefaultHTTPClient();
+        } else {
+            try {
+                MCRHTTPClient cl = (MCRHTTPClient) MCRConfiguration2.getInstanceOf("MCR.HTTPClient.Class").get();
+                //  .orElseThrow(() -> MCRConfiguration2.createConfigurationException("MCR.HTTPClient.Class"));
+                return cl;
+            } catch (RuntimeException re) {
+                throw new MCRException("Cannot instantiate " + className + " ", re);
+            }
+        }
+    }
+
     static class MCRDefaultHTTPClient implements MCRHTTPClient {
         // TODO: subject to change! - stays same for backward-compatible safety
         // tmp. keep the old and add a new prefix?
@@ -89,21 +104,6 @@ public class MCRHTTPProvider {
                     case VALIDATED -> "The response was generated from the cache after validating the entry "
                         + "with the origin server";
                 };
-        }
-    }
-
-    public static MCRHTTPClient getMCRHTTPClient() {
-        String className = MCRConfiguration2.getString("MCR.HTTPClient.Class").orElse(null);
-        if (className == null) {
-            return new MCRDefaultHTTPClient();
-        } else {
-            try {
-                MCRHTTPClient cl = (MCRHTTPClient) MCRConfiguration2.getInstanceOf("MCR.HTTPClient.Class").get();
-                //	.orElseThrow(() -> MCRConfiguration2.createConfigurationException("MCR.HTTPClient.Class"));
-                return cl;
-            } catch (RuntimeException re) {
-                throw new MCRException("Cannot instantiate " + className + " ", re);
-            }
         }
     }
 }
