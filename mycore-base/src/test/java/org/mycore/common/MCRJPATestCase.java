@@ -33,9 +33,12 @@ import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
+import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
+import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
+import org.mycore.backend.jpa.MCREntityManagerFactory;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRJPABootstrapper;
 
@@ -77,9 +80,59 @@ public class MCRJPATestCase extends MCRTestCase {
                 schemaProperties.put("jakarta.persistence.schema-generation.scripts.action", action);
                 schemaProperties.put("jakarta.persistence.schema-generation.scripts." + action + "-target", output);
             }
-            Persistence.generateSchema(getCurrentComponentName(), schemaProperties);
+            if (MCREntityManagerProvider.getEntityManagerFactory() instanceof MCREntityManagerFactory) {
+                PersistenceUnitDescriptor pud
+                    = ((MCREntityManagerFactory) MCREntityManagerProvider.getEntityManagerFactory())
+                        .getPersistenceUnitDescriptor();
+                new EntityManagerFactoryBuilderImpl(pud, schemaProperties).generateSchema();
+            } else {
+                Persistence.generateSchema(getCurrentComponentName(), schemaProperties);
+            }
             LogManager.getLogger().debug(() -> "invoked '" + action + "' sql script:\n" + output);
         }
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+
+        String emPropertyPrefix = "MCR.Persistence.EntityManagerFactory." + getCurrentComponentName();
+
+        testProperties.put(emPropertyPrefix + ".Class", "org.mycore.backend.jpa.MCREntityManagerFactory");
+
+        testProperties.put(emPropertyPrefix + ".PersistenceUnitDescriptor.Class",
+            "org.mycore.backend.jpa.MCRPersistenceUnitDescriptor");
+
+        testProperties.put(
+            emPropertyPrefix + ".PersistenceUnitDescriptor.Properties.jakarta.persistence.jdbc.url",
+            "jdbc:h2:mem:" + getCurrentComponentName());
+
+        testProperties.put(
+            emPropertyPrefix + ".PersistenceUnitDescriptor.Properties.jakarta.persistence.jdbc.driver",
+            "org.h2.Driver");
+
+        testProperties.put(
+            emPropertyPrefix + ".PersistenceUnitDescriptor.Properties.jakarta.persistence.jdbc.user",
+            "postgres");
+
+        testProperties.put(
+            emPropertyPrefix + ".PersistenceUnitDescriptor.Properties.jakarta.persistence.jdbc.password",
+            "junit");
+
+        testProperties.put(
+            emPropertyPrefix + ".PersistenceUnitDescriptor.Properties.hibernate.default_schema",
+            "junit");
+
+        testProperties.put(
+            emPropertyPrefix
+                + ".PersistenceUnitDescriptor.Properties.hibernate.globally_quoted_identifiers_skip_column_definitions",
+            "true");
+
+        testProperties.put(
+            emPropertyPrefix + ".PersistenceUnitDescriptor.Properties.hibernate.globally_quoted_identifiers",
+            "true");
+
+        return testProperties;
     }
 
     @Before()
