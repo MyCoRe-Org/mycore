@@ -538,21 +538,21 @@ public final class MCRURIResolver implements URIResolver {
         private org.apache.logging.log4j.Logger logger;
 
         MCRRESTResolver() {
-        	this.client = MCRHTTPProvider.getMCRHTTPClient();
+            this.client = MCRHTTPProvider.getMCRHTTPClient();
             this.logger = LogManager.getLogger();
         }
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-        	//MCRHTTPClient client = MCRURIResolver.instance().http_client; //MCRHTTPProvider.getMCRHTTPClient();
+            //MCRHTTPClient client = MCRURIResolver.instance().http_client; //MCRHTTPProvider.getMCRHTTPClient();
             URI hrefURI = MCRURIResolver.resolveURI(href, base);
             try {
-				final Source source = client.get(hrefURI).getSource();
+                final Source source = client.get(hrefURI).getSource();
                 source.setSystemId(hrefURI.toASCIIString());
                 return source;
-			} catch (IOException e) {
-				throw new TransformerException(e);
-			}
+            } catch (IOException e) {
+                throw new TransformerException(e);
+            }
         }
     }
 

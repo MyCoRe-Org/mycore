@@ -6,6 +6,7 @@ import java.net.URI;
 import org.mycore.common.content.MCRContent;
 
 public interface MCRHTTPClient {
-	MCRContent get(URI hrefURI) throws IOException;
-	void close();
+    MCRContent get(URI hrefURI) throws IOException;
+
+    void close();
 }
