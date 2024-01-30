@@ -94,7 +94,7 @@ public class MCRAclEditorResource {
     }
 
     protected InputStream transform(String xmlFile) throws Exception {
-        InputStream guiXML = MCRResourceHelper.getWebResourceAsStream("/modules/acl-editor2/gui/xml/" + xmlFile);
+        InputStream guiXML = getAclEditorResource(xmlFile);
         if (guiXML == null) {
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).build());
         }
@@ -348,4 +348,9 @@ public class MCRAclEditorResource {
 
         return new MCRAccessRule(newRuleID, uid, new Date(), ruleText, ruleDesc);
     }
+
+    private InputStream getAclEditorResource(String filename) {
+        return MCRResourceHelper.getWebResourceAsStream("/modules/acl-editor2/gui/" + filename);
+    }
+    
 }

@@ -1223,7 +1223,7 @@ public final class MCRURIResolver implements URIResolver {
                 root.setAttribute("version", "1.0");
                 return new JDOMSource(root);
             }
-            LOGGER.info("xslImport importing {}", importXSL);
+            LOGGER.debug("xslImport importing {}", importXSL);
 
             return fallback.resolve("resource:" + xslFolder + "/" + importXSL, base);
         }
@@ -1396,14 +1396,15 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             String versionType = href.substring(href.indexOf(":") + 1);
             final Element versionElement = new Element("version");
-            versionElement.setText(switch (versionType) {
-            case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
-            case "abbrev" -> MCRCoreVersion.getAbbrev();
-            case "branch" -> MCRCoreVersion.getBranch();
-            case "version" -> MCRCoreVersion.getVersion();
-            case "revision" -> MCRCoreVersion.getRevision();
-            default -> MCRCoreVersion.getCompleteVersion();
-            });
+            versionElement.setText(
+                switch (versionType) {
+                    case "gitDescribe" -> MCRCoreVersion.getGitDescribe();
+                    case "abbrev" -> MCRCoreVersion.getAbbrev();
+                    case "branch" -> MCRCoreVersion.getBranch();
+                    case "version" -> MCRCoreVersion.getVersion();
+                    case "revision" -> MCRCoreVersion.getRevision();
+                    default -> MCRCoreVersion.getCompleteVersion();
+                });
             return new JDOMSource(versionElement);
         }
     }
