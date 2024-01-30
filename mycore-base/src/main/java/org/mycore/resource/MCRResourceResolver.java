@@ -25,19 +25,21 @@ package org.mycore.resource;
 
 import java.net.URL;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
+import org.mycore.common.log.MCRListMessage;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.provider.MCRCombinedResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider;
@@ -85,11 +87,15 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  */
 public final class MCRResourceResolver {
 
+    public static final String RESOLVER_KEY = "MCR.Resource.Resolver";
+
+    public static final String HINTS_KEY = "MCR.Resource.Resolver.Hints";
+
     private static final Logger LOGGER = StatusLogger.getLogger();
 
     private static final MCRResourceResolver INSTANCE = new MCRResourceResolver(getProvider());
 
-    private static final List<MCRHint<?>> DEFAULT_HINTS = getDefaultHints();
+    private static final MCRHints DEFAULT_HINTS = getDefaultHints();
 
     private final MCRResourceProvider provider;
 
@@ -99,30 +105,39 @@ public final class MCRResourceResolver {
 
     private static MCRResourceProvider getProvider() {
 
-        String name = MCRConfiguration2.getStringOrThrow("MCR.Resource.Resolver");
+        String name = MCRConfiguration2.getStringOrThrow(RESOLVER_KEY);
         LOGGER.info("Using resolver: {}", name);
 
-        String property = "MCR.Resource.Resolver" + "." + name + ".Provider.Class";
-        MCRResourceProvider provider = getInstanceOfOrThrow(property);
+        String providerProperty = RESOLVER_KEY + "." + name + ".Provider.Class";
+        MCRResourceProvider provider = getInstanceOfOrThrow(providerProperty);
 
-        LOGGER.info(provider.compileDescription(LOGGER.getLevel()).logMessage("Resolving resources with provider:"));
+        MCRTreeMessage description = provider.compileDescription(LOGGER.getLevel());
+        LOGGER.info(description.logMessage("Resolving resources with provider:"));
 
         return provider;
 
     }
 
-    private static List<MCRHint<?>> getDefaultHints() {
+    private static MCRHints getDefaultHints() {
 
-        List<MCRHint<?>> hints = MCRConfiguration2.getInstantiatablePropertyKeys("MCR.Resource.Resolver.Hints.")
-            .map(property -> (MCRHint<?>) getInstanceOfOrThrow(property))
-            .sorted(Comparator.comparing(MCRHint::key))
-            .collect(Collectors.toUnmodifiableList());
+        String prefix = HINTS_KEY + ".";
+        Map<String, Callable<MCRHint<?>>> hintFactoriesByProperty = MCRConfiguration2.getInstances(prefix);
 
-        MCRTreeMessage description = new MCRTreeMessage();
-        hints.forEach(hint -> description.add(hint.key().toString(), hint.getClass().getName()));
+        MCRListMessage description = new MCRListMessage();
+        MCRHintsBuilder builder = new MCRHintsBuilder();
+        for (String property : hintFactoriesByProperty.keySet()) {
+            try {
+                String schema = property.substring(prefix.length());
+                MCRHint<?> hint = hintFactoriesByProperty.get(property).call();
+                description.add(schema, hint.getClass().getName());
+                builder.add(hint);
+            } catch (Exception e) {
+                throw new MCRException("Failed to instantiate hint configured in: " + property);
+            }
+        }
         LOGGER.info(description.logMessage("Resolving resources with default hints:"));
 
-        return hints;
+        return builder.build();
 
     }
 
@@ -291,7 +306,7 @@ public final class MCRResourceResolver {
     }
 
     /**
-     * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}. 
+     * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}.
      */
     public Optional<MCRResourcePath> reverse(URL resourceUrl) {
         return this.reverse(resourceUrl, defaultHints());
@@ -299,8 +314,8 @@ public final class MCRResourceResolver {
 
     /**
      * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}, using the given hints. Optionally
-     * performs a consistency check by resolving the calculated {@link MCRResourcePath} and comparing the 
-     * result of this resolution against the given resource URL. 
+     * performs a consistency check by resolving the calculated {@link MCRResourcePath} and comparing the
+     * result of this resolution against the given resource URL.
      */
     public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints) {
         LOGGER.debug("Reversing resource URL {}", resourceUrl);
@@ -326,7 +341,7 @@ public final class MCRResourceResolver {
             return false;
         }
         return isConsistent(resourceUrl, potentialPath, resolvedResourceUrl.get());
-        
+
     }
 
     private static boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, URL resolvedResourceUrl) {
@@ -344,9 +359,7 @@ public final class MCRResourceResolver {
      * Intended to be a basis for customized hints, if customization or extension is required.
      */
     public static MCRHints defaultHints() {
-        MCRHintsBuilder builder = new MCRHintsBuilder();
-        DEFAULT_HINTS.forEach(builder::add);
-        return builder.build();
+        return DEFAULT_HINTS;
     }
 
 }
