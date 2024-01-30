@@ -44,12 +44,12 @@ import org.mycore.common.function.MCRTriConsumer;
  * <p>
  * Using this class is very easy, here is an example:
  * </p>
- * <PRE>
+ * {@snippet :
  * // Get a configuration property as a String:
  * String sValue = MCRConfiguration2.getString("MCR.String.Value").orElse(defaultValue);
  *
  * // Get a configuration property as a List of String (values are seperated by ","):
- * List&lt;String&gt; lValue = MCRConfiguration2.getString("MCR.StringList.Value").stream()
+ * List<String> lValue = MCRConfiguration2.getString("MCR.StringList.Value").stream()
  *     .flatMap(MCRConfiguration2::splitValue)
  *     .collect(Collectors.toList());
  *
@@ -61,7 +61,7 @@ import org.mycore.common.function.MCRTriConsumer;
  *
  * // Get a configuration property as an int, use 500 as default if not set:
  * int max = MCRConfiguration2.getInt("MCR.Cache.Size").orElse(500);
- * </PRE>
+ * }
  *
  * There are some helper methods to help you with converting values
  * <ul>
@@ -97,16 +97,16 @@ public class MCRConfiguration2 {
      *     <li>the key of the target map is the name of the property without <code>propertPrefix</code></li>
      * </ol>
      * Example for <code>propertyPrefix="MCR.Foo."</code>:
-     * <pre>
+     * {@snippet lang=Properties :
      *     MCR.Foo.Bar=Baz
      *     MCR.Foo.Hello=World
      *     MCR.Other.Prop=Value
-     * </pre>
+     * }
      * will result in
-     * <pre>
+     * {@snippet lang=Properties :
      *     Bar=Baz
      *     Hello=World
-     * </pre>
+     * }
      * @param propertyPrefix prefix of the property name
      * @return a map of the properties as stated above
      */
@@ -122,10 +122,10 @@ public class MCRConfiguration2 {
     /**
      * Returns a new instance of the class specified in the configuration property with the given name.
      * If you call a method on the returned Optional directly you need to set the type like this:
-     * <pre>
-     * MCRConfiguration2.&lt;MCRMyType&gt; getInstanceOf(name)
-     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
-     * </pre>
+     * {@snippet :
+     * MCRConfiguration2.<MCRMyType>getInstanceOf(name)
+     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     * }
      * 
      * @param name
      *            the non-null and non-empty name of the configuration property
@@ -143,10 +143,10 @@ public class MCRConfiguration2 {
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * previously instantiated by this method this instance is returned.
      * If you call a method on the returned Optional directly you need to set the type like this:
-     * <pre>
-     * MCRConfiguration2.&lt;MCRMyType&gt; getSingleInstanceOf(name)
-     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
-     * </pre>
+     * {@snippet :
+     * MCRConfiguration2.<MCRMyType>getSingleInstanceOf(name)
+     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     * }
      *
      * @param name
      *            non-null and non-empty name of the configuration property
@@ -164,10 +164,10 @@ public class MCRConfiguration2 {
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * previously instantiated by this method this instance is returned.
      * If you call a method on the returned Optional directly you need to set the type like this:
-     * <pre>
-     * MCRConfiguration2.&lt;MCRMyType&gt; getSingleInstanceOf(name, alternative)
-     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
-     * </pre>
+     * {@snippet :
+     * MCRConfiguration2.<MCRMyType>getSingleInstanceOf(name, alternative)
+     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     * }
      *
      * @param name
      *            non-null and non-empty name of the configuration property
