@@ -32,6 +32,25 @@
   <properties>
     <manifest.priority>95</manifest.priority>
   </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- due to: https://issues.apache.org/jira/projects/MDEP/issues/MDEP-891 -->
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <configuration>
+              <ignoredDependencies>
+                <ignoredDependency>org.apache.solr:solr-solrj</ignoredDependency>
+                <ignoredDependency>org.mycore:mycore-jobqueue</ignoredDependency>
+              </ignoredDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>org.apache.commons</groupId>
