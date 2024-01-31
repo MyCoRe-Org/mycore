@@ -100,10 +100,10 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
   onDndDrop: function (deferred, args) {
     let source = args[0];
     let nodes = args[1];
-    let parent = source.current.item;
     let items = nodes
       .map(node => source.getItem(node.id))
       .map(sourceItem => sourceItem.data.item);
+    let parent = this.tree.model.getParent(items[0]);
     this.tree.model.resolveChildren(parent, () => {
       for (let item of items) {
         on.emit(this, "itemMoved", {
