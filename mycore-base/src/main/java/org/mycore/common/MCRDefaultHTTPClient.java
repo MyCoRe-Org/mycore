@@ -12,7 +12,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.logging.log4j.LogManager;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -20,29 +20,23 @@ import org.mycore.services.http.MCRHttpUtils;
 
 public class MCRDefaultHTTPClient implements MCRHTTPClient {
     static org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    // TODO: subject to change! - stays same for backward-compatible safety
-    // tmp. keep the old and add a new prefix?
-    private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private static final long MAX_OBJECT_SIZE = MCRConfiguration2.getLong(CONFIG_PREFIX + "REST.MaxObjectSize")
-        .orElse(128 * 1024L);
+    private long maxObjectSize;
 
-    private static final int MAX_CACHE_ENTRIES = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.MaxCacheEntries")
-        .orElse(1000);
+    private int maxCacheEntries;
 
-    private static final int REQUEST_TIMEOUT = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.RequestTimeout")
-        .orElse(30000);
+    private int requestTimeout;
 
-    CloseableHttpClient restClient;
+    private CloseableHttpClient restClient;
 
     public MCRDefaultHTTPClient() {
         CacheConfig cacheConfig = CacheConfig.custom()
-            .setMaxObjectSize(MAX_OBJECT_SIZE)
-            .setMaxCacheEntries(MAX_CACHE_ENTRIES)
+            .setMaxObjectSize(maxObjectSize)
+            .setMaxCacheEntries(maxCacheEntries)
             .build();
         RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectTimeout(REQUEST_TIMEOUT)
-            .setSocketTimeout(REQUEST_TIMEOUT)
+            .setConnectTimeout(requestTimeout)
+            .setSocketTimeout(requestTimeout)
             .build();
         this.restClient = CachingHttpClients.custom()
             .setCacheConfig(cacheConfig)
@@ -53,11 +47,26 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
         MCRShutdownHandler.getInstance().addCloseable(this::close);
     }
 
+    @MCRProperty(name = "MaxObjectSize")
+    public void setMaxObjectSize(String size) {
+        this.maxObjectSize = Long.parseLong(size);
+    }
+
+    @MCRProperty(name = "MaxCacheEntries")
+    public void setMaxCacheEntries(String size) {
+        this.maxCacheEntries = Integer.parseInt(size);
+    }
+
+    @MCRProperty(name = "RequestTimeout")
+    public void setRequestTimeout(String size) {
+        this.requestTimeout = Integer.parseInt(size);
+    }
+
     public void close() {
         try {
             restClient.close();
         } catch (IOException e) {
-            LogManager.getLogger().warn("Exception while closing http client.", e);
+            logger.warn("Exception while closing http client.", e);
         }
     }
 
