@@ -76,7 +76,6 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHTTPClient;
-import org.mycore.common.MCRHTTPProvider;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
@@ -534,16 +533,15 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRRESTResolver implements URIResolver {
         private MCRHTTPClient client;
 
-        private org.apache.logging.log4j.Logger logger;
+        //private org.apache.logging.log4j.Logger logger;
 
         MCRRESTResolver() {
-            this.client = MCRHTTPProvider.getMCRHTTPClient();
-            this.logger = LogManager.getLogger();
+            this.client = (MCRHTTPClient) MCRConfiguration2.getInstanceOf("MCR.HTTPClient.Class").get();
+            //this.logger = LogManager.getLogger();
         }
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            //MCRHTTPClient client = MCRURIResolver.instance().http_client; //MCRHTTPProvider.getMCRHTTPClient();
             URI hrefURI = MCRURIResolver.resolveURI(href, base);
             try {
                 final Source source = client.get(hrefURI).getSource();
