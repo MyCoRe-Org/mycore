@@ -132,6 +132,8 @@ public final class MCRURIResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
+    private static final String HTTP_CLIENT_CLASS = "MCR.HTTPClient.Class";
+
     private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
 
     private static Map<String, URIResolver> SUPPORTED_SCHEMES;
@@ -536,7 +538,7 @@ public final class MCRURIResolver implements URIResolver {
         //private org.apache.logging.log4j.Logger logger;
 
         MCRRESTResolver() {
-            this.client = (MCRHTTPClient) MCRConfiguration2.getInstanceOf("MCR.HTTPClient.Class").get();
+            this.client = (MCRHTTPClient) MCRConfiguration2.getInstanceOf(HTTP_CLIENT_CLASS).get();
             //this.logger = LogManager.getLogger();
         }
 
