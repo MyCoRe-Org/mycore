@@ -28,6 +28,24 @@
   </parent>
   <artifactId>mycore-iiif</artifactId>
   <name>MyCoRe IIIF</name>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- due to: https://issues.apache.org/jira/projects/MDEP/issues/MDEP-891 -->
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <configuration>
+              <ignoredDependencies>
+                <ignoredDependency>org.glassfish.jersey.core:jersey-server</ignoredDependency>
+              </ignoredDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>com.google.code.gson</groupId>
