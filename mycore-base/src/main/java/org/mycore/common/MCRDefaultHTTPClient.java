@@ -74,17 +74,17 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
     public MCRContent get(URI hrefURI) throws IOException {
         HttpCacheContext context = HttpCacheContext.create();
         HttpGet get = new HttpGet(hrefURI);
+        MCRContent retContent = null;
         try (CloseableHttpResponse response = restClient.execute(get, context);
             InputStream content = response.getEntity().getContent();) {
             logger.debug("http query: {}", hrefURI);
             logger.debug("http resp status: {}", response.getStatusLine());
             logger.debug(() -> getCacheDebugMsg(hrefURI, context));
-            //resource warning: do not make a one-line return-statement out of the following:
-            MCRContent cnt = (new MCRStreamContent(content)).getReusableCopy();
-            return cnt;
+            retContent = (new MCRStreamContent(content)).getReusableCopy();
         } finally {
             get.reset();
         }
+        return retContent;
     }
 
     private String getCacheDebugMsg(URI hrefURI, HttpCacheContext context) {
