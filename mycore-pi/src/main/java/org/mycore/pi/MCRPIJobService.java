@@ -33,6 +33,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -42,8 +43,6 @@ import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
 import org.mycore.services.queuedjob.MCRJobQueue;
 import org.mycore.services.queuedjob.MCRJobQueueManager;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserManager;
 
 /**
  * Implementation of a {@link MCRPIService} which helps to outsource a registration task to a {@link MCRJob}
@@ -260,11 +259,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
         if (jobUserPresent) {
             savedUserInformation = session.getUserInformation();
-            MCRUser user = MCRUserManager.getUser(jobUser);
+            MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(jobUser);
 
             /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
             session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
-            session.setUserInformation(user);
+            session.setUserInformation(userInformation);
             LOGGER.info("Continue as User {}", jobUser);
         } else {
             savedUserInformation = session.getUserInformation();
@@ -294,7 +293,27 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     private String getJobUser() {
-        return this.getProperties().get(JOB_API_USER_PROPERTY);
+        String jobApiUser = this.getProperties().get(JOB_API_USER_PROPERTY);
+        // try to remain compatible with values configured before MCR-3033
+        if (!jobApiUser.contains(":")) {
+            String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user";
+            String userProviderClass = "org.mycore.user2.MCRUserProvider";
+            if (this.getProperties().get(userProviderKey).equals(userProviderClass)) {
+                LOGGER.warn("JobApiUser references username '" + jobApiUser
+                    + "' directly. Switching to 'user:" + jobApiUser
+                    + "' using the compatible user information provider "
+                    + userProviderClass + " configured in "
+                    + userProviderKey);
+                jobApiUser = "user:" + jobApiUser;
+            } else {
+                LOGGER.error("JobApiUser references username '" + jobApiUser
+                    + "' directly. Unable to switch to compatible user information provider "
+                    + userProviderClass + " since it is not configured in "
+                    + userProviderKey);
+                throw new MCRConfigurationException("Invalid JobApiUser: " + jobApiUser);
+            }
+        }
+        return jobApiUser;
     }
 
     private boolean isJobUserPresent() {
