@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.common;
 
 import java.io.IOException;
@@ -12,6 +30,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -19,7 +38,7 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.services.http.MCRHttpUtils;
 
 public class MCRDefaultHTTPClient implements MCRHTTPClient {
-    static org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static Logger logger = LogManager.getLogger();
 
     private long maxObjectSize;
 
