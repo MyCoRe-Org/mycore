@@ -35,6 +35,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRLayoutUtilities;
@@ -54,6 +55,22 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     private static final long serialVersionUID = -9213353868244605750L;
 
+    private static final String REDIRECT_GUESTS_PROPERTY = "MCR.StaticXMLFileServlet.NoAccess.RedirectGuestsToLogin";
+
+    private static final boolean REDIRECT_GUESTS = MCRConfiguration2
+        .getBoolean(REDIRECT_GUESTS_PROPERTY)
+        .orElse(false);
+
+    private static final String REDIRECT_GUESTS_XSL_STATUS_MESSAGE = MCRConfiguration2
+        .getString(REDIRECT_GUESTS_PROPERTY + ".XSLStatusMessage")
+        .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
+        .orElse("");
+
+    private static final String REDIRECT_GUESTS_XSL_STATUS_STYLE = MCRConfiguration2
+        .getString(REDIRECT_GUESTS_PROPERTY + ".XSLStatusStyle")
+        .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
+        .orElse("");
+
     protected static final Logger LOGGER = LogManager.getLogger(MCRStaticXMLFileServlet.class);
 
     @Override
@@ -64,11 +81,13 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         if (!hasAccess) {
             HttpServletResponse response = job.getResponse();
             MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-            if (currentUser.equals(MCRSystemUserInformation.getGuestInstance())) {
+            if (REDIRECT_GUESTS && currentUser.equals(MCRSystemUserInformation.getGuestInstance())) {
                 String redirectTarget = "/servlets/MCRLoginServlet?url="
-                    + URLEncoder.encode(webpageID, StandardCharsets.UTF_8)
-                    + "&XSL.Status.Message=component.base.webpage.notLoggedIn"
-                    + "&XSL.Status.Style=danger";
+                    + URLEncoder.encode(webpageID, StandardCharsets.UTF_8);
+                if (!REDIRECT_GUESTS_XSL_STATUS_MESSAGE.isEmpty() && !REDIRECT_GUESTS_XSL_STATUS_STYLE.isEmpty()) {
+                    redirectTarget += "&XSL.Status.Message=" + REDIRECT_GUESTS_XSL_STATUS_MESSAGE;
+                    redirectTarget += "&XSL.Status.Style=" + REDIRECT_GUESTS_XSL_STATUS_STYLE;
+                }
                 String redirectUrl = response.encodeRedirectURL(redirectTarget);
                 response.setStatus(403);
                 response.sendRedirect(redirectUrl);
