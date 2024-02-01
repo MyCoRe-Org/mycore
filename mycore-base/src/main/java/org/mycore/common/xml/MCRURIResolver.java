@@ -535,11 +535,8 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRRESTResolver implements URIResolver {
         private MCRHTTPClient client;
 
-        //private org.apache.logging.log4j.Logger logger;
-
         MCRRESTResolver() {
             this.client = (MCRHTTPClient) MCRConfiguration2.getInstanceOf(HTTP_CLIENT_CLASS).get();
-            //this.logger = LogManager.getLogger();
         }
 
         @Override
