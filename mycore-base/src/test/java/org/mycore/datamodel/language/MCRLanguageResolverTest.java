@@ -9,7 +9,11 @@ import org.mycore.common.MCRTestCase;
 import javax.xml.transform.TransformerException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MCRLanguageResolverTest extends MCRTestCase {
 
@@ -25,10 +29,9 @@ public class MCRLanguageResolverTest extends MCRTestCase {
         assertEquals(2, languageElement.getChildren().size());
 
         // empty code
-        jdomSource = (JDOMSource) languageResolver.resolve("language:", "");
-        document = jdomSource.getDocument();
-        assertNotNull(document);
-        assertNotNull(document.getRootElement());
+        assertThrows(IllegalArgumentException.class, () -> {
+            languageResolver.resolve("language:", "");
+        });
     }
 
 }
