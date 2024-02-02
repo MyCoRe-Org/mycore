@@ -25,9 +25,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.FileStore;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.Normalizer;
@@ -842,7 +844,7 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * Strippes HTML tags from string.
+     * Stripes HTML tags from string.
      *
      * @param s string to strip HTML tags of
      * @return the plain text without tags
@@ -854,6 +856,20 @@ public class MCRXMLFunctions {
             res.insert(m.start(), stripHtml(m.group(m.groupCount() - 1)));
         }
         return StringEscapeUtils.unescapeHtml4(res.toString()).replaceAll(TAG_SELF_CLOSING, "");
+    }
+
+    /**
+     * Returns approximately the usable space in the MCR.datadir in bytes as in {@link FileStore#getUsableSpace()}.
+     *
+     * @return approximately the usable space in the MCR.datadir
+     * @throws IOException
+     * */
+    public static long getUsableSpace() throws IOException{
+        Path dataDir = Paths.get(MCRConfiguration2.getString("MCR.datadir").get());
+        dataDir = dataDir.toRealPath();
+        FileStore fs = Files.getFileStore(dataDir);
+
+        return fs.getUsableSpace();
     }
 
     /**
