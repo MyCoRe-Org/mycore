@@ -77,6 +77,8 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
     public static final String INVALID_OBJECT_TRANSLATION_KEY = "component.webtools.upload.invalid.parameter.object";
     public static final String OBJECT_DOES_NOT_EXIST_TRANSLATION_KEY
         = "component.webtools.upload.invalid.parameter.object.not.exist";
+    public static final String INVALID_FILE_NAME_TRANSLATION_KEY = "component.webtools.upload.invalid.fileName";
+    public static final String INVALID_FILE_SIZE_TRANSLATION_KEY = "component.webtools.upload.invalid.fileSize";
 
     public static void setDefaultMainFile(MCRDerivate derivate) {
         MCRPath path = MCRPath.getPath(derivate.getId().toString(), "/");
@@ -171,12 +173,12 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
         try {
             MCRUploadHelper.checkPathName(name);
         } catch (MCRException e) {
-            throw new MCRInvalidFileException(name, "component.webtools.upload.invalid.fileName", true);
+            throw new MCRInvalidFileException(name, INVALID_FILE_NAME_TRANSLATION_KEY, true);
         }
 
         long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
         if (size > maxSize) {
-            throw new MCRInvalidFileException(name, "component.webtools.upload.invalid.fileSize", true,
+            throw new MCRInvalidFileException(name, INVALID_FILE_SIZE_TRANSLATION_KEY, true,
                 MCRUtils.getSizeFormatted(size), MCRUtils.getSizeFormatted(maxSize));
         }
     }
