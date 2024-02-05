@@ -18,6 +18,8 @@
 
 package org.mycore.webtools.upload.exception;
 
+import org.mycore.services.i18n.MCRTranslation;
+
 /**
  * Should be thrown if the file is not valid. E.g. the size is too big or the file name contains invalid characters.
  */
@@ -29,8 +31,20 @@ public class MCRInvalidFileException extends MCRUploadException {
 
     private final String reason;
 
+    public MCRInvalidFileException(String fileName) {
+        super("component.webtools.upload.invalid.file.noReason", fileName);
+        this.fileName = fileName;
+        this.reason = null;
+    }
+
     public MCRInvalidFileException(String fileName, String reason) {
-        super("component.webtools.upload.invalid.file", fileName, reason);
+        this(fileName, reason, false);
+    }
+
+    public MCRInvalidFileException(String fileName, String reason, boolean translateReason,
+        Object... translationParams) {
+        super("component.webtools.upload.invalid.file", fileName,
+            translateReason ? MCRTranslation.translate(reason, translationParams) : reason);
         this.fileName = fileName;
         this.reason = reason;
     }

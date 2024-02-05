@@ -225,10 +225,12 @@ export class UploadTarget {
      */
     private async getEntrySize(fileEntry: any): Promise<number> {
         return new Promise((accept, reject) => {
-            if("getMetadata" in fileEntry){
+            if("getMetadata" in fileEntry) {
                 fileEntry.getMetadata((metadata) => {
                     accept(metadata.size);
                 }, (err) => reject(err));
+            } else if("size" in fileEntry) {
+                accept(fileEntry.size);
             } else {
                 accept(-1);
             }
