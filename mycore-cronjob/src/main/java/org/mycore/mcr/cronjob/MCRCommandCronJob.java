@@ -21,13 +21,21 @@ package org.mycore.mcr.cronjob;
 import java.util.List;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.frontend.cli.MCRCommandManager;
-import org.mycore.util.concurrent.MCRTransactionableRunnable;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 public class MCRCommandCronJob extends MCRCronjob {
 
+    private String user;
+
     private String command;
+
+    @MCRProperty(name = "User", defaultName = "MCR.CronJob.Default.Command.User")
+    public void setUser(String user) {
+        this.user = user;
+    }
 
     public String getCommand() {
         return command;
@@ -40,17 +48,22 @@ public class MCRCommandCronJob extends MCRCronjob {
 
     @Override
     public void runJob() {
-        new MCRTransactionableRunnable(() -> {
-            String command = getCommand();
-            MCRCommandManager cmdMgr = new MCRCommandManager();
-            invokeCommand(command, cmdMgr);
-        }).run();
+        try {
+            new MCRFixedUserCallable<>(() -> {
+                String command = getCommand();
+                MCRCommandManager cmdMgr = new MCRCommandManager();
+                invokeCommand(command, cmdMgr);
+                return null;
+            }, MCRUserInformationResolver.instance().getOrThrow(user)).call();
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
     }
 
     private void invokeCommand(String command, MCRCommandManager cmdMgr) {
         try {
             List<String> result = cmdMgr.invokeCommand(command);
-            if (result.size() > 0) {
+            if (!result.isEmpty()) {
                 for (String s : result) {
                     invokeCommand(s, cmdMgr);
                 }
@@ -64,4 +77,5 @@ public class MCRCommandCronJob extends MCRCronjob {
     public String getDescription() {
         return "Runs the command '" + getCommand() + "'";
     }
+
 }
