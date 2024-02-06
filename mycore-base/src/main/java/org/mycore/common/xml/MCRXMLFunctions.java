@@ -865,7 +865,7 @@ public class MCRXMLFunctions {
      * @throws IOException
      * */
     public static long getUsableSpace() throws IOException{
-        Path dataDir = Paths.get(MCRConfiguration2.getString("MCR.datadir").get());
+        Path dataDir = Paths.get(MCRConfiguration2.getStringOrThrow("MCR.datadir"));
         dataDir = dataDir.toRealPath();
         FileStore fs = Files.getFileStore(dataDir);
 
