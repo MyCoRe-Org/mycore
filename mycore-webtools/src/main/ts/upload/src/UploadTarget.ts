@@ -98,8 +98,7 @@ export class UploadTarget {
                         const validation = await this.validateTraverse(file);
                         FileTransferQueue.getQueue().setValidating(false);
                         if (!validation.test) {
-                            // TODO: show nice in GUI
-                            alert(validation.reason);
+                            FileTransferQueue.getQueue().pushValidationError(validation.reason);
                             return true;
                         }
                         const fileTransfer = new FileTransfer(file, this.target, transferSession, []);
@@ -132,8 +131,7 @@ export class UploadTarget {
                 const validation = await this.validateTraverse(file);
                 FileTransferQueue.getQueue().setValidating(false);
                 if (!validation.test) {
-                    // TODO: show nice in GUI
-                    alert(validation.reason);
+                    FileTransferQueue.getQueue().pushValidationError(validation.reason);
                     return true;
                 }
             }
@@ -187,7 +185,7 @@ export class UploadTarget {
      * @param fileEntry the entry which contains the name and size
      * @private
      */
-    private async validateFile(fileEntry: File|FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
+    private async validateFile(fileEntry: File | FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
         const size = await this.getEntrySize(fileEntry);
         return new Promise((accept, reject) => {
             const isFileSystemEntry = 'fullPath' in fileEntry;
@@ -223,15 +221,19 @@ export class UploadTarget {
      * @param fileEntry the file entry
      * @private
      */
-    private async getEntrySize(fileEntry: any): Promise<number> {
+    private async getEntrySize(fileEntry: File | FileSystemEntry): Promise<number> {
         return new Promise((accept, reject) => {
-            if("getMetadata" in fileEntry) {
-                fileEntry.getMetadata((metadata) => {
-                    accept(metadata.size);
-                }, (err) => reject(err));
+            if("file" in fileEntry) {
+                (fileEntry as FileSystemFileEntry ).file((file) => {
+                    accept(file.size);
+                }, (error) => {
+                    console.error(["Error while reading file size", fileEntry, error]);
+                    accept(-1);
+                });
             } else if("size" in fileEntry) {
                 accept(fileEntry.size);
             } else {
+                console.error(["Error while reading file size", fileEntry]);
                 accept(-1);
             }
         });
