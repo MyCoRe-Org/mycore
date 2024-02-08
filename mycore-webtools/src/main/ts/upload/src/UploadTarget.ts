@@ -144,9 +144,17 @@ export class UploadTarget {
         return true;
     }
 
-    private async validateTraverse(fileEntry: any): Promise<{ test: boolean, fileEntry: any, reason: string | null }> {
-        if (fileEntry.isDirectory) {
-            let children = await this.readEntries(fileEntry);
+    private async validateTraverse(fileEntry: File | FileSystemEntry): Promise<{
+        test: boolean,
+        fileEntry: any,
+        reason: string | null
+    }> {
+        if(fileEntry == null) {
+            console.error("File entry is null", fileEntry);
+            return {test: false, fileEntry: fileEntry, reason: "File entry is null"};
+        }
+        if ("isDirectory" in fileEntry && fileEntry.isDirectory) {
+            let children = await this.readEntries(fileEntry as FileSystemDirectoryEntry);
             const promises: Array<Promise<{ test: boolean, fileEntry: any, reason: string | null }>> = [];
             for (let childIndex in children) {
                 const child = children[childIndex];
@@ -158,12 +166,12 @@ export class UploadTarget {
             const failed = results.find((result) => !result.test);
             return failed || {test: true, fileEntry, reason: null};
         } else {
-            const validation = await this.validateFile(fileEntry);
+            const validation = await this.validateFile(fileEntry as FileSystemFileEntry | File);
             return {test: validation.valid, fileEntry, reason: validation.reason};
         }
     }
 
-    private async readEntries(fileEntry: any): Promise<any[]> {
+    private async readEntries(fileEntry: FileSystemDirectoryEntry): Promise<FileSystemEntry[]> {
         const reader = fileEntry.createReader();
 
         return new Promise((accept, reject) => {
