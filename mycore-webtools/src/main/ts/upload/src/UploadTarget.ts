@@ -122,7 +122,24 @@ export class UploadTarget {
 
             const webkitEntries: any[] = [];
             for (let i = 0; i < items.length; i++) {
-                webkitEntries.push(items[i].webkitGetAsEntry());
+                const item = items[i];
+                if (item.kind !== "file") {
+                    console.warn("Item is not a file", item);
+                    continue;
+                }
+                let result: FileSystemEntry | null = null;
+                if ("webkitGetAsEntry" in item) {
+                    result = item.webkitGetAsEntry();
+                } else if ("getAsEntry" in item) {
+                    // webkitGetAsEntry will be renamed to getAsEntry in the future
+                    result = (item as any).getAsEntry();
+                }
+                if (result != null) {
+                    webkitEntries.push(result);
+                }
+            }
+            if (webkitEntries.length == 0) {
+                return false;
             }
 
             for (let i = 0; i < webkitEntries.length; i++) {
