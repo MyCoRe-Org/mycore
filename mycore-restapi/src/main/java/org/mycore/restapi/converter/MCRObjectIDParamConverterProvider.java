@@ -21,6 +21,7 @@ package org.mycore.restapi.converter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import jakarta.ws.rs.core.MediaType;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -51,6 +52,7 @@ public class MCRObjectIDParamConverterProvider implements ParamConverterProvider
                         return rawType.cast(MCRObjectID.getInstance(value));
                     } catch (MCRException e) {
                         throw new BadRequestException(Response.status(CODE_INVALID)
+                            .type(MediaType.TEXT_PLAIN_TYPE) // overwrite endpoint, e.g. "application/xml"
                             .entity(MSG_INVALID)
                             .build());
                     }
