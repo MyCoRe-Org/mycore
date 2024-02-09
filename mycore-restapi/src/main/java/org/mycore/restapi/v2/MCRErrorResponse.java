@@ -83,6 +83,11 @@ public class MCRErrorResponse {
         WebApplicationException e;
         Response.Status s = Response.Status.fromStatusCode(status);
         final Response response = Response.status(s)
+            .header("X-Error-Code", getErrorCode())
+            .header("X-Error-Message", getMessage())
+            .header("X-Error-Time", new Date(getTimestamp().toEpochMilli())) //no HeaderDelegate for Instant
+            .header("X-Error-Detail", getDetail())
+            .header("X-Error-UUID", getUuid())
             .entity(this)
             .build();
         //s maybe null
