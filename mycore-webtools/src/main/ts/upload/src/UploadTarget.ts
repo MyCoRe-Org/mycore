@@ -87,24 +87,29 @@ export class UploadTarget {
                 }
 
 
-
+                fileInput.multiple = true;
                 fileInput.setAttribute("type", "file");
                 fileInput.addEventListener('change', async () => {
-                    let transferSession = FileTransferQueue.getQueue().registerTransferSession(this.uploadHandler,
+                    const queue = FileTransferQueue.getQueue();
+                    let transferSession = queue.registerTransferSession(this.uploadHandler,
                         this.attributes);
+                    queue.setValidating(true);
+                    const validFiles: File[] = [];
                     for (let i = 0; i < fileInput.files.length; i++) {
                         let file = fileInput.files.item(i);
-                        FileTransferQueue.getQueue().setValidating(true);
                         const validation = await this.validateTraverse(file);
-                        FileTransferQueue.getQueue().setValidating(false);
                         if (!validation.test) {
-                            FileTransferQueue.getQueue().pushValidationError(validation.reason);
+                            queue.setValidating(false);
+                            queue.pushValidationError(validation.reason);
                             return true;
                         }
-                        const fileTransfer = new FileTransfer(file, this.target, transferSession, []);
-                        FileTransferQueue.getQueue()
-                        FileTransferQueue.getQueue().add(fileTransfer);
+                        validFiles.push(file);
                     }
+                    queue.setValidating(false);
+                    validFiles.forEach((file) => {
+                        const fileTransfer = new FileTransfer(file, this.target, transferSession, []);
+                        queue.add(fileTransfer);
+                    });
                 });
                 if (!testing) {
                     fileInput.click();
@@ -142,16 +147,18 @@ export class UploadTarget {
                 return false;
             }
 
+            FileTransferQueue.getQueue().setValidating(true);
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
-                FileTransferQueue.getQueue().setValidating(true);
                 const validation = await this.validateTraverse(file);
-                FileTransferQueue.getQueue().setValidating(false);
                 if (!validation.test) {
+                    FileTransferQueue.getQueue().setValidating(false);
                     FileTransferQueue.getQueue().pushValidationError(validation.reason);
-                    return true;
+                    return false;
                 }
             }
+            FileTransferQueue.getQueue().setValidating(false);
+
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
                 this.traverse(ts, file);
