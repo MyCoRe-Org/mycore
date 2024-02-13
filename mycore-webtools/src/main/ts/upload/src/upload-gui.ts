@@ -110,6 +110,10 @@ export class FileTransferGUI {
            this.handleSessionBeginError(session, message);
         });
 
+        queue.addValidationHandler((ft) => {
+           this.showError(ft);
+        });
+
         window.setInterval(() => {
             this.transferProgressMap.forEach((progress) => {
                 this.setTransferProgress(this.getEntry(progress.transfer), progress.loaded, progress.total);
@@ -273,7 +277,7 @@ export class FileTransferGUI {
         }
     }
 
-    private showError(message: string) {
+    public showError(message: string) {
         const error = this._uploadBox.querySelector(".mcr-commit-error");
         if (error.classList.contains("d-none")) {
             error.classList.remove("d-none");
@@ -334,7 +338,7 @@ class FileTransferGUITemplates {
             <span class="fas fa-window-minimize minimize float-right" style="font-size: 11px;line-height: 22px;"></span></div>
         <div class="card-body mcr-upload-entry-list" style="overflow-y:  scroll;">
             <div class="container-fluid">
-                <div class="row d-none mcr-commit-error bg-danger">
+                <div class="row d-none mcr-commit-error bg-danger rounded">
                     <div class="col-12" data-i18n="component.webtools.upload.error"></div>
                     <div class="col-12 mcr-error-message" style="overflow: hidden; max-height: 200px"></div>
                 </div>

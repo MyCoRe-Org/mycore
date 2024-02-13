@@ -87,25 +87,29 @@ export class UploadTarget {
                 }
 
 
-
+                fileInput.multiple = true;
                 fileInput.setAttribute("type", "file");
                 fileInput.addEventListener('change', async () => {
-                    let transferSession = FileTransferQueue.getQueue().registerTransferSession(this.uploadHandler,
+                    const queue = FileTransferQueue.getQueue();
+                    let transferSession = queue.registerTransferSession(this.uploadHandler,
                         this.attributes);
+                    queue.setValidating(true);
+                    const validFiles: File[] = [];
                     for (let i = 0; i < fileInput.files.length; i++) {
                         let file = fileInput.files.item(i);
-                        FileTransferQueue.getQueue().setValidating(true);
                         const validation = await this.validateTraverse(file);
-                        FileTransferQueue.getQueue().setValidating(false);
                         if (!validation.test) {
-                            // TODO: show nice in GUI
-                            alert(validation.reason);
+                            queue.setValidating(false);
+                            queue.pushValidationError(validation.reason);
                             return true;
                         }
-                        const fileTransfer = new FileTransfer(file, this.target, transferSession, []);
-                        FileTransferQueue.getQueue()
-                        FileTransferQueue.getQueue().add(fileTransfer);
+                        validFiles.push(file);
                     }
+                    queue.setValidating(false);
+                    validFiles.forEach((file) => {
+                        const fileTransfer = new FileTransfer(file, this.target, transferSession, []);
+                        queue.add(fileTransfer);
+                    });
                 });
                 if (!testing) {
                     fileInput.click();
@@ -123,20 +127,38 @@ export class UploadTarget {
 
             const webkitEntries: any[] = [];
             for (let i = 0; i < items.length; i++) {
-                webkitEntries.push(items[i].webkitGetAsEntry());
-            }
-
-            for (let i = 0; i < webkitEntries.length; i++) {
-                const file = webkitEntries[i];
-                FileTransferQueue.getQueue().setValidating(true);
-                const validation = await this.validateTraverse(file);
-                FileTransferQueue.getQueue().setValidating(false);
-                if (!validation.test) {
-                    // TODO: show nice in GUI
-                    alert(validation.reason);
-                    return true;
+                const item = items[i];
+                if (item.kind !== "file") {
+                    console.warn("Item is not a file", item);
+                    continue;
+                }
+                let result: FileSystemEntry | null = null;
+                if ("webkitGetAsEntry" in item) {
+                    result = item.webkitGetAsEntry();
+                } else if ("getAsEntry" in item) {
+                    // webkitGetAsEntry will be renamed to getAsEntry in the future
+                    result = (item as any).getAsEntry();
+                }
+                if (result != null) {
+                    webkitEntries.push(result);
                 }
             }
+            if (webkitEntries.length == 0) {
+                return false;
+            }
+
+            FileTransferQueue.getQueue().setValidating(true);
+            for (let i = 0; i < webkitEntries.length; i++) {
+                const file = webkitEntries[i];
+                const validation = await this.validateTraverse(file);
+                if (!validation.test) {
+                    FileTransferQueue.getQueue().setValidating(false);
+                    FileTransferQueue.getQueue().pushValidationError(validation.reason);
+                    return false;
+                }
+            }
+            FileTransferQueue.getQueue().setValidating(false);
+
             for (let i = 0; i < webkitEntries.length; i++) {
                 const file = webkitEntries[i];
                 this.traverse(ts, file);
@@ -146,9 +168,17 @@ export class UploadTarget {
         return true;
     }
 
-    private async validateTraverse(fileEntry: any): Promise<{ test: boolean, fileEntry: any, reason: string | null }> {
-        if (fileEntry.isDirectory) {
-            let children = await this.readEntries(fileEntry);
+    private async validateTraverse(fileEntry: File | FileSystemEntry): Promise<{
+        test: boolean,
+        fileEntry: any,
+        reason: string | null
+    }> {
+        if(fileEntry == null) {
+            console.error("File entry is null", fileEntry);
+            return {test: false, fileEntry: fileEntry, reason: "File entry is null"};
+        }
+        if ("isDirectory" in fileEntry && fileEntry.isDirectory) {
+            let children = await this.readEntries(fileEntry as FileSystemDirectoryEntry);
             const promises: Array<Promise<{ test: boolean, fileEntry: any, reason: string | null }>> = [];
             for (let childIndex in children) {
                 const child = children[childIndex];
@@ -160,12 +190,12 @@ export class UploadTarget {
             const failed = results.find((result) => !result.test);
             return failed || {test: true, fileEntry, reason: null};
         } else {
-            const validation = await this.validateFile(fileEntry);
+            const validation = await this.validateFile(fileEntry as FileSystemFileEntry | File);
             return {test: validation.valid, fileEntry, reason: validation.reason};
         }
     }
 
-    private async readEntries(fileEntry: any): Promise<any[]> {
+    private async readEntries(fileEntry: FileSystemDirectoryEntry): Promise<FileSystemEntry[]> {
         const reader = fileEntry.createReader();
 
         return new Promise((accept, reject) => {
@@ -187,7 +217,7 @@ export class UploadTarget {
      * @param fileEntry the entry which contains the name and size
      * @private
      */
-    private async validateFile(fileEntry: File|FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
+    private async validateFile(fileEntry: File | FileSystemEntry): Promise<{ valid: boolean, reason: string | null }> {
         const size = await this.getEntrySize(fileEntry);
         return new Promise((accept, reject) => {
             const isFileSystemEntry = 'fullPath' in fileEntry;
@@ -223,13 +253,19 @@ export class UploadTarget {
      * @param fileEntry the file entry
      * @private
      */
-    private async getEntrySize(fileEntry: any): Promise<number> {
+    private async getEntrySize(fileEntry: File | FileSystemEntry): Promise<number> {
         return new Promise((accept, reject) => {
-            if("getMetadata" in fileEntry){
-                fileEntry.getMetadata((metadata) => {
-                    accept(metadata.size);
-                }, (err) => reject(err));
+            if("file" in fileEntry) {
+                (fileEntry as FileSystemFileEntry ).file((file) => {
+                    accept(file.size);
+                }, (error) => {
+                    console.error(["Error while reading file size", fileEntry, error]);
+                    accept(-1);
+                });
+            } else if("size" in fileEntry) {
+                accept(fileEntry.size);
             } else {
+                console.error(["Error while reading file size", fileEntry]);
                 accept(-1);
             }
         });
