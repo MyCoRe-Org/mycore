@@ -41,37 +41,39 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     @MCRPostConstruction
     public void initializeName(String property) {
-       this.name = property.substring(MCRJPABootstrapper.ENTITY_MANAGER_FACTORY_PREFIX.length()).split("\\.")[0];
+       this.name = property.substring(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME.length())
+               .split("\\.")[0];
+       LOGGER.info("Initialized persistence unit {}", this.name);
     }
 
     @MCRProperty(name = "PersistenceProviderClassName", required = false,
-        defaultName = "MCR.Persistence.ProviderClassName")
+        defaultName = "MCR.JPA.ProviderClassName")
     public void setPersistenceProviderClassName(String persistenceProviderClassName) {
         this.persistenceProviderClassName = persistenceProviderClassName;
     }
 
-    @MCRProperty(name = "UseQuotedIdentifiers", required = false, defaultName = "MCR.Persistence.UseQuotedIdentifiers")
+    @MCRProperty(name = "UseQuotedIdentifiers", required = false, defaultName = "MCR.JPA.UseQuotedIdentifiers")
     public void setUseQuotedIdentifiersString(String useQuotedIdentifiersString) {
         setUseQuotedIdentifiers(Boolean.parseBoolean(useQuotedIdentifiersString));
     }
 
     @MCRProperty(name = "ExcludeUnlistedClasses", required = false,
-        defaultName = "MCR.Persistence.ExcludeUnlistedClasses")
+        defaultName = "MCR.JPA.ExcludeUnlistedClasses")
     public void setExcludeUnlistedClassesString(String excludeUnlistedClassesString) {
         setExcludeUnlistedClasses(Boolean.parseBoolean(excludeUnlistedClassesString));
     }
 
-    @MCRProperty(name = "TransactionType", required = false, defaultName = "MCR.Persistence.TransactionType")
+    @MCRProperty(name = "TransactionType", required = false, defaultName = "MCR.JPA.TransactionType")
     public void setTransactionTypeString(String transactionTypeString) {
         setTransactionType(PersistenceUnitTransactionType.valueOf(transactionTypeString));
     }
 
-    @MCRProperty(name = "ValidationMode", required = false, defaultName = "MCR.Persistence.ValidationMode")
+    @MCRProperty(name = "ValidationMode", required = false, defaultName = "MCR.JPA.ValidationMode")
     public void setValidationModeString(String validationModeString) {
         setValidationMode(ValidationMode.valueOf(validationModeString));
     }
 
-    @MCRProperty(name = "SharedCacheMode", required = false, defaultName = "MCR.Persistence.SharedCacheMode")
+    @MCRProperty(name = "SharedCacheMode", required = false, defaultName = "MCR.JPA.SharedCacheMode")
     public void setSharedCacheModeString(String sharedCacheModeString) {
         setSharedCacheMode(SharedCacheMode.valueOf(sharedCacheModeString));
     }
@@ -141,7 +143,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return managedClassNames;
     }
 
-    @MCRProperty(name = "ManagedClassNames", required = false, defaultName = "MCR.Persistence.ManagedClassNames")
+    @MCRProperty(name = "ManagedClassNames", required = false, defaultName = "MCR.JPA.ManagedClassNames")
     public void setManagedClassNames(String managedClassNames) {
         Stream<String> classNames = MCRConfiguration2.splitValue(managedClassNames);
         setManagedClassNames(classNames.filter(className -> !className.isBlank()).toList());
@@ -156,7 +158,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return mappingFileNames;
     }
 
-    @MCRProperty(name = "MappingFileNames", required = false, defaultName = "MCR.Persistence.MappingFileNames")
+    @MCRProperty(name = "MappingFileNames", required = false, defaultName = "MCR.JPA.MappingFileNames")
     public void setMappingFileNames(String mappingFileNames) {
         Stream<String> fileNames = MCRConfiguration2.splitValue(mappingFileNames);
         setMappingFileNames(fileNames.filter(fileName -> !fileName.isBlank()).toList());
@@ -168,19 +170,19 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     @Override
     public List<URL> getJarFileUrls() {
-        LOGGER.warn("getJarFileUrls not implemented");
+        // LOGGER.warn("getJarFileUrls not implemented");
         return Collections.emptyList();
     }
 
     @Override
     public Object getNonJtaDataSource() {
-        LOGGER.warn("getNonJtaDataSource not implemented");
+        // LOGGER.warn("getNonJtaDataSource not implemented");
         return null;
     }
 
     @Override
     public Object getJtaDataSource() {
-        LOGGER.warn("getJtaDataSource not implemented");
+        // LOGGER.warn("getJtaDataSource not implemented");
         return null;
     }
 
@@ -216,12 +218,12 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     @Override
     public void pushClassTransformer(EnhancementContext enhancementContext) {
-        LOGGER.warn("pushClassTransformer not implemented");
+        // LOGGER.warn("pushClassTransformer not implemented");
     }
 
     @Override
     public ClassTransformer getClassTransformer() {
-        LOGGER.warn("getClassTransformer not implemented");
+        // LOGGER.warn("getClassTransformer not implemented");
         return null;
     }
 }
