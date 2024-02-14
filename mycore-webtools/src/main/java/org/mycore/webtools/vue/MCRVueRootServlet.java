@@ -17,20 +17,11 @@
  */
 package org.mycore.webtools.vue;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.xml.transform.TransformerException;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,65 +32,92 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRContentServlet;
+import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXException;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <p>This Servlet can be bound to a URL where a Vue Build App with a createWebHistory() router is present.</p>
+ * <pre>
  * <code>
- * &lt;servlet&gt;<br>
- * &nbsp;&nbsp;&lt;servlet-name&gt;MCRVueRootServlet&lt;/servlet-name&gt;<br>
- * &nbsp;&nbsp;&lt;servlet-class&gt;org.mycore.webtools.vue.MCRVueRootServlet&lt;/servlet-class&gt;<br>
- * &lt;/servlet&gt;<br>
- * &lt;servlet-mapping&gt;<br>
- * &nbsp;&nbsp;&lt;servlet-name&gt;MCRVueRootServlet&lt;/servlet-name&gt;<br>
- * &nbsp;&nbsp;&lt;url-pattern&gt;/handbuecher/*&lt;/url-pattern&gt;<br>
- * &lt;/servlet-mapping&gt;<br>
+ *
+ * &lt;servlet&gt;
+ *   &lt;servlet-name&gt;MCRVueRootServlet&lt;/servlet-name&gt;
+ *   &lt;servlet-class&gt;org.mycore.webtools.vue.MCRVueRootServlet&lt;/servlet-class&gt;
+ * &lt;/servlet&gt;
+ * &lt;servlet-mapping&gt;
+ *   &lt;servlet-name&gt;MCRVueRootServlet&lt;/servlet-name&gt;
+ *   &lt;url-pattern&gt;/modules/webtools/texteditor/*&lt;/url-pattern&gt;
+ * &lt;/servlet-mapping&gt;
  * </code>
+ * </pre>
  * <p>It will pass through resources that exists at this path like javascript and css, but at every other path it will
  * deliver a modified version of the index.html.
  * The index.html is convert to xhtml and then will be wrapped with a MyCoReWebPage, which will produce the surrounding
  * default layout.</p>
- * <p>In the example the vue app is located in: src/main/vue/modul_handbuecher</p>
+ * <p>In the example the vue app is located in: src/main/vue/texteditor</p>
  * <p>The Router needs to be configured like this:</p>
+ * <pre>
  * <code>
- * function getContext() { <br>
- * &nbsp;&nbsp;const el = document.createElement('a');<br>
- * &nbsp;&nbsp;el.href = (&lt;any&gt;window).webApplicationBaseURL;<br>
- * &nbsp;&nbsp;return el.pathname;<br>
- * }<br>
- * const router = createRouter({<br>
- * &nbsp;&nbsp;history: createWebHistory(getContext() + "handbuecher/"),<br>
- * &nbsp;&nbsp;routes<br>
+ *
+ * function getContext() {
+ *   if (import.meta.env.DEV) {
+ *     return import.meta.env.BASE_URL;
+ *   }
+ *   const el = document.createElement('a');
+ *   el.href = getWebApplicationBaseURL();
+ *   return el.pathname + "modules/webtools/texteditor/";
+ * }
+ * const router = createRouter({
+ *   history: createWebHistory(getContext()),
+ *   routes
  * })
  * </code>
- * <p>The String "handbuecher/" is the location of the vue app below the java application context.</p>
+ * </pre>
+ * <p>The String "modules/webtools/texteditor/" is the location of the vue app below the java application context.</p>
  * <p>To change the output destination of the vue compiler process you need to change the vue.config.js,
  * if you use vue-cli</p>
+ * <pre>
  * <code>
- * const { defineConfig } = require('@vue/cli-service')<br>
- * module.exports = defineConfig({<br>
- * &nbsp;&nbsp;transpileDependencies: true,<br>
- * &nbsp;&nbsp;outputDir: "../../../../target/classes/META-INF/resources/handbuecher",<br>
- * &nbsp;&nbsp;publicPath: "./"<br>
- * });<br>
- * </code>
  *
- * <p>If you use vite you have to change the vite.config.ts, to change the output destination of the vite compiler
- * process</p>
- * <code>
- * ... <br>
- * // https://vitejs.dev/config/ <br>
- * export default defineConfig({ <br>
- * ... <br>
- * build: { <br>
- * outDir: "../../../../target/classes/META-INF/resources/handbuecher", <br>
- * }, <br>
- * base: "./" <br>
- *}); <br>
+ * const { defineConfig } = require('@vue/cli-service')
+ * module.exports = defineConfig({
+ *   transpileDependencies: true,
+ *   outputDir: "../../../../target/classes/META-INF/resources/modules/webtools/texteditor",
+ *   publicPath: "./"
+ * });
  * </code>
+ * </pre>
+ * <p>If you use vite you have to change the vite.config.ts, to change the output destination of the vite compiler
+ * process.</p>
+ * <a href="https://vitejs.dev/config/">vite config</a>
+ * <pre>
+ * <code>
+ * export default defineConfig({
+ *   ...
+ *   build: {
+ *     outDir: "../../../../target/classes/META-INF/resources/modules/webtools/texteditor",
+ *   },
+ *   base: "./"
+ * });
+ * </code>
+ * </pre>
+ *
+ * @author Sebastian Hofmann
+ * @author Matthias Eichner
  */
 public class MCRVueRootServlet extends MCRContentServlet {
 
@@ -108,21 +126,21 @@ public class MCRVueRootServlet extends MCRContentServlet {
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
-        String indexHtmlPath = req.getServletPath() + "/index.html";
+        String indexHtmlPage = getIndexPage();
+        String indexHtmlPath = req.getServletPath() + "/" + indexHtmlPage;
         URL resource = getServletContext().getResource(req.getServletPath() + pathInfo);
 
-        if (resource != null && !pathInfo.endsWith("/") && !pathInfo.endsWith("index.html")) {
+        if (resource != null && !pathInfo.endsWith("/") && !pathInfo.endsWith(indexHtmlPage)) {
             return new MCRURLContent(resource);
         } else {
             URL indexResource = getServletContext().getResource(indexHtmlPath);
-            org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource,
-                MCRFrontendUtil.getBaseURL() + removeLeadingSlash(req.getServletPath()));
+            org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource, getAbsoluteServletPath(req));
             if (pathInfo != null && pathInfo.endsWith("/404")) {
                 /* if there is a requested route which does not exist, the app should
                  * redirect to this /404 route the get the actual 404 Code.
                  * see also https://www.youtube.com/watch?v=vjj8B4sq0UI&t=1815s
                  * */
-                resp.setStatus(404);
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
             try {
                 return getLayoutService().getTransformedContent(req, resp, new MCRJDOMContent(mycoreWebpage));
@@ -132,48 +150,116 @@ public class MCRVueRootServlet extends MCRContentServlet {
         }
     }
 
-    private String removeLeadingSlash(String sp) {
-        return sp.startsWith("/") ? sp.substring(1) : sp;
+    protected String getIndexPage() {
+        return "index.html";
     }
 
-    private org.jdom2.Document getIndexDocument(URL indexResource, String absoluteServletPath) throws IOException {
+    protected String getAbsoluteServletPath(HttpServletRequest req) {
+        String servletPath = req.getServletPath();
+        servletPath = servletPath.startsWith("/") ? servletPath.substring(1) : servletPath;
+        return MCRFrontendUtil.getBaseURL() + servletPath;
+    }
+
+    protected org.jdom2.Document getIndexDocument(URL indexResource, String absoluteServletPath) throws IOException {
         try (InputStream indexFileStream = indexResource.openStream()) {
             Document document = Jsoup.parse(indexFileStream, StandardCharsets.UTF_8.toString(), "");
             document.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
             document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
             document.outerHtml();
-            org.jdom2.Document jdom = new SAXBuilder().build(new StringReader(document.outerHtml()));
-            Element jdomRoot = jdom.getRootElement();
-            List<Element> scriptAndLinks = jdomRoot.getChild("head").getChildren().stream()
-                .filter(el -> "script".equals(el.getName()) || "link".equals(el.getName()))
-                .collect(Collectors.toList())
-                .stream().map(Element::detach).peek(el -> {
-                    String hrefAttr = el.getAttributeValue("href");
-                    if (hrefAttr != null) {
-                        el.setAttribute("href", absoluteServletPath + "/" + hrefAttr);
-                    }
-
-                    String srcAttr = el.getAttributeValue("src");
-                    if (srcAttr != null) {
-                        el.setAttribute("src", absoluteServletPath + "/" + srcAttr);
-                    }
-                }).collect(Collectors.toList());
-
-            List<Element> bodyContent = new ArrayList<>(jdomRoot.getChild("body").getChildren()).stream()
-                .map(Element::detach).collect(Collectors.toList());
-
-            Element webPage = new Element("MyCoReWebPage");
-            org.jdom2.Document webpageDoc = new org.jdom2.Document(webPage);
-
-            Element section = new Element("section");
-            webPage.addContent(section);
-            section.setAttribute("lang", "de", Namespace.XML_NAMESPACE);
-            section.addContent(scriptAndLinks).addContent(bodyContent);
-
-            return webpageDoc;
+            return buildMCRWebpage(absoluteServletPath, new StringReader(document.outerHtml()));
         } catch (JDOMException e) {
             throw new MCRException(e);
         }
+    }
+
+    /**
+     * Injects properties into the script. Override if you want to use own properties. By default, only the
+     * webApplicationBaseURL is provided.
+     *
+     * @return properties for javascript injection
+     */
+    protected Properties getProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("webApplicationBaseUR", MCRFrontendUtil.getBaseURL());
+        return properties;
+    }
+
+    protected org.jdom2.Document buildMCRWebpage(String absoluteServletPath, Reader reader)
+        throws JDOMException, IOException {
+        org.jdom2.Document jdom = new SAXBuilder().build(reader);
+        Element jdomRoot = jdom.getRootElement();
+
+        List<Content> scriptAndLinks = buildScriptAndLinks(absoluteServletPath, jdomRoot);
+        List<Content> bodyContent = buildBodyContent(jdomRoot);
+
+        List<Content> content = Stream.of(scriptAndLinks, bodyContent)
+            .flatMap(Collection::stream)
+            .toList();
+
+        MyCoReWebPageProvider mycoreWebPage = new MyCoReWebPageProvider();
+        mycoreWebPage.addSection("", content, "de");
+        return mycoreWebPage.getXML();
+    }
+
+    protected List<Content> buildBodyContent(Element root) {
+        List<Element> body = root.getChild("body").getChildren();
+        return new ArrayList<>(body).stream()
+            .map(Element::detach)
+            .collect(Collectors.toList());
+    }
+
+    protected List<Content> buildScriptAndLinks(String absoluteServletPath, Element root) {
+        // inject properties
+        Element propertiesScript = buildPropertiesScript();
+
+        // script and links from vue's index.html
+        List<Element> vueScriptAndLink = buildVueScriptAndLink(absoluteServletPath, root);
+
+        // combine
+        List<Content> scriptAndLinks = new ArrayList<>();
+        scriptAndLinks.add(propertiesScript);
+        scriptAndLinks.addAll(vueScriptAndLink);
+        return scriptAndLinks;
+    }
+
+    /**
+     * Creates a new script tag embedding the given {@link #getProperties()} as javascript variables. The variables
+     * are stored under the mycore variable e.g. 'mycore.webApplicationBaseURL'.
+     *
+     * @return script element tag with properties javascript variables
+     */
+    protected Element buildPropertiesScript() {
+        Element propertiesScript = new Element("script");
+        propertiesScript.setAttribute("type", "text/javascript");
+        StringBuilder propertiesJson = new StringBuilder("var mycore = mycore || {};");
+        propertiesJson.append(System.lineSeparator());
+        getProperties().forEach((key, value) -> propertiesJson.append("mycore.").append(key).append("=\"").append(value)
+            .append("\";").append(System.lineSeparator()));
+        propertiesScript.setText(propertiesJson.toString());
+        return propertiesScript;
+    }
+
+    /**
+     * Extracts the script and link elements out of the vue index.html.
+     *
+     * @param absoluteServletPath the absolute servlet path
+     * @param root the root element
+     * @return list of script and link elements
+     */
+    protected List<Element> buildVueScriptAndLink(String absoluteServletPath, Element root) {
+        return root.getChild("head").getChildren().stream()
+            .filter(el -> "script".equals(el.getName()) || "link".equals(el.getName()))
+            .toList()
+            .stream().map(Element::detach).peek(el -> {
+                String hrefAttr = el.getAttributeValue("href");
+                if (hrefAttr != null) {
+                    el.setAttribute("href", absoluteServletPath + "/" + hrefAttr);
+                }
+                String srcAttr = el.getAttributeValue("src");
+                if (srcAttr != null) {
+                    el.setAttribute("src", absoluteServletPath + "/" + srcAttr);
+                }
+            }).toList();
     }
 
 }
