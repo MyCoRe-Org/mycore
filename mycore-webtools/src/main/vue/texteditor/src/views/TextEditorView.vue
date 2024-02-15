@@ -55,12 +55,15 @@ const save = async () => {
   if (contentHandler === undefined) {
     return;
   }
+  updateEnabled.value = false;
   try {
     await contentHandler.save(props.id, model.value);
     originalModel = model.value.data;
+    success.value = "Erfolgreich gespeichert!";
   } catch (err: any) {
     console.log(err);
     error.value = err;
+    updateEnabled.value = true;
   }
 }
 load();

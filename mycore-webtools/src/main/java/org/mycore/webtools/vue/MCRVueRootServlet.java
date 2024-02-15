@@ -180,7 +180,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
      */
     protected Properties getProperties() {
         Properties properties = new Properties();
-        properties.setProperty("webApplicationBaseUR", MCRFrontendUtil.getBaseURL());
+        properties.setProperty("webApplicationBaseURL", MCRFrontendUtil.getBaseURL());
         return properties;
     }
 
