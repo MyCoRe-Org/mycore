@@ -27,8 +27,10 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
@@ -44,6 +46,7 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ParamConverter;
 
 @Priority(Priorities.AUTHORIZATION)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
@@ -55,6 +58,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     public static final String PARAM_DERID = "derid";
 
     public static final String PARAM_DER_PATH = "path";
+
+    public static final ParamConverter<MCRObjectID> OBJECT_ID_PARAM_CONVERTER = new MCRObjectIDParamConverterProvider()
+        .getConverter(MCRObjectID.class, null, null);
 
     @Context
     ResourceInfo resourceInfo;
@@ -88,7 +94,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         Optional<String> checkable = Optional.ofNullable(derId)
             .filter(d -> path != null) //only check for derId if path is given
             .map(Optional::of)
-            .orElseGet(() -> Optional.ofNullable(objectId));
+            .orElseGet(() -> Optional.ofNullable(objectId))
+            .map(OBJECT_ID_PARAM_CONVERTER::fromString) //MCR-3041 check for Bad Request
+            .map(MCRObjectID::toString);
         checkable.ifPresent(id -> LogManager.getLogger().info("Checking " + permission + " access on " + id));
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         boolean allowed = checkable

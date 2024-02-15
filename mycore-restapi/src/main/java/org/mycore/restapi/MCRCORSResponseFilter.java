@@ -59,16 +59,21 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     private static final String ACCESS_CONTROL_REQUEST_HEADERS = "Access-Control-Request-Headers";
 
+    private static final String ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method";
+
     private static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
 
     private static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
+
 
     @Context
     ResourceInfo resourceInfo;
 
     private static boolean handlePreFlight(ContainerRequestContext requestContext,
         MultivaluedMap<String, Object> responseHeaders) {
-        if (!requestContext.getMethod().equals(HttpMethod.OPTIONS)) {
+        if (!requestContext.getMethod().equals(HttpMethod.OPTIONS)
+            || requestContext.getHeaderString(ACCESS_CONTROL_REQUEST_METHOD) == null) {
+            //required for CORS-preflight request
             return false;
         }
         //allow all methods
