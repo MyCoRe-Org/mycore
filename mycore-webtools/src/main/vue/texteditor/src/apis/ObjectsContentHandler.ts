@@ -20,7 +20,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
                 type: contentType
             };
         }
-        throw new Error(`Unable to load ${id}. Request failed with status code ${response.status}.`);
+        throw this.buildError(`Unable to load ${id}.`, response);
     }
 
     async save(id: string, content: Content): Promise<void> {
@@ -36,7 +36,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
         if (response.ok) {
             return;
         }
-        throw new Error(`Unable to save ${id}. Request failed with status code ${response.status}.`);
+        throw this.buildError(`Unable to save ${id}.`, response);
     }
 
     async hasWriteAccess(id: string): Promise<boolean> {
