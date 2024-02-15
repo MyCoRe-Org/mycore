@@ -111,6 +111,10 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         if (!handlePreFlight(requestContext, responseHeaders)) {
             //not a CORS preflight request
             ArrayList<String> exposedHeaders = new ArrayList<>();
+            //MCR-3041 expose all header starting with X-
+            responseHeaders.keySet().stream()
+                .filter(name -> name.startsWith("x-") || name.startsWith("X-"))
+                .forEach(exposedHeaders::add);
             if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
                 exposedHeaders.add(HttpHeaders.AUTHORIZATION);
             }
