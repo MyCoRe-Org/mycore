@@ -37,14 +37,11 @@ function highlighter(text: string) {
   return highlight(text, prismLanguage.grammar, prismLanguage.language);
 }
 
-function onScroll(evt: any) {
-  console.log(evt)
-}
 </script>
 
 <template>
   <div class="overlay">
-    <prism-editor @scroll="onScroll" ref="editor" class="texteditor" v-model="model.data"
+    <prism-editor ref="editor" class="texteditor" v-model="model.data"
                   :class="{loading: props.loading, writeAccess: props.writeAccess}"
                   :highlight="highlighter" line-numbers :readonly="props.loading || !props.writeAccess">
     </prism-editor>

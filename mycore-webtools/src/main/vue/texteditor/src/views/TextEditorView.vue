@@ -15,10 +15,19 @@ let loading: any = ref(true);
 let success: any = ref();
 let error: any = ref();
 let updateEnabled = ref(false);
-let originalModel: string = "";
 let writeAccess = ref(false);
+let undoKeyPressed = false;
+let originalModel: string = "";
 
 watch(() => model.value.data, async (newModel) => {
+  // prevent ctrl+z clearing the textarea
+  setTimeout(() => {
+    if (undoKeyPressed && newModel === "") {
+      model.value.data = originalModel;
+      updateEnabled.value = false;
+      return;
+    }
+  }, 0);
   updateEnabled.value = originalModel !== newModel;
 });
 
@@ -64,7 +73,7 @@ const save = async () => {
   try {
     await contentHandler.save(props.id, model.value);
     success.value = "Erfolgreich gespeichert!";
-    if(contentHandler.dirtyAfterSave(props.id)) {
+    if (contentHandler.dirtyAfterSave(props.id)) {
       await load();
     } else {
       originalModel = model.value.data;
@@ -76,12 +85,23 @@ const save = async () => {
   }
   loading.value = false;
 }
+
+function onKeyDown(evt: any) {
+  undoKeyPressed = evt.ctrlKey && (evt.key === "z" || evt.key === "Z");
+  // fix undo is not triggered on empty textarea
+  setTimeout(() => {
+    if (undoKeyPressed && model.value.data === "") {
+      model.value.data = originalModel;
+    }
+  }, 0);
+}
+
 load();
 hasWriteAccess();
 </script>
 
 <template>
-  <text-editor v-model="model" :loading="loading" :writeAccess="writeAccess"></text-editor>
+  <text-editor @keydown="onKeyDown" v-model="model" :loading="loading" :writeAccess="writeAccess"></text-editor>
   <footer>
     <div class="info">
       <div v-if="success" class="alert alert-success">

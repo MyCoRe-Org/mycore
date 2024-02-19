@@ -41,25 +41,22 @@ export class ClassificationsContentHandler extends BaseContentHandler {
         return true;
     }
 
-    prettifyXml(sourceXml: string) {
-            const xmlDoc = new DOMParser().parseFromString(sourceXml, "application/xml");
-            const xsltDoc = new DOMParser().parseFromString(`
-                <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                  <xsl:strip-space elements="*"/>
-                  <xsl:template match="para[content-style][not(text())]">
-                    <xsl:value-of select="normalize-space(.)"/>
-                  </xsl:template>
-                  <xsl:template match="node()|@*">
-                    <xsl:copy><xsl:apply-templates select="node()|@*"/></xsl:copy>
-                  </xsl:template>
-                  <xsl:output indent="yes"/>
-                </xsl:stylesheet>`, "application/xml");
-            const xsltProcessor = new XSLTProcessor();
-            console.log(xsltDoc);
-            xsltProcessor.importStylesheet(xsltDoc);
-            const resultDoc = xsltProcessor.transformToDocument(xmlDoc);
-            return new XMLSerializer().serializeToString(resultDoc);
-    };
+    /**
+     * https://stackoverflow.com/questions/376373/pretty-printing-xml-with-javascript
+     *
+     * @param xml xml to prettify
+     */
+    prettifyXml(xml: string) {
+        const tab = "  ";
+        let formatted = "";
+        let indent = "";
+        xml.split(/>\s*</).forEach(function (node) {
+            if (node.match(/^\/\w/)) indent = indent.substring(tab.length);
+            formatted += `${indent}<${node}>\r\n`;
+            if (node.match(/^<?\w[^>]*[^\/]$/)) indent += tab;
+        });
+        return formatted.substring(1, formatted.length - 3);
+    }
 
     dirtyAfterSave(id: string): boolean {
         return false;
