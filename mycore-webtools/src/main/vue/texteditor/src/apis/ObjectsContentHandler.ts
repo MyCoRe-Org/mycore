@@ -40,10 +40,51 @@ export class ObjectsContentHandler extends BaseContentHandler {
     }
 
     async hasWriteAccess(id: string): Promise<boolean> {
+        const authorizationHeader = await getAuthorizationHeader(this.mcrApplicationBaseURL);
+        const baseId = this.getBaseId(id);
+        const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${baseId}/try`, {
+            method: "PUT",
+            headers: {
+                "Authorization": authorizationHeader
+            }
+        });
+        return response.ok;
+        /*
+        TODO: this code uses an OPTION http request currently not supported by the rest v2 API. This should be used in the future.
         const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${id}`, {
             method: "OPTIONS"
         });
         return super.handleWriteAccessResponse(id, response);
+        */
+    }
+
+    dirtyAfterSave(id: string): boolean {
+        const isContent = this.isContentsId(id);
+        return !isContent;
+    }
+
+    /**
+     * Checks if the id contains the '/contents' part. Assuming access to files.
+     *
+     * @param id the id to check
+     * @return true if it's a content id
+     */
+    private isContentsId(id: string) {
+        return id.indexOf("/contents") !== -1;
+    }
+
+    /**
+     * Ignores the content part of the id (if any).
+     *
+     * @param id the requested id
+     * @return the base id ignoring the content
+     */
+    private getBaseId(id: string) {
+        if (!this.isContentsId(id)) {
+            return id;
+        }
+        let path = id.split("/");
+        return path.length <= 2 ? path[0] : `${path[0]}/${path[1]}/${path[2]}`;
     }
 
 }

@@ -11,6 +11,7 @@ let model: Ref<Content> = ref({
   data: "",
   type: ""
 });
+let loading: any = ref(true);
 let success: any = ref();
 let error: any = ref();
 let updateEnabled = ref(false);
@@ -48,6 +49,7 @@ const load = async () => {
     console.log(err);
     error.value = err;
   }
+  loading.value = false;
 }
 
 const save = async () => {
@@ -55,23 +57,31 @@ const save = async () => {
   if (contentHandler === undefined) {
     return;
   }
+  loading.value = true;
+  success.value = undefined;
+  error.value = undefined;
   updateEnabled.value = false;
   try {
     await contentHandler.save(props.id, model.value);
-    originalModel = model.value.data;
     success.value = "Erfolgreich gespeichert!";
+    if(contentHandler.dirtyAfterSave(props.id)) {
+      await load();
+    } else {
+      originalModel = model.value.data;
+    }
   } catch (err: any) {
     console.log(err);
     error.value = err;
     updateEnabled.value = true;
   }
+  loading.value = false;
 }
 load();
 hasWriteAccess();
 </script>
 
 <template>
-  <text-editor v-model="model"></text-editor>
+  <text-editor v-model="model" :loading="loading" :writeAccess="writeAccess"></text-editor>
   <footer>
     <div class="info">
       <div v-if="success" class="alert alert-success">
