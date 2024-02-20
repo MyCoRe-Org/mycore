@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.datamodel.common;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +30,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,21 +89,29 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         throws IOException {
         buffer.clear();
         channel.position(0);
-        buffer.putInt(nextID.getNumberAsInteger());
+        byte[] idAsBytes = nextID.toString().getBytes(StandardCharsets.UTF_8);
+        buffer.put(idAsBytes);
         buffer.flip();
         int written = channel.write(buffer);
-        if (written != Integer.BYTES) {
+        if (written != idAsBytes.length) {
             throw new MCRException("Could not write new ID to " + cacheFile.toAbsolutePath());
         }
     }
 
+    /**
+     * Set the next free id for the given baseId. Should only be used for migration purposes and the caller has to make
+     * sure that the cache file is not used by another process.
+     * @param baseId the base id
+     * @param next the next free id to be returned by getNextFreeId
+     */
     public void setNextFreeId(String baseId, int next) {
         Path cacheFile = getCacheFilePath(baseId);
 
+        int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
         try (
             FileChannel channel = FileChannel.open(cacheFile, StandardOpenOption.WRITE,
                 StandardOpenOption.SYNC, StandardOpenOption.CREATE);){
-            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+            ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
             channel.position(0);
             writeNewID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, next-1)), buffer, channel, cacheFile);
         } catch (FileNotFoundException e) {
@@ -110,23 +137,24 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
                     StandardOpenOption.SYNC);
                 FileLock fileLock = channel.lock()) {
 
-                ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+                int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
+                ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
                 buffer.clear();
                 channel.position(0);
                 int bytesRead = channel.read(buffer);
-
                 if (bytesRead <= 0) {
                     LOGGER.info("No ID found in " + cacheFile.toAbsolutePath());
                     // empty file -> new currentID is 1
                     nextID = MCRObjectID.getInstance(MCRObjectID.formatID(baseId, maxInWorkflow + 1));
                     writeNewID(nextID, buffer, channel, cacheFile);
-                } else if (bytesRead == Integer.BYTES) {
+                } else if (bytesRead == idLengthInBytes) {
                     buffer.flip();
-                    int lastID = buffer.getInt();
+                    MCRObjectID objectID = readObjectIDFromBuffer(idLengthInBytes, buffer);
+                    int lastID = objectID.getNumberAsInteger();
                     nextID = MCRObjectID.getInstance(MCRObjectID.formatID(baseId, lastID + maxInWorkflow + 1));
                     writeNewID(nextID, buffer, channel, cacheFile);
                 } else {
-                    throw new MCRException("Content is not Int Number " + cacheFile.toAbsolutePath());
+                    throw new MCRException("Content has different id length " + cacheFile.toAbsolutePath());
                 }
             } catch (FileNotFoundException e) {
                 throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
@@ -140,6 +168,13 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         return nextID;
     }
 
+    private static MCRObjectID readObjectIDFromBuffer(int idLengthBytes, ByteBuffer buffer) {
+        byte[] idBytes = new byte[idLengthBytes];
+        buffer.get(idBytes);
+        String lastIDString = new String(idBytes, StandardCharsets.UTF_8);
+        return MCRObjectID.getInstance(lastIDString);
+    }
+
     @Override
     public MCRObjectID getLastID(String baseId) {
         Path cacheFilePath = getCacheFilePath(baseId);
@@ -147,20 +182,21 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
         try {
             readLock.lock();
+            int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
 
             try (FileChannel channel = FileChannel.open(cacheFilePath)) {
-                ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+                ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
                 buffer.clear();
                 channel.position(0);
                 int bytesRead = channel.read(buffer);
                 if (bytesRead == -1) {
+                    // empty file -> no ID found
                     return null;
-                } else if (bytesRead == Integer.BYTES) {
+                } else if (bytesRead == idLengthInBytes) {
                     buffer.flip();
-                    int lastID = buffer.getInt();
-                    return MCRObjectID.getInstance(MCRObjectID.formatID(baseId, lastID));
+                    return readObjectIDFromBuffer(idLengthInBytes, buffer);
                 } else {
-                    throw new MCRException("Content is not Int Number " + cacheFilePath.toAbsolutePath());
+                    throw new MCRException("Content has different id length " + cacheFilePath.toAbsolutePath());
                 }
             } catch (IOException e) {
                 throw new MCRException("Could not open " + cacheFilePath.toAbsolutePath(), e);

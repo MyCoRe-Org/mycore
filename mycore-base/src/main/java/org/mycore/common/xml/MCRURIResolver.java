@@ -351,7 +351,7 @@ public final class MCRURIResolver implements URIResolver {
         URIResolver uriResolver = SUPPORTED_SCHEMES.get(scheme);
         if (uriResolver != null) {
             Source resolved = uriResolver.resolve(href, base);
-            if (resolved.getSystemId() == null) {
+            if (resolved != null && resolved.getSystemId() == null) {
                 resolved.setSystemId(href);
             }
             return resolved;
