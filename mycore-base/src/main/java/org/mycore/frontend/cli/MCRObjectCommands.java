@@ -84,6 +84,7 @@ import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRFileBaseCacheObjectIDGenerator;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -1384,6 +1385,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mid = MCRObjectID.getInstance(id);
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mid);
         MCRMetadataManager.repairSharedMetadata(obj);
+    }
+
+    @MCRCommand(
+        syntax = "create object id cache",
+        help = "Creates a cache for all object ids in the configuration directory.",
+        order = 175)
+    public static void createObjectIDCache() {
+        MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
+        metadataManager.getObjectBaseIds().forEach(id -> {
+            LOGGER.info("Creating cache for base {}", id);
+            int highestStoredID = metadataManager.getHighestStoredID(id);
+            MCRFileBaseCacheObjectIDGenerator gen = new MCRFileBaseCacheObjectIDGenerator();
+            gen.setNextFreeId(id, highestStoredID+1);
+        });
     }
 
     /**
