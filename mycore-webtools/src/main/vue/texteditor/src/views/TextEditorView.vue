@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {type Ref, ref, watch} from "vue";
+import {nextTick, type Ref, ref, watch} from "vue";
 import {ContentHandlerSelector} from "@/apis/ContentHandlerSelector";
 import TextEditor from "@/components/TextEditor.vue";
 
@@ -21,14 +21,13 @@ let originalModel: string = "";
 
 watch(() => model.value.data, async (newModel) => {
   // prevent ctrl+z clearing the textarea
-  setTimeout(() => {
-    if (undoKeyPressed && newModel === "") {
-      model.value.data = originalModel;
-      updateEnabled.value = false;
-      return;
-    }
-  }, 0);
-  updateEnabled.value = originalModel !== newModel;
+  await nextTick();
+  if (undoKeyPressed && newModel === "") {
+    model.value.data = originalModel;
+    updateEnabled.value = false;
+  } else {
+    updateEnabled.value = originalModel !== newModel;
+  }
 });
 
 const hasWriteAccess = async () => {
@@ -86,14 +85,13 @@ const save = async () => {
   loading.value = false;
 }
 
-function onKeyDown(evt: any) {
+const onKeyDown = async (evt: any) => {
   undoKeyPressed = evt.ctrlKey && (evt.key === "z" || evt.key === "Z");
   // fix undo is not triggered on empty textarea
-  setTimeout(() => {
-    if (undoKeyPressed && model.value.data === "") {
-      model.value.data = originalModel;
-    }
-  }, 0);
+  await nextTick();
+  if (undoKeyPressed && model.value.data === "") {
+    model.value.data = originalModel;
+  }
 }
 
 load();

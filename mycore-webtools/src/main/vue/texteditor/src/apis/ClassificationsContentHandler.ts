@@ -42,6 +42,10 @@ export class ClassificationsContentHandler extends BaseContentHandler {
     }
 
     /**
+     * Prettifies classification xml. This is a workaround as long as the server does not returns a prettified xml by
+     * itself.
+     * TODO: remove if not necessary anymore
+     *
      * https://stackoverflow.com/questions/376373/pretty-printing-xml-with-javascript
      *
      * @param xml xml to prettify

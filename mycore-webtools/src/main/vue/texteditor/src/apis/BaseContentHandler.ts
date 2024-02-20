@@ -33,7 +33,7 @@ export abstract class BaseContentHandler implements ContentHandler {
         if (!response.ok) {
             throw this.buildError(`Unable get OPTIONS of ${id}.`, response);
         }
-        //let allow = response.headers.get("Allow");
+        //TODO const allow = response.headers.get("Allow");
         const allow = "HEAD,DELETE,GET,OPTIONS,PUT";
         if (!allow) {
             throw new Error(`Unable get OPTIONS of ${id}. Request failed because 'Allow' header is empty.`);

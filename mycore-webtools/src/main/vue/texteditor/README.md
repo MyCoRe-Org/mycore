@@ -9,5 +9,5 @@ yarn
 ### Compile and Hot-Reload for Development
 
 ```sh
-npm dev
+yarn dev
 ```
