@@ -38,6 +38,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * This class generates object ids based on a file based cache. The cache is used to store the last generated id for a
+ * given base id. The cache file is located in the data directory of MyCoRe and is named "id_cache" and contains one
+ * file for each base id. The file contains the last generated id as a string.
+ */
 public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
