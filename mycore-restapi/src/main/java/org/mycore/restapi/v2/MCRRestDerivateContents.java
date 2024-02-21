@@ -289,6 +289,7 @@ public class MCRRestDerivateContents {
                 @Header(name = "Last-Modified", description = "last modified date of file"),
             }))
     public Response getFileOrDirectoryMetadata() {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derid);
         MCRPath mcrPath = getPath();
         MCRFileAttributes fileAttributes;
         try {
@@ -329,6 +330,7 @@ public class MCRRestDerivateContents {
         summary = "List directory contents or serves file given by {path} in derivate",
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     public Response getFileOrDirectory(@Context UriInfo uriInfo, @Context HttpHeaders requestHeader) {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derid);
         LogManager.getLogger().info("{}:{}", derid, path);
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
         MCRFileAttributes fileAttributes;
@@ -384,6 +386,7 @@ public class MCRRestDerivateContents {
         },
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     public Response createFileOrDirectory(InputStream contents) {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derid);
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
         if (mcrPath.getNameCount() > 1) {
             MCRPath parentDirectory = mcrPath.getParent();
@@ -429,6 +432,7 @@ public class MCRRestDerivateContents {
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     @MCRRequireTransaction
     public Response deleteFileOrDirectory() {
+        MCRRestDerivates.validateDerivateRelation(mcrId, derid);
         MCRPath mcrPath = getPath();
         try {
             if (Files.exists(mcrPath) && Files.isDirectory(mcrPath)) {

@@ -103,6 +103,7 @@ export class FileTransferQueue {
     private uploadIDCount: {} = {};
     private _validating: boolean;
     private validatingHandlerList:Array<(validating: boolean) => void > = [];
+    private validationHandlerList: Array<(message: string) => void> = [];
 
     constructor() {
     }
@@ -190,6 +191,14 @@ export class FileTransferQueue {
 
     public isValidating() {
         return this._validating;
+    }
+
+    public pushValidationError(message: string) {
+        this.validationHandlerList.forEach(handler => handler(message));
+    }
+
+    public addValidationHandler(handler: (message: string) => void) {
+        this.validationHandlerList.push(handler);
     }
 
     public addCompleteHandler(handler: FileTransferHandler) {

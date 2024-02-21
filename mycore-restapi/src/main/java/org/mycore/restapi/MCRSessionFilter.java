@@ -250,8 +250,8 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         try {
             MCRSessionMgr.unlock();
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-            if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode() && currentSession
-                .getUserInformation().getUserID().equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+            if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode()
+                && isUnAuthorized(requestContext)) {
                 LOGGER.debug("Guest detected, change response from FORBIDDEN to UNAUTHORIZED.");
                 responseContext.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
                 responseContext.getHeaders().putSingle(HttpHeaders.WWW_AUTHENTICATE,
@@ -283,6 +283,10 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         } finally {
             LOGGER.debug("ResponseFilter stop");
         }
+    }
+
+    private static boolean isUnAuthorized(ContainerRequestContext requestContext) {
+        return requestContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null;
     }
 
     //returns true for Ajax-Requests or requests for embedded images

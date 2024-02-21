@@ -16,20 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.webtools.upload.exception;
+package org.mycore.common;
 
-public class MCRUploadForbiddenException extends MCRUploadException {
+import java.io.IOException;
+import java.net.URI;
 
-    private static final long serialVersionUID = 1L;
+import org.mycore.common.content.MCRContent;
 
+public interface MCRHTTPClient {
+    MCRContent get(URI hrefURI) throws IOException;
 
-
-    public MCRUploadForbiddenException(String reason) {
-        super("component.webtools.upload.forbidden", reason);
-    }
-
-    public MCRUploadForbiddenException() {
-        super("component.webtools.upload.forbidden.noReason");
-    }
-
+    void close();
 }

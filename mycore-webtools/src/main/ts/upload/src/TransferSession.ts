@@ -66,18 +66,18 @@ export class TransferSession {
         this.request.open('PUT', Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/begin" + uploadHandlerParameter + parameters, true);
 
         this.request.onreadystatechange = (result) => {
-            if (this.request.readyState === 4 && this.request.status === 200) {
-                this._bucketID = this.request.responseText;
-                this._started = true;
-                if (completionHandler) {
-                    completionHandler();
+            if (this.request.readyState === 4) {
+                if(this.request.status === 200) {
+                    this._bucketID = this.request.responseText;
+                    this._started = true;
+                    if (completionHandler) {
+                        completionHandler();
+                    }
+                } else {
+                    if (errorHandler) {
+                        errorHandler(this.request.responseText);
+                    }
                 }
-            }
-        };
-
-        this.request.onerror = (evt) => {
-            if (errorHandler) {
-                errorHandler(this.request.responseText);
             }
         };
 
