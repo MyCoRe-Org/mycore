@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@types/prismjs": "^1.26.3",
+    "npm-run-all2": "^6.1.2",
     "prismjs": "^1.29.0",
     "vue": "^3.4.15",
     "vue-prism-editor": "^2.0.0-alpha.2",
