@@ -88,7 +88,7 @@ public class MyCoReWebPageProvider {
 
     public static final String TIME_FORMAT = "HH:mm";
 
-    private Document xml;
+    private final Document xml;
 
     public MyCoReWebPageProvider() {
         this.xml = new Document();
@@ -148,11 +148,14 @@ public class MyCoReWebPageProvider {
         if (lang != null) {
             section.setAttribute(XML_LANG, lang, Namespace.XML_NAMESPACE);
         }
-        if (title != null && !title.equals("")) {
+        if (title != null && !title.isEmpty()) {
             section.setAttribute(XML_TITLE, title);
         }
         for (Content content : contentList) {
-            if (content instanceof Text) {
+            if (content instanceof Text text) {
+                if (text.getTextTrim().isEmpty()) {
+                    continue;
+                }
                 // MyCoReWebPage.xsl ignores single text content -> wrap it in a p
                 section.addContent(new Element("p").addContent(content));
             } else {
