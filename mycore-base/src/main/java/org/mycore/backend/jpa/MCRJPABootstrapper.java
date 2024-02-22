@@ -44,8 +44,6 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRJPABootstrapper implements AutoExecutable {
 
-    public static final String PERSISTENCE_UNIT_NAME = "MyCoRe";
-
     @Override
     public String getName() {
         return "JPA Bootstrapper";
