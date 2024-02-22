@@ -34,6 +34,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
 
 /**
  * Eventhandler for linking MODS_OBJECTTYPE document to MyCoRe classifications.
@@ -89,7 +90,14 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         //may have to reindex children, if they inherit any information
         for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
             MCRObjectID childID = childLinkID.getXLinkHrefID();
-            if (MCRMetadataManager.exists(childID)) {
+
+            // check if the default share agent is used, which does not care about mods inheritance, so the metadata
+            // of the child object never changes, but the parent object may have changed inherited metadata.
+            // TODO: clean up this code, it does not belong here
+            boolean isDefaultShareAgent = MCRMetadataShareAgentFactory.getAgent(obj.getId())
+                    .equals(MCRMetadataShareAgentFactory.getDefaultAgent());
+
+            if (MCRMetadataManager.exists(childID) && isDefaultShareAgent) {
                 MCREvent childEvent
                     = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.INDEX);
                 childEvent.put(MCREvent.OBJECT_KEY, MCRMetadataManager.retrieve(childID));
