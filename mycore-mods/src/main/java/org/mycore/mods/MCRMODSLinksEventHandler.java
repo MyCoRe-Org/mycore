@@ -86,15 +86,6 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             return;
         }
         handleObjectCreated(evt, obj);
-        //may have to reindex children, if they inherit any information
-        for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
-            MCRObjectID childID = childLinkID.getXLinkHrefID();
-            if (MCRMetadataManager.exists(childID)) {
-                MCREvent childEvent = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.INDEX);
-                childEvent.put(MCREvent.OBJECT_KEY, MCRMetadataManager.retrieve(childID));
-                MCREventManager.instance().handleEvent(childEvent);
-            }
-        }
     }
 
     /* (non-Javadoc)
