@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
@@ -41,6 +42,11 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
+
+    public static final String INDEX_ALL_CHILDREN_PROPERTY_NAME = "MCR.MODS.LinksEventHandler.IndexAllChildren";
+    private static final boolean INDEX_ALL_CHILDREN
+        = MCRConfiguration2.getBoolean(INDEX_ALL_CHILDREN_PROPERTY_NAME)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(INDEX_ALL_CHILDREN_PROPERTY_NAME));
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase
@@ -87,11 +93,11 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         }
         handleObjectCreated(evt, obj);
         //may have to reindex children, if they inherit any information
+        // TODO: clean up this code, it does not belong here
         for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
             MCRObjectID childID = childLinkID.getXLinkHrefID();
-            if (MCRMetadataManager.exists(childID)) {
-                MCREvent childEvent
-                    = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.INDEX);
+            if (MCRMetadataManager.exists(childID) && INDEX_ALL_CHILDREN) {
+                MCREvent childEvent = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.INDEX);
                 childEvent.put(MCREvent.OBJECT_KEY, MCRMetadataManager.retrieve(childID));
                 MCREventManager.instance().handleEvent(childEvent);
             }
