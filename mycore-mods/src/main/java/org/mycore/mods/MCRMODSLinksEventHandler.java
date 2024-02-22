@@ -93,7 +93,8 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         }
         handleObjectCreated(evt, obj);
         //may have to reindex children, if they inherit any information
-        // TODO: clean up this code, it does not belong here
+        // TODO: remove this code, it is not part of this classes responsibility. if information is inherited, i.e.
+        //  because of a metadata share agent, that process should, in turn, cause a reindexing of affected objects
         for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
             MCRObjectID childID = childLinkID.getXLinkHrefID();
             if (MCRMetadataManager.exists(childID) && INDEX_ALL_CHILDREN) {
