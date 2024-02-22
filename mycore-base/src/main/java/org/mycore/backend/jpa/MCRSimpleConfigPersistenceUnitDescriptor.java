@@ -40,7 +40,6 @@ public class MCRSimpleConfigPersistenceUnitDescriptor extends MCRPersistenceUnit
         map.put("jakarta.persistence.jdbc.user", "MCR.JPA.User");
         map.put("jakarta.persistence.jdbc.password", "MCR.JPA.Password");
 
-
         map.put("hibernate.cache.use_second_level_cache", "MCR.JPA.Cache.UseSecondLevelCache");
         map.put("hibernate.cache.use_query_cache", "MCR.JPA.Cache.UseQueryCache");
         map.put("hibernate.cache.region.factory_class", "MCR.JPA.Cache.RegionFactoryClass");
@@ -51,8 +50,6 @@ public class MCRSimpleConfigPersistenceUnitDescriptor extends MCRPersistenceUnit
         map.put("hibernate.show_sql", "MCR.JPA.ShowSql");
         map.put("hibernate.hbm2ddl.auto", "MCR.JPA.Hbm2ddlAuto");
         map.put("hibernate.default_schema", "MCR.JPA.DefaultSchema");
-
-
 
         map.put("hibernate.connection.provider_class", "MCR.JPA.Connection.ProviderClass");
         map.put("hibernate.hikari.maximumPoolSize", "MCR.JPA.Connection.MaximumPoolSize");
