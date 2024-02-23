@@ -44,6 +44,7 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
 import jakarta.persistence.RollbackException;
+import org.mycore.backend.jpa.MCRPersistenceProvider;
 
 public class MCRJPATestCase extends MCRTestCase {
 
@@ -80,6 +81,33 @@ public class MCRJPATestCase extends MCRTestCase {
             Persistence.generateSchema(getCurrentComponentName(), schemaProperties);
             LogManager.getLogger().debug(() -> "invoked '" + action + "' sql script:\n" + output);
         }
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+
+        String emPropertyPrefix = MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME + getCurrentComponentName();
+
+        testProperties.put(emPropertyPrefix + ".Class", "org.mycore.backend.jpa.MCRPersistenceUnitDescriptor");
+
+        testProperties.put(emPropertyPrefix + ".Properties.jakarta.persistence.jdbc.url", "jdbc:h2:mem:" +
+                getCurrentComponentName());
+
+        testProperties.put(emPropertyPrefix + ".Properties.jakarta.persistence.jdbc.driver", "org.h2.Driver");
+
+        testProperties.put(emPropertyPrefix + ".Properties.jakarta.persistence.jdbc.user", "postgres");
+
+        testProperties.put(emPropertyPrefix + ".Properties.jakarta.persistence.jdbc.password", "junit");
+
+        testProperties.put(emPropertyPrefix + ".Properties.hibernate.default_schema", "junit");
+
+        testProperties.put(
+            emPropertyPrefix + ".Properties.hibernate.globally_quoted_identifiers_skip_column_definitions", "true");
+
+        testProperties.put(emPropertyPrefix + ".Properties.hibernate.globally_quoted_identifiers", "true");
+
+        return testProperties;
     }
 
     @Before()

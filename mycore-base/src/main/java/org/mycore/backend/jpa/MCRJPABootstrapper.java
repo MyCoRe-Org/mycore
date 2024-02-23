@@ -44,8 +44,6 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRJPABootstrapper implements AutoExecutable {
 
-    public static final String PERSISTENCE_UNIT_NAME = "MyCoRe";
-
     @Override
     public String getName() {
         return "JPA Bootstrapper";
@@ -90,9 +88,11 @@ public class MCRJPABootstrapper implements AutoExecutable {
     }
 
     public static void initializeJPA(String persistenceUnitName, Map<?, ?> properties) {
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
-            Optional.ofNullable(persistenceUnitName).orElse(PERSISTENCE_UNIT_NAME),
-            properties);
+        String unitName = Optional.ofNullable(persistenceUnitName)
+                .orElseGet(() -> MCRConfiguration2.getStringOrThrow("MCR.JPA.PersistenceUnitName"));
+
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(unitName, properties);
+
         checkFactory(entityManagerFactory);
         MCREntityManagerProvider.init(entityManagerFactory);
     }
