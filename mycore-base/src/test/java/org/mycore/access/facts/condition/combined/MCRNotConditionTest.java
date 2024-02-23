@@ -15,20 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.access.facts.condition.combined;
 
-import org.mycore.access.facts.MCRFactsHolder;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * This condition combines its child conditions with a boolean AND
- * 
- * @author Robert Stephan
- *
- */
-public final class MCRAndCondition extends MCRAbstractCombinedCondition {
+import org.junit.jupiter.api.Test;
 
-    public boolean matches(MCRFactsHolder facts) {
-        return conditions.stream().allMatch(c -> addDebugInfoIfRequested(c, facts));
+class MCRNotConditionTest {
+
+    @Test
+    void matches() {
+        MCRNotCondition xor = new MCRNotCondition();
+        xor.add(new MCRTestCondition(() -> false));
+        xor.add(new MCRTestCondition(() -> {
+            throw new UnsupportedOperationException("Should not be checked");
+        }));
+        assertTrue(xor.matches(null));
+        xor.getChildConditions().clear();
+        xor.add(new MCRTestCondition(() -> true));
+        xor.add(new MCRTestCondition(() -> {
+            throw new UnsupportedOperationException("Should not be checked");
+        }));
+        assertFalse(xor.matches(null));
     }
 
 }

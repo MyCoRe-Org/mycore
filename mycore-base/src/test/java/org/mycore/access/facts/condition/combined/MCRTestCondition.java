@@ -15,20 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.access.facts.condition.combined;
 
 import org.mycore.access.facts.MCRFactsHolder;
+import org.mycore.access.facts.condition.MCRAbstractCondition;
 
-/**
- * This condition combines its child conditions with a boolean AND
- * 
- * @author Robert Stephan
- *
- */
-public final class MCRAndCondition extends MCRAbstractCombinedCondition {
+import java.util.function.Supplier;
 
-    public boolean matches(MCRFactsHolder facts) {
-        return conditions.stream().allMatch(c -> addDebugInfoIfRequested(c, facts));
+class MCRTestCondition extends MCRAbstractCondition {
+    Supplier<Boolean> match;
+
+    MCRTestCondition(Supplier<Boolean> match) {
+        this.match = match;
     }
 
+    @Override
+    public boolean matches(MCRFactsHolder facts) {
+        return match.get();
+    }
 }
