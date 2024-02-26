@@ -135,7 +135,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     }
 
     private static MCRCronjob toJob(String property) {
-        return MCRConfiguration2.<MCRCronjob>getInstanceOf(property).orElseThrow();
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRCronjob.class, property);
     }
 
     private static class MCRCronjobManagerInstanceHelper {

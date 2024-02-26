@@ -93,8 +93,10 @@ public class MCROAIAdapter implements OAIAdapter {
 
     public MCROAISetManager getSetManager() {
         if (this.setManager == null) {
-            this.setManager = MCRConfiguration2.<MCROAISetManager>getInstanceOf(getConfigPrefix() + "SetManager")
-                .orElseGet(MCROAISetManager::new);
+            String setManager = getConfigPrefix() + "SetManager";
+            this.setManager = MCRConfiguration2.getInstanceOf(MCROAISetManager.class, setManager)
+                .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
+                    MCROAISetManager.class, MCROAIAdapter.PREFIX + "DefaultSetManager"));
             int cacheMaxAge = MCRConfiguration2.getInt(this.configPrefix + "SetCache.MaxAge").orElse(0);
             this.setManager.init(getConfigPrefix(), cacheMaxAge);
         }

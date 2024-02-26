@@ -38,17 +38,14 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
 
     private String uri;
 
-    private MCROAISetHandler<SolrQuery, SolrDocument, String> handler;
+    private MCROAISolrSetHandler handler;
 
     public MCROAISolrSetConfiguration(String configPrefix, String setId) {
         String setConfigPrefix = configPrefix + SETS_PREFIX + setId;
-        String defaultname = getFallbackHandler(configPrefix, setId);
-        MCROAISetHandler<SolrQuery, SolrDocument, String> handler = defaultname == null
-            ? MCRConfiguration2.getOrThrow(setConfigPrefix + ".Handler", MCRConfiguration2::instantiateClass)
-            : MCRConfiguration2.<MCROAISetHandler<SolrQuery, SolrDocument, String>>getInstanceOf(
-                setConfigPrefix + ".Handler")
-                .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultname));
-        handler.init(configPrefix, setId);
+        MCROAISolrSetHandler handler = MCRConfiguration2.getInstanceOf(
+                MCROAISolrSetHandler.class, setConfigPrefix + ".Handler")
+            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
+                MCROAISolrSetHandler.class, getFallbackHandler(configPrefix, setId)));
         this.id = setId;
         this.uri = getURI(setConfigPrefix);
         this.handler = handler;

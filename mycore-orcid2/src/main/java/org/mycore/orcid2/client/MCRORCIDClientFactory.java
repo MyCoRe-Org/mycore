@@ -59,8 +59,8 @@ public class MCRORCIDClientFactory {
         publicAPI = MCRConfiguration2.getStringOrThrow(prefix + ".PublicAPI");
         memberAPI = MCRConfiguration2.getStringOrThrow(prefix + ".MemberAPI");
         final String modeString = MCRConfiguration2.getStringOrThrow(prefix + ".APIMode");
-        errorHandler = MCRConfiguration2.<MCRORCIDClientErrorHandler>getInstanceOf(prefix + ".ErrorHandler.Class")
-            .orElse(null);
+        errorHandler = MCRConfiguration2.getInstanceOf(MCRORCIDClientErrorHandler.class,
+            prefix + ".ErrorHandler.Class").orElse(null);
         try {
             mode = ReadClientMode.valueOf(modeString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {

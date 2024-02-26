@@ -19,7 +19,6 @@
 package org.mycore.datamodel.classifications2;
 
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -27,15 +26,14 @@ import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
  * @since 2.0
  */
 public class MCRCategLinkServiceFactory {
-    private static MCRCategLinkService instance = MCRConfiguration2
-        .<MCRCategLinkService>getInstanceOf("MCR.Category.LinkService")
-        .orElseGet(MCRCategLinkServiceImpl::new);
+    private static final MCRCategLinkService INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRCategLinkService.class, "MCR.Category.LinkService");
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
     public static MCRCategLinkService getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
 }

@@ -47,8 +47,8 @@ public class MCRDNBURNGeneratorTest extends MCRStoreTestCase {
         MCRObjectID getID = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("test", "mock");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(getID);
-        MCRFLURNGenerator flGenerator = (MCRFLURNGenerator) MCRConfiguration2
-            .getInstanceOf("MCR.PI.Generator." + GENERATOR_ID).get();
+        MCRFLURNGenerator flGenerator = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRFLURNGenerator.class, "MCR.PI.Generator." + GENERATOR_ID);
         MCRDNBURN generated = flGenerator.generate(mcrObject1, "");
 
         String urn = generated.asString();

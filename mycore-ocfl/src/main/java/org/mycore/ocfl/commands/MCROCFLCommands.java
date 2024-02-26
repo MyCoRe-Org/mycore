@@ -197,8 +197,8 @@ public class MCROCFLCommands {
         help = "restore a specified revision of a ocfl classification backup to the primary classification store")
     public static void writeClassToDbVersioned(String classId, String revision)
         throws URISyntaxException, JDOMException, IOException, SAXException {
-        MCROCFLXMLClassificationManager manager = MCRConfiguration2
-            .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager").orElseThrow();
+        MCROCFLXMLClassificationManager manager = MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager");
         MCRCategoryID cId = MCRCategoryID.fromString(classId);
         MCRContent content = manager.retrieveContent(cId, revision);
         MCRCategory category = MCRXMLTransformer.getCategory(content.asXML());
@@ -254,8 +254,8 @@ public class MCROCFLCommands {
         if (!mcrCgId.isRootID()) {
             throw new MCRUsageException("You can only purge root classifications!");
         }
-        MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager")
-            .orElseThrow().purge(mcrCgId);
+        MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager").purge(mcrCgId);
 
     }
 
@@ -325,8 +325,8 @@ public class MCROCFLCommands {
 
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
-        MCROCFLXMLClassificationManager manager = MCRConfiguration2
-            .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager").orElseThrow();
+        MCROCFLXMLClassificationManager manager = MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager");
         repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),

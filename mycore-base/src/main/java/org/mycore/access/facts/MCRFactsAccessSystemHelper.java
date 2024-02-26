@@ -17,13 +17,10 @@
  */
 package org.mycore.access.facts;
 
-import java.util.Optional;
-
 import org.jdom2.Element;
 import org.mycore.access.facts.model.MCRCombinedCondition;
 import org.mycore.access.facts.model.MCRCondition;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Utility functions for parsing conditions from rules.xml
@@ -44,16 +41,10 @@ public class MCRFactsAccessSystemHelper {
     }
 
     static MCRCondition build(String type) {
-        Optional<MCRCondition> optCondition = MCRConfiguration2.getInstanceOf(CONDITION_PREFIX + type);
-        if (optCondition.isEmpty()) {
-            throw new MCRConfigurationException("The Condition type " + type + " is not configured!");
-        }
-
-        MCRCondition condition = optCondition.get();
+        MCRCondition condition = MCRConfiguration2.getInstanceOfOrThrow(MCRCondition.class, CONDITION_PREFIX + type);
         if (MCRFactsAccessSystem.LOGGER.isDebugEnabled() && condition instanceof MCRCombinedCondition combCond) {
             combCond.setDebug(true);
         }
-
         return condition;
     }
 }

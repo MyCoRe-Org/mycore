@@ -30,8 +30,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRViewerAltoEditorConfiguration extends MCRViewerConfiguration {
 
-    private MCRAltoChangeSetStore changeSetStore = MCRConfiguration2
-        .<MCRAltoChangeSetStore>getInstanceOf("MCR.Viewer.AltoChangeSetStore.Class").orElseThrow();
+    private final MCRAltoChangeSetStore changeSetStore = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRAltoChangeSetStore.class, "MCR.Viewer.AltoChangeSetStore.Class");
 
     @Override
     public MCRViewerConfiguration setup(HttpServletRequest request) {

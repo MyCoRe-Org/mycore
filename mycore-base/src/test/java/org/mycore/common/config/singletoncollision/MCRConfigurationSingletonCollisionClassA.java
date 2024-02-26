@@ -28,7 +28,7 @@ import org.mycore.common.config.MCRConfigurationTest;
  */
 public class MCRConfigurationSingletonCollisionClassA {
 
-    public static final Object COLLISION_CLASS_B = MCRConfiguration2.getSingleInstanceOf(
-        MCRConfiguration2.getStringOrThrow(MCRConfigurationTest.COLLISION_PROPERTY_NAME)).get();
+    public static final Object COLLISION_CLASS_B = MCRConfiguration2.getSingleInstanceOfOrThrow(
+        Object.class, MCRConfiguration2.getStringOrThrow(MCRConfigurationTest.COLLISION_PROPERTY_NAME));
 
 }

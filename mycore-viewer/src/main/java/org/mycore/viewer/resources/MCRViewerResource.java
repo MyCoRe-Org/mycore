@@ -35,10 +35,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.viewer.configuration.MCRIviewACLProvider;
-import org.mycore.viewer.configuration.MCRIviewDefaultACLProvider;
 import org.mycore.viewer.configuration.MCRViewerConfiguration;
 import org.mycore.viewer.configuration.MCRViewerConfigurationStrategy;
-import org.mycore.viewer.configuration.MCRViewerDefaultConfigurationStrategy;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
@@ -63,9 +61,8 @@ import jakarta.xml.bind.JAXBException;
 @Path("/viewer")
 public class MCRViewerResource {
 
-    private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration2
-        .<MCRIviewACLProvider>getInstanceOf("MCR.Viewer.MCRIviewACLProvider")
-        .orElseGet(MCRIviewDefaultACLProvider::new);
+    private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRIviewACLProvider.class, "MCR.Viewer.MCRIviewACLProvider");
 
     private static final String JSON_CONFIG_ELEMENT_NAME = "json";
 
@@ -145,10 +142,8 @@ public class MCRViewerResource {
             MCRJerseyUtil.throwException(Status.UNAUTHORIZED, errorMessage);
         }
         // build configuration object
-        MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration2
-            .<MCRViewerDefaultConfigurationStrategy>getInstanceOf(
-                "MCR.Viewer.configuration.strategy")
-            .orElseGet(MCRViewerDefaultConfigurationStrategy::new);
+        MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRViewerConfigurationStrategy.class, "MCR.Viewer.configuration.strategy");
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));
         MCRParameterCollector parameter = new MCRParameterCollector(req);
         MCRContentTransformer transformer = getContentTransformer(source.getDocType(), parameter);

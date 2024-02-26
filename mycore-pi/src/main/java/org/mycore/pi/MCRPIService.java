@@ -158,9 +158,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
 
         String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService;
-        MCRPIMetadataService<T> mdService = MCRConfiguration2.<MCRPIMetadataService<T>>getInstanceOf(msProperty)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(msProperty));
-        return mdService;
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRPIMetadataService.class, msProperty);
     }
 
     protected MCRPIGenerator<T> getGenerator() {
@@ -172,9 +170,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .orElseThrow(generatorPropertiesNotSetError);
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
-        MCRPIGenerator<T> generator = MCRConfiguration2.<MCRPIGenerator<T>>getInstanceOf(generatorPropertyKey)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(generatorPropertyKey));
-        return generator;
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, generatorPropertyKey);
     }
 
     public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
@@ -522,8 +518,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
-        return MCRConfiguration2.<Predicate<MCRBase>>getInstanceOf(predicateProperty)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(predicateProperty));
+        return MCRConfiguration2.getInstanceOfOrThrow(Predicate.class, predicateProperty);
     }
 
 }

@@ -329,9 +329,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public int getHighestStoredID(String project, String type) {
         int highestStoredID = 0;
         int maxDepth = Integer.MAX_VALUE;
-        MCROCFLRepositoryProvider oclfRepoProvider = MCRConfiguration2
-            .getSingleInstanceOf("MCR.OCFL.Repository." + repositoryKey)
-            .map(MCROCFLRepositoryProvider.class::cast).orElseThrow();
+        MCROCFLRepositoryProvider oclfRepoProvider = MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCROCFLRepositoryProvider.class, "MCR.OCFL.Repository." + repositoryKey);
 
         OcflExtensionConfig config = oclfRepoProvider.getExtensionConfig();
         Path basePath = null;

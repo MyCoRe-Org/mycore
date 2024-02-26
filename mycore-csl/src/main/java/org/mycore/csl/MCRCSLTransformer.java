@@ -70,8 +70,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     }
 
     private MCRItemDataProvider createItemDataProvider() {
-        return (MCRItemDataProvider) MCRConfiguration2.getInstanceOf(configuredItemProviderProperty)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(configuredItemProviderProperty));
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRItemDataProvider.class, configuredItemProviderProperty);
     }
 
     @Override

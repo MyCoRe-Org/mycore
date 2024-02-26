@@ -46,11 +46,11 @@ import jakarta.ws.rs.core.Response;
 
 public class MCRALTOEditorResource {
 
-    private MCRAltoChangeSetStore changeSetStore = MCRConfiguration2
-        .<MCRAltoChangeSetStore>getInstanceOf("MCR.Viewer.AltoChangeSetStore.Class").orElseThrow();
+    private final MCRAltoChangeSetStore changeSetStore = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRAltoChangeSetStore.class, "MCR.Viewer.AltoChangeSetStore.Class");
 
-    private MCRAltoChangeApplier changeApplier = MCRConfiguration2
-        .<MCRAltoChangeApplier>getInstanceOf("MCR.Viewer.AltoChangeApplier.Class").orElseThrow();
+    private final MCRAltoChangeApplier changeApplier = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRAltoChangeApplier.class, "MCR.Viewer.AltoChangeApplier.Class");
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
