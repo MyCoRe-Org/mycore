@@ -482,10 +482,10 @@ public class MCRUserServlet extends MCRServlet {
             LOGGER.info("search users like {}", search);
 
             int max = MCRConfiguration2.getInt(MCRUser2Constants.CONFIG_PREFIX + "Users.MaxResults").orElse(100);
-            int num = MCRUserManager.countUsers(search, null, search, search);
+            int num = MCRUserManager.countUsers(search, null, search, search, null, search);
 
             if ((num < max) && (num > 0)) {
-                results = MCRUserManager.listUsers(search, null, search, search);
+                results = MCRUserManager.listUsers(search, null, search, search, null, search, 0, Integer.MAX_VALUE);
             }
             users.setAttribute("num", String.valueOf(num));
             users.setAttribute("max", String.valueOf(max));
