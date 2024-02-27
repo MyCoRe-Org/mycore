@@ -33,56 +33,28 @@ public class MCRFixedUserCallable<V> extends MCRTransactionableCallable<V> {
     private final MCRUserInformation userInfo;
 
     /**
-     * Shorthand for {@link #MCRFixedUserCallable(Callable, MCRSession, MCRUserInformation)}
-     * with <code>null</code> as the session parameter.
-     */
-    public MCRFixedUserCallable(Callable<V> callable, MCRUserInformation userInfo) {
-        this(callable, null, userInfo);
-    }
-
-    /**
      * Creates a new {@link Callable} encapsulating the {@link #call()} method with a new
-     * a database transaction. The transaction will be created in the context of a session
+     * database transaction. The transaction will be created in the context of a session
      * and the privileges of the given user information.
      * Afterward the transaction will be committed and the session will be released.
-     * <ul>
-     * <li>
-     * If a non-null session is provided as the second parameter, that session will be used.
-     * The session will <em>not</em> be closed, after it has been released.
-     * </li>
-     * <li>
-     * Otherwise, if a session is bound to the current thread, that session will be reused.
-     * The session will <em>not</em> be closed, after it has been released.
-     * </li>
-     * <li>
-     * Otherwise, a new session will be used.
-     * The session will be closed, after it has been released.
-     * </li>
-     * </ul>
-     * If a provided or thread bound session is already associated with user information, 
-     * that user information <strong>must be equal</strong> to the user information that
-     * is given as a parameter.
+     * <p>
+     * In order for this to work, no session must be bound to the thread in which this 
+     * callable is executed.
      *
      * @param callable the callable to execute within a session and transaction
-     * @param session  the session to use
      * @param userInfo specify the user this callable should run
      */
-    public MCRFixedUserCallable(Callable<V> callable, MCRSession session, MCRUserInformation userInfo) {
-        super(callable, session);
+    public MCRFixedUserCallable(Callable<V> callable, MCRUserInformation userInfo) {
+        super(callable, null);
         this.userInfo = Objects.requireNonNull(userInfo);
     }
 
     @Override
     protected void onBeforeTransaction(MCRSession session, SessionType type) {
-        MCRUserInformation currentUserInfo = session.getUserInformation();
         if (type == SessionType.EPHEMERAL) {
             session.setUserInformation(userInfo);
         } else {
-            if (!currentUserInfo.equals(userInfo)) {
-                throw new MCRUsageException(
-                    "MCRFixedUserCallable is bound to " + currentUserInfo.getUserID() + ". " +
-                        "Can't change to " + userInfo.getUserID() + ".");
-            }
+            throw new MCRUsageException("An existing session was reused.");
         }
     }
 

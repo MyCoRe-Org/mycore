@@ -22,7 +22,6 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.function.FailableRunnable;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRUserInformation;
 
 /**
@@ -33,48 +32,22 @@ public class MCRFixedUserFailableRunnable<E extends Exception> implements Runnab
 
     private final FailableRunnable<E> runnable;
 
-    private final MCRSession session;
-
     private final MCRUserInformation userInfo;
-
-    /**
-     * Shorthand for {@link #MCRFixedUserFailableRunnable(FailableRunnable, MCRSession, MCRUserInformation)}
-     * with <code>null</code> as the session parameter.
-     */
-    public MCRFixedUserFailableRunnable(FailableRunnable<E> runnable, MCRUserInformation userInfo) {
-        this(runnable, null, userInfo);
-    }
 
     /**
      * Creates a new {@link FailableRunnable} encapsulating the {@link #run()} method with a new
      * a database transaction. The transaction will be created in the context of a session
      * and the privileges of the given user information.
      * Afterward the transaction will be committed and the session will be released.
-     * <ul>
-     * <li>
-     * If a non-null session is provided as the second parameter, that session will be used.
-     * The session will <em>not</em> be closed, after it has been released.
-     * </li>
-     * <li>
-     * Otherwise, if a session is bound to the current thread, that session will be reused.
-     * The session will <em>not</em> be closed, after it has been released.
-     * </li>
-     * <li>
-     * Otherwise, a new session will be used.
-     * The session will be closed, after it has been released.
-     * </li>
-     * </ul>
-     * If a provided or thread bound session is already associated with user information, 
-     * that user information <strong>must be equal</strong> to the user information that
-     * is given as a parameter.
-     * 
-     * @param runnable the callable to execute within a session and transaction
-     * @param session  the session to use
+     * <p>
+     * In order for this to work, no session must be bound to the thread in which this
+     * callable is executed.
+     *
+     * @param runnable the runnable to execute within a session and transaction
      * @param userInfo specify the user this callable should run
      */
-    public MCRFixedUserFailableRunnable(FailableRunnable<E> runnable, MCRSession session, MCRUserInformation userInfo) {
+    public MCRFixedUserFailableRunnable(FailableRunnable<E> runnable, MCRUserInformation userInfo) {
         this.runnable = Objects.requireNonNull(runnable);
-        this.session = session;
         this.userInfo = Objects.requireNonNull(userInfo);
     }
 
@@ -84,7 +57,7 @@ public class MCRFixedUserFailableRunnable<E extends Exception> implements Runnab
             new MCRFixedUserCallable<>(() -> {
                 runnable.run();
                 return null;
-            }, session, userInfo).call();
+            }, userInfo).call();
         } catch (Exception e) {
             throw new MCRException("Failed to run nested runnable with a fixed user", e);
         }
