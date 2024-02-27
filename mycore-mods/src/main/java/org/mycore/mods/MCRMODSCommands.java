@@ -43,7 +43,9 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -153,6 +155,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         throws MCRPersistenceException, MCRAccessException {
         MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsRoot, projectID);
         mcrObject.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(mcrObject.getId().getBase()));
+        MCRConfiguration2.getString("MCR.MODS.Import.Object.State")
+            .ifPresent(mcrObject.getService()::setState);
         MCRMetadataManager.create(mcrObject);
         return mcrObject.getId();
     }
@@ -192,6 +196,14 @@ public class MCRMODSCommands extends MCRAbstractCommands {
             firstRegularFile.ifPresent(ifs::setMainDoc);
             derivate.getDerivate().setInternals(ifs);
         }
+        MCRConfiguration2.getString("MCR.MODS.Import.Derivate.Categories")
+            .map(MCRConfiguration2::splitValue)
+            .ifPresent(s -> {
+                s.map(MCRCategoryID::fromString)
+                    .forEach(categId -> derivate.getDerivate().getClassifications()
+                        .add(new MCRMetaClassification("classification", 0, null,
+                            categId)));
+            });
 
         LOGGER.debug("Creating new derivate with ID {}", derivate.getId());
         MCRMetadataManager.create(derivate);
