@@ -56,7 +56,8 @@ public class MCRORCIDCommands {
         help = "Migrates orcid user access token attributes to orcid2 oauth credential")
     public static void migrateORCIDTokenAttributes() {
         final List<MCRUser> users
-            = MCRUserManager.listUsers(null, null, null, null, ORCID_TOKEN_ATTRIBUTE_NAME, 0, Integer.MAX_VALUE);
+            = MCRUserManager.listUsers(null, null, null, null, ORCID_TOKEN_ATTRIBUTE_NAME,
+            null, 0, Integer.MAX_VALUE);
         for (MCRUser user : users) {
             String orcid = null;
             orcid = user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_ID);
