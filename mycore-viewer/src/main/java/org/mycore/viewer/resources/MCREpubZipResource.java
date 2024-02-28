@@ -137,7 +137,7 @@ public class MCREpubZipResource {
 
         try {
             epubStream = Files.newByteChannel(epubPath, StandardOpenOption.READ);
-            zipFile = new ZipFile(epubStream);
+            zipFile = new ZipFile.Builder().setSeekableByteChannel(epubStream).get();
 
             final Optional<ZipArchiveEntry> entryOfFileInEpub = StreamSupport
                 .stream(Spliterators.spliteratorUnknownSize(zipFile.getEntries().asIterator(), Spliterator.ORDERED),
