@@ -19,11 +19,11 @@
 package org.mycore.resource.provider;
 
 import java.net.URL;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -59,12 +59,11 @@ public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public List<Supplier<List<PrefixStripper>>> prefixStrippers(MCRHints hints) {
-        List<Supplier<List<PrefixStripper>>> strippers = new LinkedList<>();
-        strippers.add(JarUrlPrefixStripper.INSTANCE_LIST_SUPPLER);
-        hints.get(MCRResourceHintKeys.CLASS_LOADER).ifPresent(classLoader ->
-            strippers.add(BaseDirPrefixStripper.ofClassLoader(classLoader)));
-        return strippers;
+    public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
+        return Stream.concat(
+            Stream.of(JarUrlPrefixStripper.INSTANCE),
+            hints.get(MCRResourceHintKeys.CLASS_LOADER).map(ClassLoaderPrefixStripper::new).stream()
+        );
     }
 
     public static class Factory implements Supplier<MCRClassLoaderResourceProvider> {

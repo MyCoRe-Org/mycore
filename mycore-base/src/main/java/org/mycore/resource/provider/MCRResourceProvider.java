@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
@@ -54,7 +55,7 @@ public interface MCRResourceProvider {
      */
     List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
 
-    List<Supplier<List<PrefixStripper>>> prefixStrippers(MCRHints hints);
+    Stream<PrefixStripper> prefixStrippers(MCRHints hints);
 
     /**
      * Returns a description of this {@link MCRResourceProvider}.
@@ -81,26 +82,26 @@ public interface MCRResourceProvider {
 
     interface PrefixStripper {
 
-        Optional<MCRResourcePath> strip(URL url);
+        Supplier<List<MCRResourcePath>> strip(URL url);
 
     }
 
     abstract class PrefixStripperBase implements PrefixStripper {
 
         @Override
-        public final Optional<MCRResourcePath> strip(URL url) {
-            return Optional.ofNullable(doStrip(url.toString())).flatMap(MCRResourcePath::ofPath);
+        public final Supplier<List<MCRResourcePath>> strip(URL url) {
+            return () -> getStrippedPaths(url.toString())
+                .stream()
+                .map(MCRResourcePath::ofPath)
+                .flatMap(Optional::stream)
+                .toList();
         }
 
-        protected abstract String doStrip(String value);
+        protected abstract List<String> getStrippedPaths(String value);
 
     }
 
     final class BaseDirPrefixStripper extends PrefixStripperBase {
-
-        private static final int CLASS_GRAPH_THREADS = 4;
-
-        private static final ExecutorService EXECUTOR_SERVICE = new AutoCloseableExecutorService(CLASS_GRAPH_THREADS);
 
         private final String prefix;
 
@@ -109,11 +110,11 @@ public interface MCRResourceProvider {
         }
 
         @Override
-        public String doStrip(String value) {
+        public List<String> getStrippedPaths(String value) {
             if (value.startsWith(prefix)) {
-                return value.substring(prefix.length());
+                return List.of(value.substring(prefix.length()));
             }
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
@@ -121,26 +122,45 @@ public interface MCRResourceProvider {
             return prefix;
         }
 
-        public static Supplier<List<PrefixStripper>> ofClassLoader(ClassLoader classLoader) {
+    }
 
-            return () -> {
-                List<PrefixStripper> strippers = new LinkedList<>();
-                ClassGraph classGraph = new ClassGraph();
-                classGraph.overrideClassLoaders(classLoader);
-                try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREADS)) {
-                    List<URI> classpath = scanResult.getClasspathURIs();
-                    classpath.forEach(uri -> {
-                        if (uri.getScheme().equals("file")) {
-                            File file = new File(uri.getPath());
-                            if (file.isDirectory()) {
-                                strippers.add(new BaseDirPrefixStripper(file));
+    final class ClassLoaderPrefixStripper extends PrefixStripperBase {
+
+        private static final int CLASS_GRAPH_THREADS = 4;
+
+        private static final ExecutorService EXECUTOR_SERVICE = new AutoCloseableExecutorService(CLASS_GRAPH_THREADS);
+
+        private final ClassLoader classLoader;
+
+        public ClassLoaderPrefixStripper(ClassLoader classLoader) {
+            this.classLoader = Objects.requireNonNull(classLoader);
+        }
+
+        @Override
+        public List<String> getStrippedPaths(String value) {
+            List<String> potentialPaths = new LinkedList<>();
+            ClassGraph classGraph = new ClassGraph();
+            classGraph.overrideClassLoaders(classLoader);
+            try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREADS)) {
+                List<URI> classpath = scanResult.getClasspathURIs();
+                for (URI uri : classpath) {
+                    if (uri.getScheme().equals("file")) {
+                        File file = new File(uri.getPath());
+                        if (file.isDirectory()) {
+                            String prefix = file.toURI().toString();
+                            if (value.startsWith(prefix)) {
+                                potentialPaths.add(value.substring(prefix.length()));
                             }
                         }
-                    });
+                    }
                 }
-                return strippers;
-            };
+            }
+            return potentialPaths;
+        }
 
+        @Override
+        public String toString() {
+            return classLoader.getName();
         }
 
     }
@@ -149,22 +169,18 @@ public interface MCRResourceProvider {
 
         public static final PrefixStripper INSTANCE = new JarUrlPrefixStripper();
 
-        public static final List<PrefixStripper> INSTANCE_LIST = Collections.singletonList(INSTANCE);
-
-        public static final Supplier<List<PrefixStripper>> INSTANCE_LIST_SUPPLER = () -> INSTANCE_LIST;
-
         private JarUrlPrefixStripper() {
         }
 
         @Override
-        public String doStrip(String value) {
+        public List<String> getStrippedPaths(String value) {
             if (value.startsWith("jar:")) {
                 int index = value.indexOf('!');
                 if (-1 != index) {
-                    return value.substring(index + 1);
+                    return List.of(value.substring(index + 1));
                 }
             }
-            return null;
+            return Collections.emptyList();
         }
 
         @Override

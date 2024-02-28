@@ -21,11 +21,9 @@ package org.mycore.resource.provider;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -187,12 +185,8 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
     }
 
     @Override
-    public final List<Supplier<List<PrefixStripper>>> prefixStrippers(MCRHints hints) {
-        return getBaseDirs(hints).map(MCRFileSystemResourceProviderBase::prefixStrippers).toList();
-    }
-
-    private static Supplier<List<PrefixStripper>> prefixStrippers(File baseDir) {
-        return () -> Collections.singletonList(new BaseDirPrefixStripper(baseDir));
+    public final Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
+        return getBaseDirs(hints).map(BaseDirPrefixStripper::new);
     }
 
     @Override

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
@@ -79,8 +80,8 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public List<Supplier<List<PrefixStripper>>> prefixStrippers(MCRHints hints) {
-        return providers.stream().flatMap(provider -> provider.prefixStrippers(hints).stream()).toList();
+    public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
+        return providers.stream().flatMap(provider -> provider.prefixStrippers(hints));
     }
 
     @Override

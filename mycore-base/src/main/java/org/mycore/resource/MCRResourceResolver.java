@@ -20,13 +20,11 @@ package org.mycore.resource;
 
 import java.net.URL;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.function.Supplier;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
@@ -315,43 +313,17 @@ public final class MCRResourceResolver {
      */
     public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints) {
         LOGGER.debug("Reversing resource URL {}", resourceUrl);
-        List<Supplier<List<PrefixStripper>>> strippers = provider.prefixStrippers(hints);
-        for (PrefixStripper stripper : toIterable(strippers)) {
-            Optional<MCRResourcePath> potentialPath = stripper.strip(resourceUrl);
-            if (potentialPath.isPresent()) {
-                if (!isConsistent(resourceUrl, potentialPath.get(), hints)) {
-                    continue;
+        List<PrefixStripper> prefixStrippers = provider.prefixStrippers(hints).toList();
+        for (PrefixStripper stripper : prefixStrippers) {
+            List<MCRResourcePath> potentialPaths = stripper.strip(resourceUrl).get();
+            for (MCRResourcePath potentialPath : potentialPaths) {
+                if (isConsistent(resourceUrl, potentialPath, hints)) {
+                    return Optional.of(potentialPath);
                 }
-                return potentialPath;
             }
         }
         LOGGER.debug("Unable to reverse path for resource URL {}", resourceUrl);
         return Optional.empty();
-    }
-
-    private Iterable<PrefixStripper> toIterable(List<Supplier<List<PrefixStripper>>> strippers) {
-
-        return () -> new Iterator<>() {
-
-            private final Iterator<Supplier<List<PrefixStripper>>> all = strippers.iterator();
-
-            private Iterator<PrefixStripper> current = Collections.emptyIterator();
-
-            @Override
-            public boolean hasNext() {
-                while (!current.hasNext() && all.hasNext()) {
-                    current = all.next().get().iterator();
-                }
-                return current.hasNext();
-            }
-
-            @Override
-            public PrefixStripper next() {
-                return current.next();
-            }
-
-        };
-
     }
 
     private boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, MCRHints hints) {

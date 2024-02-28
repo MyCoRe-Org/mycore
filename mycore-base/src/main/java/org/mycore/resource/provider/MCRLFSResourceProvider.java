@@ -88,7 +88,7 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public List<Supplier<List<PrefixStripper>>> prefixStrippers(MCRHints hints) {
+    public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
         return locator.prefixStrippers(hints);
     }
 

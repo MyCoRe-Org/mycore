@@ -31,7 +31,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.provider.MCRResourceProvider;
+import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 
 /**
  * A {@link MCRCombinedResourceLocator} is a {@link MCRResourceLocator} that delegates to multiple other
@@ -62,8 +62,8 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
     }
 
     @Override
-    public List<Supplier<List<MCRResourceProvider.PrefixStripper>>> prefixStrippers(MCRHints hints) {
-        return locators.stream().flatMap(locator -> locator.prefixStrippers(hints).stream()).toList();
+    public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
+        return locators.stream().flatMap(locator -> locator.prefixStrippers(hints));
     }
 
     public static class Factory implements Supplier<MCRCombinedResourceLocator> {
