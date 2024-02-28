@@ -27,17 +27,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
-import nonapi.io.github.classgraph.concurrency.AutoCloseableExecutorService;
 
 /**
  * A {@link MCRResourceProvider} implements a resource lookup strategy.
@@ -126,9 +131,14 @@ public interface MCRResourceProvider {
 
     final class ClassLoaderPrefixStripper extends PrefixStripperBase {
 
-        private static final int CLASS_GRAPH_THREADS = 4;
+        private static final String CLASS_GRAPH_THREAD_COUNT_NAME = "MCR.Resource.Provider.ClassGraph.ThreadCount";
 
-        private static final ExecutorService EXECUTOR_SERVICE = new AutoCloseableExecutorService(CLASS_GRAPH_THREADS);
+        private static final int CLASS_GRAPH_THREAD_COUNT = MCRConfiguration2.getInt(CLASS_GRAPH_THREAD_COUNT_NAME)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(CLASS_GRAPH_THREAD_COUNT_NAME));
+
+        private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CLASS_GRAPH_THREAD_COUNT,
+            CLASS_GRAPH_THREAD_COUNT, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+            new ThreadFactoryBuilder().setNameFormat("ClassLoaderPrefixStripper-worker-%d").setDaemon(true).build());
 
         private final ClassLoader classLoader;
 
@@ -141,7 +151,7 @@ public interface MCRResourceProvider {
             List<String> potentialPaths = new LinkedList<>();
             ClassGraph classGraph = new ClassGraph();
             classGraph.overrideClassLoaders(classLoader);
-            try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREADS)) {
+            try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREAD_COUNT)) {
                 List<URI> classpath = scanResult.getClasspathURIs();
                 for (URI uri : classpath) {
                     if (uri.getScheme().equals("file")) {
