@@ -331,20 +331,22 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private Source tryResolveXSL(String href, String base) throws TransformerException {
-        String baseURI = getParentDirectoryResourceURI(base);
+        String baseUri = getParentDirectoryResourceURI(base);
 
-        final String initialUri = baseURI + href;
-        while (href.startsWith("../") & baseURI.endsWith("/")) {
-            if (baseURI.length() == 1) {
+        final String initialUri = baseUri + href;
+        String saneHref = href;
+        String saneBaseUri = baseUri;
+        while (saneHref.startsWith("../") & saneBaseUri.endsWith("/")) {
+            if (saneBaseUri.length() == 1) {
                 throw new TransformerException("Relative href points outside of base URI:" + initialUri);
             }
-            baseURI = baseURI.substring(0, baseURI.lastIndexOf('/', baseURI.length() - 2) + 1);
-            href = href.substring("../".length());
+            saneBaseUri = saneBaseUri.substring(0, saneBaseUri.lastIndexOf('/', saneBaseUri.length() - 2) + 1);
+            saneHref = saneHref.substring("../".length());
         }
 
-        final String uri = baseURI + href;
-        LOGGER.debug("Trying to resolve {} from uri {}", href, uri);
-        Source newResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve(uri, base);
+        final String finalUri = saneBaseUri + saneHref;
+        LOGGER.debug("Trying to resolve {} from uri {}", saneHref, finalUri);
+        Source newResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve(finalUri, base);
         if (newResolveMethodResult != null) {
             return newResolveMethodResult;
         }
