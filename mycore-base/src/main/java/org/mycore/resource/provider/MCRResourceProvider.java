@@ -22,11 +22,12 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
@@ -34,6 +35,8 @@ import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
 
 import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
+import nonapi.io.github.classgraph.concurrency.AutoCloseableExecutorService;
 
 /**
  * A {@link MCRResourceProvider} implements a resource lookup strategy.
@@ -51,7 +54,7 @@ public interface MCRResourceProvider {
      */
     List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
 
-    Set<PrefixStripper> prefixStrippers(MCRHints hints);
+    List<Supplier<List<PrefixStripper>>> prefixStrippers(MCRHints hints);
 
     /**
      * Returns a description of this {@link MCRResourceProvider}.
@@ -95,6 +98,10 @@ public interface MCRResourceProvider {
 
     final class BaseDirPrefixStripper extends PrefixStripperBase {
 
+        private static final int CLASS_GRAPH_THREADS = 4;
+
+        private static final ExecutorService EXECUTOR_SERVICE = new AutoCloseableExecutorService(CLASS_GRAPH_THREADS);
+
         private final String prefix;
 
         public BaseDirPrefixStripper(File baseDir) {
@@ -114,18 +121,26 @@ public interface MCRResourceProvider {
             return prefix;
         }
 
-        public static Set<PrefixStripper> ofClassLoader(ClassLoader classLoader) {
-            Set<PrefixStripper> strippers = new LinkedHashSet<>();
-            List<URI> classpath = new ClassGraph().overrideClassLoaders(classLoader).getClasspathURIs();
-            classpath.forEach(uri -> {
-                if (uri.getScheme().equals("file")) {
-                    File file = new File(uri.getPath());
-                    if (file.isDirectory()) {
-                        strippers.add(new BaseDirPrefixStripper(file));
-                    }
+        public static Supplier<List<PrefixStripper>> ofClassLoader(ClassLoader classLoader) {
+
+            return () -> {
+                List<PrefixStripper> strippers = new LinkedList<>();
+                ClassGraph classGraph = new ClassGraph();
+                classGraph.overrideClassLoaders(classLoader);
+                try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREADS)) {
+                    List<URI> classpath = scanResult.getClasspathURIs();
+                    classpath.forEach(uri -> {
+                        if (uri.getScheme().equals("file")) {
+                            File file = new File(uri.getPath());
+                            if (file.isDirectory()) {
+                                strippers.add(new BaseDirPrefixStripper(file));
+                            }
+                        }
+                    });
                 }
-            });
-            return strippers;
+                return strippers;
+            };
+
         }
 
     }
@@ -134,7 +149,9 @@ public interface MCRResourceProvider {
 
         public static final PrefixStripper INSTANCE = new JarUrlPrefixStripper();
 
-        public static final Set<PrefixStripper> INSTANCE_SET = Collections.singleton(INSTANCE);
+        public static final List<PrefixStripper> INSTANCE_LIST = Collections.singletonList(INSTANCE);
+
+        public static final Supplier<List<PrefixStripper>> INSTANCE_LIST_SUPPLER = () -> INSTANCE_LIST;
 
         private JarUrlPrefixStripper() {
         }

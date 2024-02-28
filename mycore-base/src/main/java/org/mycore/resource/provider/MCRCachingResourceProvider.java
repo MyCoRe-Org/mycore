@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.Level;
@@ -73,7 +72,7 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public Set<PrefixStripper> prefixStrippers(MCRHints hints) {
+    public List<Supplier<List<PrefixStripper>>> prefixStrippers(MCRHints hints) {
         return provider.prefixStrippers(hints);
     }
 

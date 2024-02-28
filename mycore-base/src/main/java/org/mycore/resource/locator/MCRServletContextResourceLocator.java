@@ -20,9 +20,11 @@ package org.mycore.resource.locator;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRException;
@@ -67,8 +69,8 @@ public class MCRServletContextResourceLocator extends MCRResourceLocatorBase {
     }
 
     @Override
-    public Set<MCRResourceProvider.PrefixStripper> prefixPatterns(MCRHints hints) {
-        return MCRResourceProvider.JarUrlPrefixStripper.INSTANCE_SET;
+    public List<Supplier<List<MCRResourceProvider.PrefixStripper>>> prefixStrippers(MCRHints hints) {
+        return Collections.singletonList(MCRResourceProvider.JarUrlPrefixStripper.INSTANCE_LIST_SUPPLER);
     }
 
 }

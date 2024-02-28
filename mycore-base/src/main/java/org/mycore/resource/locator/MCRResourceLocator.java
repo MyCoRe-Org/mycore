@@ -19,7 +19,8 @@
 package org.mycore.resource.locator;
 
 import java.net.URL;
-import java.util.Set;
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
@@ -45,6 +46,6 @@ public interface MCRResourceLocator {
      */
     MCRTreeMessage compileDescription(Level level);
 
-    Set<MCRResourceProvider.PrefixStripper> prefixPatterns(MCRHints hints);
+    List<Supplier<List<MCRResourceProvider.PrefixStripper>>> prefixStrippers(MCRHints hints);
 
 }
