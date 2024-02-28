@@ -37,6 +37,10 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
+        <configuration>
+          <!-- override node version of mycore parent which is stuck on 16.x -->
+          <nodeVersion>v20.11.0</nodeVersion>
+        </configuration>
         <executions>
           <execution>
             <id>yarn-install</id>
@@ -93,6 +97,28 @@
             <phase>generate-resources</phase>
             <configuration>
               <workingDirectory>${basedir}/src/main/ts/upload</workingDirectory>
+              <arguments>build</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-install-texteditor</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-build-texteditor</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
               <arguments>build</arguments>
             </configuration>
           </execution>
