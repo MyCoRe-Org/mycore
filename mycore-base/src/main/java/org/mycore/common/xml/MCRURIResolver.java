@@ -18,7 +18,6 @@
 
 package org.mycore.common.xml;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -33,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,14 +71,12 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRCoreVersion;
-import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHTTPClient;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
@@ -107,6 +103,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.resource.MCRResourceHelper;
+import org.mycore.resource.MCRResourcePath;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
@@ -244,7 +242,6 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("fileMeta", new MCRFileMetadataResolver());
         supportedSchemes.put("basket", new org.mycore.frontend.basket.MCRBasketResolver());
         supportedSchemes.put("language", new org.mycore.datamodel.language.MCRLanguageResolver());
-        supportedSchemes.put("chooseTemplate", new MCRChooseTemplateResolver());
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
         supportedSchemes.put("i18n", new MCRI18NResolver());
@@ -270,55 +267,12 @@ public final class MCRURIResolver implements URIResolver {
             return "resource:" + xslFolder + "/";
         } else {
             String resolvingBase = null;
-
-            String configurationResourceDir = MCRConfigurationDir.getConfigurationDirectory().toPath()
-                .toAbsolutePath()
-                .normalize()
-                .resolve("resources")
-                .toFile()
-                .toURI()
-                .toString();
-
-            String webappPath = context != null ? new File(context.getRealPath("/WEB-INF/classes/")).toURI().toString()
-                : null;
-
-            Optional<String> matching = MCRDeveloperTools.getOverridePaths()
-                .map(Path::toAbsolutePath)
-                .map(Path::toFile)
-                .map(File::toURI)
-                .map(URI::toString)
-                .filter(base::startsWith)
-                .findFirst();
-            if (matching.isPresent()) {
-                // in this case the developer mode is active and the file is in the override directory e.G.
-                // /root/workspace/mir/src/main/resources/xsl/mir-accesskey-utils.xsl
-                resolvingBase = base.substring(matching.get().length());
-            } else if (base.contains(".jar!")) {
-                // in this case the file is in a jar file e.G.
-                // /root/.m2/repository/some/directory/some.jar!/xsl/directory/myfile.xsl
-                resolvingBase = base.lastIndexOf(".jar!") > 0
-                    ? base.substring(base.lastIndexOf(".jar!") + ".jar!".length())
-                    : base;
-            } else if (base.startsWith(configurationResourceDir)) {
-                // in this case the file is in the configuration directory e.G.
-                // file:/root/.mycore/dev-mir/resources/xsl/mir-accesskey-utils.xsl
-                resolvingBase = base.substring(configurationResourceDir.length());
-            } else if (webappPath != null && base.startsWith(webappPath)) {
-                // in this case the file is in the webapp directory e.G.
-                // file:/../mir/mir-webapp/target/catalina-base/webapps/mir/WEB-INF/classes/xsl/mir-accesskey-utils.xsl
-                resolvingBase = base.substring(webappPath.length());
+            MCRResourcePath resourcePath = MCRResourceHelper.getResourcePath(base);
+            if (resourcePath != null) {
+                String path = resourcePath.asRelativePath();
+                resolvingBase = "resource:" + path.substring(0, path.lastIndexOf('/') + 1);
             }
 
-            if (resolvingBase != null) {
-                resolvingBase = resolvingBase.startsWith("/") ? resolvingBase.substring(1) : resolvingBase;
-                resolvingBase = "resource:" + resolvingBase;
-            } else {
-                resolvingBase = base;
-            }
-
-            if (!resolvingBase.endsWith("/") && resolvingBase.lastIndexOf('/') > 0) {
-                resolvingBase = resolvingBase.substring(0, resolvingBase.lastIndexOf('/') + 1);
-            }
             return resolvingBase;
         }
     }
@@ -601,103 +555,17 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String path = href.substring(href.indexOf(":") + 1);
-            if (path.charAt(0) != '/') {
-                path = '/' + path;
-            }
-
-            if (MCRDeveloperTools.overrideActive()) {
-                final Optional<Path> overriddenFilePath = MCRDeveloperTools.getOverriddenFilePath(path, true);
-                if (overriddenFilePath.isPresent()) {
-                    return new StreamSource(overriddenFilePath.get().toFile());
-                }
-            }
-
-            LOGGER.debug("Reading xml from webapp {}", path);
             try {
-                URL resource = context.getResource(path);
+                URL resource = MCRResourceHelper.getWebResourceUrl(path);
                 if (resource != null) {
                     return new StreamSource(resource.toURI().toASCIIString());
+                } else {
+                    throw new TransformerException("Could not find web resource: " + path);
                 }
             } catch (Exception ex) {
-                throw new TransformerException(ex);
+                throw new TransformerException("Could not load web resource: " + path, ex);
             }
-            LOGGER.error("File does not exist: {}", context.getRealPath(path));
-            throw new TransformerException("Could not find web resource: " + path);
         }
-    }
-
-    private static class MCRChooseTemplateResolver implements URIResolver {
-
-        private static Document getStylesheets(List<String> temps) {
-
-            Element rootOut = new Element("stylesheet", MCRConstants.XSL_NAMESPACE).setAttribute("version", "1.0");
-            Document jdom = new Document(rootOut);
-
-            if (temps.isEmpty()) {
-                return jdom;
-            }
-
-            for (String templateName : temps) {
-                rootOut.addContent(
-                    new Element("include", MCRConstants.XSL_NAMESPACE).setAttribute("href", templateName + ".xsl"));
-            }
-
-            // first template named "chooseTemplate" in chooseTemplate.xsl
-            Element template = new Element("template", MCRConstants.XSL_NAMESPACE).setAttribute("name",
-                "chooseTemplate");
-            Element choose = new Element("choose", MCRConstants.XSL_NAMESPACE);
-            // second template named "get.templates" in chooseTemplate.xsl
-            Element template2 = new Element("template", MCRConstants.XSL_NAMESPACE).setAttribute("name",
-                "get.templates");
-            Element templates = new Element("templates");
-
-            for (String templateName : temps) {
-                // add elements in the first template
-                Element when = new Element("when", MCRConstants.XSL_NAMESPACE).setAttribute("test",
-                    "$template = '" + templateName + "'");
-                when.addContent(
-                    new Element("call-template", MCRConstants.XSL_NAMESPACE).setAttribute("name", templateName));
-                choose.addContent(when);
-
-                // add elements in the second template
-                templates.addContent(new Element("template").setAttribute("category", "master").setText(templateName));
-            }
-
-            // first
-            template.addContent(choose);
-            rootOut.addContent(template);
-            // second
-            template2.addContent(templates);
-            rootOut.addContent(template2);
-            return jdom;
-        }
-
-        @Override
-        public Source resolve(String href, String base) {
-            String type = href.substring(href.indexOf(":") + 1);
-            String path = "/templates/" + type + "/";
-            LOGGER.debug("Reading templates from {}", path);
-            Set<String> resourcePaths = context.getResourcePaths(path);
-            ArrayList<String> templates = new ArrayList<>();
-            if (resourcePaths != null) {
-                for (String resourcePath : resourcePaths) {
-                    if (!resourcePath.endsWith("/")) {
-                        //only handle directories
-                        continue;
-                    }
-                    String templateName = resourcePath.substring(path.length(), resourcePath.length() - 1);
-                    LOGGER.debug("Checking if template: {}", templateName);
-                    if (templateName.contains("/")) {
-                        continue;
-                    }
-                    templates.add(templateName);
-                }
-                Collections.sort(templates);
-            }
-            LOGGER.info("Found theses templates: {}", templates);
-            return new JDOMSource(getStylesheets(templates));
-        }
-
     }
 
     /**
@@ -708,7 +576,7 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String path = href.substring(href.indexOf(":") + 1);
-            URL resource = MCRConfigurationDir.getConfigResource(path);
+            URL resource = MCRResourceHelper.getResourceUrl(path);
             if (resource != null) {
                 //have to use SAX here to resolve entities
                 if (path.endsWith(".xsl")) {
@@ -723,11 +591,13 @@ public final class MCRURIResolver implements URIResolver {
                     SAXSource saxSource = new SAXSource(reader, input);
                     LOGGER.debug("include stylesheet: {}", saxSource.getSystemId());
                     return saxSource;
+                } else {
+                    return MCRURIResolver.instance().resolve(resource.toString(), base);
                 }
-                return MCRURIResolver.instance().resolve(resource.toString(), base);
             }
             return null;
         }
+
     }
 
     /**

@@ -18,14 +18,29 @@
 
 package org.mycore.frontend.cli;
 
+import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.MCRResourceResolver;
+import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -34,6 +49,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.i18n.MCRTranslation;
+
+import com.google.common.base.Splitter;
 
 /**
  * This class contains commands that may be helpful during development.
@@ -125,23 +142,222 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-        syntax = "show resource {0}",
-        help = "Show resource with uri {0}",
+        syntax = "resolve uri {0}",
+        help = "Resolve uri {0}",
         order = 70)
-    public static void showResource(String uri) {
+    public static void resolveUri(String uri) {
         try {
             Element resource = MCRURIResolver.instance().resolve(uri);
-            String xmlText = new XMLOutputter(Format.getPrettyFormat()).outputString(resource);
-            LOGGER.info("Resolved resource for uri {}:\n{}", uri, xmlText);
+            if (null != resource) {
+                String xmlText = new XMLOutputter(Format.getPrettyFormat()).outputString(resource);
+                LOGGER.info("Resolved URI {}:\n{}", uri, xmlText);
+            } else {
+                LOGGER.info("URI {} not found", uri);
+            }
         } catch (Exception e) {
-            LOGGER.info("Failed to resolve resource for uri " + uri, e);
+            LOGGER.info("Failed to resolve URI " + uri, e);
         }
+    }
+
+    @MCRCommand(
+        syntax = "show resource url for {0}",
+        help = "Show resource URL for {0}",
+        order = 80)
+    public static void showResourceUri(String path) {
+        showResourceUri(MCRResourcePath.ofPath(path));
+    }
+
+    @MCRCommand(
+        syntax = "show web resource url for {0}",
+        help = "Show web resource URL for {0}",
+        order = 81)
+    public static void showWebResourceUri(String path) {
+        showResourceUri(MCRResourcePath.ofWebPath(path));
+    }
+
+    private static void showResourceUri(Optional<MCRResourcePath> path) {
+        if (path.isEmpty()) {
+            LOGGER.info("Invalid resource path");
+        } else {
+            doShowResourceUri(path.get());
+        }
+    }
+
+    private static void doShowResourceUri(MCRResourcePath path) {
+        try {
+            URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
+            if (url != null) {
+                LOGGER.info("Resolved resource {} as {}", path, url);
+            } else {
+                LOGGER.info("Resource {} not found", path);
+            }
+        } catch (Exception e) {
+            LOGGER.info("Failed to resolve resource " + path, e);
+        }
+    }
+
+    @MCRCommand(
+        syntax = "show all resource urls for {0}",
+        help = "Show all resource URLs for {0}",
+        order = 85)
+    public static void showAllResourceUrls(String path) {
+        showAllResourceUrls(MCRResourcePath.ofPath(path));
+    }
+
+    @MCRCommand(
+        syntax = "show all web resource urls for {0}",
+        help = "Show all web resource URLs for {0}",
+        order = 86)
+    public static void showAllWebResourceUrls(String path) {
+        showAllResourceUrls(MCRResourcePath.ofWebPath(path));
+    }
+
+    private static void showAllResourceUrls(Optional<MCRResourcePath> path) {
+        if (path.isEmpty()) {
+            LOGGER.info("Invalid resource path");
+        } else {
+            doShowAllResourceUrls(path.get());
+        }
+    }
+
+    private static void doShowAllResourceUrls(MCRResourcePath path) {
+        try {
+            List<ProvidedUrl> urls = MCRResourceResolver.instance().resolveAll(path);
+            if (urls.isEmpty()) {
+                LOGGER.info("Resource {} not found", path);
+            } else {
+                urls.forEach(url -> LOGGER.info("Resolved resource {} as {} [{}]", path, url.url, url.origin));
+            }
+        } catch (Exception e) {
+            LOGGER.info("Failed to resolve resource " + path, e);
+        }
+    }
+
+    @MCRCommand(
+        syntax = "resolve textual resource {0} with charset {1}",
+        help = "Resolve textual resource {0} with charset {1}",
+        order = 90)
+    public static void resolveTextualResource(String path, String charset) {
+        resolveTextualResource(MCRResourcePath.ofPath(path), charset);
+    }
+
+    @MCRCommand(
+        syntax = "resolve textual web resource {0} with charset {1}",
+        help = "Resolve textual web resource {0} with charset {1}",
+        order = 91)
+    public static void resolveTextualWebResource(String path, String charset) {
+        resolveTextualResource(MCRResourcePath.ofWebPath(path), charset);
+    }
+
+    private static void resolveTextualResource(Optional<MCRResourcePath> path, String charset) {
+        if (path.isEmpty()) {
+            LOGGER.info("Invalid resource path");
+        } else {
+            doResolveTextualResource(path.get(), charset);
+        }
+    }
+
+    private static void doResolveTextualResource(MCRResourcePath path, String charset) {
+        try {
+            URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
+            if (url != null) {
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(url.openStream(), writer, Charset.forName(charset));
+                LOGGER.info("Resolved resource {} as {}:\n{}", path, url, writer.toString());
+            } else {
+                LOGGER.info("Resource {} not found", path);
+            }
+        } catch (Exception e) {
+            LOGGER.info("Failed to resolve resource " + path, e);
+        }
+    }
+
+    @MCRCommand(
+        syntax = "resolve textual resource {0}",
+        help = "Resolve textual resource {0}",
+        order = 95)
+    public static void resolveTextualResource(String path) {
+        MCRDeveloperCommands.resolveTextualResource(path, Charset.defaultCharset().name());
+    }
+
+
+    @MCRCommand(
+        syntax = "resolve textual web resource {0}",
+        help = "Resolve textual web resource {0}",
+        order = 96)
+    public static void resolveTextualWebResource(String path) {
+        resolveTextualWebResource(path, Charset.defaultCharset().name());
+    }
+
+    @MCRCommand(
+        syntax = "resolve binary resource {0} with encoder {1}",
+        help = "Resolve binary resource {0} with encoder {1}",
+        order = 100)
+    public static void resolveBinaryResource(String path, String encoder) {
+        resolveBinaryResource(MCRResourcePath.ofPath(path), encoder);
+    }
+
+    @MCRCommand(
+        syntax = "resolve binary web resource {0} with encoder {1}",
+        help = "Resolve binary web resource {0} with encoder {1}",
+        order = 101)
+    public static void resolveBinaryWebResource(String path, String encoder) {
+        resolveBinaryResource(MCRResourcePath.ofWebPath(path), encoder);
+    }
+
+    private static void resolveBinaryResource(Optional<MCRResourcePath> path, String encoder) {
+        if (path.isEmpty()) {
+            LOGGER.info("Invalid resource path");
+        } else {
+            doResolveBinaryResource(path.get(), encoder);
+        }
+    }
+
+    private static void doResolveBinaryResource(MCRResourcePath path, String encoder) {
+        try {
+            URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
+            if (url != null) {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                IOUtils.copy(url.openStream(), stream);
+                String encodedContent = getEncoder(encoder).apply(stream.toByteArray());
+                LOGGER.info("Resolved resource {} as {}:\n{}", path, url, encodedContent);
+            } else {
+                LOGGER.info("Resource {} not found", path);
+            }
+        } catch (Exception e) {
+            LOGGER.info("Failed to resolve resource " + path, e);
+        }
+    }
+
+    private static Function<byte[], String> getEncoder(String encoder) {
+        try {
+            return Encoder.valueOf(encoder);
+        } catch (IllegalArgumentException e) {
+            String encoders = Arrays.stream(Encoder.values()).map(Encoder::toString).collect(Collectors.joining(", "));
+            throw new MCRException("Encoder '" + encoder + "' unknown; must be one of: " + encoders);
+        }
+    }
+
+    @MCRCommand(
+        syntax = "resolve binary resource {0}",
+        help = "Resolve binary resource {0}",
+        order = 105)
+    public static void resolveBinaryResource(String path) {
+        resolveBinaryResource(path, Encoder.BASE_64.name());
+    }
+
+    @MCRCommand(
+        syntax = "resolve binary web resource {0}",
+        help = "Resolve binary web resource {0}",
+        order = 106)
+    public static void resolveBinaryWebResource(String path) {
+        resolveBinaryWebResource(path, Encoder.BASE_64.name());
     }
 
     @MCRCommand(
         syntax = "touch object {0}",
         help = "Load and update object with id {0} without making any modifications",
-        order = 80)
+        order = 110)
     public static void touchObject(String id) {
         try {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
@@ -156,7 +372,7 @@ public class MCRDeveloperCommands {
     @MCRCommand(
         syntax = "touch derivate {0}",
         help = "Load and update derivate with id {0} without making any modifications",
-        order = 90)
+        order = 111)
     public static void touchDerivate(String id) {
         try {
             MCRObjectID derivateId = MCRObjectID.getInstance(id);
@@ -166,6 +382,21 @@ public class MCRDeveloperCommands {
         } catch (Exception e) {
             LOGGER.info("Failed to touch derivate with id " + id, e);
         }
+    }
+
+    private enum Encoder implements Function<byte[], String> {
+
+        BASE_64 {
+            @Override
+            public String apply(byte[] bytes) {
+                String base64 = Base64.getEncoder().encodeToString(bytes);
+                StringBuilder builder = new StringBuilder();
+                Splitter.fixedLength(80).split(base64).forEach(line -> builder.append(line).append('\n'));
+                return builder.toString();
+            }
+
+        };
+
     }
 
 }

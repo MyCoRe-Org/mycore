@@ -18,6 +18,9 @@
 
 package org.mycore.frontend.acl2.resources;
 
+import java.io.InputStream;
+
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.jersey.MCRStaticContent;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,20 +41,23 @@ public class MCRAclEditorGuiResource {
     @Path("{filename:.*}")
     public Response getResources(@PathParam("filename") String filename) {
         if (filename.endsWith(".js")) {
-            return Response.ok(getClass()
-                .getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/" + filename))
+            return Response.ok(getAclEditorGuiResource(filename))
                 .header("Content-Type", "application/javascript")
                 .build();
         }
 
         if (filename.endsWith(".css")) {
-            return Response.ok(getClass()
-                .getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/" + filename))
+            return Response.ok(getAclEditorGuiResource(filename))
                 .header("Content-Type", "text/css")
                 .build();
         }
-        return Response.ok(getClass()
-            .getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/" + filename))
+
+        return Response.ok(getAclEditorGuiResource(filename))
             .build();
     }
+
+    private InputStream getAclEditorGuiResource(String filename) {
+        return MCRResourceHelper.getWebResourceAsStream("/modules/acl-editor2/gui/" + filename);
+    }
+
 }

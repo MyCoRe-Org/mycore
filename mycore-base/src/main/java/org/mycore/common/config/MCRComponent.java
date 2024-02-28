@@ -35,7 +35,7 @@ import org.mycore.common.MCRException;
  * This class abstracts different MyCoRe component types.
  * As every component (mycore component, application module) holds it configuration in different places,
  * you can use this class to get uniform access to these configuration resources.
- * 
+ * <p>
  * As this class is immutable it could be used as key in a {@link Map}
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
@@ -49,30 +49,32 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private static final NumberFormat PRIORITY_FORMAT = getPriorityFormat();
 
+    private static final String DEFAULT_PRIORITY = "99";
+
+    private final Type type;
+
+    private final String name;
+
+    private final File jarFile;
+
+    private final int priority;
+
+    private final String sortCriteria;
+
+    private final String artifactId;
+
+    private final Manifest manifest;
+
+    private enum Type {
+        base, component, module
+    }
+
     private static NumberFormat getPriorityFormat() {
         NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
         format.setGroupingUsed(false);
         format.setMinimumIntegerDigits(3);
         return format;
     }
-
-    private static final String DEFAULT_PRIORITY = "99";
-
-    private enum Type {
-        base, component, module
-    }
-
-    private Type type;
-
-    private String name;
-
-    private File jarFile;
-
-    private String sortCriteria;
-
-    private String artifactId;
-
-    private Manifest manifest;
 
     public MCRComponent(String artifactId, Manifest manifest) {
         this(artifactId, manifest, null);
@@ -81,24 +83,25 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public MCRComponent(String artifactId, Manifest manifest, File jarFile) {
         if (artifactId.startsWith("mycore-")) {
             if (artifactId.endsWith("base")) {
-                type = Type.base;
-                setName("base");
+                this.type = Type.base;
+                this.name = "base";
             } else {
-                type = Type.component;
-                setName(artifactId.substring("mycore-".length()));
+                this.type = Type.component;
+                this.name = artifactId.substring("mycore-".length());
             }
         } else {
-            type = Type.module;
-            setName(artifactId.replaceAll("[_-]?module", ""));
+            this.type = Type.module;
+            this.name = artifactId.replaceAll("[_-]?module", "");
         }
-        setJarFile(jarFile);
+        this.jarFile = jarFile;
         this.artifactId = artifactId;
         this.manifest = manifest;
-        buildSortCriteria();
+        this.priority = calculatePriority(artifactId, manifest, this.type);
+        this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + getName();
         LOGGER.debug("{} is of type {} and named {}: {}", artifactId, type, getName(), jarFile);
     }
 
-    private void buildSortCriteria() {
+    private static int calculatePriority(String artifactId, Manifest manifest, Type type) {
         String priorityAtt = manifest.getMainAttributes().getValue(ATT_PRIORITY);
         if (priorityAtt == null) {
             priorityAtt = DEFAULT_PRIORITY;
@@ -116,7 +119,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             case module -> 300;
             default -> throw new MCRException("Do not support MCRComponenty of type: " + type);
         };
-        this.sortCriteria = PRIORITY_FORMAT.format(priority) + getName();
+        return priority;
     }
 
     public InputStream getConfigFileStream(String filename) {
@@ -182,21 +185,22 @@ public class MCRComponent implements Comparable<MCRComponent> {
         return name;
     }
 
-    private void setName(String name) {
-        this.name = name;
-    }
-
     /**
      * Returns the jar file or <code>null</code> if nothing was set.
-     * 
+     *
      * @return the jar file
      */
     public File getJarFile() {
         return jarFile;
     }
 
-    private void setJarFile(File jarFile) {
-        this.jarFile = jarFile;
+    /**
+     * Returns the priority.
+     *
+     * @return the priority
+     */
+    public int getPriority() {
+        return this.priority;
     }
 
     /**
@@ -267,4 +271,5 @@ public class MCRComponent implements Comparable<MCRComponent> {
         sb.append(artifactId);
         return sb.toString();
     }
+
 }

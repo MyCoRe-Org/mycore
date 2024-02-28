@@ -19,29 +19,20 @@
 package org.mycore.common.config;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRUtils;
 
 import jakarta.servlet.ServletContext;
 
 /**
  * This helper class determines in which directory to look for addition configuration files.
- *
+ * <p>
  * The configuration directory can be set with the system property or environment variable <code>MCR.ConfigDir</code>.
- *
+ * <p>
  * The directory path is build this way:
  * <ol>
  *  <li>System property <code>MCR.Home</code> defined
@@ -209,88 +200,7 @@ public class MCRConfigurationDir {
         if (configurationDirectory == null || !configurationDirectory.isDirectory()) {
             return null;
         }
-
         return MCRUtils.safeResolve(configurationDirectory.toPath(), relativePath).toFile();
     }
 
-    /**
-     * Returns URL of a config resource.
-     * Same as {@link #getConfigResource(String, ClassLoader)} with second argument <code>null</code>.
-     * @param relativePath as defined in {@link #getConfigFile(String)}
-     */
-    public static URL getConfigResource(String relativePath) {
-        return getConfigResource(relativePath, null);
-    }
-
-    /**
-     * Returns URL of a config resource.
-     * If {@link #getConfigFile(String)} returns an existing file for "resources"+{relativePath}, its URL is returned.
-     * In any other case this method returns the same as {@link ClassLoader#getResource(String)} 
-     * @param relativePath as defined in {@link #getConfigFile(String)}
-     * @param classLoader a classLoader to resolve the resource (see above), null defaults to this class' class loader
-     */
-    public static URL getConfigResource(String relativePath, ClassLoader classLoader) {
-        if (MCRDeveloperTools.overrideActive()) {
-            final Optional<Path> overriddenFilePath = MCRDeveloperTools.getOverriddenFilePath(relativePath, false);
-            if (overriddenFilePath.isPresent()) {
-                try {
-                    return overriddenFilePath.get().toUri().toURL();
-                } catch (MalformedURLException e) {
-                    // Ignore
-                }
-            }
-        }
-
-        File resolvedFile = getConfigFile("resources/" + relativePath);
-        if (resolvedFile != null && resolvedFile.exists()) {
-            try {
-                return resolvedFile.toURI().toURL();
-            } catch (MalformedURLException e) {
-                LogManager.getLogger(MCRConfigurationDir.class)
-                    .warn("Exception while returning URL for file: {}", resolvedFile, e);
-            }
-        }
-        return getClassPathResource(relativePath, classLoader == null ? MCRClassTools.getClassLoader() : classLoader);
-    }
-
-    private static URL getClassPathResource(String relativePath, ClassLoader classLoader) {
-        URL currentUrl = classLoader.getResource(relativePath);
-        if (SERVLET_CONTEXT != null && currentUrl != null) {
-            Enumeration<URL> resources = null;
-            try {
-                resources = classLoader.getResources(relativePath);
-            } catch (IOException e) {
-                LogManager.getLogger(MCRConfigurationDir.class)
-                    .error("Error while retrieving resource: {}", relativePath, e);
-            }
-            if (resources != null) {
-                File configDir = getConfigurationDirectory();
-                String configDirURL = configDir.toURI().toString();
-                @SuppressWarnings("unchecked")
-                List<String> libsOrder = (List<String>) SERVLET_CONTEXT.getAttribute(ServletContext.ORDERED_LIBS);
-                int pos = Integer.MAX_VALUE;
-                while (resources.hasMoreElements()) {
-                    URL testURL = resources.nextElement();
-                    String testURLStr = testURL.toString();
-                    if (testURLStr.contains(configDirURL)) {
-                        return testURL; //configuration directory always wins
-                    }
-                    if (testURLStr.startsWith("file:")) {
-                        //local files should generally win
-                        pos = -1;
-                        currentUrl = testURL;
-                    }
-                    if (pos > 0 && libsOrder != null /*if <absolute-ordering> present in web.xml */) {
-                        for (int i = 0; i < libsOrder.size(); i++) {
-                            if (testURLStr.contains(libsOrder.get(i)) && i < pos) {
-                                currentUrl = testURL;
-                                pos = i;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return currentUrl;
-    }
 }

@@ -56,9 +56,9 @@ import org.apache.xmlgraphics.io.ResourceResolver;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRErrorListener;
 
@@ -104,7 +104,8 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         final String foCfg = MCRConfiguration2.getString("MCR.LayoutService.FoFormatter.FOP.config").orElse("");
         if (!foCfg.isEmpty()) {
             try {
-                URL configResource = MCRConfigurationDir.getConfigResource(foCfg);
+
+                URL configResource = MCRResourceHelper.getResourceUrl(foCfg);
                 URLConnection con = configResource.openConnection();
                 final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
                 final Configuration cfg;

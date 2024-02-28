@@ -21,10 +21,8 @@ package org.mycore.frontend;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -63,10 +61,10 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessStore;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -118,7 +116,7 @@ public class MCRLayoutUtilities {
 
             @Override
             public DocumentHolder load(String key) throws Exception {
-                URL url = SERVLET_CONTEXT.getResource(key);
+                URL url = MCRResourceHelper.getWebResourceUrl(key);
                 try {
                     return new DocumentHolder(url);
                 } finally {
@@ -129,7 +127,7 @@ public class MCRLayoutUtilities {
 
             @Override
             public ListenableFuture<DocumentHolder> reload(final String key, DocumentHolder oldValue) throws Exception {
-                URL url = SERVLET_CONTEXT.getResource(key);
+                URL url = MCRResourceHelper.getWebResourceUrl(key);
                 if (oldValue.isValid(url)) {
                     LOGGER.debug("Keeping {} in cache", url);
                     return Futures.immediateFuture(oldValue);
@@ -357,29 +355,12 @@ public class MCRLayoutUtilities {
     }
 
     /**
-     * Returns the navigation.xml as File.
-     * This file may not exist yet as navigation.xml may be served as a web resource.
-     * Use {@link #getNavigationURL()} to get access to the actual web resource.
-     */
-    public static File getNavigationFile() {
-        String realPath = SERVLET_CONTEXT.getRealPath(NAV_RESOURCE);
-        if (realPath == null) {
-            return null;
-        }
-        return new File(realPath);
-    }
-
-    /**
      * Returns the navigation.xml as URL.
-     *
+     * <p>
      * Use this method if you need to parse it on your own.
      */
     public static URL getNavigationURL() {
-        try {
-            return SERVLET_CONTEXT.getResource(NAV_RESOURCE);
-        } catch (MalformedURLException e) {
-            throw new MCRException("Error while resolving navigation.xml", e);
-        }
+        return MCRResourceHelper.getWebResourceUrl(NAV_RESOURCE);
     }
 
     public static org.w3c.dom.Document getPersonalNavigation() throws JDOMException, XPathExpressionException {

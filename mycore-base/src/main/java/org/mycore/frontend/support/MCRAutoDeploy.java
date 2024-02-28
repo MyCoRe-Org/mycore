@@ -17,24 +17,14 @@
  */
 package org.mycore.frontend.support;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,8 +56,6 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
 
     private static final String AUTO_DEPLOY_ATTRIB = "MCR-Auto-Deploy";
 
-    private static final String RESOURCE_DIR = "META-INF/resources";
-
     private static final String WEB_FRAGMENT = "META-INF/web-fragment.xml";
 
     @Override
@@ -85,73 +73,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
         if (servletContext != null) {
             MCRRuntimeComponentDetector.getAllComponents().stream()
                 .filter(cmp -> Boolean.parseBoolean(cmp.getManifestMainAttribute(AUTO_DEPLOY_ATTRIB)))
-                .forEach(cmp -> {
-                    registerWebFragment(servletContext, cmp);
-                    deployWebResources(servletContext, cmp);
-                });
-        }
-    }
-
-    private Path toNativePath(ZipEntry entry) {
-        String nativePath;
-        if (File.separatorChar != '/') {
-            nativePath = entry.getName().replace('/', File.separatorChar);
-        } else {
-            nativePath = entry.getName();
-        }
-        return Paths.get(nativePath);
-    }
-
-    private boolean isUnzipRequired(ZipEntry entry, Path target) {
-        try {
-            BasicFileAttributes fileAttributes = Files.readAttributes(target, BasicFileAttributes.class);
-            //entry does not contain size when read by ZipInputStream, assume equal size and just compare last modified
-            return !entry.isDirectory()
-                && !(fileTimeEquals(entry.getLastModifiedTime(), fileAttributes.lastModifiedTime())
-                    && (entry.getSize() == -1 || entry.getSize() == fileAttributes.size()));
-        } catch (IOException e) {
-            LOGGER.warn("Target path {} does not exist.", target);
-            return true;
-        }
-    }
-
-    /**
-     * compares if two file times are equal.
-     *
-     * Uses seconds only instead of finer granularity to compare file times of different file systems.
-     */
-    private boolean fileTimeEquals(FileTime a, FileTime b) {
-        return a.to(TimeUnit.SECONDS) == b.to(TimeUnit.SECONDS) && a.to(TimeUnit.DAYS) == b.to(TimeUnit.DAYS);
-    }
-
-    private void deployWebResources(final ServletContext servletContext, final MCRComponent comp) {
-        final Path webRoot = Optional.ofNullable(servletContext.getRealPath("/")).map(Paths::get).orElse(null);
-        if (webRoot != null) {
-            int resourceDirPathComponents = RESOURCE_DIR.split("/").length;
-            try (InputStream fin = Files.newInputStream(comp.getJarFile().toPath());
-                ZipInputStream zin = new ZipInputStream(fin)) {
-                LOGGER.info("Deploy web resources from {} to {}...", comp.getName(), webRoot);
-                for (ZipEntry zipEntry = zin.getNextEntry(); zipEntry != null; zipEntry = zin.getNextEntry()) {
-                    if (zipEntry.getName().startsWith(RESOURCE_DIR)) {
-                        Path relativePath = toNativePath(zipEntry);
-                        if (relativePath.getNameCount() > resourceDirPathComponents) {
-                            //strip RESOURCE_DIR:
-                            relativePath = relativePath.subpath(resourceDirPathComponents, relativePath.getNameCount());
-                            Path target = webRoot.resolve(relativePath);
-                            if (zipEntry.isDirectory()) {
-                                Files.createDirectories(target);
-                            } else if (isUnzipRequired(zipEntry, target)) {
-                                LOGGER.debug("...deploy {}", zipEntry.getName());
-                                Files.copy(zin, target, StandardCopyOption.REPLACE_EXISTING);
-                                Files.setLastModifiedTime(target, zipEntry.getLastModifiedTime());
-                            }
-                        }
-                    }
-                }
-                LOGGER.info("...done.");
-            } catch (final IOException e) {
-                LOGGER.error("Could not deploy web resources of " + comp.getJarFile() + "!", e);
-            }
+                .forEach(cmp -> registerWebFragment(servletContext, cmp));
         }
     }
 

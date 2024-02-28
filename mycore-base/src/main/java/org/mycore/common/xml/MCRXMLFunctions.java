@@ -76,8 +76,8 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -286,7 +286,7 @@ public class MCRXMLFunctions {
     }
 
     public static boolean resourceAvailable(String resourceName) {
-        URL resource = MCRConfigurationDir.getConfigResource(resourceName);
+        URL resource = MCRResourceHelper.getResourceUrl(resourceName);
         if (resource == null) {
             LOGGER.debug("did not find resource: {}", resourceName);
             return false;
