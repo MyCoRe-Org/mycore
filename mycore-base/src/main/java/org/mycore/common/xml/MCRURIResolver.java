@@ -332,6 +332,16 @@ public final class MCRURIResolver implements URIResolver {
 
     private Source tryResolveXSL(String href, String base) throws TransformerException {
         String baseURI = getParentDirectoryResourceURI(base);
+
+        final String initialUri = baseURI + href;
+        while (href.startsWith("../") & baseURI.endsWith("/")) {
+            if (baseURI.length() == 1) {
+                throw new TransformerException("Relative href points outside of base URI:" + initialUri);
+            }
+            baseURI = baseURI.substring(0, baseURI.lastIndexOf('/', baseURI.length() - 2) + 1);
+            href = href.substring("../".length());
+        }
+
         final String uri = baseURI + href;
         LOGGER.debug("Trying to resolve {} from uri {}", href, uri);
         Source newResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve(uri, base);
