@@ -387,7 +387,7 @@ public class MCRUtils {
             TarArchiveEntry tarEntry;
             FileSystem targetFS = expandToDirectory.getFileSystem();
             HashMap<Path, FileTime> directoryTimes = new HashMap<>();
-            while ((tarEntry = tain.getNextTarEntry()) != null) {
+            while ((tarEntry = tain.getNextEntry()) != null) {
                 Path target = MCRPathUtils.getPath(targetFS, tarEntry.getName());
                 Path absoluteTarget = expandToDirectory.resolve(target).normalize().toAbsolutePath();
                 if (tarEntry.isDirectory()) {
