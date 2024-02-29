@@ -465,7 +465,14 @@ public class MCRTranslation {
         }
     }
 
-    static void reInit() {
+    /**
+     * use with care: only required for Junit tests if properties changes.
+     *
+     * {@snippet lang=Properties :
+     * MCR.Metadata.Languages=…
+     * }
+     */
+    public static void reInit() {
         synchronized (AVAILABLE_LANGUAGES) {
             Set<String> newLanguages = loadAvailableLanguages();
             AVAILABLE_LANGUAGES.clear();
