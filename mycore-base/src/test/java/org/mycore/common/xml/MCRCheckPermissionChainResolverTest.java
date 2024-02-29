@@ -49,7 +49,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
 
     public static final String USE_STUFF_CALL = RESOLVER_PREFIX + "::" + PERMISSION_USE_STUFF + ":" + MOCK_CALL;
 
-    static final JDOMSource resultSource = new JDOMSource(new Document(new Element("result")));
+    final JDOMSource resultSource = new JDOMSource(new Document(new Element("result")));
 
     @Override
     public void setUp() throws Exception {
