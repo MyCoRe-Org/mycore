@@ -33,6 +33,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
 
@@ -91,8 +92,7 @@ public class MCROCFLMigration {
     public void start() {
         MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
         for (String baseId : instance.getObjectBaseIds()) {
-            String[] idParts = baseId.split("_");
-            int maxId = instance.getHighestStoredID(idParts[0], idParts[1]);
+            int maxId = MCRMetadataManager.getMCRObjectIDGenerator().getLastID(baseId).getNumberAsInteger();
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
                 .mapToObj(i -> MCRObjectID.formatID(baseId, i))
                 .collect(Collectors.toList());
