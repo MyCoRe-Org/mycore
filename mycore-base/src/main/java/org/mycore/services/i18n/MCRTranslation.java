@@ -464,4 +464,12 @@ public class MCRTranslation {
             }
         }
     }
+
+    static void reInit() {
+        synchronized (AVAILABLE_LANGUAGES) {
+            Set<String> newLanguages = loadAvailableLanguages();
+            AVAILABLE_LANGUAGES.clear();
+            AVAILABLE_LANGUAGES.addAll(newLanguages);
+        }
+    }
 }
