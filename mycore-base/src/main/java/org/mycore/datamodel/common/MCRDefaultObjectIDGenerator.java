@@ -17,6 +17,7 @@
  */
 package org.mycore.datamodel.common;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.mycore.common.config.MCRConfiguration2;
@@ -93,6 +94,11 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
             return null;
         }
         return MCRObjectID.getInstance(MCRObjectID.formatID(baseId, lastIDNumber));
+    }
+
+    @Override
+    public Collection<String> getBaseIDs() {
+        return MCRXMLMetadataManager.instance().getObjectBaseIds();
     }
 
     /**

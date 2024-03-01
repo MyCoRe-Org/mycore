@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -91,14 +90,13 @@ public class MCROCFLMigration {
     }
 
     public void start() {
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
         MCRObjectIDGenerator mcrObjectIDGenerator = MCRMetadataManager.getMCRObjectIDGenerator();
 
-        for (String baseId : instance.getObjectBaseIds()) {
+        for (String baseId : mcrObjectIDGenerator.getBaseIDs()) {
             int maxId = mcrObjectIDGenerator.getLastID(baseId).getNumberAsInteger();
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
                 .mapToObj(i -> MCRObjectID.formatID(baseId, i))
-                .collect(Collectors.toList());
+                .toList();
 
             for (String id : possibleIds) {
                 LOGGER.info("Try migrate {}", id);
@@ -124,7 +122,7 @@ public class MCROCFLMigration {
 
                     steps.add(step);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // an error happened, so all steps are useless
                 LOGGER.warn("Error while receiving all information which are needed to migrate the object " + id, e);
                 steps.clear();
