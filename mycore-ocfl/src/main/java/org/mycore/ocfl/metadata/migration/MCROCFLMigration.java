@@ -32,6 +32,7 @@ import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import org.mycore.datamodel.common.MCRObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -91,8 +92,10 @@ public class MCROCFLMigration {
 
     public void start() {
         MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
+        MCRObjectIDGenerator mcrObjectIDGenerator = MCRMetadataManager.getMCRObjectIDGenerator();
+
         for (String baseId : instance.getObjectBaseIds()) {
-            int maxId = MCRMetadataManager.getMCRObjectIDGenerator().getLastID(baseId).getNumberAsInteger();
+            int maxId = mcrObjectIDGenerator.getLastID(baseId).getNumberAsInteger();
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
                 .mapToObj(i -> MCRObjectID.formatID(baseId, i))
                 .collect(Collectors.toList());
@@ -117,7 +120,9 @@ public class MCROCFLMigration {
                     MCROCFLRevision step = migrateRevision(rev, objectID);
 
                     // read one time now, to avoid errors later, but do not store it
-                    retriveActualContent(rev);
+                    if (rev.getType() != 'D') {
+                        retriveActualContent(rev);
+                    }
 
                     steps.add(step);
                 }
