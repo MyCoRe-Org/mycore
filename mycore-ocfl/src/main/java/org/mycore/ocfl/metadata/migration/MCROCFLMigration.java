@@ -120,9 +120,7 @@ public class MCROCFLMigration {
                     MCROCFLRevision step = migrateRevision(rev, objectID);
 
                     // read one time now, to avoid errors later, but do not store it
-                    if (rev.getType() != 'D') {
-                        retriveActualContent(rev);
-                    }
+                    retriveActualContent(rev);
 
                     steps.add(step);
                 }
@@ -205,6 +203,9 @@ public class MCROCFLMigration {
     }
 
     private MCRContent retriveActualContent(MCRAbstractMetadataVersion rev) throws IOException {
+        if(rev.getType()=='D'){
+            return null;
+        }
         MCRContent content = rev.retrieve();
         Document document;
 
