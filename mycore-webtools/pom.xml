@@ -40,6 +40,7 @@
         <configuration>
           <!-- override node version of mycore parent which is stuck on 16.x -->
           <nodeVersion>v20.11.0</nodeVersion>
+          <installDirectory>${settings.localRepository}/node-yarn-v20.11.0-${yarn.version}</installDirectory>
         </configuration>
         <executions>
           <execution>
