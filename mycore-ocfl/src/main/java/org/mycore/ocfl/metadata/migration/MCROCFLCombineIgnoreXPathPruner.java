@@ -32,6 +32,14 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRXMLHelper;
 
+/**
+ * A pruner that combines and compares revisions, based on an XPath expression, to decide which to keep and which to
+ * discard.
+ * The XPath expression marks content that should be ignored when comparing two revisions and when the content is equal,
+ * the revisions are merged. There is a property NeedSameAutor that can be set to true to require that the revisions
+ * have the same author. The properties FirstAutorWins and FirstDateWins can be set to true to decide which revision
+ * metadata should be used in the merged revision.
+ */
 public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
     implements MCROCFLCombineComparePruner.RevisionMergeDecider {
 

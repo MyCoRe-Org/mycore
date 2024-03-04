@@ -29,6 +29,14 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 
+/**
+ * A pruner that combines and compares revisions to decide which to keep and which to discard.
+ * The method {@link #getMergeDecider()} should return a {@link RevisionMergeDecider} that decides if two
+ * revisions should be merged.
+ *
+ * The method {@link #buildMergedRevision(MCROCFLRevision, MCROCFLRevision, Document, Document)} should return a new
+ * revision that is the result of merging the two given revisions.
+ */
 public abstract class MCROCFLCombineComparePruner implements MCROCFLRevisionPruner {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -74,11 +82,26 @@ public abstract class MCROCFLCombineComparePruner implements MCROCFLRevisionPrun
         return newRevisions;
     }
 
+    /**
+     * Returns a {@link RevisionMergeDecider} that decides if two revisions should be merged.
+     * @return a {@link RevisionMergeDecider}
+     */
     public abstract RevisionMergeDecider getMergeDecider();
 
+    /**
+     * Builds a new revision that is the result of merging the two given revisions.
+     * @param current the current revision
+     * @param next the next revision to merge
+     * @param currentDocument the current document
+     * @param nextDocument the document of the next revision
+     * @return a new revision that is the result of merging the two given revisions
+     */
     public abstract MCROCFLRevision buildMergedRevision(MCROCFLRevision current, MCROCFLRevision next,
         Document currentDocument, Document nextDocument);
 
+    /**
+     * A decider that decides if two revisions should be merged.
+     */
     public interface RevisionMergeDecider {
 
         boolean shouldMerge(MCROCFLRevision r1, Document o1, MCROCFLRevision r2, Document o2);
