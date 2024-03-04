@@ -34,16 +34,15 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
+import org.mycore.ocfl.metadata.migration.MCROCFLMigration.ContentSupplier;
 
 public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
 
-    private static final Logger LOGGER = LogManager.getLogger();
     public static final String JUNIT_TEST_00000001 = "junit_test_00000001";
     public static final String AUTOR_1 = "Sebastian";
     public static final String AUTOR_2 = "Hans";
     public static final String AUTOR_3 = "Peter";
-    public static final MCROCFLMigration.ContentSupplier CONTENT_1 = () -> {
+    public static final ContentSupplier CONTENT_1 = () -> {
         Element test = new Element("test");
         Document testDoc = new Document(test);
         test.addContent(new Element("a").setText("1"));
@@ -51,8 +50,7 @@ public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
         test.addContent(new Element("c").setText("3"));
         return new MCRJDOMContent(testDoc);
     };
-
-    public static final MCROCFLMigration.ContentSupplier CONTENT_2 = () -> {
+    public static final ContentSupplier CONTENT_2 = () -> {
         Element test = new Element("test");
         Document testDoc = new Document(test);
         test.addContent(new Element("a").setText("4"));
@@ -60,8 +58,7 @@ public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
         test.addContent(new Element("c").setText("3"));
         return new MCRJDOMContent(testDoc);
     };
-
-    public static final MCROCFLMigration.ContentSupplier CONTENT_3 = () -> {
+    public static final ContentSupplier CONTENT_3 = () -> {
         Element test = new Element("test");
         Document testDoc = new Document(test);
         test.addContent(new Element("a").setText("6"));
@@ -69,6 +66,7 @@ public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
         test.addContent(new Element("c").setText("4"));
         return new MCRJDOMContent(testDoc);
     };
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void testPrune() throws IOException, JDOMException {
@@ -131,7 +129,8 @@ public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
         Assert.assertTrue("r2 content should be original r3 content",
             MCRXMLHelper.deepEqual(prune.get(1).getContentSupplier().get().asXML(), CONTENT_3.get().asXML()));
 
-        LOGGER.info("Second Result: " + prune.stream().map(MCROCFLRevision::toString).collect(Collectors.joining("\n")));
+        LOGGER
+            .info("Second Result: " + prune.stream().map(MCROCFLRevision::toString).collect(Collectors.joining("\n")));
 
     }
 
