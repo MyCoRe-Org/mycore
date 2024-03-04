@@ -16,13 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl.metadata;
+package org.mycore.ocfl.metadata.migration;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,8 +31,11 @@ import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import org.mycore.datamodel.common.MCRObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
 
 public class MCROCFLMigration {
 
@@ -49,14 +51,28 @@ public class MCROCFLMigration {
 
     private final ArrayList<String> failed;
 
+    private final List<MCROCFLRevisionPruner> pruners;
+
     public MCROCFLMigration(String newRepoKey) {
-        target = new MCROCFLXMLMetadataManager();
-        target.setRepositoryKey(newRepoKey);
+        this(newRepoKey, new ArrayList<>());
+    }
+
+    public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners) {
+        this(newRepoKey, pruners, new MCROCFLXMLMetadataManager());
+    }
+
+    public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners, MCROCFLXMLMetadataManager target) {
+        this.target = target;
+
+        if (newRepoKey != null) {
+            target.setRepositoryKey(newRepoKey);
+        }
 
         invalidState = new ArrayList<>();
         withoutHistory = new ArrayList<>();
         success = new ArrayList<>();
         failed = new ArrayList<>();
+        this.pruners = pruners;
     }
 
     public ArrayList<String> getInvalidState() {
@@ -76,13 +92,13 @@ public class MCROCFLMigration {
     }
 
     public void start() {
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
-        for (String baseId : instance.getObjectBaseIds()) {
-            String[] idParts = baseId.split("_");
-            int maxId = instance.getHighestStoredID(idParts[0], idParts[1]);
+        MCRObjectIDGenerator mcrObjectIDGenerator = MCRMetadataManager.getMCRObjectIDGenerator();
+
+        for (String baseId : mcrObjectIDGenerator.getBaseIDs()) {
+            int maxId = mcrObjectIDGenerator.getLastID(baseId).getNumberAsInteger();
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
                 .mapToObj(i -> MCRObjectID.formatID(baseId, i))
-                .collect(Collectors.toList());
+                .toList();
 
             for (String id : possibleIds) {
                 LOGGER.info("Try migrate {}", id);
@@ -92,28 +108,49 @@ public class MCROCFLMigration {
 
     }
 
+
     private void migrateID(String id) {
         List<? extends MCRAbstractMetadataVersion<?>> revisions;
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         revisions = readRevisions(objectID);
-        List<MigrationStep> steps = new ArrayList<>();
+        List<MCROCFLRevision> steps = new ArrayList<>();
         if (revisions != null) {
             try {
                 for (MCRAbstractMetadataVersion rev : revisions) {
-                    MigrationStep step = migrateRevision(rev, objectID);
+                    MCROCFLRevision step = migrateRevision(rev, objectID);
+
+                    // read one time now, to avoid errors later, but do not store it
+                    retriveActualContent(rev);
+
                     steps.add(step);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // an error happened, so all steps are useless
                 LOGGER.warn("Error while receiving all information which are needed to migrate the object " + id, e);
                 steps.clear();
             }
         }
-        if (steps.size() > 0) {
+
+        int originalStepsSize = steps.size();
+        if (!pruners.isEmpty()) {
+            for (MCROCFLRevisionPruner pruner : pruners) {
+                try {
+                    int size = steps.size();
+                    steps = pruner.prune(steps);
+                    LOGGER.info("Pruned {} revisions to {} with {}", size, steps.size(), pruner);
+                } catch (IOException | JDOMException e) {
+                    LOGGER.warn("Error while pruning " + id, e);
+                    failed.add(id);
+                    return;
+                }
+            }
+        }
+
+        if (originalStepsSize > 0) {
             // try version migration
             try {
-                for (MigrationStep step : steps) {
-                    step.execute();
+                for (MCROCFLRevision step : steps) {
+                    step.execute(target);
                 }
                 success.add(id);
                 return;
@@ -150,20 +187,25 @@ public class MCROCFLMigration {
         }
     }
 
-    private MigrationStep migrateRevision(MCRAbstractMetadataVersion rev, MCRObjectID objectID) throws IOException {
+    private MCROCFLRevision migrateRevision(MCRAbstractMetadataVersion rev, MCRObjectID objectID)
+        throws IOException {
         String user = rev.getUser();
         Date date = rev.getDate();
         LOGGER.info("Migrate revision {} of {}", rev.getRevision(), objectID);
 
+
         return switch (rev.getType()) {
-            case 'A' -> new CreateMigrationStep(retriveActualContent(rev), user, date, objectID);
-            case 'D' -> new DeleteMigrationStep(user, date, objectID);
-            case 'M' -> new UpdateMigrationStep(retriveActualContent(rev), user, date, objectID);
+        case 'A' -> new MCROCFLCreateRevision(() -> retriveActualContent(rev), user, date, objectID);
+        case 'D' -> new MCROCFLDeleteRevision(user, date, objectID);
+        case 'M' -> new MCROCFLUpdateRevision(() -> retriveActualContent(rev), user, date, objectID);
             default -> null;
         };
     }
 
     private MCRContent retriveActualContent(MCRAbstractMetadataVersion rev) throws IOException {
+        if (rev.getType() == 'D') {
+            return null;
+        }
         MCRContent content = rev.retrieve();
         Document document;
 
@@ -187,56 +229,8 @@ public class MCROCFLMigration {
         return revisions;
     }
 
-    private abstract static class MigrationStep {
-        MCRContent content;
-
-        String user;
-
-        Date date;
-
-        MCRObjectID objectID;
-
-        MigrationStep(MCRContent content, String user, Date date, MCRObjectID objectID) {
-            this.content = content;
-            this.user = user;
-            this.date = date;
-            this.objectID = objectID;
-        }
-
-        public abstract void execute();
-    }
-
-    private class CreateMigrationStep extends MigrationStep {
-        CreateMigrationStep(MCRContent content, String user, Date date, MCRObjectID objectID) {
-            super(content, user, date, objectID);
-        }
-
-        @Override
-        public void execute() {
-            target.create(objectID, content, date, user);
-        }
-    }
-
-    private class UpdateMigrationStep extends MigrationStep {
-        UpdateMigrationStep(MCRContent content, String user, Date date, MCRObjectID objectID) {
-            super(content, user, date, objectID);
-        }
-
-        @Override
-        public void execute() {
-            target.update(objectID, content, date, user);
-        }
-    }
-
-    private class DeleteMigrationStep extends MigrationStep {
-        DeleteMigrationStep(String user, Date date, MCRObjectID objectID) {
-            super(null, user, date, objectID);
-        }
-
-        @Override
-        public void execute() {
-            target.delete(objectID, date, user);
-        }
+    interface ContentSupplier {
+        MCRContent get() throws IOException;
     }
 
 }
