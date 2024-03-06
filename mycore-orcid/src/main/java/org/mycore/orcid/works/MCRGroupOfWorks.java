@@ -51,7 +51,7 @@ public class MCRGroupOfWorks {
      * The MODS from each is merged together.
      */
     public Element buildMergedMODS() {
-        Element mods = works.get(0).getMODS().clone();
+        Element mods = works.getFirst().getMODS().clone();
         for (int i = 1; i < works.size(); i++) {
             MCRMergeTool.merge(mods, works.get(i).getMODS());
         }

@@ -95,7 +95,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
 
         List<Element> categories = session.getEditedXML().getRootElement().getChildren("category");
         assertEquals(1, categories.size());
-        assertEquals("", categories.get(0).getText());
+        assertEquals("", categories.getFirst().getText());
 
         session.getSubmission()
             .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
@@ -108,7 +108,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
 
         categories = session.getEditedXML().getRootElement().getChildren("category");
         assertEquals(1, categories.size());
-        assertEquals("b", categories.get(0).getText());
+        assertEquals("b", categories.getFirst().getText());
     }
 
     @Test

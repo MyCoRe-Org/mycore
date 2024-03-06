@@ -148,6 +148,6 @@ public final class MCRURLRetriever {
         if (parents == null || parents.isEmpty()) {
             return null;
         }
-        return parents.iterator().next().getId().getId();
+        return parents.getFirst().getId().getId();
     }
 }

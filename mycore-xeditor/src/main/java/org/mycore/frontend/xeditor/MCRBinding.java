@@ -138,7 +138,7 @@ public class MCRBinding {
     }
 
     public Object getBoundNode() {
-        return boundNodes.get(0);
+        return boundNodes.getFirst();
     }
 
     public void removeBoundNode(int index) {
@@ -186,7 +186,7 @@ public class MCRBinding {
         List<MCRBinding> ancestors = new ArrayList<>();
         MCRBinding current = this;
         do {
-            ancestors.add(0, current);
+            ancestors.addFirst(current);
             current = current.getParent();
         } while (current != null);
         return ancestors;

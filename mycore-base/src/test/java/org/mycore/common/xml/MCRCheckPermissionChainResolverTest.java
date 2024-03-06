@@ -81,7 +81,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         Assert.assertEquals("The result source should be returned", resultSource, result);
         Assert.assertEquals("The resolver should have been called", 1, MCRMockResolver.getCalls().size());
         Assert.assertEquals("The Mock resolver should have been called with the right uri", MOCK_CALL,
-            MCRMockResolver.getCalls().get(0).getHref());
+            MCRMockResolver.getCalls().getFirst().getHref());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         Assert.assertEquals("The result source should be returned", resultSource, result);
         Assert.assertEquals("The resolver should have been called", 1, MCRMockResolver.getCalls().size());
         Assert.assertEquals("The Mock resolver should have been called with the right uri", MOCK_CALL,
-            MCRMockResolver.getCalls().get(0).getHref());
+            MCRMockResolver.getCalls().getFirst().getHref());
 
     }
 
@@ -115,18 +115,18 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         Assert.assertEquals("There should be a call to the access strategy", 1,
             MCRAccessMock.getCheckPermissionCalls().size());
         Assert.assertEquals("The call should be made with permission " + PERMISSION_USE_STUFF, PERMISSION_USE_STUFF,
-            MCRAccessMock.getCheckPermissionCalls().get(0).getPermission());
+            MCRAccessMock.getCheckPermissionCalls().getFirst().getPermission());
         Assert.assertNull("The call should be made with null as id ",
-            MCRAccessMock.getCheckPermissionCalls().get(0).getId());
+            MCRAccessMock.getCheckPermissionCalls().getFirst().getId());
     }
 
     private void assertReadCall() {
         Assert.assertEquals("There should be a call to the access strategy", 1,
             MCRAccessMock.getCheckPermissionCalls().size());
         Assert.assertEquals("The call should be made with permission read", MCRAccessManager.PERMISSION_READ,
-            MCRAccessMock.getCheckPermissionCalls().get(0).getPermission());
+            MCRAccessMock.getCheckPermissionCalls().getFirst().getPermission());
         Assert.assertEquals("The call should be made with the id " + MOCK_ID, MOCK_ID,
-            MCRAccessMock.getCheckPermissionCalls().get(0).getId());
+            MCRAccessMock.getCheckPermissionCalls().getFirst().getId());
     }
 
     @Override

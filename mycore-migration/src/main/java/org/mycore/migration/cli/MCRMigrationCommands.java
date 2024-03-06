@@ -118,13 +118,13 @@ public class MCRMigrationCommands {
                 createUser = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
                 modifyUser = createUser;
             } else {
-                MCRAbstractMetadataVersion<?> firstVersion = versions.get(0);
+                MCRAbstractMetadataVersion<?> firstVersion = versions.getFirst();
                 for (MCRAbstractMetadataVersion<?> version : versions) {
                     if (version.getType() == 'A') {
                         firstVersion = version; // get last 'added'
                     }
                 }
-                MCRAbstractMetadataVersion<?> lastVersion = versions.get(versions.size() - 1);
+                MCRAbstractMetadataVersion<?> lastVersion = versions.getLast();
                 createUser = firstVersion.getUser();
                 modifyUser = lastVersion.getUser();
             }
@@ -366,7 +366,7 @@ public class MCRMigrationCommands {
         //migrate title:
         //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
         if (derivate.getService().getFlags("title").size() > 0) {
-            String title = derivate.getService().getFlags("title").get(0);
+            String title = derivate.getService().getFlags("title").getFirst();
             derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
             derivate.getService().removeFlags("title");
         }

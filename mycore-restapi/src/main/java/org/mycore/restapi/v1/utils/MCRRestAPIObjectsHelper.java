@@ -831,7 +831,7 @@ public class MCRRestAPIObjectsHelper {
                 QueryResponse response = solrClient.query(query);
                 SolrDocumentList solrResults = response.getResults();
                 if (solrResults.getNumFound() == 1) {
-                    String id = solrResults.get(0).getFieldValue("returnId").toString();
+                    String id = solrResults.getFirst().getFieldValue("returnId").toString();
                     return retrieveMCRObject(id);
                 } else {
                     if (solrResults.getNumFound() == 0) {

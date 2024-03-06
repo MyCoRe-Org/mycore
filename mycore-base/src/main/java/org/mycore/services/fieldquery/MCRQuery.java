@@ -312,7 +312,7 @@ public class MCRQuery {
         Element conditions = xml.getChild("conditions");
         MCRQuery query = null;
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condElem = conditions.getChildren().get(0);
+            Element condElem = conditions.getChildren().getFirst();
             query = new MCRQuery(new MCRQueryParser().parse(condElem));
         } else {
             String queryString = conditions.getTextTrim();

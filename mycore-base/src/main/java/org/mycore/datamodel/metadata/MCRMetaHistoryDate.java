@@ -72,7 +72,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public MCRMetaHistoryDate() {
         super();
         texts = new ArrayList<>();
-        calendar = MCRCalendar.CALENDARS_LIST.get(0);
+        calendar = MCRCalendar.CALENDARS_LIST.getFirst();
         setDefaultVon();
         setDefaultBis();
     }
@@ -96,7 +96,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public MCRMetaHistoryDate(String subtag, String type, int inherted) throws MCRException {
         super(subtag, null, type, inherted);
         texts = new ArrayList<>();
-        calendar = MCRCalendar.CALENDARS_LIST.get(0);
+        calendar = MCRCalendar.CALENDARS_LIST.getFirst();
         setDefaultVon();
         setDefaultBis();
     }

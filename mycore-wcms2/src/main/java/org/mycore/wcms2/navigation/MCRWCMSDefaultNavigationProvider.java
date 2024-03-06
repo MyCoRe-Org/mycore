@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
 
 /**
  * Default implementation of <code>NavigationProvider</code>.
- *
+ * 
  * @author Matthias Eichner
  */
 public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvider {
@@ -69,7 +69,7 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
             for (MCRNavigationBaseItem childItem : navigationItemContainer.getChildren()) {
                 create(childItem, childHierarchyArray, items);
             }
-            if (childHierarchyArray.size() > 0) {
+            if (!childHierarchyArray.isEmpty()) {
                 hierarchyObject.add(JSON_CHILDREN, childHierarchyArray);
             }
         }
@@ -82,21 +82,26 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         jsonItem.remove(JSON_CHILDREN);
         WCMSType type = null;
         String href = null;
-        if (item instanceof MCRNavigation navigation) {
-            type = WCMSType.root;
-            href = navigation.getHrefStartingPage();
-        } else if (item instanceof MCRNavigationMenuItem menuItem) {
-            type = WCMSType.menu;
-            href = menuItem.getDir();
-        } else if (item instanceof MCRNavigationItem navigationItem) {
-            type = WCMSType.item;
-            href = navigationItem.getHref();
-        } else if (item instanceof MCRNavigationInsertItem) {
-            type = WCMSType.insert;
-        } else if (item instanceof MCRNavigationGroup) {
-            type = WCMSType.group;
-        } else {
-            LOGGER.warn("Unable to set type for item {}", id);
+        switch (item) {
+            case MCRNavigation navigation -> {
+                type = WCMSType.root;
+                href = navigation.getHrefStartingPage();
+            }
+            case MCRNavigationMenuItem menuItem -> {
+                type = WCMSType.menu;
+                href = menuItem.getDir();
+            }
+            case MCRNavigationItem navigationItem -> {
+                type = WCMSType.item;
+                href = navigationItem.getHref();
+            }
+            case MCRNavigationInsertItem mcrNavigationInsertItem -> {
+                type = WCMSType.insert;
+            }
+            case MCRNavigationGroup mcrNavigationGroup -> {
+                type = WCMSType.group;
+            }
+            case null, default -> LOGGER.warn("Unable to set type for item {}", id);
         }
         jsonItem.addProperty(JSON_WCMS_TYPE, type.name());
         if (href != null) {
@@ -114,7 +119,7 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
     public MCRNavigation fromJSON(JsonObject navigationJSON) {
         JsonArray items = navigationJSON.get(JSON_ITEMS).getAsJsonArray();
         JsonArray hierarchy = navigationJSON.get(JSON_HIERARCHY).getAsJsonArray();
-        if (hierarchy.size() > 0) {
+        if (!hierarchy.isEmpty()) {
             JsonObject root = hierarchy.get(0).getAsJsonObject();
             MCRNavigationBaseItem item = createItem(root, items);
             if (item instanceof MCRNavigation navigation) {

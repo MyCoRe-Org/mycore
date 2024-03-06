@@ -277,7 +277,7 @@ public class MCRTopologicalSort<T> {
         // while S is non-empty do
         while (!leafs.isEmpty()) {
             // remove a node n from S
-            Integer node = leafs.remove(0);
+            Integer node = leafs.removeFirst();
             // add n to tail of L (we use head, because we need an inverted list !!)
             result[cursor--] = node;
             // for each node m with an edge e from n to m do

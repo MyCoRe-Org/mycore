@@ -204,8 +204,8 @@ public class MCRNeo4JQueryRunner {
             List<String> stringList = ((List<?>) value).stream().map(Object::toString).toList();
 
             if (stringList.size() == 1) {
-                if (stringList.get(0).contains(NEO4J_PARAMETER_SEPARATOR)) {
-                    String[] sep = stringList.get(0).split(NEO4J_PARAMETER_SEPARATOR);
+                if (stringList.getFirst().contains(NEO4J_PARAMETER_SEPARATOR)) {
+                    String[] sep = stringList.getFirst().split(NEO4J_PARAMETER_SEPARATOR);
                     String classification = getClassificationLabel(sep[0], sep[1], lang);
                     metaDataList.add(new Neo4JMetaData(key, List.of(classification)));
                 }

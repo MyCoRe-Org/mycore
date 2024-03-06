@@ -160,7 +160,7 @@ public class MCREnricher {
             .stream()
             .map(MCRTransactionableCallable::new)
             .collect(Collectors.toList());
-        ExecutorService executor = Executors.newFixedThreadPool(calls.size());
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         try {
             executor.invokeAll(calls);
         } catch (InterruptedException ex) {

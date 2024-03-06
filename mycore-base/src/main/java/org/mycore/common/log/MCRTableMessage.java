@@ -113,15 +113,12 @@ public final class MCRTableMessage<T> {
     }
 
     private String stringValue(Object value) {
-        if (value == null) {
-            return "";
-        } else if (value instanceof String string) {
-            return string;
-        } else if (value instanceof Optional<?> optional) {
-            return optional.map(this::stringValue).orElse("");
-        } else {
-            return value.toString();
-        }
+        return switch (value) {
+            case null -> "";
+            case String string -> string;
+            case Optional<?> optional -> optional.map(this::stringValue).orElse("");
+            default -> value.toString();
+        };
     }
 
     private String rowLine(String[] values, int[] lengths) {

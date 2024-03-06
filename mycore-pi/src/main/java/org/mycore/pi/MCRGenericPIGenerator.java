@@ -247,15 +247,12 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
                     MCRConstants.getStandardNamespaces());
                 final Object content = expr.evaluateFirst(mcrBase.createXML());
 
-                if (content instanceof Text text) {
-                    return text.getTextNormalize();
-                } else if (content instanceof Attribute attribute) {
-                    return attribute.getValue();
-                } else if (content instanceof Element element) {
-                    return element.getTextNormalize();
-                } else {
-                    return content.toString();
-                }
+                return switch (content) {
+                    case Text text -> text.getTextNormalize();
+                    case Attribute attribute -> attribute.getValue();
+                    case Element element -> element.getTextNormalize();
+                    case null, default -> content.toString();
+                };
             });
             System.out.println(resultingPI);
         }
@@ -318,7 +315,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         return Optional.ofNullable(mapping)
             .map(mappingStr -> mappingStr.split(","))
             .map(Arrays::asList)
-            .filter(o -> o.get(0).equals(typeID))
+            .filter(o -> o.getFirst().equals(typeID))
             .map(o -> o.get(1))
             .orElse(typeID);
     }
@@ -330,7 +327,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         return Optional.ofNullable(mapping)
             .map(mappingStr -> mappingStr.split(","))
             .map(Arrays::asList)
-            .filter(o -> o.get(0).equals(projectID))
+            .filter(o -> o.getFirst().equals(projectID))
             .map(o -> o.get(1))
             .orElse(projectID);
     }
