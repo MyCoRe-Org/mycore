@@ -31,6 +31,7 @@ import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import org.mycore.datamodel.common.MCRMetadataVersionType;
 import org.mycore.datamodel.common.MCRObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -116,7 +117,7 @@ public class MCROCFLMigration {
         List<MCROCFLRevision> steps = new ArrayList<>();
         if (revisions != null) {
             try {
-                for (MCRAbstractMetadataVersion rev : revisions) {
+                for (MCRAbstractMetadataVersion<?> rev : revisions) {
                     MCROCFLRevision step = migrateRevision(rev, objectID);
 
                     // read one time now, to avoid errors later, but do not store it
@@ -150,7 +151,7 @@ public class MCROCFLMigration {
             // try version migration
             try {
                 for (MCROCFLRevision step : steps) {
-                    step.execute(target);
+                    writeRevision(step, objectID);
                 }
                 success.add(id);
                 return;
@@ -187,23 +188,28 @@ public class MCROCFLMigration {
         }
     }
 
-    private MCROCFLRevision migrateRevision(MCRAbstractMetadataVersion rev, MCRObjectID objectID)
+    private void writeRevision(MCROCFLRevision step, MCRObjectID objectID) throws IOException {
+        switch (step.type()) {
+        case CREATED -> target.create(objectID, step.contentSupplier().get(), step.date());
+        case MODIFIED -> target.update(objectID, step.contentSupplier().get(), step.date());
+        case DELETED -> target.delete(objectID, step.date(), step.user());
+        }
+    }
+
+    private MCROCFLRevision migrateRevision(MCRAbstractMetadataVersion<?> rev, MCRObjectID objectID)
         throws IOException {
         String user = rev.getUser();
         Date date = rev.getDate();
         LOGGER.info("Migrate revision {} of {}", rev.getRevision(), objectID);
 
 
-        return switch (rev.getType()) {
-        case 'A' -> new MCROCFLCreateRevision(() -> retriveActualContent(rev), user, date, objectID);
-        case 'D' -> new MCROCFLDeleteRevision(user, date, objectID);
-        case 'M' -> new MCROCFLUpdateRevision(() -> retriveActualContent(rev), user, date, objectID);
-            default -> null;
-        };
+        MCRMetadataVersionType type = MCRMetadataVersionType.fromValue(rev.getType());
+        ContentSupplier supplier = type == MCRMetadataVersionType.DELETED ? null : () -> retriveActualContent(rev);
+        return new MCROCFLRevision(type, supplier, user, date, objectID);
     }
 
-    private MCRContent retriveActualContent(MCRAbstractMetadataVersion rev) throws IOException {
-        if (rev.getType() == 'D') {
+    private MCRContent retriveActualContent(MCRAbstractMetadataVersion<?> rev) throws IOException {
+        if (rev.getType() == MCRAbstractMetadataVersion.DELETED) {
             return null;
         }
         MCRContent content = rev.retrieve();
@@ -229,7 +235,7 @@ public class MCROCFLMigration {
         return revisions;
     }
 
-    interface ContentSupplier {
+    public interface ContentSupplier {
         MCRContent get() throws IOException;
     }
 

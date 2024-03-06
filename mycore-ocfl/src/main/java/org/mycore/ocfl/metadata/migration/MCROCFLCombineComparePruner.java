@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.common.MCRMetadataVersionType;
 
 /**
  * A pruner that combines and compares revisions to decide which to keep and which to discard.
@@ -56,12 +57,11 @@ public abstract class MCROCFLCombineComparePruner implements MCROCFLRevisionPrun
         while (iterator.hasNext()) {
             MCROCFLRevision next = iterator.next();
 
-            if ((last.getType() == MCROCFLVersionType.CREATE || last.getType() == MCROCFLVersionType.UPDATE) &&
-                    (next.getType() == MCROCFLVersionType.CREATE || next.getType() == MCROCFLVersionType.UPDATE)) {
-                MCRContent currentContent = last.getContentSupplier().get();
+            if (last.type() != MCRMetadataVersionType.DELETED && next.type() != MCRMetadataVersionType.DELETED) {
+                MCRContent currentContent = last.contentSupplier().get();
                 Document currentDocument = currentContent.asXML();
 
-                MCRContent nextContent = next.getContentSupplier().get();
+                MCRContent nextContent = next.contentSupplier().get();
                 Document nextDocument = nextContent.asXML();
 
                 if (comparator.shouldMerge(last, currentDocument, next,nextDocument)) {
@@ -103,8 +103,8 @@ public abstract class MCROCFLCombineComparePruner implements MCROCFLRevisionPrun
      * A decider that decides if two revisions should be merged.
      */
     public interface RevisionMergeDecider {
-
-        boolean shouldMerge(MCROCFLRevision r1, Document o1, MCROCFLRevision r2, Document o2);
+        boolean shouldMerge(MCROCFLRevision revision1, Document document1,
+            MCROCFLRevision revision2, Document document2);
     }
 
 }

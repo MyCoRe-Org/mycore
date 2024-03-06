@@ -18,63 +18,15 @@
 
 package org.mycore.ocfl.metadata.migration;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
-
-import java.io.IOException;
 import java.util.Date;
 
-public abstract class MCROCFLRevision {
+import org.mycore.datamodel.common.MCRMetadataVersionType;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.ocfl.metadata.migration.MCROCFLMigration.ContentSupplier;
 
-    private final MCROCFLVersionType type;
-
-    MCROCFLMigration.ContentSupplier contentSupplier;
-
-    String user;
-
-    Date date;
-
-    MCRObjectID objectID;
-
-    MCROCFLRevision(MCROCFLVersionType type, MCROCFLMigration.ContentSupplier contentSupplier, String user, Date date,
-                    MCRObjectID objectID) {
-        this.type = type;
-        this.contentSupplier = contentSupplier;
-        this.user = user;
-        this.date = date;
-        this.objectID = objectID;
-    }
-
-    public abstract void execute(MCROCFLXMLMetadataManager metadataManager) throws IOException;
-
-    public MCROCFLMigration.ContentSupplier getContentSupplier() {
-        return contentSupplier;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public MCRObjectID getObjectID() {
-        return objectID;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public MCROCFLVersionType getType() {
-        return type;
-    }
-
-
-    @Override
-    public String toString() {
-        return "MCROCFLRevision{" +
-                "type=" + type +
-                ", user='" + user + '\'' +
-                ", date=" + date +
-                ", objectID=" + objectID +
-                '}';
-    }
+public record MCROCFLRevision(MCRMetadataVersionType type,
+    ContentSupplier contentSupplier,
+    String user,
+    Date date,
+    MCRObjectID objectID) {
 }

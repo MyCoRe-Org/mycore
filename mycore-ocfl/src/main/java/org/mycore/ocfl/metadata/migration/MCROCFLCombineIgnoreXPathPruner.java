@@ -31,13 +31,14 @@ import org.jdom2.xpath.XPathExpression;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.common.MCRMetadataVersionType;
 
 /**
  * A pruner that combines and compares revisions, based on an XPath expression, to decide which to keep and which to
  * discard.
  * The XPath expression marks content that should be ignored when comparing two revisions and when the content is equal,
- * the revisions are merged. There is a property NeedSameAutor that can be set to true to require that the revisions
- * have the same author. The properties FirstAutorWins and FirstDateWins can be set to true to decide which revision
+ * the revisions are merged. There is a property NeedSameAuthor that can be set to true to require that the revisions
+ * have the same author. The properties FirstAuthorWins and FirstDateWins can be set to true to decide which revision
  * metadata should be used in the merged revision.
  */
 public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
@@ -45,11 +46,11 @@ public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
 
     private XPathExpression<Content> xpath;
 
-    private boolean firstAutorWins;
+    private boolean firstAuthorWins;
 
     private boolean firstDateWins;
 
-    private boolean needSameAutor;
+    private boolean needSameAuthor;
 
     public XPathExpression<Content> getXpath() {
         return xpath;
@@ -65,17 +66,17 @@ public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
         this.xpath = xpath;
     }
 
-    public boolean isFirstAutorWins() {
-        return firstAutorWins;
+    public boolean isFirstAuthorWins() {
+        return firstAuthorWins;
     }
 
-    @MCRProperty(name = "FirstAutorWins", required = true)
-    public void setFirstAutorWins(String firstAutorWins) {
-        this.firstAutorWins = Boolean.parseBoolean(firstAutorWins);
+    @MCRProperty(name = "FirstAuthorWins", required = true)
+    public void setFirstAuthorWins(String firstAuthorWins) {
+        this.firstAuthorWins = Boolean.parseBoolean(firstAuthorWins);
     }
 
-    public void setFirstAutorWins(boolean firstAutorWins) {
-        this.firstAutorWins = firstAutorWins;
+    public void setFirstAuthorWins(boolean firstAuthorWins) {
+        this.firstAuthorWins = firstAuthorWins;
     }
 
     public boolean isFirstDateWins() {
@@ -96,46 +97,46 @@ public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
         return this;
     }
 
-    @MCRProperty(name = "NeedSameAutor", required = true)
-    public void setNeedSameAutor(String needSameAutor) {
-        this.needSameAutor = Boolean.parseBoolean(needSameAutor);
+    @MCRProperty(name = "NeedSameAuthor", required = true)
+    public void setNeedSameAuthor(String needSameAuthor) {
+        this.needSameAuthor = Boolean.parseBoolean(needSameAuthor);
     }
 
-    public void setNeedSameAutor(boolean needSameAutor) {
-        this.needSameAutor = needSameAutor;
+    public void setNeedSameAuthor(boolean needSameAuthor) {
+        this.needSameAuthor = needSameAuthor;
     }
 
-    public boolean needSameAutor() {
-        return needSameAutor;
+    public boolean needSameAuthor() {
+        return needSameAuthor;
     }
 
     @Override
     public MCROCFLRevision buildMergedRevision(MCROCFLRevision current, MCROCFLRevision next, Document currentDocument,
         Document nextDocument) {
-        MCROCFLVersionType type = current.getType();
+        MCRMetadataVersionType type = current.type();
         String user = chooseUser(current, next);
         Date date = chooseDate(current, next);
 
-        return switch (type) {
-        case CREATE -> new MCROCFLCreateRevision(next.getContentSupplier(), user, date, next.getObjectID());
-        case UPDATE -> new MCROCFLUpdateRevision(next.getContentSupplier(), user, date, next.getObjectID());
-        default -> throw new IllegalArgumentException("Unsupported type: " + type);
-        };
+        if (type == MCRMetadataVersionType.DELETED) {
+            throw new IllegalArgumentException("Unsupported type: " + type);
+        }
+        return new MCROCFLRevision(type, next.contentSupplier(), user, date, next.objectID());
+
     }
 
     public String chooseUser(MCROCFLRevision current, MCROCFLRevision next) {
-        if (isFirstAutorWins()) {
-            return current.getUser();
+        if (isFirstAuthorWins()) {
+            return current.user();
         } else {
-            return next.getUser();
+            return next.user();
         }
     }
 
     public Date chooseDate(MCROCFLRevision current, MCROCFLRevision next) {
         if (isFirstDateWins()) {
-            return current.getDate();
+            return current.date();
         } else {
-            return next.getDate();
+            return next.date();
         }
     }
 
@@ -150,27 +151,28 @@ public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
     }
 
     @Override
-    public boolean shouldMerge(MCROCFLRevision r1, Document o1, MCROCFLRevision r2, Document o2) {
-        if (needSameAutor() && !Objects.equals(r1.getUser(), r2.getUser())) {
+    public boolean shouldMerge(MCROCFLRevision revision1, Document document1, MCROCFLRevision revision2,
+        Document document2) {
+        if (needSameAuthor() && !Objects.equals(revision1.user(), revision2.user())) {
             return false;
         }
 
-        Document o1Clone = o1.clone();
-        Document o2Clone = o2.clone();
+        Document document1Clone = document1.clone();
+        Document document2Clone = document2.clone();
 
-        pruneXPathMatches(o1Clone);
-        pruneXPathMatches(o2Clone);
+        pruneXPathMatches(document1Clone);
+        pruneXPathMatches(document2Clone);
 
-        return MCRXMLHelper.deepEqual(o1Clone, o2Clone);
+        return MCRXMLHelper.deepEqual(document1Clone, document2Clone);
     }
 
     @Override
     public String toString() {
         return "MCROCFLCombineIgnoreXPathPruner{" +
                 "xpath=" + xpath.getExpression() +
-                ", firstAutorWins=" + firstAutorWins +
+            ", firstAuthorWins=" + firstAuthorWins +
                 ", firstDateWins=" + firstDateWins +
-                ", needSameAutor=" + needSameAutor +
+            ", needSameAuthor=" + needSameAuthor +
                 '}';
     }
 }

@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.common.MCRMetadataVersionType;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration.ContentSupplier;
 
@@ -73,61 +74,68 @@ public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
 
         MCROCFLCombineIgnoreXPathPruner xPathPruner = new MCROCFLCombineIgnoreXPathPruner();
         xPathPruner.setXpath("/test/a|/test/b");
-        xPathPruner.setFirstAutorWins(true);
+        xPathPruner.setFirstAuthorWins(true);
         xPathPruner.setFirstDateWins(true);
 
         MCRObjectID objectID = MCRObjectID.getInstance(JUNIT_TEST_00000001);
         Date baseDate = new Date();
 
-        MCROCFLRevision r1 = new MCROCFLCreateRevision(CONTENT_1, AUTOR_1, baseDate, objectID);
+        MCROCFLRevision r1
+            = new MCROCFLRevision(MCRMetadataVersionType.CREATED, CONTENT_1, AUTOR_1, baseDate, objectID);
 
         MCROCFLRevision r2
-            = new MCROCFLUpdateRevision(CONTENT_2, AUTOR_2, new Date(baseDate.getTime() + 1000), objectID);
+            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_2, AUTOR_2,
+                new Date(baseDate.getTime() + 1000), objectID);
 
         MCROCFLRevision r3
-            = new MCROCFLUpdateRevision(CONTENT_3, AUTOR_3, new Date(baseDate.getTime() + 2000), objectID);
+            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_3, AUTOR_3,
+                new Date(baseDate.getTime() + 2000), objectID);
 
         MCROCFLRevision r4
-            = new MCROCFLDeleteRevision(AUTOR_3, new Date(baseDate.getTime() + 3000), objectID);
+            = new MCROCFLRevision(MCRMetadataVersionType.DELETED, null, AUTOR_3, new Date(baseDate.getTime() + 3000),
+                objectID);
 
         MCROCFLRevision r5
-            = new MCROCFLCreateRevision(CONTENT_1, AUTOR_1, new Date(baseDate.getTime() + 4000), objectID);
+            = new MCROCFLRevision(MCRMetadataVersionType.CREATED, CONTENT_1, AUTOR_1,
+                new Date(baseDate.getTime() + 4000), objectID);
 
         MCROCFLRevision r6
-            = new MCROCFLUpdateRevision(CONTENT_2, AUTOR_2, new Date(baseDate.getTime() + 5000), objectID);
+            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_2, AUTOR_2,
+                new Date(baseDate.getTime() + 5000), objectID);
 
         MCROCFLRevision r7
-            = new MCROCFLUpdateRevision(CONTENT_1, AUTOR_3, new Date(baseDate.getTime() + 6000), objectID);
+            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_1, AUTOR_3,
+                new Date(baseDate.getTime() + 6000), objectID);
 
         List<MCROCFLRevision> prune = xPathPruner.prune(List.of(r1, r2, r3, r4, r5, r6, r7));
 
         Assert.assertEquals("r2, r6 and r7 should be pruned away", 4, prune.size());
-        Assert.assertEquals("r1 autor should be original r1 autor", AUTOR_1, prune.get(0).getUser());
-        Assert.assertEquals("r2 autor should be original r3 autor", AUTOR_3, prune.get(1).getUser());
-        Assert.assertEquals("r1 date should be original r1 date", baseDate, prune.get(0).getDate());
+        Assert.assertEquals("r1 autor should be original r1 autor", AUTOR_1, prune.get(0).user());
+        Assert.assertEquals("r2 autor should be original r3 autor", AUTOR_3, prune.get(1).user());
+        Assert.assertEquals("r1 date should be original r1 date", baseDate, prune.get(0).date());
         Assert.assertEquals("r2 date should be original r3 date", new Date(baseDate.getTime() + 2000),
-            prune.get(1).getDate());
+            prune.get(1).date());
         Assert.assertTrue("r1 content should be original r2 content",
-            MCRXMLHelper.deepEqual(prune.get(0).getContentSupplier().get().asXML(), CONTENT_2.get().asXML()));
+            MCRXMLHelper.deepEqual(prune.get(0).contentSupplier().get().asXML(), CONTENT_2.get().asXML()));
         Assert.assertTrue("r2 content should be original r3 content",
-            MCRXMLHelper.deepEqual(prune.get(1).getContentSupplier().get().asXML(), CONTENT_3.get().asXML()));
+            MCRXMLHelper.deepEqual(prune.get(1).contentSupplier().get().asXML(), CONTENT_3.get().asXML()));
 
         LOGGER.info("First Result: " + prune.stream().map(MCROCFLRevision::toString).collect(Collectors.joining("\n")));
 
         xPathPruner.setFirstDateWins(false);
-        xPathPruner.setFirstAutorWins(false);
+        xPathPruner.setFirstAuthorWins(false);
         prune = xPathPruner.prune(List.of(r1, r2, r3, r4, r5, r6, r7));
         Assert.assertEquals("r2, r6 and r7 should be pruned away", 4, prune.size());
-        Assert.assertEquals("r1 autor should be original r2 autor", AUTOR_2, prune.get(0).getUser());
-        Assert.assertEquals("r2 autor should be original r3 autor", AUTOR_3, prune.get(1).getUser());
+        Assert.assertEquals("r1 autor should be original r2 autor", AUTOR_2, prune.get(0).user());
+        Assert.assertEquals("r2 autor should be original r3 autor", AUTOR_3, prune.get(1).user());
         Assert.assertEquals("r1 date should be original r2 date", new Date(baseDate.getTime() + 1000),
-            prune.get(0).getDate());
+            prune.get(0).date());
         Assert.assertEquals("r2 date should be original r3 date", new Date(baseDate.getTime() + 2000),
-            prune.get(1).getDate());
+            prune.get(1).date());
         Assert.assertTrue("r1 content should be original r2 content",
-            MCRXMLHelper.deepEqual(prune.get(0).getContentSupplier().get().asXML(), CONTENT_2.get().asXML()));
+            MCRXMLHelper.deepEqual(prune.get(0).contentSupplier().get().asXML(), CONTENT_2.get().asXML()));
         Assert.assertTrue("r2 content should be original r3 content",
-            MCRXMLHelper.deepEqual(prune.get(1).getContentSupplier().get().asXML(), CONTENT_3.get().asXML()));
+            MCRXMLHelper.deepEqual(prune.get(1).contentSupplier().get().asXML(), CONTENT_3.get().asXML()));
 
         LOGGER
             .info("Second Result: " + prune.stream().map(MCROCFLRevision::toString).collect(Collectors.joining("\n")));

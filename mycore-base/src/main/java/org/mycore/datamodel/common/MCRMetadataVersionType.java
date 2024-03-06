@@ -16,8 +16,28 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl.metadata.migration;
+package org.mycore.datamodel.common;
 
-enum MCROCFLVersionType {
-    CREATE, DELETE, UPDATE
+import java.util.stream.Stream;
+
+public enum MCRMetadataVersionType {
+    CREATED('A'),
+    MODIFIED('M'),
+    DELETED('D');
+
+    private final char charValue;
+
+    MCRMetadataVersionType(char a) {
+        this.charValue = a;
+    }
+
+    public static MCRMetadataVersionType fromValue(char a) {
+        return Stream.of(values()).filter(t -> t.charValue == a)
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
+    }
+
+    final char getCharValue() {
+        return charValue;
+    }
 }
