@@ -133,19 +133,18 @@ public class MCROCFLMigration {
         }
 
         int originalStepsSize = steps.size();
-        if (!pruners.isEmpty()) {
-            for (MCROCFLRevisionPruner pruner : pruners) {
-                try {
-                    int size = steps.size();
-                    steps = pruner.prune(steps);
-                    LOGGER.info("Pruned {} revisions to {} with {}", size, steps.size(), pruner);
-                } catch (IOException | JDOMException e) {
-                    LOGGER.warn("Error while pruning " + id, e);
-                    failed.add(id);
-                    return;
-                }
+        for (MCROCFLRevisionPruner pruner : pruners) {
+            try {
+                int size = steps.size();
+                steps = pruner.prune(steps);
+                LOGGER.info("Pruned {} revisions to {} with {}", size, steps.size(), pruner);
+            } catch (IOException | JDOMException e) {
+                LOGGER.warn("Error while pruning " + id, e);
+                failed.add(id);
+                return;
             }
         }
+
 
         if (originalStepsSize > 0) {
             // try version migration
