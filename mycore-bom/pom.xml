@@ -971,6 +971,11 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>com.bucket4j</groupId>
+        <artifactId>bucket4j-core</artifactId>
+        <version>8.1.0</version>
+      </dependency>
+      <dependency>
         <groupId>com.cathive.fonts</groupId>
         <artifactId>fonts-roboto</artifactId>
         <version>2012023.1</version>
