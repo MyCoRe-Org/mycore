@@ -164,6 +164,10 @@
       <artifactId>java-jwt</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.bucket4j</groupId>
+      <artifactId>bucket4j-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
     </dependency>
@@ -385,10 +389,6 @@
     <dependency>
       <groupId>se.jiderhamn.classloader-leak-prevention</groupId>
       <artifactId>classloader-leak-prevention-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.bucket4j</groupId>
-      <artifactId>bucket4j-core</artifactId>
     </dependency>
     <dependency>
       <groupId>xalan</groupId>

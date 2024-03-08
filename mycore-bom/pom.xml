@@ -95,6 +95,11 @@
         <version>4.4.0</version>
       </dependency>
       <dependency>
+        <groupId>com.bucket4j</groupId>
+        <artifactId>bucket4j-core</artifactId>
+        <version>8.1.0</version>
+      </dependency>
+      <dependency>
         <groupId>com.cronutils</groupId>
         <artifactId>cron-utils</artifactId>
         <version>9.2.1</version>
@@ -969,11 +974,6 @@
         <artifactId>jakarta.inject</artifactId>
         <version>${hk2.version}</version>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.bucket4j</groupId>
-        <artifactId>bucket4j-core</artifactId>
-        <version>8.1.0</version>
       </dependency>
       <dependency>
         <groupId>com.cathive.fonts</groupId>
