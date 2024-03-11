@@ -57,17 +57,20 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         Path idCachePath = getCacheDirPath();
 
         Path cacheFile = MCRUtils.safeResolve(idCachePath, baseId);
-        if (!Files.exists(cacheFile)) {
-            synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
-                if (!Files.exists(cacheFile)) {
-                    try {
-                        Files.createFile(cacheFile);
-                    } catch (IOException e) {
-                        throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
-                    }
+        if (Files.exists(cacheFile)) {
+            return cacheFile;
+        }
+
+        synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
+            if (!Files.exists(cacheFile)) {
+                try {
+                   return Files.createFile(cacheFile);
+                } catch (IOException e) {
+                    throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
                 }
             }
         }
+
         return cacheFile;
     }
 
@@ -75,15 +78,15 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         Path dataDir = getDataDirPath();
 
         Path idCachePath = dataDir.resolve("id_cache");
-        if (!Files.exists(idCachePath)) {
-            synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
-                if (!Files.exists(idCachePath)) {
-                    try {
-                        Files.createDirectory(idCachePath);
-                    } catch (IOException e) {
-                        throw new MCRException(
-                            "Could not create " + idCachePath.toAbsolutePath() + " directory", e);
-                    }
+        if (Files.exists(idCachePath)) {
+            return idCachePath;
+        }
+        synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
+            if (!Files.exists(idCachePath)) {
+                try {
+                    Files.createDirectory(idCachePath);
+                } catch (IOException e) {
+                    throw new MCRException("Could not create " + idCachePath.toAbsolutePath() + " directory", e);
                 }
             }
         }
