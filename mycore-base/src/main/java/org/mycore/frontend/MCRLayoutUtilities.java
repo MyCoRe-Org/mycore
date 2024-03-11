@@ -66,8 +66,10 @@ import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -407,6 +409,19 @@ public class MCRLayoutUtilities {
         for (int i = 0; i < emptyNodes.getLength(); ++i) {
             Node emptyTextNode = emptyNodes.item(i);
             emptyTextNode.getParentNode().removeChild(emptyTextNode);
+        }
+        NodeList userNameNodes = (NodeList) xpath.evaluate("//@href[contains(.,'{CurrentUser}')]", personalNavi,
+            XPathConstants.NODESET);
+        for (int i = 0; i < userNameNodes.getLength(); i++) {
+            Attr href = (Attr) userNameNodes.item(i);
+            String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
+            if (userID.equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+                //remove item if user is not logged in
+                org.w3c.dom.Element item = href.getOwnerElement();
+                item.getParentNode().removeChild(item);
+            } else {
+                href.setValue(href.getValue().replace("{CurrentUser}", userID));
+            }
         }
         personalNavi.normalizeDocument();
         if (LOGGER.isDebugEnabled()) {
