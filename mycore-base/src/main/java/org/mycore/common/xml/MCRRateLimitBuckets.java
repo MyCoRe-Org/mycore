@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the {@link Bucket Buckets} for different configurations.
@@ -37,7 +38,7 @@ public class MCRRateLimitBuckets {
 
     private static final String CONFIG_PREFIX = "MCR.RateLimitResolver.";
 
-    private static final HashMap<String, Bucket> EXISTING_BUCKETS = new HashMap<>();
+    private static final Map<String, Bucket> EXISTING_BUCKETS = new ConcurrentHashMap<>();
 
     private static String CONFIG_ID;
 
@@ -62,7 +63,7 @@ public class MCRRateLimitBuckets {
         }
         final String dsConfigLimits = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + CONFIG_ID + ".Limits");
 
-        HashMap<String, Integer> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
+        final HashMap<String, Integer> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
             HashMap::new, (map, str) -> map.put(str.split("/")[1].trim(),
                 Integer.parseInt(str.split("/")[0].trim())),
             HashMap::putAll);
