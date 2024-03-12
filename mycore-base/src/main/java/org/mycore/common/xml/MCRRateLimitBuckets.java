@@ -8,6 +8,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -93,7 +94,7 @@ public class MCRRateLimitBuckets {
      * @return the duration until a bucket refill should happen
      */
     private static Duration getDuration(String unit, long amount) {
-        switch (unit.toLowerCase()) {
+        switch (unit.toLowerCase(Locale.ROOT)) {
             case "m" -> {
                 return Duration.ofDays(30);
             }
