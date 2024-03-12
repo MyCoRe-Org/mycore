@@ -400,9 +400,14 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        long modified = MCRXMLMetadataManager.instance().getLastModified(id);
-        if (modified < 0) {
-            throw new NotFoundException("MCRObject " + id + " not found");
+        long modified;
+        try {
+            modified = MCRXMLMetadataManager.instance().getLastModified(id);
+        } catch (IOException io) {
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
+                .withMessage("MCRObject " + id + " not found")
+                .toException();
         }
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);

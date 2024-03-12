@@ -18,6 +18,8 @@
 
 package org.mycore.webtools.upload.exception;
 
+import org.mycore.services.i18n.MCRTranslation;
+
 /**
  * Should be thrown if a parameter required by an upload handler is not valid. E.g. a classification does not exist.
  */
@@ -32,7 +34,13 @@ public class MCRInvalidUploadParameterException extends MCRUploadException {
     private final String badValue;
 
     public MCRInvalidUploadParameterException(String parameterName, String badValue, String wrongReason) {
-        super("component.webtools.upload.invalid.parameter", parameterName, badValue, wrongReason);
+        this(parameterName, badValue, wrongReason, false);
+    }
+
+    public MCRInvalidUploadParameterException(String parameterName, String badValue, String wrongReason,
+        boolean translateReason) {
+        super("component.webtools.upload.invalid.parameter", parameterName, badValue,
+            translateReason ? MCRTranslation.translate(wrongReason) : wrongReason);
         this.parameterName = parameterName;
         this.wrongReason = wrongReason;
         this.badValue = badValue;

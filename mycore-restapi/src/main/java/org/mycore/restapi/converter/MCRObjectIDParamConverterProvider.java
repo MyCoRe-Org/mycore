@@ -23,9 +23,9 @@ import java.lang.reflect.Type;
 
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.restapi.v2.MCRErrorResponse;
 
 import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ParamConverter;
 import jakarta.ws.rs.ext.ParamConverterProvider;
 import jakarta.ws.rs.ext.Provider;
@@ -50,9 +50,12 @@ public class MCRObjectIDParamConverterProvider implements ParamConverterProvider
                     try {
                         return rawType.cast(MCRObjectID.getInstance(value));
                     } catch (MCRException e) {
-                        throw new BadRequestException(Response.status(CODE_INVALID)
-                            .entity(MSG_INVALID)
-                            .build());
+                        throw MCRErrorResponse.fromStatus(CODE_INVALID)
+                            .withErrorCode("MCROBJECTID_INVALID")
+                            .withMessage(MSG_INVALID)
+                            .withDetail(e.getMessage())
+                            .withCause(e)
+                            .toException();
                     }
                 }
 

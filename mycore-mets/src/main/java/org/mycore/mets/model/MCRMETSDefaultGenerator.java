@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -132,7 +133,8 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         StructLink structLink = new StructLink();
 
         // create internal structure
-        structureMets(getDerivatePath(), getIgnorePaths(), fileSec, physicalDiv, logicalDiv, structLink, 0);
+        structureMets(getDerivatePath(), getIgnorePaths(), fileSec, physicalDiv, logicalDiv, structLink,
+                new AtomicInteger(0));
         hrefIdMap.clear();
 
         // add to mets
@@ -147,8 +149,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
     }
 
     private void structureMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileSec fileSec, PhysicalDiv physicalDiv,
-        LogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
-        int lOrder = logOrder;
+        LogicalDiv logicalDiv, StructLink structLink, AtomicInteger logCounter) throws IOException {
         SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>();
         SortedMap<MCRPath, BasicFileAttributes> directories = new TreeMap<>();
 
@@ -160,11 +161,12 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
             String dirName = directory.getKey().getFileName().toString();
             if (isInExcludedRootFolder(directory.getKey())) {
-                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, lOrder);
+                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink,
+                    logCounter);
             } else {
-                LogicalDiv section = new LogicalDiv("log_" + ++lOrder, "section", dirName);
+                LogicalDiv section = new LogicalDiv("log_" + logCounter.incrementAndGet(), "section", dirName);
                 logicalDiv.add(section);
-                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, lOrder);
+                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, logCounter);
             }
         }
     }

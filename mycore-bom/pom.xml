@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2024.02-SNAPSHOT</version>
+    <version>2023.06.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-bom</artifactId>
@@ -361,7 +361,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.24.0</version>
+        <version>1.26.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -871,7 +871,7 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.6.0</version>
+        <version>42.7.2</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>

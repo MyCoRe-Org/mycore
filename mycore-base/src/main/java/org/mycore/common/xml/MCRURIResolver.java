@@ -58,14 +58,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.cache.HttpCacheContext;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.cache.CacheConfig;
-import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -82,6 +75,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRHTTPClient;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
@@ -95,7 +89,6 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
-import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -114,7 +107,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRLayoutUtilities;
-import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
@@ -139,6 +131,8 @@ public final class MCRURIResolver implements URIResolver {
     static final String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
+
+    private static final String HTTP_CLIENT_CLASS = "MCR.HTTPClient.Class";
 
     private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
 
@@ -539,77 +533,23 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static class MCRRESTResolver implements URIResolver {
-        private static final long MAX_OBJECT_SIZE = MCRConfiguration2.getLong(CONFIG_PREFIX + "REST.MaxObjectSize")
-            .orElse(128 * 1024L);
-
-        private static final int MAX_CACHE_ENTRIES = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.MaxCacheEntries")
-            .orElse(1000);
-
-        private static final int REQUEST_TIMEOUT = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.RequestTimeout")
-            .orElse(30000);
-
-        private CloseableHttpClient restClient;
-
-        private org.apache.logging.log4j.Logger logger;
+        private MCRHTTPClient client;
 
         MCRRESTResolver() {
-            CacheConfig cacheConfig = CacheConfig.custom()
-                .setMaxObjectSize(MAX_OBJECT_SIZE)
-                .setMaxCacheEntries(MAX_CACHE_ENTRIES)
-                .build();
-            RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(REQUEST_TIMEOUT)
-                .setSocketTimeout(REQUEST_TIMEOUT)
-                .build();
-            this.restClient = CachingHttpClients.custom()
-                .setCacheConfig(cacheConfig)
-                .setDefaultRequestConfig(requestConfig)
-                .setUserAgent(MCRHttpUtils.getHttpUserAgent())
-                .useSystemProperties()
-                .build();
-            MCRShutdownHandler.getInstance().addCloseable(this::close);
-            this.logger = LogManager.getLogger();
-        }
-
-        public void close() {
-            try {
-                restClient.close();
-            } catch (IOException e) {
-                LogManager.getLogger().warn("Exception while closing http client.", e);
-            }
+            this.client = (MCRHTTPClient) MCRConfiguration2.getInstanceOf(HTTP_CLIENT_CLASS).get();
         }
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             URI hrefURI = MCRURIResolver.resolveURI(href, base);
             try {
-                HttpCacheContext context = HttpCacheContext.create();
-                HttpGet get = new HttpGet(hrefURI);
-                try (CloseableHttpResponse response = restClient.execute(get, context);
-                    InputStream content = response.getEntity().getContent()) {
-                    logger.debug(() -> getCacheDebugMsg(hrefURI, context));
-                    final Source source = new MCRStreamContent(content).getReusableCopy().getSource();
-                    source.setSystemId(hrefURI.toASCIIString());
-                    return source;
-                } finally {
-                    get.reset();
-                }
+                final Source source = client.get(hrefURI).getSource();
+                source.setSystemId(hrefURI.toASCIIString());
+                return source;
             } catch (IOException e) {
                 throw new TransformerException(e);
             }
         }
-
-        private String getCacheDebugMsg(URI hrefURI, HttpCacheContext context) {
-            return hrefURI.toASCIIString() + ": " +
-                switch (context.getCacheResponseStatus()) {
-                    case CACHE_HIT -> "A response was generated from the cache with no requests sent upstream";
-                    case CACHE_MODULE_RESPONSE -> "The response was generated directly by the caching module";
-                    case CACHE_MISS -> "The response came from an upstream server";
-                    case VALIDATED -> "The response was generated from the cache after validating the entry "
-                        + "with the origin server";
-                };
-        }
-
     }
 
     private static class MCRObjectResolver implements URIResolver {
