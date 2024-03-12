@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manages the {@link Bucket Buckets} for different configurations.
  * A configuration for a bucket and specific configuration ID looks like this:
  * <pre>
- * MCR.RateLimitResolver.&lt;configID&gt;.Behavior=[block/error/empty]</p>
+ * MCR.RateLimitResolver.&lt;configID&gt;.Behavior=[block/error/empty]
  * MCR.RateLimitResolver.&lt;configID&gt;.Limits=&lt;limit&gt;/&lt;timeunit&gt;
  * </pre>
  * Ex:<p>

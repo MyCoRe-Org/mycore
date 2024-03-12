@@ -43,9 +43,9 @@ public class MCRRateLimitResolver implements URIResolver {
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        href = href.substring(href.indexOf(":") + 1);
-        configID = href.substring(0, href.indexOf(':'));
-        href = href.substring(href.indexOf(":") + 1);
+        final String subHref = href.substring(href.indexOf(":") + 1);
+        configID = subHref.substring(0, subHref.indexOf(':'));
+        final String resolvedHref = subHref.substring(subHref.indexOf(":") + 1);
         try {
             dsConfigBehavior = RateLimitBehavior.fromValue(MCRConfiguration2.getStringOrThrow(
                 CONFIG_PREFIX + configID + ".Behavior"));
@@ -58,12 +58,12 @@ public class MCRRateLimitResolver implements URIResolver {
         if (dsConfigBehavior.equals(RateLimitBehavior.BLOCK)) {
             try {
                 currentRateLimit.asBlocking().consume(1);
-                return MCRURIResolver.instance().resolve(href, base);
+                return MCRURIResolver.instance().resolve(resolvedHref, base);
             } catch (InterruptedException e) {
-                return probeAccessLimit(href, base);
+                return probeAccessLimit(resolvedHref, base);
             }
         } else {
-            return probeAccessLimit(href, base);
+            return probeAccessLimit(resolvedHref, base);
         }
     }
 
