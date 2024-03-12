@@ -21,41 +21,50 @@ package org.mycore.util.concurrent;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRUsageException;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
 
 /**
- * Encapsulates a {@link Callable} with a mycore session belonging to a specific user and a database transaction.
+ * Encapsulates a {@link Runnable} with a mycore session belonging to a specific user and a database transaction.
  */
-public class MCRFixedUserCallable<V> extends MCRTransactionableCallable<V> {
+public class MCRFixedUserRunnable implements Runnable, MCRDecorator<Runnable> {
+
+    private final Runnable runnable;
 
     private final MCRUserInformation userInfo;
 
     /**
-     * Creates a new {@link Callable} encapsulating the {@link #call()} method with a new
-     * database transaction. The transaction will be created in the context of a session
+     * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
+     * a database transaction. The transaction will be created in the context of a session
      * and the privileges of the given user information.
      * Afterward the transaction will be committed and the session will be released.
      * <p>
-     * In order for this to work, no session must be bound to the thread in which this 
+     * In order for this to work, no session must be bound to the thread in which this
      * callable is executed.
      *
-     * @param callable the callable to execute within a session and transaction
+     * @param runnable the runnable to execute within a session and transaction
      * @param userInfo specify the user this callable should run
      */
-    public MCRFixedUserCallable(Callable<V> callable, MCRUserInformation userInfo) {
-        super(callable, null);
+    public MCRFixedUserRunnable(Runnable runnable, MCRUserInformation userInfo) {
+        this.runnable = Objects.requireNonNull(runnable);
         this.userInfo = Objects.requireNonNull(userInfo);
     }
 
     @Override
-    protected void onBeforeTransaction(MCRSession session, SessionType type) {
-        if (type == SessionType.EPHEMERAL) {
-            session.setUserInformation(userInfo);
-        } else {
-            throw new MCRUsageException("An existing session was reused.");
+    public void run() {
+        try {
+            new MCRFixedUserCallable<>((Callable<Void>) () -> {
+                runnable.run();
+                return null;
+            }, userInfo).call();
+        } catch (Exception e) {
+            throw new MCRException("Failed to run nested runnable with a fixed user", e);
         }
+    }
+
+    @Override
+    public Runnable get() {
+        return this.runnable;
     }
 
 }

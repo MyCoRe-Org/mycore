@@ -21,13 +21,12 @@ package org.mycore.resource.provider;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
@@ -81,10 +80,8 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public Set<PrefixStripper> prefixStrippers(MCRHints hints) {
-        Set<PrefixStripper> strippers = new LinkedHashSet<>();
-        providers.forEach(provider -> strippers.addAll(provider.prefixStrippers(hints)));
-        return strippers;
+    public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
+        return providers.stream().flatMap(provider -> provider.prefixStrippers(hints));
     }
 
     @Override

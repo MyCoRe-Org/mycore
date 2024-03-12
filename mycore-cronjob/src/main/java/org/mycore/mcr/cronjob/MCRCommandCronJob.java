@@ -24,7 +24,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.frontend.cli.MCRCommandManager;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
+import org.mycore.util.concurrent.MCRFixedUserRunnable;
 
 public class MCRCommandCronJob extends MCRCronjob {
 
@@ -48,16 +48,11 @@ public class MCRCommandCronJob extends MCRCronjob {
 
     @Override
     public void runJob() {
-        try {
-            new MCRFixedUserCallable<>(() -> {
-                String command = getCommand();
-                MCRCommandManager cmdMgr = new MCRCommandManager();
-                invokeCommand(command, cmdMgr);
-                return null;
-            }, MCRUserInformationResolver.instance().getOrThrow(user)).call();
-        } catch (Exception e) {
-            throw new MCRException(e);
-        }
+        new MCRFixedUserRunnable(() -> {
+            String command = getCommand();
+            MCRCommandManager cmdMgr = new MCRCommandManager();
+            invokeCommand(command, cmdMgr);
+        }, MCRUserInformationResolver.instance().getOrThrow(user)).run();
     }
 
     private void invokeCommand(String command, MCRCommandManager cmdMgr) {
