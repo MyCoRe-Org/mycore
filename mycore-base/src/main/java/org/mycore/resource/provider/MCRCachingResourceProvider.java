@@ -22,8 +22,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
 import org.mycore.common.MCRCache;
@@ -73,7 +73,7 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    public Set<PrefixStripper> prefixStrippers(MCRHints hints) {
+    public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
         return provider.prefixStrippers(hints);
     }
 

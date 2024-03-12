@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.Logger;
@@ -314,14 +313,13 @@ public final class MCRResourceResolver {
      */
     public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints) {
         LOGGER.debug("Reversing resource URL {}", resourceUrl);
-        Set<PrefixStripper> strippers = provider.prefixStrippers(hints);
-        for (PrefixStripper stripper : strippers) {
-            Optional<MCRResourcePath> potentialPath = stripper.strip(resourceUrl);
-            if (potentialPath.isPresent()) {
-                if (!isConsistent(resourceUrl, potentialPath.get(), hints)) {
-                    continue;
+        List<PrefixStripper> prefixStrippers = provider.prefixStrippers(hints).toList();
+        for (PrefixStripper stripper : prefixStrippers) {
+            List<MCRResourcePath> potentialPaths = stripper.strip(resourceUrl).get();
+            for (MCRResourcePath potentialPath : potentialPaths) {
+                if (isConsistent(resourceUrl, potentialPath, hints)) {
+                    return Optional.of(potentialPath);
                 }
-                return potentialPath;
             }
         }
         LOGGER.debug("Unable to reverse path for resource URL {}", resourceUrl);

@@ -22,18 +22,27 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 
 /**
  * A {@link MCRResourceProvider} implements a resource lookup strategy.
@@ -51,7 +60,7 @@ public interface MCRResourceProvider {
      */
     List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
 
-    Set<PrefixStripper> prefixStrippers(MCRHints hints);
+    Stream<PrefixStripper> prefixStrippers(MCRHints hints);
 
     /**
      * Returns a description of this {@link MCRResourceProvider}.
@@ -78,18 +87,22 @@ public interface MCRResourceProvider {
 
     interface PrefixStripper {
 
-        Optional<MCRResourcePath> strip(URL url);
+        Supplier<List<MCRResourcePath>> strip(URL url);
 
     }
 
     abstract class PrefixStripperBase implements PrefixStripper {
 
         @Override
-        public final Optional<MCRResourcePath> strip(URL url) {
-            return Optional.ofNullable(doStrip(url.toString())).flatMap(MCRResourcePath::ofPath);
+        public final Supplier<List<MCRResourcePath>> strip(URL url) {
+            return () -> getStrippedPaths(url.toString())
+                .stream()
+                .map(MCRResourcePath::ofPath)
+                .flatMap(Optional::stream)
+                .toList();
         }
 
-        protected abstract String doStrip(String value);
+        protected abstract List<String> getStrippedPaths(String value);
 
     }
 
@@ -102,11 +115,11 @@ public interface MCRResourceProvider {
         }
 
         @Override
-        public String doStrip(String value) {
+        public List<String> getStrippedPaths(String value) {
             if (value.startsWith(prefix)) {
-                return value.substring(prefix.length());
+                return List.of(value.substring(prefix.length()));
             }
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
@@ -114,18 +127,50 @@ public interface MCRResourceProvider {
             return prefix;
         }
 
-        public static Set<PrefixStripper> ofClassLoader(ClassLoader classLoader) {
-            Set<PrefixStripper> strippers = new LinkedHashSet<>();
-            List<URI> classpath = new ClassGraph().overrideClassLoaders(classLoader).getClasspathURIs();
-            classpath.forEach(uri -> {
-                if (uri.getScheme().equals("file")) {
-                    File file = new File(uri.getPath());
-                    if (file.isDirectory()) {
-                        strippers.add(new BaseDirPrefixStripper(file));
+    }
+
+    final class ClassLoaderPrefixStripper extends PrefixStripperBase {
+
+        private static final String CLASS_GRAPH_THREAD_COUNT_NAME = "MCR.Resource.Provider.ClassGraph.ThreadCount";
+
+        private static final int CLASS_GRAPH_THREAD_COUNT = MCRConfiguration2.getInt(CLASS_GRAPH_THREAD_COUNT_NAME)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(CLASS_GRAPH_THREAD_COUNT_NAME));
+
+        private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CLASS_GRAPH_THREAD_COUNT,
+            CLASS_GRAPH_THREAD_COUNT, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+            new ThreadFactoryBuilder().setNameFormat("ClassLoaderPrefixStripper-worker-%d").setDaemon(true).build());
+
+        private final ClassLoader classLoader;
+
+        public ClassLoaderPrefixStripper(ClassLoader classLoader) {
+            this.classLoader = Objects.requireNonNull(classLoader);
+        }
+
+        @Override
+        public List<String> getStrippedPaths(String value) {
+            List<String> potentialPaths = new LinkedList<>();
+            ClassGraph classGraph = new ClassGraph();
+            classGraph.overrideClassLoaders(classLoader);
+            try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREAD_COUNT)) {
+                List<URI> classpath = scanResult.getClasspathURIs();
+                for (URI uri : classpath) {
+                    if (uri.getScheme().equals("file")) {
+                        File file = new File(uri.getPath());
+                        if (file.isDirectory()) {
+                            String prefix = file.toURI().toString();
+                            if (value.startsWith(prefix)) {
+                                potentialPaths.add(value.substring(prefix.length()));
+                            }
+                        }
                     }
                 }
-            });
-            return strippers;
+            }
+            return potentialPaths;
+        }
+
+        @Override
+        public String toString() {
+            return classLoader.getName();
         }
 
     }
@@ -134,20 +179,18 @@ public interface MCRResourceProvider {
 
         public static final PrefixStripper INSTANCE = new JarUrlPrefixStripper();
 
-        public static final Set<PrefixStripper> INSTANCE_SET = Collections.singleton(INSTANCE);
-
         private JarUrlPrefixStripper() {
         }
 
         @Override
-        public String doStrip(String value) {
+        public List<String> getStrippedPaths(String value) {
             if (value.startsWith("jar:")) {
                 int index = value.indexOf('!');
                 if (-1 != index) {
-                    return value.substring(index + 1);
+                    return List.of(value.substring(index + 1));
                 }
             }
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
