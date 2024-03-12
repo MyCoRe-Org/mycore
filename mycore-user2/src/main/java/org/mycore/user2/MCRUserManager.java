@@ -497,11 +497,13 @@ public class MCRUserManager {
         return em
             .createQuery(
                 query
+                    .distinct(true)
                     .where(
                         buildCondition(cb, user, userPattern, realm, namePattern, mailPattern,
                             attributeNamePattern, attributeValuePattern)))
             .setFirstResult(offset)
             .setMaxResults(limit)
+            .setHint("hibernate.query.passDistinctThrough", false)
             .getResultList();
     }
 
@@ -577,9 +579,11 @@ public class MCRUserManager {
             .createQuery(
                 query
                     .select(cb.count(user))
+                    .distinct(true)
                     .where(
                         buildCondition(cb, user, userPattern, realm, namePattern, mailPattern,
                             attributeNamePattern, attributeValuePattern)))
+            .setHint("hibernate.query.passDistinctThrough", false)
             .getSingleResult().intValue();
     }
 
