@@ -108,7 +108,7 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         IllegalArgumentException illegalArgumentException
             = Assert.assertThrows(IllegalArgumentException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test2"));
         assertThat(illegalArgumentException.getMessage(), containsString("-10"));
-        assertThat(illegalArgumentException.getMessage(), containsString("wrong value for period tokens"));
+        assertThat(illegalArgumentException.getMessage(), containsString("capacity should be positive"));
 
         // Test non-number value for token amount
         MCRConfiguration2.set("MCR.RateLimitResolver.Test3.Behavior", "block");

@@ -1,8 +1,6 @@
 package org.mycore.common.xml;
 
-import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import io.github.bucket4j.local.LocalBucketBuilder;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -63,9 +61,9 @@ public class MCRRateLimitBuckets {
         }
         final String dsConfigLimits = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + CONFIG_ID + ".Limits");
 
-        final HashMap<String, Integer> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
+        final HashMap<String, Long> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
             HashMap::new, (map, str) -> map.put(str.split("/")[1].trim(),
-                Integer.parseInt(str.split("/")[0].trim())),
+                Long.parseLong(str.split("/")[0].trim())),
             HashMap::putAll);
         final Bucket bucket = createNewBucket(limitMap);
         EXISTING_BUCKETS.put(CONFIG_ID, bucket);
@@ -73,49 +71,46 @@ public class MCRRateLimitBuckets {
     }
 
     /**
-     * Creates a bucket using a map of limits and the configured ID.
+     * Creates a bucket using a map of limits and the configured ID. The used bucket refill-strategy is "intervally".
+     * This means the whole amount of tokens is refilled after the whole time period has elapsed.
      * @param limitMap a map of time units and the corresponding limit/amount of tokens.
      * @return the created bucket
      */
-    private static Bucket createNewBucket(HashMap<String, Integer> limitMap) {
+    private static Bucket createNewBucket(HashMap<String, Long> limitMap) {
         final LocalBucketBuilder builder = Bucket.builder();
-        for (Map.Entry<String, Integer> entry : limitMap.entrySet()) {
-            builder.addLimit(getBandwidth(entry.getKey(), entry.getValue()).withId(entry.getKey() + "-limit"));
+        for (Map.Entry<String, Long> entry : limitMap.entrySet()) {
+            final String unit = entry.getKey();
+            final Long amount = entry.getValue();
+            builder.addLimit(limit -> limit.capacity(amount).refillIntervally(amount, getDuration(unit, amount)));
         }
         return builder.build();
     }
 
     /**
-     * To create a bucket, limits are added using one or multiple {@link Bandwidth Bandwidths}.
-     * This method creates and returns a bandwidth using the amount of bucket-tokens per time unit.
-     * The used bucket refill-strategy is "intervally". This means the whole amount of tokens is
-     * refilled after the whole time period has elapsed.
-     * @param unit the time unit used
-     * @param amount the amount of tokens
-     * @return the created bandwidth
+     * Helper method to determine the duration until a bucket refill for a given time unit.
+     * @param unit the time unit in String-format
+     * @param amount amount of tokens for a bucket
+     * @return the duration until a bucket refill should happen
      */
-    private static Bandwidth getBandwidth(String unit, int amount) {
-        Duration duration;
+    private static Duration getDuration(String unit, long amount) {
         switch (unit.toLowerCase()) {
             case "m" -> {
-                duration = Duration.ofDays(30);
+                return Duration.ofDays(30);
             }
             case "d" -> {
-                duration = Duration.ofDays(1);
+                return Duration.ofDays(1);
             }
             case "h" -> {
-                duration = Duration.ofHours(1);
+                return Duration.ofHours(1);
             }
             case "min" -> {
-                duration = Duration.ofMinutes(1);
+                return Duration.ofMinutes(1);
             }
             case "s" -> {
-                duration = Duration.ofSeconds(1);
+                return Duration.ofSeconds(1);
             }
             default -> throw new MCRConfigurationException("The configuration \"" + amount + " tokens per " + unit +
-                "\" for the ID \"" + CONFIG_ID + "\" is malformed. No time unit can be identified.");
+                "\" for the ID \"" + CONFIG_ID + "\" is malformed. No time unit could be identified.");
         }
-        final Refill refill = Refill.intervally(amount, duration);
-        return Bandwidth.classic(amount, refill);
     }
 }
