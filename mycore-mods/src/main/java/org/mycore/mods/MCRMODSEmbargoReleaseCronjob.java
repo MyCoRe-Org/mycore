@@ -35,7 +35,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.cronjob.MCRCronjob;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
+import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
 
 /**
  * This Cronjob updates the embargo dates in the Database.
@@ -58,7 +58,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
 
         try {
 
-            new MCRFixedUserCallable<>(() -> {
+            new MCRFixedUserFailableRunnable<>(() -> {
 
                 LOGGER.info("Searching embargoed objects");
 
@@ -81,9 +81,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                     .peek(id -> LOGGER.info("Found embargoed object " + id))
                     .forEach(this::releaseDocument);
 
-                return null;
-
-            }, MCRSystemUserInformation.getSuperUserInstance()).call();
+            }, MCRSystemUserInformation.getSuperUserInstance()).run();
 
         } catch (Exception e) {
             LOGGER.error("Failed to search embargoed objects", e);

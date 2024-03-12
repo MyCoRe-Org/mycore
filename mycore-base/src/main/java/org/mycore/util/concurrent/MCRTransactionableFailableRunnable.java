@@ -20,28 +20,30 @@ package org.mycore.util.concurrent;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.function.FailableRunnable;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 
 /**
- * Encapsulates a {@link Runnable} with a mycore session and a database transaction.
+ * Encapsulates a {@link FailableRunnable} with a mycore session and a database transaction.
  */
-public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnable> {
+public class MCRTransactionableFailableRunnable<E extends Exception> implements FailableRunnable<E>,
+    MCRDecorator<FailableRunnable<E>> {
 
-    private final Runnable runnable;
+    private final FailableRunnable<E> runnable;
 
     private final MCRSession session;
 
     /**
-     * Shorthand for {@link #MCRTransactionableRunnable(Runnable, MCRSession)}
+     * Shorthand for {@link #MCRTransactionableFailableRunnable(FailableRunnable, MCRSession)}
      * with <code>null</code> as the session parameter.
      */
-    public MCRTransactionableRunnable(Runnable runnable) {
+    public MCRTransactionableFailableRunnable(FailableRunnable<E> runnable) {
         this(runnable, null);
     }
 
     /**
-     * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
+     * Creates a new {@link FailableRunnable} encapsulating the {@link #run()} method with a new
      * a database transaction. The transaction will be created in the context of a session.
      * Afterward the transaction will be committed and the session will be released.
      * <ul>
@@ -62,7 +64,7 @@ public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnab
      * @param runnable the runnable to execute within a session and transaction
      * @param session  the session to use
      */
-    public MCRTransactionableRunnable(Runnable runnable, MCRSession session) {
+    public MCRTransactionableFailableRunnable(FailableRunnable<E> runnable, MCRSession session) {
         this.runnable = Objects.requireNonNull(runnable, "runnable must not be null");
         this.session = session;
     }
@@ -80,7 +82,7 @@ public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnab
     }
 
     @Override
-    public Runnable get() {
+    public FailableRunnable<E> get() {
         return this.runnable;
     }
 
