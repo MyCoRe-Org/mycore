@@ -99,7 +99,7 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
 
     @Override
     public Boolean activated() {
-        String property = MCRConfiguration2JobConfig.CONFIG_PREFIX + MCRConfiguration2JobConfig.CONFIG_ACTIVATED;
+        String property = CONFIG_PREFIX + CONFIG_ACTIVATED;
         return MCRConfiguration2.getBoolean(property)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }

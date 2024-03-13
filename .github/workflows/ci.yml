@@ -4,6 +4,7 @@ on: [ push, pull_request ]
 
 env:
   MAVEN_OPTS: -Xmx1024M -Xss128M
+  MAVEN_ARGS: -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS
   GECKODRIVER_VERSION: 0.27.0
 
 jobs:
@@ -17,7 +18,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        java-version: 17
+        java-version: 21
         distribution: temurin
 
     - name: Fetch Geckodriver cache
@@ -66,7 +67,7 @@ jobs:
         export FIREFOX_BIN=$(which firefox-esr)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
+        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml
         mvn -P!standard-with-extra-repos -B javadoc:javadoc
 
     - name: Upload logs on build failure

@@ -37,6 +37,7 @@
   <properties>
     <HostName>127.0.0.1</HostName>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
+    <failsafe.arg />
     <jetty.port>9201</jetty.port>
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
@@ -114,8 +115,8 @@
         </dependencies>
       </plugin>
       <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
+        <groupId>org.eclipse.jetty.ee10</groupId>
+        <artifactId>jetty-ee10-maven-plugin</artifactId>
         <version>${jetty.version}</version>
         <configuration>
           <supportedPackagings>jar</supportedPackagings>
@@ -254,8 +255,8 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-maven-plugin</artifactId>
             <executions>
               <execution>
                 <id>start-jetty</id>
@@ -286,7 +287,7 @@
                 <ResultFolder>${TestResultDir}</ResultFolder>
               </systemPropertyVariables>
               <trimStackTrace>false</trimStackTrace>
-              <argLine>${env.MAVEN_OPTS}</argLine>
+              <argLine>${failsafe.arg}</argLine>
             </configuration>
             <executions>
               <execution>

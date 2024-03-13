@@ -218,11 +218,10 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     /** Sends output to client browser 
      */
     private void renderToHTML(MCRServletJob job, Settings settings, Element xml)
-        throws IOException, TransformerException,
-        SAXException {
+        throws IOException, TransformerException, SAXException {
         settings.getStyle()
             .ifPresent(style -> job.getRequest().setAttribute("XSL.Style", style)); // XSL.Style, optional
-        MCRServlet.getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(xml));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(xml));
     }
 
     @Override

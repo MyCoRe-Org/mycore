@@ -32,6 +32,7 @@
   <name>MyCoRe METS</name>
   <properties>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
+    <failsafe.arg />
     <jetty.port>9301</jetty.port>
     <manifest.priority>45</manifest.priority>
     <pmd.failOnViolation>false</pmd.failOnViolation>
@@ -153,8 +154,8 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-maven-plugin</artifactId>
             <version>${jetty.version}</version>
             <configuration>
               <supportedPackagings>jar</supportedPackagings>
@@ -203,7 +204,7 @@
               </systemPropertyVariables>
               <trimStackTrace>false</trimStackTrace>
               <runOrder>alphabetical</runOrder>
-              <argLine>${env.MAVEN_OPTS}</argLine>
+              <argLine>${failsafe.arg}</argLine>
             </configuration>
             <executions>
               <execution>

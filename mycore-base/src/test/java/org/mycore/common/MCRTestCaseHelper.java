@@ -70,7 +70,11 @@ public class MCRTestCaseHelper {
 
     public static void after() {
         MCRConfigurationBase.initialize(Collections.emptyMap(), Collections.emptyMap(), true);
-        MCRSessionMgr.releaseCurrentSession();
+        if (MCRSessionMgr.hasCurrentSession()) {
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            MCRSessionMgr.releaseCurrentSession();
+            Thread.ofVirtual().start(currentSession::close);
+        }
     }
 
     public static String getCurrentComponentName() {
