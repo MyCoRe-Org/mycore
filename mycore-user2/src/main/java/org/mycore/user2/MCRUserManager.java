@@ -370,13 +370,13 @@ public class MCRUserManager {
         addSearchPredicate(cb, root, MCRUser_.EMail, mailPattern, searchPredicates);
 
         if (isValidSearchPattern(attributeNamePattern) || isValidSearchPattern(attributeValuePattern)) {
-            Join<MCRUser, MCRUserAttribute> userAttributeJoin = root.join(MCRUser_.attributes);
+            Join<MCRUser, MCRUserAttribute> userAttributeJoin = root.join(MCRUser_.attributes, JoinType.LEFT);
             if (isValidSearchPattern(attributeNamePattern)) {
-                searchPredicates.add(cb.like(userAttributeJoin.get(MCRUserAttribute_.name),
+                searchPredicates.add(cb.like(cb.lower(userAttributeJoin.get(MCRUserAttribute_.name)),
                     buildSearchPattern(attributeNamePattern)));
             }
             if (isValidSearchPattern(attributeValuePattern)) {
-                searchPredicates.add(cb.like(userAttributeJoin.get(MCRUserAttribute_.value),
+                searchPredicates.add(cb.like(cb.lower(userAttributeJoin.get(MCRUserAttribute_.value)),
                     buildSearchPattern(attributeValuePattern)));
             }
         }
@@ -497,6 +497,7 @@ public class MCRUserManager {
         return em
             .createQuery(
                 query
+                    .distinct(true)
                     .where(
                         buildCondition(cb, user, userPattern, realm, namePattern, mailPattern,
                             attributeNamePattern, attributeValuePattern)))
@@ -577,6 +578,7 @@ public class MCRUserManager {
             .createQuery(
                 query
                     .select(cb.count(user))
+                    .distinct(true)
                     .where(
                         buildCondition(cb, user, userPattern, realm, namePattern, mailPattern,
                             attributeNamePattern, attributeValuePattern)))
