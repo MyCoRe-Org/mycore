@@ -274,6 +274,20 @@ public class MCRXMLFunctions {
         }
     }
 
+    /**
+     * Get the string matching the regular expression from the source paramater.
+     *
+     * @param source the string to search
+     * @param regex the regular expression
+     *
+     * @return the string matching in the source parameter matching the given regular expression
+     */
+    public static String getMatchingString(String source, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(source);
+        return m.find() ? m.group() : "";
+    }
+
     public static boolean classAvailable(String className) {
         try {
             MCRClassTools.forName(className);
