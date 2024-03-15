@@ -29,6 +29,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.VersionNum;
 
 public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
 
@@ -48,5 +49,11 @@ public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
         InputStream storedContentStream = super.getStoredContentStream(mcrid, storeObject);
         return new GZIPInputStream(storedContentStream);
+    }
+
+    @Override
+    protected MCROCFLContent getContent(MCRObjectID id, String ocflObjectID, VersionNum key) {
+        return new MCRGZIPOCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
+                key.toString());
     }
 }

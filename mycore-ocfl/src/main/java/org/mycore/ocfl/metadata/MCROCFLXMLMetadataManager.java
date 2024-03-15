@@ -216,7 +216,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             : MCROCFLObjectIDPrefixHelper.MCROBJECT + mcrid;
     }
 
-    private String buildFilePath(MCRObjectID mcrid) {
+    protected String buildFilePath(MCRObjectID mcrid) {
         return "metadata/" + mcrid + ".xml";
     }
 
@@ -305,13 +305,17 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             VersionDetails details = v.getValue();
             VersionInfo versionInfo = details.getVersionInfo();
 
-            MCROCFLContent content = new MCROCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
-                key.toString());
+            MCROCFLContent content = getContent(id, ocflObjectID, key);
             return new MCROCFLMetadataVersion(content,
                 key.toString(),
                 versionInfo.getUser().getName(),
                 Date.from(details.getCreated().toInstant()), convertMessageToType(versionInfo.getMessage()));
         }).collect(Collectors.toList());
+    }
+
+    protected MCROCFLContent getContent(MCRObjectID id, String ocflObjectID, VersionNum key) {
+        return new MCROCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
+                key.toString());
     }
 
     private boolean isMetadata(String id) {
