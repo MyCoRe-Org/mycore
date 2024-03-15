@@ -20,12 +20,10 @@ package org.mycore.frontend.jersey.resources;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.ws.rs.core.MediaType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +32,9 @@ import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+
+import jakarta.ws.rs.core.MediaType;
+import org.mycore.services.i18n.MCRTranslation;
 
 public class MCRLocaleResourceTest extends MCRTestCase {
 
@@ -46,17 +47,21 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         jersey.setUp(Set.of(
             MCRSessionHookFilter.class,
             MCRLocaleResource.class));
+        MCRTranslation.reInit();
     }
 
     @After
     public void tearDown() throws Exception {
-        super.tearDown();
-        jersey.tearDown();
+        try {
+            jersey.tearDown();
+        } finally {
+            super.tearDown();
+        }
     }
 
     @Override
     protected Map<String, String> getTestProperties() {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = super.getTestProperties();
         map.put("MCR.Metadata.Languages", "de,en,it");
         return map;
     }

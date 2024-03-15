@@ -45,6 +45,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectIDTest;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.xml.sax.SAXException;
@@ -63,6 +64,10 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        String testId = "junit_document_00000001";
+        if (MCRObjectID.getInstance(testId).toString().length() != testId.length()) {
+            MCRObjectIDTest.resetObjectIDFormat();
+        }
         MyCoRe_document_00000001 = new XMLInfo("MyCoRe_document_00000001",
             "<object id=\"MyCoRe_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
         MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001",

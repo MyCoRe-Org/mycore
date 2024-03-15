@@ -55,10 +55,6 @@ public class MCRGroupClauseTest extends MCRTestCase {
         MCRSessionMgr.getCurrentSession().setUserInformation(userInfo);
     }
 
-    @After
-    public void tearDown() {
-    }
-
     @Test
     public final void testEvaluate() {
         String outGroup = "outgroup";

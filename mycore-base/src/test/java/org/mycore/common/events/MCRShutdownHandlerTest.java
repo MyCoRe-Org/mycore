@@ -23,6 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class MCRShutdownHandlerTest {
@@ -95,6 +97,16 @@ public class MCRShutdownHandlerTest {
         shutdownHandler.addCloseable(hiPrio);
         shutdownHandler.runClosables();
         assertTrue(hiClosed.get() && lowClosed.get());
+    }
+
+    @Before
+    public void saveCloseables() {
+        MCRShutdownHandler.getInstance().mark();
+    }
+
+    @After
+    public void resetCloseables() {
+        MCRShutdownHandler.getInstance().resetCloseables();
     }
 
 }

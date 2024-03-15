@@ -464,4 +464,19 @@ public class MCRTranslation {
             }
         }
     }
+
+    /**
+     * use with care: only required for Junit tests if properties changes.
+     *
+     * <pre>
+     * MCR.Metadata.Languages=…
+     * </pre>
+     */
+    public static void reInit() {
+        synchronized (AVAILABLE_LANGUAGES) {
+            Set<String> newLanguages = loadAvailableLanguages();
+            AVAILABLE_LANGUAGES.clear();
+            AVAILABLE_LANGUAGES.addAll(newLanguages);
+        }
+    }
 }

@@ -55,6 +55,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCRMockResolver.setResultSource(resultSource);
+        MCRURIResolver.reInit();
     }
 
     @Test
