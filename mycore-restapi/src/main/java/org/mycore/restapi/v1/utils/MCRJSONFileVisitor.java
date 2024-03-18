@@ -70,7 +70,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         return super.preVisitDirectory(dir, attrs);
     }
 
-    private void writePathInfo(Path path, BasicFileAttributes attrs) throws IOException {
+    private String writePathInfo(Path path, BasicFileAttributes attrs) throws IOException {
         MCRPath mcrPath = MCRPath.toMCRPath(path);
         MCRPath relativePath = mcrPath.getRoot().relativize(mcrPath);
         boolean isRoot = mcrPath.getNameCount() == 0;
@@ -80,12 +80,21 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
             jw.name("mycorederivate").value(mcrPath.getOwner());
         }
         jw.name("name").value(isRoot ? "" : mcrPath.getFileName().toString());
-        jw.name("path")
-            .value(attrs.isDirectory() ? toStringValue(relativePath) : SEPARATOR_STRING + relativePath);
+        String pathString;
+        String urlPathString;
+        try {
+            pathString = toStringValue(relativePath, attrs.isDirectory());
+            urlPathString = MCRXMLFunctions.encodeURIPath(pathString);
+            jw.name("path").value(pathString);
+            jw.name("urlPath").value(urlPathString);
+        } catch (URISyntaxException e) {
+            throw new IOException("Can't encode file path to URI " + relativePath, e);
+        }
         if (!isRoot) {
-            jw.name("parentPath").value(toStringValue(relativePath.getParent()));
+            jw.name("parentPath").value(toStringValue(relativePath.getParent(), true));
         }
         addBasicAttributes(path, attrs);
+        return urlPathString;
     }
 
     private void addBasicAttributes(Path path, BasicFileAttributes attrs) throws IOException {
@@ -105,24 +114,17 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        MCRPath mcrPath = MCRPath.toMCRPath(file);
-        MCRPath relativePath = mcrPath.getRoot().relativize(mcrPath);
-        final String fileNodePath;
-        final String fileNodeServletSecuredURI;
-        try {
-            fileNodePath = MCRXMLFunctions.encodeURIPath(relativePath.toString());
-            fileNodeServletSecuredURI = MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(
-                MCRObjectID.getInstance(derId), fileNodePath, this.baseURL);
-        } catch (URISyntaxException e) {
-            throw new IOException("Can't encode file path to URI " + relativePath.toString(), e);
-        }
         jw.beginObject();
-        writePathInfo(file, attrs);
+        String urlPathString = writePathInfo(file, attrs);
         jw.name("extension").value(getFileExtension(file.getFileName().toString()));
-        jw.name("urlPath").value(fileNodePath);
-        jw.name("href").value(fileNodeServletSecuredURI);
+        jw.name("href").value(getHref(urlPathString));
         jw.endObject();
         return super.visitFile(file, attrs);
+    }
+
+    private String getHref(String urlPathString) {
+        return MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(
+            MCRObjectID.getInstance(derId), urlPathString.substring(1), this.baseURL);
     }
 
     private static String getFileExtension(String fileName) {
@@ -140,7 +142,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         return super.postVisitDirectory(dir, exc);
     }
 
-    private static String toStringValue(MCRPath relativePath) {
+    private static String toStringValue(MCRPath relativePath, boolean isDirectory) {
         if (relativePath == null) {
             return SEPARATOR_STRING;
         }
@@ -149,9 +151,13 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
             return SEPARATOR_STRING;
         }
         if (pathString.equals(SEPARATOR_STRING)) {
-            return pathString;
+            return SEPARATOR_STRING;
         }
-        return SEPARATOR + pathString + SEPARATOR;
+        if (isDirectory) {
+            return SEPARATOR + pathString + SEPARATOR;
+        } else {
+            return SEPARATOR + pathString;
+        }
     }
 
 }
