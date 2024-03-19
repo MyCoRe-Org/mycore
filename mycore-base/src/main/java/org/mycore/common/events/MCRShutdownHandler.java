@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -65,6 +66,7 @@ public class MCRShutdownHandler {
     boolean isWebAppRunning;
 
     ClassLoaderLeakPreventor leakPreventor;
+    private MCRShutdownHandlerState mark;
 
     private MCRShutdownHandler() {
         isWebAppRunning = false;
@@ -144,6 +146,7 @@ public class MCRShutdownHandler {
         shutdownLock.writeLock().lock();
         try {
             shuttingDown = true;
+            System.err.println(Thread.currentThread().toString() + ": MCRShutdownHandler: shut down!");
             //during shut down more request may come in MCR-1726
             final List<Closeable> alreadyPrepared = Arrays.asList(closeables);
             requests.stream()
@@ -157,6 +160,30 @@ public class MCRShutdownHandler {
         } finally {
             shutdownLock.writeLock().unlock();
         }
+    }
+
+    /**
+     * only used to make {@link MCRShutdownHandler#resetCloseables()} testable
+     */
+    protected void mark() {
+        this.mark = new MCRShutdownHandlerState(shuttingDown, requests);
+    }
+
+    /**
+     * only used to make {@link MCRShutdownHandler#resetCloseables()} testable
+     */
+    protected void resetCloseables() {
+        Optional.ofNullable(mark)
+            .ifPresent(state -> {
+                shutdownLock.writeLock().lock();
+                try {
+                    this.shuttingDown = state.shuttingDown;
+                    this.requests.clear();
+                    this.requests.addAll(state.requests);
+                } finally {
+                    shutdownLock.writeLock().unlock();
+                }
+            });
     }
 
     /**
@@ -200,6 +227,15 @@ public class MCRShutdownHandler {
             return Comparator.comparingInt(Closeable::getPriority)
                 .thenComparingLong(Closeable::hashCode)
                 .compare(other, this);
+        }
+    }
+
+    /**
+     * only used to make {@link MCRShutdownHandler#resetCloseables()} testable
+     */
+    private record MCRShutdownHandlerState(boolean shuttingDown, ConcurrentSkipListSet<Closeable> requests) {
+        MCRShutdownHandlerState {
+            requests = new ConcurrentSkipListSet<>(requests);
         }
     }
 
