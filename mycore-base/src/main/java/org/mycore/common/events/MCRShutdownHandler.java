@@ -146,7 +146,6 @@ public class MCRShutdownHandler {
         shutdownLock.writeLock().lock();
         try {
             shuttingDown = true;
-            System.err.println(Thread.currentThread().toString() + ": MCRShutdownHandler: shut down!");
             //during shut down more request may come in MCR-1726
             final List<Closeable> alreadyPrepared = Arrays.asList(closeables);
             requests.stream()
