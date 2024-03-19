@@ -83,9 +83,14 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
         .getOrThrow("MCR.Access.Strategy.CreatorReviewPermissions", MCRConfiguration2::splitValue)
         .collect(Collectors.toList());
 
+    private static List<String> CREATOR_ANY_STATE_PERMISSIONS =
+        MCRConfiguration2.getString("MCR.Access.Strategy.CreatorAnyStatePermissions").stream()
+            .flatMap(MCRConfiguration2::splitValue).toList();
+
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     private static final MCRObjectTypeStrategy BASE_STRATEGY = new MCRObjectTypeStrategy();
+
 
     /*
      * (non-Javadoc)
@@ -155,6 +160,9 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
                     return true;
                 }
                 if (objectStatusIsReview(mcrObjectId) && CREATOR_REVIEW_PERMISSIONS.contains(permission)) {
+                    return true;
+                }
+                if (CREATOR_ANY_STATE_PERMISSIONS.contains(permission)) {
                     return true;
                 }
             }
