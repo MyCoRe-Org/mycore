@@ -162,14 +162,22 @@ public class MCRShutdownHandler {
     }
 
     /**
-     * only used to make {@link MCRShutdownHandler#resetCloseables()} testable
+     * Marks the current state of the shutdown handler.
+     * This method saves the current shuttingDown value and {@link Closeable} requests fields.
+     * <p>
+     * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
      */
     protected void mark() {
         this.mark = new MCRShutdownHandlerState(shuttingDown, requests);
     }
 
     /**
-     * only used to make {@link MCRShutdownHandler#resetCloseables()} testable
+     * Resets the {@link Closeable} requests in the shutdown handler.
+     * This method checks if there is a previous state ({@link #mark()}) and, if present, resets the shuttingDown
+     * and requests fields to their values from the mark.
+     * The operation is performed under a write lock to ensure thread safety.
+     * <p>
+     * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
      */
     protected void resetCloseables() {
         Optional.ofNullable(mark)
@@ -229,10 +237,19 @@ public class MCRShutdownHandler {
         }
     }
 
+
     /**
-     * only used to make {@link MCRShutdownHandler#resetCloseables()} testable
+     * The MCRShutdownHandlerState class represents the state of a shutdown handler.
+     * It only used by {@link #mark} and {@link #resetCloseables()}.
      */
     private record MCRShutdownHandlerState(boolean shuttingDown, ConcurrentSkipListSet<Closeable> requests) {
+
+        /**
+         * Constructs an instance of MCRShutdownHandlerState with the given parameters. 
+         * The requests field is initialized as a new ConcurrentSkipListSet containing the provided Closeables.
+         * @param shuttingDown A boolean indicating whether the system is currently in the process of shutting down.
+         * @param requests A set of Closeable objects representing the current shutdown requests.
+         */
         MCRShutdownHandlerState {
             requests = new ConcurrentSkipListSet<>(requests);
         }

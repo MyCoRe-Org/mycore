@@ -144,17 +144,11 @@ public final class MCRURIResolver implements URIResolver {
 
     static {
         try {
+            reInit();
             singleton = new MCRURIResolver();
         } catch (Exception exc) {
             LOGGER.error("Unable to initialize MCRURIResolver", exc);
         }
-    }
-
-    /**
-     * Creates a new MCRURIResolver
-     */
-    private MCRURIResolver() {
-        reInit();
     }
 
     public static void reInit() {
