@@ -468,9 +468,9 @@ public class MCRTranslation {
     /**
      * use with care: only required for Junit tests if properties changes.
      *
-     * {@snippet lang=Properties :
+     * <pre>
      * MCR.Metadata.Languages=…
-     * }
+     * </pre>
      */
     public static void reInit() {
         synchronized (AVAILABLE_LANGUAGES) {
