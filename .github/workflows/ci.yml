@@ -8,7 +8,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -19,6 +19,7 @@ jobs:
       with:
         java-version: 17
         distribution: temurin
+        cache: maven
 
     - name: Fetch Geckodriver cache
       id: geckodriver-cache
@@ -53,11 +54,6 @@ jobs:
         ~/geckodriver/geckodriver --version
         echo "${HOME}/geckodriver" >> $GITHUB_PATH
 
-    - name: Restore Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: restore
-
     - name: Build
       run: |
         export $(dbus-launch)
@@ -81,7 +77,3 @@ jobs:
           ./**/*error*.log
           ./**/*test.log
 
-    - name: Save Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: save
