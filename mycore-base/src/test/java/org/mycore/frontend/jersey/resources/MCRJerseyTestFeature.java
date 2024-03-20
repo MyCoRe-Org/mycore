@@ -27,6 +27,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.test.DeploymentContext;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.ServletDeploymentContext;
+import org.glassfish.jersey.test.TestProperties;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.glassfish.jersey.test.spi.TestContainerException;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
@@ -68,6 +69,7 @@ public class MCRJerseyTestFeature {
 
         @Override
         protected Application configure() {
+            forceSet(TestProperties.CONTAINER_PORT, "0");
             return new MCRJerseyTestResourceConfig(COMPONENTS.get());
         }
 
