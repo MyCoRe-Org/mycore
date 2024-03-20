@@ -82,3 +82,5 @@ jobs:
           ./**/screenshots
           ./**/*error*.log
           ./**/*test.log
+          ./**/*test.log
+          ./**/jetty-*.out

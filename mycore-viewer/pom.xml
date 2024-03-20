@@ -37,6 +37,7 @@
   <properties>
     <HostName>127.0.0.1</HostName>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
+    <failsafe.arg />
     <jetty.port>9201</jetty.port>
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
@@ -114,10 +115,14 @@
         </dependencies>
       </plugin>
       <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
+        <groupId>org.eclipse.jetty.ee10</groupId>
+        <artifactId>jetty-ee10-maven-plugin</artifactId>
         <version>${jetty.version}</version>
         <configuration>
+          <useTestScope>true</useTestScope>
+          <jettyXmls>
+            <jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
+          </jettyXmls>
           <supportedPackagings>jar</supportedPackagings>
           <webAppSourceDirectory>${basedir}/target/</webAppSourceDirectory>
           <scanIntervalSeconds>10</scanIntervalSeconds>
@@ -222,6 +227,11 @@
       <artifactId>jersey-media-json-jackson</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>
@@ -254,8 +264,15 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-maven-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>2.0.12</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <id>start-jetty</id>
@@ -264,6 +281,7 @@
                 </goals>
                 <phase>pre-integration-test</phase>
                 <configuration>
+                  <deployMode>FORK</deployMode>
                   <scanIntervalSeconds>0</scanIntervalSeconds>
                 </configuration>
               </execution>
@@ -286,7 +304,7 @@
                 <ResultFolder>${TestResultDir}</ResultFolder>
               </systemPropertyVariables>
               <trimStackTrace>false</trimStackTrace>
-              <argLine>${env.MAVEN_OPTS}</argLine>
+              <argLine>${failsafe.arg}</argLine>
             </configuration>
             <executions>
               <execution>

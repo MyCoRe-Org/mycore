@@ -63,7 +63,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <hibernate.base.version>6.3</hibernate.base.version>
     <hibernate.version>${hibernate.base.version}.1.Final</hibernate.version>
     <java.target.version>17</java.target.version>
-    <jetty.version>11.0.8</jetty.version>
+    <jetty.version>12.0.8</jetty.version>
     <log4j.version>2.19.0</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
