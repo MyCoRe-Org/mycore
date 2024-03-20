@@ -161,7 +161,7 @@
               <webAppSourceDirectory>${basedir}/target/</webAppSourceDirectory>
               <scanIntervalSeconds>10</scanIntervalSeconds>
               <stopKey>foo</stopKey>
-              <stopPort>9202</stopPort>
+              <stopPort>9302</stopPort>
               <webApp>
                 <webInfIncludeJarPattern>doNotIncludeAnyJarsPattern</webInfIncludeJarPattern>
               </webApp>
