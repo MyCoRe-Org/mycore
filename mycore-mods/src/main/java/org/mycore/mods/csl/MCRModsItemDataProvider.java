@@ -221,9 +221,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             if (list != null) {
                 idb.page(list);
             } else if (start != null && end != null) {
-                idb.page(Integer.parseInt(start), Integer.parseInt(end));
+                idb.pageFirst(start);
+                idb.page(start + "-" + end);
             } else if (start != null && total != null) {
-                idb.page(Integer.parseInt(start));
+                idb.pageFirst(start);
 
                 try {
                     final int totalI = Integer.parseInt(total);
@@ -235,11 +236,14 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
                 idb.numberOfPages(total);
             } else if (start != null) {
-                idb.page(Integer.parseInt(start));
+                idb.pageFirst(start);
+                idb.page(start);
             } else if (end != null) {
+                idb.pageFirst(end);
                 idb.page(end);
             }
         }
+
     }
 
     protected void processGenre(CSLItemDataBuilder idb) {

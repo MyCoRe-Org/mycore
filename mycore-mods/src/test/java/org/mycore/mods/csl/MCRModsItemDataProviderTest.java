@@ -88,7 +88,7 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
         CSLItemData build2 = testModsPart(testData2);
 
         Assert.assertEquals("Volumes should equal", "80", build1.getVolume());
-        Assert.assertEquals("start should equal", "711", build1.getPage());
+        Assert.assertEquals("start should equal", "711", build1.getPageFirst());
         Assert.assertEquals("end should equal", "711-718", build1.getPage());
 
         Assert.assertEquals("Volumes should equal", "11875", build2.getVolume());
