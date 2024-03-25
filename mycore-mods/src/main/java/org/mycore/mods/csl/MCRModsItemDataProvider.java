@@ -217,27 +217,29 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
             final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
             final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
-
+            
+            final int startI = Integer.parseInt(start);
+            final int endI = Integer.parseInt(end);
+            final int totalI = Integer.parseInt(total);
+            
             if (list != null) {
                 idb.page(list);
             } else if (start != null && end != null) {
-                idb.page(Integer.parseInt(start) , Integer.parseInt(end));
+                idb.page(startI , endI);
             } else if (start != null && total != null) {
-                idb.page(Integer.parseInt(start), -1);
+                idb.page(startI, -1);
 
                 try {
-                    final int totalI = Integer.parseInt(total);
-                    final int startI = Integer.parseInt(start);
-                    idb.page(Integer.parseInt(start), (totalI - startI));
+                    idb.page(startI, (totalI - startI));
                 } catch (NumberFormatException e) {
-                    idb.page(start);
+                    idb.page(startI, -1);
                 }
 
                 idb.numberOfPages(total);
             } else if (start != null) {
-                idb.page(Integer.parseInt(start),-1);
+                idb.page(startI, -1);
             } else if (end != null) {
-                idb.page(-1,Integer.parseInt(end));
+                idb.page(-1, endI);
             }
         }
 
