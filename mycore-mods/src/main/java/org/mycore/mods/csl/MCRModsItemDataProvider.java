@@ -221,26 +221,23 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             if (list != null) {
                 idb.page(list);
             } else if (start != null && end != null) {
-                idb.pageFirst(start);
-                idb.page(start + "-" + end);
+                idb.page(Integer.parseInt(start) , Integer.parseInt(end));
             } else if (start != null && total != null) {
-                idb.pageFirst(start);
+                idb.page(Integer.parseInt(start), -1);
 
                 try {
                     final int totalI = Integer.parseInt(total);
                     final int startI = Integer.parseInt(start);
-                    idb.page(start + "-" + (totalI - startI));
+                    idb.page(Integer.parseInt(start), (totalI - startI));
                 } catch (NumberFormatException e) {
                     idb.page(start);
                 }
 
                 idb.numberOfPages(total);
             } else if (start != null) {
-                idb.pageFirst(start);
-                idb.page(start);
+                idb.page(Integer.parseInt(start),-1);
             } else if (end != null) {
-                idb.pageFirst(end);
-                idb.page(end);
+                idb.page(-1,Integer.parseInt(end));
             }
         }
 
