@@ -159,6 +159,7 @@
             <configuration>
               <supportedPackagings>jar</supportedPackagings>
               <webAppSourceDirectory>${basedir}/target/</webAppSourceDirectory>
+              <deployMode>FORK</deployMode>
               <scanIntervalSeconds>10</scanIntervalSeconds>
               <stopKey>foo</stopKey>
               <stopPort>9302</stopPort>
