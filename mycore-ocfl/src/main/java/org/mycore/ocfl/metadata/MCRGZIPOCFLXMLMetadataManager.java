@@ -56,4 +56,9 @@ public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
         return new MCRGZIPOCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
                 key.toString());
     }
+
+    @Override
+    protected String buildFilePath(MCRObjectID mcrid) {
+        return super.buildFilePath(mcrid)+".gz";
+    }
 }
