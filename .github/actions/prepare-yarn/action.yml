@@ -30,9 +30,12 @@ runs:
       run: |
         for lockfile in $(find . -name "yarn.lock"); do
           dir=$(dirname $lockfile)
-          echo "Installing dependencies in $dir"
-          cd $dir
-          yarn install --frozen-lockfile
-          cd -
+          if [[ ! "${dir: -18}" == "access-key-manager" ]]
+          then
+            echo "Installing dependencies in $dir"
+            cd $dir
+            yarn install --frozen-lockfile
+            cd -
+          fi
         done
       shell: bash
