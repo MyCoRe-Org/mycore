@@ -14,10 +14,17 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - id: install-mvnd
+    - name: Setup Maven Daemon
+      id: install-mvnd
       uses: ./.github/actions/install-mvnd
       with:
         version: 1.0-m8
+
+    - name: Prepare yarn environment
+      id: prepare-yarn
+      uses: ./.github/actions/prepare-yarn
+      with:
+        node-version: 18.19.1
 
     - name: Set up JDK
       uses: actions/setup-java@v2
