@@ -220,7 +220,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             
             if (list != null) {
                 idb.page(list);
-            } else if (start != null && end != null) {
+            } else if (start != null && end != null && start.matches("\\d+") && end.matches("\\d+")) {
                 idb.page(Integer.parseInt(start) , Integer.parseInt(end));
             } else if (start != null && total != null) {
                 idb.page(start);
