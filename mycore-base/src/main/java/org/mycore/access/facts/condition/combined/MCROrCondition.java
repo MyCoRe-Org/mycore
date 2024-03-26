@@ -26,13 +26,9 @@ import org.mycore.access.facts.MCRFactsHolder;
  * @author Robert Stephan
  *
  */
-public class MCROrCondition extends MCRAbstractCombinedCondition {
+public final class MCROrCondition extends MCRAbstractCombinedCondition {
 
     public boolean matches(MCRFactsHolder facts) {
-        return conditions.stream().anyMatch(c -> {
-            boolean matches = c.matches(facts);
-            debugInfoForMatchingChildElement(c, matches);
-            return matches;
-        });
+        return conditions.stream().anyMatch(c -> addDebugInfoIfRequested(c, facts));
     }
 }

@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2024.02-SNAPSHOT</version>
+    <version>2024.05-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-bom</artifactId>
@@ -227,6 +227,11 @@
         <version>5.10.5</version>
       </dependency>
       <dependency>
+        <groupId>io.github.classgraph</groupId>
+        <artifactId>classgraph</artifactId>
+        <version>4.8.165</version>
+      </dependency>
+      <dependency>
         <groupId>io.ocfl</groupId>
         <artifactId>ocfl-java-api</artifactId>
         <version>${ocfl-java.version}</version>
@@ -361,7 +366,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.24.0</version>
+        <version>1.26.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -871,7 +876,7 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.6.0</version>
+        <version>42.7.2</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>

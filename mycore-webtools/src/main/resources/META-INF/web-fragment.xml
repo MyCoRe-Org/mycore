@@ -3,16 +3,24 @@
               xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_6_0.xsd"
               metadata-complete="true">
 
-    <name>mycore_web_tools</name>
+  <name>mycore_web_tools</name>
 
 
-    <servlet>
-        <servlet-name>MCRPropertyHelperContentServlet</servlet-name>
-        <servlet-class>org.mycore.webtools.properties.MCRPropertyHelperContentServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>MCRPropertyHelperContentServlet</servlet-name>
-        <url-pattern>/servlets/PropertyHelperContentServlet</url-pattern>
-    </servlet-mapping>
-    
+  <servlet>
+    <servlet-name>MCRPropertyHelperContentServlet</servlet-name>
+    <servlet-class>org.mycore.webtools.properties.MCRPropertyHelperContentServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRPropertyHelperContentServlet</servlet-name>
+    <url-pattern>/servlets/PropertyHelperContentServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>TextEditor</servlet-name>
+    <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TextEditor</servlet-name>
+    <url-pattern>/modules/webtools/texteditor/*</url-pattern>
+  </servlet-mapping>
+
 </web-fragment>

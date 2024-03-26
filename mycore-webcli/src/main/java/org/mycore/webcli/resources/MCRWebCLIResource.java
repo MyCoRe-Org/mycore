@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
@@ -52,7 +53,7 @@ public class MCRWebCLIResource {
     @MCRRestrictedAccess(MCRWebCLIPermission.class)
     @Produces(MediaType.TEXT_HTML)
     public Response start() {
-        InputStream mainGui = getClass().getResourceAsStream("/META-INF/resources/modules/webcli/index.html");
+        InputStream mainGui = getWebCLIResource("index.html");
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         LOGGER.info("MyCore Session REST ID: {}", mcrSession.getID());
         LOGGER.info("REST ThreadID: {}", Thread.currentThread().getName());
@@ -64,20 +65,23 @@ public class MCRWebCLIResource {
     @MCRStaticContent
     public Response getResources(@PathParam("filename") String filename) {
         if (filename.endsWith(".js")) {
-            return Response.ok(getClass()
-                .getResourceAsStream("/META-INF/resources/modules/webcli/" + filename))
+            return Response.ok(getWebCLIResource(filename))
                 .header("Content-Type", "application/javascript")
                 .build();
         }
 
         if (filename.endsWith(".css")) {
-            return Response.ok(getClass()
-                .getResourceAsStream("/META-INF/resources/modules/webcli/" + filename))
+            return Response.ok(getWebCLIResource(filename))
                 .header("Content-Type", "text/css")
                 .build();
         }
-        return Response.ok(getClass()
-            .getResourceAsStream("/META-INF/resources/modules/webcli/" + filename))
+
+        return Response.ok(getWebCLIResource(filename))
             .build();
     }
+
+    private InputStream getWebCLIResource(String filename) {
+        return MCRResourceHelper.getWebResourceAsStream("/modules/webcli/" + filename);
+    }
+
 }

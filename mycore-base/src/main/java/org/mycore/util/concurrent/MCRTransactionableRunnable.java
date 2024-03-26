@@ -20,82 +20,62 @@ package org.mycore.util.concurrent;
 
 import java.util.Objects;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
 
 /**
  * Encapsulates a {@link Runnable} with a mycore session and a database transaction.
- * 
- * @author Matthias Eichner
  */
 public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnable> {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private final Runnable runnable;
 
-    protected Runnable runnable;
-
-    private MCRSession session;
+    private final MCRSession session;
 
     /**
-     * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
-     * {@link MCRSession} and a database transaction. Afterwards the transaction will
-     * be committed and the session will be released and closed.
-     * 
-     * <p>If you want to execute your runnable in the context of an already existing
-     * session use the {@link MCRTransactionableRunnable#MCRTransactionableRunnable(Runnable, MCRSession)}
-     * constructor instead.
-     * 
-     * @param runnable the runnable to execute within a session and transaction
+     * Shorthand for {@link #MCRTransactionableRunnable(Runnable, MCRSession)}
+     * with <code>null</code> as the session parameter.
      */
     public MCRTransactionableRunnable(Runnable runnable) {
-        this.runnable = Objects.requireNonNull(runnable, "runnable must not be null");
+        this(runnable, null);
     }
 
     /**
      * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
-     * a database transaction. The transaction will be created in the context of the
-     * given session. Afterwards the transaction will be committed and the session
-     * will be released (but not closed!).
-     * 
+     * a database transaction. The transaction will be created in the context of a session.
+     * Afterward the transaction will be committed and the session will be released.
+     * <ul>
+     * <li>
+     * If a non-null session is provided as the second parameter, that session will be used.
+     * The session will <em>not</em> be closed, after it has been released.
+     * </li>
+     * <li>
+     * Otherwise, if a session is bound to the current thread, that session will be reused.
+     * The session will <em>not</em> be closed, after it has been released.
+     * </li>
+     * <li>
+     * Otherwise, a new session will be used.
+     * The session will be closed, after it has been released.
+     * </li>
+     * </ul>
+     *
      * @param runnable the runnable to execute within a session and transaction
-     * @param session the session to use
+     * @param session  the session to use
      */
     public MCRTransactionableRunnable(Runnable runnable, MCRSession session) {
         this.runnable = Objects.requireNonNull(runnable, "runnable must not be null");
-        this.session = Objects.requireNonNull(session, "session must not be null");
+        this.session = session;
     }
 
     @Override
     public void run() {
-        boolean newSession = this.session == null;
-        MCRSessionMgr.unlock();
-        boolean closeSession = newSession && !MCRSessionMgr.hasCurrentSession();
-        if (newSession) {
-            this.session = MCRSessionMgr.getCurrentSession();
-        }
-        MCRSessionMgr.setCurrentSession(this.session);
-        MCRTransactionHelper.beginTransaction();
         try {
-            this.runnable.run();
-        } finally {
-            try {
-                MCRTransactionHelper.commitTransaction();
-            } catch (Exception commitExc) {
-                LOGGER.error("Error while commiting transaction.", commitExc);
-                try {
-                    MCRTransactionHelper.rollbackTransaction();
-                } catch (Exception rollbackExc) {
-                    LOGGER.error("Error while rollbacking transaction.", commitExc);
-                }
-            } finally {
-                MCRSessionMgr.releaseCurrentSession();
-                if (closeSession && session != null) {
-                    session.close();
-                }
-            }
+            new MCRTransactionableCallable<>(() -> {
+                runnable.run();
+                return null;
+            }, session).call();
+        } catch (Exception e) {
+            throw new MCRException("Failed to run nested runnable in a transaction", e);
         }
     }
 

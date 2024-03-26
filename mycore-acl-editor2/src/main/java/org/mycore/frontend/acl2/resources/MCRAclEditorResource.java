@@ -36,6 +36,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
@@ -89,11 +90,11 @@ public class MCRAclEditorResource {
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Produces(MediaType.TEXT_HTML)
     public InputStream start() throws Exception {
-        return transform("/META-INF/resources/modules/acl-editor2/gui/xml/webpage.xml");
+        return transform("webpage.xml");
     }
 
     protected InputStream transform(String xmlFile) throws Exception {
-        InputStream guiXML = getClass().getResourceAsStream(xmlFile);
+        InputStream guiXML = getAclEditorResource(xmlFile);
         if (guiXML == null) {
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).build());
         }
@@ -347,4 +348,9 @@ public class MCRAclEditorResource {
 
         return new MCRAccessRule(newRuleID, uid, new Date(), ruleText, ruleDesc);
     }
+
+    private InputStream getAclEditorResource(String filename) {
+        return MCRResourceHelper.getWebResourceAsStream("/modules/acl-editor2/gui/" + filename);
+    }
+    
 }

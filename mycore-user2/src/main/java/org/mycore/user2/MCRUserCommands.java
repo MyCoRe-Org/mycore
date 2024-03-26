@@ -303,7 +303,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
         order = 160)
     public static void listAllUsers() {
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
-
         for (MCRUser uid : users) {
             listUser(uid);
         }
@@ -594,6 +593,54 @@ public class MCRUserCommands extends MCRAbstractCommands {
             MCRUserManager.updateUser(user);
         } catch (Exception e) {
             throw new MCRException("Error while unassigning " + userID + " from role " + roleID + ".", e);
+        }
+    }
+
+    /**
+     * This method sets a user attribute for a user.
+     *
+     * @param name
+     *            the name of the attribute
+     * @param value
+     *            the value of the attribute
+     * @param userID
+     *            the ID of the user
+     */
+    @MCRCommand(
+        syntax = "set attribute {0} to {1} for user {2}",
+        help = "Sets the attribute {0} to {1} for user {2}",
+        order = 130)
+    public static void setUserAttribute(String name, String value, String userID) throws MCRException {
+        try {
+            MCRUser user = MCRUserManager.getUser(userID);
+            user.setUserAttribute(name, value);
+            MCRUserManager.updateUser(user);
+        } catch (Exception e) {
+            throw new MCRException("Error while setting attribute " + name + " to " + value +
+                " for user " + userID, e);
+        }
+    }
+
+    /**
+     * This method removes a user attribute for a user.
+     *
+     * @param name
+     *            the name of the attribute
+     * @param userID
+     *            the ID of the user
+     */
+    @MCRCommand(
+        syntax = "remove attribute {0} for user {1}",
+        help = "Removes the attribute {0} for user {1}",
+        order = 130)
+    public static void setUserAttribute(String name, String userID) throws MCRException {
+        try {
+            MCRUser user = MCRUserManager.getUser(userID);
+            user.getAttributes().removeIf(a->a.getName().equals(name));
+            MCRUserManager.updateUser(user);
+        } catch (Exception e) {
+            throw new MCRException("Error while removing attribute " + name +
+                " for user " + userID, e);
         }
     }
 

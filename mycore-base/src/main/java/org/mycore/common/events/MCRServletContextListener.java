@@ -42,7 +42,6 @@ public class MCRServletContextListener implements ServletContextListener {
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
-        // shutdown event
         MCRShutdownHandler.getInstance().shutDown();
     }
 }

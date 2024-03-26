@@ -20,7 +20,6 @@ package org.mycore.wcms2.navigation;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,8 +35,9 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.tools.MyCoReWebPageProvider;
-import org.mycore.wcms2.MCRWebPagesSynchronizer;
+import org.mycore.wcms2.MCRWCMSUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -92,12 +92,7 @@ public class MCRWCMSContentManager {
      */
     public JsonObject getContent(String webpageId) throws IOException, JDOMException {
         boolean isXML = webpageId.endsWith(".xml");
-        URL resourceURL = null;
-        try {
-            resourceURL = MCRWebPagesSynchronizer.getURL(webpageId);
-        } catch (MalformedURLException e) {
-            throwError(ErrorType.invalidDirectory, webpageId);
-        }
+        URL resourceURL = MCRResourceHelper.getWebResourceUrl(webpageId);
         // file is not in web application directory
         if (!isXML) {
             throwError(ErrorType.invalidFile, webpageId);
@@ -159,7 +154,7 @@ public class MCRWCMSContentManager {
                 JsonArray content = item.get("content").getAsJsonArray();
                 Element mycoreWebpage = this.sectionProvider.fromJSON(content);
                 // save
-                try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(webpageId)) {
+                try (OutputStream fout = MCRWCMSUtil.getOutputStream(webpageId)) {
                     out.output(new Document(mycoreWebpage), fout);
                 } catch (IOException | RuntimeException exc) {
                     LOGGER.error("Error while saving {}", webpageId, exc);
@@ -171,13 +166,11 @@ public class MCRWCMSContentManager {
 
     private Optional<String> getWebPageId(JsonObject item) {
         JsonElement webpageIdElement = item.has("href") ? item.get("href")
-            : (item.has("hrefStartingPage") ? item
-                .get("hrefStartingPage") : null);
+            : item.has("hrefStartingPage") ? item.get("hrefStartingPage") : null;
         if (webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
             return Optional.empty();
         }
-        return Optional.of(webpageIdElement)
-            .map(JsonElement::getAsString);
+        return Optional.of(webpageIdElement).map(JsonElement::getAsString);
     }
 
     private Optional<JsonObject> validateContent(JsonElement e) {
@@ -200,7 +193,7 @@ public class MCRWCMSContentManager {
     public void move(String from, String to) {
         try {
             // get from
-            URL fromURL = MCRWebPagesSynchronizer.getURL(from);
+            URL fromURL = MCRResourceHelper.getWebResourceUrl(from);
             Document document;
             if (fromURL == null) {
                 // if the from resource couldn't be found we assume its not created yet.
@@ -213,7 +206,7 @@ public class MCRWCMSContentManager {
             }
             // save
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding("UTF-8"));
-            try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(to)) {
+            try (OutputStream fout = MCRWCMSUtil.getOutputStream(to)) {
                 out.output(document, fout);
             }
             // delete old

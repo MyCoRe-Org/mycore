@@ -52,6 +52,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
@@ -250,7 +251,7 @@ public class MCREditorOutValidator {
      */
     public static void setDefaultDerivateACLs(Element service) {
         // Read stylesheet and add user
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_derivate.xml");
+        InputStream aclxml = MCRResourceHelper.getResourceAsStream("editor_default_acls_derivate.xml");
         if (aclxml == null) {
             LOGGER.warn("Can't find default derivate ACL file editor_default_acls_derivate.xml.");
             return;

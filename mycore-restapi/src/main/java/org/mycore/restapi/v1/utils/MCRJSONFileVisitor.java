@@ -107,16 +107,19 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         MCRPath mcrPath = MCRPath.toMCRPath(file);
         MCRPath relativePath = mcrPath.getRoot().relativize(mcrPath);
+        final String fileNodePath;
         final String fileNodeServletSecuredURI;
         try {
+            fileNodePath = MCRXMLFunctions.encodeURIPath(relativePath.toString());
             fileNodeServletSecuredURI = MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(
-                MCRObjectID.getInstance(derId), MCRXMLFunctions.encodeURIPath(relativePath.toString()), this.baseURL);
+                MCRObjectID.getInstance(derId), fileNodePath, this.baseURL);
         } catch (URISyntaxException e) {
             throw new IOException("Can't encode file path to URI " + relativePath.toString(), e);
         }
         jw.beginObject();
         writePathInfo(file, attrs);
         jw.name("extension").value(getFileExtension(file.getFileName().toString()));
+        jw.name("urlPath").value(fileNodePath);
         jw.name("href").value(fileNodeServletSecuredURI);
         jw.endObject();
         return super.visitFile(file, attrs);

@@ -29,80 +29,139 @@ import org.mycore.common.MCRTransactionHelper;
 
 /**
  * Encapsulates a {@link Callable} with a mycore session and a database transaction.
- *
- * @author Matthias Eichner
  */
 public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<Callable<V>> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private Callable<V> callable;
+    private final Callable<V> callable;
 
-    protected MCRSession session;
+    private final MCRSession session;
 
     /**
-     * Creates a new {@link Callable} encapsulating the {@link #call()} method with a new
-     * {@link MCRSession} and a database transaction. Afterwards the transaction will
-     * be committed and the session will be released and closed.
-     *
-     * <p>If you want to execute your callable in the context of an already existing
-     * session use the {@link MCRTransactionableCallable#MCRTransactionableCallable(Callable, MCRSession)}
-     * constructor instead.
-     *
-     * @param callable the callable to execute within a session and transaction
+     * Shorthand for {@link #MCRTransactionableCallable(Callable, MCRSession)}
+     * with <code>null</code> as the session parameter.
      */
     public MCRTransactionableCallable(Callable<V> callable) {
-        this.callable = Objects.requireNonNull(callable, "callable must not be null");
+        this(callable, null);
     }
 
     /**
      * Creates a new {@link Callable} encapsulating the {@link #call()} method with a new
-     * a database transaction. The transaction will be created in the context of the
-     * given session. Afterwards the transaction will be committed and the session
-     * will be released (but not closed!).
+     * a database transaction. The transaction will be created in the context of a session.
+     * Afterward the transaction will be committed and the session will be released.
+     * <ul>
+     * <li>
+     * If a non-null session is provided as the second parameter, that session will be used.
+     * The session will <em>not</em> be closed, after it has been released.
+     * </li>
+     * <li>
+     * Otherwise, if a session is bound to the current thread, that session will be reused.
+     * The session will <em>not</em> be closed, after it has been released.
+     * </li>
+     * <li>
+     * Otherwise, a new ephemeral session will be created and used.
+     * The session will be closed, after it has been released.
+     * </li>
+     * </ul>
      *
      * @param callable the callable to execute within a session and transaction
-     * @param session the session to use
+     * @param session  the session to use
      */
     public MCRTransactionableCallable(Callable<V> callable, MCRSession session) {
         this.callable = Objects.requireNonNull(callable, "callable must not be null");
-        this.session = Objects.requireNonNull(session, "session must not be null");
+        this.session = session;
     }
 
     @Override
     public V call() throws Exception {
-        boolean newSession = this.session == null;
-        MCRSessionMgr.unlock();
-        boolean closeSession = newSession && !MCRSessionMgr.hasCurrentSession();
-        if (newSession) {
-            this.session = MCRSessionMgr.getCurrentSession();
-        }
-        MCRSessionMgr.setCurrentSession(this.session);
+        TypedSession typedSession = obtainSession();
+        MCRSession session = typedSession.session();
+        SessionType type = typedSession.type();
+        onBeforeTransaction(session, type);
         try {
             MCRTransactionHelper.beginTransaction();
             return this.callable.call();
         } finally {
             try {
                 MCRTransactionHelper.commitTransaction();
-            } catch (Exception commitExc) {
-                LOGGER.error("Error while commiting transaction.", commitExc);
+            } catch (Exception commitException) {
+                LOGGER.error("Error while committing transaction.", commitException);
                 try {
                     MCRTransactionHelper.rollbackTransaction();
-                } catch (Exception rollbackExc) {
-                    LOGGER.error("Error while rollbacking transaction.", commitExc);
+                } catch (Exception rollbackException) {
+                    LOGGER.error("Error while rolling back transaction.", rollbackException);
                 }
             } finally {
+                onAfterTransaction(session, type);
                 MCRSessionMgr.releaseCurrentSession();
-                if (closeSession && session != null) {
+                if (type == SessionType.EPHEMERAL && session != null) {
                     session.close();
                 }
             }
         }
     }
 
+    private TypedSession obtainSession() {
+        MCRSessionMgr.unlock();
+        MCRSession session;
+        SessionType type;
+        if (this.session != null) {
+            LOGGER.info("Using provided session");
+            session = this.session;
+            type = SessionType.PROVIDED;
+        } else if (MCRSessionMgr.hasCurrentSession()) {
+            LOGGER.info("Reusing existing thread bound session");
+            session = MCRSessionMgr.getCurrentSession();
+            type = SessionType.THREAD_BOUND;
+        } else {
+            LOGGER.info("Creating new ephemeral session");
+            session = MCRSessionMgr.getCurrentSession();
+            type = SessionType.EPHEMERAL;
+        }
+        MCRSessionMgr.setCurrentSession(session);
+        return new TypedSession(session, type);
+    }
+
+    /**
+     * Hook that is called after a session has been selected and before the transaction has begun.
+     *
+     * @param session the session
+     * @param type    the session type
+     */
+    protected void onBeforeTransaction(MCRSession session, SessionType type) {
+        // may be implemented by child classes
+    }
+
+    /**
+     * Hook that is called after the transaction has been committed or rolled back and before the session is released.
+     *
+     * @param session the session
+     * @param type    the session type
+     */
+    protected void onAfterTransaction(MCRSession session, SessionType type) {
+        // may be implemented by child classes
+    }
+
     @Override
     public Callable<V> get() {
         return callable;
     }
+
+
+    protected enum SessionType {
+
+        PROVIDED,
+
+        THREAD_BOUND,
+
+        EPHEMERAL;
+
+    }
+
+    private record TypedSession(MCRSession session, SessionType type) {
+
+    }
+
 
 }

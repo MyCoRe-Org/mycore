@@ -57,6 +57,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
         shutdownHandler.isWebAppRunning = true;
         shutdownHandler.leakPreventor = leakPreventor;
+        MCRServletContextHolder.instance().set(ctx);
         MCRStartupHandler.startUp(ctx);
         //Make sure logging is configured
         final Logger logger = LogManager.getLogger();

@@ -229,14 +229,16 @@ public class MCRUserManagerTest extends MCRUserTestCase {
      */
     @Test
     public final void testConditionWithUserAttributeNamePattern() {
-        assertEquals("Attribute name search failed", 0, MCRUserManager.countUsers(null, null, null, null, "bar"));
+        assertEquals("Attribute name search failed", 0, MCRUserManager.countUsers(null, null, null, null,
+            "bar", null));
 
         MCRUser user2 = new MCRUser("junit2");
         user2.setRealName("Test Case II");
         user2.setUserAttribute("junit2", "foo");
         user2.setUserAttribute("bar", "test");
         MCRUserManager.createUser(user2);
-        assertEquals("Attribute name search failed", 1, MCRUserManager.countUsers(null, null, null, null, "bar"));
+        assertEquals("Attribute name search failed", 1, MCRUserManager.countUsers(null, null, null, null,
+            "bar", null));
     }
 
     /**

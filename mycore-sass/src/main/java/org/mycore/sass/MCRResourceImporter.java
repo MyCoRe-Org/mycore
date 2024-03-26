@@ -20,16 +20,12 @@ package org.mycore.sass;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRDeveloperTools;
-import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.resource.MCRResourceHelper;
 
 import com.google.protobuf.ByteString;
 import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse.ImportSuccess;
@@ -129,22 +125,7 @@ public class MCRResourceImporter extends CustomImporter {
      * @return The URL of the web resource.
      */
     private URL getWebResourceUrl(String resourcePath) {
-        return MCRDeveloperTools.getOverriddenFilePath(resourcePath, true)
-            .map(p -> {
-                try {
-                    return p.toUri().toURL();
-                } catch (MalformedURLException e) {
-                    throw new UncheckedIOException(e);
-                }
-            })
-            .or(() -> Optional.ofNullable(MCRConfigurationDir.getConfigResource("META-INF/resources/" + resourcePath)))
-            .orElseGet(() -> {
-                try {
-                    return servletContext.getResource("/" + resourcePath);
-                } catch (MalformedURLException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+        return MCRResourceHelper.getWebResourceUrl(resourcePath);
     }
 
     /**

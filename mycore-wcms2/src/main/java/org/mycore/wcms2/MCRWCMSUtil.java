@@ -21,10 +21,15 @@ package org.mycore.wcms2;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -42,6 +47,34 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
 public abstract class MCRWCMSUtil {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static File getWCMSDataDir() {
+        return new File(MCRConfiguration2.getStringOrThrow("MCR.WCMS2.DataDir"));
+    }
+
+    public static Path getWCMSDataDirPath(){
+        return getWCMSDataDir().toPath();
+    }
+
+    /**
+     * Returns an OutputStream that writes to file inside <code>MCR.WCMS2.DataDir</code>.
+     */
+    public static OutputStream getOutputStream(String path) throws IOException {
+        String cleanPath = path.startsWith("/") ? path.substring(1) : path;
+        File wcmsDataDirTarget = new File(getWCMSDataDir(), cleanPath);
+        LOGGER.info(String.format(Locale.ROOT, "Writing content to %s.", wcmsDataDirTarget));
+        createDirectoryIfNeeded(wcmsDataDirTarget);
+        return new FileOutputStream(wcmsDataDirTarget);
+    }
+
+    private static void createDirectoryIfNeeded(File targetFile) throws IOException {
+        File targetDirectory = targetFile.getParentFile();
+        if (!targetDirectory.isDirectory() && !targetDirectory.mkdirs()) {
+            throw new IOException(String.format(Locale.ROOT, "Could not create directory: %s", targetDirectory));
+        }
+    }
 
     public static MCRNavigation load(org.w3c.dom.Document doc) throws JAXBException {
         return unmarshall(um -> um.unmarshal(doc));

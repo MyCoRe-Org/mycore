@@ -17,9 +17,7 @@
  */
 package org.mycore.access.facts.condition.combined;
 
-import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
-import org.mycore.access.facts.model.MCRCondition;
 
 /**
  * This condition negates its child condition 
@@ -31,22 +29,12 @@ import org.mycore.access.facts.model.MCRCondition;
  * @author Robert Stephan
  *
  */
-public class MCRNotCondition extends MCRAbstractCombinedCondition {
+public final class MCRNotCondition extends MCRAbstractCombinedCondition {
 
     public boolean matches(MCRFactsHolder facts) {
-        MCRCondition negatedCondition = conditions.stream().findFirst().get();
-        boolean result = negatedCondition.matches(facts);
-        boolean negated = !result;
-        if (isDebug()) {
-            Element boundElement = negatedCondition.getBoundElement();
-            if (boundElement != null) {
-                boundElement.setAttribute("_matched", Boolean.toString(result));
-            }
-
-            if (this.getBoundElement() != null) {
-                this.getBoundElement().setAttribute("_matched", Boolean.toString(negated));
-            }
-        }
-        return negated;
+        return conditions.stream()
+            .limit(1)
+            .filter(c -> !addDebugInfoIfRequested(c, facts))
+            .count() == 1;
     }
 }

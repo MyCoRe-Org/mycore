@@ -243,7 +243,8 @@ public class MCRAccessKeyUtils {
      * @return a list with all users which own at least an access key in given range
      */
     private static List<MCRUser> listUsersWithAccessKey(final int offset, final int limit) {
-        return MCRUserManager.listUsers(null, null, null, null, ACCESS_KEY_PREFIX + "*", offset, limit);
+        return MCRUserManager.listUsers(null, null, null, null, ACCESS_KEY_PREFIX + "*",
+            null, offset, limit);
     }
 
     /**

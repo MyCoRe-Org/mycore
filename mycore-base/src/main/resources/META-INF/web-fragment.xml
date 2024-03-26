@@ -159,7 +159,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>MCRXSLInfoServlet</servlet-name>
-    <url-pattern> /servlets/MCRXSLInfoServlet </url-pattern>
+    <url-pattern>/servlets/MCRXSLInfoServlet</url-pattern>
   </servlet-mapping>
 
   <filter-mapping>
@@ -319,7 +319,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>MCRExportServlet</servlet-name>
-    <url-pattern> /servlets/MCRExportServlet/* </url-pattern>
+    <url-pattern>/servlets/MCRExportServlet/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -353,6 +353,25 @@
     <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MyCoRe Jersey Resource</servlet-name>
     <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+
+
+  <!-- **************************************************************** -->
+  <!-- Resources -->
+  <!-- **************************************************************** -->
+
+  <filter>
+    <filter-name>MCRDefaultResourceInterceptFilter</filter-name>
+    <filter-class>org.mycore.resource.MCRDefaultResourceInterceptFilter</filter-class>
+    <init-param>
+      <param-name>expiresMinutes</param-name>
+      <param-value>1440</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>MCRDefaultResourceInterceptFilter</filter-name>
+    <servlet-name>default</servlet-name>
   </filter-mapping>
 
   <!-- **************************************************************** -->

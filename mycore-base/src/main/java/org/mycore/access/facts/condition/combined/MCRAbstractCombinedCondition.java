@@ -17,11 +17,13 @@
  */
 package org.mycore.access.facts.condition.combined;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsAccessSystemHelper;
+import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.condition.MCRAbstractCondition;
 import org.mycore.access.facts.model.MCRCombinedCondition;
 import org.mycore.access.facts.model.MCRCondition;
@@ -33,9 +35,10 @@ import org.mycore.access.facts.model.MCRCondition;
  * @author Robert Stephan
  *
  */
-public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition implements MCRCombinedCondition {
+sealed public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition implements MCRCombinedCondition
+    permits MCRAndCondition, MCRNotCondition, MCROrCondition, MCRXorCondition {
 
-    protected Set<MCRCondition> conditions = new HashSet<>();
+    protected Set<MCRCondition> conditions = new LinkedHashSet<>();
 
     public void add(MCRCondition condition) {
         conditions.add(condition);
@@ -55,6 +58,7 @@ public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition 
         return conditions;
     }
 
+    @Deprecated
     public void debugInfoForMatchingChildElement(MCRCondition c, boolean matches) {
         if (isDebug()) {
             Element el = c.getBoundElement();
@@ -62,6 +66,16 @@ public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition 
                 el.setAttribute("_matches", Boolean.toString(matches));
             }
         }
+    }
+
+    boolean addDebugInfoIfRequested(MCRCondition c, MCRFactsHolder facts) {
+        if (!isDebug()) {
+            return c.matches(facts);
+        }
+        boolean matches = c.matches(facts);
+        Objects.requireNonNull(c.getBoundElement(), "Condition is not bound to an element.")
+            .setAttribute("_matches", Boolean.toString(matches));
+        return matches;
     }
 
 }

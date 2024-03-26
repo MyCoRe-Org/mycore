@@ -47,7 +47,7 @@ import org.mycore.oai.set.MCROAISetConfiguration;
 import org.mycore.oai.set.MCROAISetHandler;
 import org.mycore.oai.set.MCROAISolrSetConfiguration;
 import org.mycore.oai.set.MCRSet;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
+import org.mycore.util.concurrent.MCRFixedUserRunnable;
 
 /**
  * Manager class to handle OAI-PMH set specific behavior.
@@ -121,17 +121,7 @@ public class MCROAISetManager {
     }
 
     private Runnable getUpdateRunnable() {
-        MCRFixedUserCallable<Object> callable = new MCRFixedUserCallable<>(
-            Executors.callable(this::updateCachedSetList), MCRSystemUserInformation.getSystemUserInstance());
-        return () -> {
-            try {
-                callable.call();
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new MCRException(e);
-            }
-        };
+        return new MCRFixedUserRunnable(this::updateCachedSetList, MCRSystemUserInformation.getSystemUserInstance());
     }
 
     private void updateCachedSetList() {

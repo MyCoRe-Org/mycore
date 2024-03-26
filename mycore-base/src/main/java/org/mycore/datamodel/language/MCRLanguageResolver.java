@@ -18,27 +18,30 @@
 
 package org.mycore.datamodel.language;
 
-import java.util.Map.Entry;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.tools.MCRLanguageOrientationHelper;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+import java.util.Map.Entry;
+
 /**
  * Resolves languages by code. Syntax: language:{ISOCode}
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRLanguageResolver implements URIResolver {
 
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) throws TransformerException, IllegalArgumentException {
+        String[] hrefContent = href.split(":");
+        if (hrefContent.length < 2) {
+            throw new IllegalArgumentException("Empty language code found while resolving URI 'language:'.");
+        }
         try {
-            String code = href.split(":")[1];
+            String code = hrefContent[1];
             MCRLanguage language = MCRLanguageFactory.instance().getLanguage(code);
             Document doc = new Document(buildXML(language));
             return new JDOMSource(doc);
@@ -66,4 +69,5 @@ public class MCRLanguageResolver implements URIResolver {
 
         return xml;
     }
+
 }

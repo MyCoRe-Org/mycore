@@ -52,6 +52,10 @@ public abstract class MCRServletContentHelper {
     public static Config buildConfig(ServletConfig servletConfig) {
         Config config = new Config();
 
+        if (servletConfig.getInitParameter("expiresMinutes") != null) {
+            config.expiresMinutes = Integer.parseInt(servletConfig.getInitParameter("expiresMinutes"));
+        }
+
         if (servletConfig.getInitParameter("inputBufferSize") != null) {
             config.inputBufferSize = Integer.parseInt(servletConfig.getInitParameter("inputBufferSize"));
         }
@@ -151,6 +155,12 @@ public abstract class MCRServletContentHelper {
             if (lastModified >= 0) {
                 response.setDateHeader("Last-Modified", lastModified);
             }
+
+            if (config.expiresMinutes != 0) {
+                long expires = System.currentTimeMillis() + (config.expiresMinutes * 60L * 1000L);
+                response.setDateHeader("Expires", expires);
+            }
+
             if (serveContent) {
                 String dispositionType = request.getParameter("dl") == null ? "inline" : "attachment";
                 response.setHeader("Content-Disposition", dispositionType + ";filename=\"" + filename + "\"");
@@ -465,6 +475,8 @@ public abstract class MCRServletContentHelper {
     }
 
     public static class Config {
+
+        public int expiresMinutes = 0;
 
         public boolean useAcceptRanges = true;
 

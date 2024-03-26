@@ -33,7 +33,7 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
+import org.mycore.util.concurrent.MCRFixedUserRunnable;
 
 import jakarta.persistence.EntityManager;
 
@@ -51,28 +51,18 @@ public class MCRDNBURNRegistrationCheckCronjob extends MCRCronjob {
 
     @Override
     public void runJob() {
+        new MCRFixedUserRunnable(() -> {
 
-        try {
+            LOGGER.info("Searching unregistered URNs");
 
-            new MCRFixedUserCallable<>(() -> {
+            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+            MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, -1)
+                .stream()
+                .peek(em::detach)
+                .peek(mcrpi -> LOGGER.info("Found unregistered URN " + mcrpi.getIdentifier()))
+                .forEach(this::checkIfUrnIsRegistered);
 
-                LOGGER.info("Searching unregistered URNs");
-
-                EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-                MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, -1)
-                    .stream()
-                    .peek(em::detach)
-                    .peek(mcrpi -> LOGGER.info("Found unregistered URN " + mcrpi.getIdentifier()))
-                    .forEach(this::checkIfUrnIsRegistered);
-
-                return null;
-
-            }, MCRSystemUserInformation.getJanitorInstance()).call();
-
-        } catch (Exception e) {
-            LOGGER.error("Failed to check unregistered URNs", e);
-        }
-
+        }, MCRSystemUserInformation.getJanitorInstance()).run();
     }
 
     private void checkIfUrnIsRegistered(MCRPI mcrpi) {
