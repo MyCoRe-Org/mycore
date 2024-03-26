@@ -20,18 +20,23 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/cache@v2
+      id: mvnd-cache
+      with:
+        path: /tmp/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}
+        key: ${{ inputs.version }}-${{ inputs.distribution }}
     - run: curl -fsSL -o mvnd.zip https://archive.apache.org/dist/maven/mvnd/${{ inputs.version }}/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}.zip
-      if: inputs.dry-run == 'false'
+      if: inputs.dry-run == 'false' && steps.mvnd-cache.outputs.cache-hit != 'true'
       shell: bash
     - run: curl -fsSL -o mvnd.zip.sha256 https://archive.apache.org/dist/maven/mvnd/${{ inputs.version }}/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}.zip.sha256
-      if: inputs.dry-run == 'false'
+      if: inputs.dry-run == 'false' && steps.mvnd-cache.outputs.cache-hit != 'true'
       shell: bash
     - id: integrity-check
       run: echo "$(cat mvnd.zip.sha256) mvnd.zip" | sha256sum --check
-      if: inputs.dry-run == 'false'
+      if: inputs.dry-run == 'false' && steps.mvnd-cache.outputs.cache-hit != 'true'
       shell: bash
     - run: unzip mvnd.zip -d /tmp/
-      if: inputs.dry-run == 'false'
+      if: inputs.dry-run == 'false' && steps.mvnd-cache.outputs.cache-hit != 'true'
       shell: bash
     - id: mvnd-location
       run: echo "mvnd-dir=/tmp/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}/bin" >> $GITHUB_OUTPUT
