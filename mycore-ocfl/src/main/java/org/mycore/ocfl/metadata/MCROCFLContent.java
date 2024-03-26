@@ -18,6 +18,7 @@
 
 package org.mycore.ocfl.metadata;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.mycore.common.content.MCRContent;
@@ -49,7 +50,7 @@ public class MCROCFLContent extends MCRContent {
     }
 
     @Override
-    public InputStream getInputStream() {
+    public InputStream getInputStream() throws IOException {
         return repository
             .getObject(version == null ? ObjectVersionId.head(objectid) : ObjectVersionId.version(objectid, version))
             .getFile(fileName).getStream();
