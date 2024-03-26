@@ -14,6 +14,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - id: install-mvnd
+      uses: ./.github/actions/install-mvnd
+      with:
+        version: 1.0-m8
+
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
@@ -62,8 +67,8 @@ jobs:
         export FIREFOX_BIN=$(which firefox-esr)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T1C
-        mvn -P!standard-with-extra-repos -B javadoc:javadoc
+        mvnd -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml
+        mvnd -P!standard-with-extra-repos -B javadoc:javadoc
 
     - name: Upload logs on build failure
       if: failure()

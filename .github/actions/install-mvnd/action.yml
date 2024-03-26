@@ -1,0 +1,44 @@
+name: 'install-mvnd'
+description: 'Install the maven daemon'
+inputs:
+  version:
+    description: 'The version of the maven daemon to install'
+    required: true
+    default: '1.0-m8'
+  distribution:
+    description: 'The maven distribution to use'
+    required: true
+    default: 'm39-linux-amd64'
+  dry-run:
+    description: 'Flag to enable to the dry-run mode'
+    required: true
+    default: 'false'
+outputs:
+  mvnd-dir:
+    description: "The directory where the command mvnd is located"
+    value: ${{ steps.mvnd-location.outputs.mvnd-dir }}
+runs:
+  using: "composite"
+  steps:
+    - run: curl -fsSL -o mvnd.zip https://archive.apache.org/dist/maven/mvnd/${{ inputs.version }}/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}.zip
+      if: inputs.dry-run == 'false'
+      shell: bash
+    - run: curl -fsSL -o mvnd.zip.sha256 https://archive.apache.org/dist/maven/mvnd/${{ inputs.version }}/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}.zip.sha256
+      if: inputs.dry-run == 'false'
+      shell: bash
+    - id: integrity-check
+      run: echo "$(cat mvnd.zip.sha256) mvnd.zip" | sha256sum --check
+      if: inputs.dry-run == 'false'
+      shell: bash
+    - run: unzip mvnd.zip -d /tmp/
+      if: inputs.dry-run == 'false'
+      shell: bash
+    - id: mvnd-location
+      run: echo "mvnd-dir=/tmp/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}/bin" >> $GITHUB_OUTPUT
+      shell: bash
+    - id: mvnd-path
+      run: echo "PATH=$PATH:/tmp/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}/bin" >> $GITHUB_ENV
+      shell: bash
+    - id: mvnd-opts
+      run: echo "MVND_OPTS=-Dsurefire.rerunFailingTestsCount=2 -Dfailsafe.rerunFailingTestsCount=2" >> $GITHUB_ENV
+      shell: bash
