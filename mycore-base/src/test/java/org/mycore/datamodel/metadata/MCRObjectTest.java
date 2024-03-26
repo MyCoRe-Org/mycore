@@ -50,7 +50,10 @@ public class MCRObjectTest extends MCRTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-
+        String testId = "junit_test_00000001";
+        if (MCRObjectID.getInstance(testId).toString().length() != testId.length()) {
+            MCRObjectIDTest.resetObjectIDFormat();
+        }
         // create doc
         Document testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
         testObject = new MCRObject();

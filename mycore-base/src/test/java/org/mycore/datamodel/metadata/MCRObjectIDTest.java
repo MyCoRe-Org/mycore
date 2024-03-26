@@ -23,6 +23,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -34,6 +36,7 @@ import java.util.stream.Stream;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRStoreTestCase;
@@ -41,6 +44,22 @@ import org.mycore.common.MCRStoreTestCase;
 public class MCRObjectIDTest extends MCRStoreTestCase {
 
     private static final String BASE_ID = "MyCoRe_test";
+
+    /**
+     * Resets MCRObjectID number format via reflection
+     */
+    public static void resetObjectIDFormat() {
+        try {
+            Field fNumberformat = MCRObjectID.class.getDeclaredField("NUMBER_FORMAT");
+            fNumberformat.setAccessible(true);
+            Method mInitNumberformat = MCRObjectID.class.getDeclaredMethod("initNumberFormat");
+            mInitNumberformat.setAccessible(true); //if security settings allow this
+            Object oNumberFormat = mInitNumberformat.invoke(null);
+            fNumberformat.set(null, oNumberFormat);
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+    }
 
     @Override
     @Before

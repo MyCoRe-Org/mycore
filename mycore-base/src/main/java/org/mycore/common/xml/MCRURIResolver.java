@@ -144,17 +144,15 @@ public final class MCRURIResolver implements URIResolver {
 
     static {
         try {
-            EXT_RESOLVER = getExternalResolverProvider();
+            reInit();
             singleton = new MCRURIResolver();
         } catch (Exception exc) {
             LOGGER.error("Unable to initialize MCRURIResolver", exc);
         }
     }
 
-    /**
-     * Creates a new MCRURIResolver
-     */
-    private MCRURIResolver() {
+    public static void reInit() {
+        EXT_RESOLVER = getExternalResolverProvider();
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
     }
 
@@ -210,7 +208,7 @@ public final class MCRURIResolver implements URIResolver {
         return context;
     }
 
-    private HashMap<String, URIResolver> getResolverMapping() {
+    private static HashMap<String, URIResolver> getResolverMapping() {
         final Map<String, URIResolver> extResolverMapping = EXT_RESOLVER.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
