@@ -1,0 +1,50 @@
+name: 'Yarn Setup'
+description: 'GitHub Action for setting up a Yarn environment. Caches dependencies for reduced execution times.'
+
+inputs:
+  node-version:
+    description: 'The version of Node.js that will be used'
+    required: true
+    default: '16.19.1'
+
+outputs:
+  cache-hit:
+    description: 'Indicates a cache hit'
+    value: ${{ steps.cache.outputs.cache-hit }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4.0.2
+      with:
+        node-version: ${{inputs.node-version}}
+
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+      shell: bash
+
+    - name: Cache Yarn
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        save-always: true
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: Find and install dependencies
+      run: |
+        for lockfile in $(find . -name "yarn.lock"); do
+          dir=$(dirname $lockfile)
+          if [[ ! "${dir: -18}" == "access-key-manager" ]]
+          then
+            echo "Installing dependencies in $dir"
+            cd $dir
+            yarn install --frozen-lockfile
+            cd -
+          fi
+        done
+      shell: bash
