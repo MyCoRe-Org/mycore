@@ -14,12 +14,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Setup Maven Daemon
-      id: install-mvnd
-      uses: ./.github/actions/install-mvnd
-      with:
-        version: 1.0-m8
-
     - name: Prepare yarn environment
       id: prepare-yarn
       uses: ./.github/actions/prepare-yarn
@@ -35,7 +29,7 @@ jobs:
 
     - name: Fetch Geckodriver cache
       id: geckodriver-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/geckodriver
         key: ${{ env.GECKODRIVER_VERSION }}
@@ -74,8 +68,8 @@ jobs:
         export FIREFOX_BIN=$(which firefox-esr)
         export SELENIUM_BROWSER=firefox
 
-        mvnd -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml
-        mvnd -P!standard-with-extra-repos -B javadoc:javadoc
+        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T1C
+        mvn -P!standard-with-extra-repos -B javadoc:javadoc -T1C
 
     - name: Upload logs on build failure
       if: failure()
