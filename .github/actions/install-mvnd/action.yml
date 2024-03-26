@@ -20,7 +20,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       id: mvnd-cache
       with:
         path: /tmp/maven-mvnd-${{ inputs.version }}-${{ inputs.distribution }}
