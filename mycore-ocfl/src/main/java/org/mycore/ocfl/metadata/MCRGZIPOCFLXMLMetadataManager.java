@@ -59,6 +59,6 @@ public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
 
     @Override
     protected String buildFilePath(MCRObjectID mcrid) {
-        return super.buildFilePath(mcrid)+".gz";
+        return super.buildFilePath(mcrid) + ".gz";
     }
 }
