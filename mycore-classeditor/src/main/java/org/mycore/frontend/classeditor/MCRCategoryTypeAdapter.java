@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import org.mycore.common.MCRJSONTypeAdapter;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -120,10 +119,8 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
 
     private MCRCategLinkService getLinkService() {
         if (linkService == null) {
-            linkService = MCRConfiguration2.<MCRCategLinkService>getInstanceOf("Category.Link.Service")
-                .orElseGet(MCRCategLinkServiceFactory::getInstance);
+            return MCRCategLinkServiceFactory.getInstance();
         }
-
         return linkService;
     }
 }

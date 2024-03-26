@@ -56,7 +56,8 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * There are the following configuration values:
  * <ul>
  *     <li><code>Provider.Class</code> - The configured instance of {@link MCRResourceProvider} to be used, configured
- *     by {@link MCRConfiguration2#getInstanceOf(String)}, typically a {@link MCRCombinedResourceProvider}.</li>
+ *     by {@link MCRConfiguration2#getInstanceOfOrThrow(Class, String)},
+ *     typically a {@link MCRCombinedResourceProvider}.</li>
  * </ul>
  * <p>
  * Example:
@@ -102,8 +103,8 @@ public final class MCRResourceResolver {
         String name = MCRConfiguration2.getStringOrThrow(RESOLVER_KEY);
         LOGGER.info("Using resolver: {}", name);
 
-        String providerProperty = RESOLVER_KEY + "." + name + ".Provider.Class";
-        MCRResourceProvider provider = getInstanceOfOrThrow(providerProperty);
+        String providerKey = RESOLVER_KEY + "." + name + ".Provider.Class";
+        MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(MCRResourceProvider.class, providerKey);
 
         MCRTreeMessage description = provider.compileDescription(LOGGER.getLevel());
         LOGGER.info(description.logMessage("Resolving resources with provider:"));
@@ -133,11 +134,6 @@ public final class MCRResourceResolver {
 
         return builder.build();
 
-    }
-
-    private static <T> T getInstanceOfOrThrow(String property) {
-        return MCRConfiguration2.<T>getInstanceOf(property)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
 
     public static MCRResourceResolver instance() {

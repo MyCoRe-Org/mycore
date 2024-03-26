@@ -85,8 +85,8 @@ public class MCRDOICommands {
             + "{1} the registration service from configuration.")
     public static void repairIncompleteRegisteredDOI(String doiString, String serviceID)
         throws MCRPersistentIdentifierException, MCRAccessException {
-        MCRDOIService registrationService = (MCRDOIService) MCRConfiguration2
-            .getInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID).get();
+        MCRDOIService registrationService = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRDOIService.class, MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID);
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
 
         MCRDigitalObjectIdentifier doi = new MCRDOIParser().parse(doiString)
@@ -127,8 +127,8 @@ public class MCRDOICommands {
             + "It also updates all media files. The Service ID{0} is the id from the configuration.",
         order = 10)
     public static void synchronizeDatabase(String serviceID) {
-        MCRDOIService registrationService = (MCRDOIService) MCRConfiguration2
-            .getInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID).get();
+        MCRDOIService registrationService = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRDOIService.class, MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID);
 
         try {
             MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
@@ -181,8 +181,8 @@ public class MCRDOICommands {
     @MCRCommand(syntax = "repair media list of {0}",
         help = "Sends new media lists to Datacite. The Service ID{0} is the id from the configuration.")
     public static List<String> updateMediaListOfAllDOI(String serviceID) {
-        MCRDOIService registrationService = (MCRDOIService) MCRConfiguration2
-            .getInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID).get();
+        MCRDOIService registrationService = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRDOIService.class, MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID);
         try {
             MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
             List<MCRDigitalObjectIdentifier> doiList = dataciteClient.getDOIList();
@@ -206,8 +206,8 @@ public class MCRDOICommands {
     @MCRCommand(syntax = REPAIR_MEDIALIST_OF_0_AND_SERVICE_1,
         help = "Sends new media list to Datacite. {0} is the DOI. The Service ID{1} is the id from the configuration.")
     public static void updateMediaListForDOI(String doiString, String serviceID) {
-        MCRDOIService registrationService = (MCRDOIService) MCRConfiguration2
-            .getInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID).get();
+        MCRDOIService registrationService = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRDOIService.class, MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + serviceID);
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
 
         MCRDigitalObjectIdentifier doi = new MCRDOIParser()

@@ -133,12 +133,10 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException
      *             if the class can not be loaded or instantiated
      */
+    @Deprecated
+    @SuppressWarnings("unchecked")
     public static <T> Optional<T> getInstanceOf(String name) throws MCRConfigurationException {
-        if (MCRConfigurableInstanceHelper.isSingleton(name)) {
-            return getSingleInstanceOf(name);
-        } else {
-            return MCRConfigurableInstanceHelper.getInstance(name);
-        }
+        return (Optional<T>) getInstanceOf(Object.class, name);
     }
 
     /**
@@ -156,11 +154,10 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException
      *             if the class can not be loaded or instantiated
      */
+    @Deprecated
+    @SuppressWarnings("unchecked")
     public static <T> Optional<T> getSingleInstanceOf(String name) {
-        return getString(name)
-            .map(className -> new ConfigSingletonKey(name, className))
-            .map(key -> (T) instanceHolder.computeIfAbsent(key,
-                k -> MCRConfigurableInstanceHelper.getInstance(name).orElse(null)));
+        return (Optional<T>) getSingleInstanceOf(Object.class, name);
     }
 
     /**
@@ -180,12 +177,72 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException
      *             if the class can not be loaded or instantiated
      */
+    @Deprecated
     public static <T> Optional<T> getSingleInstanceOf(String name, Class<? extends T> alternative) {
         return MCRConfiguration2.<T>getSingleInstanceOf(name)
             .or(() -> Optional.ofNullable(alternative)
                 .map(className -> new ConfigSingletonKey(name, className.getName()))
                 .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
                     (k) -> MCRConfigurableInstanceHelper.getInstance(MCRInstanceConfiguration.ofClass(alternative)))));
+    }
+
+    /**
+     * Returns a new instance of the class specified in the configuration property with the given name.
+     *
+     * @param superClass the intended super class of the instantiated class
+     * @param name the non-null and non-empty name of the configuration property
+     * @return the instance of the class named by the value of the configuration property
+     * @throws MCRConfigurationException if the class can not be loaded or instantiated
+     */
+    public static <S> Optional<S> getInstanceOf(Class<S> superClass, String name) throws MCRConfigurationException {
+        if (MCRConfigurableInstanceHelper.isSingleton(superClass)) {
+            return getSingleInstanceOf(superClass, name);
+        } else {
+            return MCRConfigurableInstanceHelper.getInstance(superClass, name);
+        }
+    }
+
+    /**
+     * Returns a new instance of the class specified in the configuration property with the given name.
+     *
+     * @param superClass the intended super class of the instantiated class
+     * @param name the non-null and non-empty name of the configuration property
+     * @return the instance of the class named by the value of the configuration property
+     * @throws MCRConfigurationException if the class can not be loaded or instantiated
+     * or the configuration property is not set
+     */
+    public static <S> S getInstanceOfOrThrow(Class<S> superClass, String name) throws MCRConfigurationException {
+        return getInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
+    }
+
+    /**
+     * Returns an instance of the class specified in the configuration property with the given name. If the class was
+     * previously instantiated by this method, that instance is returned.
+     *
+     * @param superClass the intended super class of the instantiated class
+     * @param name non-null and non-empty name of the configuration property
+     * @return the instance of the class named by the value of the configuration property
+     * @throws MCRConfigurationException if the class can not be loaded or instantiated
+     */
+    public static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name) {
+        return getString(name)
+            .map(className -> new ConfigSingletonKey(name, className))
+            .map(key -> (S) instanceHolder.computeIfAbsent(key,
+                k -> MCRConfigurableInstanceHelper.getInstance(superClass, name).orElse(null)));
+    }
+
+    /**
+     * Returns an instance of the class specified in the configuration property with the given name. If the class was
+     * previously instantiated by this method, that instance is returned.
+     *
+     * @param superClass the intended super class of the instantiated class
+     * @param name non-null and non-empty name of the configuration property
+     * @return the instance of the class named by the value of the configuration property
+     * @throws MCRConfigurationException if the class can not be loaded or instantiated
+     * or the configuration property is not set
+     */
+    public static <S> S getSingleInstanceOfOrThrow(Class<S> superClass, String name) {
+        return getSingleInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
     }
 
     /**

@@ -42,8 +42,7 @@ public class MCRCSLJSONTransformer extends MCRContentTransformer {
     }
 
     private MCRItemDataProvider createItemDataProvider() {
-        return MCRConfiguration2.<MCRItemDataProvider>getInstanceOf(configuredItemProviderProperty)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(configuredItemProviderProperty));
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRItemDataProvider.class, configuredItemProviderProperty);
     }
 
     @Override

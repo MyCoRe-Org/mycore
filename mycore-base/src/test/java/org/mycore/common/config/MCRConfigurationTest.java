@@ -56,7 +56,7 @@ public class MCRConfigurationTest extends MCRTestCase {
 
         Pair<String, String> properties = createConflictConfiguration();
 
-        Object objectA = MCRConfiguration2.getSingleInstanceOf(properties.getLeft()).orElseThrow();
+        Object objectA = MCRConfiguration2.getSingleInstanceOfOrThrow(Object.class, properties.getLeft());
         Object objectB = MCRConfigurationSingletonCollisionClassA.COLLISION_CLASS_B;
 
         assertTrue("Wrong or no class loaded!", objectA instanceof MCRConfigurationSingletonCollisionClassA);
@@ -80,7 +80,7 @@ public class MCRConfigurationTest extends MCRTestCase {
         String classNameA = MCRConfiguration2.getStringOrThrow(propertyA);
         String classNameB = MCRConfiguration2.getStringOrThrow(propertyB);
 
-        MCRConfiguration2.getSingleInstanceOf(propertyA).orElseThrow();
+        MCRConfiguration2.getSingleInstanceOfOrThrow(Object.class, propertyA);
 
         assertNotNull(
             MCRConfiguration2.instanceHolder.get(new MCRConfiguration2.ConfigSingletonKey(propertyA, classNameA)));

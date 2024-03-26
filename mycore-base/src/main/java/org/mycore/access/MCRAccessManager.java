@@ -29,7 +29,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
-import org.mycore.access.strategies.MCRDerivateIDStrategy;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
@@ -73,8 +72,7 @@ public class MCRAccessManager {
 
     @SuppressWarnings("unchecked")
     public static <T extends MCRAccessInterface> T getAccessImpl() {
-        return (T) MCRConfiguration2.<MCRAccessInterface>getInstanceOf("MCR.Access.Class")
-            .orElseGet(MCRAccessBaseImpl::new);
+        return (T) MCRConfiguration2.getInstanceOfOrThrow(MCRAccessInterface.class, "MCR.Access.Class");
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
@@ -84,10 +82,9 @@ public class MCRAccessManager {
         Optional<String> optStrategy = MCRConfiguration2.getString("MCR.Access.Strategy.Class");
         Optional<String> optAccessImpl = MCRConfiguration2.getString("MCR.Access.Class");
         if (optStrategy.isPresent() && optAccessImpl.isPresent() && optStrategy.get().equals(optAccessImpl.get())) {
-            return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Class").orElseThrow();
+            return MCRConfiguration2.getInstanceOfOrThrow(MCRAccessCheckStrategy.class, "MCR.Access.Class");
         } else {
-            return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
-                .orElseGet(MCRDerivateIDStrategy::new);
+            return MCRConfiguration2.getInstanceOfOrThrow(MCRAccessCheckStrategy.class, "MCR.Access.Strategy.Class");
         }
     }
 

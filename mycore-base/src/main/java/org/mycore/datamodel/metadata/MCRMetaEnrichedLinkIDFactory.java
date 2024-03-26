@@ -31,9 +31,8 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
     }
 
     public static MCRMetaEnrichedLinkIDFactory getInstance() {
-        return MCRConfiguration2
-            .<MCRMetaEnrichedLinkIDFactory>getInstanceOf("MCR.Metadata.EnrichedDerivateLinkIDFactory.Class")
-            .orElseGet(MCRDefaultEnrichedDerivateLinkIDFactory::new);
+        return MCRConfiguration2.getInstanceOfOrThrow(
+            MCRMetaEnrichedLinkIDFactory.class, "MCR.Metadata.EnrichedDerivateLinkIDFactory.Class");
     }
 
     public abstract MCREditableMetaEnrichedLinkID getDerivateLink(MCRDerivate der);

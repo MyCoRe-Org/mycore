@@ -21,7 +21,6 @@ package org.mycore.datamodel.classifications2;
 import java.util.Objects;
 
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -51,8 +50,8 @@ public class MCRCategoryDAOFactory {
     // encapsulate the INSTANCE in an inner static class to avoid issues with class loading order
     // this is known as "Bill Pugh singleton"
     private static class MCRCategoryDAOHolder {
-        private static MCRCategoryDAO INSTANCE = MCRConfiguration2.<MCRCategoryDAO>getInstanceOf("MCR.Category.DAO")
-            .orElseGet(MCRCategoryDAOImpl::new);
+        private static MCRCategoryDAO INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRCategoryDAO.class, "MCR.Category.DAO");
     }
 
 }

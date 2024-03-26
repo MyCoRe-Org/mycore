@@ -52,8 +52,8 @@ public class MCRTileServlet extends HttpServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
 
-    private static MCRTileFileProvider TFP = MCRConfiguration2.<MCRDefaultTileFileProvider>getInstanceOf(
-        "MCR.IIIFImage.Iview.TileFileProvider").orElseGet(MCRDefaultTileFileProvider::new);
+    private static MCRTileFileProvider TFP = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRDefaultTileFileProvider.class, "MCR.IIIFImage.Iview.TileFileProvider");
 
     /**
      * Extracts tile or image properties from iview2 file and transmits it.

@@ -33,8 +33,8 @@ import org.mycore.viewer.alto.service.MCRDerivateTitleResolver;
 
 public class MCRJPAAltoChangeSetStore implements MCRAltoChangeSetStore {
 
-    private MCRDerivateTitleResolver titleResolver = MCRConfiguration2
-        .<MCRDerivateTitleResolver>getInstanceOf("MCR.Viewer.DerivateTitleResolver.Class").orElseThrow();
+    private final MCRDerivateTitleResolver titleResolver = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRDerivateTitleResolver.class, "MCR.Viewer.DerivateTitleResolver.Class");
 
     @Override
     public MCRStoredChangeSet get(String pid) {

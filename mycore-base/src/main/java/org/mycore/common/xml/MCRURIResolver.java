@@ -487,10 +487,10 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static class MCRRESTResolver implements URIResolver {
-        private MCRHTTPClient client;
+        private final MCRHTTPClient client;
 
         MCRRESTResolver() {
-            this.client = (MCRHTTPClient) MCRConfiguration2.getInstanceOf(HTTP_CLIENT_CLASS).get();
+            this.client = MCRConfiguration2.getInstanceOfOrThrow(MCRHTTPClient.class, HTTP_CLIENT_CLASS);
         }
 
         @Override
@@ -1104,9 +1104,8 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
-                    MCRLayoutTransformerFactory factory = MCRConfiguration2
-                        .<MCRLayoutTransformerFactory>getInstanceOf(TRANSFORMER_FACTORY_PROPERTY)
-                        .orElseGet(MCRLayoutTransformerFactory::new);
+                    MCRLayoutTransformerFactory factory = MCRConfiguration2.getInstanceOfOrThrow(
+                        MCRLayoutTransformerFactory.class, TRANSFORMER_FACTORY_PROPERTY);
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
                     if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {

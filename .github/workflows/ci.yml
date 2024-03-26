@@ -70,7 +70,7 @@ jobs:
         mvn -P!standard-with-extra-repos -B javadoc:javadoc
 
     - name: Upload logs on build failure
-      if: failure()
+      if: failure() || cancelled()
       uses: actions/upload-artifact@v2
       with:
         name: test-results

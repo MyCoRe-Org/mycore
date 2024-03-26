@@ -71,8 +71,7 @@ public class MCRChangeTracker implements Cloneable {
         counter--;
 
         String property = CONFIG_PREFIX + data.getType() + ".Class";
-        MCRChange change = MCRConfiguration2.<MCRChange>getSingleInstanceOf(property)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
+        MCRChange change = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRChange.class, property);
         change.undo(data);
         return data;
     }
