@@ -465,23 +465,25 @@ public class MCRUserServlet extends MCRServlet {
 
         List<MCRUser> results = null;
         if (hasAdminPermission) {
-            String search = req.getParameter("search");
-            if ((search == null) || search.trim().length() == 0) {
-                search = null;
-            }
 
-            if (search != null) {
+            String search = req.getParameter("search");
+            String pattern;
+
+            if (search == null || search.isBlank()) {
+                pattern = null;
+            } else {
                 users.setAttribute("search", search);
-                search = "*" + search + "*";
+                pattern = "*" + search + "*";
             }
 
             LOGGER.info("search users like {}", search);
 
             int max = MCRConfiguration2.getInt(MCRUser2Constants.CONFIG_PREFIX + "Users.MaxResults").orElse(100);
-            int num = MCRUserManager.countUsers(search, null, search, search, null, search);
+            int num = MCRUserManager.countUsers(pattern, null, pattern, pattern, null, pattern);
 
             if ((num < max) && (num > 0)) {
-                results = MCRUserManager.listUsers(search, null, search, search, null, search, 0, Integer.MAX_VALUE);
+                results = MCRUserManager.listUsers(pattern, null, pattern, pattern, null,
+                    pattern, 0, Integer.MAX_VALUE);
             }
             users.setAttribute("num", String.valueOf(num));
             users.setAttribute("max", String.valueOf(max));

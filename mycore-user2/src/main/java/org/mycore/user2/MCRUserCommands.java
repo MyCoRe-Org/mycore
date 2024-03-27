@@ -310,6 +310,23 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
+     * This method invokes MCRUserMgr.getAllUserIDs() and retrieves a ArrayList of all users stored in the persistent
+     * datastore.
+     */
+    @MCRCommand(
+        syntax = "list users like {0}",
+        help = "Lists users like {0} (in the same way as the user servlet, except w/o limit).",
+        order = 160)
+    public static void listAllUsers(String search) throws Exception {
+        String pattern = "*" + search + "*";
+        List<MCRUser> users = MCRUserManager.listUsers(pattern, null, pattern, pattern, null,
+            pattern, 0, Integer.MAX_VALUE);
+        for (MCRUser uid : users) {
+            listUser(uid);
+        }
+    }
+
+    /**
      * This method invokes {@link MCRRoleManager#listSystemRoles()} and retrieves a list of all roles stored in the
      * persistent datastore.
      */
