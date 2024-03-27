@@ -252,6 +252,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("https", restResolver);
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("cache", new MCRCachingResolver());
+        supportedSchemes.put("ratelimit", new MCRRateLimitResolver());
         return supportedSchemes;
     }
 
