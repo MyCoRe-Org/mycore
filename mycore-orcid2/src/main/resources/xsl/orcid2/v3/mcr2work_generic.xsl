@@ -25,7 +25,6 @@
       <xsl:call-template name="externalIDs" />
       <xsl:apply-templates select="(mods:location/mods:url)[1]" />
       <xsl:call-template name="workContributors" />
-      <xsl:apply-templates select="mods:recordInfo/mods:languageOfCataloging" />
     </work:work>
   </xsl:template>
 
@@ -257,21 +256,6 @@
       </xsl:choose>
     </work:contributor-role>
   </xsl:template>
-
-  <xsl:template match="mods:recordInfo/mods:languageOfCataloging[1]">
-    <common:language-code>
-      <xsl:choose>
-        <xsl:when test="mods:languageTerm[@type='code']">
-          <xsl:value-of select="mods:languageTerm[@type='code']" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="text()" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </common:language-code>
-  </xsl:template>
-
-  <xsl:template match="mods:recordInfo/mods:languageOfCataloging[position() &gt; 1]"/>
 
   <xsl:template match="*">
     <xsl:apply-templates/>

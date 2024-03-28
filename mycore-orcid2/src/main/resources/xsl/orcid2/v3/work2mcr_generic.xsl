@@ -25,7 +25,6 @@
         <xsl:apply-templates select="work:short-description" />
         <xsl:apply-templates select="common:url" />
         <xsl:apply-templates select="common:external-ids/common:external-id[common:external-id-relationship='self']" />
-        <xsl:apply-templates select="common:language-code" />
       </mods:mods>
       <xsl:apply-templates select="work:citation[work:citation-type='bibtex']" />
     </xsl:copy>
@@ -207,16 +206,6 @@
   <!-- Ignore last modification date -->
   <xsl:template match="common:last-modified-date" />
 
-  <xsl:template match="common:language-code">
-    <mods:recordInfo>
-      <mods:languageOfCataloging>
-        <mods:languageTerm authority="rfc5646" type="code">
-          <xsl:value-of select="document(concat('language:',text()))/language/@xmlCode" />
-        </mods:languageTerm>
-      </mods:languageOfCataloging>
-    </mods:recordInfo>
-  </xsl:template>
-  
   <xsl:template match="@*|text()" />
 
 </xsl:stylesheet>
