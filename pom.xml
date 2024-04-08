@@ -83,144 +83,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <version>0.8</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <archive>
-              <manifest>
-                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-              </manifest>
-              <manifestEntries>
-                <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
-                <Priority>${manifest.priority}</Priority>
-              </manifestEntries>
-            </archive>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <quiet>true</quiet>
-            <source>${java.target.version}</source>
-            <groups>
-              <group>
-                <title>MyCoRe Datamodel</title>
-                <packages>org.mycore.datamodel*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Authorization System</title>
-                <packages>org.mycore.access*</packages>
-              </group>
-              <group>
-                <title>MyCoRe ACL</title>
-                <packages>org.mycore.mcr.acl*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Persistence Backend Implementations</title>
-                <packages>org.mycore.backend*</packages>
-              </group>
-              <group>
-                <title>MyCoRe User Interface Frontend</title>
-                <packages>org.mycore.frontend*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Common Functionality</title>
-                <packages>org.mycore.common*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Services</title>
-                <packages>org.mycore.services*</packages>
-              </group>
-              <group>
-                <title>MyCoRe User and Group Management</title>
-                <packages>org.mycore.user*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: FO</title>
-                <packages>org.mycore.fo*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: IView 2</title>
-                <packages>org.mycore.iview2*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: Importer</title>
-                <packages>org.mycore.importer*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: Migration</title>
-                <packages>org.mycore.migration*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: Media</title>
-                <packages>org.mycore.media*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: validation</title>
-                <packages>org.mycore.validation*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: METS</title>
-                <packages>org.mycore.mets*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: MODS</title>
-                <packages>org.mycore.mods*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: Neo4J</title>
-                <packages>org.mycore.mcr.neo4j*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: ORCID Integration</title>
-                <packages>org.mycore.orcid*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: OAI</title>
-                <packages>org.mycore.oai*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: REST-API</title>
-                <packages>org.mycore.restapi*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: SOLR</title>
-                <packages>org.mycore.solr*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: Sword</title>
-                <packages>org.mycore.sword*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: Web-CLI</title>
-                <packages>org.mycore.webcli*</packages>
-              </group>
-              <group>
-                <title>MyCoRe Component: WFC</title>
-                <packages>org.mycore.wfc*</packages>
-              </group>
-            </groups>
-            <links>
-              <link>https://docs.oracle.com/en/java/javase/17/docs/api/</link>
-              <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
-              <link>http://www.jdom.org/docs/apidocs/</link>
-              <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-api/</link>
-              <link>http://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>
-              <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
-              <!--
-              <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
-			  -->
-            </links>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <argLine>@{argLine}</argLine>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
           <version>${frontend.maven.plugin.version}</version>
@@ -259,66 +121,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.bsc.maven</groupId>
-        <artifactId>maven-processor-plugin</artifactId>
-        <version>4.5</version>
-        <dependencies>
-          <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>3.0.1</version>
-          </dependency>
-          <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>${hibernate.version}</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <id>generate-jpa-model</id>
-            <goals>
-              <goal>process</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <compilerArguments>-implicit:none -AaddGeneratedAnnotation=false</compilerArguments>
-              <processors>
-                <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-              </processors>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <useIncrementalCompilation>true</useIncrementalCompilation>
-          <compilerArgs>
-            <arg>${maven.compiler.arg}</arg>
-            <arg>-Xpkginfo:always</arg>
-          </compilerArgs>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.apache.logging.log4j</groupId>
-              <artifactId>log4j-core</artifactId>
-              <version>${log4j.version}</version>
-            </path>
-          </annotationProcessorPaths>
-          <annotationProcessors>
-            <annotationProcessor>org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor</annotationProcessor>
-          </annotationProcessors>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <additionalparam>${javadoc.doclint.none}</additionalparam>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
   <ciManagement>
     <system>Bamboo</system>
@@ -373,6 +175,245 @@ Applications based on MyCoRe use a common core, which provides the functionality
     </site>
   </distributionManagement>
   <profiles>
+    <profile>
+      <id>java-modules</id>
+      <activation>
+        <file>
+          <exists>${basedir}/src/main/java</exists>
+        </file>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <configuration>
+                <archive>
+                  <manifest>
+                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                  </manifest>
+                  <manifestEntries>
+                    <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
+                    <Priority>${manifest.priority}</Priority>
+                  </manifestEntries>
+                </archive>
+              </configuration>
+            </plugin>
+            <plugin>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                <quiet>true</quiet>
+                <source>${java.target.version}</source>
+                <groups>
+                  <group>
+                    <title>MyCoRe Datamodel</title>
+                    <packages>org.mycore.datamodel*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Authorization System</title>
+                    <packages>org.mycore.access*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe ACL</title>
+                    <packages>org.mycore.mcr.acl*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Persistence Backend Implementations</title>
+                    <packages>org.mycore.backend*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe User Interface Frontend</title>
+                    <packages>org.mycore.frontend*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Common Functionality</title>
+                    <packages>org.mycore.common*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Services</title>
+                    <packages>org.mycore.services*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe User and Group Management</title>
+                    <packages>org.mycore.user*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: FO</title>
+                    <packages>org.mycore.fo*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: IView 2</title>
+                    <packages>org.mycore.iview2*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: Importer</title>
+                    <packages>org.mycore.importer*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: Migration</title>
+                    <packages>org.mycore.migration*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: Media</title>
+                    <packages>org.mycore.media*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: validation</title>
+                    <packages>org.mycore.validation*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: METS</title>
+                    <packages>org.mycore.mets*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: MODS</title>
+                    <packages>org.mycore.mods*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: Neo4J</title>
+                    <packages>org.mycore.mcr.neo4j*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: ORCID Integration</title>
+                    <packages>org.mycore.orcid*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: OAI</title>
+                    <packages>org.mycore.oai*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: REST-API</title>
+                    <packages>org.mycore.restapi*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: SOLR</title>
+                    <packages>org.mycore.solr*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: Sword</title>
+                    <packages>org.mycore.sword*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: Web-CLI</title>
+                    <packages>org.mycore.webcli*</packages>
+                  </group>
+                  <group>
+                    <title>MyCoRe Component: WFC</title>
+                    <packages>org.mycore.wfc*</packages>
+                  </group>
+                </groups>
+                <links>
+                  <link>https://docs.oracle.com/en/java/javase/17/docs/api/</link>
+                  <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
+                  <link>http://www.jdom.org/docs/apidocs/</link>
+                  <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-api/</link>
+                  <link>http://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>
+                  <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
+                  <!--
+                  <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
+                  -->
+                </links>
+              </configuration>
+            </plugin>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <argLine>@{argLine}</argLine>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>filter-shared-resources</id>
+                <goals>
+                  <goal>resources</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${user.dir}/src/main/resources/shared</directory>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.bsc.maven</groupId>
+            <artifactId>maven-processor-plugin</artifactId>
+            <version>4.5</version>
+            <dependencies>
+              <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>3.0.1</version>
+              </dependency>
+              <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-jpamodelgen</artifactId>
+                <version>${hibernate.version}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>generate-jpa-model</id>
+                <goals>
+                  <goal>process</goal>
+                </goals>
+                <phase>generate-sources</phase>
+                <configuration>
+                  <compilerArguments>-implicit:none -AaddGeneratedAnnotation=false</compilerArguments>
+                  <processors>
+                    <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+                  </processors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <useIncrementalCompilation>true</useIncrementalCompilation>
+              <compilerArgs>
+                <arg>${maven.compiler.arg}</arg>
+                <arg>-Xpkginfo:always</arg>
+              </compilerArgs>
+              <annotationProcessorPaths>
+                <path>
+                  <groupId>org.apache.logging.log4j</groupId>
+                  <artifactId>log4j-core</artifactId>
+                  <version>${log4j.version}</version>
+                </path>
+              </annotationProcessorPaths>
+              <annotationProcessors>
+                <annotationProcessor>org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor</annotationProcessor>
+              </annotationProcessors>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>${javadoc.doclint.none}</additionalparam>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+
+    </profile>
     <profile>
       <id>pass-maven_opts</id>
       <activation>
