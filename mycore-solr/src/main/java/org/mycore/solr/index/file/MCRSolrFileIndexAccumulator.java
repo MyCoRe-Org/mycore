@@ -41,7 +41,7 @@ public interface MCRSolrFileIndexAccumulator {
     /**
      * Returns if this accumulator is enabled. Default is true.
      * To enable or disable an accumulator, set the property
-     * code>MCR.Solr.Indexer.File.Accumulator.[SimpleClassName].Enabled</code> to true or false.
+     * <code>MCR.Solr.Indexer.File.Accumulator.[SimpleClassName].Enabled</code> to true or false.
      * @return true if enabled, false otherwise
      */
     default boolean isEnabled() {
