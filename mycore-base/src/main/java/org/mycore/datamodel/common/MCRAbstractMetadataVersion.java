@@ -20,7 +20,6 @@ package org.mycore.datamodel.common;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.stream.Stream;
 
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
@@ -41,24 +40,6 @@ import jakarta.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "revision")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class MCRAbstractMetadataVersion<T> {
-
-    protected enum Type {
-        created(MCRAbstractMetadataVersion.CREATED),
-        modified(MCRAbstractMetadataVersion.UPDATED),
-        deleted(MCRAbstractMetadataVersion.DELETED);
-
-        private final char charValue;
-
-        Type(char a) {
-            this.charValue = a;
-        }
-
-        public static Type fromValue(char a) {
-            return Stream.of(values()).filter(t -> t.charValue == a)
-                .findAny()
-                .orElseThrow(IllegalArgumentException::new);
-        }
-    }
 
     /**
      * The metadata document this version belongs to
@@ -88,7 +69,8 @@ public abstract class MCRAbstractMetadataVersion<T> {
      * Was this version result of a create, update or delete?
      */
     @XmlAttribute()
-    protected Type type;
+    protected MCRMetadataVersionType type;
+
 
     /**
      * A version that was created in store
@@ -129,7 +111,7 @@ public abstract class MCRAbstractMetadataVersion<T> {
         this.revision = revision;
         this.user = user;
         this.date = date;
-        this.type = Type.fromValue(type);
+        this.type = MCRMetadataVersionType.fromValue(type);
     }
 
     /**
@@ -149,7 +131,7 @@ public abstract class MCRAbstractMetadataVersion<T> {
      * @see #DELETED
      */
     public char getType() {
-        return type.charValue;
+        return type.getCharValue();
     }
 
     /**

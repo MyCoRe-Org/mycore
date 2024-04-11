@@ -23,7 +23,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -46,8 +48,9 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
-import org.mycore.ocfl.metadata.MCROCFLMigration;
 import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
+import org.mycore.ocfl.metadata.migration.MCROCFLMigration;
+import org.mycore.ocfl.metadata.migration.MCROCFLRevisionPruner;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -71,13 +74,35 @@ public class MCROCFLCommands {
 
     public static final String FAILED_AND_NOW_INVALID_STATE = FAILED + " and now invalid state";
 
+    public static final String PRUNERS_CONFIG_PREFIX = "MCR.OCFL.Metadata.Migration.Pruners.";
+
     private static boolean confirmPurgeMarked = false;
 
-    @MCRCommand(syntax = "migrate metadata to repository {0}",
-        help = "migrates all the metadata to the ocfl " +
-            "repository with the id {0}")
-    public static void migrateToOCFL(String repository) {
-        MCROCFLMigration migration = new MCROCFLMigration(repository);
+
+    protected static void migrateWithPrunersAndRepositoryKeyOrMetadataManager(String repository,
+        String metadataManagerConfigKey,
+        String prunersStringList) throws Exception {
+
+        List<MCROCFLRevisionPruner> prunerList = new ArrayList<>();
+        if (!prunersStringList.isBlank()) {
+            String[] prunerIds = prunersStringList.split(",");
+            Map<String, Callable<Object>> pruners = MCRConfiguration2.getInstances(PRUNERS_CONFIG_PREFIX);
+            for (String prunerId : prunerIds) {
+                prunerList.add((MCROCFLRevisionPruner) pruners.get(PRUNERS_CONFIG_PREFIX + prunerId).call());
+            }
+        }
+
+        MCROCFLMigration migration = null;
+        if (metadataManagerConfigKey != null && !metadataManagerConfigKey.isEmpty()) {
+            MCROCFLXMLMetadataManager metadataManager
+                = MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
+                    .orElseThrow(() -> MCRConfiguration2.createConfigurationException(metadataManagerConfigKey));
+            migration = new MCROCFLMigration(null, prunerList, metadataManager);
+        } else if(repository != null && !repository.isEmpty()) {
+            migration = new MCROCFLMigration(repository, prunerList);
+        } else {
+            throw new MCRUsageException("Either a repository or a metadata manager must be specified");
+        }
 
         migration.start();
 
@@ -105,6 +130,31 @@ public class MCROCFLCommands {
             failed.size(),
             invalidState.size(),
             withoutHistory.size());
+    }
+
+    @MCRCommand(syntax = "migrate metadata to metadatamanager {1} and pruners {2} ",
+        help = "migrates all the metadata to the ocfl " +
+            "repository with the id {0} and prunes the revisions with the given pruners",
+        order = 0)
+    public static void migrateToMetadataMangerWithPruners(String metadataManagerConfigKey, String prunersStringList)
+        throws Exception {
+        migrateWithPrunersAndRepositoryKeyOrMetadataManager(null, metadataManagerConfigKey, prunersStringList);
+    }
+
+    @MCRCommand(syntax = "migrate metadata to repository {0} with pruners {1}",
+        help = "migrates all the metadata to the ocfl " +
+            "repository with the id {0} and prunes the revisions with the given pruners",
+        order = 1)
+    public static void migrateToRepositoryKeyWithPruners(String repository, String prunersStringList) throws Exception {
+        migrateWithPrunersAndRepositoryKeyOrMetadataManager(repository, null, prunersStringList);
+    }
+
+    @MCRCommand(syntax = "migrate metadata to repository {0}",
+        help = "migrates all the metadata to the ocfl " +
+            "repository with the id {0}",
+        order = 2)
+    public static void migrateToRepositoryKey(String repository) throws Exception {
+        migrateToRepositoryKeyWithPruners(repository, "");
     }
 
     @MCRCommand(syntax = "update ocfl classifications",

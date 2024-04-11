@@ -127,6 +127,7 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
+    public static volatile MimetypesFileTypeMap MIMETYPE_MAP = null;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -272,6 +273,20 @@ public class MCRXMLFunctions {
             LOGGER.warn("Could not apply regular expression. Returning source string ({}).", source);
             return source;
         }
+    }
+
+    /**
+     * Get the string matching the regular expression from the source paramater.
+     *
+     * @param source the string to search
+     * @param regex the regular expression
+     *
+     * @return the string matching in the source parameter matching the given regular expression
+     */
+    public static String getMatchingString(String source, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(source);
+        return m.find() ? m.group() : "";
     }
 
     public static boolean classAvailable(String className) {
@@ -520,8 +535,16 @@ public class MCRXMLFunctions {
         if (f == null) {
             return "application/octet-stream";
         }
-        MimetypesFileTypeMap mTypes = new MimetypesFileTypeMap();
-        return mTypes.getContentType(f.toLowerCase(Locale.ROOT));
+
+        if (MIMETYPE_MAP == null) {
+            synchronized (MCRXMLFunctions.class) {
+                if (MIMETYPE_MAP == null) {
+                    MIMETYPE_MAP = new MimetypesFileTypeMap();
+                }
+            }
+        }
+
+        return MIMETYPE_MAP.getContentType(f.toLowerCase(Locale.ROOT));
     }
 
     /**

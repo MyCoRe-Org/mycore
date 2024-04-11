@@ -85,15 +85,39 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
             "  </metadata>\n" +
             "</mycoreobject>\n";
 
+        final String testData3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
+            " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"ilm_mods_00001817\">\n" +
+            "  <metadata>\n" +
+            "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
+            "      <modsContainer inherited=\"0\">\n" +
+            "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
+            "<mods:relatedItem type=\"host\">\n" +
+            "<mods:titleInfo>\n" +
+            "<mods:title>Advances in Engineering Research and Application</mods:title>\n" +
+            "</mods:titleInfo>\n" +
+            "<mods:part>\n" +
+            "<mods:extent unit=\"pages\">\n" +
+            "<mods:start>v</mods:start>\n" +
+            "<mods:end>vi</mods:end>\n" +
+            "</mods:extent>\n" +
+            "</mods:part>\n" +
+            "</mods:relatedItem>" +
+            "        </mods:mods>\n" +
+            "      </modsContainer>\n" +
+            "    </def.modsContainer>\n" +
+            "  </metadata>\n" +
+            "</mycoreobject>\n";
+
         CSLItemData build1 = testModsPart(testData);
         CSLItemData build2 = testModsPart(testData2);
+        CSLItemData build3 = testModsPart(testData3);
 
         Assert.assertEquals("Volumes should equal", "80", build1.getVolume());
-        Assert.assertEquals("start should equal", "711", build1.getPageFirst());
-        Assert.assertEquals("end should equal", "711-718", build1.getPage());
-
+        Assert.assertEquals("Page intervall should equal", "711–718", build1.getPage());
         Assert.assertEquals("Volumes should equal", "11875", build2.getVolume());
-
+        Assert.assertEquals("Page intervall should equal", "v-vi", build3.getPage());
     }
 
     @Test

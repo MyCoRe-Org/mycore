@@ -18,13 +18,6 @@
 
 package org.mycore.datamodel.common;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.MCRObjectID;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -35,8 +28,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class generates object ids based on a file based cache. The cache is used to store the last generated id for a
@@ -50,36 +54,43 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
     static ConcurrentHashMap<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
 
     private static Path getCacheFilePath(String baseId) {
+        Path idCachePath = getCacheDirPath();
 
+        Path cacheFile = MCRUtils.safeResolve(idCachePath, baseId);
+        if (Files.exists(cacheFile)) {
+            return cacheFile;
+        }
+
+        synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
+            if (!Files.exists(cacheFile)) {
+                try {
+                   return Files.createFile(cacheFile);
+                } catch (IOException e) {
+                    throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
+                }
+            }
+        }
+
+        return cacheFile;
+    }
+
+    private static Path getCacheDirPath() {
         Path dataDir = getDataDirPath();
 
         Path idCachePath = dataDir.resolve("id_cache");
-        if (!Files.exists(idCachePath)) {
-            synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
-                if (!Files.exists(idCachePath)) {
-                    try {
-                        Files.createDirectory(idCachePath);
-                    } catch (IOException e) {
-                        throw new MCRException(
-                            "Could not create " + idCachePath.toAbsolutePath() + " directory", e);
-                    }
+        if (Files.exists(idCachePath)) {
+            return idCachePath;
+        }
+        synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
+            if (!Files.exists(idCachePath)) {
+                try {
+                    Files.createDirectory(idCachePath);
+                } catch (IOException e) {
+                    throw new MCRException("Could not create " + idCachePath.toAbsolutePath() + " directory", e);
                 }
             }
         }
-
-        Path cacheFile = MCRUtils.safeResolve(idCachePath, baseId);
-        if (!Files.exists(cacheFile)) {
-            synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
-                if (!Files.exists(cacheFile)) {
-                    try {
-                        Files.createFile(cacheFile);
-                    } catch (IOException e) {
-                        throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
-                    }
-                }
-            }
-        }
-        return cacheFile;
+        return idCachePath;
     }
 
     static Path getDataDirPath() {
@@ -209,6 +220,21 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         } finally {
             readLock.unlock();
         }
+    }
+
+    @Override
+    public Collection<String> getBaseIDs() {
+        Path cacheDir = getCacheDirPath();
+
+        try (Stream<Path> list = Files.list(cacheDir);) {
+            List<String> baseIdList = list.filter(Files::isRegularFile)
+                    .map(Path::getFileName).map(Path::toString)
+                    .collect(Collectors.toList());
+            return baseIdList;
+        } catch (IOException e) {
+            throw new MCRException("Could not detect cache files!", e);
+        }
+
     }
 
 }
