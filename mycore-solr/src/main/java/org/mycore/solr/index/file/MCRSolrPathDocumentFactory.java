@@ -68,18 +68,20 @@ public class MCRSolrPathDocumentFactory {
                     return accumulatorClass.getDeclaredConstructor().newInstance();
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
-                        "AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME + " not found : "
+                        "AccumulatorClass configured in " + ACCUMULATOR_LIST_PROPERTY_NAME + " not found : "
                             + accumulatorClassRef,
                         e);
 
                 } catch (ReflectiveOperationException e) {
                     throw new MCRConfigurationException(
-                        "Construxtor of the AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME
+                        "Constructor of the AccumulatorClass configured in " + ACCUMULATOR_LIST_PROPERTY_NAME
                             + " can not be invoked.",
                         e);
 
                 }
-            }).collect(Collectors.toList());
+            })
+                .filter(MCRSolrFileIndexAccumulator::isEnabled)
+                .collect(Collectors.toList());
     }
 
     public static MCRSolrPathDocumentFactory getInstance() {

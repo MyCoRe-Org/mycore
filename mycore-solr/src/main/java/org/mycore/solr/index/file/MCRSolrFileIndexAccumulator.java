@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * This interface is used to accumulate information of a file to a solr document.
@@ -36,4 +37,16 @@ public interface MCRSolrFileIndexAccumulator {
      * @param attributes of the file in a derivate
      */
     void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes) throws IOException;
+
+    /**
+     * Returns if this accumulator is enabled. Default is true.
+     * To enable or disable an accumulator, set the property
+     * <code>MCR.Solr.Indexer.File.Accumulator.[SimpleClassName].Enabled</code> to true or false.
+     * @return true if enabled, false otherwise
+     */
+    default boolean isEnabled() {
+        return MCRConfiguration2
+            .getBoolean("MCR.Solr.Indexer.File.Accumulator." + this.getClass().getSimpleName() + ".Enabled")
+            .orElse(true);
+    }
 }
