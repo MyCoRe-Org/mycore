@@ -90,9 +90,6 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         } catch (URISyntaxException e) {
             throw new IOException("Can't encode file path to URI " + relativePath, e);
         }
-        if (!isRoot) {
-            jw.name("parentPath").value(toStringValue(relativePath.getParent(), true));
-        }
         addBasicAttributes(path, attrs);
         return urlPathString;
     }
