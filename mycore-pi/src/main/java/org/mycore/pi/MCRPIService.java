@@ -494,7 +494,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      */
     protected String requireNotEmptyProperty(String propertyName) throws MCRConfigurationException {
         final Map<String, String> properties = getProperties();
-        if (!properties.containsKey(propertyName) && properties.get(propertyName).length() > 0) {
+        if (!properties.containsKey(propertyName) ||
+            properties.get(propertyName) == null ||
+            properties.get(propertyName).isEmpty()) {
             throw new MCRConfigurationException(String
                 .format(Locale.ROOT, "The property %s%s.%s is empty or not set!", REGISTRATION_CONFIG_PREFIX,
                     registrationServiceID,
