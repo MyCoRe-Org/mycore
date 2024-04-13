@@ -31,7 +31,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRDefaultObjectIDetector implements MCRObjectIDDetector {
 
     /**
-     * @see MCRObjectIDDetector.detectMCRObjectID
+     * @see MCRObjectIDDetector
      */
     @Override
     public Optional<MCRObjectID> detectMCRObjectID(String mcrid) {
@@ -42,7 +42,7 @@ public class MCRDefaultObjectIDetector implements MCRObjectIDDetector {
     }
 
     /**
-     * @see MCRObjectIDDetector.detectMCRDerivateID
+     * @see MCRObjectIDDetector
      */
     @Override
     public Optional<MCRObjectID> detectMCRDerivateID(MCRObjectID mcrObjId, String derid) {
