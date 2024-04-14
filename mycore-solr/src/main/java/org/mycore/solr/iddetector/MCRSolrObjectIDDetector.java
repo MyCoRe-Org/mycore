@@ -12,11 +12,11 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.iddetector.MCRDefaultObjectIDetector;
+import org.mycore.frontend.iddetector.MCRDefaultObjectIDDetector;
 import org.mycore.frontend.iddetector.MCRObjectIDDetector;
 import org.mycore.solr.MCRSolrClientFactory;
 
-public class MCRSolrObjectIDDetector extends MCRDefaultObjectIDetector implements MCRObjectIDDetector {
+public class MCRSolrObjectIDDetector extends MCRDefaultObjectIDDetector implements MCRObjectIDDetector {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

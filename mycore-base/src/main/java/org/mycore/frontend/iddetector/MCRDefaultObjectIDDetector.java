@@ -28,7 +28,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *  
  * @author Robert Stephan
  */
-public class MCRDefaultObjectIDetector implements MCRObjectIDDetector {
+public class MCRDefaultObjectIDDetector implements MCRObjectIDDetector {
 
     /**
      * @see MCRObjectIDDetector
