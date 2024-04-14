@@ -21,8 +21,6 @@ import java.util.Optional;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-
-
 /**
  * Interface for an object id detector 
  * It is used in rest api and elsewhere to retrieve 
@@ -35,20 +33,20 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  */
 public interface MCRObjectIDDetector {
-    public static String MCR_PROPERTY_CLASS = "MCR.Object.IDDetector.Class";
-    
+    String MCR_PROPERTY_CLASS = "MCR.Object.IDDetector.Class";
+
     /**
      * Detection of the MyCoRe object id  
      * @param mcrid - the id string that should be evaluated
      * @return a MCRObjectID instance for the object id
      */
-    public Optional<MCRObjectID> detectMCRObjectID(String mcrid);
-    
+    Optional<MCRObjectID> detectMCRObjectID(String mcrid);
+
     /**
      * Detection of the MyCoRe derivate id
      * @param mcrObjId - the MCRObjectID of the MyCoRe object to which the derivate should belong to  
      * @param derid - the id string that should be evaluated
      * @return a MCRObjectID instance for the derivate id
      */
-    public Optional<MCRObjectID> detectMCRDerivateID(MCRObjectID mcrObjId, String derid);
+    Optional<MCRObjectID> detectMCRDerivateID(MCRObjectID mcrObjId, String derid);
 }
