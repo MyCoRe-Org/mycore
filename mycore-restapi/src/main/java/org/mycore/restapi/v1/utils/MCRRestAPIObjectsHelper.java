@@ -502,7 +502,7 @@ public class MCRRestAPIObjectsHelper {
      * returns a list of derivate objects
      * @param info - the injected Jersey URIInfo object
      *
-     * @param mcrObjID - the MyCoRe Object ID
+     * @param paramMcrObjID - the MyCoRe object id as string
      * @param format - the output format ('xml'|'json')
      * @param sort - the sort criteria
      *
@@ -642,8 +642,8 @@ public class MCRRestAPIObjectsHelper {
      * lists derivate content (file listing)
      * @param info - the Jersey UriInfo Object
      * @param request - the HTTPServletRequest object
-     * @param mcrObjID - the MyCoRe Object ID
-     * @param mcrDerID - the MyCoRe Derivate ID
+     * @param paramMcrObjID - the MyCoRe object id
+     * @param paramMcrDerID - the MyCoRe derivate id
      * @param format - the output format ('xml'|'json')
      * @param path - the sub path of a directory inside the derivate
      * @param depth - the level of subdirectories to be returned
@@ -702,8 +702,8 @@ public class MCRRestAPIObjectsHelper {
      * returns the URL of the main document of a derivate
      * 
      * @param info - the Jersey UriInfo object
-     * @param mcrObjID - the MyCoRe Object ID
-     * @param mcrDerID - the MyCoRe Derivate ID
+     * @param paramMcrObjID - the MyCoRe object id
+     * @param paramMcrDerID - the MyCoRe derivate id
      * 
      * @return the Resolving URL for the main document of the derivate
      */
