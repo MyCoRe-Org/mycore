@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.solr.iddetector;
+package org.mycore.solr.idmapper;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -32,18 +32,18 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.iddetector.MCRDefaultObjectIDDetector;
-import org.mycore.frontend.iddetector.MCRObjectIDDetector;
+import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
+import org.mycore.frontend.idmapper.MCRIDMapper;
 import org.mycore.solr.MCRSolrClientFactory;
 
 /**
- * implementation of an MCRObjectIDDetector
+ * implementation of an MCRIDMapper
  * 
  * It uses Solr to retrieve the real id from the given input string
  *  
  * @author Robert Stephan
  */
-public class MCRSolrObjectIDDetector extends MCRDefaultObjectIDDetector implements MCRObjectIDDetector {
+public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -68,15 +68,15 @@ public class MCRSolrObjectIDDetector extends MCRDefaultObjectIDDetector implemen
     }
 
     @Override
-    public Optional<MCRObjectID> detectMCRObjectID(String mcrid) {
+    public Optional<MCRObjectID> mapMCRObjectID(String mcrid) {
         String solrObjid = retrieveMCRObjectIDfromSOLR(mcrid);
-        return super.detectMCRObjectID(solrObjid);
+        return super.mapMCRObjectID(solrObjid);
     }
 
     @Override
-    public Optional<MCRObjectID> detectMCRDerivateID(MCRObjectID mcrObjId, String derid) {
+    public Optional<MCRObjectID> mapMCRDerivateID(MCRObjectID mcrObjId, String derid) {
         String solrDerid = retrieveMCRDerivateIDfromSOLR(mcrObjId, derid);
-        return super.detectMCRDerivateID(mcrObjId, solrDerid);
+        return super.mapMCRDerivateID(mcrObjId, solrDerid);
     }
 
     /**

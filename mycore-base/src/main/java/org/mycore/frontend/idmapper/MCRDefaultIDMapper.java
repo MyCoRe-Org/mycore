@@ -15,26 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.frontend.iddetector;
+package org.mycore.frontend.idmapper;
 
 import java.util.Optional;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * Default implementation of an MCRObjectIDDetector
+ * Default implementation of an MCRIDMapper
  * 
  * It simply take the id string and tries to create the MCRObjectID from it.
  *  
  * @author Robert Stephan
  */
-public class MCRDefaultObjectIDDetector implements MCRObjectIDDetector {
+public class MCRDefaultIDMapper implements MCRIDMapper {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<MCRObjectID> detectMCRObjectID(String mcrid) {
+    public Optional<MCRObjectID> mapMCRObjectID(String mcrid) {
         if (MCRObjectID.isValid(mcrid)) {
             return Optional.of(MCRObjectID.getInstance(mcrid));
         }
@@ -45,7 +45,7 @@ public class MCRDefaultObjectIDDetector implements MCRObjectIDDetector {
      * {@inheritDoc}
      */
     @Override
-    public Optional<MCRObjectID> detectMCRDerivateID(MCRObjectID mcrObjId, String derid) {
+    public Optional<MCRObjectID> mapMCRDerivateID(MCRObjectID mcrObjId, String derid) {
         if (MCRObjectID.isValid(derid)) {
             return Optional.of(MCRObjectID.getInstance(derid));
         }

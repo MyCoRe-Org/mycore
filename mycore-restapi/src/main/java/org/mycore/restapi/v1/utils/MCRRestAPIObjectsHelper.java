@@ -66,7 +66,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
-import org.mycore.frontend.iddetector.MCRObjectIDDetector;
+import org.mycore.frontend.idmapper.MCRIDMapper;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.v1.MCRRestAPIObjects;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
@@ -106,8 +106,8 @@ public class MCRRestAPIObjectsHelper {
 
     private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
-    private static MCRObjectIDDetector MCRID_DETECTOR = MCRConfiguration2
-        .<MCRObjectIDDetector>getInstanceOf(MCRObjectIDDetector.MCR_PROPERTY_CLASS).get();
+    private static MCRIDMapper ID_MAPPER = MCRConfiguration2
+        .<MCRIDMapper>getInstanceOf(MCRIDMapper.MCR_PROPERTY_CLASS).get();
 
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
         throws MCRRestAPIException {
@@ -791,7 +791,7 @@ public class MCRRestAPIObjectsHelper {
     }
 
     private static MCRObjectID retrieveMCRObjectID(String paramMcrObjId) throws MCRRestAPIException {
-        Optional<MCRObjectID> optObjId = MCRID_DETECTOR.detectMCRObjectID(paramMcrObjId);
+        Optional<MCRObjectID> optObjId = ID_MAPPER.mapMCRObjectID(paramMcrObjId);
         if (optObjId.isEmpty() || !MCRMetadataManager.exists(optObjId.get())) {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
@@ -802,7 +802,7 @@ public class MCRRestAPIObjectsHelper {
 
     private static MCRObjectID retrieveMCRDerivateID(MCRObjectID parentObjId, String paramMcrDerId)
         throws MCRRestAPIException {
-        Optional<MCRObjectID> optDerObjId = MCRID_DETECTOR.detectMCRDerivateID(parentObjId, paramMcrDerId);
+        Optional<MCRObjectID> optDerObjId = ID_MAPPER.mapMCRDerivateID(parentObjId, paramMcrDerId);
         if (optDerObjId.isEmpty() || !MCRMetadataManager.exists(optDerObjId.get())) {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + paramMcrDerId + " not found.",

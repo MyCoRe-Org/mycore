@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.iddetector.MCRObjectIDDetector;
+import org.mycore.frontend.idmapper.MCRIDMapper;
 
 import jakarta.annotation.Priority;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,8 +59,8 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
     @Context
     HttpServletResponse response;
 
-    private MCRObjectIDDetector mcridDetector = MCRConfiguration2
-        .<MCRObjectIDDetector>getInstanceOf(MCRObjectIDDetector.MCR_PROPERTY_CLASS).get();
+    private MCRIDMapper mcrIdMapper = MCRConfiguration2
+        .<MCRIDMapper>getInstanceOf(MCRIDMapper.MCR_PROPERTY_CLASS).get();
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -77,7 +77,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
             String mcrid = pathParts[mcrIdPos];
             String mcridExtension = getExtension(mcrid);
             mcrid = mcrid.substring(0, mcrid.length() - mcridExtension.length());
-            Optional<MCRObjectID> optObjId = mcridDetector.detectMCRObjectID(mcrid);
+            Optional<MCRObjectID> optObjId = mcrIdMapper.mapMCRObjectID(mcrid);
             if (optObjId.isEmpty()) {
                 throw new NotFoundException("No unique MyCoRe Object ID found for query " + mcrid);
             }
@@ -87,7 +87,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
                 String derid = pathParts[derIdPos];
                 String deridExtension = getExtension(derid);
                 derid = derid.substring(0, derid.length() - deridExtension.length());
-                Optional<MCRObjectID> optDerId = mcridDetector.detectMCRDerivateID(optObjId.get(), derid);
+                Optional<MCRObjectID> optDerId = mcrIdMapper.mapMCRDerivateID(optObjId.get(), derid);
                 if (optDerId.isEmpty()) {
                     throw new NotFoundException("No unique MyCoRe Derivate ID found for query " + derid);
                 }

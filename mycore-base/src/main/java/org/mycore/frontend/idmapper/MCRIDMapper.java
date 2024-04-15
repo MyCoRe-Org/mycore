@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.frontend.iddetector;
+package org.mycore.frontend.idmapper;
 
 import java.util.Optional;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * Interface for an object id detector 
+ * Interface for an object id mapper 
  * It is used in rest api and elsewhere to retrieve 
  * the MCRObjectID of an object or derivate for a given id string
  * 
@@ -32,15 +32,15 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Robert Stephan
  *
  */
-public interface MCRObjectIDDetector {
-    String MCR_PROPERTY_CLASS = "MCR.Object.IDDetector.Class";
+public interface MCRIDMapper {
+    String MCR_PROPERTY_CLASS = "MCR.Object.IDMapper.Class";
 
     /**
      * Detection of the MyCoRe object id  
      * @param mcrid - the id string that should be evaluated
      * @return a MCRObjectID instance for the object id
      */
-    Optional<MCRObjectID> detectMCRObjectID(String mcrid);
+    Optional<MCRObjectID> mapMCRObjectID(String mcrid);
 
     /**
      * Detection of the MyCoRe derivate id
@@ -48,5 +48,5 @@ public interface MCRObjectIDDetector {
      * @param derid - the id string that should be evaluated
      * @return a MCRObjectID instance for the derivate id
      */
-    Optional<MCRObjectID> detectMCRDerivateID(MCRObjectID mcrObjId, String derid);
+    Optional<MCRObjectID> mapMCRDerivateID(MCRObjectID mcrObjId, String derid);
 }
