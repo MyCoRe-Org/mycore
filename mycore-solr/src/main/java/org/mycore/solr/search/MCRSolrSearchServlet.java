@@ -38,6 +38,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.solr.proxy.MCRSolrProxyHttpClient;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 import jakarta.servlet.RequestDispatcher;
@@ -254,7 +255,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             sortParameters, phraseQuery);
         buildedSolrParameters.putAll(solrParameters);
 
-        request.setAttribute(MCRSolrProxyServlet.MAP_KEY, buildedSolrParameters);
+        request.setAttribute(MCRSolrProxyHttpClient.MAP_KEY, buildedSolrParameters);
         LOGGER.info("Forward SOLR Parameters: {}", buildedSolrParameters);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);

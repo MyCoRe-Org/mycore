@@ -138,11 +138,12 @@ public class MCRSolrProxyServlet extends MCRServlet {
                     IOUtils.copy(solrResponseStream, servletOutput);
                 } else {
                     MCRStreamContent solrStreamResponse = new MCRStreamContent(solrResponseStream,
-                        mcrHttpSolrResult.uri().toString(), "response");
+                        mcrHttpSolrResult.solrHttpMethod().toString(), "response");
                     MCRLayoutService.instance().doLayout(request, resp, solrStreamResponse);
                 }
             }
         }
+        mcrHttpSolrResult.solrHttpMethod().releaseConnection();
     }
 
     /**

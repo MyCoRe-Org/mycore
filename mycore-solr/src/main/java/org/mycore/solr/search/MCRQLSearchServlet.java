@@ -32,7 +32,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.solr.proxy.MCRSolrProxyServlet;
+import org.mycore.solr.proxy.MCRSolrProxyHttpClient;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -98,7 +98,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
         throws IOException, ServletException {
         SolrQuery mergedSolrQuery = MCRSolrSearchUtils.getSolrQuery(query, input, request);
-        request.setAttribute(MCRSolrProxyServlet.QUERY_KEY, mergedSolrQuery);
+        request.setAttribute(MCRSolrProxyHttpClient.QUERY_KEY, mergedSolrQuery);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }

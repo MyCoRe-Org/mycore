@@ -4,7 +4,6 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
 
 import java.io.IOException;
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -29,11 +28,11 @@ import org.mycore.solr.MCRSolrConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class MCRSolrProxyHttpClient {
+public class MCRSolrProxyHttpClient implements AutoCloseable {
     static final Logger LOGGER = LogManager.getLogger();
 
     public static final String QUERY_CORE_PARAMETER = "core";
-    
+
     public static final String MAP_KEY = MCRSolrProxyServlet.class.getName() + ".map";
 
     private static int MAX_CONNECTIONS = MCRConfiguration2
@@ -43,7 +42,6 @@ public class MCRSolrProxyHttpClient {
      * Attribute key to store Query parameters as <code>Map&lt;String, String[]&gt;</code> for SOLR. This takes
      * precedence over any {@link HttpServletRequest} parameter.
      */
-    
 
     private static Map<String, String> NEW_HTTP_RESPONSE_HEADER = MCRConfiguration2
         .getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader.");
@@ -112,8 +110,7 @@ public class MCRSolrProxyHttpClient {
                     resp.setHeader(header.getName(), header.getValue());
                 }
             }
-            solrHttpMethod.releaseConnection();
-            return new McrSolrHttpResult(response, solrHttpMethod.getURI());
+             return new McrSolrHttpResult(response, solrHttpMethod);
 
         } catch (IOException ex) {
             solrHttpMethod.abort();
@@ -153,10 +150,6 @@ public class MCRSolrProxyHttpClient {
 
     }
 
-    public record McrSolrHttpResult(HttpResponse response, URI uri) {
-
-    };
-
     public ModifiableSolrParams toSolrParams(Map<String, String[]> parameters) {
         // to maintain order
         LinkedHashMap<String, String[]> copy = new LinkedHashMap<>(parameters);
@@ -166,4 +159,8 @@ public class MCRSolrProxyHttpClient {
         }
         return solrParams;
     }
+
+    public record McrSolrHttpResult(HttpResponse response, HttpGet solrHttpMethod) {
+
+    };
 }

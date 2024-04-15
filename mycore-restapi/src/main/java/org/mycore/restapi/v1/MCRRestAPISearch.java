@@ -19,20 +19,14 @@
 package org.mycore.restapi.v1;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.proxy.MCRSolrProxyHttpClient;
+import org.mycore.solr.proxy.MCRSolrProxyHttpClient.McrSolrHttpResult;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.DefaultValue;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -90,80 +84,26 @@ public class MCRRestAPISearch {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response search(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("q") String query,
-        @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
-        @QueryParam("start") String start, @QueryParam("rows") String rows,
-        @QueryParam("fq") List<String> fq, @QueryParam("fl") List<String> fl,
-        @QueryParam("facet") String facet, @QueryParam("facet.sort") String facetSort,
-        @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
-        @QueryParam("facet.mincount") String facetMinCount,
-        @QueryParam("json.wrf") String jsonWrf) {
-        StringBuilder url = new StringBuilder(MCRSolrClientFactory.getMainSolrCore().getV1CoreURL());
-        url.append("/select?");
+    public Response search(@Context UriInfo info, @Context HttpServletRequest request,
+        @Context HttpServletResponse response, @QueryParam("wt") String wt) {
 
-        if (query != null) {
-            url.append("&q=").append(URLEncoder.encode(query, StandardCharsets.UTF_8));
-        }
-        if (sort != null) {
-            url.append("&sort=").append(URLEncoder.encode(sort, StandardCharsets.UTF_8));
-        }
-        if (wt != null) {
-            url.append("&wt=").append(wt);
-        }
-        if (start != null) {
-            url.append("&start=").append(start);
-        }
-        if (rows != null) {
-            url.append("&rows=").append(rows);
-        }
-        if (fq != null) {
-            for (String fqItem : fq) {
-                url.append("&fq=").append(URLEncoder.encode(fqItem, StandardCharsets.UTF_8));
-            }
-        }
-        if (fl != null) {
-            for (String flItem : fl) {
-                url.append("&fl=").append(URLEncoder.encode(flItem, StandardCharsets.UTF_8));
-            }
-        }
-        if (facet != null) {
-            url.append("&facet=").append(URLEncoder.encode(facet, StandardCharsets.UTF_8));
-        }
-        for (String ff : facetFields) {
-            url.append("&facet.field=").append(URLEncoder.encode(ff, StandardCharsets.UTF_8));
-        }
-        if (facetSort != null) {
-            url.append("&facet.sort=").append(facetSort);
-        }
-        if (facetLimit != null) {
-            url.append("&facet.limit=").append(facetLimit);
-        }
-        if (facetMinCount != null) {
-            url.append("&facet.mincount=").append(facetMinCount);
-        }
-        if (jsonWrf != null) {
-            url.append("&json.wrf=").append(jsonWrf);
-        }
+        try (MCRSolrProxyHttpClient solrHttpClient = new MCRSolrProxyHttpClient()) {
+            McrSolrHttpResult result = solrHttpClient.handleQuery("/select", request, response);
+            String contentType = switch (wt) {
+                case FORMAT_XML -> "application/xml; charset=UTF-8";
+                case FORMAT_JSON -> "application/json; charset=UTF-8";
+                case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
+                default -> "text";
+            };
+            return Response.ok(result.response().getEntity())
+                .type(contentType)
+                .build();
 
-        try (InputStream is = new URI(url.toString()).toURL().openStream()) {
-            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
-                String text = scanner.useDelimiter("\\A").next();
+        } catch (IOException e) {
+            LOGGER.error("Error in SOLR RestAPI", e);
 
-                String contentType = switch (wt) {
-                    case FORMAT_XML -> "application/xml; charset=UTF-8";
-                    case FORMAT_JSON -> "application/json; charset=UTF-8";
-                    case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
-                    default -> "text";
-                };
-                return Response.ok(text)
-                    .type(contentType)
-                    .build();
-
-            }
-        } catch (IOException | URISyntaxException e) {
-            LOGGER.error(e);
         }
-
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
+
 }
