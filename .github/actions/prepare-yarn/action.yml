@@ -5,7 +5,7 @@ inputs:
   node-version:
     description: 'The version of Node.js that will be used'
     required: true
-    default: '16.19.1'
+    default: '18.19.1'
 
 outputs:
   cache-hit:
@@ -22,7 +22,7 @@ runs:
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Cache Yarn
