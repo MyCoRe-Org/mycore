@@ -81,8 +81,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
             if (optObjId.isEmpty()) {
                 throw new NotFoundException("No unique MyCoRe Object ID found for query " + mcrid);
             }
-            pathParts[mcrIdPos] = optObjId.get().toString();
-            pathParts[mcrIdPos] += mcridExtension;
+            pathParts[mcrIdPos] = optObjId.get().toString() + mcridExtension;
 
             if (optObjId.isPresent() && pathParts.length > derIdPos && pathParts[derIdPos - 1].equals("derivates")) {
                 String derid = pathParts[derIdPos];
@@ -92,9 +91,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
                 if (optDerId.isEmpty()) {
                     throw new NotFoundException("No unique MyCoRe Derivate ID found for query " + derid);
                 }
-                pathParts[derIdPos] = optDerId.get().toString();
-                pathParts[derIdPos] += deridExtension;
-
+                pathParts[derIdPos] = optDerId.get().toString() + deridExtension;
             }
         } catch (MCRException ex) {
             throw new BadRequestException("Could not detect MyCoRe ID", ex);
