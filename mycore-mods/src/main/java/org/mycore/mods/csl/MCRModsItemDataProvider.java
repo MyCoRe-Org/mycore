@@ -109,6 +109,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public CSLItemData retrieveItem(String id) {
         final CSLItemDataBuilder idb = new CSLItemDataBuilder().id(id);
 
+        processMyCoReId(id, idb);
         processURL(id, idb);
         processGenre(idb);
         processTitles(idb);
@@ -128,6 +129,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
 
         return build;
+    }
+
+    private void processMyCoReId(String id, CSLItemDataBuilder idb) {
+        idb.citationKey(id);
     }
 
     private void processSubject(CSLItemDataBuilder idb) {
