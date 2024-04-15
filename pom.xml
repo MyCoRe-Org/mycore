@@ -406,10 +406,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <additionalparam>${javadoc.doclint.none}</additionalparam>
             </configuration>
           </plugin>
-          <plugin>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>maven-bundle-plugin</artifactId>
-          </plugin>
         </plugins>
       </build>
 
