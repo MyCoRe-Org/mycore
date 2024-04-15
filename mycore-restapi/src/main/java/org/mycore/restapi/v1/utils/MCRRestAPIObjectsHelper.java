@@ -111,7 +111,7 @@ public class MCRRestAPIObjectsHelper {
 
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
         throws MCRRestAPIException {
-        MCRObjectID mcrObjId = retrieveMCRObjectID(queryParamStyle);
+        MCRObjectID mcrObjId = retrieveMCRObjectID(pathParamId);
         MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjId);
         Document doc = mcrObj.createXML();
         Element eStructure = doc.getRootElement().getChild("structure");
