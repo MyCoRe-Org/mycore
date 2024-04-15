@@ -5,7 +5,7 @@
   </properties>
   <appenders>
     <File name="File" fileName="${filename}">
-      <PatternLayout pattern="%C{1}.%M %m %ex%n"/>
+      <PatternLayout pattern="%d{ABSOLUTE} %C{1}.%M %m %ex%n"/>
     </File>
   </appenders>
   <loggers>
