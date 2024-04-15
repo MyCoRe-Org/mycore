@@ -3,7 +3,7 @@ name: test
 on: [ push, pull_request ]
 
 env:
-  MAVEN_OPTS: -Xmx1024M -Xss128M
+  MAVEN_OPTS: -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS
   GECKODRIVER_VERSION: 0.27.0
 
 jobs:
