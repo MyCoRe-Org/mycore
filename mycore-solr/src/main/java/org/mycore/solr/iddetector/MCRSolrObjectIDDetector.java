@@ -17,9 +17,11 @@
  */
 package org.mycore.solr.iddetector;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +30,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.iddetector.MCRDefaultObjectIDDetector;
 import org.mycore.frontend.iddetector.MCRObjectIDDetector;
@@ -44,21 +47,25 @@ public class MCRSolrObjectIDDetector extends MCRDefaultObjectIDDetector implemen
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static Set<String> SEARCHKEYS_FOR_OBJECTS = MCRConfiguration2
-        .getString("MCR.Solr.Object.IDDetector.Keys.Objects").or(
-            // fallback (property key before 2024.06 LTS)
-            () -> MCRConfiguration2
-                .getString("MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys"))
-        .stream()
-        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+    private Set<String> objectSolrFields = Collections.emptySet();
 
-    private static Set<String> SEARCHKEYS_FOR_DERIVATES = MCRConfiguration2
-        .getString("MCR.Solr.Object.IDDetector.Keys.Derivates").or(
-            // fallback (property key before 2024.06 LTS)
-            () -> MCRConfiguration2
-                .getString("MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys"))
-        .stream()
-        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+    private Set<String> derivateSolrFields = Collections.emptySet();
+
+    //property MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys deprecated in 2024.06
+    @MCRProperty(name = "ObjectSolrFields", required = false,
+        defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys")
+    public void setObjectSolrFields(String fields) {
+        objectSolrFields
+            = Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+    }
+
+    //property MCR.RestAPI.V2.AlternativeIdentifier.Derivate.Keys deprecated in 2024.06
+    @MCRProperty(name = "DerivateSolrFields", required = false,
+        defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys")
+    public void setDerivateSolrFields(String fields) {
+        derivateSolrFields
+            = Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+    }
 
     @Override
     public Optional<MCRObjectID> detectMCRObjectID(String mcrid) {
@@ -77,10 +84,10 @@ public class MCRSolrObjectIDDetector extends MCRDefaultObjectIDDetector implemen
      */
     private String retrieveMCRObjectIDfromSOLR(String mcrid) {
         String result = mcrid;
-        if (mcrid != null && mcrid.contains(":") && !SEARCHKEYS_FOR_OBJECTS.isEmpty()) {
+        if (mcrid != null && mcrid.contains(":") && !objectSolrFields.isEmpty()) {
             String key = mcrid.substring(0, mcrid.indexOf(":"));
             String value = mcrid.substring(mcrid.indexOf(":") + 1);
-            if (SEARCHKEYS_FOR_OBJECTS.contains(key)) {
+            if (objectSolrFields.contains(key)) {
                 ModifiableSolrParams params = new ModifiableSolrParams();
                 params.set("start", 0);
                 params.set("rows", 1);
@@ -116,10 +123,10 @@ public class MCRSolrObjectIDDetector extends MCRDefaultObjectIDDetector implemen
     private String retrieveMCRDerivateIDfromSOLR(MCRObjectID mcrObjId, String derid) {
         String result = derid;
         if (mcrObjId != null && derid != null
-            && derid.contains(":") && !SEARCHKEYS_FOR_DERIVATES.isEmpty()) {
+            && derid.contains(":") && !derivateSolrFields.isEmpty()) {
             String key = derid.substring(0, derid.indexOf(":"));
             String value = derid.substring(derid.indexOf(":") + 1);
-            if (SEARCHKEYS_FOR_DERIVATES.contains(key)) {
+            if (derivateSolrFields.contains(key)) {
                 ModifiableSolrParams params = new ModifiableSolrParams();
                 params.set("start", 0);
                 params.set("rows", 1);
