@@ -126,8 +126,7 @@ public class DefaultApplicationController extends ApplicationController {
         zipInputStream.available();
         while ((nextEntry = zipInputStream.getNextEntry()) != null) {
             String entryName = nextEntry.getName();
-            String fileName = dest + "/" + entryName;
-            Path localFile = dest.resolve(fileName);
+            Path localFile = dest.resolve(entryName);
             if (nextEntry.isDirectory()) {
                 Files.createDirectories(localFile);
             } else {
