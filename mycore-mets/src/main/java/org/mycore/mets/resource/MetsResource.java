@@ -21,12 +21,10 @@ package org.mycore.mets.resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
-import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -72,11 +70,8 @@ public class MetsResource {
         checkDerivateExists(derivateIdObject);
         checkDerivateAccess(derivateIdObject, MCRAccessManager.PERMISSION_WRITE);
 
-        InputStream resourceAsStream = MCRClassTools.getClassLoader().getResourceAsStream("mets-editor.html");
-        try {
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(resourceAsStream, writer, StandardCharsets.UTF_8);
-            String htmlTemplate = writer.toString();
+        try (InputStream resourceAsStream = MCRClassTools.getClassLoader().getResourceAsStream("mets-editor.html")){
+            String htmlTemplate = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
             // add additional javascript code
             String js = MCRConfiguration2.getString("MCR.Mets.Editor.additional.javascript").orElse(null);
             if (js != null && !js.isEmpty()) {

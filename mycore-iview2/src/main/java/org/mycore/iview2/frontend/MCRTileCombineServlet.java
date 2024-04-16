@@ -41,7 +41,6 @@ import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
@@ -273,7 +272,7 @@ public class MCRTileCombineServlet extends MCRServlet {
                 response.setContentLength((int) ze.getSize());
                 try (ServletOutputStream out = response.getOutputStream();
                     InputStream zin = zipFile.getInputStream(ze)) {
-                    IOUtils.copy(zin, out);
+                    zin.transferTo(out);
                 }
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);

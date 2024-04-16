@@ -22,11 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -131,8 +128,7 @@ public class MCRCrossrefClient {
                     case 200:
                         if (entity != null) {
                             try (InputStream inputStream = entity.getContent()) {
-                                List<String> doc = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
-                                message = doc.stream().collect(Collectors.joining(System.lineSeparator()));
+                                message = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                                 LOGGER.debug(message);
                             }
                         }
@@ -142,8 +138,7 @@ public class MCRCrossrefClient {
                     default:
                         if (entity != null) {
                             try (InputStream inputStream = entity.getContent()) {
-                                List<String> doc = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
-                                message = doc.stream().collect(Collectors.joining(System.lineSeparator()));
+                                message = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                             }
                         }
                         throw new MCRDatacenterException(
