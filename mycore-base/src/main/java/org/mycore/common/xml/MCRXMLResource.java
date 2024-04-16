@@ -18,14 +18,12 @@
 
 package org.mycore.common.xml;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
@@ -170,8 +168,8 @@ public class MCRXMLResource {
             return null;
         }
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
-            InputStream in = new BufferedInputStream(con.getInputStream())) {
-            IOUtils.copy(in, baos);
+            InputStream in = con.getInputStream()) {
+            in.transferTo(baos);
             return baos.toByteArray();
         } finally {
             closeURLConnection(con);

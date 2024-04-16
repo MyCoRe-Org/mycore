@@ -34,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
@@ -125,7 +124,7 @@ final class ContentUtils {
                         contentIS, inputBufferSize)) {
                 endCurrentTransaction();
                 // Copy the inputBufferSize stream to the outputBufferSize stream
-                bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);
+                bytesCopied = copyLarge(in, out, inputBufferSize, outputBufferSize, new byte[outputBufferSize]);
             }
         }
         if (length >= 0 && length != bytesCopied) {

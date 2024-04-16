@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -143,7 +142,7 @@ public class MCRFile extends MCRStoredNode {
     @Override
     void repairMetadata() throws IOException {
         MCRContentInputStream cis = getContent().getContentInputStream();
-        IOUtils.copy(cis, DEV_NULL);
+        cis.transferTo(DEV_NULL);
         cis.close();
         String path = getPath();
         writeData(e -> {

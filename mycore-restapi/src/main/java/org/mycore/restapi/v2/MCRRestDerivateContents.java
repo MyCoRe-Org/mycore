@@ -45,7 +45,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -103,8 +102,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
     private static final String HTTP_HEADER_IS_DIRECTORY = "X-MCR-IsDirectory";
-
-    private static final int BUFFER_SIZE = 8192;
 
     @Context
     ContainerRequestContext request;
@@ -175,7 +172,7 @@ public class MCRRestDerivateContents {
             .setSuffix(mcrPath.getFileName().toString())
             .setDirectory(uploadDirectory).get();
             MaxBytesOutputStream mbos = new MaxBytesOutputStream(dfos)) {
-            IOUtils.copy(contents, mbos);
+            contents.transferTo(mbos);
             mbos.close(); //required if temporary file was used
             OutputStream out = Files.newOutputStream(mcrPath);
             try {
@@ -213,7 +210,7 @@ public class MCRRestDerivateContents {
         try {
             OutputStream out = Files.newOutputStream(mcrPath, StandardOpenOption.CREATE_NEW);
             try {
-                IOUtils.copy(contents, out, BUFFER_SIZE);
+                contents.transferTo(out);
             } finally {
                 //close writes data to database
                 doWithinTransaction(out::close);
