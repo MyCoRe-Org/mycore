@@ -29,8 +29,8 @@ import org.mycore.frontend.xeditor.MCRBinding;
 public interface MCRChange {
 
     /** Returns an informative message about this change **/
-    public String getMessage();
+    String getMessage();
     
     /** Performs an undo of this change in the edited xml **/
-    public void undo(MCRBinding root) throws JaxenException;
+    void undo(MCRBinding root) throws JaxenException;
 }

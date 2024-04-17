@@ -45,6 +45,11 @@ public class MCRDebugTarget implements MCREditorTarget {
 
     private static final String USE_DEBUG_PERMISSION = "use-xeditor-debug";
 
+    private static final Format XML_OUTPUT_FORMAT
+        = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
+
+    private static final XMLOutputter XML_OUTPUTTER = new XMLOutputter(XML_OUTPUT_FORMAT);
+
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
@@ -65,8 +70,9 @@ public class MCRDebugTarget implements MCREditorTarget {
         List<Object> steps = new ArrayList<Object>();
         while (tracker.getChangeCount() > 0) {
             MCRChange change = tracker.undoLastChange(result);
-            if (change instanceof MCRBreakpoint)
+            if (change instanceof MCRBreakpoint) {
                 steps.add(0, result.clone());
+            }
             steps.add(0, change);
         }
 
@@ -108,19 +114,15 @@ public class MCRDebugTarget implements MCREditorTarget {
         out.println("</pre></p>");
     }
 
-    private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
-
-    private XMLOutputter outputter = new XMLOutputter(format);
-
     private void output(Object o, PrintWriter out) {
         if (o instanceof MCRBreakpoint bp) {
             out.println("<h3>" + bp.getMessage() + ":</h3>");
         } else if (o instanceof MCRChange c) {
             out.println("<p>" + c.getMessage() + "</p>");
         } else if (o instanceof Document doc) {
-            Element pre = new Element("pre").setAttribute("lang","xml");
-            pre.setText(outputter.outputString(doc));
-            out.println("<p>" + outputter.outputString(pre) + "</p>");
+            Element pre = new Element("pre").setAttribute("lang", "xml");
+            pre.setText(XML_OUTPUTTER.outputString(doc));
+            out.println("<p>" + XML_OUTPUTTER.outputString(pre) + "</p>");
         }
     }
 }
