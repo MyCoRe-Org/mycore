@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -70,7 +71,7 @@ public class ControllerUtil {
                 Path pDir = Paths.get(SCREENSHOT_FOLDER);
                 Files.createDirectories(pDir);
                 Path pFile = pDir.resolve(name + ".png");
-                Files.copy(new ByteArrayInputStream(imageBytes), pFile);
+                Files.copy(new ByteArrayInputStream(imageBytes), pFile, StandardCopyOption.REPLACE_EXISTING);
                 return ImageIO.read(new ByteArrayInputStream(imageBytes));
             } catch (IOException e) {
                 LOGGER.error("Error while taking screenshot!");
