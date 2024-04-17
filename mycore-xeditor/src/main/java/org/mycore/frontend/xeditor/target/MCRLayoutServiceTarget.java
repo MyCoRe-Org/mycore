@@ -24,7 +24,6 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 import jakarta.servlet.ServletContext;
 
@@ -40,7 +39,6 @@ public class MCRLayoutServiceTarget implements MCREditorTarget {
         Document result = session.getEditedXML();
 
         if (session.getValidator().isValid()) {
-            result = MCRChangeTracker.removeChangeTracking(result);
             result = session.getXMLCleaner().clean(result);
             result = session.getPostProcessor().process(result);
 

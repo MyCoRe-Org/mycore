@@ -18,15 +18,28 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Element;
+import org.mycore.frontend.xeditor.MCRBinding;
 
+/**
+ * Tracks a breakpoint, a marker useful for debugging  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRBreakpoint implements MCRChange {
 
-    public static MCRChangeData setBreakpoint(Element context, String label) {
-        return new MCRChangeData("breakpoint", label, context.getContentSize(), context);
+    private String message;
+
+    public MCRBreakpoint(String message) {
+        this.message = message;
     }
 
-    public void undo(MCRChangeData data) {
-        // Need implementation
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public void undo(MCRBinding root) {
+        // Nothing to do here
     }
 }

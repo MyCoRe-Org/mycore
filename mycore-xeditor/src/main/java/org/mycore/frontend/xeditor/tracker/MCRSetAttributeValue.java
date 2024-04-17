@@ -18,19 +18,41 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
+import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
+import org.mycore.common.xml.MCRXPathBuilder;
+import org.mycore.frontend.xeditor.MCRBinding;
 
+/**
+ * Sets an attribute value in the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRSetAttributeValue implements MCRChange {
 
-    public static MCRChangeData setValue(Attribute attribute, String value) {
-        MCRChangeData data = new MCRChangeData("set-attribute", attribute);
-        attribute.setValue(value);
-        return data;
+    public String xPath;
+
+    public String newValue;
+
+    public String oldValue;
+
+    public MCRSetAttributeValue(Attribute attribute, String newValue) {
+        this.xPath = MCRXPathBuilder.buildXPath(attribute);
+        this.oldValue = attribute.getValue();
+        this.newValue = newValue;
+        attribute.setValue(newValue);
     }
 
-    public void undo(MCRChangeData data) {
-        Attribute attribute = data.getAttribute();
-        data.getContext().removeAttribute(attribute.getName(), attribute.getNamespace());
-        data.getContext().setAttribute(attribute);
+    @Override
+    public String getMessage() {
+        return "Set value of " + xPath + " to " + newValue;
+    }
+
+    @Override
+    public void undo(MCRBinding root) throws JaxenException {
+        MCRBinding attributeBinding = new MCRBinding(xPath, false, root);
+        Attribute attribute = (Attribute) (attributeBinding.getBoundNode());
+        attribute.setValue(oldValue);
+        attributeBinding.detach();
     }
 }

@@ -40,7 +40,7 @@ import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
-import org.mycore.frontend.xeditor.tracker.MCRChangeData;
+import org.mycore.frontend.xeditor.tracker.MCRChange;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.frontend.xeditor.tracker.MCRRemoveAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
@@ -144,9 +144,9 @@ public class MCRBinding {
     public void removeBoundNode(int index) {
         Object node = boundNodes.remove(index);
         if (node instanceof Element element) {
-            track(MCRRemoveElement.remove(element));
+            track(new MCRRemoveElement(element));
         } else {
-            track(MCRRemoveAttribute.remove((Attribute) node));
+            track(new MCRRemoveAttribute((Attribute) node));
         }
     }
 
@@ -163,11 +163,10 @@ public class MCRBinding {
 
     private void trackNodeCreated(Object node) {
         if (node instanceof Element element) {
-            MCRChangeTracker.removeChangeTracking(element);
-            track(MCRAddedElement.added(element));
+            track(new MCRAddedElement(element));
         } else {
             Attribute attribute = (Attribute) node;
-            track(MCRAddedAttribute.added(attribute));
+            track(new MCRAddedAttribute(attribute));
         }
     }
 
@@ -233,9 +232,9 @@ public class MCRBinding {
             return;
         }
         if (node instanceof Attribute attribute) {
-            track(MCRSetAttributeValue.setValue(attribute, value));
+            track(new MCRSetAttributeValue(attribute, value));
         } else {
-            track(MCRSetElementText.setText((Element) node, value));
+            track(new MCRSetElementText((Element) node, value));
         }
     }
 
@@ -283,7 +282,7 @@ public class MCRBinding {
         return new MCRXPathEvaluator(buildXPathVariables(), getBoundNodes());
     }
 
-    public void track(MCRChangeData change) {
+    public void track(MCRChange change) {
         if (tracker != null) {
             tracker.track(change);
         } else if (parent != null) {

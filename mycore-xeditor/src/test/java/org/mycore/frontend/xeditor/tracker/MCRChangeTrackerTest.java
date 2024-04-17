@@ -28,7 +28,6 @@ import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.filter.Filters;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -48,7 +47,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         assertEquals(3, doc.getRootElement().getChildren().size());
         assertTrue(doc.getRootElement().getChildren().contains(title));
 
-        tracker.track(MCRAddedElement.added(title));
+        tracker.track(new MCRAddedElement(title));
         tracker.undoChanges(doc);
 
         assertEquals(2, doc.getRootElement().getChildren().size());
@@ -62,7 +61,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         Element title = doc.getRootElement().getChildren().get(1);
-        tracker.track(MCRRemoveElement.remove(title));
+        tracker.track(new MCRRemoveElement(title));
         assertEquals(2, doc.getRootElement().getChildren().size());
         assertFalse(doc.getRootElement().getChildren().contains(title));
 
@@ -80,7 +79,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         Attribute id = new Attribute("id", "foo");
         doc.getRootElement().setAttribute(id);
-        tracker.track(MCRAddedAttribute.added(id));
+        tracker.track(new MCRAddedAttribute(id));
 
         tracker.undoChanges(doc);
 
@@ -93,7 +92,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         Attribute id = doc.getRootElement().getAttribute("id");
-        tracker.track(MCRRemoveAttribute.remove(id));
+        tracker.track(new MCRRemoveAttribute(id));
         assertNull(doc.getRootElement().getAttribute("id"));
 
         tracker.undoChanges(doc);
@@ -107,7 +106,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         Attribute id = doc.getRootElement().getAttribute("id");
-        tracker.track(MCRSetAttributeValue.setValue(id, "bar"));
+        tracker.track(new MCRSetAttributeValue(id, "bar"));
         assertEquals("bar", id.getValue());
 
         tracker.undoChanges(doc);
@@ -121,7 +120,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
             new MCRNodeBuilder().buildElement("document[@id='foo'][titles/title][author]", null, null));
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        tracker.track(MCRSetElementText.setText(doc.getRootElement(), "text"));
+        tracker.track(new MCRSetElementText(doc.getRootElement(), "text"));
         assertEquals("text", doc.getRootElement().getText());
         assertEquals("foo", doc.getRootElement().getAttributeValue("id"));
 
@@ -144,15 +143,15 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         Element titles = (Element) (new MCRBinding("document/titles", true, new MCRBinding(doc)).getBoundNode());
         Element title = new Element("title").setAttribute("type", "alternative");
         titles.addContent(2, title);
-        tracker.track(MCRAddedElement.added(title));
+        tracker.track(new MCRAddedElement(title));
 
         Attribute lang = new Attribute("lang", "de");
         doc.getRootElement().setAttribute(lang);
-        tracker.track(MCRAddedAttribute.added(lang));
+        tracker.track(new MCRAddedAttribute(lang));
 
         Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc))
             .getBoundNode());
-        tracker.track(MCRRemoveElement.remove(author));
+        tracker.track(new MCRRemoveElement(author));
 
         tracker.undoChanges(doc);
 
@@ -160,35 +159,11 @@ public class MCRChangeTrackerTest extends MCRTestCase {
     }
 
     @Test
-    public void testRemoveChangeTracking() throws JaxenException {
-        String template = "document[titles[title][title[2]]][authors/author[first='John'][last='Doe']]";
-        Document doc = new Document(new MCRNodeBuilder().buildElement(template, null, null));
-
-        MCRChangeTracker tracker = new MCRChangeTracker();
-
-        Element titles = (Element) (new MCRBinding("document/titles", true, new MCRBinding(doc)).getBoundNode());
-        Element title = new Element("title").setAttribute("type", "alternative");
-        titles.addContent(2, title);
-        tracker.track(MCRAddedElement.added(title));
-
-        Attribute lang = new Attribute("lang", "de");
-        doc.getRootElement().setAttribute(lang);
-        tracker.track(MCRAddedAttribute.added(lang));
-
-        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc))
-            .getBoundNode());
-        tracker.track(MCRRemoveElement.remove(author));
-
-        doc = MCRChangeTracker.removeChangeTracking(doc);
-        assertFalse(doc.getDescendants(Filters.processinginstruction()).iterator().hasNext());
-    }
-
-    @Test
     public void testEscaping() {
         String pattern = "<?xed-foo ?>";
         Document doc = new Document(new Element("document").addContent(new Element("child").setText(pattern)));
         MCRChangeTracker tracker = new MCRChangeTracker();
-        tracker.track(MCRRemoveElement.remove(doc.getRootElement().getChildren().get(0)));
+        tracker.track(new MCRRemoveElement(doc.getRootElement().getChildren().get(0)));
         tracker.undoChanges(doc);
         assertEquals(pattern, doc.getRootElement().getChildren().get(0).getText());
     }
@@ -201,19 +176,19 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         Element title = new Element("title");
         root.addContent(title);
-        tracker.track(MCRAddedElement.added(title));
+        tracker.track(new MCRAddedElement(title));
 
         Attribute id = new Attribute("type", "main");
         title.setAttribute(id);
-        tracker.track(MCRAddedAttribute.added(id));
+        tracker.track(new MCRAddedAttribute(id));
 
         Element part = new Element("part");
         title.addContent(part);
-        tracker.track(MCRAddedElement.added(part));
+        tracker.track(new MCRAddedElement(part));
 
-        tracker.track(MCRRemoveElement.remove(part));
-        tracker.track(MCRRemoveAttribute.remove(id));
-        tracker.track(MCRRemoveElement.remove(title));
+        tracker.track(new MCRRemoveElement(part));
+        tracker.track(new MCRRemoveAttribute(id));
+        tracker.track(new MCRRemoveElement(title));
 
         tracker.undoChanges(doc);
     }
@@ -226,11 +201,11 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         Attribute href = new Attribute("href", "foo", MCRConstants.XLINK_NAMESPACE);
         root.setAttribute(href);
-        tracker.track(MCRAddedAttribute.added(href));
+        tracker.track(new MCRAddedAttribute(href));
 
-        tracker.track(MCRSetAttributeValue.setValue(href, "bar"));
+        tracker.track(new MCRSetAttributeValue(href, "bar"));
 
-        tracker.track(MCRRemoveAttribute.remove(href));
+        tracker.track(new MCRRemoveAttribute(href));
         tracker.undoLastChange(doc);
 
         assertEquals("bar", root.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE));
@@ -240,13 +215,13 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         Element title = new Element("title", MCRConstants.MODS_NAMESPACE).setText("foo");
         root.addContent(title);
-        tracker.track(MCRAddedElement.added(title));
+        tracker.track(new MCRAddedElement(title));
 
-        tracker.track(MCRSetElementText.setText(title, "bar"));
+        tracker.track(new MCRSetElementText(title, "bar"));
         tracker.undoLastChange(doc);
         assertEquals("foo", root.getChild("title", MCRConstants.MODS_NAMESPACE).getText());
 
-        tracker.track(MCRRemoveElement.remove(title));
+        tracker.track(new MCRRemoveElement(title));
         tracker.undoLastChange(doc);
 
         assertNotNull(root.getChild("title", MCRConstants.MODS_NAMESPACE));
@@ -261,20 +236,20 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         Element title = new Element("title");
         root.addContent(title);
-        tracker.track(MCRAddedElement.added(title));
+        tracker.track(new MCRAddedElement(title));
 
-        tracker.track(MCRBreakpoint.setBreakpoint(root, "Test"));
+        tracker.track(new MCRBreakpoint("Test"));
 
         Attribute href = new Attribute("href", "foo", MCRConstants.XLINK_NAMESPACE);
         root.setAttribute(href);
-        tracker.track(MCRAddedAttribute.added(href));
+        tracker.track(new MCRAddedAttribute(href));
 
-        tracker.track(MCRSetAttributeValue.setValue(href, "bar"));
+        tracker.track(new MCRSetAttributeValue(href, "bar"));
 
         String label = tracker.undoLastBreakpoint(doc);
         assertEquals("Test", label);
         assertNull(root.getAttribute("href"));
-        assertEquals(1, tracker.getChangeCounter());
+        assertEquals(1, tracker.getChangeCount());
     }
 
     @Test
@@ -287,7 +262,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         assertEquals("b", root.getChildren().get(3).getText());
 
         MCRChangeTracker tracker = new MCRChangeTracker();
-        tracker.track(MCRSwapElements.swap(root, 0, 3));
+        tracker.track(new MCRSwapElements(root, 0, 3));
 
         assertEquals("b", root.getChildren().get(0).getText());
         assertEquals("a", root.getChildren().get(3).getText());

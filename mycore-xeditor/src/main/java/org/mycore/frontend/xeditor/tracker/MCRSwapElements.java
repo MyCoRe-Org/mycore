@@ -18,39 +18,57 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Content;
-import org.jdom2.Element;
+import java.util.List;
 
+import org.jaxen.JaxenException;
+import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
+import org.mycore.frontend.xeditor.MCRBinding;
+
+/**
+ * Swaps two elements in the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRSwapElements implements MCRChange {
 
-    public static MCRChangeData swap(Element parent, Element a, Element b) {
-        int posA = parent.indexOf(a);
-        int posB = parent.indexOf(b);
-        return swap(parent, posA, a, posB, b);
+    private String xPath;
+
+    private int posA;
+
+    private int posB;
+
+    public MCRSwapElements(Element parent, Element a, Element b) {
+        this(parent, parent.getChildren().indexOf(a), parent.getChildren().indexOf(b));
     }
 
-    public static MCRChangeData swap(Element parent, int posA, int posB) {
-        Content a = parent.getContent().get(posA);
-        Content b = parent.getContent().get(posB);
-        return swap(parent, posA, a, posB, b);
+    public MCRSwapElements(Element parent, int posA, int posB) {
+        this.xPath = MCRXPathBuilder.buildXPath(parent);
+        this.posA = posA;
+        this.posB = posB;
+        swap(parent, posA, posB);
     }
 
-    public static MCRChangeData swap(Element parent, int posA, Content a, int posB, Content b) {
+    @Override
+    public String getMessage() {
+        return "Swapped elements " + posA + " and " + posB + " at " + xPath;
+    }
+
+    private void swap(Element parent, int posA, int posB) {
         if (posA > posB) {
-            return swap(parent, posB, b, posA, a);
+            swap(parent, posB, posA);
+        } else {
+            List<Element> children = parent.getChildren(); // => x a x x b x
+            Element b = children.remove(posB); // => x a x x x  
+            children.add(posA, b); // => x b a x x x 
+            Element a = children.remove(posA + 1); // => x b x x x 
+            children.add(posB, a); // => x b x x a x
         }
-
-        b.detach(); // x a x x x  
-        parent.addContent(posA, b); // x b a x x x 
-        a.detach(); // x b x x x
-        parent.addContent(posB, a); // x b x x a x
-
-        return new MCRChangeData("swapped-elements", posA + " " + posB, posB, parent);
     }
 
-    public void undo(MCRChangeData data) {
-        int posA = Integer.parseInt(data.getText().split(" ")[0]);
-        int posB = Integer.parseInt(data.getText().split(" ")[1]);
-        swap(data.getContext(), posA, posB);
+    public void undo(MCRBinding root) throws JaxenException {
+        MCRBinding parentBinding = new MCRBinding(xPath, false, root);
+        Element parent = (Element) (parentBinding.getBoundNode());
+        swap(parent, posA, posB);
     }
 }

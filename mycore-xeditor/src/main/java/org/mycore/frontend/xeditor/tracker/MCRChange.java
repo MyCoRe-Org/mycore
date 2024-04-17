@@ -18,7 +18,19 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
+import org.jaxen.JaxenException;
+import org.mycore.frontend.xeditor.MCRBinding;
+
+/**
+ * Represents a change in the edited xml, which can be undone.
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public interface MCRChange {
 
-    void undo(MCRChangeData data);
+    /** Returns an informative message about this change **/
+    public String getMessage();
+    
+    /** Performs an undo of this change in the edited xml **/
+    public void undo(MCRBinding root) throws JaxenException;
 }

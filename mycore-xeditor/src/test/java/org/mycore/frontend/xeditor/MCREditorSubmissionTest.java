@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * @author Frank Lützenkirchen
@@ -56,7 +55,6 @@ public class MCREditorSubmissionTest extends MCRTestCase {
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
         Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         Document result = session.getEditedXML();
-        result = MCRChangeTracker.removeChangeTracking(result);
         assertTrue(MCRXMLHelper.deepEqual(expected, result));
     }
 

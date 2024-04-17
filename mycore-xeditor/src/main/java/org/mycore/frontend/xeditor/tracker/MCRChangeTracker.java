@@ -18,31 +18,28 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import java.util.Iterator;
+import java.util.Stack;
 
+import org.jaxen.JaxenException;
 import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.ProcessingInstruction;
-import org.jdom2.filter.Filters;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.frontend.xeditor.MCRBinding;
 
+/**
+ * Tracks changes to the edited xml, allowing to undo them step by step.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRChangeTracker implements Cloneable {
 
-    private static final String CONFIG_PREFIX = "MCR.XEditor.ChangeTracker.";
+    private Stack<MCRChange> changes = new Stack<MCRChange>();
 
-    public static final String PREFIX = "xed-tracker-";
-
-    private int counter = 0;
-
-    public void track(MCRChangeData data) {
-        ProcessingInstruction pi = data.getProcessingInstruction();
-        pi.setTarget(PREFIX + (++counter) + "-" + pi.getTarget());
-        data.getContext().addContent(data.getPosition(), pi);
+    public void track(MCRChange change) {
+        changes.add(change);
     }
 
-    public int getChangeCounter() {
-        return counter;
+    public int getChangeCount() {
+        return changes.size();
     }
 
     public void undoChanges(Document doc) {
@@ -50,64 +47,39 @@ public class MCRChangeTracker implements Cloneable {
     }
 
     public void undoChanges(Document doc, int stepNumber) {
-        while (counter > stepNumber) {
+        while (getChangeCount() > stepNumber) {
             undoLastChange(doc);
         }
     }
 
     public String undoLastBreakpoint(Document doc) {
-        while (counter > 0) {
-            MCRChangeData change = undoLastChange(doc);
-            if ("breakpoint".equals(change.getType())) {
-                return change.getText();
+        while (getChangeCount() > 0) {
+            MCRChange change = undoLastChange(doc);
+            if (change instanceof MCRBreakpoint) {
+                return change.getMessage();
             }
         }
         return null;
     }
 
-    public MCRChangeData undoLastChange(Document doc) {
-        MCRChangeData data = findLastChange(doc);
-        data.getProcessingInstruction().detach();
-        counter--;
-
-        String property = CONFIG_PREFIX + data.getType() + ".Class";
-        MCRChange change = MCRConfiguration2.<MCRChange>getSingleInstanceOf(property)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
-        change.undo(data);
-        return data;
-    }
-
-    public MCRChangeData findLastChange(Document doc) {
-        String typePrefix = PREFIX + counter + "-";
-        for (ProcessingInstruction instruction : doc.getDescendants(Filters.processinginstruction())) {
-            String target = instruction.getTarget();
-
-            if (target.startsWith(typePrefix)) {
-                return new MCRChangeData(instruction, typePrefix);
-            }
+    public MCRChange undoLastChange(Document doc) {
+        MCRChange change = changes.pop();
+        try {
+            change.undo(new MCRBinding(doc));
+        } catch (JaxenException ex) {
+            throw new MCRException(ex);
         }
-        throw new MCRException("Lost processing instruction for undo, not found: " + typePrefix);
+        return change;
     }
 
-    public static Document removeChangeTracking(Document doc) {
-        Document clone = doc.clone();
-        removeChangeTracking(clone.getRootElement());
-        return clone;
-    }
-
-    public static void removeChangeTracking(Element element) {
-        for (Iterator<ProcessingInstruction> iter = element.getDescendants(Filters.processinginstruction())
-            .iterator(); iter.hasNext();) {
-            if (iter.next().getTarget().startsWith(PREFIX)) {
-                iter.remove();
-            }
-        }
+    public MCRChange getLastChange() {
+        return changes.peek();
     }
 
     @Override
     public MCRChangeTracker clone() {
         MCRChangeTracker tracker = new MCRChangeTracker();
-        tracker.counter = this.counter;
+        tracker.changes.addAll(this.changes);
         return tracker;
     }
 }

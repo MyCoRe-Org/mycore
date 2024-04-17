@@ -18,27 +18,44 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import java.util.Iterator;
+import java.util.List;
 
-import org.jdom2.Attribute;
+import org.jaxen.JaxenException;
+import org.jdom2.Content;
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
+import org.mycore.frontend.xeditor.MCRBinding;
 
+/**
+ * Sets an element's text in the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRSetElementText implements MCRChange {
 
-    public static MCRChangeData setText(Element element, String text) {
-        Element clone = element.clone();
+    public String xPath;
 
-        for (Iterator<Attribute> attributes = clone.getAttributes().iterator(); attributes.hasNext();) {
-            attributes.next();
-            attributes.remove();
-        }
+    public String newValue;
 
-        MCRChangeData data = new MCRChangeData("set-text", clone, 0, element);
-        element.setText(text);
-        return data;
+    public List<Content> oldContent;
+
+    public MCRSetElementText(Element element, String newValue) {
+        this.xPath = MCRXPathBuilder.buildXPath(element);
+        this.oldContent = element.cloneContent();
+        this.newValue = newValue;
+        element.setText(newValue);
     }
 
-    public void undo(MCRChangeData data) {
-        data.getContext().setContent(data.getElement().cloneContent());
+    @Override
+    public String getMessage() {
+        return "Set value of " + xPath + " to " + newValue;
+    }
+
+    @Override
+    public void undo(MCRBinding root) throws JaxenException {
+        MCRBinding elementBinding = new MCRBinding(xPath, false, root);
+        Element element = (Element) (elementBinding.getBoundNode());
+        element.setContent(oldContent);
+        elementBinding.detach();
     }
 }
