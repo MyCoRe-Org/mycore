@@ -70,7 +70,7 @@ public class MetsResource {
         checkDerivateExists(derivateIdObject);
         checkDerivateAccess(derivateIdObject, MCRAccessManager.PERMISSION_WRITE);
 
-        try (InputStream resourceAsStream = MCRClassTools.getClassLoader().getResourceAsStream("mets-editor.html")){
+        try (InputStream resourceAsStream = MCRClassTools.getClassLoader().getResourceAsStream("mets-editor.html")) {
             String htmlTemplate = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
             // add additional javascript code
             String js = MCRConfiguration2.getString("MCR.Mets.Editor.additional.javascript").orElse(null);

@@ -42,8 +42,8 @@ public class MCRURIResolverTest extends MCRTestCase {
         Path nestedMyFileFile = nestedConfigurationXslDirectory.resolve("myfile.xsl");
 
         // create actual files in test directories
-        
-        try(InputStream is = myFileResourceUrl.openStream();
+
+        try (InputStream is = myFileResourceUrl.openStream();
             InputStream nestedIs = nestedMyFileResourceUrl.openStream()) {
             long bytesCopied = Files.copy(is, myFileFile);
             long nestedBytesCopied = Files.copy(nestedIs, nestedMyFileFile);

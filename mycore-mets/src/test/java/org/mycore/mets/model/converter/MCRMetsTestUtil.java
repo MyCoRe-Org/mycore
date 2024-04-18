@@ -43,8 +43,8 @@ public class MCRMetsTestUtil {
     private static Properties PROPERTIES = new Properties();
 
     public static String readJsonFile(String path) throws IOException {
-        try(InputStream resourceAsStream = MCRMetsTestUtil.class.getClassLoader().getResourceAsStream("json/" + path)){
-            return new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
+        try (InputStream is = MCRMetsTestUtil.class.getClassLoader().getResourceAsStream("json/" + path)) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
