@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="document">
+        <xed:bind xpath="@publish" initially="true" default="false">
+          <input id="publish" type="checkbox" value="true" />
+          <label for="publish">Dokument publizieren</label>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <test label="Testing initially true, default false, no source xml">
+
+    <transform />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <input name="publish" checked="checked" id="publish" type="checkbox" value="true" />
+        <label for="publish">Dokument publizieren</label>
+        <div style="visibility:hidden">
+          <input value="false" name="_xed_default_/document/@publish" type="hidden" />
+          <input value="1-4" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+    
+    <xml>
+      <document publish="@@_publish_@@=true" />
+    </xml>
+
+  </test>
+
+  <test label="Testing initially true, default false, source xml sets false">
+
+    <source id="test">
+      <document publish="false" />
+    </source>
+    
+    <param name="key">test</param>
+    
+    <transform />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <input name="publish" id="publish" type="checkbox" value="true" />
+        <label for="publish">Dokument publizieren</label>
+        <div style="visibility:hidden">
+          <input value="test" name="key" type="hidden" />
+          <input value="false" name="_xed_default_/document/@publish" type="hidden" />
+          <input value="1-3" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+
+    <xml>
+      <document publish="@@_publish_@@=false" />
+    </xml>
+
+  </test>  
+  
+</test>

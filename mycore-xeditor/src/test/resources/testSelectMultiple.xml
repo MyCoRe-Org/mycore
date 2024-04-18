@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$id}" />
+      <xed:bind xpath="reise">
+      
+        <xed:bind xpath="leistung" default="hotel">
+          <select multiple="multiple">
+            <option value="hotel">Hotel</option>
+            <option value="plane">Flug</option>
+            <option value="insurance">Reiserücktrittversicherung</option>
+          </select>
+        </xed:bind>
+        
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <test label="No source XML, all options except default unselected">
+
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <select multiple="multiple" name="leistung">
+          <option value="hotel" selected="selected">Hotel</option>
+          <option value="plane">Flug</option>
+          <option value="insurance">Reiserücktrittversicherung</option>
+        </select>
+        <div style="visibility:hidden">
+          <input value="hotel" name="_xed_default_/reise/leistung[1]" type="hidden" />
+          <input value="1-5" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+    <xml>
+      <reise>
+        <leistung>@@_leistung_@@=hotel</leistung>
+      </reise>
+    </xml>
+
+  </test>
+ 
+  <test label="With source XML, related options should be marked selected">
+
+    <source id="test">
+      <reise>
+        <leistung>plane</leistung>
+        <leistung>insurance</leistung>
+      </reise>
+    </source>
+
+    <param name="id">test</param>
+
+    <transform />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <select multiple="multiple" name="leistung">
+          <option value="hotel">Hotel</option>
+          <option value="plane" selected="selected">Flug</option>
+          <option value="insurance" selected="selected">Reiserücktrittversicherung</option>
+        </select>
+        <div style="visibility:hidden">
+          <input value="test" name="id" type="hidden" />
+          <input value="hotel" name="_xed_default_/reise/leistung[1]" type="hidden" />
+          <input value="1-4" name="_xed_session" type="hidden" />
+        </div>        
+      </form>
+    </html>
+
+    <xml>
+      <reise>
+        <leistung>@@_leistung_@@=plane</leistung>
+        <leistung>@@_leistung_@@=insurance</leistung>
+      </reise>
+    </xml>
+
+  </test>
+
+</test>

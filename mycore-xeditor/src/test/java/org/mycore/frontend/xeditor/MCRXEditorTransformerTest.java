@@ -18,28 +18,24 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.transform.TransformerException;
-
 import org.jaxen.JaxenException;
-import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -47,158 +43,194 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformerTest extends MCRTestCase {
 
-    private MCREditorSession buildEditorSession(String editedXMLFile) {
-        HashMap<String, String[]> parameters = new HashMap<>();
-        if (editedXMLFile != null) {
-            parameters.put("input", new String[] { editedXMLFile });
+    @Test
+    public void testBasicInputComponents() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testBasicInputComponents");
+    }
+
+    @Test
+    public void testBasicFieldMapping() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testBasicFieldMapping");
+    }
+
+    @Test
+    public void testCheckboxesAndRadios() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testCheckboxesAndRadios");
+    }
+
+    @Test
+    public void testSelect() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testSelect");
+    }
+
+    @Test
+    public void testSelectMultiple() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testSelectMultiple");
+    }
+
+    @Test
+    public void testDefaultValue() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testDefaultValue");
+    }
+
+    @Test
+    public void testConditions() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testConditions");
+    }
+
+    @Test
+    public void testI18N() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testI18N");
+    }
+
+    @Test
+    public void testNamespaces() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testNamespaces");
+    }
+
+    @Test
+    public void testSource() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testSource");
+    }
+
+    @Test
+    public void testLoadResources() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testLoadResources");
+    }
+
+    @Test
+    public void testIncludes() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testIncludes");
+    }
+
+    @Test
+    public void testPreload() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testPreload");
+    }
+
+    @Test
+    public void testRepeater() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testRepeater");
+    }
+
+    @Test
+    public void testRepeaterControls() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testRepeaterControls");
+    }
+
+    @Test
+    public void testXPathSubstitution() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testXPathSubstitution");
+    }
+
+    @Test
+    public void testValidation() throws IOException, JDOMException, SAXException, JaxenException {
+        runTestFile("testValidation");
+    }
+
+    private void runTestFile(String testFile) throws IOException, JDOMException, SAXException, JaxenException {
+        Element test = MCRURIResolver.instance().resolve("resource:" + testFile + ".xml");
+        runTest(null, test);
+    }
+
+    private void runTest(Element xed, Element test) throws IOException, JDOMException, SAXException, JaxenException {
+        System.out.println("========== " + test.getAttributeValue("label") + " ==========");
+
+        Map<String, String> params = new HashMap<String, String>();
+        MCRParameterCollector pc = null;
+        MCREditorSession session = null;
+        MCRContent transformed = null;
+
+        for (Element e : test.getChildren()) {
+            switch (e.getName()) {
+            case "xed":
+                xed = e.getChildren().get(0).detach();
+                break;
+            case "test":
+                runTest(xed, e);
+                break;
+            case "source":
+                prepareSourceXML(e);
+                break;
+            case "param":
+                params.put(e.getAttributeValue("name"), e.getText());
+                break;
+            case "lang":
+                MCRSessionMgr.getCurrentSession().setCurrentLanguage(e.getTextTrim());
+                break;
+            case "transform":
+                pc = new MCRParameterCollector();
+                session = buildEditorSession(pc, params);
+            case "transformAgain":    
+                MCRXEditorTransformer transformer = new MCRXEditorTransformer(session, pc);
+                transformed = transformer.transform(new MCRJDOMContent(xed.clone()));
+                break;
+            case "html":
+                testResultingHTML(e, transformed);
+                break;
+            case "xml":
+                testResultingXML(session, e);
+                break;
+            case "isValid":
+                MCRFieldMapper.emptyNotResubmittedNodes(session.getEditedXML().getDocument());
+                Boolean expected = Boolean.valueOf(e.getTextTrim());
+                Boolean isValid = session.getValidator().isValid();
+                assertEquals(expected, isValid);
+                break;
+            }
         }
-        MCRParameterCollector collector = new MCRParameterCollector(false);
-        collector.setParameter("input", editedXMLFile);
-        MCREditorSession editorSession = new MCREditorSession(parameters, collector);
-        editorSession.setID("1");
-        return editorSession;
     }
 
-    private MCREditorSession testTransformation(String inputFile, String editedXMLFile, String expectedOutputFile)
-        throws TransformerException, IOException, JDOMException, SAXException, JaxenException {
-        MCREditorSession editorSession = buildEditorSession(editedXMLFile);
-        testTransformation(inputFile, editedXMLFile, editorSession, expectedOutputFile);
-        return editorSession;
+    private MCREditorSession buildEditorSession(MCRParameterCollector pc, Map<String, String> params) {
+        pc.setParameters(params);
+
+        Map<String, String[]> requestParameters = new HashMap<String, String[]>();
+        params.entrySet().forEach(me -> {
+            requestParameters.put(me.getKey(), new String[] { me.getValue() });
+        });
+
+        MCREditorSession session = new MCREditorSession(requestParameters, pc);
+        session.setID("1");
+        return session;
     }
 
-    private void testTransformation(String inputFile, String editedXMLFile, MCREditorSession session,
-        String expectedOutputFile) throws TransformerException, IOException, JDOMException, SAXException,
-        JaxenException {
-        MCRParameterCollector pc = new MCRParameterCollector(false);
-        if (editedXMLFile != null) {
-            pc.setParameter("input", editedXMLFile);
+    private void prepareSourceXML(Element source) {
+        String id = source.getAttributeValue("id");
+        Element root = source.getChildren().get(0).detach();
+        MCRSessionMgr.getCurrentSession().put(id, root);
+    }
+
+    private void testResultingXML(MCREditorSession session, Element xml) throws IOException {
+        Element expectedXML = xml.getChildren().get(0).detach();
+        Element editedXML = session.getEditedXML().getDocument().getRootElement().clone();
+        TestResult tr = compare(editedXML, expectedXML);
+        assertTrue("resulting XML is not as expected:" + tr.message, tr.result);
+    }
+
+    private void testResultingHTML(Element html, MCRContent transformed)
+        throws JDOMException, IOException, SAXException {
+        Element expectedResult = html.getChildren().get(0).detach();
+        Element transformedResult = transformed.asXML().detachRootElement();
+        TestResult tr = compare(transformedResult, expectedResult);
+        assertTrue("resulting HTML is not as expected:" + tr.message, tr.result);
+    }
+
+    private TestResult compare(Element result, Element expected) throws IOException {
+        TestResult tr = new TestResult();
+        tr.result = MCRXMLHelper.deepEqual(result, expected);
+        if (!tr.result) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("---------- expected: ----------\n");
+            sb.append(new MCRJDOMContent(expected).asString());
+            sb.append("---------- actual result: ----------\n");
+            sb.append(new MCRJDOMContent(result).asString());
+            tr.message = sb.toString();
         }
-
-        MCRContent input = MCRSourceContent.getInstance("resource:" + inputFile);
-        MCRContent transformed = new MCRXEditorTransformer(session, pc).transform(input);
-
-        Document expected = MCRSourceContent.getInstance("resource:" + expectedOutputFile).asXML();
-
-        MCRBinding binding = new MCRBinding("//input[@type='hidden'][@name='_xed_session']/@value", true,
-            new MCRBinding(expected));
-        binding.setValue(session.getID() + "-" + session.getChangeTracker().getChangeCount());
-
-        binding = new MCRBinding("//form/@action", true, new MCRBinding(expected));
-        binding.setValue(MCRFrontendUtil.getBaseURL() + "servlets/XEditor");
-
-        String msg = "Transformed output is different to " + expectedOutputFile;
-        boolean isEqual = MCRXMLHelper.deepEqual(expected, transformed.asXML());
-        if (!isEqual) {
-            System.out.println("---------- expected: ----------");
-            System.out.println(new MCRJDOMContent(expected).asString());
-            System.out.println("---------- transformed: ----------");
-            System.out.println(transformed.asString());
-        }
-        assertTrue(msg, isEqual);
+        return tr;
     }
 
-    @Test
-    public void testBasicInputComponents() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        testTransformation("testBasicInputComponents-editor.xml", null, "testBasicInputComponents-transformed1.xml");
-        testTransformation("testBasicInputComponents-editor.xml", "testBasicInputComponents-source.xml",
-            "testBasicInputComponents-transformed2.xml");
-    }
-
-    @Test
-    public void testIncludes() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        testTransformation("testIncludes-editor.xml", null, "testIncludes-transformed.xml");
-    }
-
-    @Test
-    public void testPreload() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        testTransformation("testPreload-editor.xml", null, "testPreload-transformed.xml");
-    }
-
-    @Test
-    public void testRepeats() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        testTransformation("testRepeats-editor.xml", "testBasicInputComponents-source.xml",
-            "testRepeats-transformed.xml");
-    }
-
-    @Test
-    public void testXPathSubstitution() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        MCRSessionMgr.getCurrentSession().put("SomeUser", "John Doe");
-        testTransformation("testXPathSubstitution-editor.xml", "testBasicInputComponents-source.xml",
-            "testXPathSubstitution-transformed.xml");
-    }
-
-    @Test
-    public void testNamespaces() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        testTransformation("testNamespaces-editor.xml", "testNamespaces-source.xml", "testNamespaces-transformed.xml");
-    }
-
-    @Test
-    public void testConditions() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        MCRSessionMgr.getCurrentSession().put("switch", "on");
-        MCRSessionMgr.getCurrentSession().put("case", "2");
-        testTransformation("testConditions-editor.xml", "testBasicInputComponents-source.xml",
-            "testConditions-transformed.xml");
-    }
-
-    @Test
-    public void testI18N() throws IOException, TransformerException, JDOMException, SAXException,
-        JaxenException {
-        MCRSessionMgr.getCurrentSession().setCurrentLanguage("en");
-        testTransformation("testI18N-editor.xml", "testBasicInputComponents-source.xml", "testI18N-transformed-en.xml");
-        MCRSessionMgr.getCurrentSession().setCurrentLanguage("de");
-        testTransformation("testI18N-editor.xml", "testBasicInputComponents-source.xml", "testI18N-transformed-de.xml");
-    }
-
-    @Test
-    public void testLoadResources() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        MCRSessionMgr.getCurrentSession().put("genre", "article");
-        MCRSessionMgr.getCurrentSession().put("host", "journal");
-        testTransformation("testLoadResources-editor.xml", null, "testLoadResources-transformed.xml");
-    }
-
-    @Test
-    public void testValidation() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        MCREditorSession session = testTransformation("testValidation-editor.xml",
-            "testBasicInputComponents-source.xml", "testValidation-transformed1.xml");
-        assertTrue(session.getValidator().isValid());
-        session = testTransformation("testValidation-editor.xml", null, "testValidation-transformed2.xml");
-        assertFalse(session.getValidator().isValid());
-        testTransformation("testValidation-editor.xml", null, session, "testValidation-transformed3.xml");
-    }
-
-    @Test
-    public void testDefaultValue() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        MCREditorSession session = testTransformation("testDefaultValue-editor.xml", null,
-            "testDefaultValue-transformed1.xml");
-        assertEquals("true", session.getEditedXML().getRootElement().getAttributeValue("publish"));
-        session = testTransformation("testDefaultValue-editor.xml", "testDefaultValue-input.xml",
-            "testDefaultValue-transformed2.xml");
-        assertEquals("false", session.getEditedXML().getRootElement().getAttributeValue("publish"));
-    }
-
-    @Test
-    public void testSelect() throws IOException, TransformerException, JDOMException,
-        SAXException, JaxenException {
-        testTransformation("testSelect-editor.xml", "testSelect-source.xml", "testSelect-transformed.xml");
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> properties = super.getTestProperties();
-
-        properties.put("MCR.URIResolver.CachingResolver.Capacity", "100");
-        properties.put("MCR.URIResolver.CachingResolver.MaxAge", "3600000");
-
-        return properties;
+    class TestResult {
+        boolean result;
+        String message;
     }
 }

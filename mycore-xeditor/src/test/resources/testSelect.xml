@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$testID}" />
+      <xed:bind xpath="mods:mods">
+        <xed:bind xpath="mods:identifier/@type" default="doi">
+          <select>
+            <optgroup label="Work identifiers">
+              <option value="doi">DOI</option>
+              <option value="urn">URN</option>
+            </optgroup>
+            <optgroup label="Journal identifiers">
+              <option value="issn">ISSN</option>
+              <option value="zdb">ZDB ID</option>
+            </optgroup>
+            <option value="isbn">ISBN</option>
+          </select>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <test label="Empty source, default should set selected option">
+    <transform />
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <select name="type">
+          <optgroup label="Work identifiers">
+            <option value="doi" selected="selected">DOI</option>
+            <option value="urn">URN</option>
+          </optgroup>
+          <optgroup label="Journal identifiers">
+            <option value="issn">ISSN</option>
+            <option value="zdb">ZDB ID</option>
+          </optgroup>
+          <option value="isbn">ISBN</option>
+        </select>
+        <div style="visibility:hidden">
+          <input value="doi" name="_xed_default_/mods:mods/mods:identifier[1]/@type" type="hidden" />
+          <input value="1-5" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:identifier type="@@_type_@@=doi" />
+      </mods:mods>
+    </xml>
+  </test>
+
+  <test label="Source xml should set selected option">
+    <param name="testID">test</param>
+    <source id="test">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:identifier type="isbn">978-123-45-67890</mods:identifier>
+      </mods:mods>
+    </source>
+    <transform />
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <select name="type">
+          <optgroup label="Work identifiers">
+            <option value="doi">DOI</option>
+            <option value="urn">URN</option>
+          </optgroup>
+          <optgroup label="Journal identifiers">
+            <option value="issn">ISSN</option>
+            <option value="zdb">ZDB ID</option>
+          </optgroup>
+          <option value="isbn" selected="selected">ISBN</option>
+        </select>
+        <div style="visibility:hidden">
+          <input value="test" name="testID" type="hidden" />
+          <input value="doi" name="_xed_default_/mods:mods/mods:identifier[1]/@type" type="hidden" />
+          <input value="1-3" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:identifier type="@@_type_@@=isbn">978-123-45-67890</mods:identifier>
+      </mods:mods>
+    </xml>
+  </test>
+
+</test>

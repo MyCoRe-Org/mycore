@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test label="Testing namespaces">
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="mods:mods">
+        <xed:bind xpath="mods:titleInfo/mods:title">
+          <input type="text" />
+        </xed:bind>
+        <xed:bind xpath="mods:relatedItem/@xlink:href">
+          <input type="text" />
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <source id="input">
+    <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+      <mods:titleInfo>
+        <mods:title>Test</mods:title>
+      </mods:titleInfo>
+    </mods:mods>
+  </source>
+
+  <param name="key">input</param>
+  
+  <transform />
+
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <input name="mods_title" value="Test" type="text" />
+      <input name="xlink_href" value="" type="text" />
+      <div style="visibility:hidden">
+        <input value="input" name="key" type="hidden" />
+        <input value="1-5" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </html>
+  
+  <xml>
+    <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+      <mods:titleInfo>
+        <mods:title>@@_mods_title_@@=Test</mods:title>
+      </mods:titleInfo>
+      <mods:relatedItem xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="@@_xlink_href_@@=" />
+    </mods:mods>
+  </xml>
+
+</test>

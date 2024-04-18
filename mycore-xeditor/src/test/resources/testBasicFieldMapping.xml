@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$testID}" />
+
+      <xed:bind xpath="mods:mods">
+        <xed:bind xpath="mods:name">
+          <xed:bind xpath="mods:namePart[@type='given']">
+            <div>
+              <label for="given">Vorname:</label>
+              <input id="given" type="text" name="firstName" />
+            </div>
+          </xed:bind>
+          <xed:bind xpath="mods:namePart[@type='family']">
+            <div>
+              <label for="family">Nachname:</label>
+              <input id="family" type="text" name="lastName" />
+            </div>
+          </xed:bind>
+        </xed:bind>
+
+        <xed:bind xpath="mods:abstract">
+          <div>
+            <label for="abstract">Abstract:</label>
+            <textarea id="abstract" />
+          </div>
+        </xed:bind>
+
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <test label="Testing basic XED-to-HTML transformation with empty source xml">
+
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <div>
+          <label for="given">Vorname:</label>
+          <input id="given" type="text" name="firstName" value="" />
+        </div>
+        <div>
+          <label for="family">Nachname:</label>
+          <input id="family" type="text" name="lastName" value="" />
+        </div>
+        <div>
+          <label for="abstract">Abstract:</label>
+          <textarea id="abstract" name="mods_abstract" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="1-9" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:name>
+          <mods:namePart type="given">@@_firstName_@@=</mods:namePart>
+          <mods:namePart type="family">@@_lastName_@@=</mods:namePart>
+        </mods:name>
+        <mods:abstract>@@_mods_abstract_@@=</mods:abstract>
+      </mods:mods>
+    </xml>
+
+  </test>
+
+  <test label="Testing basic XED-to-HTML transformation with source XML given">
+
+    <source id="testBasic">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:name>
+          <mods:namePart type="given">John</mods:namePart>
+          <mods:namePart type="family">Doe</mods:namePart>
+        </mods:name>
+        <mods:abstract>This is the abstract.</mods:abstract>
+        <mods:note>This is a note</mods:note>
+      </mods:mods>
+    </source>
+    
+    <param name="testID">testBasic</param>
+
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <div>
+          <label for="given">Vorname:</label>
+          <input id="given" type="text" name="firstName" value="John" />
+        </div>
+        <div>
+          <label for="family">Nachname:</label>
+          <input id="family" type="text" name="lastName" value="Doe" />
+        </div>
+        <div>
+          <label for="abstract">Abstract:</label>
+          <textarea id="abstract" name="mods_abstract">This is the abstract.</textarea>
+        </div>
+        <div style="visibility:hidden">
+          <input value="testBasic" name="testID" type="hidden" />
+          <input value="1-5" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:name>
+          <mods:namePart type="given">@@_firstName_@@=John</mods:namePart>
+          <mods:namePart type="family">@@_lastName_@@=Doe</mods:namePart>
+        </mods:name>
+        <mods:abstract>@@_mods_abstract_@@=This is the abstract.</mods:abstract>
+        <mods:note>This is a note</mods:note>
+      </mods:mods>
+    </xml>
+
+  </test>
+
+</test>

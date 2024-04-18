@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+  
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="document">
+        <xed:if test="$xed-validation-failed">
+          <h3>Fehlerhafte Eingabe:</h3>
+          <xed:display-validation-messages />
+        </xed:if>
+        <xed:bind xpath="title">
+          <div class="form-group {$xed-validation-marker}">
+            <xed:display-validation-message />
+            <input type="text" />
+            <xed:validate display="here local global" required="true" xsl="contains(.,'Utopie')">
+              Titel erforderlich, muss utopisch sein!
+            </xed:validate>
+          </div>
+        </xed:bind>
+        <xed:bind xpath="year">
+          <div class="form-group {$xed-validation-marker}">
+            <input type="text" />
+            <xed:validate display="here" xsl="string-length(.) = 4"> <!-- since not required, will only check if input exists -->
+              Jahr vierstellig eingeben!
+            </xed:validate>
+          </div>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <test label="Validate starting with empty form">
+  
+    <transform />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <div class="form-group ">
+          <input type="text" name="title" value="" />
+        </div>
+        <div class="form-group ">
+          <input type="text" name="year" value="" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="1-6" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+    
+    <isValid>false</isValid>
+  
+    <xml>
+      <document>
+        <title></title>
+        <year></year>
+      </document>
+    </xml>
+    
+    <transformAgain />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <h3>Fehlerhafte Eingabe:</h3>
+        <span class="help-inline">Titel erforderlich, muss utopisch sein!</span>
+        <div class="form-group mcr-invalid">
+          <span class="help-inline">Titel erforderlich, muss utopisch sein!</span>
+          <input name="title" value="" type="text" />
+          <span class="help-inline">Titel erforderlich, muss utopisch sein!</span>
+        </div>
+        <div class="form-group ">
+          <input name="year" value="" type="text" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="1-9" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+  </test>
+  
+  <test label="Validate with input from source xml">
+  
+    <source id="test">
+      <document>
+        <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
+      </document>
+    </source>
+    
+    <param name="key">test</param>
+    
+    <transform />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <div class="form-group ">
+          <input type="text" name="title" value="Der neue XEditor - Utopie oder Wahnsinn?" />
+        </div>
+        <div class="form-group ">
+          <input type="text" name="year" value="" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="test" name="key" type="hidden" />
+          <input value="1-5" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+
+    <isValid>true</isValid>
+    
+    <xml>    
+      <document>
+        <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
+        <year></year>
+      </document>
+    </xml>
+    
+  </test>
+  
+</test>

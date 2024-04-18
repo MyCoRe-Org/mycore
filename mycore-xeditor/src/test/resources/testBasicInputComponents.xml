@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test label="Testing basic input components">
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <h1>Sample XEditor form</h1>
+      <xed:source uri="session:{$testID}" />
+      <xed:bind xpath="document">
+        <xed:bind xpath="title">
+          <input type="text" />
+        </xed:bind>
+        <xed:bind xpath="author">
+          <xed:bind xpath="firstName">
+            <input id="firstName" />
+          </xed:bind>
+          <xed:bind xpath="lastName">
+            <input type="text" id="lastName" />
+          </xed:bind>
+        </xed:bind>
+        <xed:bind xpath="abstract">
+          <textarea />
+        </xed:bind>
+        <xed:bind xpath="type">
+          <select id="type">
+            <optgroup label="Publikation">
+              <option value="journal">Zeitschrift</option>
+              <option value="article">Artikel</option>
+            </optgroup>
+            <optgroup label="Sonstiges">
+              <option value="video">Video</option>
+            </optgroup>
+          </select>
+        </xed:bind>
+        <xed:bind xpath="service" initially="urn">
+          <input id="oai" value="oai" type="checkbox" />
+          <input id="urn" value="urn" type="checkbox" />
+        </xed:bind>
+        <xed:bind xpath="relatedItem[@type='host']">
+          <xed:bind xpath="titleInfo[nonSort='The'][title='international journal of repository software']" />
+          <xed:bind xpath="part[detail[@type='volume']/number='24'][detail[@type='issue']/number='2']" />
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <test label="Testing basic XED-to-HTML transformation with empty source xml">
+
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <h1>Sample XEditor form</h1>
+        <input name="title" value="" type="text" />
+        <input name="firstName" value="" id="firstName" />
+        <input name="lastName" value="" type="text" id="lastName" />
+        <textarea name="abstract" />
+        <select name="type" id="type">
+          <optgroup label="Publikation">
+            <option value="journal">Zeitschrift</option>
+            <option value="article">Artikel</option>
+          </optgroup>
+          <optgroup label="Sonstiges">
+            <option value="video">Video</option>
+          </optgroup>
+        </select>
+        <input name="service" id="oai" value="oai" type="checkbox" />
+        <input name="service" id="urn" value="urn" type="checkbox" checked="checked" />
+        <div style="visibility:hidden">
+          <input value="1-18" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+    <xml>
+      <document>
+        <title>@@_title_@@=</title>
+        <author>
+          <firstName>@@_firstName_@@=</firstName>
+          <lastName>@@_lastName_@@=</lastName>
+        </author>
+        <abstract>@@_abstract_@@=</abstract>
+        <type>@@_type_@@=</type>
+        <service>@@_service_@@=urn</service>
+        <relatedItem type="host">
+          <titleInfo>
+            <nonSort>The</nonSort>
+            <title>international journal of repository software</title>
+          </titleInfo>
+          <part>
+            <detail type="volume">
+              <number>24</number>
+            </detail>
+            <detail type="issue">
+              <number>2</number>
+            </detail>
+          </part>
+        </relatedItem>
+      </document>
+    </xml>
+
+  </test>
+
+  <test label="Testing basic XED-to-HTML transformation with source XML given">
+
+    <source id="testBasic">
+      <document>
+        <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
+        <author>
+          <firstName>Frank</firstName>
+          <lastName>Lützenkirchen</lastName>
+        </author>
+        <abstract>
+          Der XEditor ermöglicht es, HTML-Formulare zur 
+          Bearbeitung von XML-Dokumenten zu verwenden.
+        </abstract>
+        <type>article</type>
+        <service>oai</service>
+        <service>urn</service>
+      </document>
+    </source>
+    
+    <param name="testID">testBasic</param>
+
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <h1>Sample XEditor form</h1>
+        <input name="title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
+        <input name="firstName" value="Frank" id="firstName" />
+        <input name="lastName" value="Lützenkirchen" type="text" id="lastName" />
+        <textarea name="abstract">Der XEditor ermöglicht es, HTML-Formulare zur
+          Bearbeitung von XML-Dokumenten zu verwenden.
+        </textarea>
+        <select name="type" id="type">
+          <optgroup label="Publikation">
+            <option value="journal">Zeitschrift</option>
+            <option selected="selected" value="article">Artikel</option>
+          </optgroup>
+          <optgroup label="Sonstiges">
+            <option value="video">Video</option>
+          </optgroup>
+        </select>
+        <input name="service" checked="checked" id="oai" value="oai" type="checkbox" />
+        <input name="service" checked="checked" id="urn" value="urn" type="checkbox" />
+        <div style="visibility:hidden">
+          <input value="testBasic" name="testID" type="hidden" />
+          <input value="1-12" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+    <xml>
+      <document>
+        <title>@@_title_@@=Der neue XEditor - Utopie oder Wahnsinn?</title>
+        <author>
+          <firstName>@@_firstName_@@=Frank</firstName>
+          <lastName>@@_lastName_@@=Lützenkirchen</lastName>
+        </author>
+        <abstract>@@_abstract_@@=Der XEditor ermöglicht es, HTML-Formulare zur
+                Bearbeitung von XML-Dokumenten zu verwenden.</abstract>
+        <type>@@_type_@@=article</type>
+        <service>@@_service_@@=oai</service>
+        <service>@@_service_@@=urn</service>
+        <relatedItem type="host">
+          <titleInfo>
+            <nonSort>The</nonSort>
+            <title>international journal of repository software</title>
+          </titleInfo>
+          <part>
+            <detail type="volume">
+              <number>24</number>
+            </detail>
+            <detail type="issue">
+              <number>2</number>
+            </detail>
+          </part>
+        </relatedItem>
+      </document>
+    </xml>
+
+  </test>
+
+</test>

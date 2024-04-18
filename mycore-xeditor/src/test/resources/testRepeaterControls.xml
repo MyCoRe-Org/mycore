@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="/document">
+        <xed:repeat xpath="service">
+          <div>
+            <input type="text" />
+          </div>
+        </xed:repeat>
+        <xed:repeat xpath="name[@type='personal']" min="3">
+          <div>
+            <input type="text" />
+          </div>
+          <xed:controls>up down append</xed:controls>
+        </xed:repeat>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <source id="test">
+    <document>
+      <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
+      <author>
+        <firstName>Frank</firstName>
+        <lastName>Lützenkirchen</lastName>
+      </author>
+      <abstract>
+        Der XEditor ermöglicht es, HTML-Formulare zur 
+        Bearbeitung von XML-Dokumenten zu verwenden.
+      </abstract>
+      <type>article</type>
+      <service>oai</service>
+      <service>urn</service>
+    </document>
+  </source>
+  
+  <param name="key">test</param>
+
+  <transform />
+  
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <a id="rep-1" />
+      <div>
+        <input name="service" value="oai" type="text" />
+      </div>
+      <a id="rep-2" />
+      <div>
+        <input name="service_1" value="urn" type="text" />
+      </div>
+      <a id="rep-3" />
+      <div>
+        <input name="name" value="" type="text" />
+      </div>
+      <button name="_xed_submit_down:/document|1|build|name[(@type = &quot;personal&quot;)]|rep-3" class="btn btn-secondary" type="submit">
+        <i class="fas fa-arrow-down" />
+      </button>
+      <a id="rep-4" />
+      <div>
+        <input name="name_2" value="" type="text" />
+      </div>
+      <button name="_xed_submit_up:/document|1|build|name[(@type = &quot;personal&quot;)]|rep-4" class="btn btn-secondary" type="submit">
+        <i class="fas fa-arrow-up" />
+      </button>
+      <button name="_xed_submit_down:/document|2|build|name[(@type = &quot;personal&quot;)]|rep-4" class="btn btn-secondary" type="submit">
+        <i class="fas fa-arrow-down" />
+      </button>
+      <a id="rep-5" />
+      <div>
+        <input name="name_3" value="" type="text" />
+      </div>
+      <button name="_xed_submit_up:/document|2|build|name[(@type = &quot;personal&quot;)]|rep-5" class="btn btn-secondary" type="submit">
+        <i class="fas fa-arrow-up" />
+      </button>
+      <button name="_xed_submit_append:/document|3|build|name[(@type = &quot;personal&quot;)]|rep-5" class="btn btn-secondary" type="submit">
+        <i class="fas fa-plus" />
+      </button>
+      <div style="visibility:hidden">
+        <input value="test" name="key" type="hidden" />
+        <input value="1-10" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </html>
+
+</test>

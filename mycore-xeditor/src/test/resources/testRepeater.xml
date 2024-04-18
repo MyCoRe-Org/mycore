@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="/mods:mods">
+        <xed:repeat xpath="mods:titleInfo">
+          <xed:bind xpath="mods:title">
+            <div>
+              <input type="text" />
+            </div>
+          </xed:bind>
+        </xed:repeat>
+        <xed:repeat xpath="mods:name[@type='personal']" min="3">
+          <div>
+            <xed:bind xpath="mods:namePart[@type='given']">
+              <input type="text" name="firstName" />
+            </xed:bind>
+            <xed:bind xpath="mods:namePart[@type='family']">
+              <input type="text" name="lastName" />
+            </xed:bind>
+            <xed:repeat xpath="mods:role/mods:roleTerm" min="2">
+              <input type="text" />
+            </xed:repeat>
+          </div>
+        </xed:repeat>
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <test>
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <a id="rep-1" />
+        <div>
+          <input type="text" name="mods_title" value="" />
+        </div>
+        <a id="rep-2" />
+        <div>
+          <input type="text" name="firstName" value="" />
+          <input type="text" name="lastName" value="" />
+          <a id="rep-3" />
+          <input type="text" name="mods_roleTerm" value="" />
+          <a id="rep-4" />
+          <input type="text" name="mods_roleTerm_1" value="" />
+        </div>
+        <a id="rep-5" />
+        <div>
+          <input type="text" name="firstName_2" value="" />
+          <input type="text" name="lastName_3" value="" />
+          <a id="rep-6" />
+          <input type="text" name="mods_roleTerm_4" value="" />
+          <a id="rep-7" />
+          <input type="text" name="mods_roleTerm_5" value="" />
+        </div>
+        <a id="rep-8" />
+        <div>
+          <input type="text" name="firstName_6" value="" />
+          <input type="text" name="lastName_7" value="" />
+          <a id="rep-9" />
+          <input type="text" name="mods_roleTerm_8" value="" />
+          <a id="rep-10" />
+          <input type="text" name="mods_roleTerm_9" value="" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="1-32" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:titleInfo>
+          <mods:title>@@_mods_title_@@=</mods:title>
+        </mods:titleInfo>
+        <mods:name type="personal">
+          <mods:namePart type="given">@@_firstName_@@=</mods:namePart>
+          <mods:namePart type="family">@@_lastName_@@=</mods:namePart>
+          <mods:role>
+            <mods:roleTerm>@@_mods_roleTerm_@@=</mods:roleTerm>
+            <mods:roleTerm>@@_mods_roleTerm_1_@@=</mods:roleTerm>
+          </mods:role>
+        </mods:name>
+        <mods:name type="personal">
+          <mods:namePart type="given">@@_firstName_2_@@=</mods:namePart>
+          <mods:namePart type="family">@@_lastName_3_@@=</mods:namePart>
+          <mods:role>
+            <mods:roleTerm>@@_mods_roleTerm_4_@@=</mods:roleTerm>
+            <mods:roleTerm>@@_mods_roleTerm_5_@@=</mods:roleTerm>
+          </mods:role>
+        </mods:name>
+        <mods:name type="personal">
+          <mods:namePart type="given">@@_firstName_6_@@=</mods:namePart>
+          <mods:namePart type="family">@@_lastName_7_@@=</mods:namePart>
+          <mods:role>
+            <mods:roleTerm>@@_mods_roleTerm_8_@@=</mods:roleTerm>
+            <mods:roleTerm>@@_mods_roleTerm_9_@@=</mods:roleTerm>
+          </mods:role>
+        </mods:name>
+      </mods:mods>
+    </xml>
+
+  </test>
+
+  <test>
+
+    <source id="testRepeat">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:titleInfo>
+          <mods:title>MyCoRe leicht gemacht</mods:title>
+        </mods:titleInfo>
+        <mods:titleInfo>
+          <mods:title>MyCoRe made simple</mods:title>
+        </mods:titleInfo>
+        <mods:name type="personal">
+          <mods:namePart type="given">Frank</mods:namePart>
+          <mods:namePart type="family">Lützenkirchen</mods:namePart>
+        </mods:name>
+        <mods:name type="personal">
+          <mods:namePart type="given">Kathleen</mods:namePart>
+          <mods:namePart type="family">Neumann</mods:namePart>
+        </mods:name>
+      </mods:mods>
+    </source>
+
+    <param name="key">testRepeat</param>
+
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <a id="rep-1" />
+        <div>
+          <input type="text" name="mods_title" value="MyCoRe leicht gemacht" />
+        </div>
+        <a id="rep-2" />
+        <div>
+          <input type="text" name="mods_title_1" value="MyCoRe made simple" />
+        </div>
+        <a id="rep-3" />
+        <div>
+          <input type="text" name="firstName" value="Frank" />
+          <input type="text" name="lastName" value="Lützenkirchen" />
+          <a id="rep-4" />
+          <input type="text" name="mods_roleTerm" value="" />
+          <a id="rep-5" />
+          <input type="text" name="mods_roleTerm_2" value="" />
+        </div>
+        <a id="rep-6" />
+        <div>
+          <input type="text" name="firstName_3" value="Kathleen" />
+          <input type="text" name="lastName_4" value="Neumann" />
+          <a id="rep-7" />
+          <input type="text" name="mods_roleTerm_5" value="" />
+          <a id="rep-8" />
+          <input type="text" name="mods_roleTerm_6" value="" />
+        </div>
+        <a id="rep-9" />
+        <div>
+          <input type="text" name="firstName_7" value="" />
+          <input type="text" name="lastName_8" value="" />
+          <a id="rep-10" />
+          <input type="text" name="mods_roleTerm_9" value="" />
+          <a id="rep-11" />
+          <input type="text" name="mods_roleTerm_10" value="" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="testRepeat" name="key" type="hidden" />
+          <input value="1-25" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:titleInfo>
+          <mods:title>@@_mods_title_@@=MyCoRe leicht gemacht</mods:title>
+        </mods:titleInfo>
+        <mods:titleInfo>
+          <mods:title>@@_mods_title_1_@@=MyCoRe made simple</mods:title>
+        </mods:titleInfo>
+        <mods:name type="personal">
+          <mods:namePart type="given">@@_firstName_@@=Frank</mods:namePart>
+          <mods:namePart type="family">@@_lastName_@@=Lützenkirchen</mods:namePart>
+          <mods:role>
+            <mods:roleTerm>@@_mods_roleTerm_@@=</mods:roleTerm>
+            <mods:roleTerm>@@_mods_roleTerm_2_@@=</mods:roleTerm>
+          </mods:role>
+        </mods:name>
+        <mods:name type="personal">
+          <mods:namePart type="given">@@_firstName_3_@@=Kathleen</mods:namePart>
+          <mods:namePart type="family">@@_lastName_4_@@=Neumann</mods:namePart>
+          <mods:role>
+            <mods:roleTerm>@@_mods_roleTerm_5_@@=</mods:roleTerm>
+            <mods:roleTerm>@@_mods_roleTerm_6_@@=</mods:roleTerm>
+          </mods:role>
+        </mods:name>
+        <mods:name type="personal">
+          <mods:namePart type="given">@@_firstName_7_@@=</mods:namePart>
+          <mods:namePart type="family">@@_lastName_8_@@=</mods:namePart>
+          <mods:role>
+            <mods:roleTerm>@@_mods_roleTerm_9_@@=</mods:roleTerm>
+            <mods:roleTerm>@@_mods_roleTerm_10_@@=</mods:roleTerm>
+          </mods:role>
+        </mods:name>
+      </mods:mods>
+    </xml>
+
+  </test>
+
+</test>

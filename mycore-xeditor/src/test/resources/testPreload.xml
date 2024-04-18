@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <div xmlns:xed="http://www.mycore.de/xeditor">
+    
+      <xed:template id="field.title">
+        <xed:bind xpath="title">
+          <label for="title">Titel:</label>
+          <input id="title" />
+        </xed:bind>
+      </xed:template>
+      
+      <xed:template id="field.author">
+        <xed:bind xpath="author">
+          <label for="author">Autor:</label>
+          <input id="author" />
+        </xed:bind>
+      </xed:template>
+    
+      <xed:template id="field.place">
+        <xed:bind xpath="place">
+          <label for="place">Ort:</label>
+          <input id="place" />
+        </xed:bind>
+      </xed:template>
+    
+      <xed:template id="field.publisher">
+        <xed:bind xpath="publisher">
+          <label for="publisher">Verlag:</label>
+          <input id="publisher" />
+        </xed:bind>
+      </xed:template>
+    
+      <xed:template id="panel.origin">
+        <xed:bind xpath="origin">
+          <xed:include ref="field.place" />
+          <xed:include ref="field.publisher" />
+        </xed:bind>
+      </xed:template>
+    
+      <xed:form>
+        <xed:preload uri="resource:testPreload.xml" />
+        <xed:preload uri="resource:testPreload-includes.xml" />
+    
+        <xed:bind xpath="/document">
+          <xed:include ref="field.title" />
+          <xed:include ref="field.author" />
+          <xed:include ref="panel.origin" />
+        </xed:bind>    
+    
+      </xed:form>
+    
+    </div>
+  </xed>
+  
+  <transform />
+  
+  <html>
+    <div>
+
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+    
+        <label for="title">Titel:</label>
+        <input name="title" value="" id="title" />
+    
+        <label for="author.first">Vorname:</label>
+        <input name="first" value="" id="author.first" />
+    
+        <label for="author.last">Nachname:</label>
+        <input name="Last" value="" id="author.last" />
+    
+        <label for="publisher">Verlag:</label>
+        <input name="publisher" value="" id="publisher" />
+    
+        <label for="edition">Auflage:</label>
+        <input name="edition" value="" id="edition" />
+    
+        <label for="year">Erscheinungsjahr:</label>
+        <input name="year" value="" id="year" />
+    
+        <div style="visibility:hidden">
+          <input value="1-16" name="_xed_session" type="hidden" />
+        </div>
+    
+      </form>
+
+    </div>
+  </html>
+  
+</test>

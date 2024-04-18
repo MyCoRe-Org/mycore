@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="/document">
+        <xed:bind xpath="title">
+          <div>
+            Diese Publikation mit dem Titel "<xed:output />" dürfen Sie als <xed:output value="$SomeUser" /> bearbeiten.
+            <input type="text" size="{string-length(.)}" />
+          </div>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <source id="test">
+    <document>
+      <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
+      <author>
+        <firstName>Frank</firstName>
+        <lastName>Lützenkirchen</lastName>
+      </author>
+    </document>
+  </source>
+  
+  <param name="SomeUser">John Doe</param>
+  <param name="key">test</param>
+  
+  <transform />
+  
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <div>
+        Diese Publikation mit dem Titel "
+        Der neue XEditor - Utopie oder Wahnsinn?
+        " dürfen Sie als 
+        John Doe 
+        bearbeiten.
+        <input name="title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" size="40" />
+      </div>
+      <div style="visibility:hidden">
+        <input value="John Doe" name="SomeUser" type="hidden" />
+        <input value="test" name="key" type="hidden" />
+        <input value="1-3" name="_xed_session" type="hidden" />
+      </div>
+      </form>
+  </html>
+  
+</test>

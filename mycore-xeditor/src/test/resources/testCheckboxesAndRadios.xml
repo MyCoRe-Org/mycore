@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$id}" />
+      <xed:bind xpath="reise">
+      
+        <xed:bind xpath="leistung">
+          <div>
+            <label>Hotel</label>
+            <input type="checkbox" value="hotel" />
+          </div>
+          <div>
+            <label>Flug</label>
+            <input type="checkbox" value="plane" />
+          </div>
+          <div>
+            <label>Reiserücktrittversicherung</label>
+            <input type="checkbox" value="insurance" />
+          </div>
+        </xed:bind>
+        
+        <xed:bind xpath="@ziel" default="america">
+          <div>
+            <label>Europa, Mittlerer Osten, Afrika</label>
+            <input type="radio" value="emea" />
+          </div>
+          <div>
+            <label>Nord- und Südamerika</label>
+            <input type="radio" value="america" />
+          </div>
+        </xed:bind>
+        
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <test label="No source XML, all should be unchecked, radio has default">
+
+    <transform />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <div>
+          <label>Hotel</label>
+          <input type="checkbox" value="hotel" name="leistung" />
+        </div>
+        <div>
+          <label>Flug</label>
+          <input type="checkbox" value="plane" name="leistung" />
+        </div>
+        <div>
+          <label>Reiserücktrittversicherung</label>
+          <input type="checkbox" value="insurance" name="leistung" />
+        </div>
+        <div>
+          <label>Europa, Mittlerer Osten, Afrika</label>
+          <input type="radio" value="emea" name="ziel" />
+        </div>
+        <div>
+          <label>Nord- und Südamerika</label>
+          <input type="radio" value="america" name="ziel" checked="checked" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="america" name="_xed_default_/reise/@ziel" type="hidden" />
+          <input value="1-7" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+    <xml>
+      <reise ziel="@@_ziel_@@=america">
+        <leistung>@@_leistung_@@=</leistung>
+      </reise>
+    </xml>
+
+  </test>
+
+  <test label="With source XML, some should be checked">
+
+    <source id="test">
+      <reise ziel="emea">
+        <leistung>hotel</leistung>
+        <leistung>insurance</leistung>
+      </reise>
+    </source>
+
+    <param name="id">test</param>
+
+    <transform />
+
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <div>
+          <label>Hotel</label>
+          <input type="checkbox" value="hotel" name="leistung" checked="checked" />
+        </div>
+        <div>
+          <label>Flug</label>
+          <input type="checkbox" value="plane" name="leistung" />
+        </div>
+        <div>
+          <label>Reiserücktrittversicherung</label>
+          <input type="checkbox" value="insurance" name="leistung" checked="checked" />
+        </div>
+        <div>
+          <label>Europa, Mittlerer Osten, Afrika</label>
+          <input type="radio" value="emea" name="ziel" checked="checked" />
+        </div>
+        <div>
+          <label>Nord- und Südamerika</label>
+          <input type="radio" value="america" name="ziel" />
+        </div>
+        <div style="visibility:hidden">
+          <input value="test" name="id" type="hidden" />
+          <input value="america" name="_xed_default_/reise/@ziel" type="hidden" />
+          <input value="1-5" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+  
+    <xml>
+      <reise ziel="@@_ziel_@@=emea">
+        <leistung>@@_leistung_@@=hotel</leistung>
+        <leistung>@@_leistung_@@=insurance</leistung>
+      </reise>
+    </xml>
+
+  </test>
+
+</test>
