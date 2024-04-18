@@ -37,9 +37,20 @@ public class MCRTranslationTest extends MCRTestCase {
         return testProperties;
     }
 
-    @Before
-    public void reInit(){
+    /**
+     * use with care: only required for Junit tests if properties changes.
+     *
+     * <pre>
+     * MCR.Metadata.Languages=…
+     * </pre>
+     */
+    public static void reInit() {
         MCRTranslation.reInit();
+    }
+
+    @Before
+    public void cleanUp() {
+        reInit();
     }
 
     @Test

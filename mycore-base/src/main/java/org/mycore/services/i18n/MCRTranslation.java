@@ -472,7 +472,7 @@ public class MCRTranslation {
      * MCR.Metadata.Languages=…
      * </pre>
      */
-    public static void reInit() {
+    static void reInit() {
         synchronized (AVAILABLE_LANGUAGES) {
             Set<String> newLanguages = loadAvailableLanguages();
             AVAILABLE_LANGUAGES.clear();

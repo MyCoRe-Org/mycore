@@ -35,6 +35,7 @@ import com.google.gson.JsonParser;
 
 import jakarta.ws.rs.core.MediaType;
 import org.mycore.services.i18n.MCRTranslation;
+import org.mycore.services.i18n.MCRTranslationTest;
 
 public class MCRLocaleResourceTest extends MCRTestCase {
 
@@ -47,7 +48,7 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         jersey.setUp(Set.of(
             MCRSessionHookFilter.class,
             MCRLocaleResource.class));
-        MCRTranslation.reInit();
+        MCRTranslationTest.reInit();
     }
 
     @After

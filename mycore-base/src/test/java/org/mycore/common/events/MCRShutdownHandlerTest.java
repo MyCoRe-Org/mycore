@@ -21,6 +21,8 @@ package org.mycore.common.events;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Optional;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.After;
@@ -28,6 +30,61 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class MCRShutdownHandlerTest {
+    private MCRShutdownHandlerState mark;
+
+    /**
+     * The MCRShutdownHandlerState class represents the state of a shutdown handler.
+     * It only used by {@link #mark} and {@link #resetCloseables()}.
+     */
+    private record MCRShutdownHandlerState(boolean shuttingDown,
+        ConcurrentSkipListSet<MCRShutdownHandler.Closeable> requests) {
+
+        /**
+         * Constructs an instance of MCRShutdownHandlerState with the given parameters.
+         * The requests field is initialized as a new ConcurrentSkipListSet containing the provided Closeables.
+         * @param shuttingDown A boolean indicating whether the system is currently in the process of shutting down.
+         * @param requests A set of Closeable objects representing the current shutdown requests.
+         */
+        MCRShutdownHandlerState {
+            requests = new ConcurrentSkipListSet<>(requests);
+        }
+    }
+
+    /**
+     * Marks the current state of the shutdown handler.
+     * This method saves the current shuttingDown value and {@link MCRShutdownHandler.Closeable} requests fields.
+     * <p>
+     * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
+     */
+    @Before
+    public void saveClosables() {
+        this.mark = new MCRShutdownHandlerState(MCRShutdownHandler.getInstance().shuttingDown,
+            MCRShutdownHandler.getInstance().requests);
+    }
+
+    /**
+     * Resets the {@link MCRShutdownHandler.Closeable} requests in the shutdown handler.
+     * This method checks if there is a previous state ({@link #mark()}) and, if present, resets the shuttingDown
+     * and requests fields to their values from the mark.
+     * The operation is performed under a write lock to ensure thread safety.
+     * <p>
+     * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
+     */
+    @After
+    public void resetCloseables() {
+        Optional.ofNullable(mark)
+            .ifPresent(state -> {
+                MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
+                shutdownHandler.shutdownLock.writeLock().lock();
+                try {
+                    shutdownHandler.shuttingDown = state.shuttingDown;
+                    shutdownHandler.requests.clear();
+                    shutdownHandler.requests.addAll(state.requests);
+                } finally {
+                    shutdownHandler.shutdownLock.writeLock().unlock();
+                }
+            });
+    }
 
     @Test
     public void runCloseables() {
@@ -97,16 +154,6 @@ public class MCRShutdownHandlerTest {
         shutdownHandler.addCloseable(hiPrio);
         shutdownHandler.runClosables();
         assertTrue(hiClosed.get() && lowClosed.get());
-    }
-
-    @Before
-    public void saveCloseables() {
-        MCRShutdownHandler.getInstance().mark();
-    }
-
-    @After
-    public void resetCloseables() {
-        MCRShutdownHandler.getInstance().resetCloseables();
     }
 
 }

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -57,16 +56,15 @@ public class MCRShutdownHandler {
 
     private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
 
-    private final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
+    final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
 
-    private final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
+    final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
-    private volatile boolean shuttingDown = false;
+    volatile boolean shuttingDown = false;
 
     boolean isWebAppRunning;
 
     ClassLoaderLeakPreventor leakPreventor;
-    private MCRShutdownHandlerState mark;
 
     private MCRShutdownHandler() {
         isWebAppRunning = false;
@@ -162,38 +160,6 @@ public class MCRShutdownHandler {
     }
 
     /**
-     * Marks the current state of the shutdown handler.
-     * This method saves the current shuttingDown value and {@link Closeable} requests fields.
-     * <p>
-     * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
-     */
-    protected void mark() {
-        this.mark = new MCRShutdownHandlerState(shuttingDown, requests);
-    }
-
-    /**
-     * Resets the {@link Closeable} requests in the shutdown handler.
-     * This method checks if there is a previous state ({@link #mark()}) and, if present, resets the shuttingDown
-     * and requests fields to their values from the mark.
-     * The operation is performed under a write lock to ensure thread safety.
-     * <p>
-     * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
-     */
-    protected void resetCloseables() {
-        Optional.ofNullable(mark)
-            .ifPresent(state -> {
-                shutdownLock.writeLock().lock();
-                try {
-                    this.shuttingDown = state.shuttingDown;
-                    this.requests.clear();
-                    this.requests.addAll(state.requests);
-                } finally {
-                    shutdownLock.writeLock().unlock();
-                }
-            });
-    }
-
-    /**
      * Object is cleanly closeable via <code>close()</code>-call.
      *
      * @author Thomas Scheffler (yagee)
@@ -234,24 +200,6 @@ public class MCRShutdownHandler {
             return Comparator.comparingInt(Closeable::getPriority)
                 .thenComparingLong(Closeable::hashCode)
                 .compare(other, this);
-        }
-    }
-
-
-    /**
-     * The MCRShutdownHandlerState class represents the state of a shutdown handler.
-     * It only used by {@link #mark} and {@link #resetCloseables()}.
-     */
-    private record MCRShutdownHandlerState(boolean shuttingDown, ConcurrentSkipListSet<Closeable> requests) {
-
-        /**
-         * Constructs an instance of MCRShutdownHandlerState with the given parameters. 
-         * The requests field is initialized as a new ConcurrentSkipListSet containing the provided Closeables.
-         * @param shuttingDown A boolean indicating whether the system is currently in the process of shutting down.
-         * @param requests A set of Closeable objects representing the current shutdown requests.
-         */
-        MCRShutdownHandlerState {
-            requests = new ConcurrentSkipListSet<>(requests);
         }
     }
 
