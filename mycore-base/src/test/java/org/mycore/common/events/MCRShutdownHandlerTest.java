@@ -33,24 +33,6 @@ public class MCRShutdownHandlerTest {
     private MCRShutdownHandlerState mark;
 
     /**
-     * The MCRShutdownHandlerState class represents the state of a shutdown handler.
-     * It only used by {@link #mark} and {@link #resetCloseables()}.
-     */
-    private record MCRShutdownHandlerState(boolean shuttingDown,
-        ConcurrentSkipListSet<MCRShutdownHandler.Closeable> requests) {
-
-        /**
-         * Constructs an instance of MCRShutdownHandlerState with the given parameters.
-         * The requests field is initialized as a new ConcurrentSkipListSet containing the provided Closeables.
-         * @param shuttingDown A boolean indicating whether the system is currently in the process of shutting down.
-         * @param requests A set of Closeable objects representing the current shutdown requests.
-         */
-        MCRShutdownHandlerState {
-            requests = new ConcurrentSkipListSet<>(requests);
-        }
-    }
-
-    /**
      * Marks the current state of the shutdown handler.
      * This method saves the current shuttingDown value and {@link MCRShutdownHandler.Closeable} requests fields.
      * <p>
@@ -154,6 +136,24 @@ public class MCRShutdownHandlerTest {
         shutdownHandler.addCloseable(hiPrio);
         shutdownHandler.runClosables();
         assertTrue(hiClosed.get() && lowClosed.get());
+    }
+
+    /**
+     * The MCRShutdownHandlerState class represents the state of a shutdown handler.
+     * It only used by {@link #mark} and {@link #resetCloseables()}.
+     */
+    private record MCRShutdownHandlerState(boolean shuttingDown,
+        ConcurrentSkipListSet<MCRShutdownHandler.Closeable> requests) {
+
+        /**
+         * Constructs an instance of MCRShutdownHandlerState with the given parameters.
+         * The requests field is initialized as a new ConcurrentSkipListSet containing the provided Closeables.
+         * @param shuttingDown A boolean indicating whether the system is currently in the process of shutting down.
+         * @param requests A set of Closeable objects representing the current shutdown requests.
+         */
+        MCRShutdownHandlerState {
+            requests = new ConcurrentSkipListSet<>(requests);
+        }
     }
 
 }
