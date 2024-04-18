@@ -152,7 +152,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     }
 
     public synchronized void reload() {
-        String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
+        String pattern = MCRConfiguration2.getStringOrThrow("MCR.Metadata.ObjectID.NumberPattern");
         defaultLayout = pattern.length() - 4 + "-2-2";
 
         String base = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Store.BaseDir");
