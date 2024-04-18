@@ -169,8 +169,9 @@
 
   <xsl:template match="*" mode="xeditor">
     <xsl:copy>
-      <xsl:apply-templates select="." mode="add-attributes" />
-      <xsl:apply-templates select="@*|node()" mode="xeditor" />
+      <xsl:apply-templates select="@*" mode="xeditor" />
+      <xsl:apply-templates select="." mode="add-attributes" /> <!-- force overwrite -->
+      <xsl:apply-templates select="node()" mode="xeditor" />
       <xsl:apply-templates select="." mode="add-content" />
     </xsl:copy>
   </xsl:template>
@@ -201,53 +202,26 @@
   <xsl:template
     match="input[contains(',,text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week,',concat(',',@type,','))]"
     mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
-    </xsl:attribute>
+    <xsl:call-template name="setFieldName" />
     <xsl:attribute name="value">
       <xsl:value-of select="transformer:getValue($transformer)" />
     </xsl:attribute>
   </xsl:template>
 
-  <xsl:template match="input[@type='checkbox']" mode="add-attributes">
-    <xsl:call-template name="setXPathOneAsName" />
-    <xsl:if test="transformer:hasValue($transformer,@value)">
-      <xsl:attribute name="checked">checked</xsl:attribute>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- There may be multiple checkboxes or a select multiple bound to 1-n elements: MCR-2140 -->
-  <xsl:template name="setXPathOneAsName">
-    <xsl:attribute name="name">
-      <xsl:variable name="xPath" select="transformer:getAbsoluteXPath($transformer)" />
-      <xsl:choose>
-        <!-- If we are bound to the first element, it means we are bound to all elements -->
-        <xsl:when test="substring($xPath,string-length($xPath)-2)='[1]'">
-          <xsl:value-of select="substring($xPath,0,string-length($xPath)-2)" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$xPath" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
-  </xsl:template>
-
-  <xsl:template match="input[@type='radio']" mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
-    </xsl:attribute>
+  <xsl:template match="input[@type='checkbox']|input[@type='radio']" mode="add-attributes">
+    <xsl:call-template name="setFieldName" />
     <xsl:if test="transformer:hasValue($transformer,@value)">
       <xsl:attribute name="checked">checked</xsl:attribute>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="select" mode="xeditor">
-    <xsl:value-of select="transformer:toggleWithinSelectElement($transformer,@multiple)" />
+    <xsl:value-of select="transformer:toggleWithinSelectElement($transformer)" />
     <xsl:copy>
       <xsl:apply-templates select="." mode="add-attributes" />
       <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
     </xsl:copy>
-    <xsl:value-of select="transformer:toggleWithinSelectElement($transformer,@multiple)" />
+    <xsl:value-of select="transformer:toggleWithinSelectElement($transformer)" />
   </xsl:template>
 
   <xsl:template match="option[transformer:isWithinSelectElement($transformer)]" mode="add-attributes">
@@ -265,18 +239,18 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="select[transformer:isWithinSelectMultiple($transformer)]" mode="add-attributes">
-    <xsl:call-template name="setXPathOneAsName" />
-  </xsl:template>
-
   <xsl:template match="textarea|select" mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
-    </xsl:attribute>
+    <xsl:call-template name="setFieldName" />
   </xsl:template>
 
   <xsl:template match="textarea" mode="add-content">
     <xsl:value-of select="transformer:getValue($transformer)" />
+  </xsl:template>
+
+  <xsl:template name="setFieldName">
+    <xsl:attribute name="name">
+      <xsl:value-of select="transformer:getFieldNameForCurrentBinding($transformer,@name)" />
+    </xsl:attribute>
   </xsl:template>
 
   <!-- ========== <xed:repeat xpath="" min="" max="" method="build|clone" /> ========== -->

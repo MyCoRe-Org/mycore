@@ -39,10 +39,12 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
+import org.jdom2.filter.ElementFilter;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -65,6 +67,8 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformer {
 
+    public static final Namespace NS_XED = Namespace.getNamespace("xed", "http://www.mycore.de/xeditor");
+    
     public int anchorID = 0;
 
     private MCREditorSession editorSession;
@@ -75,7 +79,7 @@ public class MCRXEditorTransformer {
 
     private boolean withinSelectElement = false;
 
-    private boolean withinSelectMultiple = false;
+    private MCRFieldMapper fieldMapper = new MCRFieldMapper();
 
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
@@ -96,10 +100,26 @@ public class MCRXEditorTransformer {
                 result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
+            
+            try {
+                result = removeObsoleteXEdNamespace(result);
+            } catch (JDOMException | SAXException ex) {
+                throw new IOException(ex);
+            }
+            
             return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
+    }
+    
+    private MCRJDOMContent removeObsoleteXEdNamespace(MCRContent resultFromStep2)
+        throws JDOMException, IOException, SAXException {
+        Document doc = resultFromStep2.asXML();
+        doc.getDescendants(new ElementFilter()).forEach(e -> e.removeNamespaceDeclaration(NS_XED));
+
+        MCRJDOMContent resultFromStep3 = new MCRJDOMContent(doc);
+        return resultFromStep3;
     }
 
     public void addNamespace(String prefix, String uri) {
@@ -192,26 +212,24 @@ public class MCRXEditorTransformer {
         return currentBinding.getAbsoluteXPath();
     }
 
+    public String getFieldNameForCurrentBinding(String valueOfNameAttribute) {
+        return fieldMapper.getNameFor(currentBinding, valueOfNameAttribute);
+    }
+    
     public String getValue() {
-        return currentBinding.getValue();
+        return fieldMapper.getDecodedValue(currentBinding.getBoundNode());
     }
 
     public boolean hasValue(String value) {
-        editorSession.getSubmission().mark2checkResubmission(currentBinding);
-        return currentBinding.hasValue(value);
+        return fieldMapper.hasValue(currentBinding, value);
     }
 
-    public void toggleWithinSelectElement(String attrMultiple) {
+    public void toggleWithinSelectElement() {
         withinSelectElement = !withinSelectElement;
-        withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
     }
 
     public boolean isWithinSelectElement() {
         return withinSelectElement;
-    }
-
-    public boolean isWithinSelectMultiple() {
-        return withinSelectMultiple;
     }
 
     public String replaceXPaths(String text) {
@@ -331,12 +349,6 @@ public class MCRXEditorTransformer {
                     nodeSet.addNode(buildAdditionalParameterElement(dom, name, value));
                 }
             }
-        }
-
-        String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
-        if (!xPaths2CheckResubmission.isEmpty()) {
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
-                xPaths2CheckResubmission));
         }
 
         Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();

@@ -227,7 +227,7 @@ public class MCRBinding {
         setValue(boundNodes.get(index), value);
     }
 
-    private void setValue(Object node, String value) {
+    public void setValue(Object node, String value) {
         if (value.equals(getValue(node))) {
             return;
         }

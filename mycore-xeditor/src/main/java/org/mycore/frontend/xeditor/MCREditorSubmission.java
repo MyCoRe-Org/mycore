@@ -20,28 +20,17 @@ package org.mycore.frontend.xeditor;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.common.xml.MCRXPathBuilder;
 
 public class MCREditorSubmission {
 
     public static final String PREFIX_DEFAULT_VALUE = "_xed_default_";
-
-    public static final String PREFIX_CHECK_RESUBMISSION = "_xed_check";
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    private Set<String> xPaths2CheckResubmission = new LinkedHashSet<>();
 
     private Map<String, String> xPath2DefaultValue = new LinkedHashMap<>();
 
@@ -52,45 +41,11 @@ public class MCREditorSubmission {
     }
 
     public void clear() {
-        xPaths2CheckResubmission.clear();
         xPath2DefaultValue.clear();
     }
 
-    public void mark2checkResubmission(MCRBinding binding) {
-        for (Object node : binding.getBoundNodes()) {
-            xPaths2CheckResubmission.add(MCRXPathBuilder.buildXPath(node));
-        }
-    }
-
-    public String getXPaths2CheckResubmission() {
-        StringBuilder sb = new StringBuilder();
-        for (String xPath : xPaths2CheckResubmission) {
-            String path = xPath.substring(xPath.indexOf("/", 1) + 1);
-            sb.append(path).append(' ');
-        }
-        return sb.toString().trim();
-    }
-
-    public void setXPaths2CheckResubmission(String xPaths) {
-        xPaths2CheckResubmission.clear();
-        String rootXPath = MCRXPathBuilder.buildXPath(session.getEditedXML().getRootElement()) + "/";
-        if (xPaths != null) {
-            for (String xPath : xPaths.split(" ")) {
-                xPaths2CheckResubmission.add(rootXPath + xPath);
-            }
-        }
-    }
-
     public void emptyNotResubmittedNodes() throws JaxenException {
-        for (String xPath : xPaths2CheckResubmission) {
-            MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-            if (!binding.getBoundNodes().isEmpty()) {
-                binding.setValue("");
-            } else {
-                LOGGER.warn("Binding does not contain a bound node [MCR-2558]");
-            }
-            binding.detach();
-        }
+        // binding.setValue("");
     }
 
     public void markDefaultValue(String xPath, String defaultValue) {
@@ -102,11 +57,6 @@ public class MCREditorSubmission {
     }
 
     public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
-        String[] xPaths2Check = values.get(PREFIX_CHECK_RESUBMISSION);
-        if ((xPaths2Check != null) && (xPaths2Check.length > 0)) {
-            setXPaths2CheckResubmission(xPaths2Check[0]);
-        }
-
         xPath2DefaultValue.clear();
 
         Map<MCRBinding, String[]> valuesToSet = new HashMap<>();
@@ -152,9 +102,6 @@ public class MCREditorSubmission {
             value = MCRXMLFunctions.normalizeUnicode(value);
             value = MCRXMLHelper.removeIllegalChars(value);
             binding.setValue(i, value);
-
-            Object node = binding.getBoundNodes().get(i);
-            xPaths2CheckResubmission.remove(MCRXPathBuilder.buildXPath(node));
         }
 
         binding.detach();
