@@ -141,17 +141,19 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 } catch (Exception e) {
                     LOGGER.error("Error retrieving derivate id from SOLR", e);
                 }
-                if (solrResponse != null) {
-                    SolrDocumentList solrResults = solrResponse.getResults();
-                    if (solrResults.getNumFound() == 1) {
-                        result = String.valueOf(solrResults.get(0).getFieldValue("id"));
-                    }
-                    if (solrResults.getNumFound() == 0) {
-                        LOGGER.info("ERROR: No MyCoRe Derivate ID found for query " + derid);
-                    }
-                    if (solrResults.getNumFound() > 1) {
-                        LOGGER.info("ERROR: Multiple IDs found for query " + derid);
-                    }
+                if (solrResponse == null) {
+                    return result;
+                }
+
+                SolrDocumentList solrResults = solrResponse.getResults();
+                if (solrResults.getNumFound() == 1) {
+                    result = String.valueOf(solrResults.get(0).getFieldValue("id"));
+                }
+                if (solrResults.getNumFound() == 0) {
+                    LOGGER.info("ERROR: No MyCoRe Derivate ID found for query " + derid);
+                }
+                if (solrResults.getNumFound() > 1) {
+                    LOGGER.info("ERROR: Multiple IDs found for query " + derid);
                 }
             }
         }
