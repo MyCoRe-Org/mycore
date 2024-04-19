@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <h1>Sample XEditor form</h1>
+      <xed:source uri="session:{$sourceID}" />
+      <xed:bind xpath="document">
+        <xed:bind xpath="title">
+          <input type="text" />
+        </xed:bind>
+        <xed:bind xpath="author">
+          <xed:bind xpath="@firstName">
+            <input id="firstName" />
+          </xed:bind>
+          <xed:bind xpath="@lastName">
+            <input type="text" id="lastName" />
+          </xed:bind>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <source id="testData">
+    <document>
+      <title>Titel</title>
+      <author firstName="John" lastName="Doe" />
+    </document>
+  </source>
+  
+  <param name="sourceID">testData</param>
+  
+  <transform />
+  
+  <xml>
+    <document>
+      <title>@@_title_@@=Titel</title>
+      <author firstName="@@_firstName_@@=John" lastName="@@_lastName_@@=Doe" />
+    </document>
+  </xml>
+  
+  <submit>
+    <param name="title">
+      <value>Title</value>
+    </param>
+    <param name="firstName">
+      <value>Jim</value>
+    </param>
+    <param name="lastName">
+      <value></value>
+    </param>
+  </submit>
+  
+  <xml>
+    <document>
+      <title>Title</title>
+      <author firstName="Jim" lastName="" />
+    </document>
+  </xml>
+
+</test>

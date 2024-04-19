@@ -49,8 +49,8 @@
       </form>
     </html>
     
-    <isValid>false</isValid>
-  
+    <submit />
+    
     <xml>
       <document>
         <title></title>
@@ -58,6 +58,8 @@
       </document>
     </xml>
     
+    <isValid>false</isValid>
+  
     <transformAgain />
     
     <html>
@@ -73,7 +75,7 @@
           <input name="year" value="" type="text" />
         </div>
         <div style="visibility:hidden">
-          <input value="1-9" name="_xed_session" type="hidden" />
+          <input value="1-10" name="_xed_session" type="hidden" />
         </div>
       </form>
     </html>
@@ -107,14 +109,23 @@
       </form>
     </html>
 
-    <isValid>true</isValid>
-    
+    <submit>
+      <param name="title">
+        <value>Der neue XEditor - Utopie oder Wahnsinn?</value>
+      </param>
+      <param name="year">
+        <value>2024</value>
+      </param>
+    </submit>
+
     <xml>    
       <document>
         <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
-        <year></year>
+        <year>2024</year>
       </document>
     </xml>
+    
+    <isValid>true</isValid>
     
   </test>
   

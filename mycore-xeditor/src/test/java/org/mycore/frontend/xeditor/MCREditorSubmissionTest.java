@@ -18,21 +18,13 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
 
 import org.jaxen.JaxenException;
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.xml.MCRNodeBuilder;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.xml.sax.SAXException;
 
 /**
  * @author Frank Lützenkirchen
@@ -40,25 +32,11 @@ import org.mycore.common.xml.MCRXMLHelper;
 public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
-    public void testSubmitTextfields() throws JaxenException, JDOMException {
-        String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']]";
-        MCREditorSession session = new MCREditorSession();
-        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
-
-        Map<String, String[]> submittedValues = new HashMap<>();
-        submittedValues.put("/document/title[1]", new String[] { "Title" });
-        submittedValues.put("/document/author[1]/@firstName", new String[] { "Jim" });
-        submittedValues.put("/document/author[1]/@lastName", new String[] { "" });
-        session.getSubmission().setSubmittedValues(submittedValues);
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
-        Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
-        Document result = session.getEditedXML();
-        assertTrue(MCRXMLHelper.deepEqual(expected, result));
+    public void testSubmitTextfields() throws JDOMException, SAXException, JaxenException, IOException {
+         new MCRXEditorTestRunner("testSubmitTextfields");
     }
-
-/*
+    
+    /*
     @Test
     public void testSubmitSingleCheckbox() throws JaxenException, JDOMException {
         String template = "document[@archive='false']";

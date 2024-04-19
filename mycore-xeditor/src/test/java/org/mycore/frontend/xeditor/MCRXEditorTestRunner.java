@@ -88,10 +88,22 @@ public class MCRXEditorTestRunner {
                 testResultingXML(session, e);
                 break;
             case "isValid":
-                MCRFieldMapper.emptyNotResubmittedNodes(session.getEditedXML().getDocument());
                 Boolean expected = Boolean.valueOf(e.getTextTrim());
                 Boolean isValid = session.getValidator().isValid();
                 assertEquals(expected, isValid);
+                break;
+            case "submit":
+                Map<String, String[]> submittedValues = new HashMap<>();
+                e.getChildren("param").forEach(param -> {
+                    String name = param.getAttributeValue("name");
+                    int numValues = param.getChildren().size();
+                    String[] values = new String[numValues];
+                    for (int i = 0; i < numValues; i++) {
+                        values[i] = param.getChildren().get(i).getText();
+                    }
+                    submittedValues.put(name, values);
+                });
+                session.getSubmission().setSubmittedValues(submittedValues);
                 break;
             default:
                 throw new MCRException("Unknown test element: " + e.getQualifiedName());
