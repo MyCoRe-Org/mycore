@@ -20,7 +20,6 @@ package org.mycore.restapi.v1.utils;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitOption;
@@ -36,17 +35,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Comment;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -72,12 +66,12 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
+import org.mycore.frontend.idmapper.MCRIDMapper;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.v1.MCRRestAPIObjects;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
-import org.mycore.solr.MCRSolrClientFactory;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -112,10 +106,13 @@ public class MCRRestAPIObjectsHelper {
 
     private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
+    private static MCRIDMapper ID_MAPPER = MCRConfiguration2
+        .<MCRIDMapper>getInstanceOf(MCRIDMapper.MCR_PROPERTY_CLASS).get();
+
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
         throws MCRRestAPIException {
-
-        MCRObject mcrObj = retrieveMCRObject(pathParamId);
+        MCRObjectID mcrObjId = retrieveMCRObjectID(pathParamId);
+        MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjId);
         Document doc = mcrObj.createXML();
         Element eStructure = doc.getRootElement().getChild("structure");
 
@@ -179,13 +176,13 @@ public class MCRRestAPIObjectsHelper {
             .build();
     }
 
-    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID, UriInfo info, Application app,
+    public static Response showMCRDerivate(String paramMcrObjID, String paramMcrDerID, UriInfo info, Application app,
         boolean withDetails) throws MCRRestAPIException {
-
-        MCRObjectID mcrObj = MCRObjectID.getInstance(pathParamMcrID);
-        MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
-
         try {
+            MCRObjectID mcrObjId = retrieveMCRObjectID(paramMcrObjID);
+            MCRObjectID derObjId = retrieveMCRDerivateID(mcrObjId, paramMcrDerID);
+            MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(derObjId);
+
             Document doc = derObj.createXML();
             if (withDetails) {
                 Document docContent = listDerivateContentAsXML(derObj, "/", -1, info, app);
@@ -505,14 +502,14 @@ public class MCRRestAPIObjectsHelper {
      * returns a list of derivate objects
      * @param info - the injected Jersey URIInfo object
      *
-     * @param mcrObjID - the MyCoRe Object ID
+     * @param paramMcrObjID - the MyCoRe object id as string
      * @param format - the output format ('xml'|'json')
      * @param sort - the sort criteria
      *
      * @return a Jersey response object
      * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
-    public static Response listDerivates(UriInfo info, String mcrObjID, String format,
+    public static Response listDerivates(UriInfo info, String paramMcrObjID, String format,
         String sort) throws MCRRestAPIException {
         List<MCRRestAPIError> errors = new ArrayList<>();
 
@@ -535,8 +532,9 @@ public class MCRRestAPIObjectsHelper {
         }
 
         //Parameters are checked - continue to retrieve data
-
-        List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrObjID).getStructure().getDerivates().stream()
+        MCRObjectID mcrObjId = retrieveMCRObjectID(paramMcrObjID);
+        List<MCRObjectIDDate> objIdDates = MCRMetadataManager.retrieveMCRObject(mcrObjId)
+            .getStructure().getDerivates().stream()
             .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> new MCRObjectIDDate() {
                 long lastModified;
                 {
@@ -644,23 +642,24 @@ public class MCRRestAPIObjectsHelper {
      * lists derivate content (file listing)
      * @param info - the Jersey UriInfo Object
      * @param request - the HTTPServletRequest object
-     * @param mcrObjID - the MyCoRe Object ID
-     * @param mcrDerID - the MyCoRe Derivate ID
+     * @param paramMcrObjID - the MyCoRe object id
+     * @param paramMcrDerID - the MyCoRe derivate id
      * @param format - the output format ('xml'|'json')
      * @param path - the sub path of a directory inside the derivate
      * @param depth - the level of subdirectories to be returned
      * @return a Jersey Response object
      */
-    public static Response listContents(UriInfo info, Application app, Request request, String mcrObjID,
-        String mcrDerID, String format, String path, int depth) throws MCRRestAPIException {
+    public static Response listContents(UriInfo info, Application app, Request request, String paramMcrObjID,
+        String paramMcrDerID, String format, String path, int depth) throws MCRRestAPIException {
 
         if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
             throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
                 new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The syntax of format parameter is wrong.",
                     "Allowed values for format are 'json' or 'xml'."));
         }
-        MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
-        MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
+        MCRObjectID mcrObjId = retrieveMCRObjectID(paramMcrObjID);
+        MCRObjectID derObjId = retrieveMCRDerivateID(mcrObjId, paramMcrDerID);
+        MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(derObjId);
 
         try {
             MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
@@ -703,21 +702,21 @@ public class MCRRestAPIObjectsHelper {
      * returns the URL of the main document of a derivate
      * 
      * @param info - the Jersey UriInfo object
-     * @param mcrObjID - the MyCoRe Object ID
-     * @param mcrDerID - the MyCoRe Derivate ID
+     * @param paramMcrObjID - the MyCoRe object id
+     * @param paramMcrDerID - the MyCoRe derivate id
      * 
      * @return the Resolving URL for the main document of the derivate
      */
-    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID, Application app) {
+    public static String retrieveMaindocURL(UriInfo info, String paramMcrObjID, String paramMcrDerID, Application app) {
         try {
-            MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
-            MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
+            MCRObjectID mcrObjId = retrieveMCRObjectID(paramMcrObjID);
+            MCRObjectID mcrDerId = retrieveMCRDerivateID(mcrObjId, paramMcrDerID);
+            MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(mcrDerId);
             String maindoc = derObj.getDerivate().getInternals().getMainDoc();
 
             String baseURL = MCRJerseyUtil.getBaseURL(info, app)
                 + MCRConfiguration2.getStringOrThrow("MCR.RestAPI.v1.Files.URL.path");
-            baseURL = baseURL.replace("${mcrid}", mcrObj.toString()).replace("${derid}",
-                derObj.getId().toString());
+            baseURL = baseURL.replace("${mcrid}", mcrObjId.toString()).replace("${derid}", mcrDerId.toString());
 
             return baseURL + maindoc;
         } catch (MCRRestAPIException rae) {
@@ -791,115 +790,26 @@ public class MCRRestAPIObjectsHelper {
         return result;
     }
 
-    private static MCRObject retrieveMCRObject(String idString) throws MCRRestAPIException {
-        String key = "mcr"; // the default value for the key
-        if (idString.contains(":")) {
-            int pos = idString.indexOf(":");
-            key = idString.substring(0, pos);
-            idString = idString.substring(pos + 1);
-            if (!key.equals("mcr")) {
-                idString = URLDecoder.decode(idString, StandardCharsets.UTF_8);
-                //ToDo - Shall we restrict the key set with a property?
-
-            }
+    private static MCRObjectID retrieveMCRObjectID(String paramMcrObjId) throws MCRRestAPIException {
+        Optional<MCRObjectID> optObjId = ID_MAPPER.mapMCRObjectID(paramMcrObjId);
+        if (optObjId.isEmpty() || !MCRMetadataManager.exists(optObjId.get())) {
+            throw new MCRRestAPIException(Response.Status.NOT_FOUND,
+                new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
+                    "There is no object with the given MyCoRe ID '" + paramMcrObjId + "'.", null));
         }
-        if (key.equals("mcr")) {
-
-            MCRObjectID mcrID = null;
-            try {
-                mcrID = MCRObjectID.getInstance(idString);
-            } catch (Exception e) {
-                throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_ID,
-                        "The MyCoRe ID '" + idString
-                            + "' is not valid. - Did you use the proper format: '{project}_{type}_{number}'?",
-                        e.getMessage()));
-            }
-
-            if (!MCRMetadataManager.exists(mcrID)) {
-                throw new MCRRestAPIException(Response.Status.NOT_FOUND,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
-                        "There is no object with the given MyCoRe ID '" + idString + "'.", null));
-            }
-
-            return MCRMetadataManager.retrieveMCRObject(mcrID);
-        } else {
-            SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
-            SolrQuery query = new SolrQuery();
-            query.setQuery(key + ":" + idString);
-            try {
-                QueryResponse response = solrClient.query(query);
-                SolrDocumentList solrResults = response.getResults();
-                if (solrResults.getNumFound() == 1) {
-                    String id = solrResults.get(0).getFieldValue("returnId").toString();
-                    return retrieveMCRObject(id);
-                } else {
-                    if (solrResults.getNumFound() == 0) {
-                        throw new MCRRestAPIException(Response.Status.NOT_FOUND,
-                            new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
-                                "There is no object with the given ID '" + key + ":" + idString + "'.", null));
-                    } else {
-                        throw new MCRRestAPIException(Response.Status.NOT_FOUND,
-                            new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
-                                "The ID is not unique. There are " + solrResults.getNumFound()
-                                    + " objecst fore the given ID '" + key + ":" + idString + "'.",
-                                null));
-                    }
-                }
-            } catch (SolrServerException | IOException e) {
-                LOGGER.error(e);
-                throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal server error.", e.getMessage()));
-            }
-        }
+        return optObjId.get();
     }
 
-    private static MCRDerivate retrieveMCRDerivate(MCRObjectID parentObjId, String derIDString)
+    private static MCRObjectID retrieveMCRDerivateID(MCRObjectID parentObjId, String paramMcrDerId)
         throws MCRRestAPIException {
-
-        String derKey = "mcr"; // the default value for the key
-        if (derIDString.contains(":")) {
-            int pos = derIDString.indexOf(":");
-            derKey = derIDString.substring(0, pos);
-            derIDString = derIDString.substring(pos + 1);
-            if (!derKey.equals("mcr") && !derKey.equals("label")) {
-                throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_ID, "The ID is not valid.",
-                        "The prefix is unkown. Only 'mcr' or 'label' are allowed."));
-            }
-        }
-
-        String matchedDerID = null;
-        if (Objects.equals(derKey, "mcr") &&
-            MCRMetadataManager.getDerivateIds(parentObjId, 0, TimeUnit.SECONDS)
-                .stream()
-                .map(MCRObjectID::toString)
-                .anyMatch(derIDString::equals)) {
-            matchedDerID = derIDString;
-        }
-        if (derKey.equals("label")) {
-            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(parentObjId);
-            for (MCRMetaLinkID check : mcrObj.getStructure().getDerivates()) {
-                if (derIDString.equals(check.getXLinkLabel()) || derIDString.equals(check.getXLinkTitle())) {
-                    matchedDerID = check.getXLinkHref();
-                    break;
-                }
-            }
-        }
-
-        if (matchedDerID == null) {
+        Optional<MCRObjectID> optDerObjId = ID_MAPPER.mapMCRDerivateID(parentObjId, paramMcrDerId);
+        if (optDerObjId.isEmpty() || !MCRMetadataManager.exists(optDerObjId.get())) {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND,
-                new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + derIDString + " not found.",
+                new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + paramMcrDerId + " not found.",
                     "The MyCoRe Object with id '" + parentObjId
-                        + "' does not contain a derivate with id '" + derIDString + "'."));
+                        + "' does not contain a derivate with id '" + paramMcrDerId + "'."));
         }
-
-        MCRObjectID derID = MCRObjectID.getInstance(matchedDerID);
-        if (!MCRMetadataManager.exists(derID)) {
-            throw new MCRRestAPIException(Response.Status.NOT_FOUND, new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
-                "There is no derivate with the id '" + matchedDerID + "'.", null));
-        }
-        return MCRMetadataManager.retrieveMCRDerivate(derID);
+        return optDerObjId.get();
     }
 
     /**
