@@ -79,7 +79,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        MCRLinkTableManager.instance().update(obj.getId());
+        MCRLinkTableManager.instance().update(obj);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        MCRLinkTableManager.instance().update(der.getId());
+        MCRLinkTableManager.instance().update(der);
     }
 
     @Override
