@@ -1,8 +1,12 @@
 package org.mycore.frontend.xeditor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -21,7 +25,45 @@ public class MCRFieldMapper {
 
     private int fieldCount = 1;
 
-    private Set<String> usedFields = new HashSet<String>();
+    private Map<String, List<Object>> field2node = new HashMap<String, List<Object>>();
+
+    public MCRFieldMapper() {
+    }
+
+    public MCRFieldMapper(Document doc) {
+        doc.getDescendants(Filters.element()).forEach(e -> {
+            e.getAttributes().forEach(attribute -> {
+                mapField2Node(attribute, attribute.getValue());
+            });
+        });
+        doc.getDescendants(Filters.textOnly()).forEach(text -> {
+            Element element = text.getParent();
+            mapField2Node(element, text.getText());
+        });
+    }
+
+    private void mapField2Node(Object node, String value) {
+        if (isMappedField(value)) {
+            String fieldName = getFieldName(value);
+            addNodeToMap(node, fieldName);
+        }
+    }
+
+    private void addNodeToMap(Object node, String fieldName) {
+        if (!field2node.containsKey(fieldName)) {
+            List<Object> nodes = new ArrayList<Object>();
+            field2node.put(fieldName, nodes);
+        }
+        field2node.get(fieldName).add(node);
+    }
+
+    private boolean isMappedField(String value) {
+        return value.startsWith(PREFIX);
+    }
+
+    private String getFieldName(String value) {
+        return value.substring(PREFIX.length(), value.indexOf(SUFFIX));
+    }
 
     public String getDecodedValue(Object node) {
         String value = MCRBinding.getValue(node);
@@ -45,21 +87,21 @@ public class MCRFieldMapper {
     public String getNameFor(MCRBinding binding, String nameInHTML) {
         String value = binding.getValue();
         if (value.contains(SUFFIX)) {
-            return value.substring(PREFIX.length(), value.indexOf(SUFFIX));
+            return getFieldName(value);
         } else {
             String fieldName = buildFieldName(binding, nameInHTML);
-            binding.getBoundNodes().stream().forEach(x -> encodeValue(binding, x, fieldName));
+            binding.getBoundNodes().stream().forEach(node -> {
+                encodeValue(binding, node, fieldName);
+                addNodeToMap(node, fieldName);
+            });
             return fieldName;
         }
     }
 
     private String buildFieldName(MCRBinding binding, String nameInHTML) {
-        String baseFieldName
-            = nameInHTML == null || nameInHTML.isBlank() ? buildFieldNameFromQName(binding) : nameInHTML;
-        String fieldName = baseFieldName
-            + (usedFields.contains(baseFieldName) ? "_" + Integer.toString(fieldCount++) : "");
-        usedFields.add(fieldName);
-        return fieldName;
+        String baseFieldName = StringUtils.isBlank(nameInHTML) ? buildFieldNameFromQName(binding) : nameInHTML;
+        String indexSuffix = field2node.containsKey(baseFieldName) ? "_" + Integer.toString(fieldCount++) : "";
+        return baseFieldName + indexSuffix;
     }
 
     private String buildFieldNameFromQName(MCRBinding binding) {
@@ -69,10 +111,34 @@ public class MCRFieldMapper {
         return fieldName;
     }
 
-    public static void emptyNotResubmittedNodes(Document doc) {
-        doc.getDescendants(Filters.element()).forEach(e -> {
-            e.getAttributes().forEach(a -> a.setValue(getDecodedValue(a.getValue())));
+    public void emptyNotResubmittedNodes() {
+        getNodesStream().forEach(node -> {
+            if (node instanceof Element element) {
+                element.setText("");
+            } else if (node instanceof Attribute attribute) {
+                attribute.setValue("");
+            }
         });
-        doc.getDescendants(Filters.textOnly()).forEach(t -> t.setText(getDecodedValue(t.getText())));
+
+        field2node.clear();
+    }
+
+    private Stream<Object> getNodesStream() {
+        return field2node.values().stream().flatMap(nodes -> nodes.stream());
+    }
+
+    public boolean hasField(String fieldName) {
+        return field2node.containsKey(fieldName);
+    }
+
+    public List<Object> removeResubmittedValueNodes(String fieldName, int numValuesReturned) {
+        List<Object> nodesOfField = field2node.get(fieldName);
+        List<Object> nodesResubmitted = new ArrayList<Object>();
+
+        int maxNodesReturnable = Math.min(nodesOfField.size(), numValuesReturned);
+        nodesResubmitted.addAll(nodesOfField.subList(0, maxNodesReturnable));
+        nodesOfField.removeAll(nodesResubmitted);
+        
+        return nodesResubmitted;
     }
 }

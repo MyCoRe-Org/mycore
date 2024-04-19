@@ -71,6 +71,10 @@ public class MCRBinding {
     public MCRBinding(Document document) {
         this.boundNodes.add(document);
     }
+    
+    public MCRBinding( List<Object> boundNodes) {
+        this.boundNodes = boundNodes;
+    }
 
     public MCRBinding(Document document, MCRChangeTracker tracker) {
         this(document);
