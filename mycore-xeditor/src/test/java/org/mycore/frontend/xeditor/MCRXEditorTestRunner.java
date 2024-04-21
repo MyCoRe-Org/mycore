@@ -27,6 +27,9 @@ import java.util.Map;
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
@@ -139,10 +142,22 @@ public class MCRXEditorTestRunner {
 
     private void testResultingHTML(Element html, MCRContent transformed)
         throws JDOMException, IOException, SAXException {
-        Element expectedResult = html.getChildren().get(0).detach();
-        Element transformedResult = transformed.asXML().detachRootElement();
-        MCRTestResult tr = new MCRTestResult(transformedResult, expectedResult);
+        Element expectedHTML = html.getChildren().get(0).detach();
+        Element actualHTML = transformed.asXML().detachRootElement();
+        setDummySessionID(expectedHTML);
+        setDummySessionID(actualHTML);
+        MCRTestResult tr = new MCRTestResult(actualHTML, expectedHTML);
         tr.assertTrue("Resulting HTML is not as expected");
+    }
+
+    private void setDummySessionID(Element html) {
+        while (!"form".equals(html.getName())) {
+            html = html.getChild("form");
+        }
+        XPathExpression<Element> pathToSessionID
+            = XPathFactory.instance().compile("div/input[@name='_xed_session']", Filters.element());
+        Element s = pathToSessionID.evaluateFirst(html);
+        s.setAttribute("value", "test");
     }
 
     class MCRTestResult {
