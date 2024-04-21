@@ -20,6 +20,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -68,7 +69,7 @@ import org.xml.sax.SAXException;
 public class MCRXEditorTransformer {
 
     public static final Namespace NS_XED = Namespace.getNamespace("xed", "http://www.mycore.de/xeditor");
-    
+
     public int anchorID = 0;
 
     private MCREditorSession editorSession;
@@ -81,6 +82,8 @@ public class MCRXEditorTransformer {
 
     private MCRFieldMapper fieldMapper = new MCRFieldMapper();
 
+    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<>();
+
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
@@ -88,7 +91,6 @@ public class MCRXEditorTransformer {
 
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getValidator().clearRules();
-        editorSession.getSubmission().clear();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
@@ -100,19 +102,19 @@ public class MCRXEditorTransformer {
                 result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
-            
+
             try {
                 result = removeObsoleteXEdNamespace(result);
             } catch (JDOMException | SAXException ex) {
                 throw new IOException(ex);
             }
-            
+
             return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
     }
-    
+
     private MCRJDOMContent removeObsoleteXEdNamespace(MCRContent resultFromStep2)
         throws JDOMException, IOException, SAXException {
         Document doc = resultFromStep2.asXML();
@@ -201,7 +203,7 @@ public class MCRXEditorTransformer {
 
     public void setDefault(String value) {
         currentBinding.setDefault(value);
-        editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
+        xPath2DefaultValue.put(currentBinding.getAbsoluteXPath(), value);
     }
 
     public void unbind() {
@@ -215,7 +217,7 @@ public class MCRXEditorTransformer {
     public String getFieldNameForCurrentBinding(String valueOfNameAttribute) {
         return fieldMapper.getNameFor(currentBinding, valueOfNameAttribute);
     }
-    
+
     public String getValue() {
         return fieldMapper.getDecodedValue(currentBinding.getBoundNode());
     }
@@ -338,7 +340,7 @@ public class MCRXEditorTransformer {
         return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }
 
-    public NodeSet getAdditionalParameters() throws ParserConfigurationException {
+    public NodeSet getAdditionalParameters() throws ParserConfigurationException, JaxenException {
         org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         NodeSet nodeSet = new NodeSet();
 
@@ -351,10 +353,12 @@ public class MCRXEditorTransformer {
             }
         }
 
-        Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
-        for (String xPath : defaultValues.keySet()) {
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
-                defaultValues.get(xPath)));
+        for (String xPath : xPath2DefaultValue.keySet()) {
+            MCRBinding binding = new MCRBinding(xPath, false, editorSession.getRootBinding());
+            String fieldName = fieldMapper.getNameFor(binding, "");
+            String defaultValue = xPath2DefaultValue.get(xPath);
+            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + fieldName,
+                defaultValue));
         }
 
         editorSession.setBreakpoint("After transformation to HTML");

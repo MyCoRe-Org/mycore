@@ -29,6 +29,7 @@ import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
 import org.mycore.frontend.xeditor.tracker.MCRChange;
 
 import jakarta.servlet.ServletContext;
@@ -47,7 +48,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
             session.setBreakpoint("After canceling subselect for " + baseXPath);
         } else {
             Map<String, String[]> submittedValues = MCRTargetUtils.getSubmittedValues(job, baseXPath);
-            session.getSubmission().setSubmittedValues(submittedValues);
+            new MCREditorSubmission(session).setSubmittedValues(submittedValues);
             session.setBreakpoint("After returning from subselect for " + baseXPath);
         }
 

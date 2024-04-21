@@ -32,6 +32,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChange;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
@@ -62,7 +63,7 @@ public class MCRDebugTarget implements MCREditorTarget {
         out.println("<html><body>");
 
         Map<String, String[]> parameters = job.getRequest().getParameterMap();
-        session.getSubmission().setSubmittedValues(parameters);
+        new MCREditorSubmission(session).setSubmittedValues(parameters);
 
         Document result = session.getEditedXML().clone();
         MCRChangeTracker tracker = session.getChangeTracker().clone();

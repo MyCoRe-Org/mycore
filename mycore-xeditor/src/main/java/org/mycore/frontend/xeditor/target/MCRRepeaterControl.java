@@ -20,6 +20,7 @@ package org.mycore.frontend.xeditor.target;
 
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
 
 import jakarta.servlet.ServletContext;
 
@@ -30,7 +31,7 @@ public abstract class MCRRepeaterControl implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String buttonName)
         throws Exception {
-        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        new MCREditorSubmission(session).setSubmittedValues(job.getRequest().getParameterMap());
         int posOfAnchor = buttonName.lastIndexOf('|');
         String param = buttonName.substring(0, posOfAnchor);
         String anchor = buttonName.substring(posOfAnchor + 1);

@@ -39,7 +39,7 @@
           <option value="isbn">ISBN</option>
         </select>
         <div style="visibility:hidden">
-          <input value="doi" name="_xed_default_/mods:mods/mods:identifier[1]/@type" type="hidden" />
+          <input value="doi" name="_xed_default_type" type="hidden" />
           <input value="1-5" name="_xed_session" type="hidden" />
         </div>
       </form>
@@ -74,7 +74,7 @@
         </select>
         <div style="visibility:hidden">
           <input value="test" name="testID" type="hidden" />
-          <input value="doi" name="_xed_default_/mods:mods/mods:identifier[1]/@type" type="hidden" />
+          <input value="doi" name="_xed_default_type" type="hidden" />
           <input value="1-3" name="_xed_session" type="hidden" />
         </div>
       </form>

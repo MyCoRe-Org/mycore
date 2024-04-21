@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,7 +35,7 @@ public class MCRAjaxSubselectTarget implements MCREditorTarget {
         int pos = parameter.lastIndexOf(":");
         String xPath = parameter.substring(0, pos);
         Map<String, String[]> submittedValues = MCRTargetUtils.getSubmittedValues(job, xPath);
-        session.getSubmission().setSubmittedValues(submittedValues);
+        new MCREditorSubmission(session).setSubmittedValues(submittedValues);
 
         job.getResponse().setStatus(HttpServletResponse.SC_OK);
         job.getResponse().getOutputStream().print(session.getCombinedSessionStepID());

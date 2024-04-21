@@ -106,7 +106,7 @@ public class MCRXEditorTestRunner {
                     }
                     submittedValues.put(name, values);
                 });
-                session.getSubmission().setSubmittedValues(submittedValues);
+                new MCREditorSubmission(session).setSubmittedValues(submittedValues);
                 break;
             default:
                 throw new MCRException("Unknown test element: " + e.getQualifiedName());

@@ -31,7 +31,7 @@
           <option value="insurance">Reiserücktrittversicherung</option>
         </select>
         <div style="visibility:hidden">
-          <input value="hotel" name="_xed_default_/reise/leistung[1]" type="hidden" />
+          <input value="hotel" name="_xed_default_leistung" type="hidden" />
           <input value="1-5" name="_xed_session" type="hidden" />
         </div>
       </form>
@@ -67,7 +67,7 @@
         </select>
         <div style="visibility:hidden">
           <input value="test" name="id" type="hidden" />
-          <input value="hotel" name="_xed_default_/reise/leistung[1]" type="hidden" />
+          <input value="hotel" name="_xed_default_leistung" type="hidden" />
           <input value="1-4" name="_xed_session" type="hidden" />
         </div>        
       </form>

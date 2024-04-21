@@ -24,6 +24,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
 
 import jakarta.servlet.ServletContext;
 
@@ -35,7 +36,7 @@ public class MCRLayoutServiceTarget implements MCREditorTarget {
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String style)
         throws Exception {
-        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        new MCREditorSubmission(session).setSubmittedValues(job.getRequest().getParameterMap());
         Document result = session.getEditedXML();
 
         if (session.getValidator().isValid()) {

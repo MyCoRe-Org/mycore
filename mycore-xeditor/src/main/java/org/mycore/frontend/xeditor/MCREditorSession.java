@@ -67,8 +67,6 @@ public class MCREditorSession {
 
     private MCRChangeTracker tracker = new MCRChangeTracker();
 
-    private MCREditorSubmission submission = new MCREditorSubmission(this);
-
     private MCRXEditorValidator validator = new MCRXEditorValidator(this);
 
     private MCRXMLCleaner cleaner = new MCRXMLCleaner();
@@ -224,10 +222,6 @@ public class MCREditorSession {
 
     public MCRChangeTracker getChangeTracker() {
         return tracker;
-    }
-
-    public MCREditorSubmission getSubmission() {
-        return submission;
     }
 
     public MCRXEditorValidator getValidator() {

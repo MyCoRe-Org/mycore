@@ -19,12 +19,10 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jaxen.JaxenException;
-import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -33,63 +31,70 @@ public class MCREditorSubmission {
 
     public static final String PREFIX_DEFAULT_VALUE = "_xed_default_";
 
-    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<>();
-
     private MCREditorSession session;
+
+    private MCRFieldMapper fieldMapper;
+
+    private Map<String, SubmittedField> fields = new HashMap<String, SubmittedField>();
 
     public MCREditorSubmission(MCREditorSession session) {
         this.session = session;
+        fieldMapper = new MCRFieldMapper(session.getEditedXML());
     }
 
-    public void clear() {
-        xPath2DefaultValue.clear();
-    }
-
-    public void markDefaultValue(String xPath, String defaultValue) {
-        xPath2DefaultValue.put(xPath, defaultValue);
-    }
-
-    public Map<String, String> getDefaultValues() {
-        return xPath2DefaultValue;
-    }
-
-    public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
-        xPath2DefaultValue.clear();
-
-        Map<MCRBinding, String[]> valuesToSet = new HashMap<>();
-
-        Document doc = session.getEditedXML();
-        MCRFieldMapper fieldMapper = new MCRFieldMapper(doc);
-
-        for (String paramName : values.keySet()) {
-            if (fieldMapper.hasField(paramName)) {
-                List<Object> nodes = fieldMapper.removeResubmittedValueNodes(paramName, values.get(paramName).length);
-                for( Object node : nodes ) System.out.println(node);
-                MCRBinding binding = new MCRBinding(nodes);
-                valuesToSet.put(binding, values.get(paramName));
-            } else if (paramName.startsWith("/")) {
-                MCRBinding binding = new MCRBinding(paramName, true, session.getRootBinding());
-                valuesToSet.put(binding, values.get(paramName));
-            } else if (paramName.startsWith(PREFIX_DEFAULT_VALUE)) {
-                String xPath = paramName.substring(PREFIX_DEFAULT_VALUE.length());
-                MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-                boolean nodesExist = binding.getBoundNodes().isEmpty();
-                binding.detach();
-                if (nodesExist) {
-                    String defaultValue = values.get(paramName)[0];
-                    markDefaultValue(xPath, defaultValue);
-                }
-            }
-        }
-
-        for (MCRBinding binding : valuesToSet.keySet()) {
-            setSubmittedValues(binding, valuesToSet.get(binding));
-        }
+    public void setSubmittedValues(Map<String, String[]> params) throws JaxenException, JDOMException {
+        handleLegacySubmissions(params);
+        collectSubmittedFields(params);
+        collectDefaultValues(params);
+        setSubmittedValues();
 
         fieldMapper.emptyNotResubmittedNodes();
-        setDefaultValues();
-
         session.setBreakpoint("After setting submitted values");
+    }
+
+    /** Legacy submission use absolute XPath as field name **/
+    private void handleLegacySubmissions(Map<String, String[]> params) throws JaxenException {
+        for (String paramName : params.keySet()) {
+            if (paramName.startsWith("/")) {
+                MCRBinding binding = new MCRBinding(paramName, true, session.getRootBinding());
+                setSubmittedValues(binding, params.get(paramName));
+            }
+        }
+    }
+
+    private void collectSubmittedFields(Map<String, String[]> params) {
+        params.keySet().stream().filter(name -> fieldMapper.hasField(name)).forEach(name -> {
+            SubmittedField field = new SubmittedField(name);
+            field.values = params.get(name);
+        });
+    }
+
+    private void collectDefaultValues(Map<String, String[]> params) {
+        params.keySet().stream().filter(name -> name.startsWith(PREFIX_DEFAULT_VALUE)).forEach(name -> {
+            String defaultValue = params.get(name)[0];
+
+            SubmittedField field = fields.containsKey(name) ? fields.get(name) : new SubmittedField(name);
+            if (field.values.length == 0) {
+                field.values = new String[1];
+            }
+
+            // Replace all empty string submissions with default value
+            for (int i = 0; i < field.values.length; i++) {
+                if (field.values[i].isEmpty()) {
+                    field.values[i] = defaultValue;
+                }
+            }
+        });
+    }
+
+    private void setSubmittedValues() {
+        for (SubmittedField field : fields.values()) {
+            if (fieldMapper.hasField(field.name)) {
+                List<Object> nodes = fieldMapper.removeResubmittedValueNodes(field.name, field.values.length);
+                MCRBinding binding = new MCRBinding(nodes);
+                setSubmittedValues(binding, field.values);
+            }
+        }
     }
 
     private void setSubmittedValues(MCRBinding binding, String[] values) {
@@ -109,13 +114,13 @@ public class MCREditorSubmission {
         binding.detach();
     }
 
-    public void setDefaultValues() throws JaxenException {
-        MCRBinding rootBinding = session.getRootBinding();
-        for (String xPath : xPath2DefaultValue.keySet()) {
-            String defaultValue = xPath2DefaultValue.get(xPath);
-            MCRBinding binding = new MCRBinding(xPath, false, rootBinding);
-            binding.setDefault(defaultValue);
-            binding.detach();
+    class SubmittedField {
+        String name;
+        String[] values;
+
+        SubmittedField(String name) {
+            this.name = name;
+            fields.put(name, this);
         }
     }
 }
