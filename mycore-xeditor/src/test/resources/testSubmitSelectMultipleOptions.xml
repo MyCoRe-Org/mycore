@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$sourceID}" />
+      <xed:bind xpath="document">
+        <xed:bind xpath="category">
+          <select multiple="multiple">
+            <option value="a" />
+            <option value="b" />
+            <option value="c" />
+            <option value="d" />
+          </select>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <source id="testData">
+    <document>
+      <category>a</category>
+      <category>b</category>
+      <category>c</category>
+    </document>
+  </source>
+  
+  <param name="sourceID">testData</param>
+  
+  <transform />
+  
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <select multiple="multiple" name="category">
+        <option value="a" selected="selected" />
+        <option value="b" selected="selected" />
+        <option value="c" selected="selected" />
+        <option value="d" />
+      </select>
+      <div style="visibility:hidden">
+        <input value="testData" name="sourceID" type="hidden" />
+        <input value="1-5" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </html>
+  
+  <xml>
+    <document>
+      <category>@@_category_@@=a</category>
+      <category>@@_category_@@=b</category>
+      <category>@@_category_@@=c</category>
+    </document>
+  </xml>
+  
+  <submit />
+  
+  <xml>
+    <document>
+      <category />
+      <category />
+      <category />
+    </document>
+  </xml>
+  
+  <transformAgain />
+  
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <select multiple="multiple" name="category">
+        <option value="a" />
+        <option value="b" />
+        <option value="c" />
+        <option value="d" />
+      </select>
+      <div style="visibility:hidden">
+        <input value="testData" name="sourceID" type="hidden" />
+        <input value="1-10" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </html>
+  
+  <submit>
+    <param name="category">
+      <value>c</value>
+      <value>d</value>
+    </param>
+  </submit>
+
+  <xml>
+    <document>
+      <category>c</category>
+      <category>d</category>
+      <category />
+    </document>
+  </xml>
+
+  <transformAgain />
+  
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <select multiple="multiple" name="category">
+        <option value="a" />
+        <option value="b" />
+        <option value="c" selected="selected" />
+        <option value="d" selected="selected" />
+      </select>
+      <div style="visibility:hidden">
+        <input value="testData" name="sourceID" type="hidden" />
+        <input value="1-15" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </html>
+
+  <submit>
+    <param name="category">
+      <value>a</value>
+      <value>b</value>
+      <value>c</value>
+      <value>d</value>
+    </param>
+  </submit>
+
+  <xml>
+    <document>
+      <category>a</category>
+      <category>b</category>
+      <category>c</category>
+      <category>d</category>
+    </document>
+  </xml>
+
+  <transformAgain />
+
+  <xml>
+    <document>
+      <category>@@_category_@@=a</category>
+      <category>@@_category_@@=b</category>
+      <category>@@_category_@@=c</category>
+      <category>@@_category_@@=d</category>
+    </document>
+  </xml>
+
+</test>

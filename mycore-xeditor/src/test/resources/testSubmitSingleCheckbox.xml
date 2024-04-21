@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$sourceID}" />
+      <xed:bind xpath="document">
+        <xed:bind xpath="@archive">
+          <input type="checkbox" />
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <source id="testData">
+    <document archive="false" />
+  </source>
+  
+  <param name="sourceID">testData</param>
+  
+  <transform />
+  
+  <xml>
+    <document archive="@@_archive_@@=false" />
+  </xml>
+  
+  <submit />
+  
+  <xml>
+    <document archive="" />
+  </xml>
+  
+  <transformAgain />
+  
+  <xml>
+    <document archive="@@_archive_@@=" />
+  </xml>
+
+  <submit>
+    <param name="archive">
+      <value>true</value>
+    </param>
+  </submit>  
+  
+  <xml>
+    <document archive="true" />
+  </xml>
+
+</test>
