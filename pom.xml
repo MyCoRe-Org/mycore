@@ -107,7 +107,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
               </goals>
               <phase>generate-resources</phase>
               <configuration>
-                <arguments>install</arguments>
+                <arguments>install ${yarn.install.args}</arguments>
               </configuration>
             </execution>
             <execution>
@@ -436,6 +436,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <value>true</value>
         </property>
       </activation>
+      <properties>
+        <yarn.install.args>--cache-folder ${project.basedir}/node_modules</yarn.install.args>
+      </properties>
       <build>
         <plugins>
           <plugin>
