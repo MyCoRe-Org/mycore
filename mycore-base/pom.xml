@@ -132,6 +132,9 @@
               <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
             </property>
           </properties>
+          <systemPropertyVariables>
+            <jersey.config.test.container.port>0</jersey.config.test.container.port>
+          </systemPropertyVariables>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
       </plugin>
