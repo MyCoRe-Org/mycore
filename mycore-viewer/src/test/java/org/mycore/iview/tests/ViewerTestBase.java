@@ -18,6 +18,12 @@
 
 package org.mycore.iview.tests;
 
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.URI;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -41,7 +47,55 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
     @Before
     public void setUp() {
         initController();
+        waitForServer(60000);
         getAppController().setUpDerivate(this.getDriver(), getTestDerivate());
+    }
+
+    public static boolean waitForServer(long timeout) {
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("timeout must be greater than 0");
+        }
+        long startTime = System.currentTimeMillis();
+        long elapsedTime = 0;
+
+        boolean serverReady = false;
+
+        Logger logger = LogManager.getLogger();
+        URI baseURI = URI.create("http://localhost:" + System.getProperty("BaseUrlPort") + "/");
+
+        while (!serverReady && elapsedTime < timeout) {
+            serverReady = checkPort(baseURI.getHost(), baseURI.getPort());
+            if (!serverReady) {
+                logger.info("Waiting for the server to be ready...");
+                Thread.yield();
+                elapsedTime = System.currentTimeMillis() - startTime;
+            }
+        }
+
+        return serverReady;
+    }
+
+    public static boolean checkPort(String host, int port) {
+        Socket socket = null;
+        boolean isOpen = false;
+
+        try {
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(host, port), 1000);
+            isOpen = true;
+        } catch (Exception e) {
+            isOpen = false;
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (Exception e) {
+                    LogManager.getLogger().warn("Error closing socket", e);
+                }
+            }
+        }
+
+        return isOpen;
     }
 
     @After
