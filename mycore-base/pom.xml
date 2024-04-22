@@ -116,6 +116,7 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <forkCount>1C</forkCount>
           <includes>
             <include>**/*Test*.java</include>
           </includes>
