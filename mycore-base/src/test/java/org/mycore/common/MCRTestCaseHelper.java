@@ -69,8 +69,12 @@ public class MCRTestCaseHelper {
     }
 
     public static void after() {
+        if (MCRSessionMgr.hasCurrentSession()) {
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            MCRSessionMgr.releaseCurrentSession();
+            currentSession.close();
+        }
         MCRConfigurationBase.initialize(Collections.emptyMap(), Collections.emptyMap(), true);
-        MCRSessionMgr.releaseCurrentSession();
     }
 
     public static String getCurrentComponentName() {

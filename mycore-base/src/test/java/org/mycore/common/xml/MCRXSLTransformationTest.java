@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -54,7 +55,8 @@ public class MCRXSLTransformationTest extends MCRTestCase {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-        stylesheet.delete();
+        Optional.ofNullable(stylesheet)
+                .ifPresent(File::delete);
     }
 
     /**

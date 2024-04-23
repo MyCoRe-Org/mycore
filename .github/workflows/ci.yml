@@ -3,12 +3,12 @@ name: test
 on: [ push, pull_request ]
 
 env:
-  MAVEN_OPTS: -Xmx1024M -Xss128M
-  GECKODRIVER_VERSION: 0.27.0
+  MAVEN_OPTS: -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS
+  GECKODRIVER_VERSION: 0.34.0
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -19,44 +19,40 @@ jobs:
       with:
         java-version: 17
         distribution: temurin
+        cache: maven
 
-    - name: Fetch Geckodriver cache
-      id: geckodriver-cache
-      uses: actions/cache@v2
+    - name: Setup Gecko driver
+      uses: browser-actions/setup-geckodriver@latest
       with:
-        path: ~/geckodriver
-        key: ${{ env.GECKODRIVER_VERSION }}
+        geckodriver-version: ${{ env.GECKODRIVER_VERSION }}
 
-    - name: Fetch Geckodriver
-      if: steps.geckodriver-cache.outputs.cache-hit != 'true'
-      run: |
-        mkdir ~/geckodriver
-        curl -L https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz | \
-          tar -C ~/geckodriver/ -xzvf-
+    - name: Setup firefox
+      id: setup-firefox
+      uses: browser-actions/setup-firefox@v1
+      with:
+        firefox-version: latest-esr
+
+    - name: Setup Chrome
+      id: setup-chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: stable
+
+    - name: Setup Chromedriver
+      uses: nanasess/setup-chromedriver@v2
+      with:
+        chromedriver-version: ${{ steps.setup-chrome.outputs.chrome-version }}
 
     - name: Set up test dependencies
       run: |
-        # PPA by Mozilla for ESR releases
-        # replace 'sudo add-apt-repository ppa:mozillateam/ppa' with simple commands as workaround for https://github.com/orgs/community/discussions/69720
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0AB215679C571D1C8325275B9BDB3D89CE49EC21
-        sudo add-apt-repository "deb https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu/ focal main"
-
-        sudo apt update
-        sudo apt install firefox-esr chromium-browser chromium-chromedriver dbus-x11
+        sudo apt install dbus-x11
 
         # Selenium wants to run non-ESR FF
-        sudo rm -rf /usr/lib/firefox/
-        sudo ln -s firefox-esr /usr/lib/firefox
-        sudo ln -s firefox-esr /usr/lib/firefox/firefox
+        sudo ln -sfn ${{ steps.setup-firefox.outputs.firefox-path }} /usr/bin/firefox
+        sudo ln -sfn ${{ steps.setup-firefox.outputs.firefox-path }} /usr/bin/firefox-esr
         firefox --version
 
-        ~/geckodriver/geckodriver --version
-        echo "${HOME}/geckodriver" >> $GITHUB_PATH
-
-    - name: Restore Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: restore
+        geckodriver --version
 
     - name: Build
       run: |
@@ -66,8 +62,8 @@ jobs:
         export FIREFOX_BIN=$(which firefox-esr)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
-        mvn -P!standard-with-extra-repos -B javadoc:javadoc
+        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -T1C -DreuseForks=true -DforkCount=1
+        mvn -P!standard-with-extra-repos -B javadoc:javadoc -T1C
 
     - name: Upload logs on build failure
       if: failure() || cancelled()
@@ -80,8 +76,5 @@ jobs:
           ./**/screenshots
           ./**/*error*.log
           ./**/*test.log
-
-    - name: Save Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: save
+          ./**/*test.log
+          ./**/jetty-*.out

@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
@@ -34,6 +35,22 @@ public class MCRTranslationTest extends MCRTestCase {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Languages", "de,en,fr,pl");
         return testProperties;
+    }
+
+    /**
+     * use with care: only required for Junit tests if properties changes.
+     *
+     * <pre>
+     * MCR.Metadata.Languages=…
+     * </pre>
+     */
+    public static void reInit() {
+        MCRTranslation.reInit();
+    }
+
+    @Before
+    public void cleanUp() {
+        reInit();
     }
 
     @Test
@@ -61,7 +78,7 @@ public class MCRTranslationTest extends MCRTestCase {
     @Test
     public void getAvailableLanguages() {
         Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
-        assertEquals(4, availableLanguages.size());
+        assertEquals("Expected 4 languages, but got: " + availableLanguages, 4, availableLanguages.size());
     }
 
     @Test
