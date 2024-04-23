@@ -18,6 +18,11 @@
 
 package org.mycore.common.config;
 
+import com.google.common.collect.Sets;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,12 +39,6 @@ import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRClassTools;
-
-import com.google.common.collect.Sets;
 
 /**
  * On first access this class detects all components, that is either MyCoRe components or application modules, that are
@@ -106,9 +105,14 @@ public class MCRRuntimeComponentDetector {
                 }
             }
             if (underTesting != null) {
-                //support JUnit-Tests
+                // support JUnit-Tests
                 MCRComponent component = new MCRComponent(underTesting, new Manifest());
                 components.add(component);
+                // support directly linked mycore-base and therefore using default mycore.properties
+                // TODO: we should use the java module system (ModuleLayer.boot().modules()) as soon as it is supported
+                if (components.stream().noneMatch(MCRComponent::isMyCoReBase)) {
+                    components.add(new MCRComponent("mycore-base", new Manifest()));
+                }
             }
             return components;
         } catch (IOException e) {
@@ -189,7 +193,7 @@ public class MCRRuntimeComponentDetector {
      */
     public static SortedSet<MCRComponent> getAllComponents(ComponentOrder order) {
         return order == ComponentOrder.LOWEST_PRIORITY_FIRST ? ALL_COMPONENTS_LOW_TO_HIGH
-            : ALL_COMPONENTS_HIGH_TO_LOW;
+                                                             : ALL_COMPONENTS_HIGH_TO_LOW;
     }
 
     /**
@@ -209,7 +213,7 @@ public class MCRRuntimeComponentDetector {
      */
     public static SortedSet<MCRComponent> getMyCoReComponents(ComponentOrder order) {
         return order == ComponentOrder.LOWEST_PRIORITY_FIRST ? MYCORE_COMPONENTS_LOW_TO_HIGH
-            : MYCORE_COMPONENTS_HIGH_TO_LOW;
+                                                             : MYCORE_COMPONENTS_HIGH_TO_LOW;
     }
 
     /**
@@ -229,7 +233,7 @@ public class MCRRuntimeComponentDetector {
      */
     public static SortedSet<MCRComponent> getApplicationModules(ComponentOrder order) {
         return order == ComponentOrder.LOWEST_PRIORITY_FIRST ? APP_MODULES_LOW_TO_HIGH
-            : APP_MODULES_HIGH_TO_LOW;
+                                                             : APP_MODULES_HIGH_TO_LOW;
     }
 
     public enum ComponentOrder {

@@ -178,6 +178,15 @@ public class MCRComponent implements Comparable<MCRComponent> {
     }
 
     /**
+     * Returns true, if this component is the mycore-base component.
+     *
+     * @return true if mycore-base
+     */
+    public boolean isMyCoReBase() {
+        return type == Type.base;
+    }
+
+    /**
      * A short name for this component.
      * E.g. mycore-base would return "base" here.
      */
