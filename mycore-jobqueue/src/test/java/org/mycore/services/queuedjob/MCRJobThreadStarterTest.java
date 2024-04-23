@@ -93,14 +93,16 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
         thread.start();
 
         try {
-            int maxWait = 10000;
+            final int maxWait = 60000;
+            long startTime = System.currentTimeMillis();
             int stepTime = 100;
             while (getAllJobs(dao, job1.getAction()).stream()
                 .filter(j -> j.getStatus() == MCRJobStatus.FINISHED || j.getStatus() == MCRJobStatus.ERROR)
-                .count() < 3 && maxWait > 0) {
+                .count() < 3 && startTime + maxWait >= System.currentTimeMillis()) {
+                Thread.yield();
                 Thread.sleep(stepTime);
-                LOGGER.info("waiting for jobs to finish time left: {}", maxWait);
-                maxWait -= stepTime;
+                LOGGER.info("Waiting for jobs to finish. Time left: {}",
+                    maxWait - System.currentTimeMillis() + startTime);
                 transaction.rollback(); // rollback to get new data in the next iteration
                 transaction.begin();
             }
@@ -108,10 +110,15 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
             throw new MCRException(e);
         }
 
+        long allJobCount = getAllJobs(dao, job1.getAction()).stream().count();
         long finishedJobCount
             = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count();
         long errorJobCount
             = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
+
+        getAllJobs(dao, job1.getAction())
+            .forEach(j -> LOGGER.info("Job in queue: {}", j));
+        Assert.assertEquals("There should be 3 jobs", 3, allJobCount);
         Assert.assertEquals("Finished Job count should be 2", 2, finishedJobCount);
         Assert.assertEquals("Error Job count should be 1", 1, errorJobCount);
     }
