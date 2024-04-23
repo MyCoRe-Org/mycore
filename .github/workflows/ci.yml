@@ -62,7 +62,7 @@ jobs:
         export FIREFOX_BIN=$(which firefox-esr)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -T1C -DreuseForks=true -DforkCount=2
+        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -T1C -DreuseForks=true -DforkCount=1
         mvn -P!standard-with-extra-repos -B javadoc:javadoc -T1C
 
     - name: Upload logs on build failure
