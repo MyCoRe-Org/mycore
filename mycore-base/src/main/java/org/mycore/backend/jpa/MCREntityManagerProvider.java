@@ -18,10 +18,11 @@
 
 package org.mycore.backend.jpa;
 
+import org.mycore.common.MCRPersistenceException;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
-import org.mycore.common.MCRPersistenceException;
 
 public class MCREntityManagerProvider {
 
@@ -37,7 +38,7 @@ public class MCREntityManagerProvider {
 
     public static EntityManager getCurrentEntityManager() {
         if (context == null && initException != null) {
-            throw new MCRPersistenceException("Could not get EntityManager: no context.",initException);
+            throw new MCRPersistenceException("Could not get EntityManager: no context.", initException);
         }
         return context.getCurrentEntityManager();
     }
