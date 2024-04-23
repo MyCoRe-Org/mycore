@@ -31,7 +31,6 @@ import java.util.stream.StreamSupport;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.apache.commons.io.IOUtils;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -158,7 +157,7 @@ public class MCREpubZipResource {
 
             StreamingOutput out = output -> {
                 try {
-                    IOUtils.copy(finalZipFileStream, output);
+                    finalZipFileStream.transferTo(output);
                 } catch (IOException e) {
                     // suppress spamming the console with broken pipe on request abort
                 } finally {

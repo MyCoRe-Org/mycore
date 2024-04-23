@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -260,7 +259,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
                     if (justCopyInput) {
                         // copy solr response to servlet outputstream
                         OutputStream servletOutput = resp.getOutputStream();
-                        IOUtils.copy(solrResponseStream, servletOutput);
+                        solrResponseStream.transferTo(servletOutput);
                     } else {
                         MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream,
                             solrHttpMethod.getURI().toString(),

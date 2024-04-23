@@ -59,7 +59,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
@@ -367,7 +366,7 @@ public class MCRUtils {
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException {
         try (MCRMD5InputStream md5InputStream = new MCRMD5InputStream(inputStream)) {
-            IOUtils.copy(md5InputStream, new MCRDevNull());
+            md5InputStream.transferTo(new MCRDevNull());
             return md5InputStream.getMD5String();
         }
     }

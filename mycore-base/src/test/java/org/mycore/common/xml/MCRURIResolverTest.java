@@ -1,12 +1,13 @@
 package org.mycore.common.xml;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.xml.transform.Source;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,24 +31,28 @@ public class MCRURIResolverTest extends MCRTestCase {
         checkParentDirectoryResourceUri(nestedMyFileResourceUrl.toString(), "resource:xsl/directory/");
 
         // obtain test directories (${configDir}/resources/xsl[/directory])
-        File configurationXslDirectory = getConfigurationXslDirectory();
-        File nestedConfigurationXslDirectory = new File(configurationXslDirectory, "directory");
-        boolean dirsCreated = nestedConfigurationXslDirectory.mkdirs();
+        Path configurationXslDirectory = getConfigurationXslDirectory();
+        Path nestedConfigurationXslDirectory = configurationXslDirectory.resolve("directory");
+        Files.createDirectories(nestedConfigurationXslDirectory);
+        boolean dirsCreated = Files.exists(nestedConfigurationXslDirectory);
         assert dirsCreated;
 
         // obtain files in test directories
-        File myFileFile = new File(configurationXslDirectory ,"myfile.xsl");
-        File nestedMyFileFile = new File(nestedConfigurationXslDirectory, "myfile.xsl");
+        Path myFileFile = configurationXslDirectory.resolve("myfile.xsl");
+        Path nestedMyFileFile = nestedConfigurationXslDirectory.resolve("myfile.xsl");
 
         // create actual files in test directories
-        long bytesCopied = IOUtils.copy(myFileResourceUrl, myFileFile);
-        long nestedBytesCopied = IOUtils.copy(nestedMyFileResourceUrl, nestedMyFileFile);
-        assert bytesCopied != 0 && nestedBytesCopied != 0;
+
+        try (InputStream is = myFileResourceUrl.openStream();
+            InputStream nestedIs = nestedMyFileResourceUrl.openStream()) {
+            long bytesCopied = Files.copy(is, myFileFile);
+            long nestedBytesCopied = Files.copy(nestedIs, nestedMyFileFile);
+            assert bytesCopied != 0 && nestedBytesCopied != 0;
+        }
 
         // check file URLs
-        checkParentDirectoryResourceUri(myFileFile.toURI().toString(), "resource:xsl/");
-        checkParentDirectoryResourceUri(nestedMyFileFile.toURI().toString(), "resource:xsl/directory/");
-
+        checkParentDirectoryResourceUri(myFileFile.toUri().toString(), "resource:xsl/");
+        checkParentDirectoryResourceUri(nestedMyFileFile.toUri().toString(), "resource:xsl/directory/");
     }
 
     private void checkParentDirectoryResourceUri(String uri, String expectedParentDirectoryResourceUri) {
@@ -55,11 +60,10 @@ public class MCRURIResolverTest extends MCRTestCase {
         Assert.assertEquals(expectedParentDirectoryResourceUri, actualParentDirectoryResourceURI);
     }
 
-    private static File getConfigurationXslDirectory() {
+    private static Path getConfigurationXslDirectory() {
         return MCRConfigurationDir.getConfigurationDirectory().toPath()
             .resolve("resources")
-            .resolve("xsl")
-            .toFile();
+            .resolve("xsl");
     }
 
     @Test

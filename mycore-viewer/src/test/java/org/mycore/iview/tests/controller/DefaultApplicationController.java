@@ -18,8 +18,6 @@
 
 package org.mycore.iview.tests.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -27,12 +25,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
@@ -61,7 +59,7 @@ public class DefaultApplicationController extends ApplicationController {
         if (!Files.exists(target)) {
             try (InputStream is = MCRSeleniumTestBase.class.getClassLoader().getResourceAsStream("testFiles.zip");
                 ZipInputStream zis = new ZipInputStream(is)) {
-                extractZip(target.getParent().toAbsolutePath().toString(), zis);
+                extractZip(target.getParent(), zis);
             } catch (IOException e) {
                 LOGGER.error("Could not unzip testFiles.zip", e);
             }
@@ -87,16 +85,15 @@ public class DefaultApplicationController extends ApplicationController {
     protected String buildHTMLFile(String name, String startFile, String page) throws IOException {
         try (InputStream viewerHTMLFileStream = DefaultApplicationController.class.getClassLoader()
             .getResourceAsStream("testStub/" + page + ".html")) {
-            String content = IOUtils.toString(viewerHTMLFileStream, StandardCharsets.UTF_8);
+            String content = new String(viewerHTMLFileStream.readAllBytes(), StandardCharsets.UTF_8);
             String result = content.replace("{$name}", name).replace("{$startFile}", startFile).replace("{$baseUrl}",
                 MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/");
             String fileName = buildFileName(name);
             String resultLocation = webpath + "/" + fileName;
-            File resultFile = new File(resultLocation);
-            resultFile.getParentFile().mkdirs();
-            try (FileOutputStream resultStream = new FileOutputStream(resultFile)) {
-                IOUtils.write(result, resultStream, Charset.defaultCharset());
-            }
+            Path resultFile = Paths.get(resultLocation);
+            Files.createDirectories(resultFile.getParent());
+            Files.writeString(resultFile, result, Charset.defaultCharset());
+
             return resultLocation;
         }
     }
@@ -124,22 +121,16 @@ public class DefaultApplicationController extends ApplicationController {
 
     }
 
-    private void extractZip(String dest, ZipInputStream zipInputStream) throws IOException {
+    private void extractZip(Path dest, ZipInputStream zipInputStream) throws IOException {
         ZipEntry nextEntry;
         zipInputStream.available();
         while ((nextEntry = zipInputStream.getNextEntry()) != null) {
             String entryName = nextEntry.getName();
-            String fileName = dest + "/" + entryName;
-            File localFile = new File(fileName);
-
+            Path localFile = dest.resolve(entryName);
             if (nextEntry.isDirectory()) {
-                localFile.mkdir();
+                Files.createDirectories(localFile);
             } else {
-                localFile.createNewFile();
-                try (FileOutputStream localFileOutputStream = new FileOutputStream(localFile)) {
-                    IOUtils.copyLarge(zipInputStream, localFileOutputStream, 0, nextEntry.getSize());
-                }
-
+                Files.copy(zipInputStream, localFile, StandardCopyOption.REPLACE_EXISTING);
             }
             zipInputStream.closeEntry();
         }

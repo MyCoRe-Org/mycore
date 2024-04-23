@@ -20,15 +20,16 @@ package org.mycore.iview.tests.controller;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.iview.tests.TestProperties;
@@ -66,10 +67,11 @@ public class ControllerUtil {
             try {
                 Thread.sleep(1000);
                 ByteArrayInputStream input = new ByteArrayInputStream(screenshot.getScreenshotAs(OutputType.BYTES));
-                byte[] imageBytes = IOUtils.toByteArray(input);
-                new File(SCREENSHOT_FOLDER).mkdirs();
-                IOUtils.copy(new ByteArrayInputStream(imageBytes),
-                    new FileOutputStream(new File(SCREENSHOT_FOLDER + name + ".png")));
+                byte[] imageBytes = input.readAllBytes();
+                Path pDir = Paths.get(SCREENSHOT_FOLDER);
+                Files.createDirectories(pDir);
+                Path pFile = pDir.resolve(name + ".png");
+                Files.copy(new ByteArrayInputStream(imageBytes), pFile, StandardCopyOption.REPLACE_EXISTING);
                 return ImageIO.read(new ByteArrayInputStream(imageBytes));
             } catch (IOException e) {
                 LOGGER.error("Error while taking screenshot!");

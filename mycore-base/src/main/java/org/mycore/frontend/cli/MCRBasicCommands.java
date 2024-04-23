@@ -20,10 +20,10 @@ package org.mycore.frontend.cli;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Comment;
@@ -225,21 +224,23 @@ public class MCRBasicCommands {
 
     private static void createSampleConfigFile(String path) throws IOException {
         ClassLoader classLoader = MCRClassTools.getClassLoader();
-        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
-        File targetFile = new File(configurationDirectory, path);
-        if (targetFile.exists()) {
-            LOGGER.warn("File {} already exists.", targetFile.getAbsolutePath());
+        Path configurationDirectory = MCRConfigurationDir.getConfigurationDirectory().toPath();
+        Path targetFile = configurationDirectory.resolve(path);
+        if (Files.exists(targetFile)) {
+            LOGGER.warn("File {} already exists.", targetFile.toAbsolutePath());
             return;
         }
-        if (!targetFile.getParentFile().exists() && !targetFile.getParentFile().mkdirs()) {
-            throw new IOException("Could not create directory for file: " + targetFile);
+        if (!Files.exists(targetFile.getParent())) {
+            Files.createDirectories(targetFile.getParent());
+            if (!Files.exists(targetFile.getParent())) {
+                throw new IOException("Could not create directory for file: " + targetFile);
+            }
         }
-        try (InputStream templateResource = classLoader.getResourceAsStream("configdir.template/" + path);
-            FileOutputStream fout = new FileOutputStream(targetFile)) {
+        try (InputStream templateResource = classLoader.getResourceAsStream("configdir.template/" + path)) {
             if (templateResource == null) {
                 throw new IOException("Could not find template for " + path);
             }
-            IOUtils.copy(templateResource, fout);
+            Files.copy(templateResource, targetFile);
             LOGGER.info("Created template for {} in {}", path, configurationDirectory);
         }
     }

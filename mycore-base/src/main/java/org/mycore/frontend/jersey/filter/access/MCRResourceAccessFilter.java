@@ -23,8 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
-
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.WebApplicationException;
@@ -50,7 +48,7 @@ public class MCRResourceAccessFilter implements ContainerRequestFilter {
         // TODO due to ContainerRequest.getEntity() consumes InputStream, we need to keep a copy of it in memory
         try (InputStream in = requestContext.getEntityStream()) {
             ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
-            IOUtils.copy(in, out);
+            in.transferTo(out);
             byte[] entity = out.toByteArray();
             //restore input
             requestContext.setEntityStream(new ByteArrayInputStream(entity));
