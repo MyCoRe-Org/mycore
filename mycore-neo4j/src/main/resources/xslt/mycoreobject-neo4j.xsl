@@ -4,6 +4,7 @@
   <xsl:output method="html" media-type="text/html" encoding="UTF-8" indent="yes"/>
 
   <xsl:param name="WebApplicationBaseURL"/>
+  <xsl:param name="MCR.Neo4j.VISNetworkJSURL"/>
   <xsl:param name="MCR.Neo4J.colors"/>
 
   <xsl:template match="/mycoreobject">
@@ -34,8 +35,8 @@
       </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/standalone/umd/vis-network.min.js"></script>
-    <script type="text/javascript" src="/js/mcr_neo4j_graph.js" id="{@ID}" baseUrl="{$WebApplicationBaseURL}" colors="{$MCR.Neo4J.colors}"></script>
+    <script type="text/javascript" src="{$MCR.Neo4j.VISNetworkJSURL}"/>
+    <script type="text/javascript" src="/js/mcr_neo4j_graph.js" id="{@ID}" baseUrl="{$WebApplicationBaseURL}" colors="{$MCR.Neo4J.colors}"/>
   </xsl:template>
 
 </xsl:stylesheet>
