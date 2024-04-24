@@ -39,7 +39,7 @@ public class MCREditorSubmission {
 
     public MCREditorSubmission(MCREditorSession session) {
         this.session = session;
-        fieldMapper = new MCRFieldMapper(session.getEditedXML());
+        this.fieldMapper = MCRFieldMapper.decodeFromXML(session.getEditedXML());
     }
 
     public void setSubmittedValues(Map<String, String[]> params) throws JaxenException, JDOMException {
@@ -76,12 +76,13 @@ public class MCREditorSubmission {
             SubmittedField field = fields.containsKey(name) ? fields.get(name) : new SubmittedField(name);
             if (field.values.length == 0) {
                 field.values = new String[1];
-            }
-
-            // Replace all empty string submissions with default value
-            for (int i = 0; i < field.values.length; i++) {
-                if (field.values[i].isEmpty()) {
-                    field.values[i] = defaultValue;
+                field.values[0] = defaultValue;
+            } else {
+                // Replace all empty string submissions with default value
+                for (int i = 0; i < field.values.length; i++) {
+                    if (field.values[i].isEmpty()) {
+                        field.values[i] = defaultValue;
+                    }
                 }
             }
         });
@@ -116,7 +117,7 @@ public class MCREditorSubmission {
 
     class SubmittedField {
         String name;
-        String[] values;
+        String[] values = {};
 
         SubmittedField(String name) {
             this.name = name;

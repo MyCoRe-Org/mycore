@@ -200,14 +200,14 @@
   <!-- ========== <input /> ========== -->
 
   <xsl:template
-    match="input[contains(',,text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week,',concat(',',@type,','))]"
+    match="input[contains(',,text,password,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week,',concat(',',@type,','))]|input[@type='hidden'][not(@value)]"
     mode="add-attributes">
     <xsl:call-template name="setFieldName" />
     <xsl:attribute name="value">
       <xsl:value-of select="transformer:getValue($transformer)" />
     </xsl:attribute>
   </xsl:template>
-
+  
   <xsl:template match="input[@type='checkbox']|input[@type='radio']" mode="add-attributes">
     <xsl:call-template name="setFieldName" />
     <xsl:if test="transformer:hasValue($transformer,@value)">

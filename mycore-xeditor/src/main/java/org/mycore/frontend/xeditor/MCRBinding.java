@@ -76,10 +76,12 @@ public class MCRBinding {
         this.boundNodes = boundNodes;
     }
 
-    public MCRBinding(Document document, MCRChangeTracker tracker) {
-        this(document);
-        this.tracker = tracker;
+    public MCRBinding( Object boundNode) {
+        this.boundNodes.add(boundNode);
+    }
 
+    public void setChangeTracker(MCRChangeTracker tracker) {
+        this.tracker = tracker;
     }
 
     private MCRBinding(MCRBinding parent) {

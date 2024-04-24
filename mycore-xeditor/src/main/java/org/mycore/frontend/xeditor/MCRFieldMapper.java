@@ -11,6 +11,7 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * Builds HTML field names for xml nodes. 
@@ -27,34 +28,32 @@ public class MCRFieldMapper {
 
     private Map<String, List<Object>> field2node = new HashMap<String, List<Object>>();
 
+    private Map<Object, String> node2field = new HashMap<Object, String>();
+
     public MCRFieldMapper() {
     }
 
-    public MCRFieldMapper(Document doc) {
+    public static MCRFieldMapper decodeFromXML(Document doc) {
+        MCRFieldMapper mapper = new MCRFieldMapper();
+        
         doc.getDescendants(Filters.element()).forEach(e -> {
             e.getAttributes().forEach(attribute -> {
-                mapField2Node(attribute, attribute.getValue());
+                mapper.mapField2Node(attribute, attribute.getValue());
             });
         });
         doc.getDescendants(Filters.textOnly()).forEach(text -> {
             Element element = text.getParent();
-            mapField2Node(element, text.getText());
+            mapper.mapField2Node(element, text.getText());
         });
+        
+        return mapper;
     }
-
+    
     private void mapField2Node(Object node, String value) {
         if (isMappedField(value)) {
             String fieldName = getFieldName(value);
             addNodeToMap(node, fieldName);
         }
-    }
-
-    private void addNodeToMap(Object node, String fieldName) {
-        if (!field2node.containsKey(fieldName)) {
-            List<Object> nodes = new ArrayList<Object>();
-            field2node.put(fieldName, nodes);
-        }
-        field2node.get(fieldName).add(node);
     }
 
     private boolean isMappedField(String value) {
@@ -65,37 +64,37 @@ public class MCRFieldMapper {
         return value.substring(PREFIX.length(), value.indexOf(SUFFIX));
     }
 
+    public void encodeIntoXML(MCRChangeTracker tracker) {
+      node2field.keySet().forEach( node -> {
+          String fieldName = node2field.get(node);
+          encodeValue(tracker, node, fieldName);  
+      } );
+    }
+    
     public String getDecodedValue(Object node) {
         String value = MCRBinding.getValue(node);
         return getDecodedValue(value);
     }
-
+    
     private static String getDecodedValue(String value) {
         return value.contains(SUFFIX) ? value.substring(value.indexOf(SUFFIX) + SUFFIX.length()) : value;
     }
-
-    public void encodeValue(MCRBinding binding, Object node, String fieldName) {
+    
+    public void encodeValue(MCRChangeTracker tracker, Object node, String fieldName) {
         String valuePrefix = PREFIX + fieldName + SUFFIX;
         String givenValue = getDecodedValue(node);
-        binding.setValue(node, valuePrefix + givenValue);
+        MCRBinding binding = new MCRBinding(node);
+        binding.setChangeTracker(tracker);
+        binding.setValue(valuePrefix + givenValue);
     }
-
-    public boolean hasValue(MCRBinding binding, String value) {
-        return binding.getBoundNodes().stream().anyMatch(n -> value.equals(getDecodedValue(n)));
-    }
-
+    
     public String getNameFor(MCRBinding binding, String nameInHTML) {
-        String value = binding.getValue();
-        if (value.contains(SUFFIX)) {
-            return getFieldName(value);
-        } else {
+        Object firstNode = binding.getBoundNode();
+        if (!node2field.containsKey(firstNode)) {
             String fieldName = buildFieldName(binding, nameInHTML);
-            binding.getBoundNodes().stream().forEach(node -> {
-                encodeValue(binding, node, fieldName);
-                addNodeToMap(node, fieldName);
-            });
-            return fieldName;
+            binding.getBoundNodes().stream().forEach(boundNode -> addNodeToMap(boundNode, fieldName));
         }
+        return node2field.get(firstNode);
     }
 
     private String buildFieldName(MCRBinding binding, String nameInHTML) {
@@ -109,6 +108,15 @@ public class MCRFieldMapper {
         String qName = n instanceof Element ? ((Element) n).getQualifiedName() : ((Attribute) n).getQualifiedName();
         String fieldName = qName.replace(":", "_");
         return fieldName;
+    }
+
+    private void addNodeToMap(Object node, String fieldName) {
+        if (!field2node.containsKey(fieldName)) {
+            List<Object> nodes = new ArrayList<Object>();
+            field2node.put(fieldName, nodes);
+        }
+        field2node.get(fieldName).add(node);
+        node2field.put(node, fieldName);
     }
 
     public void emptyNotResubmittedNodes() {

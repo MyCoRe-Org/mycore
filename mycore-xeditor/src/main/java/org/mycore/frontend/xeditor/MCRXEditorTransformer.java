@@ -219,11 +219,11 @@ public class MCRXEditorTransformer {
     }
 
     public String getValue() {
-        return fieldMapper.getDecodedValue(currentBinding.getBoundNode());
+        return currentBinding.getValue();
     }
 
     public boolean hasValue(String value) {
-        return fieldMapper.hasValue(currentBinding, value);
+        return currentBinding.hasValue(value);
     }
 
     public void toggleWithinSelectElement() {
@@ -360,8 +360,10 @@ public class MCRXEditorTransformer {
             nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + fieldName,
                 defaultValue));
         }
-
+        
+        fieldMapper.encodeIntoXML(editorSession.getChangeTracker());
         editorSession.setBreakpoint("After transformation to HTML");
+        
         nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
             editorSession.getCombinedSessionStepID()));
 
