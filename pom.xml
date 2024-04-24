@@ -437,6 +437,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <value>true</value>
         </property>
       </activation>
+      <properties>
+        <yarn.install.args>--cache-folder ${project.basedir}/node_modules/</yarn.install.args>
+      </properties>
       <build>
         <plugins>
           <plugin>
