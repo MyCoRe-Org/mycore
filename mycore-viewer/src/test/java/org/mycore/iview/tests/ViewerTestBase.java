@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.mycore.iview.tests.controller.ApplicationController;
@@ -45,13 +46,13 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
     private ApplicationController applicationController;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         initController();
-        waitForServer(60000);
+        Assert.assertTrue("HTTP server with test data not ready.", waitForServer(60000));
         getAppController().setUpDerivate(this.getDriver(), getTestDerivate());
     }
 
-    public static boolean waitForServer(long timeout) {
+    public static boolean waitForServer(long timeout) throws InterruptedException {
         if (timeout <= 0) {
             throw new IllegalArgumentException("timeout must be greater than 0");
         }
@@ -68,6 +69,7 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
             if (!serverReady) {
                 logger.info("Waiting for the server to be ready...");
                 Thread.yield();
+                Thread.sleep(100);
                 elapsedTime = System.currentTimeMillis() - startTime;
             }
         }

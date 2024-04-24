@@ -73,6 +73,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <site.suffix />
     <swagger.version>2.2.16</swagger.version>
     <uniqueVersion>false</uniqueVersion>
+    <yarn.install.args>--mutex network</yarn.install.args>
   </properties>
   <build>
     <pluginManagement>
@@ -106,7 +107,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <goal>yarn</goal>
               </goals>
               <phase>generate-resources</phase>
-              <configuration>
+              <configuration combine.children="override">
                 <arguments>install ${yarn.install.args}</arguments>
               </configuration>
             </execution>
@@ -437,7 +438,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </property>
       </activation>
       <properties>
-        <yarn.install.args>--cache-folder ${project.basedir}/node_modules</yarn.install.args>
+        <yarn.install.args>--cache-folder ${project.basedir}/node_modules/</yarn.install.args>
       </properties>
       <build>
         <plugins>
