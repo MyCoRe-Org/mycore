@@ -124,7 +124,7 @@ final class ContentUtils {
                         contentIS, inputBufferSize)) {
                 endCurrentTransaction();
                 // Copy the inputBufferSize stream to the outputBufferSize stream
-                bytesCopied = copyLarge(in, out, inputBufferSize, outputBufferSize, new byte[outputBufferSize]);
+                bytesCopied = copyLarge(in, out, 0, outputBufferSize, new byte[outputBufferSize]);
             }
         }
         if (length >= 0 && length != bytesCopied) {
