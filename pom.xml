@@ -106,7 +106,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <goal>yarn</goal>
               </goals>
               <phase>generate-resources</phase>
-              <configuration>
+              <configuration combine.self="override">
                 <arguments>install ${yarn.install.args}</arguments>
               </configuration>
             </execution>
