@@ -45,6 +45,7 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
     @Before
     public void setUp() throws InterruptedException {
         Assert.assertTrue("Server not ready: " + BASE_URL, waitForServer(60000));
+        LogManager.getLogger().info("Server online: " + BASE_URL);
         this.getDriver().get(BASE_URL + "/module/mets/example/mets-editor.html");
     }
 
