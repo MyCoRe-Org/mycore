@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.iview.tests.ViewerTestBase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -112,7 +113,7 @@ public class ToolBarController extends WebDriverController {
         Exception sere = null;
         while (--trys > 0) {
             try {
-                Thread.sleep(1000);
+                ViewerTestBase.sleep(1000);
             } catch (InterruptedException e) {
             }
             try {

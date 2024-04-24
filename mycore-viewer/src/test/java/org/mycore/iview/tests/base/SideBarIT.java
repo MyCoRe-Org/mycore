@@ -43,7 +43,7 @@ public class SideBarIT extends ViewerTestBase {
     public void testSideBarPresent() {
         this.setTestName(getClassname() + "-testSideBarPresent");
         this.getDriver();
-        this.getAppController().openViewer(this.getDriver(), getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
 
@@ -65,7 +65,7 @@ public class SideBarIT extends ViewerTestBase {
     public void testSideBarResize() {
         this.setTestName(getClassname() + "-testSideBarResize");
         this.getDriver();
-        this.getAppController().openViewer(this.getDriver(), getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
 
@@ -93,7 +93,7 @@ public class SideBarIT extends ViewerTestBase {
     public void testOverviewLayout() throws InterruptedException {
         this.setTestName(getClassname() + "-testOvervieLayout");
         this.getDriver();
-        this.getAppController().openViewer(this.getDriver(), getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
 
@@ -112,7 +112,7 @@ public class SideBarIT extends ViewerTestBase {
             return;
         }
 
-        Thread.sleep(1000);
+        ViewerTestBase.sleep(1000);
         int after = sbController.countThumbnails();
 
         // this test does not really work, because there are only 4 thumbnails left

@@ -61,7 +61,7 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
     @After
     public void tearDown() {
         if (httpServer != null) {
-            httpServer.stop(30);
+            httpServer.stop(0);
         }
         this.takeScreenshot();
     }
