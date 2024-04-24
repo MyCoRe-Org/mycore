@@ -18,97 +18,61 @@
 
 package org.mycore.mets.webtest;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.SimpleFileServer;
+
 public class MetsEditorTestBase extends MCRSeleniumTestBase {
 
-    public static final String BASE_URL = System.getProperty("BaseUrl", "http://localhost:9301");
+    private static final int MAX_ITERATIONS_TO_WAIT_FOR_A_ELEMENT = 100;
 
-    private static final int MAXIMAL_TIME_TO_WAIT_FOR_A_ELEMENT = 10;
+    private static final int WAIT_FOR_ELEMENT_ITERATION_IN_MS = 100;
 
-    private static final int ONE_SECOND_IN_MILLISECONDS = 1000;
+    HttpServer httpServer;
 
     @Before
-    public void setUp() throws InterruptedException {
-        Assert.assertTrue("Server not ready: " + BASE_URL, waitForServer(60000));
-        LogManager.getLogger().info("Server online: " + BASE_URL);
-        this.getDriver().get(BASE_URL + "/module/mets/example/mets-editor.html");
+    public void setUp() throws InterruptedException, IOException {
+        InetSocketAddress serverAddress = new InetSocketAddress(0);
+        Path baseDir = Path.of("target", "classes", "META-INF", "resources").toAbsolutePath();
+        httpServer = SimpleFileServer.createFileServer(serverAddress, baseDir, SimpleFileServer.OutputLevel.INFO);
+        httpServer.start();
+        String baseURL = getBaseURL();
+        LogManager.getLogger().info("Server online: " + baseURL);
+        this.getDriver().get(baseURL + "/module/mets/example/mets-editor.html");
     }
 
-    public static boolean waitForServer(long timeout) throws InterruptedException {
-        if (timeout <= 0) {
-            throw new IllegalArgumentException("timeout must be greater than 0");
-        }
-        long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-
-        boolean serverReady = false;
-
-        Logger logger = LogManager.getLogger();
-        URI baseURI = URI.create(BASE_URL);
-
-        while (!serverReady && elapsedTime < timeout) {
-            serverReady = checkPort(baseURI.getHost(), baseURI.getPort());
-            if (!serverReady) {
-                logger.info("Waiting for the server to be ready...");
-                Thread.yield();
-                Thread.sleep(100);
-                elapsedTime = System.currentTimeMillis() - startTime;
-            }
-        }
-
-        return serverReady;
-    }
-
-    public static boolean checkPort(String host, int port) {
-        Socket socket = null;
-        boolean isOpen = false;
-
-        try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(host, port), 1000);
-            isOpen = true;
-        } catch (Exception e) {
-            isOpen = false;
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (Exception e) {
-                    LogManager.getLogger().warn("Error closing socket", e);
-                }
-            }
-        }
-
-        return isOpen;
+    protected String getBaseURL() {
+        return "http://localhost:" + httpServer.getAddress().getPort();
     }
 
     @After
     public void tearDown() {
+        if (httpServer != null) {
+            httpServer.stop(30);
+        }
         this.takeScreenshot();
     }
 
     protected void waitForElement(By byTextIgnoreCSS) throws InterruptedException {
-        int maxWait = MAXIMAL_TIME_TO_WAIT_FOR_A_ELEMENT;
+        int maxWait = MAX_ITERATIONS_TO_WAIT_FOR_A_ELEMENT;
         WebDriver webDriver = this.getDriver();
-        List<WebElement> elements = new ArrayList<>();
+        List<WebElement> elements = new ArrayList<>(webDriver.findElements(byTextIgnoreCSS));
         while (elements.isEmpty() && maxWait-- > 0) {
+            Thread.sleep(WAIT_FOR_ELEMENT_ITERATION_IN_MS);
             elements = webDriver.findElements(byTextIgnoreCSS);
-            Thread.sleep(ONE_SECOND_IN_MILLISECONDS);
         }
         if (elements.isEmpty()) {
             throw new AssertionError("The element to wait for was not found!");

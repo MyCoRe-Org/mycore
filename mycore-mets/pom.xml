@@ -33,7 +33,6 @@
   <properties>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
     <failsafe.arg />
-    <jetty.port>9301</jetty.port>
     <manifest.priority>45</manifest.priority>
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
@@ -150,64 +149,11 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.jetty.ee10</groupId>
-            <artifactId>jetty-ee10-maven-plugin</artifactId>
-            <version>${jetty.version}</version>
-            <configuration>
-              <useTestScope>true</useTestScope>
-              <jettyXmls>
-                <jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
-              </jettyXmls>
-              <deployMode>FORK</deployMode>
-              <supportedPackagings>jar</supportedPackagings>
-              <webAppSourceDirectory>${basedir}/target/</webAppSourceDirectory>
-              <scanIntervalSeconds>10</scanIntervalSeconds>
-              <stopKey>foo</stopKey>
-              <stopPort>9302</stopPort>
-              <webApp>
-                <webInfIncludeJarPattern>doNotIncludeAnyJarsPattern</webInfIncludeJarPattern>
-              </webApp>
-              <systemProperties>
-                <jetty.port>${jetty.port}</jetty.port>
-                <MCR.Home>${project.build.testOutputDirectory}/mycore-home</MCR.Home>
-                <MCR.AppName>${project.artifactId}</MCR.AppName>
-                <MCRRuntimeComponentDetector.underTesting>${project.artifactId}</MCRRuntimeComponentDetector.underTesting>
-              </systemProperties>
-            </configuration>
-            <dependencies>
-              <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>2.0.12</version>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <id>start-jetty</id>
-                <goals>
-                  <goal>start</goal>
-                </goals>
-                <phase>pre-integration-test</phase>
-                <configuration>
-                  <scanIntervalSeconds>0</scanIntervalSeconds>
-                </configuration>
-              </execution>
-              <execution>
-                <id>stop-jetty</id>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-                <phase>post-integration-test</phase>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
                 <project.build.directory>${project.build.directory}</project.build.directory>
-                <BaseUrlPort>${jetty.port}</BaseUrlPort>
                 <ResultFolder>${TestResultDir}</ResultFolder>
               </systemPropertyVariables>
               <trimStackTrace>false</trimStackTrace>
