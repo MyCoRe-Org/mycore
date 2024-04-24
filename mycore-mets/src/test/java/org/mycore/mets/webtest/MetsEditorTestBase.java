@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.openqa.selenium.By;
@@ -43,11 +44,11 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
 
     @Before
     public void setUp() throws InterruptedException {
-        waitForServer(60000);
+        Assert.assertTrue("Server not ready: " + BASE_URL, waitForServer(60000));
         this.getDriver().get(BASE_URL + "/module/mets/example/mets-editor.html");
     }
 
-    public static boolean waitForServer(long timeout) {
+    public static boolean waitForServer(long timeout) throws InterruptedException {
         if (timeout <= 0) {
             throw new IllegalArgumentException("timeout must be greater than 0");
         }
@@ -64,6 +65,7 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
             if (!serverReady) {
                 logger.info("Waiting for the server to be ready...");
                 Thread.yield();
+                Thread.sleep(100);
                 elapsedTime = System.currentTimeMillis() - startTime;
             }
         }
