@@ -67,7 +67,7 @@ public class ImageOverviewIT extends ViewerTestBase {
     public void testImageOverview() throws InterruptedException {
         this.setTestName(getClassname() + "-testImageOverview");
         this.getDriver();
-        this.getAppController().openViewer(this.getDriver(), getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
 
@@ -78,7 +78,7 @@ public class ImageOverviewIT extends ViewerTestBase {
         tbController.pressButton(ToolBarController.BUTTON_ID_SIDEBAR_CONTROLL);
         tbController.clickElementById(ImageOverviewController.IMAGE_OVERVIEW_SELECTOR);
 
-        Thread.sleep(500);
+        ViewerTestBase.sleep(500);
 
         int greenPixelCount = clickImgAndCountColor(ioController, getGreenLabel(), Color.GREEN);
         int redPixelCount = clickImgAndCountColor(ioController, getRedLabel(), Color.RED);
@@ -116,7 +116,7 @@ public class ImageOverviewIT extends ViewerTestBase {
     private int clickImgAndCountColor(ImageOverviewController ioController, String label, Color color)
         throws InterruptedException {
         ioController.clickImageByOrder(label);
-        Thread.sleep(500);
+        ViewerTestBase.sleep(500);
 
         String message = label + " should be selected (class-attribut 'selected' should be set)!";
         Assert.assertTrue(message, ioController.isImageSelected(label));

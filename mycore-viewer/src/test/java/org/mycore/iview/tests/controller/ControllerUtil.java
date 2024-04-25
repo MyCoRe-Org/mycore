@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.iview.tests.TestProperties;
+import org.mycore.iview.tests.ViewerTestBase;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -65,7 +66,7 @@ public class ControllerUtil {
     public static BufferedImage getScreenshot(WebDriver driver, String name) {
         if (driver instanceof TakesScreenshot screenshot) {
             try {
-                Thread.sleep(1000);
+                ViewerTestBase.sleep(1000);
                 ByteArrayInputStream input = new ByteArrayInputStream(screenshot.getScreenshotAs(OutputType.BYTES));
                 byte[] imageBytes = input.readAllBytes();
                 Path pDir = Paths.get(SCREENSHOT_FOLDER);

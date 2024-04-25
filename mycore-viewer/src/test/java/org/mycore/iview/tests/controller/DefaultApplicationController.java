@@ -54,7 +54,7 @@ public class DefaultApplicationController extends ApplicationController {
     }
 
     @Override
-    public void setUpDerivate(WebDriver webdriver, TestDerivate testDerivate) {
+    public void setUpDerivate(WebDriver webdriver, String baseURL, TestDerivate testDerivate) {
         Path target = Paths.get(webpath);
         if (!Files.exists(target)) {
             try (InputStream is = MCRSeleniumTestBase.class.getClassLoader().getResourceAsStream("testFiles.zip");
@@ -65,29 +65,27 @@ public class DefaultApplicationController extends ApplicationController {
             }
 
         }
-        if (!derivateHTMLMapping.containsKey(testDerivate)) {
-            try {
-                String name = testDerivate.getName();
+        try {
+            String name = testDerivate.getName();
 
-                if (testDerivate.getStartFile().endsWith(".pdf")) {
-                    buildHTMLFile(name, testDerivate.getStartFile(), "MyCoRePDFViewer");
-                } else {
-                    buildHTMLFile(name, testDerivate.getStartFile(), "MyCoReImageViewer");
-                }
-
-                DefaultApplicationController.derivateHTMLMapping.put(testDerivate, buildFileName(name));
-            } catch (IOException e) {
-                LOGGER.error("Error while open connection to File Location!", e);
+            if (testDerivate.getStartFile().endsWith(".pdf")) {
+                buildHTMLFile(baseURL, name, testDerivate.getStartFile(), "MyCoRePDFViewer");
+            } else {
+                buildHTMLFile(baseURL, name, testDerivate.getStartFile(), "MyCoReImageViewer");
             }
+
+            DefaultApplicationController.derivateHTMLMapping.put(testDerivate, buildFileName(name));
+        } catch (IOException e) {
+            LOGGER.error("Error while open connection to File Location!", e);
         }
     }
 
-    protected String buildHTMLFile(String name, String startFile, String page) throws IOException {
+    protected String buildHTMLFile(String baseUrl, String name, String startFile, String page) throws IOException {
         try (InputStream viewerHTMLFileStream = DefaultApplicationController.class.getClassLoader()
             .getResourceAsStream("testStub/" + page + ".html")) {
             String content = new String(viewerHTMLFileStream.readAllBytes(), StandardCharsets.UTF_8);
             String result = content.replace("{$name}", name).replace("{$startFile}", startFile).replace("{$baseUrl}",
-                MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/");
+                baseUrl + "/test-classes/testFiles/");
             String fileName = buildFileName(name);
             String resultLocation = webpath + "/" + fileName;
             Path resultFile = Paths.get(resultLocation);
@@ -108,9 +106,9 @@ public class DefaultApplicationController extends ApplicationController {
     }
 
     @Override
-    public void openViewer(WebDriver webdriver, TestDerivate testDerivate) {
+    public void openViewer(WebDriver webdriver, String baseURL, TestDerivate testDerivate) {
         String path = null;
-        path = MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/"
+        path = baseURL + "/test-classes/testFiles/"
             + DefaultApplicationController.derivateHTMLMapping.get(testDerivate);
         LOGGER.info("Open Viewer with path : {}", path);
         webdriver.navigate().to(path);

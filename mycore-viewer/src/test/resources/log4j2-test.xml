@@ -9,6 +9,5 @@
     <root level="info">
       <appender-ref ref="Console"/>
     </root>
-    <logger name="org.hibernate" level="warning" />
   </loggers>
 </configuration>

@@ -19,19 +19,21 @@
 package org.mycore.iview.tests;
 
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.URI;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.mycore.iview.tests.controller.ApplicationController;
 import org.mycore.iview.tests.controller.ImageViewerController;
 import org.mycore.iview.tests.model.TestDerivate;
+
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.SimpleFileServer;
 
 public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
@@ -45,63 +47,44 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
     private ApplicationController applicationController;
 
+    HttpServer httpServer;
+
+    private static ThreadLocal<AtomicLong> waitTime = ThreadLocal.withInitial(AtomicLong::new);
+
+    @AfterClass
+    public static void printWaitTime() {
+        LogManager.getLogger().info("Total wait time: {}", Duration.ofMillis(waitTime.get().get()));
+        waitTime.remove();
+    }
+
+    public static void sleep(long millis) throws InterruptedException {
+        waitTime.get().addAndGet(millis);
+        Thread.sleep(millis);
+    }
+
     @Before
     public void setUp() throws InterruptedException {
+        InetSocketAddress serverAddress = new InetSocketAddress(0);
+        Path baseDir = Path.of("target").toAbsolutePath();
+        httpServer = SimpleFileServer.createFileServer(serverAddress, baseDir, SimpleFileServer.OutputLevel.INFO);
+        httpServer.start();
+
+        String baseURL = getBaseURL();
+        LogManager.getLogger().info("Server online: " + baseURL);
+
         initController();
-        Assert.assertTrue("HTTP server with test data not ready.", waitForServer(60000));
-        getAppController().setUpDerivate(this.getDriver(), getTestDerivate());
+        getAppController().setUpDerivate(this.getDriver(), getBaseURL(), getTestDerivate());
     }
 
-    public static boolean waitForServer(long timeout) throws InterruptedException {
-        if (timeout <= 0) {
-            throw new IllegalArgumentException("timeout must be greater than 0");
-        }
-        long startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-
-        boolean serverReady = false;
-
-        Logger logger = LogManager.getLogger();
-        URI baseURI = URI.create("http://localhost:" + System.getProperty("BaseUrlPort") + "/");
-
-        while (!serverReady && elapsedTime < timeout) {
-            serverReady = checkPort(baseURI.getHost(), baseURI.getPort());
-            if (!serverReady) {
-                logger.info("Waiting for the server to be ready...");
-                Thread.yield();
-                Thread.sleep(100);
-                elapsedTime = System.currentTimeMillis() - startTime;
-            }
-        }
-
-        return serverReady;
-    }
-
-    public static boolean checkPort(String host, int port) {
-        Socket socket = null;
-        boolean isOpen = false;
-
-        try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(host, port), 1000);
-            isOpen = true;
-        } catch (Exception e) {
-            isOpen = false;
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (Exception e) {
-                    LogManager.getLogger().warn("Error closing socket", e);
-                }
-            }
-        }
-
-        return isOpen;
+    protected String getBaseURL() {
+        return "http://localhost:" + httpServer.getAddress().getPort();
     }
 
     @After
     public void tearDown() {
+        if (httpServer != null) {
+            httpServer.stop(0);
+        }
         this.takeScreenshot();
     }
 
