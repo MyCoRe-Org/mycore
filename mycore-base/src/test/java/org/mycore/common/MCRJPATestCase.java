@@ -33,11 +33,16 @@ import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRJPABootstrapper;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -249,4 +254,14 @@ public class MCRJPATestCase extends MCRTestCase {
         });
     }
 
+    /**
+     * Adds a classification represented by the given XML file to the system.
+     *
+     * @param file the XML file containing the classification
+     */
+    protected void addClassification(String file) throws Exception {
+        Document classification = new SAXBuilder().build(getClass().getResourceAsStream(file));
+        MCRCategory category = MCRXMLTransformer.getCategory(classification);
+        MCRCategoryDAOFactory.getInstance().addCategory(null, category);
+    }
 }

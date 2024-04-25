@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mycoreclass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="TestClassification">
+    <categories>
+        <category ID="junit_de">
+            <label xml:lang="de" text="junit_de (de)"/>
+            <label xml:lang="en" text="junit_de (en)"/>
+        </category>
+        <category ID="junit_en">
+            <label xml:lang="en" text="junit_en (en)"/>
+        </category>
+        <category ID="junit_none">
+        </category>
+    </categories>
+</mycoreclass>
