@@ -120,11 +120,10 @@ final class ContentUtils {
         } else {
             try (InputStream contentIS = content.getInputStream();
                 InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS
-                    : new BufferedInputStream(
-                        contentIS, inputBufferSize)) {
+                    : new BufferedInputStream(contentIS, inputBufferSize)) {
                 endCurrentTransaction();
                 // Copy the inputBufferSize stream to the outputBufferSize stream
-                bytesCopied = copyLarge(in, out, 0, outputBufferSize, new byte[outputBufferSize]);
+                bytesCopied = copyLarge(in, out, 0, length, new byte[outputBufferSize]);
             }
         }
         if (length >= 0 && length != bytesCopied) {
