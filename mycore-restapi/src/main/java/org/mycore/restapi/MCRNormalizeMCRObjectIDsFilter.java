@@ -19,20 +19,13 @@
 package org.mycore.restapi;
 
 import java.net.URI;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.frontend.idmapper.MCRIDMapper;
 
 import jakarta.annotation.Priority;
 import jakarta.servlet.http.HttpServletResponse;
@@ -60,21 +53,14 @@ import jakarta.ws.rs.ext.Provider;
 @Priority(Priorities.AUTHORIZATION - 10)
 public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    private static Set<String> SEARCHKEYS_FOR_OBJECTS = MCRConfiguration2
-        .getString("MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys").stream()
-        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
-
-    private static Set<String> SEARCHKEYS_FOR_DERIVATES = MCRConfiguration2
-        .getString("MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys").stream()
-        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
-
     @Context
     ResourceInfo resourceInfo;
 
     @Context
     HttpServletResponse response;
+
+    private MCRIDMapper mcrIdMapper = MCRConfiguration2
+        .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MCR_PROPERTY_CLASS).get();
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -86,33 +72,31 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
         if (pathParts.length <= mcrIdPos || !"objects".equals(pathParts[mcrIdPos - 1])) {
             return;
         }
-        String mcrid = pathParts[mcrIdPos];
-        String mcridExtension = getExtension(mcrid);
-        mcrid = mcrid.substring(0, mcrid.length() - mcridExtension.length());
+
         try {
-            final boolean searchMcrId = !SEARCHKEYS_FOR_OBJECTS.isEmpty() && mcrid.contains(":");
-            pathParts[mcrIdPos] = MCRObjectID
-                .getInstance(searchMcrId ? retrieveMCRObjIDfromSOLR(mcrid) : mcrid)
-                .toString();
-            pathParts[mcrIdPos] += mcridExtension;
+            String mcrid = pathParts[mcrIdPos];
+            String mcridExtension = getExtension(mcrid);
+            mcrid = mcrid.substring(0, mcrid.length() - mcridExtension.length());
+            Optional<MCRObjectID> optObjId = mcrIdMapper.mapMCRObjectID(mcrid);
+            if (optObjId.isEmpty()) {
+                throw new NotFoundException("No unique MyCoRe Object ID found for query " + mcrid);
+            }
+            pathParts[mcrIdPos] = optObjId.get().toString() + mcridExtension;
+
+            if (optObjId.isPresent() && pathParts.length > derIdPos && pathParts[derIdPos - 1].equals("derivates")) {
+                String derid = pathParts[derIdPos];
+                String deridExtension = getExtension(derid);
+                derid = derid.substring(0, derid.length() - deridExtension.length());
+                Optional<MCRObjectID> optDerId = mcrIdMapper.mapMCRDerivateID(optObjId.get(), derid);
+                if (optDerId.isEmpty()) {
+                    throw new NotFoundException("No unique MyCoRe Derivate ID found for query " + derid);
+                }
+                pathParts[derIdPos] = optDerId.get().toString() + deridExtension;
+            }
         } catch (MCRException ex) {
-            // ignore
+            throw new BadRequestException("Could not detect MyCoRe ID", ex);
         }
 
-        if (pathParts.length > derIdPos && pathParts[derIdPos - 1].equals("derivates")) {
-            String derid = pathParts[derIdPos];
-            String deridExtension = getExtension(derid);
-            derid = derid.substring(0, derid.length() - deridExtension.length());
-            try {
-                final boolean searchDerId = !SEARCHKEYS_FOR_DERIVATES.isEmpty() && derid.contains(":");
-                pathParts[derIdPos] = MCRObjectID
-                    .getInstance(searchDerId ? retrieveMCRDerIDfromSOLR(mcrid, derid) : derid)
-                    .toString();
-                pathParts[derIdPos] += deridExtension;
-            } catch (MCRException ex) {
-                // ignore
-            }
-        }
         String newPath = StringUtils.join(pathParts, "/");
         if (!newPath.equals(path)) {
             String queryString = uriInfo.getRequestUri().getQuery();
@@ -131,70 +115,4 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
         return "";
     }
 
-    private String retrieveMCRDerIDfromSOLR(String mcrid, String derid) {
-        String key = derid.substring(0, derid.indexOf(":"));
-        String value = derid.substring(derid.indexOf(":") + 1);
-        if (SEARCHKEYS_FOR_DERIVATES.contains(key)) {
-            ModifiableSolrParams params = new ModifiableSolrParams();
-            params.set("start", 0);
-            params.set("rows", 1);
-            params.set("fl", "id");
-            params.set("fq", "objectKind:mycorederivate");
-            params.set("fq", "returnId:" + mcrid);
-            params.set("q", key + ":" + ClientUtils.escapeQueryChars(value));
-            params.set("sort", "derivateOrder asc");
-            QueryResponse solrResponse = null;
-            try {
-                solrResponse = MCRSolrClientFactory.getMainSolrClient().query(params);
-            } catch (Exception e) {
-                LOGGER.error("Error retrieving derivate id from SOLR", e);
-            }
-            if (solrResponse != null) {
-                SolrDocumentList solrResults = solrResponse.getResults();
-                if (solrResults.getNumFound() == 1) {
-                    return String.valueOf(solrResults.get(0).getFieldValue("id"));
-                }
-                if (solrResults.getNumFound() == 0) {
-                    throw new NotFoundException("No MyCoRe Derivate ID found for query " + derid);
-                }
-                if (solrResults.getNumFound() > 1) {
-                    throw new BadRequestException(
-                        "The query " + derid + " does not return a unique MyCoRe Derivate ID");
-                }
-            }
-        }
-        return derid;
-    }
-
-    private String retrieveMCRObjIDfromSOLR(String mcrid) {
-        String key = mcrid.substring(0, mcrid.indexOf(":"));
-        String value = mcrid.substring(mcrid.indexOf(":") + 1);
-        if (SEARCHKEYS_FOR_OBJECTS.contains(key)) {
-            ModifiableSolrParams params = new ModifiableSolrParams();
-            params.set("start", 0);
-            params.set("rows", 1);
-            params.set("fl", "id");
-            params.set("fq", "objectKind:mycoreobject");
-            params.set("q", key + ":" + ClientUtils.escapeQueryChars(value));
-            QueryResponse solrResponse = null;
-            try {
-                solrResponse = MCRSolrClientFactory.getMainSolrClient().query(params);
-            } catch (Exception e) {
-                LOGGER.error("Error retrieving object id from SOLR", e);
-            }
-            if (solrResponse != null) {
-                SolrDocumentList solrResults = solrResponse.getResults();
-                if (solrResults.getNumFound() == 1) {
-                    return String.valueOf(solrResults.get(0).getFieldValue("id"));
-                }
-                if (solrResults.getNumFound() == 0) {
-                    throw new NotFoundException("No MyCoRe ID found for query " + mcrid);
-                }
-                if (solrResults.getNumFound() > 1) {
-                    throw new BadRequestException("The query " + mcrid + " does not return a unique MyCoRe ID");
-                }
-            }
-        }
-        return mcrid;
-    }
 }
