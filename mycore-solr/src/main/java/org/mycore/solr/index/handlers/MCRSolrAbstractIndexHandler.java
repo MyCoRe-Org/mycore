@@ -41,7 +41,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     public MCRSolrAbstractIndexHandler(SolrClient solrClient) {
         this.solrClient = solrClient != null ? solrClient : MCRSolrClientFactory.getMainSolrClient();
-        this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithIn").orElse(-1);
+        this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithIn").orElseThrow();
     }
 
     public SolrClient getSolrClient() {
