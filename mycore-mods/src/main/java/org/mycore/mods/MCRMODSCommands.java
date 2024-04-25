@@ -177,8 +177,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
             Element mods = new MCRMODSWrapper(obj).getMODS();
             MCREnricher enricher = new MCREnricher(configID);
             enricher.enrich(mods);
-            MCRMetadataManager.fireUpdateEvent(obj);
-        } catch (MCRException e) {
+            MCRMetadataManager.update(obj);
+        } catch (MCRException | MCRAccessException e) {
             LOGGER.error("Error while trying to enrich {} with configuration {}: ", modsId, configID, e);
         }
     }
