@@ -44,8 +44,7 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
         String setConfigPrefix = configPrefix + SETS_PREFIX + setId;
         MCROAISolrSetHandler handler = MCRConfiguration2.getInstanceOf(
                 MCROAISolrSetHandler.class, setConfigPrefix + ".Handler")
-            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
-                MCROAISolrSetHandler.class, getFallbackHandler(configPrefix, setId)));
+            .orElseGet(() -> MCRConfiguration2.instantiateClass(getFallbackHandler(configPrefix, setId)));
         this.id = setId;
         this.uri = getURI(setConfigPrefix);
         this.handler = handler;
