@@ -52,6 +52,7 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
                 }
                 return MCRConfiguration2.instantiateClass(fallbackHandlerClassName);
             });
+        handler.init(configPrefix, setId);
         this.id = setId;
         this.uri = getURI(setConfigPrefix);
         this.handler = handler;
