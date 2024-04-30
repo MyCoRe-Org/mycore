@@ -38,7 +38,6 @@ import org.jdom2.Namespace;
 import org.jdom2.Verifier;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
@@ -217,9 +216,7 @@ public class MCREditorSession {
     }
 
     public void setBreakpoint(String msg) {
-        if (editedXML != null) {
-            tracker.track(new MCRBreakpoint(msg));
-        }
+        tracker.track(new MCRBreakpoint(msg));
     }
 
     public MCRChangeTracker getChangeTracker() {

@@ -66,18 +66,17 @@ public class MCRDebugTarget implements MCREditorTarget {
         new MCREditorSubmission(session).setSubmittedValues(parameters);
 
         Document result = session.getEditedXML().clone();
-        MCRChangeTracker tracker = session.getChangeTracker().clone();
+
+        MCRChangeTracker tracker = session.getChangeTracker();
 
         List<Object> steps = new ArrayList<Object>();
         while (tracker.getChangeCount() > 0) {
-            MCRChange change = tracker.undoLastChange(result);
+            MCRChange change = tracker.undoLastChange();
             if (change instanceof MCRBreakpoint) {
-                steps.add(0, result.clone());
+                steps.add(0, session.getEditedXML().clone());
             }
             steps.add(0, change);
         }
-
-        result = session.getEditedXML().clone();
 
         result = session.getXMLCleaner().clean(result);
         steps.add(new MCRBreakpoint("After cleaning"));

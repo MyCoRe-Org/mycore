@@ -18,40 +18,29 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.mycore.common.xml.MCRXPathBuilder;
-import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * Removes an attribute from the edited xml, and tracks that change.  
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRRemoveAttribute implements MCRChange {
+public class MCRRemoveAttribute extends MCRChange {
 
-    private String xPath;
+    private Element parent;
 
-    private Attribute attribute;
+    private Attribute removedAttribute;
 
     public MCRRemoveAttribute(Attribute attribute) {
-        this.attribute = attribute.clone();
-        this.xPath = MCRXPathBuilder.buildXPath(attribute);
-        attribute.detach();
+        this.message = "Removed attribute " + MCRXPathBuilder.buildXPath(attribute);
+        this.parent = attribute.getParent();
+        this.removedAttribute = attribute.detach();
     }
 
     @Override
-    public String getMessage() {
-        return "Removed attribute " + xPath;
-    }
-
-    @Override
-    public void undo(MCRBinding root) throws JaxenException {
-        String parentXPath = xPath.substring(0, xPath.lastIndexOf("/@"));
-        MCRBinding parentBinding = new MCRBinding(parentXPath, false, root);
-        Element parent = (Element) (parentBinding.getBoundNode());
-        parent.setAttribute(attribute);
-        parentBinding.detach();
+    public void undo() {
+        parent.setAttribute(removedAttribute);
     }
 }

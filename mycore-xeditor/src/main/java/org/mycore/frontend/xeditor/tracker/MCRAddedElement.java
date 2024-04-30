@@ -18,33 +18,24 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.mycore.common.xml.MCRXPathBuilder;
-import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * Tracks that a new element was added.  
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRAddedElement implements MCRChange {
+public class MCRAddedElement extends MCRChange {
 
-    private String xPath;
+    private Element addedElement;
 
     public MCRAddedElement(Element element) {
-        this.xPath = MCRXPathBuilder.buildXPath(element);
+        this.message = "Added element " + MCRXPathBuilder.buildXPath(element);
+        this.addedElement = element;
     }
 
-    @Override
-    public String getMessage() {
-        return "Added element " + xPath;
-    }
-
-    public void undo(MCRBinding rootBinding) throws JaxenException {
-        MCRBinding elementBinding = new MCRBinding(xPath, false, rootBinding);
-        Element element = (Element) (elementBinding.getBoundNode());
-        element.detach();
-        elementBinding.detach();
+    public void undo() {
+        addedElement.detach();
     }
 }

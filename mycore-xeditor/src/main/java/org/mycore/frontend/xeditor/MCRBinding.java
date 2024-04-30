@@ -71,12 +71,12 @@ public class MCRBinding {
     public MCRBinding(Document document) {
         this.boundNodes.add(document);
     }
-    
-    public MCRBinding( List<Object> boundNodes) {
+
+    public MCRBinding(List<Object> boundNodes) {
         this.boundNodes = boundNodes;
     }
 
-    public MCRBinding( Object boundNode) {
+    public MCRBinding(Object boundNode) {
         this.boundNodes.add(boundNode);
     }
 

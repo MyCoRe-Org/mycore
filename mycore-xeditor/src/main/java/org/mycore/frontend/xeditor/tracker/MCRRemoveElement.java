@@ -18,42 +18,31 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.mycore.common.xml.MCRXPathBuilder;
-import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * Removes an element from the edited xml, and tracks that change.  
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRRemoveElement implements MCRChange {
+public class MCRRemoveElement extends MCRChange {
 
-    private String xPath;
+    private Element removedElement;
 
-    private int pos;
+    private Element parent;
 
-    private Element element;
+    private int positionInParent;
 
     public MCRRemoveElement(Element element) {
-        this.element = element.clone();
-        this.xPath = MCRXPathBuilder.buildXPath(element);
-        this.pos = element.getParentElement().indexOf(element);
-        element.detach();
+        this.message = "Removed element " + MCRXPathBuilder.buildXPath(element);
+        this.parent = element.getParentElement();
+        this.positionInParent = parent.indexOf(element);
+        this.removedElement = element.detach();
     }
 
     @Override
-    public String getMessage() {
-        return "Removed element " + xPath;
-    }
-
-    @Override
-    public void undo(MCRBinding root) throws JaxenException {
-        String parentXPath = xPath.substring(0, xPath.lastIndexOf("/"));
-        MCRBinding parentBinding = new MCRBinding(parentXPath, false, root);
-        Element parent = (Element) (parentBinding.getBoundNode());
-        parent.addContent(pos, element);
-        parentBinding.detach();
+    public void undo() {
+        parent.addContent(positionInParent, removedElement);
     }
 }

@@ -26,177 +26,170 @@ import static org.junit.Assert.assertTrue;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.xeditor.MCRBinding;
 
 public class MCRChangeTrackerTest extends MCRTestCase {
 
+    private Element buildElement(String template) throws JaxenException {
+        return new MCRNodeBuilder().buildElement(template, null, null);
+    }
+
     @Test
     public void testAddElement() throws JaxenException {
-        Document doc = new Document(new MCRNodeBuilder().buildElement("document[title][title[2]]", null, null));
+        Element root = buildElement("document[title][title[2]]");
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         Element title = new Element("title");
-        doc.getRootElement().getChildren().add(1, title);
-        assertEquals(3, doc.getRootElement().getChildren().size());
-        assertTrue(doc.getRootElement().getChildren().contains(title));
-
+        root.getChildren().add(1, title);
         tracker.track(new MCRAddedElement(title));
-        tracker.undoChanges(doc);
 
-        assertEquals(2, doc.getRootElement().getChildren().size());
-        assertFalse(doc.getRootElement().getChildren().contains(title));
+        assertEquals(3, root.getChildren().size());
+        assertTrue(root.getChildren().contains(title));
+
+        tracker.undoChanges();
+
+        assertEquals(2, root.getChildren().size());
+        assertFalse(root.getChildren().contains(title));
     }
 
     @Test
     public void testRemoveElement() throws JaxenException {
-        String template = "document[title][title[2][@type='main'][subTitle]][title[3]]";
-        Document doc = new Document(new MCRNodeBuilder().buildElement(template, null, null));
+        Element root = buildElement("document[title][title[2][@type='main'][subTitle]][title[3]]");
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        Element title = doc.getRootElement().getChildren().get(1);
+        Element title = root.getChildren().get(1);
         tracker.track(new MCRRemoveElement(title));
-        assertEquals(2, doc.getRootElement().getChildren().size());
-        assertFalse(doc.getRootElement().getChildren().contains(title));
 
-        tracker.undoChanges(doc);
+        assertEquals(2, root.getChildren().size());
+        assertFalse(root.getChildren().contains(title));
 
-        assertEquals(3, doc.getRootElement().getChildren().size());
-        assertEquals("main", doc.getRootElement().getChildren().get(1).getAttributeValue("type"));
-        assertNotNull(doc.getRootElement().getChildren().get(1).getChild("subTitle"));
+        tracker.undoChanges();
+
+        assertEquals(3, root.getChildren().size());
+        assertEquals("main", root.getChildren().get(1).getAttributeValue("type"));
+        assertNotNull(root.getChildren().get(1).getChild("subTitle"));
     }
 
     @Test
     public void testAddAttribute() throws JaxenException {
-        Document doc = new Document(new MCRNodeBuilder().buildElement("document[title]", null, null));
+        Element root = buildElement("document[title]");
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         Attribute id = new Attribute("id", "foo");
-        doc.getRootElement().setAttribute(id);
+        root.setAttribute(id);
         tracker.track(new MCRAddedAttribute(id));
 
-        tracker.undoChanges(doc);
+        tracker.undoChanges();
 
-        assertNull(doc.getRootElement().getAttribute("id"));
+        assertNull(root.getAttribute("id"));
     }
 
     @Test
     public void testRemoveAttribute() throws JaxenException {
-        Document doc = new Document(new MCRNodeBuilder().buildElement("document[@id='foo']", null, null));
+        Element root = buildElement("document[@id='foo']");
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        Attribute id = doc.getRootElement().getAttribute("id");
+        Attribute id = root.getAttribute("id");
         tracker.track(new MCRRemoveAttribute(id));
-        assertNull(doc.getRootElement().getAttribute("id"));
+        assertNull(root.getAttribute("id"));
 
-        tracker.undoChanges(doc);
+        tracker.undoChanges();
 
-        assertEquals("foo", doc.getRootElement().getAttributeValue("id"));
+        assertEquals("foo", root.getAttributeValue("id"));
     }
 
     @Test
     public void testSetAttributeValue() throws JaxenException {
-        Document doc = new Document(new MCRNodeBuilder().buildElement("document[@id='foo']", null, null));
+        Element root = buildElement("document[@id='foo']");
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        Attribute id = doc.getRootElement().getAttribute("id");
+        Attribute id = root.getAttribute("id");
         tracker.track(new MCRSetAttributeValue(id, "bar"));
+
         assertEquals("bar", id.getValue());
 
-        tracker.undoChanges(doc);
+        tracker.undoChanges();
 
-        assertEquals("foo", doc.getRootElement().getAttributeValue("id"));
+        assertEquals("foo", root.getAttributeValue("id"));
     }
 
     @Test
     public void testSetElementText() throws JaxenException {
-        Document doc = new Document(
-            new MCRNodeBuilder().buildElement("document[@id='foo'][titles/title][author]", null, null));
+        Element root = buildElement("document[@id='foo'][titles/title][author]");
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        tracker.track(new MCRSetElementText(doc.getRootElement(), "text"));
-        assertEquals("text", doc.getRootElement().getText());
-        assertEquals("foo", doc.getRootElement().getAttributeValue("id"));
+        tracker.track(new MCRSetElementText(root, "text"));
+        assertEquals("text", root.getText());
+        assertEquals("foo", root.getAttributeValue("id"));
 
-        tracker.undoChanges(doc);
-        assertEquals("foo", doc.getRootElement().getAttributeValue("id"));
-        assertEquals(2, doc.getRootElement().getChildren().size());
-        assertEquals("titles", doc.getRootElement().getChildren().get(0).getName());
-        assertEquals("author", doc.getRootElement().getChildren().get(1).getName());
-        assertEquals("", doc.getRootElement().getText());
+        tracker.undoChanges();
+
+        assertEquals("foo", root.getAttributeValue("id"));
+        assertEquals(2, root.getChildren().size());
+        assertEquals("titles", root.getChildren().get(0).getName());
+        assertEquals("author", root.getChildren().get(1).getName());
+        assertEquals("", root.getText());
     }
 
     @Test
     public void testCompleteUndo() throws JaxenException {
         String template = "document[titles[title][title[2]]][authors/author[first='John'][last='Doe']]";
-        Document doc = new Document(new MCRNodeBuilder().buildElement(template, null, null));
-        Document before = doc.clone();
+        Element root = buildElement(template);
+        Element before = root.clone();
 
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        Element titles = (Element) (new MCRBinding("document/titles", true, new MCRBinding(doc)).getBoundNode());
         Element title = new Element("title").setAttribute("type", "alternative");
-        titles.addContent(2, title);
+        root.getChild("titles").addContent(2, title);
         tracker.track(new MCRAddedElement(title));
 
         Attribute lang = new Attribute("lang", "de");
-        doc.getRootElement().setAttribute(lang);
+        root.setAttribute(lang);
         tracker.track(new MCRAddedAttribute(lang));
 
-        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc))
-            .getBoundNode());
+        Element author = root.getChild("authors").getChild("author");
         tracker.track(new MCRRemoveElement(author));
 
-        tracker.undoChanges(doc);
+        tracker.undoChanges();
 
-        assertTrue(MCRXMLHelper.deepEqual(before, doc));
-    }
-
-    @Test
-    public void testEscaping() {
-        String pattern = "<?xed-foo ?>";
-        Document doc = new Document(new Element("document").addContent(new Element("child").setText(pattern)));
-        MCRChangeTracker tracker = new MCRChangeTracker();
-        tracker.track(new MCRRemoveElement(doc.getRootElement().getChildren().get(0)));
-        tracker.undoChanges(doc);
-        assertEquals(pattern, doc.getRootElement().getChildren().get(0).getText());
+        assertTrue(MCRXMLHelper.deepEqual(before, root));
     }
 
     @Test
     public void testNestedChanges() {
         Element root = new Element("root");
-        Document doc = new Document(root);
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         Element title = new Element("title");
         root.addContent(title);
         tracker.track(new MCRAddedElement(title));
 
-        Attribute id = new Attribute("type", "main");
-        title.setAttribute(id);
-        tracker.track(new MCRAddedAttribute(id));
+        Attribute type = new Attribute("type", "main");
+        title.setAttribute(type);
+        tracker.track(new MCRAddedAttribute(type));
 
         Element part = new Element("part");
         title.addContent(part);
         tracker.track(new MCRAddedElement(part));
 
         tracker.track(new MCRRemoveElement(part));
-        tracker.track(new MCRRemoveAttribute(id));
+        tracker.track(new MCRRemoveAttribute(type));
         tracker.track(new MCRRemoveElement(title));
 
-        tracker.undoChanges(doc);
+        tracker.undoChanges();
+
+        Element expected = new Element("root");
+        assertTrue(MCRXMLHelper.deepEqual(expected, root));
     }
 
     @Test
     public void testNamespaces() {
         Element root = new Element("root");
-        Document doc = new Document(root);
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         Attribute href = new Attribute("href", "foo", MCRConstants.XLINK_NAMESPACE);
@@ -206,10 +199,10 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         tracker.track(new MCRSetAttributeValue(href, "bar"));
 
         tracker.track(new MCRRemoveAttribute(href));
-        tracker.undoLastChange(doc);
+        tracker.undoLastChange();
 
         assertEquals("bar", root.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE));
-        tracker.undoChanges(doc);
+        tracker.undoChanges();
 
         assertNull(root.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE));
 
@@ -218,11 +211,11 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         tracker.track(new MCRAddedElement(title));
 
         tracker.track(new MCRSetElementText(title, "bar"));
-        tracker.undoLastChange(doc);
+        tracker.undoLastChange();
         assertEquals("foo", root.getChild("title", MCRConstants.MODS_NAMESPACE).getText());
 
         tracker.track(new MCRRemoveElement(title));
-        tracker.undoLastChange(doc);
+        tracker.undoLastChange();
 
         assertNotNull(root.getChild("title", MCRConstants.MODS_NAMESPACE));
     }
@@ -230,7 +223,6 @@ public class MCRChangeTrackerTest extends MCRTestCase {
     @Test
     public void testBreakpoint() {
         Element root = new Element("root");
-        Document doc = new Document(root);
 
         MCRChangeTracker tracker = new MCRChangeTracker();
 
@@ -246,7 +238,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         tracker.track(new MCRSetAttributeValue(href, "bar"));
 
-        String label = tracker.undoLastBreakpoint(doc);
+        String label = tracker.undoLastBreakpoint();
         assertEquals("Test", label);
         assertNull(root.getAttribute("href"));
         assertEquals(1, tracker.getChangeCount());
@@ -254,9 +246,8 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
     @Test
     public void testSwapElements() throws JaxenException {
-        Element root = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name[2]='b'][note[2]]", null,
-            null);
-        Document doc = new Document(root);
+        Element root
+            = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name[2]='b'][note[2]]", null, null);
 
         assertEquals("a", root.getChildren().get(0).getText());
         assertEquals("b", root.getChildren().get(3).getText());
@@ -267,7 +258,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         assertEquals("b", root.getChildren().get(0).getText());
         assertEquals("a", root.getChildren().get(3).getText());
 
-        tracker.undoChanges(doc);
+        tracker.undoChanges();
 
         assertEquals("a", root.getChildren().get(0).getText());
         assertEquals("b", root.getChildren().get(3).getText());

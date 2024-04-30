@@ -20,19 +20,17 @@ package org.mycore.frontend.xeditor.tracker;
 
 import java.util.List;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.mycore.common.xml.MCRXPathBuilder;
-import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * Swaps two elements in the edited xml, and tracks that change.  
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRSwapElements implements MCRChange {
+public class MCRSwapElements extends MCRChange {
 
-    private String xPath;
+    private Element parent;
 
     private int posA;
 
@@ -43,15 +41,11 @@ public class MCRSwapElements implements MCRChange {
     }
 
     public MCRSwapElements(Element parent, int posA, int posB) {
-        this.xPath = MCRXPathBuilder.buildXPath(parent);
+        this.parent = parent;
         this.posA = posA;
         this.posB = posB;
+        this.message = "Swapped elements " + posA + " and " + posB + " at " + MCRXPathBuilder.buildXPath(parent);
         swap(parent, posA, posB);
-    }
-
-    @Override
-    public String getMessage() {
-        return "Swapped elements " + posA + " and " + posB + " at " + xPath;
     }
 
     private void swap(Element parent, int posA, int posB) {
@@ -66,9 +60,7 @@ public class MCRSwapElements implements MCRChange {
         }
     }
 
-    public void undo(MCRBinding root) throws JaxenException {
-        MCRBinding parentBinding = new MCRBinding(xPath, false, root);
-        Element parent = (Element) (parentBinding.getBoundNode());
+    public void undo() {
         swap(parent, posA, posB);
     }
 }

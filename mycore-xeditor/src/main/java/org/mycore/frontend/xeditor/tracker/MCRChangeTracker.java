@@ -20,17 +20,12 @@ package org.mycore.frontend.xeditor.tracker;
 
 import java.util.Stack;
 
-import org.jaxen.JaxenException;
-import org.jdom2.Document;
-import org.mycore.common.MCRException;
-import org.mycore.frontend.xeditor.MCRBinding;
-
 /**
  * Tracks changes to the edited xml, allowing to undo them step by step.  
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRChangeTracker implements Cloneable {
+public class MCRChangeTracker {
 
     private Stack<MCRChange> changes = new Stack<MCRChange>();
 
@@ -42,19 +37,20 @@ public class MCRChangeTracker implements Cloneable {
         return changes.size();
     }
 
-    public void undoChanges(Document doc) {
-        undoChanges(doc, 0);
+    public void undoChanges() {
+        while (!changes.isEmpty())
+            undoLastChange();
     }
 
-    public void undoChanges(Document doc, int stepNumber) {
+    public void undoChanges(int stepNumber) {
         while (getChangeCount() > stepNumber) {
-            undoLastChange(doc);
+            undoLastChange();
         }
     }
 
-    public String undoLastBreakpoint(Document doc) {
+    public String undoLastBreakpoint() {
         while (getChangeCount() > 0) {
-            MCRChange change = undoLastChange(doc);
+            MCRChange change = undoLastChange();
             if (change instanceof MCRBreakpoint) {
                 return change.getMessage();
             }
@@ -62,24 +58,13 @@ public class MCRChangeTracker implements Cloneable {
         return null;
     }
 
-    public MCRChange undoLastChange(Document doc) {
+    public MCRChange undoLastChange() {
         MCRChange change = changes.pop();
-        try {
-            change.undo(new MCRBinding(doc));
-        } catch (JaxenException ex) {
-            throw new MCRException(ex);
-        }
+        change.undo();
         return change;
     }
 
     public MCRChange getLastChange() {
         return changes.peek();
-    }
-
-    @Override
-    public MCRChangeTracker clone() {
-        MCRChangeTracker tracker = new MCRChangeTracker();
-        tracker.changes.addAll(this.changes);
-        return tracker;
     }
 }

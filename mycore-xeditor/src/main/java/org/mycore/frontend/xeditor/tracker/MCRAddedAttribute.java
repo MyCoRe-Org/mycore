@@ -18,34 +18,25 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.mycore.common.xml.MCRXPathBuilder;
-import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * Tracks that a new attribute was added.  
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRAddedAttribute implements MCRChange {
+public class MCRAddedAttribute extends MCRChange {
 
-    private String xPath;
+    private Attribute addedAttribute;
 
     public MCRAddedAttribute(Attribute attribute) {
-        this.xPath = MCRXPathBuilder.buildXPath(attribute);
+        this.message = MCRXPathBuilder.buildXPath(attribute) + " = \"" + attribute.getValue() + "\"";
+        this.addedAttribute = attribute;
     }
 
     @Override
-    public String getMessage() {
-      return "Added attribute " + xPath;  
-    }
-
-    @Override
-    public void undo(MCRBinding rootBinding) throws JaxenException {
-        MCRBinding attributeBinding = new MCRBinding(xPath, false, rootBinding);
-        Attribute attribute = (Attribute) (attributeBinding.getBoundNode());
-        attribute.detach();
-        attributeBinding.detach();
+    public void undo() {
+        addedAttribute.detach();
     }
 }
