@@ -308,8 +308,7 @@ final class ContentUtils {
      * Called before sending data to end hibernate transaction, if any.
      */
     static void endCurrentTransaction() {
-        if (!MCRSessionMgr.isLocked()) {
-            MCRSessionMgr.getCurrentSession();
+        if (!MCRSessionMgr.isLocked() && MCRSessionMgr.hasCurrentSession()) {
             MCRTransactionHelper.commitTransaction();
         }
     }
