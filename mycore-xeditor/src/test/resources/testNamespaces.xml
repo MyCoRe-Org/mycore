@@ -30,8 +30,8 @@
 
   <html>
     <form action="http://localhost:8291/servlets/XEditor" method="post">
-      <input name="mods_title" value="Test" type="text" />
-      <input name="xlink_href" value="" type="text" />
+      <input name="mods:title" value="Test" type="text" />
+      <input name="xlink:href" value="" type="text" />
       <div style="visibility:hidden">
         <input value="input" name="key" type="hidden" />
         <input value="1-5" name="_xed_session" type="hidden" />
@@ -42,9 +42,13 @@
   <xml>
     <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
       <mods:titleInfo>
-        <mods:title>@@_mods_title_@@=Test</mods:title>
+        <mods:title>
+          Test
+          <?xed_field name="mods:title"?></mods:title>
       </mods:titleInfo>
-      <mods:relatedItem xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="@@_xlink_href_@@=" />
+      <mods:relatedItem xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="">
+        <?xed_field name="xlink:href" xpath="@xlink:href"?>
+      </mods:relatedItem>
     </mods:mods>
   </xml>
 

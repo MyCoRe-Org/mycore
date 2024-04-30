@@ -25,6 +25,7 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
  * @author Frank Lützenkirchen
  */
 public class MCRInsertTarget extends MCRSwapInsertTarget {
+    
     @Override
     protected void handle(int pos, MCRRepeatBinding repeatBinding) throws JaxenException {
         repeatBinding.insert(pos);

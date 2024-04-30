@@ -64,15 +64,15 @@
           <input type="radio" value="america" name="ziel" checked="checked" />
         </div>
         <div style="visibility:hidden">
-          <input value="america" name="_xed_default_ziel" type="hidden" />
           <input value="1-7" name="_xed_session" type="hidden" />
         </div>
       </form>
     </html>
   
     <xml>
-      <reise ziel="@@_ziel_@@=america">
-        <leistung>@@_leistung_@@=</leistung>
+      <reise ziel="america">
+        <leistung><?xed_field name="leistung"?></leistung>
+        <?xed_field name="ziel" xpath="@ziel" default="america"?>
       </reise>
     </xml>
 
@@ -115,16 +115,16 @@
         </div>
         <div style="visibility:hidden">
           <input value="test" name="id" type="hidden" />
-          <input value="america" name="_xed_default_ziel" type="hidden" />
           <input value="1-5" name="_xed_session" type="hidden" />
         </div>
       </form>
     </html>
   
     <xml>
-      <reise ziel="@@_ziel_@@=emea">
-        <leistung>@@_leistung_@@=hotel</leistung>
-        <leistung>@@_leistung_@@=insurance</leistung>
+      <reise ziel="emea">
+        <leistung>hotel<?xed_field name="leistung"?></leistung>
+        <leistung>insurance<?xed_field name="leistung"?></leistung>
+        <?xed_field name="ziel" xpath="@ziel" default="america"?>
       </reise>
     </xml>
 

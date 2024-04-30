@@ -26,6 +26,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCRNodes;
 
 /**
  * Validates edited xml using an external method. 
@@ -84,7 +85,7 @@ public class MCRExternalValidator extends MCRValidator {
         } else {
             method = findMethod(String.class);
             if (method != null) {
-                String value = MCRBinding.getValue(node);
+                String value = MCRNodes.getValue(node);
                 return value.isEmpty() ? null : invokeMethod(method, value);
             } else {
                 throw new MCRConfigurationException(

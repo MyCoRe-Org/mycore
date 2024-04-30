@@ -49,6 +49,13 @@
       </form>
     </html>
     
+    <xml>
+      <document>
+        <title><?xed_field name="title"?></title>
+        <year><?xed_field name="year"?></year>
+      </document>
+    </xml>
+
     <submit />
     
     <xml>
@@ -109,6 +116,13 @@
       </form>
     </html>
 
+    <xml>    
+      <document>
+        <title>Der neue XEditor - Utopie oder Wahnsinn?<?xed_field name="title"?></title>
+        <year><?xed_field name="year"?></year>
+      </document>
+    </xml>
+
     <submit>
       <param name="title">
         <value>Der neue XEditor - Utopie oder Wahnsinn?</value>
@@ -126,7 +140,7 @@
     </xml>
     
     <isValid>true</isValid>
-    
+     
   </test>
   
 </test>

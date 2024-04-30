@@ -33,6 +33,7 @@ public class MCRRemoveTarget extends MCRRepeaterControl {
         String xPath) throws Exception {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         binding.removeBoundNode(0);
+        session.getChangeTracker().track(binding.getChanges());
         binding.detach();
 
         session.setBreakpoint("After handling target remove " + xPath);

@@ -31,7 +31,6 @@
           <option value="insurance">Reiserücktrittversicherung</option>
         </select>
         <div style="visibility:hidden">
-          <input value="hotel" name="_xed_default_leistung" type="hidden" />
           <input value="1-5" name="_xed_session" type="hidden" />
         </div>
       </form>
@@ -39,7 +38,10 @@
   
     <xml>
       <reise>
-        <leistung>@@_leistung_@@=hotel</leistung>
+        <leistung>
+          hotel
+          <?xed_field name="leistung" default="hotel"?>
+        </leistung>
       </reise>
     </xml>
 
@@ -67,7 +69,6 @@
         </select>
         <div style="visibility:hidden">
           <input value="test" name="id" type="hidden" />
-          <input value="hotel" name="_xed_default_leistung" type="hidden" />
           <input value="1-4" name="_xed_session" type="hidden" />
         </div>        
       </form>
@@ -75,8 +76,14 @@
 
     <xml>
       <reise>
-        <leistung>@@_leistung_@@=plane</leistung>
-        <leistung>@@_leistung_@@=insurance</leistung>
+        <leistung>
+          plane
+          <?xed_field name="leistung" default="hotel"?>
+        </leistung>
+        <leistung>
+          insurance
+          <?xed_field name="leistung" default="hotel"?>
+        </leistung>
       </reise>
     </xml>
 

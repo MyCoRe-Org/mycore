@@ -22,7 +22,9 @@
   <transform />
   
   <xml>
-    <document archive="@@_archive_@@=false" />
+    <document archive="false">
+      <?xed_field name="archive" xpath="@archive"?>
+    </document>
   </xml>
   
   <submit />
@@ -34,7 +36,9 @@
   <transformAgain />
   
   <xml>
-    <document archive="@@_archive_@@=" />
+    <document archive="">
+      <?xed_field name="archive" xpath="@archive"?>
+    </document>
   </xml>
 
   <submit>

@@ -210,7 +210,6 @@ public class MCREditorSession {
 
     public MCRBinding getRootBinding() {
         MCRBinding binding = new MCRBinding(editedXML);
-        binding.setChangeTracker(tracker);
         binding.setVariables(variables);
         return binding;
     }

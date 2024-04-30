@@ -50,7 +50,7 @@
       </div>
       <a id="rep-2" />
       <div>
-        <input name="service_1" value="urn" type="text" />
+        <input name="service[2]" value="urn" type="text" />
       </div>
       <a id="rep-3" />
       <div>
@@ -61,7 +61,7 @@
       </button>
       <a id="rep-4" />
       <div>
-        <input name="name_2" value="" type="text" />
+        <input name="name[2]" value="" type="text" />
       </div>
       <button name="_xed_submit_up:/document|1|build|name[(@type = &quot;personal&quot;)]|rep-4" class="btn btn-secondary" type="submit">
         <i class="fas fa-arrow-up" />
@@ -71,7 +71,7 @@
       </button>
       <a id="rep-5" />
       <div>
-        <input name="name_3" value="" type="text" />
+        <input name="name[3]" value="" type="text" />
       </div>
       <button name="_xed_submit_up:/document|2|build|name[(@type = &quot;personal&quot;)]|rep-5" class="btn btn-secondary" type="submit">
         <i class="fas fa-arrow-up" />

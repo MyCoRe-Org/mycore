@@ -41,10 +41,13 @@
   
   <xml>
     <document>
-      <category>@@_category_@@=a</category>
+      <category>
+        a
+        <?xed_field name="category"?>
+      </category>
     </document>
   </xml>
-  
+   
   <submit>
     <param name="category">
       <value>b</value>
@@ -74,8 +77,11 @@
   
   <xml>
     <document>
-      <category>@@_category_@@=b</category>
+      <category>
+        b
+        <?xed_field name="category"?>
+      </category>
     </document>
   </xml>
-  
+
 </test>

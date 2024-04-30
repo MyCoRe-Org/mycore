@@ -29,6 +29,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * @author Frank Lützenkirchen
@@ -71,7 +72,7 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
 
         repeat.bindRepeatPosition();
         String swapParam = MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_DOWN);
-        new MCRSwapTarget().handle(swapParam, root);
+        new MCRSwapTarget().handle(swapParam, root, new MCRChangeTracker());
 
         assertEquals("b", doc.getRootElement().getChildren().get(0).getText());
         assertEquals("a", doc.getRootElement().getChildren().get(3).getText());
@@ -153,7 +154,7 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
         assertEquals("/mods:mods|1|build|mods:name[(@type = \"personal\")]", insertParam);
         repeat.detach();
 
-        new MCRInsertTarget().handle(insertParam, root);
+        new MCRInsertTarget().handle(insertParam, root, new MCRChangeTracker());
         repeat = new MCRRepeatBinding("mods:mods/mods:name[@type='personal']", root, 1, 10, "build");
         assertEquals(3, repeat.getBoundNodes().size());
         assertEquals("p1", ((Element) (repeat.getBoundNodes().get(0))).getText());
@@ -177,7 +178,7 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
         assertEquals("/mods:mods|1|clone|mods:name[(@type = \"personal\")]", insertParam);
         repeat.detach();
 
-        new MCRInsertTarget().handle(insertParam, root);
+        new MCRInsertTarget().handle(insertParam, root, new MCRChangeTracker());
         repeat = new MCRRepeatBinding("mods:mods/mods:name[@type='personal']", root, 1, 10, "build");
         assertEquals(3, repeat.getBoundNodes().size());
         assertEquals("p1", ((Element) (repeat.getBoundNodes().get(0))).getText());

@@ -74,14 +74,14 @@
   
     <xml>
       <document>
-        <title>@@_title_@@=</title>
+        <title><?xed_field name="title"?></title>
         <author>
-          <firstName>@@_firstName_@@=</firstName>
-          <lastName>@@_lastName_@@=</lastName>
+          <firstName><?xed_field name="firstName"?></firstName>
+          <lastName><?xed_field name="lastName"?></lastName>
         </author>
-        <abstract>@@_abstract_@@=</abstract>
-        <type>@@_type_@@=</type>
-        <service>@@_service_@@=urn</service>
+        <abstract><?xed_field name="abstract"?></abstract>
+        <type><?xed_field name="type"?></type>
+        <service>urn<?xed_field name="service"?></service>
         <relatedItem type="host">
           <titleInfo>
             <nonSort>The</nonSort>
@@ -153,16 +153,17 @@
   
     <xml>
       <document>
-        <title>@@_title_@@=Der neue XEditor - Utopie oder Wahnsinn?</title>
+        <title>Der neue XEditor - Utopie oder Wahnsinn?<?xed_field name="title"?></title>
         <author>
-          <firstName>@@_firstName_@@=Frank</firstName>
-          <lastName>@@_lastName_@@=Lützenkirchen</lastName>
+          <firstName>Frank<?xed_field name="firstName"?></firstName>
+          <lastName>Lützenkirchen<?xed_field name="lastName"?></lastName>
         </author>
-        <abstract>@@_abstract_@@=Der XEditor ermöglicht es, HTML-Formulare zur
-                Bearbeitung von XML-Dokumenten zu verwenden.</abstract>
-        <type>@@_type_@@=article</type>
-        <service>@@_service_@@=oai</service>
-        <service>@@_service_@@=urn</service>
+        <abstract>Der XEditor ermöglicht es, HTML-Formulare zur
+          Bearbeitung von XML-Dokumenten zu verwenden.
+          <?xed_field name="abstract"?></abstract>
+        <type>article<?xed_field name="type"?></type>
+        <service>oai<?xed_field name="service"?></service>
+        <service>urn<?xed_field name="service"?></service>
         <relatedItem type="host">
           <titleInfo>
             <nonSort>The</nonSort>

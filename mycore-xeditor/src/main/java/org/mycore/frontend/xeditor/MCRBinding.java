@@ -38,19 +38,11 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
-import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
-import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
-import org.mycore.frontend.xeditor.tracker.MCRChange;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
-import org.mycore.frontend.xeditor.tracker.MCRRemoveAttribute;
-import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
-import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
-import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRBinding {
+public class MCRBinding extends MCRNodes {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRBinding.class);
 
@@ -58,30 +50,14 @@ public class MCRBinding {
 
     protected String xPath;
 
-    protected List<Object> boundNodes = new ArrayList<>();
-
     protected MCRBinding parent;
 
     protected List<MCRBinding> children = new ArrayList<>();
 
-    protected MCRChangeTracker tracker;
-
     private Map<String, Object> staticVariables = null;
 
     public MCRBinding(Document document) {
-        this.boundNodes.add(document);
-    }
-
-    public MCRBinding(List<Object> boundNodes) {
-        this.boundNodes = boundNodes;
-    }
-
-    public MCRBinding(Object boundNode) {
-        this.boundNodes.add(boundNode);
-    }
-
-    public void setChangeTracker(MCRChangeTracker tracker) {
-        this.tracker = tracker;
+        super(document);
     }
 
     private MCRBinding(MCRBinding parent) {
@@ -139,43 +115,6 @@ public class MCRBinding {
         return xPath;
     }
 
-    public List<Object> getBoundNodes() {
-        return boundNodes;
-    }
-
-    public Object getBoundNode() {
-        return boundNodes.get(0);
-    }
-
-    public void removeBoundNode(int index) {
-        Object node = boundNodes.remove(index);
-        if (node instanceof Element element) {
-            track(new MCRRemoveElement(element));
-        } else {
-            track(new MCRRemoveAttribute((Attribute) node));
-        }
-    }
-
-    public Element cloneBoundElement(int index) {
-        Element template = (Element) (boundNodes.get(index));
-        Element newElement = template.clone();
-        Element parent = template.getParentElement();
-        int indexInParent = parent.indexOf(template) + 1;
-        parent.addContent(indexInParent, newElement);
-        boundNodes.add(index + 1, newElement);
-        trackNodeCreated(newElement);
-        return newElement;
-    }
-
-    private void trackNodeCreated(Object node) {
-        if (node instanceof Element element) {
-            track(new MCRAddedElement(element));
-        } else {
-            Attribute attribute = (Attribute) node;
-            track(new MCRAddedAttribute(attribute));
-        }
-    }
-
     public MCRBinding getParent() {
         return parent;
     }
@@ -195,53 +134,6 @@ public class MCRBinding {
             current = current.getParent();
         } while (current != null);
         return ancestors;
-    }
-
-    public String getValue() {
-        return getValue(getBoundNode());
-    }
-
-    public static String getValue(Object node) {
-        if (node instanceof Element element) {
-            return element.getTextTrim();
-        } else {
-            return ((Attribute) node).getValue();
-        }
-    }
-
-    public boolean hasValue(String value) {
-        return boundNodes.stream().map(MCRBinding::getValue).anyMatch(value::equals);
-    }
-
-    public void setValue(String value) {
-        setValue(getBoundNode(), value);
-    }
-
-    public void setDefault(String value) {
-        if (getValue().isEmpty()) {
-            setValue(getBoundNode(), value);
-        }
-    }
-
-    public void setValues(String value) {
-        for (int i = 0; i < boundNodes.size(); i++) {
-            setValue(i, value);
-        }
-    }
-
-    public void setValue(int index, String value) {
-        setValue(boundNodes.get(index), value);
-    }
-
-    public void setValue(Object node, String value) {
-        if (value.equals(getValue(node))) {
-            return;
-        }
-        if (node instanceof Attribute attribute) {
-            track(new MCRSetAttributeValue(attribute, value));
-        } else {
-            track(new MCRSetElementText((Element) node, value));
-        }
     }
 
     public String getName() {
@@ -286,13 +178,5 @@ public class MCRBinding {
 
     public MCRXPathEvaluator getXPathEvaluator() {
         return new MCRXPathEvaluator(buildXPathVariables(), getBoundNodes());
-    }
-
-    public void track(MCRChange change) {
-        if (tracker != null) {
-            tracker.track(change);
-        } else if (parent != null) {
-            parent.track(change);
-        }
     }
 }

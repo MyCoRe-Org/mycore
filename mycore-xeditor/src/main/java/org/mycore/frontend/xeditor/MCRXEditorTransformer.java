@@ -20,7 +20,6 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,6 +53,9 @@ import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.xeditor.mapper.MCRField;
+import org.mycore.frontend.xeditor.mapper.MCRFieldMapping;
+import org.mycore.frontend.xeditor.mapper.MCRNameBuilder;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
@@ -78,11 +80,11 @@ public class MCRXEditorTransformer {
 
     private MCRParameterCollector transformationParameters;
 
+    private MCRFieldMapping fieldMapping = new MCRFieldMapping();
+
+    private MCRNameBuilder nameBuilder = new MCRNameBuilder();
+
     private boolean withinSelectElement = false;
-
-    private MCRFieldMapper fieldMapper = new MCRFieldMapper();
-
-    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<>();
 
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
@@ -174,7 +176,9 @@ public class MCRXEditorTransformer {
             currentBinding = editorSession.getRootBinding();
         }
 
-        setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
+        MCRBinding newBinding = new MCRBinding(xPath, initialValue, name, currentBinding);
+        setCurrentBinding(newBinding);
+        trackChanges();
     }
 
     private void setCurrentBinding(MCRBinding binding) {
@@ -199,11 +203,19 @@ public class MCRXEditorTransformer {
 
     public void setValues(String value) {
         currentBinding.setValues(value);
+        trackChanges();
     }
 
     public void setDefault(String value) {
-        currentBinding.setDefault(value);
-        xPath2DefaultValue.put(currentBinding.getAbsoluteXPath(), value);
+        if (currentBinding.getValue().isEmpty()) {
+            currentBinding.setValue(value);
+            trackChanges();
+        }
+        fieldMapping.getField(currentBinding).setDefaultValue(value);
+    }
+
+    private void trackChanges() {
+        editorSession.getChangeTracker().track(currentBinding.getChanges());
     }
 
     public void unbind() {
@@ -214,8 +226,16 @@ public class MCRXEditorTransformer {
         return currentBinding.getAbsoluteXPath();
     }
 
-    public String getFieldNameForCurrentBinding(String valueOfNameAttribute) {
-        return fieldMapper.getNameFor(currentBinding, valueOfNameAttribute);
+    public String getFieldNameForCurrentBinding(String nameInHTML) {
+        MCRField field = fieldMapping.getField(currentBinding);
+
+        String name = field.getName();
+        if (name == null) {
+            name = nameBuilder.buildNameFor(currentBinding.getBoundNode(), nameInHTML);
+            field.setName(name);
+        }
+
+        return field.getName();
     }
 
     public String getValue() {
@@ -262,6 +282,7 @@ public class MCRXEditorTransformer {
         throws JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
+        trackChanges();
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());
     }
 
@@ -287,6 +308,7 @@ public class MCRXEditorTransformer {
 
     public void bindRepeatPosition() {
         setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
+        trackChanges();
         editorSession.getValidator().setValidationMarker(currentBinding);
     }
 
@@ -353,17 +375,9 @@ public class MCRXEditorTransformer {
             }
         }
 
-        for (String xPath : xPath2DefaultValue.keySet()) {
-            MCRBinding binding = new MCRBinding(xPath, false, editorSession.getRootBinding());
-            String fieldName = fieldMapper.getNameFor(binding, "");
-            String defaultValue = xPath2DefaultValue.get(xPath);
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + fieldName,
-                defaultValue));
-        }
-        
-        fieldMapper.encodeIntoXML(editorSession.getChangeTracker());
+        fieldMapping.encode();
         editorSession.setBreakpoint("After transformation to HTML");
-        
+
         nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
             editorSession.getCombinedSessionStepID()));
 

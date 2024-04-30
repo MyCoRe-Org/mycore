@@ -39,14 +39,15 @@
           <option value="isbn">ISBN</option>
         </select>
         <div style="visibility:hidden">
-          <input value="doi" name="_xed_default_type" type="hidden" />
           <input value="1-5" name="_xed_session" type="hidden" />
         </div>
       </form>
     </html>
     <xml>
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
-        <mods:identifier type="@@_type_@@=doi" />
+        <mods:identifier type="doi">
+          <?xed_field name="type" xpath="@type" default="doi"?>
+        </mods:identifier>
       </mods:mods>
     </xml>
   </test>
@@ -74,14 +75,16 @@
         </select>
         <div style="visibility:hidden">
           <input value="test" name="testID" type="hidden" />
-          <input value="doi" name="_xed_default_type" type="hidden" />
           <input value="1-3" name="_xed_session" type="hidden" />
         </div>
       </form>
     </html>
     <xml>
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
-        <mods:identifier type="@@_type_@@=isbn">978-123-45-67890</mods:identifier>
+        <mods:identifier type="isbn">
+          978-123-45-67890
+          <?xed_field name="type" xpath="@type" default="doi"?>
+        </mods:identifier>
       </mods:mods>
     </xml>
   </test>

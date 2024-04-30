@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -30,7 +31,11 @@ public class MCRChangeTracker {
     private Stack<MCRChange> changes = new Stack<MCRChange>();
 
     public void track(MCRChange change) {
-        changes.add(change);
+        this.changes.add(change);
+    }
+
+    public void track(List<MCRChange> changes) {
+        this.changes.addAll(changes);
     }
 
     public int getChangeCount() {

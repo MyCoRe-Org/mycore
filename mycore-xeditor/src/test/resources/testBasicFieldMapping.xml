@@ -49,10 +49,10 @@
         </div>
         <div>
           <label for="abstract">Abstract:</label>
-          <textarea id="abstract" name="mods_abstract" />
+          <textarea id="abstract" name="mods:abstract" />
         </div>
         <div style="visibility:hidden">
-          <input value="1-9" name="_xed_session" type="hidden" />
+          <input value="1-1" name="_xed_session" type="hidden" />
         </div>
       </form>
     </html>
@@ -60,10 +60,10 @@
     <xml>
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:name>
-          <mods:namePart type="given">@@_firstName_@@=</mods:namePart>
-          <mods:namePart type="family">@@_lastName_@@=</mods:namePart>
+          <mods:namePart type="given"><?xed_field name="firstName"?></mods:namePart>
+          <mods:namePart type="family"><?xed_field name="lastName"?></mods:namePart>
         </mods:name>
-        <mods:abstract>@@_mods_abstract_@@=</mods:abstract>
+        <mods:abstract><?xed_field name="mods:abstract"?></mods:abstract>
       </mods:mods>
     </xml>
 
@@ -98,11 +98,11 @@
         </div>
         <div>
           <label for="abstract">Abstract:</label>
-          <textarea id="abstract" name="mods_abstract">This is the abstract.</textarea>
+          <textarea id="abstract" name="mods:abstract">This is the abstract.</textarea>
         </div>
         <div style="visibility:hidden">
           <input value="testBasic" name="testID" type="hidden" />
-          <input value="1-5" name="_xed_session" type="hidden" />
+          <input value="1-1" name="_xed_session" type="hidden" />
         </div>
       </form>
     </html>
@@ -110,10 +110,10 @@
     <xml>
       <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
         <mods:name>
-          <mods:namePart type="given">@@_firstName_@@=John</mods:namePart>
-          <mods:namePart type="family">@@_lastName_@@=Doe</mods:namePart>
+          <mods:namePart type="given">John<?xed_field name="firstName"?></mods:namePart>
+          <mods:namePart type="family">Doe<?xed_field name="lastName"?></mods:namePart>
         </mods:name>
-        <mods:abstract>@@_mods_abstract_@@=This is the abstract.</mods:abstract>
+        <mods:abstract>This is the abstract.<?xed_field name="mods:abstract"?></mods:abstract>
         <mods:note>This is a note</mods:note>
       </mods:mods>
     </xml>

@@ -24,6 +24,7 @@ import org.jaxen.JaxenException;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCRNodes;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -93,7 +94,7 @@ public abstract class MCRValidator {
                 continue;
             }
 
-            String value = MCRBinding.getValue(node);
+            String value = MCRNodes.getValue(node);
             if (value.isEmpty()) {
                 continue;
             }

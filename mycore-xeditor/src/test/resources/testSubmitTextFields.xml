@@ -35,11 +35,17 @@
   
   <xml>
     <document>
-      <title>@@_title_@@=Titel</title>
-      <author firstName="@@_firstName_@@=John" lastName="@@_lastName_@@=Doe" />
+      <title>
+        Titel
+        <?xed_field name="title"?>
+      </title>
+      <author firstName="John" lastName="Doe">
+        <?xed_field name="firstName" xpath="@firstName"?>
+        <?xed_field name="lastName" xpath="@lastName"?>
+      </author>
     </document>
   </xml>
-  
+   
   <submit>
     <param name="title">
       <value>Title</value>
@@ -58,5 +64,5 @@
       <author firstName="Jim" lastName="" />
     </document>
   </xml>
-
+ 
 </test>

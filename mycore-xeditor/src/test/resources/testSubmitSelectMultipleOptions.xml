@@ -47,9 +47,9 @@
   
   <xml>
     <document>
-      <category>@@_category_@@=a</category>
-      <category>@@_category_@@=b</category>
-      <category>@@_category_@@=c</category>
+      <category>a<?xed_field name="category"?></category>
+      <category>b<?xed_field name="category"?></category>
+      <category>c<?xed_field name="category"?></category>
     </document>
   </xml>
   
@@ -80,13 +80,21 @@
     </form>
   </html>
   
+  <xml>
+    <document>
+      <category><?xed_field name="category"?></category>
+      <category><?xed_field name="category"?></category>
+      <category><?xed_field name="category"?></category>
+    </document>
+  </xml>
+
   <submit>
     <param name="category">
       <value>c</value>
       <value>d</value>
     </param>
   </submit>
-
+ 
   <xml>
     <document>
       <category>c</category>
@@ -112,6 +120,14 @@
     </form>
   </html>
 
+  <xml>
+    <document>
+      <category>c<?xed_field name="category"?></category>
+      <category>d<?xed_field name="category"?></category>
+      <category><?xed_field name="category"?></category>
+    </document>
+  </xml>
+
   <submit>
     <param name="category">
       <value>a</value>
@@ -134,10 +150,10 @@
 
   <xml>
     <document>
-      <category>@@_category_@@=a</category>
-      <category>@@_category_@@=b</category>
-      <category>@@_category_@@=c</category>
-      <category>@@_category_@@=d</category>
+      <category>a<?xed_field name="category"?></category>
+      <category>b<?xed_field name="category"?></category>
+      <category>c<?xed_field name="category"?></category>
+      <category>d<?xed_field name="category"?></category>
     </document>
   </xml>
 
