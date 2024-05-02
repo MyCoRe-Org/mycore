@@ -1,9 +1,5 @@
 package org.mycore.datamodel.niofs;
 
-import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.frontend.fileupload.MCRUploadHelper;
-
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.AccessDeniedException;
@@ -24,6 +20,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.frontend.fileupload.MCRUploadHelper;
+
 public abstract class MCRAbstractFileSystemProvider extends FileSystemProvider {
 
     /**
@@ -31,8 +31,7 @@ public abstract class MCRAbstractFileSystemProvider extends FileSystemProvider {
      */
     protected static final Set<? extends CopyOption> SUPPORTED_COPY_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
         StandardCopyOption.COPY_ATTRIBUTES,
-        StandardCopyOption.REPLACE_EXISTING
-    ));
+        StandardCopyOption.REPLACE_EXISTING));
 
     /**
      * set of supported open options
@@ -44,8 +43,7 @@ public abstract class MCRAbstractFileSystemProvider extends FileSystemProvider {
         StandardOpenOption.SPARSE,
         StandardOpenOption.SYNC,
         StandardOpenOption.TRUNCATE_EXISTING,
-        StandardOpenOption.WRITE
-    ));
+        StandardOpenOption.WRITE));
 
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#newFileSystem(java.net.URI, java.util.Map)
@@ -101,12 +99,12 @@ public abstract class MCRAbstractFileSystemProvider extends FileSystemProvider {
     protected void checkDirectoryAccessModes(Path directoryPath, AccessMode... modes) throws AccessDeniedException {
         for (AccessMode mode : modes) {
             switch (mode) {
-            case READ:
-            case WRITE:
-            case EXECUTE:
-                break;
-            default:
-                throw new AccessDeniedException(directoryPath.toString(), null, "Unsupported AccessMode: " + mode);
+                case READ:
+                case WRITE:
+                case EXECUTE:
+                    break;
+                default:
+                    throw new AccessDeniedException(directoryPath.toString(), null, "Unsupported AccessMode: " + mode);
             }
         }
     }
@@ -114,11 +112,11 @@ public abstract class MCRAbstractFileSystemProvider extends FileSystemProvider {
     protected void checkFileAccessModes(Path filePath, AccessMode... modes) throws AccessDeniedException {
         for (AccessMode mode : modes) {
             switch (mode) {
-            case READ:
-            case WRITE:
-                break;
-            default:
-                throw new AccessDeniedException(filePath.toString(), null, "Unsupported AccessMode: " + mode);
+                case READ:
+                case WRITE:
+                    break;
+                default:
+                    throw new AccessDeniedException(filePath.toString(), null, "Unsupported AccessMode: " + mode);
             }
         }
     }

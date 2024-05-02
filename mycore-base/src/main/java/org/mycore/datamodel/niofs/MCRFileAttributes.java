@@ -18,9 +18,9 @@
 
 package org.mycore.datamodel.niofs;
 
-import org.mycore.common.digest.MCRDigest;
-
 import java.nio.file.attribute.BasicFileAttributes;
+
+import org.mycore.common.digest.MCRDigest;
 
 /**
  * @author Thomas Scheffler (yagee)

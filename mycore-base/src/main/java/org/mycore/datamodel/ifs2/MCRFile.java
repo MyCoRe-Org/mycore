@@ -18,6 +18,12 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -28,12 +34,6 @@ import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.niofs.MCRDefaultFileAttributes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * Represents a file stored in a file collection. This is a file that is

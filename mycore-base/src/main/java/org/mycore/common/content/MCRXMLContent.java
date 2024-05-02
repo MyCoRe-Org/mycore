@@ -18,17 +18,17 @@
 
 package org.mycore.common.content;
 
-import org.jdom2.output.Format;
-import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.digest.MCRDigest;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
+
+import org.jdom2.output.Format;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.digest.MCRDigest;
 
 /**
  * Reads MCRContent from an XML document.

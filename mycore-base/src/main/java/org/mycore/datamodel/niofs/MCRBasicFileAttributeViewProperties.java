@@ -1,7 +1,5 @@
 package org.mycore.datamodel.niofs;
 
-import com.google.common.collect.Sets;
-
 import java.io.IOException;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -11,6 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeView> {
 
@@ -69,18 +69,18 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
         BasicFileAttributes attrs = view.readAttributes();
         for (String attr : requested) {
             switch (attr) {
-            case SIZE_NAME -> map.put(attr, attrs.size());
-            case CREATION_TIME_NAME -> map.put(attr, attrs.creationTime());
-            case LAST_ACCESS_TIME_NAME -> map.put(attr, attrs.lastAccessTime());
-            case LAST_MODIFIED_TIME_NAME -> map.put(attr, attrs.lastModifiedTime());
-            case FILE_KEY_NAME -> map.put(attr, attrs.fileKey());
-            case IS_DIRECTORY_NAME -> map.put(attr, attrs.isDirectory());
-            case IS_REGULAR_FILE_NAME -> map.put(attr, attrs.isRegularFile());
-            case IS_SYMBOLIC_LINK_NAME -> map.put(attr, attrs.isSymbolicLink());
-            case IS_OTHER_NAME -> map.put(attr, attrs.isOther());
-            default -> {
-            }
-            //ignored
+                case SIZE_NAME -> map.put(attr, attrs.size());
+                case CREATION_TIME_NAME -> map.put(attr, attrs.creationTime());
+                case LAST_ACCESS_TIME_NAME -> map.put(attr, attrs.lastAccessTime());
+                case LAST_MODIFIED_TIME_NAME -> map.put(attr, attrs.lastModifiedTime());
+                case FILE_KEY_NAME -> map.put(attr, attrs.fileKey());
+                case IS_DIRECTORY_NAME -> map.put(attr, attrs.isDirectory());
+                case IS_REGULAR_FILE_NAME -> map.put(attr, attrs.isRegularFile());
+                case IS_SYMBOLIC_LINK_NAME -> map.put(attr, attrs.isSymbolicLink());
+                case IS_OTHER_NAME -> map.put(attr, attrs.isOther());
+                default -> {
+                }
+                //ignored
             }
         }
         return map;
@@ -92,19 +92,19 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
             throw new IllegalArgumentException("'" + name + "' not recognized");
         }
         switch (name) {
-        case CREATION_TIME_NAME -> view.setTimes(null, null, (FileTime) value);
-        case LAST_ACCESS_TIME_NAME -> view.setTimes(null, (FileTime) value, null);
-        case LAST_MODIFIED_TIME_NAME -> view.setTimes((FileTime) value, null, null);
-        case SIZE_NAME,
-            FILE_KEY_NAME,
-            IS_DIRECTORY_NAME,
-            IS_REGULAR_FILE_NAME,
-            IS_SYMBOLIC_LINK_NAME,
-            IS_OTHER_NAME -> throw new IllegalArgumentException(
-            "'" + name + "' is a read-only attribute.");
-        default -> {
-            //ignored
-        }
+            case CREATION_TIME_NAME -> view.setTimes(null, null, (FileTime) value);
+            case LAST_ACCESS_TIME_NAME -> view.setTimes(null, (FileTime) value, null);
+            case LAST_MODIFIED_TIME_NAME -> view.setTimes((FileTime) value, null, null);
+            case SIZE_NAME,
+                FILE_KEY_NAME,
+                IS_DIRECTORY_NAME,
+                IS_REGULAR_FILE_NAME,
+                IS_SYMBOLIC_LINK_NAME,
+                IS_OTHER_NAME -> throw new IllegalArgumentException(
+                    "'" + name + "' is a read-only attribute.");
+            default -> {
+                //ignored
+            }
         }
     }
 

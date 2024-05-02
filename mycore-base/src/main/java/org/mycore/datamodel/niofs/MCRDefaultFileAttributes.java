@@ -1,16 +1,20 @@
 package org.mycore.datamodel.niofs;
 
-import org.mycore.common.digest.MCRDigest;
-
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Objects;
+
+import org.mycore.common.digest.MCRDigest;
 
 public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
 
     private static final FileTime EPOCHE_TIME = FileTime.fromMillis(0);
 
-    protected FileTime lastModified, lastAccessTime, creationTime;
+    protected FileTime lastModified;
+
+    protected FileTime lastAccessTime;
+
+    protected FileTime creationTime;
 
     protected long size;
 

@@ -1,10 +1,10 @@
 package org.mycore.datamodel.niofs;
 
-import org.mycore.common.digest.MCRDigest;
-import org.mycore.common.MCRException;
-
 import java.io.IOException;
 import java.nio.file.attribute.FileTime;
+
+import org.mycore.common.MCRException;
+import org.mycore.common.digest.MCRDigest;
 
 public abstract class MCRBasicFileAttributesProxy<T, P extends MCRPath> implements MCRFileAttributes<T> {
 

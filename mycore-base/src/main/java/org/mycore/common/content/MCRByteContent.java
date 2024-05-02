@@ -18,13 +18,13 @@
 
 package org.mycore.common.content;
 
-import org.mycore.common.MCRUtils;
-import org.mycore.common.digest.MCRDigest;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
+
+import org.mycore.common.MCRUtils;
+import org.mycore.common.digest.MCRDigest;
 
 /**
  * Reads MCRContent from a byte[] array.

@@ -1,10 +1,10 @@
 package org.mycore.common.content.streams;
 
-import org.mycore.common.MCRUtils;
-import org.mycore.common.digest.MCRDigest;
-
 import java.io.InputStream;
 import java.security.DigestInputStream;
+
+import org.mycore.common.MCRUtils;
+import org.mycore.common.digest.MCRDigest;
 
 /**
  * Builds a checksum String while content goes through this input stream.

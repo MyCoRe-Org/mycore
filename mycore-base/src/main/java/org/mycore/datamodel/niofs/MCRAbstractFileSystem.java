@@ -18,15 +18,6 @@
 
 package org.mycore.datamodel.niofs;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,6 +36,16 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 public abstract class MCRAbstractFileSystem extends FileSystem {
 

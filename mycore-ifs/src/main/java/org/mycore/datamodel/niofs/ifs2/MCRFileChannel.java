@@ -18,14 +18,6 @@
 
 package org.mycore.datamodel.niofs.ifs2;
 
-import org.mycore.common.MCRUtils;
-import org.mycore.common.digest.MCRDigest;
-import org.mycore.common.events.MCRPathEventHelper;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
-import org.mycore.datamodel.ifs2.MCRFile;
-import org.mycore.datamodel.niofs.MCRFileAttributes;
-import org.mycore.datamodel.niofs.MCRPath;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -36,6 +28,14 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
+
+import org.mycore.common.MCRUtils;
+import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.events.MCRPathEventHelper;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs2.MCRFile;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * @author Thomas Scheffler (yagee)

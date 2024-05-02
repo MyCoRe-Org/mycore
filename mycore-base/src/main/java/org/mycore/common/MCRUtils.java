@@ -18,22 +18,6 @@
 
 package org.mycore.common;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.content.streams.MCRDevNull;
-import org.mycore.common.content.streams.MCRDigestInputStream;
-import org.mycore.common.digest.MCRDigest;
-import org.mycore.common.function.MCRThrowableTask;
-import org.mycore.datamodel.niofs.MCRPathUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,6 +53,23 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.content.streams.MCRDevNull;
+import org.mycore.common.content.streams.MCRDigestInputStream;
+import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.function.MCRThrowableTask;
+import org.mycore.datamodel.niofs.MCRPathUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This class represent a general set of external methods to support the programming API.
