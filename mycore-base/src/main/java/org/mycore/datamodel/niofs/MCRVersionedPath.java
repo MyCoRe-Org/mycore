@@ -1,10 +1,10 @@
 package org.mycore.datamodel.niofs;
 
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
+
 import java.nio.file.Path;
 import java.nio.file.ProviderMismatchException;
 import java.util.Objects;
-
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 public abstract class MCRVersionedPath extends MCRPath {
 
@@ -74,9 +74,6 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof MCRVersionedPath that)) {
             return false;
         }
@@ -89,13 +86,17 @@ public abstract class MCRVersionedPath extends MCRPath {
         if (!this.getOwner().equals(that.getOwner())) {
             return false;
         }
+        return this.hasSameVersion(that);
+    }
+
+    public boolean hasSameVersion(MCRVersionedPath other) {
         String v1 = this.getVersion();
-        String v2 = that.getVersion();
+        String v2 = other.getVersion();
         if (v1 == null && v2 == null) {
             return true;
         }
         v1 = v1 != null ? v1 : this.getHeadVersion();
-        v2 = v2 != null ? v2 : that.getHeadVersion();
+        v2 = v2 != null ? v2 : other.getHeadVersion();
         return Objects.equals(v1, v2);
     }
 
@@ -123,9 +124,7 @@ public abstract class MCRVersionedPath extends MCRPath {
     }
 
     public static MCRVersionedPath toVersionedPath(final Path other) {
-        if (other == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(other);
         if (!(other instanceof MCRVersionedPath)) {
             throw new ProviderMismatchException("other is not an instance of MCRPath: " + other.getClass());
         }
@@ -156,9 +155,7 @@ public abstract class MCRVersionedPath extends MCRPath {
             if (this.owner.isEmpty()) {
                 return "";
             }
-            return this.version != null ?
-                   this.owner + OWNER_VERSION_SEPARATOR + this.version + ":" :
-                   this.owner + ":";
+            return this.version != null ? this.owner + OWNER_VERSION_SEPARATOR + this.version + ":" : this.owner + ":";
         }
 
     }

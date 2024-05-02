@@ -35,13 +35,16 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
-import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
 
 public class MCRPathTest {
+
+    private static final MCRAbstractFileSystemProvider FILE_SYSTEM_PROVIDER = new TestFileSystemProvider();
+
+    private static final TestFileSystem FILE_SYSTEM = new TestFileSystem(FILE_SYSTEM_PROVIDER);
 
     @Test
     public void startsWith() {
@@ -71,7 +74,7 @@ public class MCRPathTest {
         }
     }
 
-    private static final MCRAbstractFileSystemProvider FILE_SYSTEM_PROVIDER = new MCRAbstractFileSystemProvider() {
+    private static class TestFileSystemProvider extends MCRAbstractFileSystemProvider {
         @Override
         public URI getURI() {
             return null;
@@ -106,22 +109,22 @@ public class MCRPathTest {
 
         @Override
         public void createDirectory(Path path, FileAttribute<?>... fileAttributes) throws IOException {
-
+            // ignore
         }
 
         @Override
         public void delete(Path path) throws IOException {
-
+            // ignore
         }
 
         @Override
         public void copy(Path path, Path path1, CopyOption... copyOptions) throws IOException {
-
+            // ignore
         }
 
         @Override
         public void move(Path path, Path path1, CopyOption... copyOptions) throws IOException {
-
+            // ignore
         }
 
         @Override
@@ -141,7 +144,7 @@ public class MCRPathTest {
 
         @Override
         public void checkAccess(Path path, AccessMode... accessModes) throws IOException {
-
+            // ignore
         }
 
         @Override
@@ -163,11 +166,16 @@ public class MCRPathTest {
 
         @Override
         public void setAttribute(Path path, String s, Object o, LinkOption... linkOptions) throws IOException {
-
+            // ignore
         }
-    };
+    }
 
-    private static final MCRAbstractFileSystem FILE_SYSTEM = new MCRAbstractFileSystem(null) {
+    private static class TestFileSystem extends MCRAbstractFileSystem {
+
+        public TestFileSystem(MCRAbstractFileSystemProvider provider) {
+            super(provider);
+        }
+
         @Override
         public void createRoot(String owner) {
             //no implementation needed for test
@@ -192,5 +200,6 @@ public class MCRPathTest {
         public Iterable<FileStore> getFileStores() {
             return null;
         }
-    };
+    }
+
 }

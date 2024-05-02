@@ -229,7 +229,7 @@ public abstract class MCRTransactionHelper {
      *                         instances of the specified type.
      * @param <T>              The type parameter that extends {@link MCRPersistenceTransaction}, indicating the
      *                         specific type of persistence transaction to be returned.
-     * @return An instance of the specified type <T> if found among the active transactions; otherwise, returns
+     * @return An instance of the specified type &lt;T&gt; if found among the active transactions; otherwise, returns
      * {@code null}.
      */
     public static <T extends MCRPersistenceTransaction> T get(Class<T> persistenceClass) {

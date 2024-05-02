@@ -80,6 +80,7 @@ public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
      * @throws MCRDigestValidationException If the validation fails.
      */
     protected void validate() throws MCRDigestValidationException {
+        // by default nothing to validate. this is implementation specific.
     }
 
     /**

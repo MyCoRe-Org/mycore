@@ -411,6 +411,7 @@ public abstract class MCRPath implements Path {
     /* (non-Javadoc)
      * @see java.nio.file.Path#normalize()
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     @Override
     public MCRPath normalize() {
         final int count = getNameCount();
