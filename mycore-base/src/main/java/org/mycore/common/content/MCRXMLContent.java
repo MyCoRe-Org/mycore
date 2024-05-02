@@ -18,16 +18,17 @@
 
 package org.mycore.common.content;
 
+import org.jdom2.output.Format;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.digest.MCRDigest;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
-
-import org.jdom2.output.Format;
-import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.streams.MCRMD5InputStream;
 
 /**
  * Reads MCRContent from an XML document.
@@ -92,11 +93,11 @@ public abstract class MCRXMLContent extends MCRContent {
 
     @Override
     public String getETag() throws IOException {
-        MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
+        MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRDigest.Algorithm.MD5);
         byte[] byteArray = asByteArray();
         md5Digest.update(byteArray, 0, byteArray.length);
         byte[] digest = md5Digest.digest();
-        String md5String = MCRMD5InputStream.getMD5String(digest);
+        String md5String = MCRUtils.toHexString(digest);
         return '"' + md5String + '"';
     }
 

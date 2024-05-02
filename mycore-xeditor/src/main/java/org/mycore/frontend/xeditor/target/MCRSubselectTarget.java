@@ -62,7 +62,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
     }
 
     public static String encode(String href) {
-        return MCRUtils.toHexString(href.getBytes(StandardCharsets.UTF_8));
+        return MCRUtils.toHexStringLowerCase(href.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String decode(String href) {

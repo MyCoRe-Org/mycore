@@ -44,14 +44,17 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.digest.MCRMD5Digest;
+import org.mycore.common.events.MCRPathEventHelper;
 import org.mycore.common.function.MCRThrowFunction;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
 import org.mycore.datamodel.ifs2.MCRStoredNode;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRDefaultFileAttributes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
-import org.mycore.datamodel.niofs.MCRMD5AttributeView;
+import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
@@ -270,7 +273,7 @@ class MCRDirectoryStreamHelper {
             if (fileAttributeView != null) {
                 return fileAttributeView;
             }
-            if (type == MCRMD5AttributeView.class) {
+            if (type == MCRDigestAttributeView.class) {
                 BasicFileAttributeView baseView = baseStream.getFileAttributeView(BasicFileAttributeView.class);
                 return (V) new MD5FileAttributeViewImpl(baseView, (v) -> dir);
             }
@@ -280,7 +283,7 @@ class MCRDirectoryStreamHelper {
         @Override
         public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
             Path localRelativePath = toLocalPath(path);
-            if (type == MCRMD5AttributeView.class) {
+            if (type == MCRDigestAttributeView.class) {
                 BasicFileAttributeView baseView = baseStream.getFileAttributeView(localRelativePath,
                     BasicFileAttributeView.class, options);
                 return (V) new MD5FileAttributeViewImpl(baseView, (v) -> resolve(path));
@@ -336,7 +339,7 @@ class MCRDirectoryStreamHelper {
     }
 
     private record MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
-        MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) implements MCRMD5AttributeView {
+        MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) implements MCRDigestAttributeView {
 
         @Override
         public String name() {
@@ -358,9 +361,10 @@ class MCRDirectoryStreamHelper {
         public MCRFileAttributes readAllAttributes() throws IOException {
             MCRStoredNode node = nodeSupplier.apply(null);
             if (node instanceof MCRFile file) {
-                return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), file.getMD5());
+                return MCRDefaultFileAttributes.fromAttributes(baseAttrView.readAttributes(),
+                    new MCRMD5Digest(file.getMD5()));
             }
-            return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
+            return MCRDefaultFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
         }
     }
 }

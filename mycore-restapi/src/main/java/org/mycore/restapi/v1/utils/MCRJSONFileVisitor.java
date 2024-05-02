@@ -104,7 +104,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         if (attrs.isRegularFile()) {
             jw.name("contentType").value(MCRContentTypes.probeContentType(path));
             if (attrs instanceof MCRFileAttributes<?> fileAttrs) {
-                jw.name("md5").value(fileAttrs.md5sum());
+                jw.name("md5").value(fileAttrs.digest().getValue());
             }
         }
     }

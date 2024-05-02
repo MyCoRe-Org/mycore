@@ -36,6 +36,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.niofs.MCRDefaultFileAttributes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
@@ -248,7 +249,7 @@ public abstract class MCRStoredNode extends MCRNode {
 
     public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
         BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-        return MCRFileAttributes.fromAttributes(attrs, null);
+        return MCRDefaultFileAttributes.fromAttributes(attrs, null);
     }
 
 }

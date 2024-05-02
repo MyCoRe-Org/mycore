@@ -18,40 +18,42 @@
 
 package org.mycore.common.content.streams;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.junit.Test;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.digest.MCRDigest;
+import org.mycore.datamodel.ifs2.MCRFile;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Test;
-import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.ifs2.MCRFile;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRMD5InputStreamTest {
+public class MCRDigestInputStreamTest {
 
     @Test
     public void emptyStream() throws Exception {
-        MCRMD5InputStream m = new MCRMD5InputStream(new ByteArrayInputStream(new byte[0]));
+        byte[] data = new byte[0];
+        MCRDigestInputStream m = new MCRDigestInputStream(new ByteArrayInputStream(data), MCRDigest.Algorithm.MD5);
         assertEquals(-1, m.read());
         m.close();
-        assertEquals(MCRFile.MD5_OF_EMPTY_FILE, m.getMD5String());
+        assertEquals(MCRFile.MD5_OF_EMPTY_FILE, m.getDigestAsHexString());
     }
 
     @Test
     public void smallStream() throws Exception {
         byte[] data = "data".getBytes();
-        MCRMD5InputStream m = new MCRMD5InputStream(new ByteArrayInputStream(data));
+        MCRDigestInputStream m = new MCRDigestInputStream(new ByteArrayInputStream(data), MCRDigest.Algorithm.MD5);
         for (byte aData : data) {
             assertEquals(aData, (byte) (m.read()));
         }
         assertEquals(-1, m.read());
         m.close();
-        assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(m.getMD5String()));
-        assertEquals(16, m.getMD5().length);
-        assertEquals(32, m.getMD5String().length());
+        assertNotEquals(MCRFile.MD5_OF_EMPTY_FILE, m.getDigestAsHexString());
+        assertEquals(16, m.getDigest().length);
+        assertEquals(32, m.getDigestAsHexString().length());
     }
 
     @Test

@@ -18,35 +18,21 @@
 
 package org.mycore.datamodel.niofs;
 
-import org.mycore.common.digest.MCRDigest;
-
-import java.nio.file.attribute.BasicFileAttributes;
+import java.io.IOException;
+import java.nio.file.attribute.BasicFileAttributeView;
 
 /**
  * @author Thomas Scheffler (yagee)
+ *
  */
-public interface MCRFileAttributes<T> extends BasicFileAttributes {
+public interface MCRDigestAttributeView<T> extends BasicFileAttributeView {
 
-    enum FileType {
-        file, directory, link, other;
-
-        public static FileType fromAttribute(BasicFileAttributes attrs) {
-            if (attrs.isRegularFile()) {
-                return file;
-            }
-            if (attrs.isDirectory()) {
-                return directory;
-            }
-            if (attrs.isSymbolicLink()) {
-                return link;
-            }
-            return other;
-        }
-    }
-
-    MCRDigest digest();
-
+    /**
+     * Returns the name of the attribute view. Attribute views of this type have the name "digest".
+     */
     @Override
-    T fileKey();
+    String name();
+
+    MCRFileAttributes<T> readAllAttributes() throws IOException;
 
 }

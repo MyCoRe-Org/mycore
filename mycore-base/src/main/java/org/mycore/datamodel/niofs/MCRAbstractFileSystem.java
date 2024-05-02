@@ -18,6 +18,15 @@
 
 package org.mycore.datamodel.niofs;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,16 +46,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-
 public abstract class MCRAbstractFileSystem extends FileSystem {
 
     public static final char SEPARATOR = '/';
@@ -62,11 +61,19 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
             }
         });
 
+    private final MCRAbstractFileSystemProvider provider;
+
     private final MCRPath emptyPath;
 
-    public MCRAbstractFileSystem() {
+    public MCRAbstractFileSystem(MCRAbstractFileSystemProvider provider) {
         super();
+        this.provider = provider;
         emptyPath = getPath(null, "", this);
+    }
+
+    @Override
+    public MCRAbstractFileSystemProvider provider() {
+        return this.provider;
     }
 
     /**
@@ -75,7 +82,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
      * @see FileSystemProvider#getScheme()
      * @throws FileSystemNotFoundException if no filesystem handles this scheme
      */
-    public static MCRAbstractFileSystem getInstance(String scheme) {
+    public static MCRAbstractFileSystem getInstance(String scheme) throws FileSystemNotFoundException {
         URI uri;
         try {
             uri = MCRPaths.getURI(scheme, "helper", SEPARATOR_STRING);
@@ -93,13 +100,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     public static MCRPath getPath(final String owner, final String path, final MCRAbstractFileSystem fs) {
         Objects.requireNonNull(fs, MCRAbstractFileSystem.class.getSimpleName() + " instance may not be null.");
-        return new MCRPath(owner, path) {
-
-            @Override
-            public MCRAbstractFileSystem getFileSystem() {
-                return fs;
-            }
-        };
+        return fs.provider().getPath(owner, path, fs);
     }
 
     /**
@@ -144,14 +145,14 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
             throw new NoSuchFileException(path.toString());
         }
         Objects.requireNonNull(attrs, "attrs may not be null");
-        String md5Sum;
+        String digest;
         try {
-            md5Sum = MCRUtils.getMD5Sum(Files.newInputStream(path));
+            digest = MCRUtils.getDigest(attrs.digest().getAlgorithm(), Files.newInputStream(path));
         } catch (IOException e) {
             LogManager.getLogger(getClass()).error("Could not verify path: {}", path, e);
             return false;
         }
-        boolean returns = md5Sum.matches(attrs.md5sum());
+        boolean returns = digest.matches(attrs.digest().getValue());
         if (!returns) {
             LogManager.getLogger(getClass()).warn("MD5sum does not match: {}", path);
         }

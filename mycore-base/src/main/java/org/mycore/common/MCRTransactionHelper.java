@@ -18,26 +18,26 @@
 
 package org.mycore.common;
 
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.util.concurrent.MCRPool;
 
-public class MCRTransactionHelper {
+import java.util.List;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.function.Function;
+
+public abstract class MCRTransactionHelper {
 
     private static final MCRPool<ServiceLoader<MCRPersistenceTransaction>> SERVICE_LOADER_POOL = new MCRPool<>(
         Runtime.getRuntime().availableProcessors(), () -> ServiceLoader
-            .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader()));
+        .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader()));
 
     private static final ThreadLocal<List<MCRPersistenceTransaction>> TRANSACTION = ThreadLocal
         .withInitial(MCRTransactionHelper::getPersistenceTransactions);
 
     /**
      * performs a safe operation on the serviceLoader backed by an internal ServiceLoader pool
-     * @param f function that runs with the service loader
+     *
+     * @param f            function that runs with the service loader
      * @param defaultValue a fallback default if a service loader could not be acquired
      * @return result of operation <code>f</code>
      */
@@ -59,12 +59,11 @@ public class MCRTransactionHelper {
         return applyServiceLoader(sl -> sl.stream()
             .map(ServiceLoader.Provider::get)
             .filter(MCRPersistenceTransaction::isReady)
-            .collect(Collectors.toUnmodifiableList()), List.of());
+            .toList(), List.of());
     }
 
-    public static boolean isDatabaseAccessEnabled() {
-        return MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
-            && applyServiceLoader(sl -> sl.stream().findAny().isPresent(), false); //impl present
+    public static boolean isAccessEnabled() {
+        return applyServiceLoader(sl -> sl.stream().findAny().isPresent(), false);
     }
 
     /**
@@ -79,6 +78,23 @@ public class MCRTransactionHelper {
     }
 
     /**
+     * <p>
+     * Commits the given transaction. Commit is only done if {@link #isTransactionActive()} returns true.
+     * </p>
+     * <p>
+     * Be aware, that in difference to {@link #commitTransaction()}, this does not submits the tasks of the current
+     * session!
+     * </p>
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction}.
+     */
+    public static <T extends MCRPersistenceTransaction> void commitTransaction(Class<T> persistenceClass) {
+        if (isTransactionActive()) {
+            Optional.ofNullable(get(persistenceClass)).ifPresent(MCRPersistenceTransaction::commit);
+        }
+    }
+
+    /**
      * Forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
      * returns true.
      */
@@ -86,6 +102,18 @@ public class MCRTransactionHelper {
         if (isTransactionActive()) {
             TRANSACTION.get().forEach(MCRPersistenceTransaction::rollback);
             TRANSACTION.remove();
+        }
+    }
+
+    /**
+     * Forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
+     * returns true.
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction}.
+     */
+    public static <T extends MCRPersistenceTransaction> void rollbackTransaction(Class<T> persistenceClass) {
+        if (isTransactionActive()) {
+            Optional.ofNullable(get(persistenceClass)).ifPresent(MCRPersistenceTransaction::rollback);
         }
     }
 
@@ -100,16 +128,41 @@ public class MCRTransactionHelper {
     }
 
     /**
+     * Mark the given transaction so that the only possible outcome of the transaction is for the
+     * transaction to be rolled back.
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction}.
+     */
+    public static <T extends MCRPersistenceTransaction> void setRollbackOnly(Class<T> persistenceClass) {
+        if (isAccessEnabled()) {
+            Optional.ofNullable(get(persistenceClass)).ifPresent(MCRPersistenceTransaction::setRollbackOnly);
+        }
+    }
+
+    /**
      * Is the transaction still alive?
      *
      * @return true if the transaction is still alive
      */
     public static boolean isTransactionActive() {
-        return isDatabaseAccessEnabled() && TRANSACTION.get().stream().anyMatch(MCRPersistenceTransaction::isActive);
+        return isAccessEnabled() && TRANSACTION.get().stream().anyMatch(MCRPersistenceTransaction::isActive);
     }
 
     /**
-     * Determine whether the current resource transaction has been marked for rollback.
+     * Is the transaction still alive?
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction}.
+     * @return true if the transaction is still alive
+     */
+    public static <T extends MCRPersistenceTransaction> boolean isTransactionActive(Class<T> persistenceClass) {
+        return isAccessEnabled() && Optional.ofNullable(get(persistenceClass))
+            .map(MCRPersistenceTransaction::isActive)
+            .orElse(false);
+    }
+
+    /**
+     * Determine whether any one transaction has been marked for rollback.
+     *
      * @return boolean indicating whether the transaction has been marked for rollback
      */
     public static boolean transactionRequiresRollback() {
@@ -117,11 +170,75 @@ public class MCRTransactionHelper {
     }
 
     /**
-     * starts a new database transaction.
+     * Determine whether the given transaction has been marked for rollback.
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction}.
+     * @return boolean indicating whether the transaction has been marked for rollback
+     */
+    public static <T extends MCRPersistenceTransaction> boolean transactionRequiresRollback(Class<T> persistenceClass) {
+        return isTransactionActive() &&
+            Optional.ofNullable(get(persistenceClass))
+                .map(MCRPersistenceTransaction::getRollbackOnly)
+                .orElse(false);
+    }
+
+    /**
+     * Starts all transactions.
      */
     public static void beginTransaction() {
-        if (isDatabaseAccessEnabled()) {
+        if (isAccessEnabled()) {
             TRANSACTION.get().forEach(MCRPersistenceTransaction::begin);
         }
     }
+
+    /**
+     * Starts a new transaction.
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction}.
+     * @param <T>              The type parameter that extends {@link MCRPersistenceTransaction}, indicating the
+     *                         specific type of persistence transaction to begin.
+     */
+    public static <T extends MCRPersistenceTransaction> void beginTransaction(Class<T> persistenceClass) {
+        if (isAccessEnabled()) {
+            Optional.ofNullable(get(persistenceClass)).ifPresent(MCRPersistenceTransaction::begin);
+        }
+    }
+
+    /**
+     * Starts a new transaction if it's not already active.
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction}.
+     * @param <T>              The type parameter that extends {@link MCRPersistenceTransaction}, indicating the
+     *                         specific type of persistence transaction to begin.
+     */
+    public static <T extends MCRPersistenceTransaction> void requireTransaction(Class<T> persistenceClass) {
+        if (isAccessEnabled()) {
+            Optional.ofNullable(get(persistenceClass))
+                .filter(transaction -> !transaction.isActive())
+                .ifPresent(MCRPersistenceTransaction::begin);
+        }
+    }
+
+    /**
+     * Retrieves a specific implementation of {@link MCRPersistenceTransaction} based on the provided class type.
+     * This method iterates over the list of currently active persistence transactions stored in a thread-local
+     * variable.
+     *
+     * @param persistenceClass The class object representing the type of {@link MCRPersistenceTransaction} to be
+     *                         retrieved. This class object is used to check if any of the active transactions are
+     *                         instances of the specified type.
+     * @param <T>              The type parameter that extends {@link MCRPersistenceTransaction}, indicating the
+     *                         specific type of persistence transaction to be returned.
+     * @return An instance of the specified type <T> if found among the active transactions; otherwise, returns
+     * {@code null}.
+     */
+    public static <T extends MCRPersistenceTransaction> T get(Class<T> persistenceClass) {
+        for (MCRPersistenceTransaction persistenceTransaction : TRANSACTION.get()) {
+            if (persistenceClass.isInstance(persistenceTransaction)) {
+                return persistenceClass.cast(persistenceTransaction);
+            }
+        }
+        return null;
+    }
+
 }

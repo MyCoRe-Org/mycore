@@ -18,6 +18,22 @@
 
 package org.mycore.common;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.content.streams.MCRDevNull;
+import org.mycore.common.content.streams.MCRDigestInputStream;
+import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.function.MCRThrowableTask;
+import org.mycore.datamodel.niofs.MCRPathUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +61,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.HexFormat;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -53,24 +69,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.content.streams.MCRDevNull;
-import org.mycore.common.content.streams.MCRMD5InputStream;
-import org.mycore.common.function.MCRThrowableTask;
-import org.mycore.datamodel.niofs.MCRPathUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
-
-import jakarta.xml.bind.DatatypeConverter;
 
 /**
  * This class represent a general set of external methods to support the programming API.
@@ -157,10 +155,8 @@ public class MCRUtils {
     /**
      * Writes plain text to a file.
      *
-     * @param textToWrite
-     *            the text to write into the file
-     * @param fileName
-     *            the name of the file to write to, given as absolute path
+     * @param textToWrite the text to write into the file
+     * @param fileName    the name of the file to write to, given as absolute path
      * @return a handle to the written file
      */
     public static Path writeTextToFile(String textToWrite, String fileName, Charset cs) throws IOException {
@@ -196,10 +192,8 @@ public class MCRUtils {
     /**
      * The method return a list of all file names under the given directory and subdirectories of itself.
      *
-     * @param basedir
-     *            the File instance of the basic directory
-     * @param path
-     *            the part of directory path
+     * @param basedir the File instance of the basic directory
+     * @param path    the part of directory path
      * @return an ArrayList with file names as pathes
      */
     public static ArrayList<String> getAllFileNames(File basedir, String path) {
@@ -322,7 +316,7 @@ public class MCRUtils {
 
     /**
      * Hashes string specified by alogrithm.
-     * 
+     *
      * @param text input
      * @param algorithm hash algorithm
      * @param salt salt
@@ -354,21 +348,46 @@ public class MCRUtils {
         for (int i = 0; i < iterations; i++) {
             data = digest.digest(data);
         }
-        return toHexString(data);
+        return toHexStringLowerCase(data);
     }
 
     public static String toHexString(byte[] data) {
-        return DatatypeConverter.printHexBinary(data).toLowerCase(Locale.ROOT);
+        return HexFormat.of().formatHex(data);
+    }
+
+    public static String toHexStringLowerCase(byte[] data) {
+        return HexFormat.of().withLowerCase().formatHex(data);
+    }
+
+    /**
+     * Builds a MessageDigest instance for checksum computation.
+     *
+     * @throws MCRConfigurationException if no java classes supports the given digestAlgorithm algorithm
+     */
+    public static MessageDigest buildMessageDigest(MCRDigest.Algorithm digestAlgorithm) {
+        try {
+            return MessageDigest.getInstance(digestAlgorithm.toUpperCase());
+        } catch (NoSuchAlgorithmException exc) {
+            throw new MCRConfigurationException("Could not find java classes that support " +
+                digestAlgorithm.toUpperCase() + " checksum algorithm", exc);
+        }
+    }
+
+    /**
+     * Calculates digest sum of InputStream. InputStream is consumed after calling this method and automatically closed.
+     */
+    public static String getDigest(MCRDigest.Algorithm algorithm, InputStream inputStream) throws IOException {
+        try (MCRDigestInputStream digestInputStream = new MCRDigestInputStream(inputStream, algorithm)) {
+            digestInputStream.transferTo(new MCRDevNull());
+            return digestInputStream.getDigestAsHexString();
+        }
     }
 
     /**
      * Calculates md5 sum of InputStream. InputStream is consumed after calling this method and automatically closed.
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException {
-        try (MCRMD5InputStream md5InputStream = new MCRMD5InputStream(inputStream)) {
-            md5InputStream.transferTo(new MCRDevNull());
-            return md5InputStream.getMD5String();
-        }
+        return getDigest(MCRDigest.Algorithm.MD5, inputStream);
     }
 
     /**
@@ -508,10 +527,10 @@ public class MCRUtils {
      *          is less than, equal to, or greater than the specified object.
      *
      * @throws NullPointerException if either <code>first</code> or <code>other</code> is null
-     * 
+     *
      * deprecated in June 2023, because it was only used to compare MCRObjectID objects
      * which is no handled differently
-     * 
+     *
      */
     @Deprecated
     @SafeVarargs
@@ -536,6 +555,7 @@ public class MCRUtils {
 
     /**
      * Checks is trimmed <code>value</code> is not empty.
+     *
      * @param value String to test
      * @return <em>empty</em> if value is <code>null</code> or empty after trimming.
      */
@@ -566,6 +586,7 @@ public class MCRUtils {
 
     /**
      * Measures and logs the time of a method call
+     *
      * @param task method reference
      * @throws T if task.run() throws Exception
      */

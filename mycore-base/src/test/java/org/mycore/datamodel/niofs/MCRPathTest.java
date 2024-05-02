@@ -21,9 +21,23 @@ package org.mycore.datamodel.niofs;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.AccessMode;
+import java.nio.file.CopyOption;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
+import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -47,40 +61,136 @@ public class MCRPathTest {
 
     private static class TestMCRPath extends MCRPath {
 
-        public static final MCRAbstractFileSystem MCR_ABSTRACT_FILE_SYSTEM = new MCRAbstractFileSystem() {
-            @Override
-            public void createRoot(String owner) {
-                //no implementation needed for test
-            }
-
-            @Override
-            public void removeRoot(String owner) {
-                //no implementation needed for test
-            }
-
-            @Override
-            public FileSystemProvider provider() {
-                return null;
-            }
-
-            @Override
-            public Iterable<Path> getRootDirectories() {
-                return null;
-            }
-
-            @Override
-            public Iterable<FileStore> getFileStores() {
-                return null;
-            }
-        };
-
         TestMCRPath(String root, String path) {
             super(root, path);
         }
 
         @Override
         public MCRAbstractFileSystem getFileSystem() {
-            return MCR_ABSTRACT_FILE_SYSTEM;
+            return FILE_SYSTEM;
         }
     }
+
+    private static final MCRAbstractFileSystemProvider FILE_SYSTEM_PROVIDER = new MCRAbstractFileSystemProvider() {
+        @Override
+        public URI getURI() {
+            return null;
+        }
+
+        @Override
+        public MCRAbstractFileSystem getFileSystem() {
+            return FILE_SYSTEM;
+        }
+
+        @Override
+        public String getScheme() {
+            return null;
+        }
+
+        @Override
+        public FileSystem getFileSystem(URI uri) {
+            return FILE_SYSTEM;
+        }
+
+        @Override
+        public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> set,
+            FileAttribute<?>... fileAttributes) throws IOException {
+            return null;
+        }
+
+        @Override
+        public DirectoryStream<Path> newDirectoryStream(Path path, DirectoryStream.Filter<? super Path> filter)
+            throws IOException {
+            return null;
+        }
+
+        @Override
+        public void createDirectory(Path path, FileAttribute<?>... fileAttributes) throws IOException {
+
+        }
+
+        @Override
+        public void delete(Path path) throws IOException {
+
+        }
+
+        @Override
+        public void copy(Path path, Path path1, CopyOption... copyOptions) throws IOException {
+
+        }
+
+        @Override
+        public void move(Path path, Path path1, CopyOption... copyOptions) throws IOException {
+
+        }
+
+        @Override
+        public boolean isSameFile(Path path, Path path1) throws IOException {
+            return false;
+        }
+
+        @Override
+        public boolean isHidden(Path path) throws IOException {
+            return false;
+        }
+
+        @Override
+        public FileStore getFileStore(Path path) throws IOException {
+            return null;
+        }
+
+        @Override
+        public void checkAccess(Path path, AccessMode... accessModes) throws IOException {
+
+        }
+
+        @Override
+        public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> aClass,
+            LinkOption... linkOptions) {
+            return null;
+        }
+
+        @Override
+        public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> aClass, LinkOption... linkOptions)
+            throws IOException {
+            return null;
+        }
+
+        @Override
+        public Map<String, Object> readAttributes(Path path, String s, LinkOption... linkOptions) throws IOException {
+            return null;
+        }
+
+        @Override
+        public void setAttribute(Path path, String s, Object o, LinkOption... linkOptions) throws IOException {
+
+        }
+    };
+
+    private static final MCRAbstractFileSystem FILE_SYSTEM = new MCRAbstractFileSystem(null) {
+        @Override
+        public void createRoot(String owner) {
+            //no implementation needed for test
+        }
+
+        @Override
+        public void removeRoot(String owner) {
+            //no implementation needed for test
+        }
+
+        @Override
+        public MCRAbstractFileSystemProvider provider() {
+            return FILE_SYSTEM_PROVIDER;
+        }
+
+        @Override
+        public Iterable<Path> getRootDirectories() {
+            return null;
+        }
+
+        @Override
+        public Iterable<FileStore> getFileStores() {
+            return null;
+        }
+    };
 }

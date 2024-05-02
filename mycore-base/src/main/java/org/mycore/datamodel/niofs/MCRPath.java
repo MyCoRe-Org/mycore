@@ -280,23 +280,27 @@ public abstract class MCRPath implements Path {
         }
         final int lastOffset = offsets[nameCount - 1];
         final String fileName = path.substring(lastOffset);
-        return MCRAbstractFileSystem.getPath(null, fileName, getFileSystem());
+        return getPath(null, fileName, getFileSystem());
     }
 
     @Override
     public abstract MCRAbstractFileSystem getFileSystem();
 
+    protected MCRPath getPath(String owner, String path, MCRAbstractFileSystem fs) {
+        return fs.provider().getPath(owner, path, fs);
+    }
+
     /* (non-Javadoc)
      * @see java.nio.file.Path#getName(int)
      */
     @Override
-    public Path getName(final int index) {
+    public MCRPath getName(final int index) {
         final int nameCount = getNameCount();
         if (index < 0 || index >= nameCount) {
             throw new IllegalArgumentException();
         }
         final String pathElement = getPathElement(index);
-        return MCRAbstractFileSystem.getPath(null, pathElement, getFileSystem());
+        return getPath(null, pathElement, getFileSystem());
     }
 
     /* (non-Javadoc)
@@ -337,14 +341,14 @@ public abstract class MCRPath implements Path {
             if (root.isEmpty()) {
                 if (path.startsWith("/")) {
                     //we have root as parent
-                    return MCRAbstractFileSystem.getPath(root, "/", getFileSystem());
+                    return getPath(root, "/", getFileSystem());
                 }
                 // path is like "foo" -> no parent
                 return null;
             }
             return getRoot();
         }
-        return MCRAbstractFileSystem.getPath(root, path.substring(0, lastOffset), getFileSystem());
+        return getPath(root, path.substring(0, lastOffset), getFileSystem());
     }
 
     /* (non-Javadoc)
@@ -408,7 +412,7 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#normalize()
      */
     @Override
-    public Path normalize() {
+    public MCRPath normalize() {
         final int count = getNameCount();
         int remaining = count;
         final boolean[] ignoreSubPath = new boolean[count];
@@ -464,7 +468,7 @@ public abstract class MCRPath implements Path {
                 sb.append('/');
             }
         }
-        return MCRAbstractFileSystem.getPath(root, sb.toString(), getFileSystem());
+        return getPath(root, sb.toString(), getFileSystem());
     }
 
     /* (non-Javadoc)
@@ -510,7 +514,7 @@ public abstract class MCRPath implements Path {
         if (thatURI.equals(relativizedURI)) {
             return that;
         }
-        return MCRAbstractFileSystem.getPath(null, relativizedURI.getPath(), getFileSystem());
+        return getPath(null, relativizedURI.getPath(), getFileSystem());
     }
 
     private static boolean isEmpty(Path test) {
@@ -533,7 +537,7 @@ public abstract class MCRPath implements Path {
         final int baseLength = path.length();
         final int childLength = other.toString().length();
         if (isEmpty() || otherStr.charAt(0) == SEPARATOR) {
-            return root == null ? other : MCRAbstractFileSystem.getPath(root, otherStr, getFileSystem());
+            return root == null ? other : getPath(root, otherStr, getFileSystem());
         }
         final StringBuilder result = new StringBuilder(baseLength + 1 + childLength);
         if (baseLength != 1 || path.charAt(0) != SEPARATOR) {
@@ -541,7 +545,7 @@ public abstract class MCRPath implements Path {
         }
         result.append(SEPARATOR);
         result.append(otherStr);
-        return MCRAbstractFileSystem.getPath(root, result.toString(), getFileSystem());
+        return getPath(root, result.toString(), getFileSystem());
     }
 
     private String toMCRPathString(final Path other) {
@@ -647,7 +651,7 @@ public abstract class MCRPath implements Path {
         }
         final int begin = offsets[beginIndex];
         final int end = endIndex == offsets.length ? path.length() : offsets[endIndex] - 1;
-        return MCRAbstractFileSystem.getPath(null, path.substring(begin, end), getFileSystem());
+        return getPath(null, path.substring(begin, end), getFileSystem());
     }
 
     /* (non-Javadoc)
