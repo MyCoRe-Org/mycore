@@ -72,9 +72,11 @@ public class MCRPathTest {
         public MCRAbstractFileSystem getFileSystem() {
             return FILE_SYSTEM;
         }
+
     }
 
     private static class TestFileSystemProvider extends MCRAbstractFileSystemProvider {
+
         @Override
         public URI getURI() {
             return null;
@@ -172,7 +174,7 @@ public class MCRPathTest {
 
     private static class TestFileSystem extends MCRAbstractFileSystem {
 
-        public TestFileSystem(MCRAbstractFileSystemProvider provider) {
+        TestFileSystem(MCRAbstractFileSystemProvider provider) {
             super(provider);
         }
 
