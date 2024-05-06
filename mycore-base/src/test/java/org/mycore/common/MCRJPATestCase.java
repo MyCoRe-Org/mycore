@@ -33,16 +33,11 @@ import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRJPABootstrapper;
-import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -136,18 +131,18 @@ public class MCRJPATestCase extends MCRTestCase {
 
     protected static Optional<String> getDefaultSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-            .getEntityManagerFactory()
-            .getProperties()
-            .get("hibernate.default_schema"))
+                .getEntityManagerFactory()
+                .getProperties()
+                .get("hibernate.default_schema"))
             .map(Object::toString)
             .map(schema -> quoteSchema() ? '"' + schema + '"' : schema);
     }
 
     protected static boolean quoteSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-            .getEntityManagerFactory()
-            .getProperties()
-            .get("hibernate.globally_quoted_identifiers"))
+                .getEntityManagerFactory()
+                .getProperties()
+                .get("hibernate.globally_quoted_identifiers"))
             .map(Object::toString)
             .map(Boolean::parseBoolean)
             .orElse(Boolean.FALSE);
@@ -252,16 +247,5 @@ public class MCRJPATestCase extends MCRTestCase {
                 LogManager.getLogger().warn("Error while update '" + sql + "'", e);
             }
         });
-    }
-
-    /**
-     * Adds a classification represented by the given XML file to the system.
-     *
-     * @param file the XML file containing the classification
-     */
-    protected void addClassification(String file) throws Exception {
-        Document classification = new SAXBuilder().build(getClass().getResourceAsStream(file));
-        MCRCategory category = MCRXMLTransformer.getCategory(classification);
-        MCRCategoryDAOFactory.getInstance().addCategory(null, category);
     }
 }

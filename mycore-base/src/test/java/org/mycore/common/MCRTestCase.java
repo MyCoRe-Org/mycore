@@ -18,11 +18,6 @@
 
 package org.mycore.common;
 
-import net.sf.saxon.jaxp.TransformerImpl;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMResult;
-import org.jdom2.transform.JDOMSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,13 +25,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.xml.MCRURIResolver;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -211,45 +200,4 @@ public class MCRTestCase {
             new Object[] { this.getClass().getSimpleName(), fileName });
     }
 
-    /**
-     * Returns an XML document with the given method name as root element and the content of the given XML tree as
-     * child element. The resulting document can be used for calling XSLT test files using template matching.
-     *
-     * @param method the method name used as root element name
-     * @param xml    the XML tree
-     * @return an XML document with the method name as root element and the content of the given XML tree as children
-     */
-    protected Document xmlTest(String method, Element xml) {
-        final Element root = new Element(method);
-        root.addContent(xml.detach());
-
-        return new Document(root);
-    }
-
-    /**
-     * Parses the XML document using the given XSL stylesheet with the given parameters.
-     *
-     * @param parameters the XSL parameters
-     * @param xsl        the XSL stylesheet file used for parsing
-     * @param xml        the XML document to parse
-     */
-    protected Document parse(Map<String, Object> parameters, String xsl, Document xml) throws TransformerException {
-        Source xslt = new StreamSource(getClass().getResourceAsStream(xsl));
-        JDOMResult result = new JDOMResult();
-
-        TransformerFactory factory = TransformerFactory.newInstance();
-        factory.setURIResolver(MCRURIResolver.instance());
-
-        Transformer transformer = factory.newTransformer(xslt);
-        parameters.forEach(transformer::setParameter);
-
-        if (transformer instanceof TransformerImpl transformerImpl) {
-            transformerImpl.getUnderlyingXsltTransformer()
-                .setMessageHandler(msg -> System.err.println(msg.getContent().getStringValue()));
-        }
-
-        transformer.transform(new JDOMSource(xml), result);
-
-        return new Document(result.getResult());
-    }
 }
