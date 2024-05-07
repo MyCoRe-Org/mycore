@@ -27,25 +27,19 @@ import org.mycore.common.MCRTestCase;
 public class MCRTitleInfoMergerTest extends MCRTestCase {
 
     @Test
-    public void testMerge() throws Exception {
-        String a = "[mods:titleInfo[mods:title='Testing'][mods:subTitle='All You have to know about']]";
-        String b = "[mods:titleInfo[mods:title='testing: all you have to know about']]";
-        String e = "[mods:titleInfo[mods:title='Testing'][mods:subTitle='All You have to know about']]";
-        MCRMergerTest.test(a, b, e);
-    }
-
-    @Test
     public void testLongerWins() throws Exception {
         String a = "[mods:titleInfo[mods:title='Applied Physics A']]";
         String b = "[mods:titleInfo[mods:title='Applied Physics A : Materials Science & Processing']]";
         MCRMergerTest.test(a, b, b);
+        MCRMergerTest.test(b, a, b);
     }
 
     @Test
-    public void testMergingTitleSubtitle() throws JaxenException, IOException {
+    public void testMergingSubtitleWins() throws JaxenException, IOException {
         String a = "[mods:titleInfo[mods:title='testing: all you have to know about']]";
         String b = "[mods:titleInfo[mods:title='Testing'][mods:subTitle='All You have to know about']]";
         MCRMergerTest.test(a, b, b);
+        MCRMergerTest.test(b, a, b);
     }
 
     @Test
@@ -89,4 +83,21 @@ public class MCRTitleInfoMergerTest extends MCRTestCase {
             + "[mods:titleInfo[mods:title='Chemistry'][@type='abbreviated']]";
         MCRMergerTest.test(a, b, e);
     }
+
+
+    @Test
+    public void testMergingHtmlVariants() throws JaxenException, IOException {
+        // from importing 10.1002/cplu.202200022
+        String a = "[mods:titleInfo[mods:title='The Dynamic Covalent Chemistry of Amidoboronates: " +
+            "Tuning the rac<sub>5</sub> /rac<sub>6</sub> Ratio via " +
+            "the B-N and B-O Dynamic Covalent Bonds.']]";
+        String b = "[mods:titleInfo[mods:title='The Dynamic Covalent Chemistry of Amidoboronates: " +
+            "Tuning the <i>rac</i><sub>5</sub>/<i>rac</i><sub>6</sub> Ratio " +
+            "via the B−N and B−O Dynamic Covalent Bonds']]";
+        String c = "[mods:titleInfo[mods:title='The Dynamic Covalent Chemistry of Amidoboronates: " +
+            "Tuning the rac5/rac6 Ratio " +
+            "via the B‑N and B‐O Dynamic Covalent Bonds']]";
+        MCRMergerTest.test(new String[]{a, b, c}, b);
+    }
+    
 }

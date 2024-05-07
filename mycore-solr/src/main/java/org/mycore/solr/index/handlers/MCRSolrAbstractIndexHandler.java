@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 
@@ -40,7 +41,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     public MCRSolrAbstractIndexHandler(SolrClient solrClient) {
         this.solrClient = solrClient != null ? solrClient : MCRSolrClientFactory.getMainSolrClient();
-        this.commitWithin = -1;
+        this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithIn").orElseThrow();
     }
 
     public SolrClient getSolrClient() {
