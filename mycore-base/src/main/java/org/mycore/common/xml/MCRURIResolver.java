@@ -1015,11 +1015,11 @@ public final class MCRURIResolver implements URIResolver {
 
         public static final String PREFIX = "MCR.URIResolver.XSLStyle.Flavor.";
 
-        private static final Flavor DEFAULT_FLAVOR;
+        private final Flavor defaultFlavor;
 
-        private static final Map<String, Flavor> FLAVORS = new HashMap<>();
+        private final Map<String, Flavor> flavors;
 
-        static {
+        private MCRXslStyleResolver() {
 
             Class<? extends TransformerFactory> defaultFactoryClass = MCRConfiguration2
                 .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
@@ -1027,9 +1027,10 @@ public final class MCRURIResolver implements URIResolver {
             String defaultXslFolder = MCRConfiguration2
                 .getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
 
-            DEFAULT_FLAVOR = new Flavor(defaultFactoryClass, defaultXslFolder);
-            LOGGER.info("Working with default flavor {}", DEFAULT_FLAVOR);
+            defaultFlavor = new Flavor(defaultFactoryClass, defaultXslFolder);
+            LOGGER.info("Working with default flavor {}", defaultFlavor);
 
+            flavors = new HashMap<>();
             for (String flavorName : getFlavorNames()) {
 
                 String factoryClassProperty = PREFIX + flavorName + ".TransformerFactoryClass";
@@ -1042,7 +1043,7 @@ public final class MCRURIResolver implements URIResolver {
 
                 Flavor flavor = new Flavor(factoryClass, xslFolder);
                 LOGGER.info("Working with {} flavor {}", flavorName, flavor);
-                FLAVORS.put(flavorName, flavor);
+                flavors.put(flavorName, flavor);
 
             }
 
@@ -1068,7 +1069,7 @@ public final class MCRURIResolver implements URIResolver {
                 throw new MCRUsageException("Target URI missing in " + href);
             }
 
-            //  copy target URI from end of href, ensure that resolved element will be present
+            //  copy target URI from end of href, ensure that resolved element won't be null
             int targetStart = configurationEnd + 1;
             String targetUri = help.substring(targetStart);
             if (!targetUri.startsWith("notnull:")) {
@@ -1077,7 +1078,7 @@ public final class MCRURIResolver implements URIResolver {
 
             //  copy flavor from end of href, if present
             String flavorName = "";
-            Flavor flavor = DEFAULT_FLAVOR;
+            Flavor flavor = defaultFlavor;
             int flavorNameStart = help.lastIndexOf('#', configurationEnd);
             if (flavorNameStart != -1) {
                 flavorName = help.substring(flavorNameStart + 1, configurationEnd);
@@ -1085,37 +1086,45 @@ public final class MCRURIResolver implements URIResolver {
             }
 
             if (!flavorName.isEmpty()) {
-                flavor = FLAVORS.get(flavorName);
+                flavor = flavors.get(flavorName);
                 if (flavor == null) {
                     throw new MCRUsageException("Unknown flavor " + flavorName + " in " + href);
                 }
             }
 
-            //  copy params from end of href, if present
-            String params = "";
+            //  copy parameters from end of href, if present
+            String parameters = "";
             int paramsStart = help.lastIndexOf('?', configurationEnd);
             if (paramsStart != -1) {
-                params = help.substring(paramsStart + 1, configurationEnd);
+                parameters = help.substring(paramsStart + 1, configurationEnd);
                 configurationEnd = paramsStart;
             }
 
             //  copy stylesheets from href
-            String stylesheets = help.substring(0, configurationEnd);
+            String stylesheetPaths = help.substring(0, configurationEnd);
 
             // resolve target URI
             Source resolved = MCRURIResolver.instance().resolve(targetUri, base);
+            assert resolved != null;
 
             try {
+
                 if (resolved.getSystemId() == null) {
                     resolved.setSystemId(targetUri);
                 }
+
+                // prepare transformer
+                String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","), flavor.xslFolder);
+                MCRXSLTransformer transformer = MCRXSLTransformer.getInstance(flavor.transformerFactory, stylesheets);
+
+                //prepare parameter collector
+                MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();
+                parameterCollector.setParameters(getParameterMap(parameters));
+
+                // perform transformation
                 MCRSourceContent content = new MCRSourceContent(resolved);
-                MCRXSLTransformer transformer = MCRXSLTransformer.getInstance(flavor.transformerFactory,
-                    augmentStylesheetsPaths(stylesheets.split(Pattern.quote(",")), flavor.xslFolder));
-                MCRParameterCollector paramCollector = MCRParameterCollector.getInstanceFromUserSession();
-                paramCollector.setParameters(getParameterMap(params));
-                MCRContent result = transformer.transform(content, paramCollector);
-                return result.getSource();
+                return transformer.transform(content, parameterCollector).getSource();
+
             } catch (IOException e) {
                 Throwable cause = e.getCause();
                 while (cause != null) {
