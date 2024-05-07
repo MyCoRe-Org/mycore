@@ -8,12 +8,13 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 public class MCRTestCaseClassificationUtil {
     /**
-     * Adds a classification represented by the given XML file to the system.
+     * Adds a classification represented by the given XML file from classpath to the system.
      *
-     * @param file the XML file containing the classification
+     * @param resourcePath the XML classpath file containing the classification
      */
-    public static void addClassification(String file) throws Exception {
-        Document classification = new SAXBuilder().build(MCRTestCaseClassificationUtil.class.getResourceAsStream(file));
+    public static void addClassification(String resourcePath) throws Exception {
+        Document classification = new SAXBuilder()
+            .build(MCRTestCaseClassificationUtil.class.getResourceAsStream(resourcePath));
         MCRCategory category = MCRXMLTransformer.getCategory(classification);
         MCRCategoryDAOFactory.getInstance().addCategory(null, category);
     }

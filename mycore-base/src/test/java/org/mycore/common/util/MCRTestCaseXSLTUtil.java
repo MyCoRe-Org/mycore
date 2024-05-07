@@ -19,6 +19,10 @@
 package org.mycore.common.util;
 
 import net.sf.saxon.jaxp.TransformerImpl;
+import net.sf.saxon.s9api.Message;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMResult;
@@ -32,28 +36,50 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.util.Map;
 
+/**
+ * Provides utility methods for testing XSLT functions. The general process for XSL testing is as follows:
+ * <ol>
+ *     <li>create a test XSL file containing match templates calling functions/templates to test</li>
+ *     <li>call prepareTestDocument with the rootName matching the test template (and possible XML content)</li>
+ *     <li>call transform with the test document and evaluate the result document</li>
+ * </ol>
+ */
 public class MCRTestCaseXSLTUtil {
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final String ERROR_XTMM9000 = "XTMM9000";
+    private static final String ERROR_XTMM9001 = "XTMM9001";
+
     /**
-     * Returns an XML document with the given method name as root element and the content of the given XML tree as
+     * Returns an XML document with a root element with the given name
+     *
+     * @param rootName the root element name of the document
+     * @return an XML document with a root element with the given name
+     */
+    public static Document prepareTestDocument(String rootName) {
+        return new Document().addContent(new Element(rootName));
+    }
+
+    /**
+     * Returns an XML document with the given name as root element and the content of the given XML tree as
      * child element. The resulting document can be used for calling XSLT test files using template matching.
      *
-     * @param method the method name used as root element name
-     * @param xml    the XML tree
-     * @return an XML document with the method name as root element and the content of the given XML tree as children
+     * @param rootName the name used as root element name
+     * @param xml      the XML tree
+     * @return an XML document with the name as root element and the content of the given XML tree as children
      */
-    public static Document xmlTest(String method, Element xml) {
-        final Element root = new Element(method);
+    public static Document prepareTestDocument(String rootName, Element xml) {
+        final Element root = new Element(rootName);
         root.addContent(xml.detach());
 
         return new Document(root);
     }
 
     /**
-     * Transforms the XML document using the given XSL stylesheet with the given parameters.
+     * Transforms the XML document using the given XSL stylesheet from classpath with the given parameters.
      *
-     * @param parameters the XSL parameters
-     * @param xsl        the XSL stylesheet file used for parsing
      * @param xml        the XML document to parse
+     * @param xsl        the XSL stylesheet file used for parsing
+     * @param parameters the XSL transformation parameters
      */
     public static Document transform(Document xml, String xsl, Map<String, Object> parameters)
         throws TransformerException {
@@ -67,12 +93,26 @@ public class MCRTestCaseXSLTUtil {
         parameters.forEach(transformer::setParameter);
 
         if (transformer instanceof TransformerImpl transformerImpl) {
-            transformerImpl.getUnderlyingXsltTransformer()
-                .setMessageHandler(msg -> System.err.println(msg.getContent().getStringValue()));
+            transformerImpl.getUnderlyingXsltTransformer().setMessageHandler(MCRTestCaseXSLTUtil::log);
         }
 
         transformer.transform(new JDOMSource(xml), result);
 
         return new Document(result.getResult());
+    }
+
+    /**
+     * Logs an XSL message to the system logger.
+     *
+     * @param message the message to log
+     */
+    private static void log(Message message) {
+        // error codes from https://www.w3.org/2005/xqt-errors/:
+        // XTMM9000, XTMM9001 are messages; other codes are warnings/errors
+        if (StringUtils.equalsAny(message.getErrorCode().getLocalName(), ERROR_XTMM9000, ERROR_XTMM9001)) {
+            LOGGER.info(message.getContent());
+        } else {
+            LOGGER.error(message.getContent());
+        }
     }
 }

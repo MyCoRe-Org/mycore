@@ -2,14 +2,14 @@
 <mycoreclass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="TestClassification">
     <categories>
-        <category ID="junit_de">
-            <label xml:lang="de" text="junit_de (de)"/>
-            <label xml:lang="en" text="junit_de (en)"/>
+        <category ID="junit_1">
+            <label xml:lang="de" text="junit_1 (de)"/>
+            <label xml:lang="en" text="junit_1 (en)"/>
         </category>
-        <category ID="junit_en">
-            <label xml:lang="en" text="junit_en (en)"/>
+        <category ID="junit_2">
+            <label xml:lang="en" text="junit_2 (en)"/>
         </category>
-        <category ID="junit_none">
+        <category ID="junit_3">
         </category>
     </categories>
 </mycoreclass>
