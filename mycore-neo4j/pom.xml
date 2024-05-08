@@ -75,6 +75,10 @@
       <artifactId>neo4j-java-driver</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>vis-network</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -89,10 +93,6 @@
       <artifactId>mycore-base</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>vis-network</artifactId>
     </dependency>
   </dependencies>
   <dependencyManagement>
