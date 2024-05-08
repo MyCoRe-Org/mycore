@@ -18,6 +18,9 @@
 
 package org.mycore.mods.merger;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 
@@ -31,13 +34,15 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRTitleInfoMerger extends MCRMerger {
 
-    private String text;
+    private String originalText;
+    
+    private String normalizedText;
 
     public void setElement(Element element) {
         super.setElement(element);
-
-        text = textOf("nonSort") + " " + textOf("title") + " " + textOf("subTitle");
-        text = MCRTextNormalizer.normalizeText(text.trim());
+        originalText = Stream.of(textOf("nonSort"), textOf("title"), textOf("subTitle"))
+            .filter(s -> !s.isEmpty()).collect(Collectors.joining(" "));
+        normalizedText = MCRTextNormalizer.normalizeText(originalText);
     }
 
     private String getType() {
@@ -54,10 +59,11 @@ public class MCRTitleInfoMerger extends MCRMerger {
             return false;
         }
 
-        if (text.equals(otherTitle.text)) {
+        if (normalizedText.equals(otherTitle.normalizedText)) {
             return true;
         }
-        return text.startsWith(otherTitle.text) || otherTitle.text.startsWith(text);
+        return normalizedText.startsWith(otherTitle.normalizedText) 
+            || otherTitle.normalizedText.startsWith(normalizedText);
     }
 
     public void mergeFrom(MCRMerger other) {
@@ -65,16 +71,19 @@ public class MCRTitleInfoMerger extends MCRMerger {
 
         MCRTitleInfoMerger otherTitle = (MCRTitleInfoMerger) other;
 
+        boolean weHaveSubTitleOtherHasNot = !textOf("subTitle").isEmpty() && otherTitle.textOf("subTitle").isEmpty();
         boolean otherHasSubTitleAndWeNot = textOf("subTitle").isEmpty() && !otherTitle.textOf("subTitle").isEmpty();
-        boolean otherTitleIsLonger = otherTitle.text.length() > this.text.length();
+        boolean otherTitleIsLonger = otherTitle.originalText.length() > this.originalText.length();
 
-        if (otherHasSubTitleAndWeNot || otherTitleIsLonger) {
+        if (!weHaveSubTitleOtherHasNot && (otherHasSubTitleAndWeNot || otherTitleIsLonger)) {
             this.element.setContent(other.element.cloneContent());
-        }
+        } 
+
     }
 
     private String textOf(String childName) {
         String text = element.getChildText(childName, MCRConstants.MODS_NAMESPACE);
         return text == null ? "" : text.trim();
     }
+
 }
