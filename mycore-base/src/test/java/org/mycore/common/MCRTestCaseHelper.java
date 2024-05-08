@@ -74,7 +74,8 @@ public class MCRTestCaseHelper {
             MCRSessionMgr.releaseCurrentSession();
             currentSession.close();
         }
-        MCRConfigurationBase.initialize(Collections.emptyMap(), Collections.emptyMap(), true);
+        MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
+        MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), configurationLoader.load(), true);
     }
 
     public static String getCurrentComponentName() {
