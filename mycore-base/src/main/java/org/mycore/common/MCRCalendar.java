@@ -651,15 +651,9 @@ public class MCRCalendar {
             final boolean bb = beforeZero(dateTrimmed, CalendarType.Persic);
             final String cleanDate = cleanDate(dateTrimmed, CalendarType.Persic);
             final int[] fields = parseDateString(cleanDate, last, CalendarType.Persic);
-            int year = fields[0];
+            final int year = bb ? 622 - fields[0] : 621 + fields[0];
             final int mon = fields[1];
             final int day = fields[2];
-
-            if (bb) {
-                year = 622 - year;
-            } else {
-                year += 621;
-            }
 
             return getGregorianCalendar(year, mon, day);
         } catch (Exception e) {
