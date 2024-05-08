@@ -10,6 +10,8 @@
 
   <xsl:param name="MCR.ORCID2.Work.SourceURL" />
 
+  <xsl:variable name="short-description-max-length" select="5000"/>
+
   <xsl:template match="mycoreobject">
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
   </xsl:template>
@@ -84,7 +86,14 @@
 
   <xsl:template match="mods:abstract">
     <work:short-description>
-      <xsl:value-of select="text()" />
+      <xsl:choose>
+        <xsl:when test="string-length(.) &gt; $short-description-max-length">
+          <xsl:value-of select="concat(substring(., 1, ($short-description-max-length - 2)), ' …')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="text()" />
+        </xsl:otherwise>
+      </xsl:choose>
     </work:short-description>
   </xsl:template>
 
