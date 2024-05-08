@@ -4,7 +4,7 @@
   <xsl:output method="html" media-type="text/html" encoding="UTF-8" indent="yes"/>
 
   <xsl:param name="WebApplicationBaseURL"/>
-  <xsl:param name="MCR.Neo4j.VISNetworkJSURL"/>
+  <xsl:param name="MCR.Neo4J.VISNetworkJSURL"/>
   <xsl:param name="MCR.Neo4J.colors"/>
 
   <xsl:template match="/mycoreobject">
@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <script type="text/javascript" src="{$MCR.Neo4j.VISNetworkJSURL}"/>
+    <script type="text/javascript" src="{$MCR.Neo4J.VISNetworkJSURL}"/>
     <script type="text/javascript" src="/js/mcr_neo4j_graph.js" id="{@ID}" baseUrl="{$WebApplicationBaseURL}" colors="{$MCR.Neo4J.colors}"/>
   </xsl:template>
 
