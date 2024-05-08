@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -65,10 +66,10 @@ import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -412,12 +413,10 @@ public class MCRLayoutUtilities {
         for (int i = 0; i < userNameNodes.getLength(); i++) {
             Attr href = (Attr) userNameNodes.item(i);
             String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-            if (userID.equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
-                //remove item if user is not logged in
-                org.w3c.dom.Element item = href.getOwnerElement();
-                item.getParentNode().removeChild(item);
-            } else {
-                href.setValue(href.getValue().replace("{CurrentUser}", userID));
+            try {
+                href.setValue(href.getValue().replace("{CurrentUser}", MCRXMLFunctions.encodeURIPath(userID)));
+            } catch (URISyntaxException e) {
+                throw new MCRException("Unexpected exception while encoding user name: " + userID, e);
             }
         }
         personalNavi.normalizeDocument();
