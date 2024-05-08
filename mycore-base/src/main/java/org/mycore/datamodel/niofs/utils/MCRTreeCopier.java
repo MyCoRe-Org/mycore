@@ -32,6 +32,7 @@ import java.nio.file.attribute.FileTime;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCREntityTransaction;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 
@@ -49,7 +50,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
 
     private final boolean renameExisting;
 
-    private final boolean restartTransaction;
+    private final boolean restartDatabaseTransaction;
 
     public MCRTreeCopier(Path source, Path target) throws NoSuchFileException {
         this(source, target, false, false);
@@ -67,7 +68,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
         }
         this.source = source;
         this.target = target;
-        this.restartTransaction = restartTransaction;
+        this.restartDatabaseTransaction = restartTransaction;
     }
 
     @Override
@@ -93,16 +94,16 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 int numberPosition = fileName.lastIndexOf(".") == -1 ? fileName.length() : fileName.lastIndexOf(".");
                 String prefixString = fileName.substring(0, numberPosition);
                 String suffixString = fileName.substring(numberPosition);
-                String newName = null;
+                String newName;
                 Path parent = target.getParent();
                 do {
                     newName = prefixString + nameTry++ + suffixString;
                     target = parent.resolve(newName);
                 } while (Files.exists(target));
             }
-            if (restartTransaction && MCRSessionMgr.hasCurrentSession()) {
-                MCRTransactionHelper.commitTransaction();
-                MCRTransactionHelper.beginTransaction();
+            if (restartDatabaseTransaction && MCRSessionMgr.hasCurrentSession()) {
+                MCRTransactionHelper.commitTransaction(MCREntityTransaction.class);
+                MCRTransactionHelper.beginTransaction(MCREntityTransaction.class);
             }
             Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {
