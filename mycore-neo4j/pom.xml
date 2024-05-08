@@ -90,6 +90,10 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>vis-network</artifactId>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
