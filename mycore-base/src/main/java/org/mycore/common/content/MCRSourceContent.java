@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.Parent;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
@@ -100,25 +101,19 @@ public class MCRSourceContent extends MCRWrappedContent {
         Document xml = src.getDocument();
         if (xml != null) {
             return new MCRJDOMContent(xml);
-        } else {
-            for (Object node : src.getNodes()) {
-                if (node instanceof Element element) {
-                    Document doc = element.getDocument();
-                    if (doc == null) {
-                        return new MCRJDOMContent(element);
-                    } else {
-                        if (doc.getRootElement() == element) {
-                            return new MCRJDOMContent(doc);
-                        } else {
-                            return new MCRJDOMContent(element.clone());
-                        }
-                    }
-                } else if (node instanceof Document doc) {
-                    return new MCRJDOMContent(doc);
-                }
-            }
-            return null;
         }
+        return src.getNodes().stream()
+            .filter(Parent.class::isInstance) //only Element or Document matter
+            .map(Parent.class::cast)
+            .findFirst()
+            .map(p -> switch (p){
+                case Element element when element.isRootElement() -> new MCRJDOMContent(element.getDocument());
+                case Element element when element.getParent() == null -> new MCRJDOMContent(element);
+                case Element element -> new MCRJDOMContent(element.clone());
+                case Document doc -> new MCRJDOMContent(doc);
+                default -> null;
+            })
+            .orElse(null);
     }
 
     /**
