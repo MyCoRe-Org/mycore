@@ -88,7 +88,7 @@
 
   <xsl:template match="mods:abstract">
     <work:short-description>
-      <xsl:value-of select="mcrstring:shorten(text(), $short-description-max-length, '…')"/>
+      <xsl:value-of select="mcrstring:shorten(text(), ($short-description-max-length - 1), '…')"/>
     </work:short-description>
   </xsl:template>
 
