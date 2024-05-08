@@ -311,7 +311,7 @@ public class MCRMODSWrapper {
 
     public String getServiceFlag(String type) {
         MCRObjectService os = object.getService();
-        return (os.isFlagTypeSet(type) ? os.getFlags(type).get(0) : null);
+        return (os.isFlagTypeSet(type) ? os.getFlags(type).getFirst() : null);
     }
 
     public void setServiceFlag(String type, String value) {

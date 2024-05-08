@@ -168,7 +168,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
                 .orElseGet(() -> getLabel(defaultLang)
                     .orElseGet(() -> labels.stream().filter(l -> LANGUAGES.contains(l.getLang())).findFirst()
                         .orElseGet(() -> labels.stream().filter(l -> !l.getLang().startsWith("x-")).findFirst()
-                            .orElseGet(() -> labels.iterator().next())))));
+                            .orElseGet(() -> labels.getFirst())))));
     }
 
     public Optional<MCRLabel> getLabel(String lang) {

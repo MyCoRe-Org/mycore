@@ -211,12 +211,12 @@ public class MCRLayoutService {
         } catch (Exception e) {
             Throwable cause = e.getCause();
             while (cause != null) {
-                if (cause instanceof TransformerException te) {
-                    throw te;
-                } else if (cause instanceof SAXException se) {
-                    throw se;
-                } else if (cause instanceof IOException ioe) {
-                    throw ioe;
+                switch (cause) {
+                    case TransformerException te -> throw te;
+                    case SAXException se -> throw se;
+                    case IOException ioe -> throw ioe;
+                    default -> {
+                    }
                 }
                 cause = cause.getCause();
             }

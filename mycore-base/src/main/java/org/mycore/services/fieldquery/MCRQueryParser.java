@@ -180,112 +180,120 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
      * by '...' or wildcard search with * or ?.
      */
     public static MCRCondition<Void> normalizeCondition(MCRCondition<Void> cond) {
-        if (cond == null) {
-            return null;
-        } else if (cond instanceof MCRSetCondition<Void> sc) {
-            List<MCRCondition<Void>> children = sc.getChildren();
-            sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
-            for (MCRCondition<Void> child : children) {
-                MCRCondition<Void> normalizedChild = normalizeCondition(child);
-                if (normalizedChild != null) {
-                    if (normalizedChild instanceof MCRSetCondition
-                        && sc.getOperator().equals(((MCRSetCondition) normalizedChild).getOperator())) {
-                        // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
-                        sc.addAll(((MCRSetCondition<Void>) normalizedChild).getChildren());
-                    } else {
-                        sc.addChild(normalizedChild);
-                    }
-                }
-            }
-            children = sc.getChildren();
-            if (children.size() == 0) {
-                return null; // Completely remove empty AND condition
-            } else if (children.size() == 1) {
-                return children.get(0); // Replace AND with just one child
-            } else {
-                return sc;
-            }
-        } else if (cond instanceof MCRNotCondition<Void> nc) {
-            MCRCondition<Void> child = normalizeCondition(nc.getChild());
-            if (child == null) {
-                return null; // Remove empty NOT
-            } else if (child instanceof MCRNotCondition) {
-                return normalizeCondition(((MCRNotCondition<Void>) child).getChild());
-            } else {
-                return new MCRNotCondition<>(child);
-            }
-        } else if (cond instanceof MCRQueryCondition qc) {
+        return switch (cond) {
+            case null -> null;
+            case MCRSetCondition<Void> sc -> normalizeSetCondition(sc);
+            case MCRNotCondition<Void> nc -> normalizeNotCondition(nc);
+            case MCRQueryCondition qc -> normalizeQueryCondition(qc);
+            default -> cond;
+        };
+    }
 
-            if (!qc.getOperator().equals("contains")) {
-                return qc;
-            }
+    private static MCRCondition<Void> normalizeQueryCondition(MCRQueryCondition qc) {
+        if (!qc.getOperator().equals("contains")) {
+            return qc;
+        }
 
-            // Normalize value when contains operator is used
-            List<String> values = new ArrayList<>();
+        // Normalize value when contains operator is used
+        List<String> values = new ArrayList<>();
 
-            StringBuilder phrase = null;
-            StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
-            while (st.hasMoreTokens()) {
-                String value = st.nextToken();
-                if (phrase != null) {
-                    // we are within phrase
-                    if (value.endsWith("'")) {
-                        // end of phrase
-                        value = phrase + " " + value;
-                        values.add(value);
-                        phrase = null;
-                    } else {
-                        // in middle of phrase
-                        phrase.append(' ').append(value);
-                    }
-                } else if (value.startsWith("'")) {
-                    // begin of phrase
-                    if (value.endsWith("'")) {
-                        // one-word phrase
-                        values.add(value.substring(1, value.length() - 1));
-                    } else {
-                        phrase = new StringBuilder(value);
-                    }
-                } else if (value.startsWith("-'")) {
-                    // begin of NOT phrase
-                    if (value.endsWith("'")) {
-                        // one-word phrase
-                        values.add("-" + value.substring(2, value.length() - 1));
-                    } else {
-                        phrase = new StringBuilder(value);
-                    }
-                } else {
+        StringBuilder phrase = null;
+        StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
+        while (st.hasMoreTokens()) {
+            String value = st.nextToken();
+            if (phrase != null) {
+                // we are within phrase
+                if (value.endsWith("'")) {
+                    // end of phrase
+                    value = phrase + " " + value;
                     values.add(value);
-                }
-            }
-
-            MCRAndCondition<Void> ac = new MCRAndCondition<>();
-            for (String value : values) {
-                if (value.startsWith("'")) {
-                    ac.addChild(new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(1,
-                        value.length() - 1)));
-                } else if (value.startsWith("-'")) {
-                    ac.addChild(new MCRNotCondition<>(
-                        new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(2, value.length() - 1))));
-                } else if (value.contains("*") || value.contains("?")) {
-                    ac.addChild(new MCRQueryCondition(qc.getFieldName(), "like", value));
-                } else if (value.startsWith("-")) {
-                    // -word means "NOT word"
-                    MCRCondition<Void> subCond = new MCRQueryCondition(qc.getFieldName(), "contains",
-                        value.substring(1));
-                    ac.addChild(new MCRNotCondition<>(subCond));
+                    phrase = null;
                 } else {
-                    ac.addChild(new MCRQueryCondition(qc.getFieldName(), "contains", value));
+                    // in middle of phrase
+                    phrase.append(' ').append(value);
+                }
+            } else if (value.startsWith("'")) {
+                // begin of phrase
+                if (value.endsWith("'")) {
+                    // one-word phrase
+                    values.add(value.substring(1, value.length() - 1));
+                } else {
+                    phrase = new StringBuilder(value);
+                }
+            } else if (value.startsWith("-'")) {
+                // begin of NOT phrase
+                if (value.endsWith("'")) {
+                    // one-word phrase
+                    values.add("-" + value.substring(2, value.length() - 1));
+                } else {
+                    phrase = new StringBuilder(value);
+                }
+            } else {
+                values.add(value);
+            }
+        }
+
+        MCRAndCondition<Void> ac = new MCRAndCondition<>();
+        for (String value : values) {
+            if (value.startsWith("'")) {
+                ac.addChild(new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(1,
+                    value.length() - 1)));
+            } else if (value.startsWith("-'")) {
+                ac.addChild(new MCRNotCondition<>(
+                    new MCRQueryCondition(qc.getFieldName(), "phrase",
+                        value.substring(2, value.length() - 1))));
+            } else if (value.contains("*") || value.contains("?")) {
+                ac.addChild(new MCRQueryCondition(qc.getFieldName(), "like", value));
+            } else if (value.startsWith("-")) {
+                // -word means "NOT word"
+                MCRCondition<Void> subCond = new MCRQueryCondition(qc.getFieldName(), "contains",
+                    value.substring(1));
+                ac.addChild(new MCRNotCondition<>(subCond));
+            } else {
+                ac.addChild(new MCRQueryCondition(qc.getFieldName(), "contains", value));
+            }
+        }
+
+        if (values.size() == 1) {
+            return ac.getChildren().getFirst();
+        } else {
+            return ac;
+        }
+    }
+
+    private static MCRCondition<Void> normalizeNotCondition(MCRNotCondition<Void> nc) {
+        MCRCondition<Void> child = normalizeCondition(nc.getChild());
+        if (child == null) {
+            return null;
+        } else if (child instanceof MCRNotCondition) {
+            return normalizeCondition(((MCRNotCondition<Void>) child).getChild());
+        } else {
+            return new MCRNotCondition<>(child);
+        }
+    }
+
+    private static MCRCondition<Void> normalizeSetCondition(MCRSetCondition<Void> sc) {
+        List<MCRCondition<Void>> children = sc.getChildren();
+        sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
+        for (MCRCondition<Void> child : children) {
+            MCRCondition<Void> normalizedChild = normalizeCondition(child);
+            if (normalizedChild != null) {
+                if (normalizedChild instanceof MCRSetCondition
+                    && sc.getOperator().equals(((MCRSetCondition) normalizedChild).getOperator())) {
+                    // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
+                    sc.addAll(((MCRSetCondition<Void>) normalizedChild).getChildren());
+                } else {
+                    sc.addChild(normalizedChild);
                 }
             }
-
-            if (values.size() == 1) {
-                return ac.getChildren().get(0);
-            } else {
-                return ac;
-            }
+        }
+        children = sc.getChildren();
+        if (children.isEmpty()) {
+            return null;
+        } else if (children.size() == 1) {
+            return children.getFirst();
         } else {
-            return cond;
+            return sc;
         }
     }
 

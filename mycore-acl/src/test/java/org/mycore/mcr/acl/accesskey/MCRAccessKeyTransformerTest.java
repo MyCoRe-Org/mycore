@@ -68,7 +68,7 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
         accessKeys.add(accessKey);
         final String json = MCRAccessKeyTransformer.jsonFromAccessKeys(accessKeys);
         final List<MCRAccessKey> transAccessKeys = MCRAccessKeyTransformer.accessKeysFromJson(json);
-        final MCRAccessKey transAccessKey = transAccessKeys.get(0);
+        final MCRAccessKey transAccessKey = transAccessKeys.getFirst();
         assertNull(transAccessKey.getObjectId());
         assertEquals(transAccessKey.getId(), 0);
         assertEquals(accessKey.getSecret(), transAccessKey.getSecret());
@@ -86,7 +86,7 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
         new XMLOutputter(Format.getPrettyFormat()).output(element, System.out);
         final List<MCRAccessKey> transAccessKeys = MCRAccessKeyTransformer.accessKeysFromElement(objectId, element);
         assertEquals(2, transAccessKeys.size());
-        final MCRAccessKey transAccessKeyRead = transAccessKeys.get(0);
+        final MCRAccessKey transAccessKeyRead = transAccessKeys.getFirst();
         assertEquals(accessKeyRead.getSecret(), transAccessKeyRead.getSecret());
         assertEquals(accessKeyRead.getType(), transAccessKeyRead.getType());
     }
@@ -107,7 +107,7 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
         service.addContent(servFlags);
         new XMLOutputter(Format.getPrettyFormat()).output(service, System.out);
         final List<MCRAccessKey> transAccessKeys = MCRAccessKeyTransformer.accessKeysFromElement(objectId, service);
-        final MCRAccessKey transAccessKey = transAccessKeys.get(0);
+        final MCRAccessKey transAccessKey = transAccessKeys.getFirst();
         assertEquals(accessKey.getSecret(), transAccessKey.getSecret());
         assertEquals(accessKey.getType(), transAccessKey.getType());
     }

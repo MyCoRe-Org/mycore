@@ -61,7 +61,7 @@ public class MCRMetaClassificationParserTest extends AbstractNeo4JParserTest {
 
         assertEquals(2, relations.size());
 
-        assertEquals("a_mcrobject_00000001", relations.get(0).sourceNodeID());
+        assertEquals("a_mcrobject_00000001", relations.getFirst().sourceNodeID());
         assertEquals("a_mcrobject_00000002", relations.get(0).targetNodeID());
         assertEquals("MyMssOwner:owner_de0", relations.get(0).relationshipType());
 

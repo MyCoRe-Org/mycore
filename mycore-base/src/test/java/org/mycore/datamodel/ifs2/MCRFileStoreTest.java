@@ -135,7 +135,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         while (IDs.hasNext()) {
             int id = IDs.next();
             if (!l1.isEmpty()) {
-                assertTrue(id > l1.get(l1.size() - 1));
+                assertTrue(id > l1.getLast());
             }
             l1.add(id);
         }
@@ -145,7 +145,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         while (IDs.hasNext()) {
             int id = IDs.next();
             if (!l2.isEmpty()) {
-                assertTrue(id < l2.get(l2.size() - 1));
+                assertTrue(id < l2.getLast());
             }
             l2.add(id);
         }

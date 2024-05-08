@@ -94,7 +94,7 @@ public class MCRObjectInfoCommands {
                     // we do not know if the object ever existed
                     LOGGER.warn("Could not determine what happened to " + id);
                 } else {
-                    MCRAbstractMetadataVersion<?> deleted = versions.get(versions.size() - 1);
+                    MCRAbstractMetadataVersion<?> deleted = versions.getLast();
                     MCRAbstractMetadataVersion<?> lastExisting = versions.get(versions.size() - 2);
                     try {
                         Document doc = lastExisting.retrieve().asXML();

@@ -252,7 +252,7 @@ public class MCRNameMerger extends MCRMerger {
         if (!getNodes("mods:namePart[@type='family']").isEmpty()) {
             List<Element> namePartsWithoutType = getNodes("mods:namePart[not(@type)]");
             if (!namePartsWithoutType.isEmpty()) {
-                namePartsWithoutType.get(0).detach();
+                namePartsWithoutType.getFirst().detach();
             }
         }
     }

@@ -31,7 +31,7 @@ class MCRFunctionGenerateID implements org.jaxen.Function {
     @Override
     public Object call(Context context, List args) {
         try {
-            Object targetNode = args.isEmpty() ? context.getNodeSet().get(0) : ((List) args.get(0)).get(0);
+            Object targetNode = args.isEmpty() ? context.getNodeSet().getFirst() : ((List) args.getFirst()).getFirst();
             return "n" + System.identityHashCode(targetNode);
         } catch (Exception ex) {
             LOGGER.warn("Exception in call to generate-id", ex);

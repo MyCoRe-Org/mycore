@@ -236,7 +236,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void deleteSubCategory() {
         addWorldClassification();
-        MCRCategory deleteCategory = category.getChildren().get(0);
+        MCRCategory deleteCategory = category.getChildren().getFirst();
         assertTrue("Sub category does not exist.", DAO.exist(deleteCategory.getId()));
         testDelete(deleteCategory);
     }
@@ -246,7 +246,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         //check for MCR-1863
         addWorldClassification();
         List<MCRCategoryID> europeChildrenIds = category.getChildren()
-            .get(0)
+            .getFirst()
             .getChildren()
             .stream()
             .map(MCRCategory::getId)
@@ -262,24 +262,24 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         // check if classification is present
         assertFalse("Category is not deleted: " + deleteCategory.getId(), DAO.exist(deleteCategory.getId()));
         // check if any subcategory is present
-        assertFalse("Category is not deleted: " + deleteCategory.getChildren().get(0).getId(),
-            DAO.exist(deleteCategory.getChildren().get(0).getId()));
+        assertFalse("Category is not deleted: " + deleteCategory.getChildren().getFirst().getId(),
+            DAO.exist(deleteCategory.getChildren().getFirst().getId()));
     }
 
     @Test
     public void getCategoriesByLabel() {
         addWorldClassification();
-        MCRCategory find = category.getChildren().get(0).getChildren().get(0);
+        MCRCategory find = category.getChildren().get(0).getChildren().getFirst();
         MCRCategory dontFind = category.getChildren().get(1);
-        MCRLabel label = find.getLabels().iterator().next();
+        MCRLabel label = find.getLabels().getFirst();
         List<MCRCategory> results = DAO.getCategoriesByLabel(category.getId(), label.getLang(), label.getText());
         assertFalse("No search results found", results.isEmpty());
-        assertTrue("Could not find Category: " + find.getId(), results.get(0).getLabels().contains(label));
+        assertTrue("Could not find Category: " + find.getId(), results.getFirst().getLabels().contains(label));
         assertTrue("No search result expected.",
             DAO.getCategoriesByLabel(dontFind.getId(), label.getLang(), label.getText()).isEmpty());
         results = DAO.getCategoriesByLabel(label.getLang(), label.getText());
         assertFalse("No search results found", results.isEmpty());
-        assertTrue("Could not find Category: " + find.getId(), results.get(0).getLabels().contains(label));
+        assertTrue("Could not find Category: " + find.getId(), results.getFirst().getLabels().contains(label));
     }
 
     @Test
@@ -288,7 +288,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategory rootCategory = DAO.getCategory(category.getId(), 0);
         assertTrue("Children present with child Level 0.", rootCategory.getChildren().isEmpty());
         rootCategory = DAO.getCategory(category.getId(), 1);
-        MCRCategory origSubCategory = rootCategory.getChildren().get(0);
+        MCRCategory origSubCategory = rootCategory.getChildren().getFirst();
         assertTrue("Children present with child Level 1.", origSubCategory.getChildren().isEmpty());
         assertEquals(
             "Category count does not match with child Level 1.\n" + MCRStringTransformer.getString(rootCategory),
@@ -297,9 +297,9 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
             "Children of Level 1 do not know that they are at the first level.\n"
                 + MCRStringTransformer.getString(rootCategory),
             1, origSubCategory.getLevel());
-        MCRCategory europe = DAO.getCategory(category.getChildren().get(0).getId(), -1);
+        MCRCategory europe = DAO.getCategory(category.getChildren().getFirst().getId(), -1);
         assertFalse("No children present in " + europe.getId(), europe.getChildren().isEmpty());
-        europe = DAO.getCategory(category.getChildren().get(0).getId(), 1);
+        europe = DAO.getCategory(category.getChildren().getFirst().getId(), 1);
         assertFalse("No children present in " + europe.getId(), europe.getChildren().isEmpty());
         rootCategory = DAO.getCategory(category.getId(), -1);
         assertEquals("Did not get all categories." + MCRStringTransformer.getString(rootCategory),
@@ -333,7 +333,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void getParents() {
         addWorldClassification();
-        MCRCategory find = category.getChildren().get(0).getChildren().get(0);
+        MCRCategory find = category.getChildren().getFirst().getChildren().getFirst();
         List<MCRCategory> parents = DAO.getParents(find.getId());
         MCRCategory findParent = find;
         for (MCRCategory parent : parents) {
@@ -349,7 +349,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategoryID find = category.getId();
         List<MCRCategoryID> classIds = DAO.getRootCategoryIDs();
         assertEquals("Result size does not match.", 1, classIds.size());
-        assertEquals("Returned MCRCategoryID does not match.", find, classIds.get(0));
+        assertEquals("Returned MCRCategoryID does not match.", find, classIds.getFirst());
     }
 
     @Test
@@ -358,14 +358,14 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategoryID find = category.getId();
         List<MCRCategory> classes = DAO.getRootCategories();
         assertEquals("Result size does not match.", 1, classes.size());
-        assertEquals("Returned MCRCategoryID does not match.", find, classes.get(0).getId());
+        assertEquals("Returned MCRCategoryID does not match.", find, classes.getFirst().getId());
     }
 
     @Test
     public void getRootCategory() {
         addWorldClassification();
         // Europe
-        MCRCategory find = category.getChildren().get(0);
+        MCRCategory find = category.getChildren().getFirst();
         MCRCategory rootCategory = DAO.getRootCategory(find.getId(), 0);
         assertEquals("Category count does not match.", 2, countNodes(rootCategory));
         assertEquals("Did not get root Category.", find.getRoot().getId(), rootCategory.getId());
@@ -402,7 +402,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         startNewTransaction();
         MCRCategoryImpl rootNode = getRootCategoryFromSession();
         checkLeftRightLevelValue(rootNode, 0, 0);
-        MCRCategory movedNode = rootNode.getChildren().get(0);
+        MCRCategory movedNode = rootNode.getChildren().getFirst();
         assertEquals("Did not expect this category on position 0.", moveNode.getId(), movedNode.getId());
     }
 
@@ -529,11 +529,11 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void removeLabel() {
         addWorldClassification();
-        final MCRCategory labelNode = category.getChildren().get(0);
+        final MCRCategory labelNode = category.getChildren().getFirst();
         int labelCount = labelNode.getLabels().size();
         DAO.removeLabel(labelNode.getId(), "en");
         startNewTransaction();
-        final MCRCategory labelNodeNew = getRootCategoryFromSession().getChildren().get(0);
+        final MCRCategory labelNodeNew = getRootCategoryFromSession().getChildren().getFirst();
         assertEquals("Label count did not match.", labelCount - 1, labelNodeNew.getLabels().size());
     }
 
@@ -545,11 +545,11 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         startNewTransaction();
         MCRCategoryImpl rootNode = getRootCategoryFromSession();
         assertEquals("Category count does not match.", countNodes(category2), countNodes(rootNode));
-        assertEquals("Label count does not match.", category2.getChildren().get(0).getLabels().size(), rootNode
-            .getChildren().get(0).getLabels().size());
+        assertEquals("Label count does not match.", category2.getChildren().getFirst().getLabels().size(), rootNode
+            .getChildren().getFirst().getLabels().size());
         checkLeftRightLevelValue(rootNode, 0, 0);
         final URI germanURI = new URI("http://www.deutschland.de");
-        final MCRCategory germany = rootNode.getChildren().get(0).getChildren().get(0);
+        final MCRCategory germany = rootNode.getChildren().getFirst().getChildren().getFirst();
         assertEquals("URI was not updated", germanURI, germany.getURI());
     }
 
@@ -633,11 +633,11 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void replaceCategoryShiftCase() {
         addWorldClassification();
-        MCRCategory europe = category.getChildren().get(0);
-        MCRCategory germany = europe.getChildren().get(0);
-        europe.getChildren().remove(0);
+        MCRCategory europe = category.getChildren().getFirst();
+        MCRCategory germany = europe.getChildren().getFirst();
+        europe.getChildren().removeFirst();
         assertNull("Germany should not have a parent right now", germany.getParent());
-        category.getChildren().remove(0);
+        category.getChildren().removeFirst();
         assertNull("Europe should not have a parent right now", europe.getParent());
         category.getChildren().add(germany);
         assertEquals("Germany should not have world as parent right now", category.getId(),
@@ -646,15 +646,15 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         startNewTransaction();
         MCRCategory rootNode = getRootCategoryFromSession();
         assertEquals("Category count does not match.", countNodes(category), countNodes(rootNode));
-        assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode
-            .getChildren().get(0).getLabels().size());
+        assertEquals("Label count does not match.", category.getChildren().getFirst().getLabels().size(), rootNode
+            .getChildren().getFirst().getLabels().size());
     }
 
     @Test
     public void replaceCategoryWithItself() {
         addWorldClassification();
-        MCRCategory europe = category.getChildren().get(0);
-        MCRCategory germany = europe.getChildren().get(0);
+        MCRCategory europe = category.getChildren().getFirst();
+        MCRCategory germany = europe.getChildren().getFirst();
         DAO.replaceCategory(germany);
         startNewTransaction();
         getRootCategoryFromSession();
@@ -666,20 +666,20 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
      */
     public void testReplaceCategoryNewParent() {
         addWorldClassification();
-        MCRCategory europe = category.getChildren().get(0);
+        MCRCategory europe = category.getChildren().getFirst();
         MCRCategoryImpl test = new MCRCategoryImpl();
         test.setId(new MCRCategoryID(category.getId().getRootID(), "test"));
         test.setLabels(new TreeSet<>());
         test.getLabels().add(new MCRLabel("de", "JUnit testcase", null));
         category.getChildren().add(test);
-        category.getChildren().remove(0);
+        category.getChildren().removeFirst();
         test.getChildren().add(europe);
         DAO.replaceCategory(category);
         startNewTransaction();
         MCRCategory rootNode = getRootCategoryFromSession();
         assertEquals("Category count does not match.", countNodes(category), countNodes(rootNode));
-        assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode
-            .getChildren().get(0).getLabels().size());
+        assertEquals("Label count does not match.", category.getChildren().getFirst().getLabels().size(), rootNode
+            .getChildren().getFirst().getLabels().size());
     }
 
     private MCRCategoryImpl getRootCategoryFromSession() {

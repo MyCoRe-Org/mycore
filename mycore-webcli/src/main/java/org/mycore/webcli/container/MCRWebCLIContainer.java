@@ -433,7 +433,7 @@ public class MCRWebCLIContainer {
             httpSession.ifPresent(s -> s.setMaxInactiveInterval(-1));
             try {
                 while (!commands.isEmpty()) {
-                    String command = commands.remove(0);
+                    String command = commands.removeFirst();
                     cmdListPublisher.submit(commands);
                     if (!processCommand(command)) {
                         if (!continueIfOneFails) {
