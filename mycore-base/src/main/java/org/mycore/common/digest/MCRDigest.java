@@ -19,6 +19,7 @@
 package org.mycore.common.digest;
 
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Representing a message digest.
@@ -72,6 +73,21 @@ public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
      */
     public String getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        MCRDigest mcrDigest = (MCRDigest) o;
+        return Objects.equals(value, mcrDigest.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
     }
 
     /**
