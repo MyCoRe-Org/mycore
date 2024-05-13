@@ -1,11 +1,21 @@
 package org.mycore.datamodel.niofs;
 
-import java.io.IOException;
 import java.nio.file.attribute.FileTime;
 
-import org.mycore.common.MCRException;
 import org.mycore.common.digest.MCRDigest;
 
+/**
+ * Provides a lazy loading implementation for {@link MCRFileAttributes}.
+ *
+ * <p>The attributes are loaded only once on the first request and are then cached for subsequent uses.</p>
+ *
+ * <p>This approach is particularly beneficial in remote filesystems where network latency and data transfer costs
+ * are significant. In some scenarios, instances of this proxy might be created without ever accessing the underlying
+ * attributes, thus avoiding unnecessary network traffic entirely.</p>
+ *
+ * @param <T> The type of the file key.
+ * @param <P> The type of the {@link MCRPath} associated with these file attributes.
+ */
 public abstract class MCRBasicFileAttributesProxy<T, P extends MCRPath> implements MCRFileAttributes<T> {
 
     private volatile MCRFileAttributes<T> proxy;
@@ -72,18 +82,14 @@ public abstract class MCRBasicFileAttributesProxy<T, P extends MCRPath> implemen
         if (this.proxy == null) {
             synchronized (lock) {
                 if (this.proxy == null) {
-                    try {
-                        this.proxy = loadProxy();
-                    } catch (IOException ioException) {
-                        throw new MCRException("Unable to load basic file attributes for '" + path + "'.", ioException);
-                    }
+                    this.proxy = loadProxy();
                 }
             }
         }
         return this.proxy;
     }
 
-    protected abstract MCRFileAttributes<T> loadProxy() throws IOException;
+    protected abstract MCRFileAttributes<T> loadProxy();
 
     public P getPath() {
         return path;

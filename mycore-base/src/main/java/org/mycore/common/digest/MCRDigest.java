@@ -77,10 +77,12 @@ public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         MCRDigest mcrDigest = (MCRDigest) o;
         return Objects.equals(value, mcrDigest.value);
     }
