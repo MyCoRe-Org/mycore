@@ -45,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -52,8 +53,6 @@ import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * Instances of this class collect information kept during a session like the currently active user, the preferred
@@ -115,8 +114,9 @@ public class MCRSession implements Cloneable {
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRSession-OnCommitService-#%d")
+            .setThreadFactory(Thread.ofVirtual().factory())
             .build();
-        COMMIT_SERVICE = Executors.newFixedThreadPool(4, threadFactory);
+        COMMIT_SERVICE = Executors.newThreadPerTaskExecutor(threadFactory);
         MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
 
             @Override

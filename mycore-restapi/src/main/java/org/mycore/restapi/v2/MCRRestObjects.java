@@ -325,7 +325,7 @@ public class MCRRestObjects {
         UriBuilder nextBuilder = null;
         if (query.afterId() != null && idDates.size() == limitInt) {
             nextBuilder = uriInfo.getRequestUriBuilder();
-            nextBuilder.replaceQueryParam(PARAM_AFTER_ID, idDates.get(idDates.size() - 1).getId());
+            nextBuilder.replaceQueryParam(PARAM_AFTER_ID, idDates.getLast().getId());
         } else {
             if (query.offset() + query.limit() < count) {
                 nextBuilder = uriInfo.getRequestUriBuilder();

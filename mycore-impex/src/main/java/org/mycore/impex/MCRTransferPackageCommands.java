@@ -140,7 +140,7 @@ public class MCRTransferPackageCommands {
         MCRMarkManager markManager = MCRMarkManager.instance();
 
         if (mycoreTargetId != null && !mcrObjects.isEmpty()) {
-            String rootId = mcrObjects.get(0);
+            String rootId = mcrObjects.getFirst();
             markManager.mark(MCRObjectID.getInstance(rootId), Operation.IMPORT);
             commands.add(
                 "_import transfer package object " + rootId + " from " + sourceDirectory + " to " + mycoreTargetId);

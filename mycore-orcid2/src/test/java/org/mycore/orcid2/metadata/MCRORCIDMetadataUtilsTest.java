@@ -86,7 +86,7 @@ public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
         MCRORCIDMetadataUtils.doSetORCIDFlagContent(object, flagContent);
         flags = object.getService().getFlags("MyCoRe-ORCID");
         assertEquals(flags.size(), 1);
-        final MCRORCIDFlagContent result = MCRORCIDMetadataUtils.transformFlagContentString(flags.get(0));
+        final MCRORCIDFlagContent result = MCRORCIDMetadataUtils.transformFlagContentString(flags.getFirst());
         assertEquals(flagContent, result);
     }
 

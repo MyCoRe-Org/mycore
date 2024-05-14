@@ -51,17 +51,26 @@ public class MCRMergerTest extends MCRTestCase {
 
     @Ignore
     static void test(String xPathA, String xPathB, String xPathExpected) throws JaxenException, IOException {
-        Element a = new MCRNodeBuilder().buildElement("mods:mods" + xPathA, null, null);
-        Element b = new MCRNodeBuilder().buildElement("mods:mods" + xPathB, null, null);
+       test(new String[]{xPathA, xPathB}, xPathExpected);
+    }
+
+    @Ignore
+    static void test(String[] xPaths, String xPathExpected) throws JaxenException, IOException {
+        Element[] elements = new Element[xPaths.length];
+        for (int i=0, n=xPaths.length; i<n; i++) {
+            elements[i] = new MCRNodeBuilder().buildElement("mods:mods" + xPaths[i], null, null);
+        }
         Element e = new MCRNodeBuilder().buildElement("mods:mods" + xPathExpected, null, null);
 
-        MCRMergeTool.merge(a, b);
-
-        boolean asExpected = MCRXMLHelper.deepEqual(e, a);
+       for (int i=1, n=xPaths.length; i<n; i++) {
+            MCRMergeTool.merge(elements[0], elements[i]);
+        }
+ 
+        boolean asExpected = MCRXMLHelper.deepEqual(e, elements[0]);
 
         if (!asExpected) {
             System.out.println("actual result:");
-            logXML(a);
+            logXML(elements[0]);
             System.out.println("expected result:");
             logXML(e);
         }

@@ -262,7 +262,7 @@ public class MCRCommandLineInterface {
         } else if (interactiveMode) {
             return;
         }
-        commandQueue.add(0, lastCommand);
+        commandQueue.addFirst(lastCommand);
         saveCommandQueueToFile(commandQueue, "unprocessed-commands.txt");
     }
 

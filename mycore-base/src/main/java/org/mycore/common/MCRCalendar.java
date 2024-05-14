@@ -651,76 +651,52 @@ public class MCRCalendar {
             final boolean bb = beforeZero(dateTrimmed, CalendarType.Persic);
             final String cleanDate = cleanDate(dateTrimmed, CalendarType.Persic);
             final int[] fields = parseDateString(cleanDate, last, CalendarType.Persic);
-            final int year = fields[0];
+            final int year = bb ? 622 - fields[0] : 621 + fields[0];
             final int mon = fields[1];
             final int day = fields[2];
 
-            final int njahr;
-            if (bb) {
-                njahr = -year + 1 + 621;
-            } else {
-                njahr = year + 621;
-            }
-
-            GregorianCalendar newdate = new GregorianCalendar();
-            newdate.clear();
-            newdate.set(njahr, Calendar.MARCH, 20); // yearly beginning to 20.3.
-
-            // beginning of the month (day to year)
-            int begday = 0;
-            if (mon == 1) {
-                begday = 31;
-            }
-            if (mon == 2) {
-                begday = 62;
-            }
-            if (mon == 3) {
-                begday = 93;
-            }
-            if (mon == 4) {
-                begday = 124;
-            }
-            if (mon == 5) {
-                begday = 155;
-            }
-            if (mon == 6) {
-                begday = 186;
-            }
-            if (mon == 7) {
-                begday = 216;
-            }
-            if (mon == 8) {
-                begday = 246;
-            }
-            if (mon == 9) {
-                begday = 276;
-            }
-            if (mon == 10) {
-                begday = 306;
-            }
-            if (mon == 11) {
-                begday = 336;
-            }
-            begday += day - 1;
-
-            int jh = njahr / 100; // century
-            int b = jh % 4;
-            int c = njahr % 100; // year of the century
-            int d = c / 4; // count leap year of the century
-
-            final int min = b * 360 + 350 * c - d * 1440 + 720;
-            if (njahr >= 0) {
-                newdate.add(Calendar.MINUTE, min); // minute of day
-                newdate.add(Calendar.DATE, begday); // day of the year
-            } else {
-                newdate.add(Calendar.DATE, begday + 2); // day of the year
-                newdate.add(Calendar.MINUTE, min); // minute of day
-            }
-
-            return newdate;
+            return getGregorianCalendar(year, mon, day);
         } catch (Exception e) {
-            throw new MCRException("The ancient persian date is false.", e);
+            throw new MCRException("The ancient persian date is invalid.", e);
         }
+    }
+
+    private static GregorianCalendar getGregorianCalendar(int year, int month, int day) {
+        GregorianCalendar newdate = new GregorianCalendar();
+        newdate.clear();
+        newdate.set(year, Calendar.MARCH, 20); // yearly beginning to 20.3.
+
+        // beginning of the month (day to year)
+        int begday = switch (month) {
+            case 1 -> 31;
+            case 2 -> 62;
+            case 3 -> 93;
+            case 4 -> 124;
+            case 5 -> 155;
+            case 6 -> 186;
+            case 7 -> 216;
+            case 8 -> 246;
+            case 9 -> 276;
+            case 10 -> 306;
+            case 11 -> 336;
+            default -> 0;
+        };
+        begday += day - 1;
+
+        int jh = year / 100; // century
+        int b = jh % 4;
+        int c = year % 100; // year of the century
+        int d = c / 4; // count leap year of the century
+
+        final int min = b * 360 + 350 * c - d * 1440 + 720;
+        if (year >= 0) {
+            newdate.add(Calendar.MINUTE, min); // minute of day
+            newdate.add(Calendar.DATE, begday); // day of the year
+        } else {
+            newdate.add(Calendar.DATE, begday + 2); // day of the year
+            newdate.add(Calendar.MINUTE, min); // minute of day
+        }
+        return newdate;
     }
 
     /**
@@ -755,7 +731,7 @@ public class MCRCalendar {
         int day = fields[2];
 
         if (before) {
-            year = -year + 1;
+            year = 1 - year;
         }
 
         // Armenian calendar has every year an invariant of 365 days - these are added to the beginning of the
@@ -861,8 +837,6 @@ public class MCRCalendar {
     public static String getCalendarDateToFormattedString(Calendar calendar) {
         if (calendar instanceof IslamicCalendar) {
             return getCalendarDateToFormattedString(calendar, "dd.MM.yyyy");
-        } else if (calendar instanceof GregorianCalendar) {
-            return getCalendarDateToFormattedString(calendar, "yyyy-MM-dd G");
         }
         return getCalendarDateToFormattedString(calendar, "yyyy-MM-dd G");
     }
@@ -881,32 +855,23 @@ public class MCRCalendar {
      *         the Julian Calendar to 05.10.1582. Then it use the Gregorian Calendar.
      */
     public static String getCalendarDateToFormattedString(Calendar calendar, String format) {
-        if (calendar == null || format == null || format.trim().length() == 0) {
+        if (calendar == null || format == null || format.trim().isEmpty()) {
             return "";
         }
-        SimpleDateFormat formatter = null;
+        SimpleDateFormat formatter;
         try {
-            if (calendar instanceof IslamicCalendar) {
-                formatter = new SimpleDateFormat(format, Locale.ENGLISH);
-            } else if (calendar instanceof GregorianCalendar) {
-                formatter = new SimpleDateFormat(format, Locale.ENGLISH);
-            } else {
-                formatter = new SimpleDateFormat(format, Locale.ENGLISH);
-            }
-        } catch (Exception e) {
+            formatter = new SimpleDateFormat(format, Locale.ENGLISH);
+        } catch (RuntimeException e) {
             formatter = new SimpleDateFormat("dd.MM.yyyy G", Locale.ENGLISH);
         }
         try {
             formatter.setCalendar(calendar);
-            if (calendar instanceof IslamicCalendar) {
-                return formatter.format(calendar.getTime()) + " h.";
-            } else if (calendar instanceof CopticCalendar) {
-                return formatter.format(calendar.getTime()) + " A.M.";
-            } else if (calendar instanceof EthiopicCalendar) {
-                return formatter.format(calendar.getTime()) + " E.E.";
-            } else {
-                return formatter.format(calendar.getTime());
-            }
+            return switch (calendar) {
+                case IslamicCalendar islamicCalendar -> formatter.format(calendar.getTime()) + " h.";
+                case CopticCalendar copticCalendar -> formatter.format(calendar.getTime()) + " A.M.";
+                case EthiopicCalendar ethiopicCalendar -> formatter.format(calendar.getTime()) + " E.E.";
+                default -> formatter.format(calendar.getTime());
+            };
         } catch (Exception e) {
             return "";
         }
@@ -950,26 +915,17 @@ public class MCRCalendar {
      * @return The calendar type as string. If Calendar is empty an empty string will be returned.
      */
     public static String getCalendarTypeString(Calendar calendar) {
-        if (calendar == null) {
-            return "";
-        }
-        if (calendar instanceof IslamicCalendar) {
-            return TAG_ISLAMIC;
-        } else if (calendar instanceof BuddhistCalendar) {
-            return TAG_BUDDHIST;
-        } else if (calendar instanceof CopticCalendar) {
-            return TAG_COPTIC;
-        } else if (calendar instanceof EthiopicCalendar) {
-            return TAG_ETHIOPIC;
-        } else if (calendar instanceof HebrewCalendar) {
-            return TAG_HEBREW;
-        } else if (calendar instanceof JapaneseCalendar) {
-            return TAG_JAPANESE;
-        } else if (calendar instanceof GregorianCalendar) {
-            return TAG_GREGORIAN;
-        } else {
-            return TAG_JULIAN;
-        }
+        return switch (calendar) {
+            case IslamicCalendar islamicCalendar -> TAG_ISLAMIC;
+            case BuddhistCalendar buddhistCalendar -> TAG_BUDDHIST;
+            case CopticCalendar copticCalendar -> TAG_COPTIC;
+            case EthiopicCalendar ethiopicCalendar -> TAG_ETHIOPIC;
+            case HebrewCalendar hebrewCalendar -> TAG_HEBREW;
+            case JapaneseCalendar japaneseCalendar -> TAG_JAPANESE;
+            case GregorianCalendar gregorianCalendar -> TAG_GREGORIAN;
+            case null -> "";
+            default -> TAG_JULIAN;
+        };
     }
 
     /**
@@ -1122,14 +1078,7 @@ public class MCRCalendar {
      * @return the indexes of the date string containing the date without era statements
      */
     public static int[] calculateArmenianDateBorders(String input) {
-        final int start;
-        if (StringUtils.startsWith(input, "-")) {
-            start = 1;
-        } else {
-            start = 0;
-        }
-
-        return new int[] { start, StringUtils.length(input) };
+        return calculatePersianDateBorders(input);
     }
 
     /**
@@ -1139,14 +1088,7 @@ public class MCRCalendar {
      * @return the indexes of the date string containing the date without era statements
      */
     public static int[] calculateJapaneseDateBorders(String input) {
-        final int start;
-        if (StringUtils.startsWith(input, "-")) {
-            start = 1;
-        } else {
-            start = 0;
-        }
-
-        return new int[] { start, StringUtils.length(input) };
+        return calculatePersianDateBorders(input);
     }
 
     /**

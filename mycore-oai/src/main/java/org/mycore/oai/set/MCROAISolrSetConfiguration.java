@@ -43,9 +43,16 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
     public MCROAISolrSetConfiguration(String configPrefix, String setId) {
         String setConfigPrefix = configPrefix + SETS_PREFIX + setId;
         MCROAISolrSetHandler handler = MCRConfiguration2.getInstanceOf(
-                MCROAISolrSetHandler.class, setConfigPrefix + ".Handler")
-            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
-                MCROAISolrSetHandler.class, getFallbackHandler(configPrefix, setId)));
+            MCROAISolrSetHandler.class, setConfigPrefix + ".Handler")
+            .orElseGet(() -> {
+                String fallbackHandlerClassName = getFallbackHandler(configPrefix, setId);
+                if (fallbackHandlerClassName == null) {
+                    throw new MCRConfigurationException("Configuration property " + setConfigPrefix
+                        + ".Handler is not set and no fallback handler could be determined.");
+                }
+                return MCRConfiguration2.instantiateClass(fallbackHandlerClassName);
+            });
+        handler.init(configPrefix, setId);
         this.id = setId;
         this.uri = getURI(setConfigPrefix);
         this.handler = handler;

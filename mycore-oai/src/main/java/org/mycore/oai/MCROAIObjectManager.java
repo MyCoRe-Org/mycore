@@ -94,7 +94,7 @@ public class MCROAIObjectManager {
         if (recordElement.getNamespace().equals(OAIConstants.NS_OAI)) {
             Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
             if (metadataElement != null && !metadataElement.getChildren().isEmpty()) {
-                Element metadataChild = metadataElement.getChildren().get(0);
+                Element metadataChild = metadataElement.getChildren().getFirst();
                 record.setMetadata(new SimpleMetadata(metadataChild.detach()));
             }
             Element aboutElement = recordElement.getChild("about", OAIConstants.NS_OAI);

@@ -86,7 +86,7 @@ public class MCRBooleanClauseParser<T> {
             }
 
             if (operator.equalsIgnoreCase("not")) {
-                Element child = condition.getChildren().get(0);
+                Element child = condition.getChildren().getFirst();
                 return new MCRNotCondition<>(parse(child));
             } else if (operator.equalsIgnoreCase("and") || operator.equalsIgnoreCase("or")) {
                 List<Element> children = condition.getChildren();

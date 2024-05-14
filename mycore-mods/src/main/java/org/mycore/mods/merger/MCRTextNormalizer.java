@@ -23,6 +23,7 @@ import java.text.Normalizer.Form;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mycore.common.xml.MCRXMLFunctions;
 
 /**
  * Normalizes text to be fault-tolerant when matching for duplicates.
@@ -66,6 +67,10 @@ public class MCRTextNormalizer {
 
         String normalizedText = text;
 
+        if(MCRXMLFunctions.isHtml(normalizedText)) {
+            normalizedText = MCRXMLFunctions.stripHtml(normalizedText);
+        }
+        
         // make lowercase
         normalizedText = normalizedText.toLowerCase(Locale.getDefault());
 

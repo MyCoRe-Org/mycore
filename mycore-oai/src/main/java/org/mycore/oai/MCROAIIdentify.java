@@ -139,7 +139,7 @@ public class MCROAIIdentify extends SimpleIdentify {
 
         @Override
         public Element toXML() {
-            return description.getChildren().get(0).clone();
+            return description.getChildren().getFirst().clone();
         }
     }
 

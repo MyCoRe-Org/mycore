@@ -58,7 +58,7 @@ public class MCRQLSearchUtils {
         Element conditions = root.getChild("conditions");
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condition = conditions.getChildren().get(0);
+            Element condition = conditions.getChildren().getFirst();
             renameElements(condition);
 
             // Remove conditions without values

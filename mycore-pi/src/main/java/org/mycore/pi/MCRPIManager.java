@@ -334,7 +334,7 @@ public class MCRPIManager {
                 .select(pi)
                 .where(cb.equal(pi.get(MCRPI_.identifier), identifier), cb.equal(pi.get(MCRPI_.type), type)))
             .getResultList();
-        return resultList.size() == 0 ? Optional.empty() : Optional.of(resultList.get(0));
+        return resultList.size() == 0 ? Optional.empty() : Optional.of(resultList.getFirst());
     }
 
     /**

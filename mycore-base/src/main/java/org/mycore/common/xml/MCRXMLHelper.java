@@ -118,7 +118,7 @@ public class MCRXMLHelper {
      * @return the String with all illegal characters removed
      */
     public static String removeIllegalChars(String text) {
-        if (text == null || text.trim().length() == 0) {
+        if (text == null || text.trim().isEmpty()) {
             return text;
         }
         if (Verifier.checkCharacterData(text) == null) {
@@ -185,13 +185,11 @@ public class MCRXMLHelper {
             return MCRURIResolver.instance().resolve(schemaURI, null);
         } catch (TransformerException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof IOException ioe) {
-                throw ioe;
+            switch(cause) {
+                case IOException ioe -> throw ioe;
+                case SAXException se -> throw se;
+                default -> throw new IOException(e);
             }
-            if (cause instanceof SAXException se) {
-                throw se;
-            }
-            throw new IOException(e);
         }
     }
 
@@ -358,19 +356,14 @@ public class MCRXMLHelper {
             while (result && i1.hasNext() && i2.hasNext()) {
                 Object o1 = i1.next();
                 Object o2 = i2.next();
-                if (o1 instanceof Element e1 && o2 instanceof Element e2) {
-                    result = equivalent(e1, e2);
-                } else if (o1 instanceof Text t1 && o2 instanceof Text t2) {
-                    result = equivalent(t1, t2);
-                } else if (o1 instanceof Comment c1 && o2 instanceof Comment c2) {
-                    result = equivalent(c1, c2);
-                } else if (o1 instanceof ProcessingInstruction p1 && o2 instanceof ProcessingInstruction p2) {
-                    result = equivalent(p1, p2);
-                } else if (o1 instanceof DocType d1 && o2 instanceof DocType d2) {
-                    result = equivalent(d1, d2);
-                } else {
-                    result = false;
-                }
+                result = switch (o1) {
+                    case Element e1 when o2 instanceof Element e2 -> equivalent(e1, e2);
+                    case Text t1 when o2 instanceof Text t2 -> equivalent(t1, t2);
+                    case Comment c1 when o2 instanceof Comment c2 -> equivalent(c1, c2);
+                    case ProcessingInstruction p1 when o2 instanceof ProcessingInstruction p2 -> equivalent(p1, p2);
+                    case DocType d1 when o2 instanceof DocType d2 -> equivalent(d1, d2);
+                    case null, default -> false;
+                };
             }
             return result;
         }
@@ -432,13 +425,11 @@ public class MCRXMLHelper {
          * @return the serialized content, or null if the type is not supported
          */
         public static JsonElement serialize(Content content) {
-            if (content instanceof Element element) {
-                return serializeElement(element);
-            }
-            if (content instanceof Text text) {
-                return serializeText(text);
-            }
-            return null;
+            return switch (content) {
+                case Element element -> serializeElement(element);
+                case Text text -> serializeText(text);
+                default -> null;
+            };
         }
 
         static JsonPrimitive serializeText(Text text) {
@@ -450,7 +441,7 @@ public class MCRXMLHelper {
 
             // text
             String text = element.getText();
-            if (text != null && text.trim().length() > 0) {
+            if (text != null && !text.trim().isEmpty()) {
                 json.addProperty("$text", text);
             }
 
@@ -474,7 +465,7 @@ public class MCRXMLHelper {
                 List<Element> contentList = entry.getValue();
                 String name = getName(key.x, key.y);
                 if (entry.getValue().size() == 1) {
-                    json.add(name, serializeElement(contentList.get(0)));
+                    json.add(name, serializeElement(contentList.getFirst()));
                 } else if (contentList.size() >= 2) {
                     JsonArray arr = new JsonArray();
                     contentList.forEach(child -> arr.add(serialize(child)));
@@ -496,7 +487,7 @@ public class MCRXMLHelper {
         }
 
         private static String getName(String name, Namespace namespace) {
-            if (namespace != null && !namespace.getURI().equals("")) {
+            if (namespace != null && !namespace.getURI().isEmpty()) {
                 return getCononicalizedPrefix(namespace) + ":" + name;
             }
             return name;

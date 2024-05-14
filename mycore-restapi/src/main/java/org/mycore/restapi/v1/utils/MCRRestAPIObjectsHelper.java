@@ -802,14 +802,12 @@ public class MCRRestAPIObjectsHelper {
 
     private static MCRObjectID retrieveMCRDerivateID(MCRObjectID parentObjId, String paramMcrDerId)
         throws MCRRestAPIException {
-        Optional<MCRObjectID> optDerObjId = ID_MAPPER.mapMCRDerivateID(parentObjId, paramMcrDerId);
-        if (optDerObjId.isEmpty() || !MCRMetadataManager.exists(optDerObjId.get())) {
-            throw new MCRRestAPIException(Response.Status.NOT_FOUND,
+        return ID_MAPPER.mapMCRDerivateID(parentObjId, paramMcrDerId)
+            .filter(MCRMetadataManager::exists)
+            .orElseThrow(() -> new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + paramMcrDerId + " not found.",
                     "The MyCoRe Object with id '" + parentObjId
-                        + "' does not contain a derivate with id '" + paramMcrDerId + "'."));
-        }
-        return optDerObjId.get();
+                        + "' does not contain a derivate with id '" + paramMcrDerId + "'.")));
     }
 
     /**
