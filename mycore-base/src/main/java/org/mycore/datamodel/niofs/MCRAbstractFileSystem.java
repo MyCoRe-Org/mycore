@@ -153,9 +153,9 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
             LogManager.getLogger(getClass()).error("Could not verify path: {}", path, e);
             return false;
         }
-        boolean returns = digest.matches(attrs.digest().getValue());
+        boolean returns = digest.matches(attrs.digest().toHexString());
         if (!returns) {
-            LogManager.getLogger(getClass()).warn("MD5sum does not match: {}", path);
+            LogManager.getLogger(getClass()).warn("digest does not match: {}", path);
         }
         return returns;
     }

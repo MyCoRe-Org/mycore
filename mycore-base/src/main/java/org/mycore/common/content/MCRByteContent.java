@@ -24,7 +24,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 import org.mycore.common.MCRUtils;
-import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.digest.MCRMD5Digest;
 
 /**
  * Reads MCRContent from a byte[] array.
@@ -98,7 +98,7 @@ public class MCRByteContent extends MCRContent {
 
     @Override
     public String getETag() {
-        MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRDigest.Algorithm.MD5);
+        MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRMD5Digest.ALGORITHM);
         md5Digest.update(bytes, offset, length);
         byte[] digest = md5Digest.digest();
         String md5String = MCRUtils.toHexString(digest);

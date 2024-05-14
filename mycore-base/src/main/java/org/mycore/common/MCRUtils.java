@@ -65,6 +65,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRDigestInputStream;
 import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.common.function.MCRThrowableTask;
 import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.xml.sax.Attributes;
@@ -349,15 +350,11 @@ public class MCRUtils {
         for (int i = 0; i < iterations; i++) {
             data = digest.digest(data);
         }
-        return toHexStringLowerCase(data);
+        return toHexString(data);
     }
 
     public static String toHexString(byte[] data) {
         return HexFormat.of().formatHex(data);
-    }
-
-    public static String toHexStringLowerCase(byte[] data) {
-        return HexFormat.of().withLowerCase().formatHex(data);
     }
 
     /**
@@ -388,7 +385,7 @@ public class MCRUtils {
      * Calculates md5 sum of InputStream. InputStream is consumed after calling this method and automatically closed.
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException {
-        return getDigest(MCRDigest.Algorithm.MD5, inputStream);
+        return getDigest(MCRMD5Digest.ALGORITHM, inputStream);
     }
 
     /**

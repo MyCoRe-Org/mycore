@@ -28,7 +28,7 @@ import org.jdom2.output.Format;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.digest.MCRMD5Digest;
 
 /**
  * Reads MCRContent from an XML document.
@@ -93,7 +93,7 @@ public abstract class MCRXMLContent extends MCRContent {
 
     @Override
     public String getETag() throws IOException {
-        MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRDigest.Algorithm.MD5);
+        MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRMD5Digest.ALGORITHM);
         byte[] byteArray = asByteArray();
         md5Digest.update(byteArray, 0, byteArray.length);
         byte[] digest = md5Digest.digest();

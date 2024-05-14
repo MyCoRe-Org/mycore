@@ -97,7 +97,7 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     @Override
     public String getETag() throws IOException {
         if (attrs instanceof MCRFileAttributes<?> fAttrs) {
-            return fAttrs.digest().getValue();
+            return fAttrs.digest().toHexString();
         }
 
         if (Files.getFileStore(path).supportsFileAttributeView("md5")) {

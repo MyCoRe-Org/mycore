@@ -287,7 +287,7 @@ class MCREventHandler {
             file.addProperty("object", objId);
             file.addProperty("size", attrs.size());
             file.addProperty("modified", attrs.lastModifiedTime().toInstant().toString());
-            file.addProperty("md5", ((MCRFileAttributes) attrs).digest().getValue());
+            file.addProperty("md5", ((MCRFileAttributes<?>) attrs).digest().toHexString());
             file.addProperty("mimeType", context.getMimeType(path.getFileName().toString()));
             OutboundSseEvent event = sse.newEventBuilder()
                 .mediaType(MediaType.APPLICATION_JSON_TYPE)

@@ -18,28 +18,29 @@
 
 package org.mycore.common.digest;
 
+import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.mycore.common.MCRUtils;
+
 /**
  * Representing a message digest.
- * This class is sealed to specific digest implementations, ensuring
- * that only permitted classes can extend it.
  *
  * @see MCRMD5Digest
  * @see MCRSHA512Digest
  */
-public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
+public abstract class MCRDigest {
 
     /**
-     * Enumeration of supported digest algorithms.
+     * Digest Algorithm
      */
-    public enum Algorithm {
-        MD5("md5"), SHA512("sha-512");
+    public static abstract class Algorithm {
 
         final String name;
 
-        Algorithm(String name) {
+        protected Algorithm(String name) {
             this.name = name;
         }
 
@@ -53,7 +54,7 @@ public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
 
     }
 
-    protected String value;
+    protected byte[] value;
 
     /**
      * Constructor for creating a digest instance.
@@ -62,6 +63,17 @@ public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
      * @throws MCRDigestValidationException If the digest value is invalid.
      */
     public MCRDigest(String value) throws MCRDigestValidationException {
+        this.value = HexFormat.of().parseHex(value);
+        validate();
+    }
+
+    /**
+     * Constructor for creating a digest instance.
+     *
+     * @param value The string representation of the digest.
+     * @throws MCRDigestValidationException If the digest value is invalid.
+     */
+    public MCRDigest(byte[] value) throws MCRDigestValidationException {
         this.value = value;
         validate();
     }
@@ -71,8 +83,8 @@ public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
      *
      * @return Digest value.
      */
-    public String getValue() {
-        return this.value;
+    public String toHexString() {
+        return MCRUtils.toHexString(this.value);
     }
 
     @Override
@@ -84,7 +96,7 @@ public abstract sealed class MCRDigest permits MCRMD5Digest, MCRSHA512Digest {
             return false;
         }
         MCRDigest mcrDigest = (MCRDigest) o;
-        return Objects.equals(value, mcrDigest.value);
+        return Arrays.equals(value, mcrDigest.value);
     }
 
     @Override

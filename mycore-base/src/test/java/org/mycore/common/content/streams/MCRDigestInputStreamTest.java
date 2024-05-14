@@ -20,7 +20,7 @@ package org.mycore.common.content.streams;
 
 import org.junit.Test;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.ifs2.MCRFile;
 
 import java.io.ByteArrayInputStream;
@@ -36,7 +36,7 @@ public class MCRDigestInputStreamTest {
     @Test
     public void emptyStream() throws Exception {
         byte[] data = new byte[0];
-        MCRDigestInputStream m = new MCRDigestInputStream(new ByteArrayInputStream(data), MCRDigest.Algorithm.MD5);
+        MCRDigestInputStream m = new MCRDigestInputStream(new ByteArrayInputStream(data), MCRMD5Digest.ALGORITHM);
         assertEquals(-1, m.read());
         m.close();
         assertEquals(MCRFile.MD5_OF_EMPTY_FILE, m.getDigestAsHexString());
@@ -45,7 +45,7 @@ public class MCRDigestInputStreamTest {
     @Test
     public void smallStream() throws Exception {
         byte[] data = "data".getBytes();
-        MCRDigestInputStream m = new MCRDigestInputStream(new ByteArrayInputStream(data), MCRDigest.Algorithm.MD5);
+        MCRDigestInputStream m = new MCRDigestInputStream(new ByteArrayInputStream(data), MCRMD5Digest.ALGORITHM);
         for (byte aData : data) {
             assertEquals(aData, (byte) (m.read()));
         }

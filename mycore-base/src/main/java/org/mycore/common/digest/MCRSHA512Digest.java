@@ -23,6 +23,12 @@ package org.mycore.common.digest;
  */
 public final class MCRSHA512Digest extends MCRDigest {
 
+    public static SHA512Algorithm ALGORITHM;
+
+    static {
+        ALGORITHM = new MCRSHA512Digest.SHA512Algorithm();
+    }
+
     /**
      * Creates a new SHA-512 digest instance.
      *
@@ -35,7 +41,15 @@ public final class MCRSHA512Digest extends MCRDigest {
 
     @Override
     public Algorithm getAlgorithm() {
-        return Algorithm.SHA512;
+        return ALGORITHM;
+    }
+
+    public static class SHA512Algorithm extends Algorithm {
+
+        public SHA512Algorithm() {
+            super("sha-512");
+        }
+
     }
 
 }

@@ -244,7 +244,7 @@ public class MCRSwordUtil {
         Files.copy(inputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
 
         if (checkMd5 != null) {
-            final String md5String = MCRUtils.toHexStringLowerCase(md5Digest.digest());
+            final String md5String = MCRUtils.toHexString(md5Digest.digest());
             if (!md5String.equals(checkMd5)) {
                 MCRTransactionHelper.beginTransaction();
                 throw new IOException("MD5 mismatch, expected " + checkMd5 + " got " + md5String);

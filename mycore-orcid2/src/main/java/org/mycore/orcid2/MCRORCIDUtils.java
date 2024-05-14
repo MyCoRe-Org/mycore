@@ -36,7 +36,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -68,7 +68,7 @@ public class MCRORCIDUtils {
      */
     public static String hashString(String input) {
         final byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
-        final MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRDigest.Algorithm.MD5);
+        final MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRMD5Digest.ALGORITHM);
         md5Digest.update(bytes);
         final byte[] digest = md5Digest.digest();
         return MCRUtils.toHexString(digest);

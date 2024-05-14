@@ -18,14 +18,16 @@
 
 package org.mycore.common.digest;
 
-import java.util.regex.Pattern;
-
 /**
  * Digest implementation for MD5.
  */
 public final class MCRMD5Digest extends MCRDigest {
 
-    private static final Pattern MD5_HEX_PATTERN = Pattern.compile("[a-fA-F0-9]{32}");
+    public static Md5Algorithm ALGORITHM;
+
+    static {
+        ALGORITHM = new Md5Algorithm();
+    }
 
     /**
      * Creates a new MD5 digest instance.
@@ -38,15 +40,23 @@ public final class MCRMD5Digest extends MCRDigest {
     }
 
     @Override
-    public Algorithm getAlgorithm() {
-        return Algorithm.MD5;
+    public Md5Algorithm getAlgorithm() {
+        return ALGORITHM;
     }
 
     @Override
     protected void validate() throws MCRDigestValidationException {
-        if (this.value.length() != 32 || !MD5_HEX_PATTERN.matcher(value).matches()) {
-            throw new MCRDigestValidationException("Not a valid digest: " + value);
+        if (this.value.length != 16) {
+            throw new MCRDigestValidationException("Not a valid digest: " + toHexString());
         }
+    }
+
+    public static class Md5Algorithm extends Algorithm {
+
+        public Md5Algorithm() {
+            super("md5");
+        }
+
     }
 
 }

@@ -232,7 +232,7 @@ public class MCRRestDerivateContents {
     }
 
     private static EntityTag getETag(MCRFileAttributes attrs) {
-        return new EntityTag(attrs.digest().getValue());
+        return new EntityTag(attrs.digest().toHexString());
     }
 
     private static long getUploadMaxSize() {
@@ -314,7 +314,7 @@ public class MCRRestDerivateContents {
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .tag(getETag(fileAttributes))
-            .header("Digest", getDigestHeader(fileAttributes.digest().getValue()))
+            .header("Digest", getDigestHeader(fileAttributes.digest().toHexString()))
             .build();
     }
 
@@ -354,7 +354,7 @@ public class MCRRestDerivateContents {
                 content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
                 try {
                     final List<Map.Entry<String, String>> responseHeader = List
-                        .of(Map.entry("Digest", getDigestHeader(fileAttributes.digest().getValue())));
+                        .of(Map.entry("Digest", getDigestHeader(fileAttributes.digest().toHexString())));
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader, responseHeader);
                 } catch (IOException e) {
                     throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
@@ -597,7 +597,7 @@ public class MCRRestDerivateContents {
 
         File(MCRPath p, MCRFileAttributes attr, String mimeType) {
             super(p, attr);
-            this.md5 = attr.digest().getValue();
+            this.md5 = attr.digest().toHexString();
             this.size = attr.size();
             this.mimeType = mimeType;
         }

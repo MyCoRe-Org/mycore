@@ -29,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRDevNull;
-import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.niofs.MCRDefaultFileAttributes;
@@ -96,7 +95,7 @@ public class MCRFile extends MCRStoredNode {
      * @return the md5 checksum of the file's content.
      */
     public String getMD5() {
-        return readData(e -> e.getAttributeValue(MCRDigest.Algorithm.MD5.toLowerCase()));
+        return readData(e -> e.getAttributeValue(MCRMD5Digest.ALGORITHM.toLowerCase()));
     }
 
     /**
