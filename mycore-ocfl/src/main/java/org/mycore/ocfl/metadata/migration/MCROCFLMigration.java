@@ -96,7 +96,14 @@ public class MCROCFLMigration {
         MCRObjectIDGenerator mcrObjectIDGenerator = MCRMetadataManager.getMCRObjectIDGenerator();
 
         for (String baseId : mcrObjectIDGenerator.getBaseIDs()) {
-            int maxId = mcrObjectIDGenerator.getLastID(baseId).getNumberAsInteger();
+            final MCRObjectID lastId = mcrObjectIDGenerator.getLastID(baseId);
+
+            if (null == lastId) {
+                LOGGER.warn("No ids found for base {}.", baseId);
+                continue;
+            }
+
+            final int maxId = lastId.getNumberAsInteger();
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
                 .mapToObj(i -> MCRObjectID.formatID(baseId, i))
                 .toList();
