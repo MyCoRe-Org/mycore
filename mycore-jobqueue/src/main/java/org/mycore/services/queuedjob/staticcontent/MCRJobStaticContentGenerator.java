@@ -46,12 +46,10 @@ public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerato
 
         MCRJobQueueManager jobQueueManager = MCRJobQueueManager.getInstance();
 
-        List<MCRJob> jobs = jobQueueManager
-            .getJobDAO()
-            .getJobs(MCRStaticContentGeneratorJobAction.class, parameters,
-                List.of(MCRJobStatus.NEW, MCRJobStatus.ERROR, MCRJobStatus.PROCESSING), null, null);
+        int jobCount = jobQueueManager.getJobDAO().getJobCount(MCRStaticContentGeneratorJobAction.class, parameters,
+            List.of(MCRJobStatus.NEW, MCRJobStatus.ERROR, MCRJobStatus.PROCESSING));
 
-        if (jobs.isEmpty()) {
+        if (jobCount == 0) {
             MCRJob job = new MCRJob(MCRStaticContentGeneratorJobAction.class);
             job.setParameters(parameters);
             jobQueueManager.getJobQueue(MCRStaticContentGeneratorJobAction.class).add(job);
