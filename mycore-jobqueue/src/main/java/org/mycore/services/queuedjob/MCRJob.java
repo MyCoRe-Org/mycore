@@ -36,6 +36,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.NamedQueries;
@@ -52,7 +53,15 @@ import jakarta.persistence.Transient;
 @NamedQueries({
     @NamedQuery(name = "mcrjob.classes",
         query = "select DISTINCT(o.action) from MCRJob o") })
-@Table(name = "MCRJob")
+@Table(name = "MCRJob",
+    indexes = {
+        @Index(name = "MCRJob_status", columnList = "status"),
+        @Index(name = "MCRJob_added", columnList = "added"),
+        @Index(name = "MCRJob_start", columnList = "start"),
+        @Index(name = "MCRJob_finished", columnList = "finished"),
+        @Index(name = "MCRJob_action", columnList = "action"),
+        @Index(name = "MCRJob_tries", columnList = "tries")
+})
 public class MCRJob implements Cloneable {
     private Long id;
 
