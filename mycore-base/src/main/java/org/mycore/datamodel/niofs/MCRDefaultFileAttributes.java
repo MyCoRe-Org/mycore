@@ -59,72 +59,72 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
             attrs.creationTime(), attrs.lastModifiedTime(), attrs.lastAccessTime());
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#creationTime()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public FileTime creationTime() {
         return creationTime;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#fileKey()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public T fileKey() {
         return filekey;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#isDirectory()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean isDirectory() {
         return type == FileType.directory;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#isOther()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean isOther() {
         return type == FileType.other;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#isRegularFile()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean isRegularFile() {
         return type == FileType.file;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#isSymbolicLink()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean isSymbolicLink() {
         return type == FileType.link;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#lastAccessTime()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public FileTime lastAccessTime() {
         return lastAccessTime;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#lastModifiedTime()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public FileTime lastModifiedTime() {
         return lastModified;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.attribute.BasicFileAttributes#size()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public long size() {

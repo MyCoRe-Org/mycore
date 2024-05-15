@@ -4,94 +4,151 @@ import java.io.IOException;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
-
+/**
+ * A utility class for working with file attributes using a specified {@link BasicFileAttributeView}.
+ *
+ * @param <V> the type of the {@link BasicFileAttributeView}.
+ */
 public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeView> {
 
-    private static final String ALL = "*";
+    /**
+     * Enum representing the various file attributes that can be accessed.
+     */
+    private enum Attribute {
+        ALL("*"),
+        SIZE_NAME("size"),
+        CREATION_TIME_NAME("creationTime"),
+        LAST_ACCESS_TIME_NAME("lastAccessTime"),
+        LAST_MODIFIED_TIME_NAME("lastModifiedTime"),
+        FILE_KEY_NAME("fileKey"),
+        IS_DIRECTORY_NAME("isDirectory"),
+        IS_REGULAR_FILE_NAME("isRegularFile"),
+        IS_SYMBOLIC_LINK_NAME("isSymbolicLink"),
+        IS_OTHER_NAME("isOther");
 
-    private static final String SIZE_NAME = "size";
+        private final String name;
 
-    private static final String CREATION_TIME_NAME = "creationTime";
+        Attribute(String name) {
+            this.name = name;
+        }
 
-    private static final String LAST_ACCESS_TIME_NAME = "lastAccessTime";
+        public String getName() {
+            return name;
+        }
 
-    private static final String LAST_MODIFIED_TIME_NAME = "lastModifiedTime";
+        public static Attribute ofName(String name) {
+            return Arrays.stream(values())
+                .filter(attribute -> attribute.getName().equals(name))
+                .findAny()
+                .orElse(null);
+        }
 
-    private static final String FILE_KEY_NAME = "fileKey";
+    }
 
-    private static final String IS_DIRECTORY_NAME = "isDirectory";
+    /**
+     * Set of allowed attributes that can be accessed.
+     */
+    public static final Set<String> ALLOWED_ATTRIBUTES;
 
-    private static final String IS_REGULAR_FILE_NAME = "isRegularFile";
-
-    private static final String IS_SYMBOLIC_LINK_NAME = "isSymbolicLink";
-
-    private static final String IS_OTHER_NAME = "isOther";
-
-    public static final HashSet<String> ALLOWED_ATTRIBUTES = Sets.newHashSet(ALL, SIZE_NAME, CREATION_TIME_NAME,
-        LAST_ACCESS_TIME_NAME, LAST_MODIFIED_TIME_NAME, FILE_KEY_NAME, IS_DIRECTORY_NAME, IS_REGULAR_FILE_NAME,
-        IS_SYMBOLIC_LINK_NAME, IS_OTHER_NAME);
+    static {
+        ALLOWED_ATTRIBUTES = Arrays.stream(Attribute.values())
+            .map(Attribute::getName)
+            .collect(Collectors.toSet());
+    }
 
     private final V view;
 
+    /**
+     * Constructs a new {@code MCRBasicFileAttributeViewProperties} with the specified view.
+     *
+     * @param view the {@link BasicFileAttributeView} to be used.
+     */
     public MCRBasicFileAttributeViewProperties(V view) {
         this.view = view;
     }
 
+    /**
+     * Gets the underlying view.
+     *
+     * @return the {@link BasicFileAttributeView}.
+     */
     public V getView() {
         return view;
     }
 
-    public Map<String, Object> getAttributeMap(String... attributes)
-        throws IOException {
+    /**
+     * Retrieves a map of file attributes.
+     *
+     * @param attributes the attributes to be retrieved. Use "*" to retrieve all attributes.
+     * @return a map of attribute names to their values.
+     * @throws IOException if an I/O error occurs.
+     */
+    public Map<String, Object> getAttributeMap(String... attributes) throws IOException {
         Set<String> allowed = getAllowedAttributes();
         boolean copyAll = false;
         for (String attr : attributes) {
             if (!allowed.contains(attr)) {
                 throw new IllegalArgumentException("'" + attr + "' not recognized");
             }
-            if (Objects.equals(attr, ALL)) {
+            if (Objects.equals(attr, Attribute.ALL.getName())) {
                 copyAll = true;
             }
         }
-        Set<String> requested = copyAll ? allowed : Sets.newHashSet(attributes);
+        Set<String> requested = copyAll ? allowed : Set.of(attributes);
         return buildMap(requested);
     }
 
+    /**
+     * Builds a map of requested attributes and their values.
+     *
+     * @param requested the set of attributes to be retrieved.
+     * @return a map of attribute names to their values.
+     * @throws IOException if an I/O error occurs.
+     */
     protected Map<String, Object> buildMap(Set<String> requested) throws IOException {
         HashMap<String, Object> map = new HashMap<>();
         BasicFileAttributes attrs = view.readAttributes();
-        for (String attr : requested) {
-            switch (attr) {
-                case SIZE_NAME -> map.put(attr, attrs.size());
-                case CREATION_TIME_NAME -> map.put(attr, attrs.creationTime());
-                case LAST_ACCESS_TIME_NAME -> map.put(attr, attrs.lastAccessTime());
-                case LAST_MODIFIED_TIME_NAME -> map.put(attr, attrs.lastModifiedTime());
-                case FILE_KEY_NAME -> map.put(attr, attrs.fileKey());
-                case IS_DIRECTORY_NAME -> map.put(attr, attrs.isDirectory());
-                case IS_REGULAR_FILE_NAME -> map.put(attr, attrs.isRegularFile());
-                case IS_SYMBOLIC_LINK_NAME -> map.put(attr, attrs.isSymbolicLink());
-                case IS_OTHER_NAME -> map.put(attr, attrs.isOther());
+        for (String attributeName : requested) {
+            Attribute attribute = Attribute.ofName(attributeName);
+            switch (attribute) {
+                case SIZE_NAME -> map.put(attributeName, attrs.size());
+                case CREATION_TIME_NAME -> map.put(attributeName, attrs.creationTime());
+                case LAST_ACCESS_TIME_NAME -> map.put(attributeName, attrs.lastAccessTime());
+                case LAST_MODIFIED_TIME_NAME -> map.put(attributeName, attrs.lastModifiedTime());
+                case FILE_KEY_NAME -> map.put(attributeName, attrs.fileKey());
+                case IS_DIRECTORY_NAME -> map.put(attributeName, attrs.isDirectory());
+                case IS_REGULAR_FILE_NAME -> map.put(attributeName, attrs.isRegularFile());
+                case IS_SYMBOLIC_LINK_NAME -> map.put(attributeName, attrs.isSymbolicLink());
+                case IS_OTHER_NAME -> map.put(attributeName, attrs.isOther());
                 default -> {
                 }
-                //ignored
             }
         }
         return map;
     }
 
+    /**
+     * Sets the value of the specified attribute.
+     *
+     * @param name the name of the attribute.
+     * @param value the new value of the attribute.
+     * @throws IOException if an I/O error occurs
+     * @throws IllegalArgumentException  if the attribute is read-only.
+     */
     public void setAttribute(String name, Object value) throws IOException {
         Set<String> allowed = getAllowedAttributes();
-        if (Objects.equals(name, ALL) || !allowed.contains(name)) {
+        if (Objects.equals(name, Attribute.ALL.getName()) || !allowed.contains(name)) {
             throw new IllegalArgumentException("'" + name + "' not recognized");
         }
-        switch (name) {
+        Attribute attribute = Attribute.ofName(name);
+        switch (attribute) {
             case CREATION_TIME_NAME -> view.setTimes(null, null, (FileTime) value);
             case LAST_ACCESS_TIME_NAME -> view.setTimes(null, (FileTime) value, null);
             case LAST_MODIFIED_TIME_NAME -> view.setTimes((FileTime) value, null, null);
@@ -108,6 +165,11 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
         }
     }
 
+    /**
+     * Gets the set of allowed attributes.
+     *
+     * @return the set of allowed attributes.
+     */
     protected Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
     }

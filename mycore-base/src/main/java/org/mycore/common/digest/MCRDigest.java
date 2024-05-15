@@ -33,27 +33,6 @@ import org.mycore.common.MCRUtils;
  */
 public abstract class MCRDigest {
 
-    /**
-     * Digest Algorithm
-     */
-    public static abstract class Algorithm {
-
-        final String name;
-
-        protected Algorithm(String name) {
-            this.name = name;
-        }
-
-        public String toLowerCase() {
-            return name.toLowerCase(Locale.ROOT);
-        }
-
-        public String toUpperCase() {
-            return name.toUpperCase(Locale.ROOT);
-        }
-
-    }
-
     protected byte[] value;
 
     /**
@@ -119,5 +98,26 @@ public abstract class MCRDigest {
      * @return The digest algorithm.
      */
     public abstract Algorithm getAlgorithm();
+
+    /**
+     * Digest Algorithm
+     */
+    public static abstract class Algorithm {
+
+        final String name;
+
+        protected Algorithm(String name) {
+            this.name = name;
+        }
+
+        public String toLowerCase() {
+            return name.toLowerCase(Locale.ROOT);
+        }
+
+        public String toUpperCase() {
+            return name.toUpperCase(Locale.ROOT);
+        }
+
+    }
 
 }

@@ -93,7 +93,6 @@ public abstract class MCRVersionedFileSystemProvider extends MCRAbstractFileSyst
 
     @Override
     public boolean isHidden(Path path) {
-        MCRVersionedPath.toVersionedPath(path);
         return false;
     }
 
