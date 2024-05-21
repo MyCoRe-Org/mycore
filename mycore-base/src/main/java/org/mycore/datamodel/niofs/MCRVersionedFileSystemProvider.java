@@ -27,19 +27,17 @@ public abstract class MCRVersionedFileSystemProvider extends MCRAbstractFileSyst
     @Override
     public MCRVersionedPath getPath(final URI uri) {
         PathInformation pathInfo = getPathInformation(uri);
-        return getPath(pathInfo.owner(), pathInfo.path(), getFileSystem());
+        return getPath(pathInfo.owner(), pathInfo.path());
     }
 
     @Override
-    public MCRVersionedPath getPath(String owner, String path, MCRAbstractFileSystem fs) {
-        Objects.requireNonNull(fs, MCRAbstractFileSystem.class.getSimpleName() + " instance may not be null.");
-        return new MCRVersionedPath(owner, path) {
-            @Override
-            public MCRVersionedFileSystem getFileSystem() {
-                return (MCRVersionedFileSystem) fs;
-            }
+    public MCRVersionedPath getPath(String owner, String path) {
+        return new MCRVersionedPath(owner, path, getFileSystem()) {
         };
     }
+
+    @Override
+    public abstract MCRVersionedFileSystem getFileSystem();
 
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)

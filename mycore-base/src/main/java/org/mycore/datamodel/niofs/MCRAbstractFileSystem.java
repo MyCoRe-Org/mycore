@@ -64,12 +64,9 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     private final MCRAbstractFileSystemProvider provider;
 
-    private final MCRPath emptyPath;
-
     public MCRAbstractFileSystem(MCRAbstractFileSystemProvider provider) {
         super();
         this.provider = provider;
-        emptyPath = getPath(null, "", this);
     }
 
     @Override
@@ -101,12 +98,11 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     public static MCRPath getPath(final String owner, final String path, final MCRAbstractFileSystem fs) {
         Objects.requireNonNull(fs, MCRAbstractFileSystem.class.getSimpleName() + " instance may not be null.");
-        return fs.provider().getPath(owner, path, fs);
+        return fs.provider().getPath(owner, path);
     }
 
     /**
      * Creates a new root under the given name.
-     * 
      * After calling this method the implementing FileSystem should
      * be ready to accept data for this root.
      * 
@@ -118,7 +114,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     /**
      * Checks if the file for given Path is still valid.
-     * 
      * This should check if the file is still completely readable and the MD5 sum still matches the recorded value.
      * @param path Path to the file to check
      * @return if the file is still in good condition
@@ -135,7 +130,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     /**
      * Checks if the file for given Path is still valid.
-     * 
      * This should check if the file is still completely readable and the MD5 sum still matches the recorded value.
      * This method does the same as {@link #verifies(MCRPath)} but uses the given attributes to save a file access.
      * @param path Path to the file to check
@@ -162,7 +156,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     /**
      * Removes a root with the given name.
-     * 
      * Call this method if you want to remove a stalled directory that is not in use anymore.
      * 
      * @param owner ,e.g. derivate ID
@@ -178,7 +171,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     }
 
     public MCRPath emptyPath() {
-        return emptyPath;
+        return getPath(null, "", this);
     }
 
     @Override
@@ -192,7 +185,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         } else {
             path.append(first);
         }
-        boolean addSep = path.length() > 0;
+        boolean addSep = !path.isEmpty();
         for (final String element : more) {
             if (!element.isEmpty()) {
                 if (addSep) {
@@ -209,7 +202,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     @Override
     public PathMatcher getPathMatcher(final String syntaxAndPattern) {
         final int pos = syntaxAndPattern.indexOf(':');
-        if (pos <= 0 || pos == syntaxAndPattern.length()) {
+        if (pos <= 0 || pos == syntaxAndPattern.length() - 1) {
             throw new IllegalArgumentException();
         }
         final String syntax = syntaxAndPattern.substring(0, pos);

@@ -18,12 +18,12 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     private final OwnerVersion ownerVersion;
 
-    MCRVersionedPath(final String root, final String path) {
-        this(OwnerVersion.of(root), path);
+    MCRVersionedPath(final String root, final String path, MCRVersionedFileSystem fileSystem) {
+        this(OwnerVersion.of(root), path, fileSystem);
     }
 
-    private MCRVersionedPath(final OwnerVersion ownerVersion, final String path) {
-        super(ownerVersion.owner, path);
+    private MCRVersionedPath(final OwnerVersion ownerVersion, final String path, MCRVersionedFileSystem fileSystem) {
+        super(ownerVersion.owner, path, fileSystem);
         this.ownerVersion = ownerVersion;
     }
 
@@ -86,9 +86,6 @@ public abstract class MCRVersionedPath extends MCRPath {
     }
 
     @Override
-    public abstract MCRVersionedFileSystem getFileSystem();
-
-    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof MCRVersionedPath that)) {
             return false;
@@ -148,13 +145,18 @@ public abstract class MCRVersionedPath extends MCRPath {
         return getFileSystem().provider().getHeadVersion(this.getOwner());
     }
 
+    @Override
+    public MCRVersionedFileSystem getFileSystem() {
+        return (MCRVersionedFileSystem) this.fileSystem;
+    }
+
     /**
-     * Resolves the head version of the given path if possible.
+     * Resolves the version of the given path if possible.
      * 
      * @param path the path to resolve
-     * @return new {@link MCRVersionedPath} instance with the resolved head version
+     * @return new {@link MCRVersionedPath} instance with the resolved version
      */
-    public static MCRVersionedPath resolveHeadVersion(MCRVersionedPath path) {
+    public static MCRVersionedPath resolveVersion(MCRVersionedPath path) {
         if (path.ownerVersion.version != null) {
             return path;
         }

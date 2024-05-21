@@ -61,18 +61,13 @@ public abstract class MCRAbstractFileSystemProvider extends FileSystemProvider {
      * @see java.nio.file.spi.FileSystemProvider#getPath(java.net.URI)
      */
     @Override
-    public Path getPath(final URI uri) {
+    public MCRPath getPath(final URI uri) {
         PathInformation pathInfo = getPathInformation(uri);
-        return getPath(pathInfo.owner(), pathInfo.path(), getFileSystem());
+        return getPath(pathInfo.owner, pathInfo.path);
     }
 
-    public MCRPath getPath(String owner, String path, MCRAbstractFileSystem fs) {
-        Objects.requireNonNull(fs, MCRAbstractFileSystem.class.getSimpleName() + " instance may not be null.");
-        return new MCRPath(owner, path) {
-            @Override
-            public MCRAbstractFileSystem getFileSystem() {
-                return fs;
-            }
+    public MCRPath getPath(String owner, String path) {
+        return new MCRPath(owner, path, getFileSystem()) {
         };
     }
 

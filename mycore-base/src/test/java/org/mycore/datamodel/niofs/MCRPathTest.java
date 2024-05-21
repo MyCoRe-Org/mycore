@@ -65,12 +65,7 @@ public class MCRPathTest {
     private static class TestMCRPath extends MCRPath {
 
         TestMCRPath(String root, String path) {
-            super(root, path);
-        }
-
-        @Override
-        public MCRAbstractFileSystem getFileSystem() {
-            return FILE_SYSTEM;
+            super(root, path, FILE_SYSTEM);
         }
 
     }

@@ -56,13 +56,20 @@ import com.google.common.primitives.Ints;
  */
 public abstract class MCRPath implements Path {
 
-    String root, path, stringValue;
+    protected String root;
 
-    private int[] offsets;
+    protected String path;
 
-    MCRPath(final String root, final String path) {
+    protected String stringValue;
+
+    protected int[] offsets;
+
+    protected final MCRAbstractFileSystem fileSystem;
+
+    MCRPath(final String root, final String path, MCRAbstractFileSystem fileSystem) {
         this.root = root;
         this.path = normalizeAndCheck(Objects.requireNonNull(path, "path may not be null"));
+        this.fileSystem = fileSystem;
         if (root == null || root.isEmpty()) {
             this.root = "";
             stringValue = this.path;
@@ -284,10 +291,12 @@ public abstract class MCRPath implements Path {
     }
 
     @Override
-    public abstract MCRAbstractFileSystem getFileSystem();
+    public MCRAbstractFileSystem getFileSystem() {
+        return this.fileSystem;
+    }
 
     protected MCRPath getPath(String owner, String path, MCRAbstractFileSystem fs) {
-        return fs.provider().getPath(owner, path, fs);
+        return fs.provider().getPath(owner, path);
     }
 
     /* (non-Javadoc)
