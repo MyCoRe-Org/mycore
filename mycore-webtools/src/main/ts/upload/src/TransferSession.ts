@@ -100,6 +100,7 @@ export class TransferSession {
                         message = xhr.responseXML.querySelector("message").textContent
                         break;
                     case "text":
+                    case "":
                         message = xhr.responseText;
                         break;
                     default:
