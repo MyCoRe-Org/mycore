@@ -72,7 +72,7 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template match="mods:titleInfo">
+	<xsl:template match="mods:titleInfo[not(@altFormat)]">
 		<dc:title>
 			<xsl:value-of select="mods:nonSort"/>
 			<xsl:if test="mods:nonSort">
@@ -189,7 +189,7 @@
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="mods:abstract | mods:tableOfContents | mods:note">
+	<xsl:template match="mods:abstract[not(@altFormat)] | mods:tableOfContents[not(@altFormat)] | mods:note">
 		<dc:description>
 			<xsl:value-of select="."/>
 		</dc:description>
