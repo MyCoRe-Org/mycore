@@ -19,9 +19,6 @@ package org.mycore.access;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -29,14 +26,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRScopedSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 /**
  * @author Thomas Scheffler
@@ -62,13 +58,6 @@ public class MCRAccessManager {
     public static final String PERMISSION_HISTORY_READ = "read-history";
 
     public static final String PERMISSION_HISTORY_DELETE = "delete-history";
-
-    private static final ExecutorService EXECUTOR_SERVICE;
-
-    static {
-        EXECUTOR_SERVICE = Executors.newWorkStealingPool();
-        MCRShutdownHandler.getInstance().addCloseable(EXECUTOR_SERVICE::shutdownNow);
-    }
 
     @SuppressWarnings("unchecked")
     public static <T extends MCRAccessInterface> T getAccessImpl() {
@@ -426,33 +415,12 @@ public class MCRAccessManager {
         }
     }
 
-    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier) {
-        return checkPermission(user, checkSuplier, EXECUTOR_SERVICE);
-    }
-
-    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier,
-        ExecutorService es) {
-        return CompletableFuture.supplyAsync(getWrappedFixedUserCallable(user, checkSuplier), es);
-    }
-
-    private static Supplier<Boolean> getWrappedFixedUserCallable(MCRUserInformation user,
-        Supplier<Boolean> checkSuplier) {
-        Supplier<Boolean> check = () -> {
-            try {
-                return checkSuplier.get();
-            } finally {
-                MCREntityManagerProvider.getCurrentEntityManager().clear();
-            }
-        };
-        MCRFixedUserCallable<Boolean> mcrFixedUserCallable = new MCRFixedUserCallable<>(check::get, user);
-        return () -> {
-            try {
-                return mcrFixedUserCallable.call();
-            } catch (Exception e) {
-                LOGGER.error("Exception while running ACL check for user: {}", user.getUserID(), e);
-                return false;
-            }
-        };
+    public static boolean checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier) {
+        if (!MCRSessionMgr.hasCurrentSession()
+            || !(MCRSessionMgr.getCurrentSession() instanceof MCRScopedSession session)) {
+            throw new IllegalStateException("require an instance of MCRScopedSession");
+        }
+        return session.doAs(new MCRScopedSession.ScopedValues(user, "0.0.0.0"), checkSuplier);
     }
 
     public static MCRRuleAccessInterface requireRulesInterface() {
