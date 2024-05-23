@@ -17,22 +17,17 @@
  */
 package org.mycore.mods.classification;
 
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -44,12 +39,15 @@ import org.mycore.mods.MCRMODSWrapper;
 /**
  * Maps classifications in Mods-Documents.
  * <p>You can define a label <b><code>x-mapping</code></b> in a classification with space seperated categoryIds
- * to which the classification will be mapped.</p>
+ * to which the classification will be mapped. You can further define a label <b><code>x-mapping-xpath</code></b> in a
+ * classification which creates a classification mapping when the xPath inside the x-mapping-xpath attribute
+ * is matched.</p>
  * <code>
  * &lt;category ID=&quot;article&quot; counter=&quot;1&quot;&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;en&quot; text=&quot;Article / Chapter&quot; /&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;de&quot; text=&quot;Artikel / Aufsatz&quot; /&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;x-mapping&quot; text=&quot;diniPublType:article&quot; /&gt;<br>
+ * &nbsp;&lt;label xml:lang=&quot;x-mapping-xpath&quot; text=&quot;mods:genre[text()='article']&quot; /&gt;<br>
  * &lt;/category&gt;
  * </code>
  *
@@ -59,9 +57,17 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     public static final String GENERATOR_SUFFIX = "-mycore";
 
+    public static final String LABEL_LANG_XPATH_MAPPING = "x-mapping-xpath";
+
+    public static final String XPATH_GENERATOR_NAME = "xpathmapping";
+
+    /** This configuration lists all eligible categories for x-path-mapping */
+    private static final String X_PATH_MAPPING_CATEGORIES
+        = MCRConfiguration2.getStringOrThrow("MCR.Category.XPathMapping.ClassIDs");
+
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
-    private static List<Map.Entry<MCRCategoryID, MCRCategoryID>> getMappings(MCRCategory category) {
+    private static List<Map.Entry<MCRCategoryID, MCRCategoryID>> getXMappings(MCRCategory category) {
         Optional<MCRLabel> labelOptional = category.getLabel("x-mapping");
 
         if (labelOptional.isPresent()) {
@@ -76,6 +82,14 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         }
 
         return Collections.emptyList();
+    }
+
+    private static List<MCRCategory> loadAllXPathMappings() {
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        return Arrays.stream(X_PATH_MAPPING_CATEGORIES.trim().split(","))
+            .flatMap(
+                relevantClass -> dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream())
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -97,6 +111,11 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         return String.format(Locale.ROOT, "%s2%s%s", src.getRootID(), target.getRootID(), GENERATOR_SUFFIX);
     }
 
+    private static String getXPathMappingGenerator(MCRCategoryID target) {
+        return String.format(Locale.ROOT, "%s2%s%s", XPATH_GENERATOR_NAME, target.getRootID(),
+            GENERATOR_SUFFIX);
+    }
+
     private void createMapping(MCRObject obj) {
         MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
         if (mcrmodsWrapper.getMODS() == null) {
@@ -108,12 +127,13 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
         LOGGER.info("check mappings {}", obj.getId());
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        // check x-mappings
         mcrmodsWrapper.getMcrCategoryIDs().stream()
             .map(categoryId -> {
                 return dao.getCategory(categoryId, 0);
             })
             .filter(Objects::nonNull)
-            .map(MCRClassificationMappingEventHandler::getMappings)
+            .map(MCRClassificationMappingEventHandler::getXMappings)
             .flatMap(Collection::stream)
             .distinct()
             .forEach(mapping -> {
@@ -125,6 +145,25 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 mappedClassification.setAttribute("generator", generator);
                 MCRClassMapper.assignCategory(mappedClassification, mapping.getValue());
             });
+        // check x-mapping-xpath-mappings
+        for (MCRCategory category : loadAllXPathMappings()) {
+            if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
+
+                String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
+
+                if (evaluator.test(xPath)) {
+                    String taskMessage = String.format(Locale.ROOT, "add x-path-mapping from '%s'",
+                        category.getId().toString());
+                    LOGGER.info(taskMessage);
+                    Element mappedClassification = mcrmodsWrapper.addElement("classification");
+                    String generator = getXPathMappingGenerator(category.getId());
+                    mappedClassification.setAttribute("generator", generator);
+                    MCRClassMapper.assignCategory(mappedClassification, category.getId());
+                }
+            }
+        }
+
         LOGGER.debug("mapping complete.");
     }
 

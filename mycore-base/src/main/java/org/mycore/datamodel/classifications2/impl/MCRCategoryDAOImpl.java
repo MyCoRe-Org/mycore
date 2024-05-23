@@ -183,6 +183,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     @Override
+    public List<MCRCategory> getCategoriesByClassAndLang(final String classId, final String lang) {
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        return cast(entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "byClassAndLang", MCRCategoryImpl.class)
+            .setParameter("classID", classId)
+            .setParameter("lang", lang)
+            .getResultList());
+    }
+
+    @Override
     public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategoryDTO leftRight = getLeftRightLevelValues(entityManager, baseID);

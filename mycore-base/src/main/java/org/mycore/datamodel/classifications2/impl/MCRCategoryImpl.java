@@ -101,6 +101,11 @@ import jakarta.persistence.UniqueConstraint;
             + "  INNER JOIN cat.labels as label "
             + "  WHERE label.lang=:lang AND "
             + "    label.text=:text"),
+    @NamedQuery(name = "MCRCategory.byClassAndLang",
+        query = "FROM MCRCategoryImpl as cat "
+            + "  INNER JOIN cat.labels as label "
+            + "  WHERE cat.id.rootID=:classID"
+            + "  AND label.lang=:lang"),
     @NamedQuery(name = "MCRCategory.prefetchClassQuery",
         query = MCRCategoryDTO.SELECT
             + " WHERE cat.id.rootID=:classID ORDER BY cat.left"),
