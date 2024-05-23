@@ -1,0 +1,15 @@
+<objecttype name="tei" isChild="false" isParent="false" hasDerivates="true" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:tei="http://www.tei-c.org/ns/1.0"
+            xsi:noNamespaceSchemaLocation="datamodel.xsd">
+  <xsd>
+    <xs:import namespace="http://www.tei-c.org/ns/1.0" schemaLocation="schema/tei_all.xsd" />
+  </xsd>
+  <metadata>
+    <element name="teiContainer" type="xml" style="dontknow" notinherit="true" heritable="false">
+      <xs:sequence>
+        <xs:element ref="tei:teiHeader" />
+      </xs:sequence>
+    </element>
+  </metadata>
+</objecttype>
