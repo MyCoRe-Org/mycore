@@ -25,16 +25,35 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
 
+/**
+ * A scoped session that allows to execute actions within a restricted scope.
+ * <p/>
+ * This session is used to restrict the access to certain resources or information
+ * of the current user. These information can be overwritten in the
+ * {@link #doAs(ScopedValues, Supplier)} method.
+ */
 public final class MCRScopedSession extends MCRSession {
 
-    private ThreadLocal<ScopedValues> scopedValues = new ThreadLocal<>();
+    private final ThreadLocal<ScopedValues> scopedValues = new ThreadLocal<>();
 
-    public <T> T doAs(ScopedValues scopeValue, Supplier<T> action) {
-        scopedValues.set(Objects.requireNonNull(scopeValue));
+    /**
+     * Executes an action within a restricted scope.
+     * <p/>
+     * The scoped values are set for the duration of the action and then removed.
+     * This allows to execute actions that require a specific context or access to certain resources.
+     * The base MCRSession is left untouched in all other running threads. Bassically this
+     * allows to overwrite most of the base MCRSession information while performing {@code action}
+     * and using the same database transaction.
+     *
+     * @param scopeValues the scoped values to use during the execution of the action
+     * @param action the action to be executed within the restricted scope
+     * @return the result of the action
+     */
+    public <T> T doAs(ScopedValues scopeValues, Supplier<T> action) {
+        scopedValues.set(Objects.requireNonNull(scopeValues));
         try {
             return action.get();
         } finally {
@@ -110,7 +129,7 @@ public final class MCRScopedSession extends MCRSession {
         if (values == null) {
             return super.getObjectsKeyList();
         }
-        return values.map.keySet().stream().collect(Collectors.toSet()).iterator();
+        return values.map.keySet().iterator();
     }
 
     @Override
@@ -135,20 +154,28 @@ public final class MCRScopedSession extends MCRSession {
     public record ScopedValues(
         Map<Object, Object> map,
         MCRUserInformation userInformation,
-        String language,
         Locale locale,
         String ip) {
 
-        public ScopedValues(MCRUserInformation userInformation, String ip) {
-            this(new HashMap<>(), userInformation, getDefaultLang(), getDefaultLocale(), ip);
-        }
+        private static final Locale DEFAULT_LOCALE = MCRConfiguration2
+            .getString("MCR.Metadata.DefaultLang")
+            .map(Locale::forLanguageTag)
+            .orElseGet(() -> Locale.forLanguageTag(MCRConstants.DEFAULT_LANG));
 
-        private static String getDefaultLang() {
-            return MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG);
-        }
-
-        private static Locale getDefaultLocale() {
-            return Locale.forLanguageTag(getDefaultLang());
+        /**
+         * Creates a new instance of ScopedValues with default values.
+         *
+         * Default values are:
+         * <ul>
+         *     <li><em>empty</em> map, see: {@link MCRSession#getMapEntries()}</li>
+         *     <li>Default locale, see {@link MCRSession#getLocale()}</li>
+         *     <li>Remote IP address: 0.0.0.0</li>
+         * </ul>
+         *
+         * @param userInformation the user representation that should be used
+         */
+        public ScopedValues(MCRUserInformation userInformation) {
+            this(new HashMap<>(), userInformation, DEFAULT_LOCALE, "0.0.0.0");
         }
     }
 

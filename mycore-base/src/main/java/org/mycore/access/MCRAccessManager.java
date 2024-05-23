@@ -415,12 +415,12 @@ public class MCRAccessManager {
         }
     }
 
-    public static boolean checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier) {
+    public static boolean checkPermission(MCRUserInformation user, Supplier<Boolean> checkSupplier) {
         if (!MCRSessionMgr.hasCurrentSession()
             || !(MCRSessionMgr.getCurrentSession() instanceof MCRScopedSession session)) {
             throw new IllegalStateException("require an instance of MCRScopedSession");
         }
-        return session.doAs(new MCRScopedSession.ScopedValues(user, "0.0.0.0"), checkSuplier);
+        return session.doAs(new MCRScopedSession.ScopedValues(user), checkSupplier);
     }
 
     public static MCRRuleAccessInterface requireRulesInterface() {
