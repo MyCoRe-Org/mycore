@@ -30,7 +30,7 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * A scoped session that allows to execute actions within a restricted scope.
- * <p/>
+ * <p>
  * This session is used to restrict the access to certain resources or information
  * of the current user. These information can be overwritten in the
  * {@link #doAs(ScopedValues, Supplier)} method.
@@ -41,7 +41,7 @@ public final class MCRScopedSession extends MCRSession {
 
     /**
      * Executes an action within a restricted scope.
-     * <p/>
+     * <p>
      * The scoped values are set for the duration of the action and then removed.
      * This allows to execute actions that require a specific context or access to certain resources.
      * The base MCRSession is left untouched in all other running threads. Bassically this
@@ -164,7 +164,7 @@ public final class MCRScopedSession extends MCRSession {
 
         /**
          * Creates a new instance of ScopedValues with default values.
-         *
+         * <p>
          * Default values are:
          * <ul>
          *     <li><em>empty</em> map, see: {@link MCRSession#getMapEntries()}</li>
