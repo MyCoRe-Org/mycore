@@ -84,7 +84,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
                 xml));
 
         String expression3
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' and @categid='journal-article']";
+            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
+                + "and @categid='journal-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
