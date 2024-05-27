@@ -263,7 +263,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-        if (genres.contains("article")) {
+        if (genres.contains("article") || genres.contains ("review_article")) {
             if (parentGenres.contains("journal")) {
                 idb.type(CSLType.ARTICLE_JOURNAL);
             } else if (parentGenres.contains("newspaper")) {
@@ -271,6 +271,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             } else {
                 idb.type(CSLType.ARTICLE);
             }
+        } else if (genres.contains("conference_essay") || genres.contains ("abstract")) {
+            idb.type(CSLType.PAPER_CONFERENCE);
         } else if (genres.contains("book") || genres.contains("proceedings") || genres.contains("collection")
             || genres.contains("festschrift") || genres.contains("lexicon") || genres.contains("monograph")
             || genres.contains("lecture")) {
@@ -289,7 +291,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.type(CSLType.ARTICLE);
         } else if (genres.contains("speech") || genres.contains("poster")) {
             idb.type(CSLType.SPEECH);
-        } else if (genres.contains("video")) {
+        } else if (genres.contains("video") || genres.contains("video_contribution")) {
             idb.type(CSLType.MOTION_PICTURE);
         } else if (genres.contains("broadcasting")) {
             idb.type(CSLType.BROADCAST);
@@ -306,7 +308,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             || genres.contains("magister_thesis")) {
             idb.type(CSLType.THESIS);
         } else if (genres.contains("report") || genres.contains("research_results") || genres.contains("in_house")
-            || genres.contains("press_release") || genres.contains("declaration")) {
+            || genres.contains("press_release") || genres.contains("declaration") || genres.contains("researchpaper")) {
             idb.type(CSLType.REPORT);
             /* } else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
                || genres.contains("course_resources")) {
