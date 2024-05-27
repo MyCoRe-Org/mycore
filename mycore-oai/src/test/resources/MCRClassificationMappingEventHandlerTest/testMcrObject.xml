@@ -7,6 +7,9 @@
     <element class="MCRMetaClassification" name="genre" type="classification">
       <classification id="genre" categid="article" classid="mir_genres" />
     </element>
+    <element class="MCRMetaLangText">
+      <publishedin type="journal">A journal name</publishedin>
+    </element>
   </metadata>
 </mycoreobject>
 

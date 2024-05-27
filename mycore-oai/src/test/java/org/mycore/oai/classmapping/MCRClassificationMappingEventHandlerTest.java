@@ -17,6 +17,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -36,8 +37,14 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         return MCRCategoryDAOFactory.getInstance();
     }
 
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        MCRConfiguration2.set("MCR.Category.XPathMapping.ClassIDs", "orcidWorkType");
+    }
+
     /**
-     * Tests if an x-mapping is properly added into a Document.
+     * Tests if x-mappings and XPath-mappings are properly added into a Document.
      * @throws IOException in case of error
      * @throws JDOMException in case of error
      * @throws URISyntaxException in case of error
@@ -50,6 +57,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         SAXBuilder saxBuilder = new SAXBuilder();
 
         loadCategory("genre.xml");
+        loadCategory("orcidWorkType.xml");
 
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject.xml"));
         MCRObject mcro = new MCRObject(document);
@@ -67,10 +75,18 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
                 xml));
 
         String expression2
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
-                + "and @categid='journal-article']";
+            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='schemaOrg' "
+                + "and @categid='Article']";
         expressionObject = XPathFactory.instance()
             .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+        Assert.assertNotNull("The mapped classification for schemaOrg should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        String expression3
+            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' and @categid='journal-article']";
+        expressionObject = XPathFactory.instance()
+            .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));

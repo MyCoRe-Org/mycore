@@ -99,7 +99,7 @@ public interface MCRCategoryDAO {
     List<MCRCategory> getCategoriesByLabel(String lang, String text);
 
     /**
-     * Retrieve all Categories in a specific class-ID and language.
+     * Retrieve all Categories in a specific class-ID containing a specific language.
      * @param classId Class-ID of the category
      * @param lang language attribute of the label
      * @return a collection of all MCRCategories of a specific class and language

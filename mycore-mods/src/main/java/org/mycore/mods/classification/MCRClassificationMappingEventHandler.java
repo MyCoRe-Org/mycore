@@ -68,16 +68,24 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     public static final String LABEL_LANG_XPATH_MAPPING = "x-mapping-xpath";
 
+    public static final String LABEL_LANG_X_MAPPING = "x-mapping";
+
     public static final String XPATH_GENERATOR_NAME = "xpathmapping";
 
-    /** This configuration lists all eligible categories for x-path-mapping */
-    private static final String X_PATH_MAPPING_CATEGORIES
+    /** This configuration lists all eligible classifications for x-path-mapping */
+    private static final String X_PATH_MAPPING_CLASSIFICATIONS
         = MCRConfiguration2.getStringOrThrow("MCR.Category.XPathMapping.ClassIDs");
 
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
+    /**
+     * Reads all {@link MCRClassificationMappingEventHandler#LABEL_LANG_X_MAPPING x-mappings} from a category.
+     * All mapped categories that exist are returned as a list.
+     * @param category the source category containing a mapping
+     * @return a list of all mapped categories
+     */
     private static List<Map.Entry<MCRCategoryID, MCRCategoryID>> getXMappings(MCRCategory category) {
-        Optional<MCRLabel> labelOptional = category.getLabel("x-mapping");
+        Optional<MCRLabel> labelOptional = category.getLabel(LABEL_LANG_X_MAPPING);
 
         if (labelOptional.isPresent()) {
             final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
@@ -93,9 +101,16 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         return Collections.emptyList();
     }
 
+    /**
+     * Searches all configured classifications
+     * (see {@link MCRClassificationMappingEventHandler#X_PATH_MAPPING_CLASSIFICATIONS}) for categories
+     * with language label {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}.
+     * All categories with said label and present in database are returned in a list.
+     * @return a list of {@link MCRCategory categories} with the XPath-Mapping label
+     */
     private static List<MCRCategory> loadAllXPathMappings() {
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        return Arrays.stream(X_PATH_MAPPING_CATEGORIES.trim().split(","))
+        return Arrays.stream(X_PATH_MAPPING_CLASSIFICATIONS.trim().split(","))
             .flatMap(
                 relevantClass -> dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream())
             .collect(Collectors.toList());
@@ -125,6 +140,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             GENERATOR_SUFFIX);
     }
 
+    /**
+     * Creates x-mappings and XPath-mappings for a given object.
+     * @param obj the {@link MCRObject} to add mappings to
+     */
     private void createMapping(MCRObject obj) {
         MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
         if (mcrmodsWrapper.getMODS() == null) {
