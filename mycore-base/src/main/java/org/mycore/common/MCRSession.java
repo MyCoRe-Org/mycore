@@ -107,6 +107,8 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private Optional<URI> firstURI = Optional.empty();
 
+    private Optional<String> firstUserAgent = Optional.empty();
+
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
     private ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(ArrayDeque::new);
@@ -327,6 +329,12 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         }
     }
 
+    public void setFirstUserAgent(Supplier<String> userAgent) {
+        if (firstUserAgent.isEmpty()) {
+            firstUserAgent = Optional.of(userAgent.get());
+        }
+    }
+
     /**
      * Activate this session. For internal use mainly by MCRSessionMgr.
      *
@@ -361,6 +369,9 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         }
         if (firstURI.isEmpty()) {
             firstURI = Optional.of(DEFAULT_URI);
+        }
+        if (firstUserAgent.isEmpty()) {
+            firstUserAgent = Optional.of("");
         }
         onCommitTasks.remove();
     }
@@ -438,6 +449,10 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     public Optional<URI> getFirstURI() {
         return firstURI;
+    }
+
+    public Optional<String> getFirstUserAgent() {
+        return firstUserAgent;
     }
 
     /**
