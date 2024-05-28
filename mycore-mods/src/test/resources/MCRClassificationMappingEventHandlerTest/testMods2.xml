@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mods:mods xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink">
     <mods:typeOfResource>text</mods:typeOfResource>
-    <mods:genre authority="test" displayLabel="test">article</mods:genre>
+    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#article" />
     <mods:titleInfo xml:lang="de" xlink:type="simple">
         <mods:title>Test-Titel</mods:title>
     </mods:titleInfo>
@@ -10,6 +10,6 @@
     </mods:language>
     <mods:accessCondition type="use and reproduction" xlink:type="simple">cc_by-nc</mods:accessCondition>
     <mods:relatedItem type="host" xlink:href="host">
-        <mods:genre authority="test" displayLabel="test">journal</mods:genre>
+        <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#journal" />
     </mods:relatedItem>
 </mods:mods>

@@ -8,7 +8,7 @@
             <label xml:lang="de" text="Zeitschriftenartikel"/>
             <label xml:lang="en" text="Journal article"
                    description="Articles in peer-reviewed publications that disseminate the results of original research and scholarship."/>
-            <label xml:lang="x-mapping-xpath" text="mods:genre='article' and mods:relatedItem[@type='host']/mods:genre='journal'" />
+            <label xml:lang="x-mapping-xpath" text="mods:genre[substring-after(@valueURI,'#')='article'] and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='journal']" />
         </category>
     </categories>
 </mycoreclass>
