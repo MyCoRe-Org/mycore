@@ -40,9 +40,22 @@ public abstract class MCRVersionedPath extends MCRPath {
         this(OwnerVersion.of(root), path, fileSystem);
     }
 
+    MCRVersionedPath(final String owner, final String version, final String path, MCRVersionedFileSystem fileSystem) {
+        this(new OwnerVersion(owner, version), path, fileSystem);
+    }
+
     private MCRVersionedPath(final OwnerVersion ownerVersion, final String path, MCRVersionedFileSystem fileSystem) {
         super(ownerVersion.owner, path, fileSystem);
         this.ownerVersion = ownerVersion;
+    }
+
+    public static MCRVersionedPath getPath(String owner, String version, String path) {
+        Path resolved = MCRPaths.getVersionedPath(owner, version, path);
+        return toVersionedPath(resolved);
+    }
+
+    public static MCRVersionedPath head(String owner, String path) {
+        return getPath(owner, null, path);
     }
 
     /**
@@ -92,11 +105,6 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     public String toRelativePath() {
         return this.getOwnerRelativePath().substring(1);
-    }
-
-    public static MCRVersionedPath getPath(String owner, String path, String version) {
-        String root = toRoot(owner, version);
-        return toVersionedPath(MCRPaths.getPath(root, path));
     }
 
     private static String toRoot(String owner, String version) {
@@ -170,7 +178,7 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     /**
      * Resolves the version of the given path if possible.
-     * 
+     *
      * @param path the path to resolve
      * @return new {@link MCRVersionedPath} instance with the resolved version
      */
@@ -178,7 +186,7 @@ public abstract class MCRVersionedPath extends MCRPath {
         if (path.ownerVersion.version != null) {
             return path;
         }
-        return MCRVersionedPath.getPath(path.getOwner(), path.path, path.getHeadVersion());
+        return path.getFileSystem().provider().getPath(path.getOwner(), path.getHeadVersion(), path.path);
     }
 
     /**
@@ -194,17 +202,6 @@ public abstract class MCRVersionedPath extends MCRPath {
             throw new ProviderMismatchException("other is not an instance of MCRVersionedPath: " + other.getClass());
         }
         return (MCRVersionedPath) other;
-    }
-
-    /**
-     * Returns a new {@link MCRVersionedPath} pointing at the head. Therefore, the version is null.
-     * 
-     * @param owner owner part
-     * @param path path part
-     * @return a new {@link MCRVersionedPath}
-     */
-    public static MCRVersionedPath head(String owner, String path) {
-        return MCRVersionedPath.getPath(owner, path, (String) null);
     }
 
     private record OwnerVersion(String owner, String version) {

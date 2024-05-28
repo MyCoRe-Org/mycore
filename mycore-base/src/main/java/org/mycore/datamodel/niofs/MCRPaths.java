@@ -47,7 +47,7 @@ final class MCRPaths {
 
     static URI getURI(String owner, String path) throws URISyntaxException {
         String scheme = getDefaultScheme();
-        return getURI(scheme, owner, path);
+        return getURI(scheme, owner, null, path);
     }
 
     private static String getDefaultScheme() {
@@ -55,23 +55,38 @@ final class MCRPaths {
     }
 
     static URI getURI(String scheme, String owner, String path) throws URISyntaxException {
-        boolean needSeperator = Objects.requireNonNull(path, "No 'path' specified.").isEmpty()
-            || path.charAt(0) != MCRAbstractFileSystem.SEPARATOR;
-        String aPath = needSeperator ? (MCRAbstractFileSystem.SEPARATOR_STRING + path) : path;
-        String finalPath = MCRAbstractFileSystem.SEPARATOR_STRING
-            + Objects.requireNonNull(owner, "No 'owner' specified.") + ":" + aPath;
-        return new URI(Objects.requireNonNull(scheme, "No 'scheme' specified."), null, finalPath, null);
+        return getURI(scheme, owner, null, path);
+    }
+
+    static URI getURI(String scheme, String owner, String version, String path) throws URISyntaxException {
+        Objects.requireNonNull(scheme, "No 'scheme' specified.");
+        Objects.requireNonNull(owner, "No 'owner' specified.");
+        Objects.requireNonNull(path, "No 'path' specified.");
+
+        StringBuilder pathBuilder = new StringBuilder();
+        pathBuilder.append(MCRAbstractFileSystem.SEPARATOR_STRING);
+        pathBuilder.append(owner);
+        if(version != null) {
+            pathBuilder.append(MCRVersionedPath.OWNER_VERSION_SEPARATOR);
+            pathBuilder.append(version);
+        }
+        pathBuilder.append(":");
+        if(path.isEmpty() || path.charAt(0) != MCRAbstractFileSystem.SEPARATOR) {
+            pathBuilder.append(MCRAbstractFileSystem.SEPARATOR_STRING);
+        }
+        pathBuilder.append(path);
+        return new URI(scheme, null, pathBuilder.toString(), null);
     }
 
     static Path getPath(String owner, String path) {
         String scheme = getDefaultScheme();
-        return getPath(scheme, owner, path);
+        return getPath(scheme, owner, null, path);
     }
 
-    static Path getPath(String scheme, String owner, String path) {
+    static Path getPath(String scheme, String owner, String version, String path) {
         URI uri;
         try {
-            uri = getURI(scheme, owner, path);
+            uri = getURI(scheme, owner, version, path);
             LogManager.getLogger(MCRPaths.class).debug("Generated path URI:{}", uri);
         } catch (URISyntaxException e) {
             throw new InvalidPathException(path, "URI syntax error (" + e.getMessage() + ") for path");
@@ -88,7 +103,13 @@ final class MCRPaths {
         }
     }
 
+    static Path getVersionedPath(String owner, String version, String path) {
+        String scheme = getDefaultScheme();
+        return getPath(scheme, owner, version, path);
+    }
+
     static void addFileSystemProvider(FileSystemProvider provider) {
         webAppProvider.add(provider);
     }
+
 }

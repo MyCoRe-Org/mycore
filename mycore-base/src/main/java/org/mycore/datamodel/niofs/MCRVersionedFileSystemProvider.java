@@ -54,6 +54,22 @@ public abstract class MCRVersionedFileSystemProvider extends MCRAbstractFileSyst
         };
     }
 
+    public MCRVersionedPath getPath(String owner, String version, String path) {
+        return new MCRVersionedPath(owner, version, path, getFileSystem()) {
+        };
+    }
+
+    /**
+     * Returns a new {@link MCRVersionedPath} pointing at the head. Therefore, the version is null.
+     *
+     * @param owner owner part
+     * @param path path part
+     * @return a new {@link MCRVersionedPath}
+     */
+    public MCRVersionedPath head(String owner, String path) {
+        return getPath(owner, null, path);
+    }
+
     @Override
     public abstract MCRVersionedFileSystem getFileSystem();
 
