@@ -25,8 +25,7 @@ import java.nio.file.ProviderMismatchException;
 import java.util.Objects;
 
 /**
- * Represents a file system path that includes versioning information, extending the capabilities
- * of {@link MCRPath}.
+ * Represents a file system path that includes versioning information, extending the capabilities of {@link MCRPath}.
  *
  * <p>Instances of this class are immutable and safe for use by multiple concurrent threads.</p>
  */
@@ -105,10 +104,6 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     public String toRelativePath() {
         return this.getOwnerRelativePath().substring(1);
-    }
-
-    private static String toRoot(String owner, String version) {
-        return owner + (version != null ? (OWNER_VERSION_SEPARATOR + version) : "");
     }
 
     @Override

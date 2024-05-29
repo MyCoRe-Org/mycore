@@ -70,7 +70,7 @@ final class MCRPaths {
             pathBuilder.append(MCRVersionedPath.OWNER_VERSION_SEPARATOR);
             pathBuilder.append(version);
         }
-        pathBuilder.append(":");
+        pathBuilder.append(':');
         if(path.isEmpty() || path.charAt(0) != MCRAbstractFileSystem.SEPARATOR) {
             pathBuilder.append(MCRAbstractFileSystem.SEPARATOR_STRING);
         }
