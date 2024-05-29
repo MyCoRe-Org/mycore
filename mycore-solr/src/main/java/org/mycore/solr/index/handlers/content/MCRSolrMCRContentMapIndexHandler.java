@@ -28,10 +28,12 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
@@ -90,15 +92,21 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                 //recreate documents interator;
                 documents = debugList.iterator();
             }
+            UpdateRequest req = new UpdateRequest();
+            MCRSolrAuthenticationHelper.addAuthentication(req,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+
             if (solrClient instanceof HttpSolrClient) {
-                updateResponse = solrClient.add(documents);
+                req.setDocIterator(documents);
             } else {
                 ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
                 while (documents.hasNext()) {
                     docs.add(documents.next());
                 }
-                updateResponse = solrClient.add(docs);
+                req.add(docs);
             }
+
+            updateResponse = req.process(solrClient);
         } catch (Throwable e) {
             LOGGER.warn("Error while indexing document collection. Split and retry.", e);
             splitup();

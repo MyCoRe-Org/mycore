@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.index.MCRSolrIndexHandler;
@@ -86,6 +87,8 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         UpdateResponse updateResponse;
         try {
             UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
+            MCRSolrAuthenticationHelper.addAuthentication(updateRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
             updateRequest.add(documents);
             updateResponse = updateRequest.process(getSolrClient());
         } catch (Throwable e) {

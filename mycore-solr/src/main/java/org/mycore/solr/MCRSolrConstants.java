@@ -39,6 +39,10 @@ public class MCRSolrConstants {
 
     public static final String SOLR_CORE_SERVER_SUFFIX = ".ServerURL";
 
+    public static final String SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX = ".ConfigSetTemplate";
+
+    public static final String SOLR_CORE_SHARD_COUNT_SUFFIX = ".ShardCount";
+
     public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration2
         .getStringOrThrow(SOLR_CONFIG_PREFIX + "XMLProtocolVersion");
 

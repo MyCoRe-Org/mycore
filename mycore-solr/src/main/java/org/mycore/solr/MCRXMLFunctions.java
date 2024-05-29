@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 /**
@@ -43,7 +44,10 @@ public class MCRXMLFunctions {
         }
         SolrQuery solrQuery = new SolrQuery(q);
         solrQuery.set("rows", 0);
-        QueryResponse queryResponse = MCRSolrClientFactory.getMainSolrClient().query(solrQuery);
+        QueryRequest queryRequest = new QueryRequest(solrQuery);
+        MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        QueryResponse queryResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
         return queryResponse.getResults().getNumFound();
     }
 
@@ -58,7 +62,10 @@ public class MCRXMLFunctions {
         SolrQuery solrQuery = new SolrQuery(q);
         solrQuery.set("rows", 1);
         QueryResponse queryResponse;
-        queryResponse = MCRSolrClientFactory.getMainSolrClient().query(solrQuery);
+        QueryRequest queryRequest = new QueryRequest(solrQuery);
+        MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        queryResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
 
         if (queryResponse.getResults().getNumFound() == 0) {
             return null;

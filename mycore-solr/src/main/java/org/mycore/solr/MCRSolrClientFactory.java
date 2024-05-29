@@ -77,13 +77,23 @@ public final class MCRSolrClientFactory {
         final String coreServerKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID
             + MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
 
+        final String configSetTemplateKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID
+            + MCRSolrConstants.SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX;
+
+        final String shardCountKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID
+                + MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
+
         String coreName = MCRConfiguration2.getString(coreNameKey)
             .orElseThrow(() -> new MCRConfigurationException("Missing property " + coreNameKey));
 
         String coreServer = MCRConfiguration2.getString(coreServerKey)
             .orElse(MCRSolrConstants.DEFAULT_SOLR_SERVER_URL);
 
-        return new MCRSolrCore(coreServer, coreName);
+        String configSetTemplate = MCRConfiguration2.getString(configSetTemplateKey).orElse(null);
+
+        Integer shardCount = MCRConfiguration2.getInt(shardCountKey).orElse(-1);
+
+        return new MCRSolrCore(coreServer, coreName, configSetTemplate, shardCount);
     }
 
     public static MCRSolrCore addCore(String server, String coreName, String coreID) {

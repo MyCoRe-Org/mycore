@@ -37,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -53,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -219,7 +221,11 @@ public class MCRRSSFeedImporter {
         query.setRows(0);
         SolrDocumentList results;
         try {
-            results = solrClient.query(query).getResults();
+            QueryRequest queryRequest = new QueryRequest(query);
+            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            results = queryRequest.process(solrClient).getResults();
+
             return (results.getNumFound() > 0);
         } catch (Exception ex) {
             throw new MCRException(ex);

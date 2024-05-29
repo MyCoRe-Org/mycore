@@ -26,9 +26,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.frontend.servlets.MCRClassificationBrowser2.MCRQueryAdapter;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 
@@ -80,7 +82,10 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
         solrQuery.set("rows", 0);
         QueryResponse queryResponse;
         try {
-            queryResponse = MCRSolrClientFactory.getMainSolrClient().query(solrQuery);
+            QueryRequest queryRequest = new QueryRequest(solrQuery);
+            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            queryResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
         } catch (SolrServerException | IOException e) {
             LOGGER.warn("Could not query SOLR.", e);
             return -1;

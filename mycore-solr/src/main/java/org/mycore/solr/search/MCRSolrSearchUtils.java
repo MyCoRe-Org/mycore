@@ -33,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -43,6 +44,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -67,7 +69,10 @@ public abstract class MCRSolrSearchUtils {
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", query);
         p.set("rows", 1);
-        QueryResponse response = solrClient.query(p);
+        QueryRequest queryRequest = new QueryRequest(p);
+        MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        QueryResponse response = queryRequest.process(solrClient);
         return response.getResults().isEmpty() ? null : response.getResults().getFirst();
     }
 
@@ -182,7 +187,10 @@ public abstract class MCRSolrSearchUtils {
                 sizeParams.set("start", 0);
                 sizeParams.set("rows", 0);
                 try {
-                    QueryResponse response = solrClient.query(sizeParams);
+                    QueryRequest queryRequest = new QueryRequest(sizeParams);
+                    MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                        MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+                    QueryResponse response = queryRequest.process(solrClient);
                     this.size = response.getResults().getNumFound();
                 } catch (SolrServerException | IOException e) {
                     throw new IllegalStateException(e);
@@ -212,7 +220,10 @@ public abstract class MCRSolrSearchUtils {
 
         protected QueryResponse query(SolrParams params) {
             try {
-                return solrClient.query(params);
+                QueryRequest queryRequest = new QueryRequest(params);
+                MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                    MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+                return queryRequest.process(solrClient);
             } catch (SolrServerException | IOException e) {
                 throw new IllegalStateException(e);
             }

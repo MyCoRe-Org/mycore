@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.CommonParams;
@@ -32,6 +33,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.MCROAIUtils;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -77,7 +79,10 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         p.set(CommonParams.ROWS, 1);
         p.set(CommonParams.FL, "id");
         try {
-            QueryResponse response = solrClient.query(p);
+            QueryRequest queryRequest = new QueryRequest(p);
+            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            QueryResponse response = queryRequest.process(solrClient);
             return response.getResults().isEmpty();
         } catch (Exception exc) {
             LOGGER.error("Unable to get results of solr server", exc);

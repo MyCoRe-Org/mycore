@@ -64,6 +64,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.http.MCRIdleConnectionMonitorThread;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 import org.xml.sax.SAXException;
@@ -228,6 +229,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
         filterParams(solrParameter);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
             Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
+
+        MCRSolrAuthenticationHelper.addAuthentication(solrHttpMethod,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+
         try {
             LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());
             HttpResponse response = httpClient.execute(solrHttpMethod);

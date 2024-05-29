@@ -26,6 +26,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.MCRSolrIndexer;
@@ -65,6 +66,8 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
             MCRSolrIndexer.deleteById(solrClient, id);
         }
         UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
+        MCRSolrAuthenticationHelper.addAuthentication(updateRequest,
+            MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
         updateRequest.add(document);
         updateRequest.process(solrClient);
     }

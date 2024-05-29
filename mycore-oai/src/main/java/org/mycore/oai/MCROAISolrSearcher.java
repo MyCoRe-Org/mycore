@@ -33,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -49,6 +50,7 @@ import org.mycore.oai.set.MCROAISetHandler;
 import org.mycore.oai.set.MCROAISetResolver;
 import org.mycore.oai.set.MCROAISolrSetHandler;
 import org.mycore.oai.set.MCRSet;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -86,7 +88,11 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
-            QueryResponse response = solrClient.query(query);
+            QueryRequest queryRequest = new QueryRequest(query);
+            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            QueryResponse response = queryRequest.process(solrClient);
+
             SolrDocumentList results = response.getResults();
             if (!results.isEmpty()) {
                 return Optional.of(toHeader(results.getFirst(), getSetResolver(results)));
@@ -151,7 +157,10 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
-        QueryResponse response = solrClient.query(query);
+        QueryRequest queryRequest = new QueryRequest(query);
+        MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        QueryResponse response = queryRequest.process(solrClient);
         Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
         return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
     }
@@ -255,7 +264,10 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         params.add(CommonParams.ROWS, "1");
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
-            QueryResponse response = solrClient.query(params);
+            QueryRequest queryRequest = new QueryRequest(params);
+            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            QueryResponse response = queryRequest.process(solrClient);
             SolrDocumentList list = response.getResults();
             if (list.size() >= 1) {
                 Date date = (Date) list.getFirst().getFieldValue(fieldName);

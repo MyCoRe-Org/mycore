@@ -28,11 +28,13 @@ import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.Set;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -63,7 +65,10 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         QueryResponse response;
         try {
-            response = solrClient.query(getQuery());
+            QueryRequest queryRequest = new QueryRequest(getQuery());
+            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            response = queryRequest.process(solrClient);
         } catch (SolrServerException | IOException e) {
             throw new MCRException("Error while getting set membership.", e);
         }

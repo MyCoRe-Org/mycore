@@ -47,6 +47,12 @@ public class MCRSolrCore {
 
     protected String name;
 
+    protected String configSet;
+
+    protected int shardCount;
+
+    // todo: maybe add support for replicaCount and compositeId if required
+
     protected HttpSolrClient solrClient;
 
     protected ConcurrentUpdateSolrClient concurrentClient;
@@ -69,7 +75,7 @@ public class MCRSolrCore {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
         int i = serverURL.lastIndexOf("/") + 1;
-        setup(serverURL.substring(0, i), serverURL.substring(i));
+        setup(serverURL.substring(0, i), serverURL.substring(i), null, -1);
     }
 
     /**
@@ -81,15 +87,33 @@ public class MCRSolrCore {
      *            name of the core e.g. docportal
      */
     public MCRSolrCore(String serverURL, String name) {
-        setup(serverURL, name);
+        setup(serverURL, name, null, -1);
     }
 
-    protected void setup(String serverURL, String name) {
+    /**
+     * Creates a new solr server core instance.
+     *
+     * @param serverURL
+     *            base url of the solr server e.g. http://localhost:8296
+     * @param name
+     *            name of the core e.g. docportal
+     * @param configSet
+     *            name of the config set
+     * @param shardCount
+     *            number of shards
+     */
+    MCRSolrCore(String serverURL, String name, String configSet, int shardCount) {
+        setup(serverURL, name, configSet, shardCount);
+    }
+
+    protected void setup(String serverURL, String name, String configSet, int shardCount) {
         if (!serverURL.endsWith("/")) {
             serverURL += "/";
         }
         this.serverURL = serverURL;
         this.name = name;
+        this.configSet = configSet;
+        this.shardCount = shardCount;
         String coreURL = getV1CoreURL();
         int connectionTimeout = MCRConfiguration2
             .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout", Integer::parseInt);
@@ -182,6 +206,22 @@ public class MCRSolrCore {
      */
     public SolrClient getConcurrentClient() {
         return concurrentClient != null ? concurrentClient : solrClient;
+    }
+
+    /**
+     * Returns the ConfigSet assigned in the properties
+     * @return the ConfigSet
+     */
+    public String getConfigSet() {
+        return configSet;
+    }
+
+    /**
+     * Returns the shard count assigned in the properties
+     * @return the shard count
+     */
+    public int getShardCount() {
+        return shardCount;
     }
 
 }

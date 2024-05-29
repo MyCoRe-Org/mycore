@@ -35,6 +35,7 @@ import java.util.UUID;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -57,6 +58,7 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -297,7 +299,11 @@ public class MCRClassificationEditorResource {
         String configQuery = MCRConfiguration2.getString("MCR.Solr.linkQuery").orElse("category.top:{0}");
         String query = new MessageFormat(configQuery, Locale.ROOT).format(new String[] { id.replaceAll(":", "\\\\:") });
         params.set("q", query);
-        QueryResponse solrResponse = solrClient.query(params);
+        QueryRequest queryRequest = new QueryRequest(params);
+        MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        QueryResponse solrResponse = queryRequest.process(solrClient);
+
         SolrDocumentList solrResults = solrResponse.getResults();
         // build json response
         JsonObject response = new JsonObject();

@@ -26,6 +26,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 
@@ -79,6 +80,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     protected UpdateRequest getUpdateRequest(String path) {
         UpdateRequest req = path != null ? new UpdateRequest(path) : new UpdateRequest();
+        MCRSolrAuthenticationHelper.addAuthentication(req, MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
         req.setCommitWithin(getCommitWithin());
         return req;
     }

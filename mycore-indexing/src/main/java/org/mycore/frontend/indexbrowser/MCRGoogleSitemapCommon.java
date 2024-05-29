@@ -36,6 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -43,6 +44,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
+import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 
 /**
@@ -174,7 +176,10 @@ public final class MCRGoogleSitemapCommon {
         query.setParam("fl", "id,modified");
 
         try {
-            response = MCRSolrClientFactory.getMainSolrClient().query(query);
+            QueryRequest queryRequest = new QueryRequest(query);
+            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
+                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            response = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
             objidlist = response.getResults().stream().map((document) -> {
                 String id = (String) document.getFieldValue("id");
                 Date modified = (Date) document.getFieldValue("modified");
