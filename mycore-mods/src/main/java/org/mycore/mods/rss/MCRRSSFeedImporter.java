@@ -54,9 +54,10 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -97,6 +98,8 @@ import com.rometools.rome.io.XmlReader;
  */
 public class MCRRSSFeedImporter {
 
+    protected final MCRSolrAuthenticationFactory solrAuthenticationFactory;
+
     private String sourceSystemID;
 
     private String feedURL;
@@ -122,6 +125,7 @@ public class MCRRSSFeedImporter {
 
     public MCRRSSFeedImporter(String sourceSystemID) {
         this.sourceSystemID = sourceSystemID;
+        this.solrAuthenticationFactory = MCRSolrAuthenticationFactory.getInstance();
 
         String prefix = "MCR.MODS.RSSFeedImporter." + sourceSystemID + ".";
 
@@ -222,8 +226,8 @@ public class MCRRSSFeedImporter {
         SolrDocumentList results;
         try {
             QueryRequest queryRequest = new QueryRequest(query);
-            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            solrAuthenticationFactory.addAuthentication(queryRequest,
+                MCRSolrAuthenticationLevel.SEARCH);
             results = queryRequest.process(solrClient).getResults();
 
             return (results.getNumFound() > 0);

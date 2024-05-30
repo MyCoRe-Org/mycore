@@ -35,8 +35,9 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
 import org.mycore.frontend.idmapper.MCRIDMapper;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * implementation of an MCRIDMapper
@@ -99,8 +100,8 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 QueryResponse solrResponse = null;
                 try {
                     QueryRequest queryRequest = new QueryRequest(params);
-                    MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                        MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                        MCRSolrAuthenticationLevel.SEARCH);
                     solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {
                     LOGGER.error("Error retrieving object id from SOLR", e);
@@ -144,8 +145,8 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 QueryResponse solrResponse = null;
                 try {
                     QueryRequest queryRequest = new QueryRequest(params);
-                    MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                        MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                        MCRSolrAuthenticationLevel.SEARCH);
                     solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {
                     LOGGER.error("Error retrieving derivate id from SOLR", e);

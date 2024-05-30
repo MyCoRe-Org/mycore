@@ -36,8 +36,9 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.cronjob.MCRCronjob;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
 
 /**
@@ -46,6 +47,9 @@ import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
 public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    protected static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY =
+            MCRSolrAuthenticationFactory.getInstance();
 
     @Override
     public String getDescription() {
@@ -78,8 +82,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                 params.set("q", query);
 
                 QueryRequest queryRequest = new QueryRequest(params);
-                MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                    MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+                SOLR_AUTHENTICATION_FACTORY.addAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 solrResponse
                     .getResults()

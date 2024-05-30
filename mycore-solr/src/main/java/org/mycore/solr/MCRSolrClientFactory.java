@@ -91,13 +91,22 @@ public final class MCRSolrClientFactory {
 
         String configSetTemplate = MCRConfiguration2.getString(configSetTemplateKey).orElse(null);
 
-        Integer shardCount = MCRConfiguration2.getInt(shardCountKey).orElse(-1);
+        Integer shardCount = MCRConfiguration2.getInt(shardCountKey).orElse(1);
 
         return new MCRSolrCore(coreServer, coreName, configSetTemplate, shardCount);
     }
 
     public static MCRSolrCore addCore(String server, String coreName, String coreID) {
-        final MCRSolrCore core = new MCRSolrCore(server, coreName);
+       return addCore(server, coreName, null, 1, coreID);
+    }
+
+    public static MCRSolrCore addCore(String server, String coreName, String configSetName, String coreID) {
+        return addCore(server, coreName, configSetName, 1, coreID);
+    }
+
+    public static MCRSolrCore addCore(String server, String coreName, String configSetName, Integer shards,
+                                      String coreID) {
+        final MCRSolrCore core = new MCRSolrCore(server, coreName, configSetName, shards);
         CORE_MAP.put(coreID, core);
         return core;
     }

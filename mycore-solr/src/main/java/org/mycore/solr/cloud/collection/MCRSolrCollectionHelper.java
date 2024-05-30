@@ -19,7 +19,6 @@
 package org.mycore.solr.cloud.collection;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,49 +26,49 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.mycore.common.MCRException;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
-import org.mycore.solr.MCRSolrHttpHelper;
+import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
+/**
+ * Provides helper methods for working with Solr collections (cores).
+ */
 public class MCRSolrCollectionHelper {
 
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static void createCollection(URI solrServerURL,
-        String collectionName,
-        String configSetName,
-        int numShards) throws SolrServerException, IOException {
-
+    public static void createCollection(MCRSolrCore core) throws SolrServerException, IOException {
         CollectionAdminRequest.Create collectionCreateRequest = CollectionAdminRequest
-                .createCollection(collectionName, configSetName, numShards == -1 ? 1 : numShards, null, null, null);
-        MCRSolrAuthenticationHelper.addAuthentication(collectionCreateRequest,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+            .createCollection(core.getName(), core.buildRemoteConfigSetName(), core.getShardCount(), null, null, null);
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(collectionCreateRequest,
+            MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionCreateRequest
-                .process(MCRSolrHttpHelper.getSolrClient(solrServerURL));
+            .process(core.getBaseClient());
 
         if(!collectionAdminResponse.isSuccess()){
-            throw new MCRException("Error creating collection " + collectionName + ": " +
+            throw new MCRException("Error creating collection " + core.getName() + ": " +
                     collectionAdminResponse.getErrorMessages());
         }
 
-        LOGGER.info("Collection {} created.", collectionName);
+        LOGGER.info("Collection {} created.", core.getName());
     }
 
-    public static void removeCollection(URI solrServerURL, String collectionName) throws SolrServerException,
+    public static void removeCollection(MCRSolrCore core) throws SolrServerException,
             IOException {
-        CollectionAdminRequest.Delete collectionDeleteReq = CollectionAdminRequest.deleteCollection(collectionName);
-        MCRSolrAuthenticationHelper.addAuthentication(collectionDeleteReq,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        CollectionAdminRequest.Delete collectionDeleteReq = CollectionAdminRequest.deleteCollection(core.getName());
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(collectionDeleteReq,
+            MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionDeleteReq
-                .process(MCRSolrHttpHelper.getSolrClient(solrServerURL));
+            .process(core.getBaseClient());
 
 
         if(!collectionAdminResponse.isSuccess()){
-            throw new MCRException("Error creating collection " + collectionName + ": " +
+            throw new MCRException("Error creating collection " + core.getName() + ": " +
                     collectionAdminResponse.getErrorMessages());
         }
 
-        LOGGER.info("Collection {} deleted.", collectionName);
+        LOGGER.info("Collection {} deleted.", core.getName());
     }
 
 }

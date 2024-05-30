@@ -64,9 +64,10 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.http.MCRIdleConnectionMonitorThread;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.xml.sax.SAXException;
 
 import jakarta.servlet.ServletException;
@@ -106,6 +107,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public static final String QUERY_HANDLER_PAR_NAME = "qt";
 
     public static final String QUERY_CORE_PARAMETER = "core";
+
+    public static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY =
+            MCRSolrAuthenticationFactory.getInstance();
 
     private static int MAX_CONNECTIONS = MCRConfiguration2
         .getOrThrow(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections", Integer::parseInt);
@@ -230,8 +234,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
             Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
 
-        MCRSolrAuthenticationHelper.addAuthentication(solrHttpMethod,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        SOLR_AUTHENTICATION_FACTORY.addAuthentication(solrHttpMethod, MCRSolrAuthenticationLevel.SEARCH);
 
         try {
             LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());

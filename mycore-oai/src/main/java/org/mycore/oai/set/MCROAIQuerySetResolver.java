@@ -34,9 +34,10 @@ import org.apache.solr.common.SolrDocument;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.Set;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * Fires <code>{OAIPrefix}.Sets.{SetID}.Query</code> and limits results to the <code>id</code>s of the
@@ -66,8 +67,8 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
         QueryResponse response;
         try {
             QueryRequest queryRequest = new QueryRequest(getQuery());
-            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                MCRSolrAuthenticationLevel.SEARCH);
             response = queryRequest.process(solrClient);
         } catch (SolrServerException | IOException e) {
             throw new MCRException("Error while getting set membership.", e);

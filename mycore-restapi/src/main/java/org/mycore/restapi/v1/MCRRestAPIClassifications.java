@@ -49,9 +49,10 @@ import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -493,8 +494,8 @@ public class MCRRestAPIClassifications {
             solrQquery.setRows(0);
             try {
                 QueryRequest queryRequest = new QueryRequest(solrQquery);
-                MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                    MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+                MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                    MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse response = queryRequest.process(solrClient);
                 SolrDocumentList solrResults = response.getResults();
                 if (solrResults.getNumFound() == 0) {

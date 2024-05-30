@@ -54,7 +54,8 @@ public class MCRSolrCloudCommands {
         help = "displays the names of the config sets on the remote Solr server",
         order = 10)
     public static void listRemoteConfig() throws URISyntaxException, IOException, SolrServerException {
-        List<String> configSetNames = MCRSolrConfigSetHelper.getRemoteConfigSetNames(getSolrServerURL());
+        List<String> configSetNames = MCRSolrConfigSetHelper
+                .getRemoteConfigSetNames(MCRSolrClientFactory.getMainSolrCore());
 
         for (String configSetName : configSetNames) {
             LOGGER.info("Remote ConfigSet: {}", configSetName);
@@ -86,11 +87,7 @@ public class MCRSolrCloudCommands {
     public static void deleteRemoteConfig(String localCoreName) throws URISyntaxException {
         MCRSolrCore core = MCRSolrClientFactory.get(localCoreName)
                 .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(localCoreName));
-        String localConfigSetName = core.getConfigSet();
-        String coreName = core.getName();
-        String remoteConfigSetName = MCRSolrConfigSetHelper.buildRemoteConfigSetName(coreName, localConfigSetName);
-        MCRSolrConfigSetHelper.deleteConfigSetFromRemoteSolrServer(
-                getSolrServerURL(), remoteConfigSetName);
+        MCRSolrConfigSetHelper.deleteConfigSetFromRemoteSolrServer(core);
     }
 
     @MCRCommand(
@@ -109,12 +106,7 @@ public class MCRSolrCloudCommands {
             return;
         }
 
-        String remoteCoreName = core.getName();
-        String remoteConfigSetName = MCRSolrConfigSetHelper.buildRemoteConfigSetName(remoteCoreName,
-                localConfigSetName);
-
-        MCRSolrConfigSetHelper.transferConfigSetToRemoteSolrServer(getSolrServerURL(),
-                remoteConfigSetName, configSet);
+        MCRSolrConfigSetHelper.transferConfigSetToRemoteSolrServer(core);
     }
 
 
@@ -127,14 +119,8 @@ public class MCRSolrCloudCommands {
             throws URISyntaxException, SolrServerException, IOException {
         MCRSolrCore core = MCRSolrClientFactory.get(localCoreName)
                 .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(localCoreName));
-        String localConfigSetName = core.getConfigSet();
-        String remoteCoreName = core.getName();
 
-        String remoteConfigSetName = MCRSolrConfigSetHelper.buildRemoteConfigSetName(remoteCoreName,
-                localConfigSetName);
-
-        MCRSolrCollectionHelper.createCollection(getSolrServerURL(), remoteCoreName, remoteConfigSetName,
-            core.getShardCount());
+        MCRSolrCollectionHelper.createCollection(core);
     }
 
     private static URI getSolrServerURL() throws URISyntaxException {
@@ -148,7 +134,9 @@ public class MCRSolrCloudCommands {
         order = 70)
     public static void removeCollection(String collectionName) throws URISyntaxException, SolrServerException,
             IOException {
-        MCRSolrCollectionHelper.removeCollection(getSolrServerURL(), collectionName);
+        MCRSolrCore core = MCRSolrClientFactory.get(collectionName)
+                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(collectionName));
+        MCRSolrCollectionHelper.removeCollection(core);
     }
 
 }

@@ -35,7 +35,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRUtils;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.cs.MCRSolrPathContentStream;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
@@ -67,8 +67,8 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         }
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(SOLR_EXTRACT_PATH);
-        MCRSolrAuthenticationHelper.addAuthentication(updateRequest,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+        getSolrAuthenticationFactory().addAuthentication(updateRequest,
+            MCRSolrAuthenticationLevel.INDEX);
         try (MCRSolrPathContentStream stream = getStream()) {
             updateRequest.addContentStream(stream);
 

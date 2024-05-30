@@ -32,15 +32,16 @@ import javax.xml.transform.URIResolver;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrHttpHelper;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.search.MCRSolrURL;
 
 /**
@@ -114,19 +115,22 @@ public class MCRSolrQueryResolver implements URIResolver {
 
                 try {
                     HttpGet get = new HttpGet(solrURL.getUrl().toURI());
-                    MCRSolrAuthenticationHelper.addAuthentication(get,
-                            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(get,
+                            MCRSolrAuthenticationLevel.SEARCH);
 
-                    try(CloseableHttpClient httpClient = MCRSolrHttpHelper.createHttpClient();
-                        CloseableHttpResponse response = httpClient.execute(get)) {
+                    try {
+                        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+                        try(CloseableHttpClient httpClient = clientBuilder.build();
+                            CloseableHttpResponse response = httpClient.execute(get)) {
 
-                        if(response.getStatusLine().getStatusCode() != 200) {
-                           throw new MCRException("Error while executing request: " + response.getStatusLine());
+                            if(response.getStatusLine().getStatusCode() != 200) {
+                               throw new MCRException("Error while executing request: " + response.getStatusLine());
+                            }
+
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            response.getEntity().getContent().transferTo(byteArrayOutputStream);
+                            return new MCRByteContent(byteArrayOutputStream.toByteArray()).getSource();
                         }
-
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        response.getEntity().getContent().transferTo(byteArrayOutputStream);
-                        return new MCRByteContent(byteArrayOutputStream.toByteArray()).getSource();
                     } catch (IOException e) {
                         throw new MCRException("Error while executing request", e);
                     }

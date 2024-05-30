@@ -21,6 +21,7 @@ package org.mycore.solr;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,11 +50,13 @@ public class MCRSolrCore {
 
     protected String configSet;
 
-    protected int shardCount;
+    protected Integer shardCount;
 
     // todo: maybe add support for replicaCount and compositeId if required
 
     protected HttpSolrClient solrClient;
+
+    protected HttpSolrClient baseSolrClient;
 
     protected ConcurrentUpdateSolrClient concurrentClient;
 
@@ -75,7 +78,7 @@ public class MCRSolrCore {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
         int i = serverURL.lastIndexOf("/") + 1;
-        setup(serverURL.substring(0, i), serverURL.substring(i), null, -1);
+        setup(serverURL.substring(0, i), serverURL.substring(i), null, 1);
     }
 
     /**
@@ -87,7 +90,7 @@ public class MCRSolrCore {
      *            name of the core e.g. docportal
      */
     public MCRSolrCore(String serverURL, String name) {
-        setup(serverURL, name, null, -1);
+        setup(serverURL, name, null, 1);
     }
 
     /**
@@ -102,18 +105,18 @@ public class MCRSolrCore {
      * @param shardCount
      *            number of shards
      */
-    MCRSolrCore(String serverURL, String name, String configSet, int shardCount) {
+    MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount) {
         setup(serverURL, name, configSet, shardCount);
     }
 
-    protected void setup(String serverURL, String name, String configSet, int shardCount) {
+    protected void setup(String serverURL, String name, String configSet, Integer shardCount) {
         if (!serverURL.endsWith("/")) {
             serverURL += "/";
         }
         this.serverURL = serverURL;
         this.name = name;
         this.configSet = configSet;
-        this.shardCount = shardCount;
+        this.shardCount = Objects.requireNonNull(shardCount, "shardCount must not be null");
         String coreURL = getV1CoreURL();
         int connectionTimeout = MCRConfiguration2
             .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout", Integer::parseInt);
@@ -126,6 +129,13 @@ public class MCRSolrCore {
             .withSocketTimeout(socketTimeout)
             .build();
         solrClient.setRequestWriter(new BinaryRequestWriter());
+
+        baseSolrClient = new HttpSolrClient.Builder(getServerURL() + "solr/")
+                .withConnectionTimeout(connectionTimeout)
+                .withSocketTimeout(socketTimeout)
+                .build();
+        baseSolrClient.setRequestWriter(new BinaryRequestWriter());
+
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
             int queueSize = MCRConfiguration2
@@ -167,6 +177,12 @@ public class MCRSolrCore {
             LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
+            shutdownGracefully(baseSolrClient);
+            baseSolrClient = null;
+        } catch (SolrServerException | IOException e) {
+            LOGGER.error("Error while shutting down SOLR client.", e);
+        }
+        try {
             shutdownGracefully(concurrentClient);
             concurrentClient = null;
         } catch (SolrServerException | IOException e) {
@@ -202,6 +218,17 @@ public class MCRSolrCore {
     }
 
     /**
+     * Returns the base solr client instance, without core information. Use this for admin operations.
+     */
+    public HttpSolrClient getBaseClient() {
+        return baseSolrClient;
+    }
+
+    public String buildRemoteConfigSetName() {
+        return this.getName() + "_" + this.getConfigSet();
+    }
+
+    /**
      * Returns the concurrent solr client instance. Use this for indexing.
      */
     public SolrClient getConcurrentClient() {
@@ -220,7 +247,7 @@ public class MCRSolrCore {
      * Returns the shard count assigned in the properties
      * @return the shard count
      */
-    public int getShardCount() {
+    public Integer getShardCount() {
         return shardCount;
     }
 

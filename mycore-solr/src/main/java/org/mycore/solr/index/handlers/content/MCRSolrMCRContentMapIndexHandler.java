@@ -33,8 +33,8 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
@@ -93,8 +93,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                 documents = debugList.iterator();
             }
             UpdateRequest req = new UpdateRequest();
-            MCRSolrAuthenticationHelper.addAuthentication(req,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+            getSolrAuthenticationFactory().addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
 
             if (solrClient instanceof HttpSolrClient) {
                 req.setDocIterator(documents);

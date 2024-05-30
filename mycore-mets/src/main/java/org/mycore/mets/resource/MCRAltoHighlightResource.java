@@ -28,8 +28,9 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -95,6 +96,9 @@ import jakarta.ws.rs.core.Response;
 @Path("/alto/highlight")
 public class MCRAltoHighlightResource {
 
+    protected static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY
+            = MCRSolrAuthenticationFactory.getInstance();
+
     @GET
     @Path("{derivateId}")
     @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
@@ -113,8 +117,7 @@ public class MCRAltoHighlightResource {
         p.set("hl.maxAnalyzedChars", Integer.MAX_VALUE - 1);
         try {
             QueryRequest queryRequest = new QueryRequest(p);
-            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            SOLR_AUTHENTICATION_FACTORY.addAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
             JsonArray response = buildQueryResponse(solrResponse.getHighlighting());
             return Response.ok().entity(new Gson().toJson(response)).build();

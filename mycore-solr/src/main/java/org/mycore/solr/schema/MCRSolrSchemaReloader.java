@@ -42,10 +42,11 @@ import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
@@ -60,6 +61,9 @@ import com.google.gson.JsonParser;
  * @author Jens Kupferschmidt
  */
 public class MCRSolrSchemaReloader {
+    private static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY =
+            MCRSolrAuthenticationFactory.getInstance();
+
     private static Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
 
     private static String SOLR_SCHEMA_UPDATE_FILE_NAME = "solr-schema.json";
@@ -104,15 +108,15 @@ public class MCRSolrSchemaReloader {
     private static void deleteFieldTypes(SolrClient solrClient)
         throws SolrServerException, IOException {
         SchemaRequest.FieldTypes fieldTypesReq = new SchemaRequest.FieldTypes();
-        MCRSolrAuthenticationHelper.addAuthentication(fieldTypesReq,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        SOLR_AUTHENTICATION_FACTORY.addAuthentication(fieldTypesReq,
+            MCRSolrAuthenticationLevel.ADMIN);
         for (FieldTypeRepresentation fieldType : fieldTypesReq.process(solrClient).getFieldTypes()) {
             String fieldTypeName = fieldType.getAttributes().get("name").toString();
             if (!SOLR_DEFAULT_FIELDTYPES.contains(fieldTypeName)) {
                 LOGGER.debug("remove SOLR FieldType " + fieldTypeName);
                 SchemaRequest.DeleteFieldType delField = new SchemaRequest.DeleteFieldType(fieldTypeName);
-                MCRSolrAuthenticationHelper.addAuthentication(delField,
-                    MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+                SOLR_AUTHENTICATION_FACTORY.addAuthentication(delField,
+                    MCRSolrAuthenticationLevel.ADMIN);
                 delField.process(solrClient);
             }
         }
@@ -121,14 +125,14 @@ public class MCRSolrSchemaReloader {
     private static void deleteDynamicFields(SolrClient solrClient)
         throws SolrServerException, IOException {
         SchemaRequest.DynamicFields dynFieldsReq = new SchemaRequest.DynamicFields();
-        MCRSolrAuthenticationHelper.addAuthentication(dynFieldsReq,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        SOLR_AUTHENTICATION_FACTORY.addAuthentication(dynFieldsReq,
+            MCRSolrAuthenticationLevel.ADMIN);
         for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
             String fieldName = field.get("name").toString();
             LOGGER.debug("remove SOLR DynamicField " + fieldName);
             SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
-            MCRSolrAuthenticationHelper.addAuthentication(delField,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+            SOLR_AUTHENTICATION_FACTORY.addAuthentication(delField,
+                MCRSolrAuthenticationLevel.ADMIN);
             delField.process(solrClient);
 
         }
@@ -137,14 +141,14 @@ public class MCRSolrSchemaReloader {
     private static void deleteFields(SolrClient solrClient)
         throws SolrServerException, IOException {
         SchemaRequest.Fields fieldsReq = new SchemaRequest.Fields();
-        MCRSolrAuthenticationHelper.addAuthentication(fieldsReq, MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        SOLR_AUTHENTICATION_FACTORY.addAuthentication(fieldsReq, MCRSolrAuthenticationLevel.ADMIN);
         for (Map<String, Object> field : fieldsReq.process(solrClient).getFields()) {
             String fieldName = field.get("name").toString();
             if (!SOLR_DEFAULT_FIELDS.contains(fieldName)) {
                 LOGGER.debug("remove SOLR Field " + fieldName);
                 SchemaRequest.DeleteField delField = new SchemaRequest.DeleteField(fieldName);
-                MCRSolrAuthenticationHelper.addAuthentication(delField,
-                    MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+                SOLR_AUTHENTICATION_FACTORY.addAuthentication(delField,
+                    MCRSolrAuthenticationLevel.ADMIN);
                 delField.process(solrClient);
             }
         }
@@ -153,16 +157,16 @@ public class MCRSolrSchemaReloader {
     private static void deleteCopyFields(SolrClient solrClient)
         throws SolrServerException, IOException {
         SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
-        MCRSolrAuthenticationHelper.addAuthentication(copyFieldsReq,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        SOLR_AUTHENTICATION_FACTORY.addAuthentication(copyFieldsReq,
+            MCRSolrAuthenticationLevel.ADMIN);
         for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {
             String fieldSrc = copyField.get("source").toString();
             List<String> fieldDest = new ArrayList<>();
             fieldDest.add(copyField.get("dest").toString());
             LOGGER.debug("remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.getFirst());
             SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
-            MCRSolrAuthenticationHelper.addAuthentication(delCopyField,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+            SOLR_AUTHENTICATION_FACTORY.addAuthentication(delCopyField,
+                MCRSolrAuthenticationLevel.ADMIN);
             delCopyField.process(solrClient);
         }
     }
@@ -196,8 +200,8 @@ public class MCRSolrSchemaReloader {
                     String command = e.toString();
 
                     HttpPost post = new HttpPost(solrCore.getV1CoreURL() + "/schema");
-                    MCRSolrAuthenticationHelper.addAuthentication(post,
-                        MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+                    SOLR_AUTHENTICATION_FACTORY.addAuthentication(post,
+                        MCRSolrAuthenticationLevel.ADMIN);
                     post.setHeader("Content-type", "application/json");
                     post.setEntity(new StringEntity(command));
                     String commandprefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))

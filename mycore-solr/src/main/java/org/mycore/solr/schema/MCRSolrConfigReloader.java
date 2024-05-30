@@ -46,10 +46,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
@@ -224,7 +225,7 @@ public class MCRSolrConfigReloader {
      */
     private static void executeSolrCommand(String coreURL, JsonObject command) throws UnsupportedEncodingException {
         HttpPost post = new HttpPost(coreURL + "/config");
-        MCRSolrAuthenticationHelper.addAuthentication(post, MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(post, MCRSolrAuthenticationLevel.ADMIN);
         post.setHeader("Content-type", "application/json");
         post.setEntity(new StringEntity(command.toString()));
         String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
@@ -268,7 +269,7 @@ public class MCRSolrConfigReloader {
      */
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
         HttpGet getConfig = new HttpGet(coreURL + "/config");
-        MCRSolrAuthenticationHelper.addAuthentication(getConfig, MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
         return getJSON(getConfig);
     }
 
@@ -279,7 +280,7 @@ public class MCRSolrConfigReloader {
      */
     private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
         HttpGet getConfig = new HttpGet(coreURL + "/config/overlay");
-        MCRSolrAuthenticationHelper.addAuthentication(getConfig, MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
         return getJSON(getConfig);
     }
 

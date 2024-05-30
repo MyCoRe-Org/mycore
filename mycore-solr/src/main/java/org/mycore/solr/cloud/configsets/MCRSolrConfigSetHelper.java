@@ -20,7 +20,6 @@ package org.mycore.solr.cloud.configsets;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
@@ -36,12 +35,10 @@ import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
-import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrHttpHelper;
-import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * Provides helper methods for working with Solr configuration sets.
@@ -57,18 +54,17 @@ public class MCRSolrConfigSetHelper {
 
     /**
      * Fetches the list of config sets from the remote Solr server using the v2 API.
-     * @param solrServerURL The URL of the Solr server.
-     * @return A list of config set names.
+     * @param core The core for which the config sets should be fetched.
      * @throws URISyntaxException If the URL is invalid.
      * @throws IOException If an error occurs while fetching the config sets.
      */
-    public static List<String> getRemoteConfigSetNames(URI solrServerURL) throws URISyntaxException, IOException,
+    public static List<String> getRemoteConfigSetNames(MCRSolrCore core) throws URISyntaxException, IOException,
             SolrServerException {
         ConfigSetAdminRequest.List listRequest = new ConfigSetAdminRequest.List();
-        MCRSolrAuthenticationHelper.addAuthentication(listRequest,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(listRequest,
+            MCRSolrAuthenticationLevel.ADMIN);
 
-        SolrClient solrClient = MCRSolrHttpHelper.getSolrClient(solrServerURL);
+        SolrClient solrClient = core.getBaseClient();
         ConfigSetAdminResponse.List listRequestResponse = listRequest.process(solrClient);
         return listRequestResponse.getConfigSets();
     }
@@ -99,15 +95,13 @@ public class MCRSolrConfigSetHelper {
 
     /**
      * Transfers a config set to the remote Solr server.
-     * @param solrServerURL The URL of the Solr server.
-     * @param remoteName The name of the config set.
-     * @param configSetProvider The config set provider.
+     * @param core The core for which the config set should be transferred.
      */
-    public static void transferConfigSetToRemoteSolrServer(URI solrServerURL,
-        String remoteName,
-        MCRSolrConfigSetProvider configSetProvider) throws SolrServerException, IOException {
+    public static void transferConfigSetToRemoteSolrServer(MCRSolrCore core) throws SolrServerException, IOException {
+        String remoteName = core.buildRemoteConfigSetName();
+
         try {
-            List<String> remoteConfigSetNames = getRemoteConfigSetNames(solrServerURL);
+            List<String> remoteConfigSetNames = getRemoteConfigSetNames(core);
             if (remoteConfigSetNames.contains(remoteName)) {
                 throw new MCRConfigurationException("Config set " + remoteName + " already exists on the " +
                     "remote Solr server.");
@@ -118,10 +112,10 @@ public class MCRSolrConfigSetHelper {
         }
 
         ConfigSetAdminRequest.Upload request = new ConfigSetAdminRequest.Upload();
-        MCRSolrAuthenticationHelper.addAuthentication(request,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
-
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(request, MCRSolrAuthenticationLevel.ADMIN);
         request.setConfigSetName(remoteName);
+
+        MCRSolrConfigSetProvider configSetProvider = getLocalConfigSets().get(core.getConfigSet());
 
         request.setUploadStream(new ContentStreamBase() {
             @Override
@@ -135,7 +129,7 @@ public class MCRSolrConfigSetHelper {
             }
         });
 
-        ConfigSetAdminResponse uploadResponse = request.process(MCRSolrHttpHelper.getSolrClient(solrServerURL));
+        ConfigSetAdminResponse uploadResponse = request.process(core.getBaseClient());
 
         if (uploadResponse.getStatus() != 0) {
             throw new MCRConfigurationException("Error while transferring config set to remote Solr server. " +
@@ -148,18 +142,17 @@ public class MCRSolrConfigSetHelper {
 
     /**
      * Deletes a config set from the remote Solr server.
-     * @param solrServerURL The URL of the Solr server.
-     * @param name The name of the config set.
+     * @param core The core for which the config set should be deleted.
      */
-    public static void deleteConfigSetFromRemoteSolrServer(URI solrServerURL, String name) {
+    public static void deleteConfigSetFromRemoteSolrServer(MCRSolrCore core) {
         ConfigSetAdminRequest.Delete request = new ConfigSetAdminRequest.Delete();
-        MCRSolrAuthenticationHelper.addAuthentication(request,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(request,
+            MCRSolrAuthenticationLevel.ADMIN);
 
-        request.setConfigSetName(name);
+        request.setConfigSetName(core.buildRemoteConfigSetName());
 
         try {
-            ConfigSetAdminResponse deleteResponse = request.process(MCRSolrHttpHelper.getSolrClient(solrServerURL));
+            ConfigSetAdminResponse deleteResponse = request.process(core.getBaseClient());
             if (deleteResponse.getStatus() != 0) {
                 throw new MCRConfigurationException("Error while deleting config set from remote Solr server. " +
                     "Status code: " + deleteResponse.getStatus() + "\n  " + deleteResponse.getErrorMessages());
@@ -168,33 +161,9 @@ public class MCRSolrConfigSetHelper {
             throw new MCRConfigurationException("Error while deleting config set from remote Solr server.", e);
         }
 
-        LOGGER.info("Config set {} deleted from remote Solr server.", name);
+        LOGGER.info("Config set {} deleted from remote Solr server.", core.getConfigSet());
     }
 
-    /**
-     * Returns the config set which is configured for a specific core.
-     * @param configCoreName The name of the core.
-     * @return The name of the config set.
-     */
-    public static String getConfigSetForCore(String configCoreName) {
-        MCRSolrCore core = MCRSolrClientFactory.get(configCoreName)
-                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(configCoreName));
-        return core.getConfigSet();
-    }
 
-    /**
-     * When a config set is uploaded to the remote Solr server, it is stored under a name that is a combination of the
-     * core name and the local config set name. This method constructs the name of the remote config set.
-     * This is required because the schema API is used to configure the core further, and it does not modify only the
-     * core's configuration, but also the configuration of the config set. Therefore, the config set must be uniquely
-     * identifiable.
-     *
-     * @param remoteCoreName The name of the core on the remote Solr server.
-     * @param localConfigSetName The name of the local config set.
-     * @return The name of the remote config set.
-     */
-    public static String buildRemoteConfigSetName(String remoteCoreName, String localConfigSetName) {
-        return remoteCoreName + "_" + localConfigSetName;
-    }
 
 }

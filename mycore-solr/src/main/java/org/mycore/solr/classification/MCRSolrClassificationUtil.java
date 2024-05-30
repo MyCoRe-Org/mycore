@@ -42,10 +42,11 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 import com.google.common.collect.Lists;
@@ -115,8 +116,8 @@ public abstract class MCRSolrClassificationUtil {
                     UpdateRequest req = new UpdateRequest();
                     req.add(part);
                     req.setCommitWithin(500);
-                    MCRSolrAuthenticationHelper.addAuthentication(req,
-                        MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+                        MCRSolrAuthenticationLevel.INDEX);
                     req.process(client);
                     added += part.size();
                     LOGGER.info("Added {}/{} documents", added, docNum);
@@ -134,8 +135,8 @@ public abstract class MCRSolrClassificationUtil {
         try {
             SolrClient solrClient = getCore().getConcurrentClient();
             UpdateRequest req = new UpdateRequest();
-            MCRSolrAuthenticationHelper.addAuthentication(req,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+            MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+                MCRSolrAuthenticationLevel.INDEX);
             req.deleteByQuery("*:*");
             req.process(solrClient);
         } catch (Exception exc) {
@@ -213,8 +214,8 @@ public abstract class MCRSolrClassificationUtil {
             try {
                 UpdateRequest req = new UpdateRequest();
                 req.add(solrCategory.toSolrDocument());
-                MCRSolrAuthenticationHelper.addAuthentication(req,
-                    MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+                MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+                    MCRSolrAuthenticationLevel.INDEX);
                 req.process(solrClient);
             } catch (Exception exc) {
                 LOGGER.error("Unable to reindex {}", category.getId(), exc);
@@ -223,8 +224,8 @@ public abstract class MCRSolrClassificationUtil {
         try {
             UpdateRequest commitRequest = new UpdateRequest();
             commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
-            MCRSolrAuthenticationHelper.addAuthentication(commitRequest,
-                    MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+            MCRSolrAuthenticationFactory.getInstance().addAuthentication(commitRequest,
+                    MCRSolrAuthenticationLevel.INDEX);
             commitRequest.process(solrClient);
         } catch (Exception exc) {
             LOGGER.error("Unable to commit reindexed categories", exc);
@@ -280,8 +281,8 @@ public abstract class MCRSolrClassificationUtil {
             toDelete.add(id.toString());
             UpdateRequest req = new UpdateRequest();
             req.deleteById(toDelete);
-            MCRSolrAuthenticationHelper.addAuthentication(req,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.INDEX);
+            MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+                MCRSolrAuthenticationLevel.INDEX);
             req.process(solrClient);
             // reindex parent
             if (parent != null) {

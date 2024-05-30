@@ -50,9 +50,10 @@ import org.mycore.oai.set.MCROAISetHandler;
 import org.mycore.oai.set.MCROAISetResolver;
 import org.mycore.oai.set.MCROAISolrSetHandler;
 import org.mycore.oai.set.MCRSet;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * Solr searcher implementation. Uses cursors.
@@ -89,8 +90,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
             QueryRequest queryRequest = new QueryRequest(query);
-            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
 
             SolrDocumentList results = response.getResults();
@@ -158,8 +159,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         QueryRequest queryRequest = new QueryRequest(query);
-        MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+            MCRSolrAuthenticationLevel.SEARCH);
         QueryResponse response = queryRequest.process(solrClient);
         Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
         return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
@@ -265,8 +266,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
             QueryRequest queryRequest = new QueryRequest(params);
-            MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-                MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+            MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
             SolrDocumentList list = response.getResults();
             if (list.size() >= 1) {

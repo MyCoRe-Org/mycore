@@ -58,8 +58,9 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.solr.MCRSolrAuthenticationHelper;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -109,6 +110,9 @@ public class MCRClassificationEditorResource {
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
     private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+
+    protected static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY
+            = MCRSolrAuthenticationFactory.getInstance();
 
     @Context
     UriInfo uriInfo;
@@ -300,8 +304,7 @@ public class MCRClassificationEditorResource {
         String query = new MessageFormat(configQuery, Locale.ROOT).format(new String[] { id.replaceAll(":", "\\\\:") });
         params.set("q", query);
         QueryRequest queryRequest = new QueryRequest(params);
-        MCRSolrAuthenticationHelper.addAuthentication(queryRequest,
-            MCRSolrAuthenticationHelper.AuthenticationLevel.SEARCH);
+        SOLR_AUTHENTICATION_FACTORY.addAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
         QueryResponse solrResponse = queryRequest.process(solrClient);
 
         SolrDocumentList solrResults = solrResponse.getResults();
