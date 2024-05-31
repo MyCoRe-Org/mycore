@@ -18,10 +18,7 @@
 
 package org.mycore.solr.commands;
 
-import static org.mycore.solr.MCRSolrConstants.DEFAULT_SOLR_SERVER_URL;
-
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -121,10 +118,6 @@ public class MCRSolrCloudCommands {
                 .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(localCoreName));
 
         MCRSolrCollectionHelper.createCollection(core);
-    }
-
-    private static URI getSolrServerURL() throws URISyntaxException {
-        return new URI(DEFAULT_SOLR_SERVER_URL + "/solr");
     }
 
     @MCRCommand(

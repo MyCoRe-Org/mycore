@@ -47,9 +47,6 @@ public class MCRSolrResourceConfigSetProvider extends MCRSolrConfigSetProvider {
 
     private String base;
 
-    public MCRSolrResourceConfigSetProvider() {
-    }
-
     public String getFilesString() {
         return filesString;
     }
@@ -110,7 +107,7 @@ public class MCRSolrResourceConfigSetProvider extends MCRSolrConfigSetProvider {
         StringBuilder dir = new StringBuilder();
         for (int i = 0; i < dirs.length - 1; i++) {
             dir.append(dirs[i]);
-            dir.append("/");
+            dir.append('/');
             if (!existingDirs.contains(dir.toString())) {
                 outputStream.putNextEntry(new ZipEntry(dir.toString()));
                 outputStream.closeEntry();

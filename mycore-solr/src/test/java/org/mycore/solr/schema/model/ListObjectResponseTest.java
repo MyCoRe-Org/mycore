@@ -33,6 +33,12 @@ import junit.framework.TestCase;
 @RunWith(Parameterized.class)
 public class ListObjectResponseTest extends TestCase {
 
+    @Parameterized.Parameter(0)
+    public String json;
+    
+    @Parameterized.Parameter(1)
+    public ListObjectResponse expected;
+
     @Parameterized.Parameters()
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
@@ -52,12 +58,6 @@ public class ListObjectResponseTest extends TestCase {
             }
         });
     }
-
-    @Parameterized.Parameter(0)
-    public String json;
-
-    @Parameterized.Parameter(1)
-    public ListObjectResponse expected;
 
     @Test
     public void testConfigSets() {

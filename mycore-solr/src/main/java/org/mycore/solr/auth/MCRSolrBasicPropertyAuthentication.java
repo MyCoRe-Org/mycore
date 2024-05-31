@@ -46,6 +46,10 @@ public class MCRSolrBasicPropertyAuthentication implements MCRSolrAuthentication
         this.level = level;
     }
 
+    public MCRSolrAuthenticationLevel getLevel() {
+        return level;
+    }
+
     @Override
     public void addAuthentication(SolrRequest<?> request) {
         request.setBasicAuthCredentials(username, password);
