@@ -550,6 +550,18 @@
     }
   },
   {
+    "add-field": {
+      "name": "tika_has_error",
+      "type": "boolean"
+    }
+  },
+  {
+    "add-field": {
+      "name": "tika_error_message",
+      "type": "string"
+    }
+  },
+  {
     "add-dynamic-field": {
       "name": "ignored_*",
       "type": "ignored"

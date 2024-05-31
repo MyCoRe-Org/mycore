@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -102,8 +101,8 @@ public abstract class MCRSolrIndexHandlerFactory {
             /* extract metadata with tika */
             indexHandler = new MCRSolrFileIndexHandler(file, attrs, solrClient);
         } else {
-            SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
-            indexHandler = new MCRSolrInputDocumentHandler(doc, solrClient);
+            indexHandler = new MCRSolrInputDocumentHandler(() ->
+                    MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs), solrClient, file.toString());
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);
