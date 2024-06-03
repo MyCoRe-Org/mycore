@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 public class MCRSimpleTikaMapperTest extends TestCase {
 
     public static final String X_TIKA_PARSED_BY = "X-TIKA:Parsed-By";
-    public static String TEST_JSON;
+    public String TEST_JSON;
 
     public MCRSimpleTikaMapperTest() {
         super();
