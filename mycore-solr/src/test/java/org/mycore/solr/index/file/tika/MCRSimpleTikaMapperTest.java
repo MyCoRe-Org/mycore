@@ -18,12 +18,18 @@
 
 package org.mycore.solr.index.file.tika;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.junit.Assert;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRException;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -33,51 +39,17 @@ import junit.framework.TestCase;
 
 public class MCRSimpleTikaMapperTest extends TestCase {
 
-    public final static String TEST_JSON
-        = """
-            {
-               "pdf:unmappedUnicodeCharsPerPage": "0",
-               "pdf:PDFVersion": "1.7",
-               "pdf:hasXFA": "false",
-               "access_permission:modify_annotations": "true",
-               "access_permission:can_print_degraded": "true",
-               "X-TIKA:Parsed-By-Full-Set": [
-                 "org.apache.tika.parser.DefaultParser",
-                 "org.apache.tika.parser.pdf.PDFParser"
-               ],
-               "pdf:num3DAnnotations": "0",
-               "dcterms:created": "2021-08-02T14:14:13Z",
-               "dcterms:modified": "2021-08-02T14:14:13Z",
-               "dc:format": "application/pdf; version=1.7",
-               "pdf:overallPercentageUnmappedUnicodeChars": "0.0",
-               "access_permission:fill_in_form": "true",
-               "pdf:docinfo:modified": "2021-08-02T14:14:13Z",
-               "pdf:hasCollection": "false",
-               "pdf:encrypted": "false",
-               "pdf:containsNonEmbeddedFont": "true",
-               "Content-Length": "1406",
-               "pdf:hasMarkedContent": "false",
-               "Content-Type": "application/pdf",
-               "pdf:producer": "iText® 7.1.15 ©2000-2021 iText Group NV (AGPL-version)",
-               "pdf:totalUnmappedUnicodeChars": "0",
-               "access_permission:extract_for_accessibility": "true",
-               "access_permission:assemble_document": "true",
-               "xmpTPg:NPages": "1",
-               "pdf:hasXMP": "false",
-               "pdf:charsPerPage": "469",
-               "access_permission:extract_content": "true",
-               "access_permission:can_print": "true",
-               "X-TIKA:Parsed-By": [
-                 "org.apache.tika.parser.DefaultParser",
-                 "org.apache.tika.parser.pdf.PDFParser"
-               ],
-               "X-TIKA:content": "\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\nBecker, Klaus : Einschränkungen im Lehrbetrieb gravierender als in Forschung und Transfer: Die \\nAuswirkungen der Corona-Pandemie auf Forschung und Transfer an der Technischen \\nHochschule (TH) Köln – ein Einblick. In: DUZ Wissenschaft & Management . Berlin, DUZ \\nVerlags- und Medienhaus GmbH (2020a), Nr. 10, S. 50–52\\n\\nBecker, Klaus : Transfer an der TH Köln: Wissen auch gesellschaftlich wirksam machen – mit \\nund in der Region Köln. In: Köln-Magazin (2020b), Nr. 2, S. 54–55\\n\\n\\n",
-               "access_permission:can_modify": "true",
-               "pdf:docinfo:producer": "iText® 7.1.15 ©2000-2021 iText Group NV (AGPL-version)",
-               "pdf:docinfo:created": "2021-08-02T14:14:13Z",
-               "pdf:containsDamagedFont": "false"
-             }""";
     public static final String X_TIKA_PARSED_BY = "X-TIKA:Parsed-By";
+    public static String TEST_JSON;
+
+    public MCRSimpleTikaMapperTest() {
+        super();
+        try (InputStream is = MCRClassTools.getClassLoader().getResourceAsStream("tika_test.json")) {
+            TEST_JSON = new String(Objects.requireNonNull(is).readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
+    }
 
     public void testMap() throws MCRTikaMappingException {
         MCRSimpleTikaMapper simpleTikaMapper = new MCRSimpleTikaMapper();
@@ -100,10 +72,9 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         Assert.assertEquals("There should be two " + skName + " entries", 2, field.getValueCount());
         ArrayList<Object> values = new ArrayList<>(field.getValues());
         Assert.assertEquals("First " + skName + " entry should be 'org.apache.tika.parser.DefaultParser'",
-                "org.apache.tika.parser.DefaultParser", values.get(0));
+            "org.apache.tika.parser.DefaultParser", values.get(0));
         Assert.assertEquals("Second " + skName + " entry should be 'org.apache.tika.parser.pdf.PDFParser'",
-                "org.apache.tika.parser.pdf.PDFParser", values.get(1));
-
+            "org.apache.tika.parser.pdf.PDFParser", values.get(1));
 
         // Test with stripNamespace = true and multiValue = true
         doc = new SolrInputDocument();
@@ -116,10 +87,9 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         Assert.assertEquals("There should be two \"parsed_by\" entries", 2, field.getValueCount());
         values = new ArrayList<>(field.getValues());
         Assert.assertEquals("First \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser'",
-                "org.apache.tika.parser.DefaultParser", values.get(0));
+            "org.apache.tika.parser.DefaultParser", values.get(0));
         Assert.assertEquals("Second \"parsed_by\" entry should be 'org.apache.tika.parser.pdf.PDFParser'",
-                "org.apache.tika.parser.pdf.PDFParser", values.get(1));
-
+            "org.apache.tika.parser.pdf.PDFParser", values.get(1));
 
         // Test with stripNamespace = true and multiValue = false
         doc = new SolrInputDocument();
@@ -130,9 +100,9 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         field = doc.getField("parsed_by");
         Assert.assertNotNull("There should be a \"parsed_by\" entry", field);
         Assert.assertEquals("There should be just one \"parsed_by\" entries", 1, field.getValueCount());
-        Assert.assertEquals("The \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser'",
-                "org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser", field.getValue());
-
+        Assert.assertEquals(
+            "The \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser'",
+            "org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser", field.getValue());
 
         // Test with stripNamespace = false and multiValue = false
         doc = new SolrInputDocument();
@@ -143,7 +113,9 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         field = doc.getField(skName);
         Assert.assertNotNull("There should be a " + skName + " entry", field);
         Assert.assertEquals("There should be just one " + skName + " entries", 1, field.getValueCount());
-        Assert.assertEquals("The " + skName + " entry should be 'org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser'",
-                "org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser", field.getValue());
+        Assert.assertEquals(
+            "The " + skName
+                + " entry should be 'org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser'",
+            "org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser", field.getValue());
     }
 }
