@@ -23,10 +23,10 @@ package org.mycore.common.digest;
  */
 public final class MCRMD5Digest extends MCRDigest {
 
-    public static Md5Algorithm ALGORITHM;
+    public static MD5Algorithm ALGORITHM;
 
     static {
-        ALGORITHM = new Md5Algorithm();
+        ALGORITHM = new MD5Algorithm();
     }
 
     /**
@@ -40,7 +40,7 @@ public final class MCRMD5Digest extends MCRDigest {
     }
 
     @Override
-    public Md5Algorithm getAlgorithm() {
+    public MD5Algorithm getAlgorithm() {
         return ALGORITHM;
     }
 
@@ -51,9 +51,9 @@ public final class MCRMD5Digest extends MCRDigest {
         }
     }
 
-    public static class Md5Algorithm extends Algorithm {
+    public static class MD5Algorithm extends Algorithm {
 
-        public Md5Algorithm() {
+        public MD5Algorithm() {
             super("md5");
         }
 

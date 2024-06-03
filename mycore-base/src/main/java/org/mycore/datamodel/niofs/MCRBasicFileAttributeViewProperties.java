@@ -73,13 +73,9 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
     /**
      * Set of allowed attributes that can be accessed.
      */
-    public static final Set<String> ALLOWED_ATTRIBUTES;
-
-    static {
-        ALLOWED_ATTRIBUTES = Arrays.stream(Attribute.values())
-            .map(Attribute::getName)
-            .collect(Collectors.toSet());
-    }
+    public static final Set<String> ALLOWED_ATTRIBUTES = Arrays.stream(Attribute.values())
+        .map(Attribute::getName)
+        .collect(Collectors.toSet());
 
     private final V view;
 
