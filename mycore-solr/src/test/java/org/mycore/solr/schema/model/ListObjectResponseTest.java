@@ -47,15 +47,15 @@ public class ListObjectResponseTest extends TestCase {
                     {
                       "configSets":["_default"]
                     }
-                    """, new ListObjectResponse(List.of("_default"))
+                    """, new ListObjectResponse(List.of("_default")),
             },
             {
                 """
                     {
                       "configSets":["mycore_main", "mycore_classifications"]
                     }
-                    """, new ListObjectResponse(List.of("mycore_main", "mycore_classifications"))
-            }
+                    """, new ListObjectResponse(List.of("mycore_main", "mycore_classifications")),
+            },
         });
     }
 
