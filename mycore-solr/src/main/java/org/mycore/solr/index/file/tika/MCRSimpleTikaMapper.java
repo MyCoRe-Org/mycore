@@ -18,12 +18,13 @@
 
 package org.mycore.solr.index.file.tika;
 
-import com.google.gson.JsonElement;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.config.annotation.MCRProperty;
 
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
+import com.google.gson.JsonElement;
 
 /**
  * A simple implementation of the MCRTikaMapper interface. This implementation maps the JSON key to a Solr field name
@@ -69,10 +70,10 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
 
     @Override
     public void map(String key,
-                    JsonElement element,
-                    SolrInputDocument document,
-                    Path filePath,
-                    BasicFileAttributes attributes) throws MCRTikaMappingException {
+        JsonElement element,
+        SolrInputDocument document,
+        Path filePath,
+        BasicFileAttributes attributes) throws MCRTikaMappingException {
 
         String keyWONamespace = isStripNamespace() && key.contains(":") ? key.substring(key.indexOf(":") + 1) : key;
         String simplifiedKey = MCRTikaMapper.simplifyKeyName(keyWONamespace);
@@ -80,18 +81,18 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
         if (element.isJsonPrimitive()) {
             document.addField(simplifiedKey, element.getAsString());
         } else if (element.isJsonArray()) {
-            if(isMultiValueField()) {
+            if (isMultiValueField()) {
                 element.getAsJsonArray().forEach(e -> {
                     if (e.isJsonPrimitive()) {
                         document.addField(simplifiedKey, e.getAsString());
                     }
                 });
             } else {
-                document.addField(simplifiedKey,   String.join("\n",element.getAsJsonArray()
-                        .asList()
-                        .stream()
-                        .map(JsonElement::getAsString)
-                        .toArray(String[]::new)));
+                document.addField(simplifiedKey, String.join("\n", element.getAsJsonArray()
+                    .asList()
+                    .stream()
+                    .map(JsonElement::getAsString)
+                    .toArray(String[]::new)));
             }
         }
     }

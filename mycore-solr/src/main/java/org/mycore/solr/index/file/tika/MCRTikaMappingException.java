@@ -40,5 +40,4 @@ public class MCRTikaMappingException extends Exception {
         super(cause);
     }
 
-
 }

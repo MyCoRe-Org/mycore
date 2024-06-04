@@ -18,11 +18,12 @@
 
 package org.mycore.solr.index.file.tika;
 
-import com.google.gson.JsonElement;
-import org.apache.solr.common.SolrInputDocument;
-
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+
+import org.apache.solr.common.SolrInputDocument;
+
+import com.google.gson.JsonElement;
 
 /**
  * A NOP (no operation) implementation of the MCRTikaMapper interface.
@@ -32,7 +33,7 @@ public class MCRTikaNOPMapper implements MCRTikaMapper {
 
     @Override
     public void map(String key, JsonElement element, SolrInputDocument document, Path filePath,
-                    BasicFileAttributes attributes) throws MCRTikaMappingException {
+        BasicFileAttributes attributes) throws MCRTikaMappingException {
         // do nothing
     }
 
