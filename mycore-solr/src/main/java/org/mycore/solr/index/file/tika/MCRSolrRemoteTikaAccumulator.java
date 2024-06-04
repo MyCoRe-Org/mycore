@@ -44,11 +44,11 @@ import com.google.gson.JsonObject;
 
 /**
  * Accumulates text extracted from files using a remote Tika server. The server URL is configured in the
- * <code>mycore.properties</code> file using the key <code>MCR.Solr.TikaServerURL</code>. The value of this key should
+ * <code>mycore.properties</code> file using the key <code>MCR.Solr.Tika.ServerURL</code>. The value of this key should
  * be a comma-separated list of URLs to Tika servers. The accumulator will use the servers in a round-robin fashion.
  * <br/>
  * The accumulator uses mappers to map the extracted json to Solr fields. The mappers are defined in the
- * properties file using the key <code>MCR.Solr.TikaMapper.&lt;key&gt;.Class</code>. The <code>&lt;key&gt;</code> is the
+ * properties file using the key <code>MCR.Solr.Tika.Mapper.&lt;key&gt;.Class</code>. The <code>&lt;key&gt;</code> is the
  * key of the extracted json element transformed to lowercase and every not letter and digit replaced with
  * <code>_</code> and the value is the fully qualified class name of the mapper. If no mapper is defined for a key, the
  * default mapper with the key <code>default</code> is used.
