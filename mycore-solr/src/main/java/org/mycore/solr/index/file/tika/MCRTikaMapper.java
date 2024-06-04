@@ -54,7 +54,7 @@ public interface MCRTikaMapper {
      */
     static MCRTikaMapper getDefaultMapper() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRTikaMapper.class,
-            SOLR_CONFIG_PREFIX + "TikaMapper.Default.Class");
+            SOLR_CONFIG_PREFIX + "Tika.Mapper.Default.Class");
     }
 
     /**
@@ -64,7 +64,7 @@ public interface MCRTikaMapper {
      */
     static Optional<MCRTikaMapper> getMapper(String key) {
         return MCRConfiguration2.getInstanceOf(MCRTikaMapper.class,
-            SOLR_CONFIG_PREFIX + "TikaMapper." + key + ".Class");
+            SOLR_CONFIG_PREFIX + "Tika.Mapper." + key + ".Class");
     }
 
     /**

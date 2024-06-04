@@ -18,10 +18,10 @@
 
 package org.mycore.solr.index.file.tika;
 
-import org.mycore.solr.index.strategy.MCRSolrFileStrategy;
-
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+
+import org.mycore.solr.index.strategy.MCRSolrFileStrategy;
 
 /**
  * The MCRTikaSolrFileStrategy is a strategy to check if a file should be sent to solr. (which is always false, because

@@ -48,7 +48,7 @@ public class MCRTikaHttpClient {
     }
 
     public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<JsonObject, T> responseConsumer)
-            throws IOException, T {
+        throws IOException, T {
         HttpPut httpPut = new HttpPut(url + "tika/text");
         httpPut.setHeader("Accept", "application/json");
         httpPut.setEntity(new InputStreamEntity(is));
@@ -59,7 +59,7 @@ public class MCRTikaHttpClient {
                     throw new IOException("Tika server returned " + response.getStatusLine().getStatusCode());
                 }
 
-                try(InputStream responseStream = response.getEntity().getContent();
+                try (InputStream responseStream = response.getEntity().getContent();
                     InputStreamReader isr = new InputStreamReader(responseStream, StandardCharsets.UTF_8)) {
                     JsonStreamParser parser = new JsonStreamParser(isr);
                     JsonElement root = parser.next();

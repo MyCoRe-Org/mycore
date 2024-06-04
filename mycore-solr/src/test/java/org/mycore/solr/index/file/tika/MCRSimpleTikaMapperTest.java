@@ -39,13 +39,14 @@ import junit.framework.TestCase;
 
 public class MCRSimpleTikaMapperTest extends TestCase {
 
+    public String testJson;
     public static final String X_TIKA_PARSED_BY = "X-TIKA:Parsed-By";
-    public String TEST_JSON;
 
     public MCRSimpleTikaMapperTest() {
         super();
-        try (InputStream is = MCRClassTools.getClassLoader().getResourceAsStream("tika_test.json")) {
-            TEST_JSON = new String(Objects.requireNonNull(is).readAllBytes(), StandardCharsets.UTF_8);
+
+        try(InputStream is =MCRClassTools.getClassLoader().getResourceAsStream("tika_test.json")){
+            testJson = new String(Objects.requireNonNull(is).readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new MCRException(e);
         }
@@ -56,7 +57,7 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         JsonObject rootObject;
 
         SolrInputDocument doc = new SolrInputDocument();
-        try (StringReader stringReader = new StringReader(TEST_JSON)) {
+        try (StringReader stringReader = new StringReader(testJson)) {
             JsonStreamParser parser = new JsonStreamParser(stringReader);
             JsonElement root = parser.next();
             rootObject = root.getAsJsonObject();

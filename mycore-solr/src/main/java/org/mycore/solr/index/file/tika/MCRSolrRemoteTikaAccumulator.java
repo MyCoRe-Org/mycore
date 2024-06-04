@@ -20,21 +20,24 @@ package org.mycore.solr.index.file.tika;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
 
 import com.google.gson.JsonObject;
@@ -54,16 +57,35 @@ import com.google.gson.JsonObject;
  */
 public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator {
 
+    public static final String TIKA_MAPPER_IGNORED_FILES_PROPERTY = SOLR_CONFIG_PREFIX + "Tika.IgnoredFiles";
+
+    public static final String TIKA_SERVER_PROPERTY = SOLR_CONFIG_PREFIX + "Tika.ServerURL";
+
+    public static final String TIKA_MAPPER_MAX_FILE_SIZE = SOLR_CONFIG_PREFIX + "Tika.MaxFileSize";
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private final Set<MCRTikaHttpClient> tikaClient;
 
     private final boolean enabled;
 
+    private final Set<Pattern> ignoredFilesPattern;
+
+    private final long maxFileSize;
+
     private Iterator<MCRTikaHttpClient> tikaClientIterator = null;
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     public MCRSolrRemoteTikaAccumulator() {
-        Optional<String> serverList = MCRConfiguration2.getString(SOLR_CONFIG_PREFIX +"TikaServerURL");
+        Optional<String> serverList = MCRConfiguration2.getString(TIKA_SERVER_PROPERTY);
+
+        ignoredFilesPattern = Collections.synchronizedSet(MCRConfiguration2
+            .getOrThrow(TIKA_MAPPER_IGNORED_FILES_PROPERTY,
+                MCRConfiguration2::splitValue)
+            .map(Pattern::compile)
+            .collect(Collectors.toSet()));
+
+        maxFileSize = MCRConfiguration2.getLong(TIKA_MAPPER_MAX_FILE_SIZE).orElseThrow(
+            () -> MCRConfiguration2.createConfigurationException(TIKA_MAPPER_MAX_FILE_SIZE));
 
         Set<MCRTikaHttpClient> tikaClients = null;
         if (serverList.isPresent()) {
@@ -75,9 +97,24 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
     }
 
     @Override
-    public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
-            throws IOException {
+    public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes) {
         if (!enabled) {
+            return;
+        }
+
+        if (filePath instanceof MCRPath mcrPath) {
+            Optional<Pattern> matching = ignoredFilesPattern.stream()
+                .filter(p -> p.matcher(mcrPath.getOwnerRelativePath()).matches())
+                .findAny();
+            if (matching.isPresent()) {
+                LOGGER.info("File {} is ignored by pattern {}", mcrPath.getOwnerRelativePath(), matching.get());
+                return;
+            }
+        }
+
+        if (attributes.size() > maxFileSize) {
+            LOGGER.info("File {} is ignored because it is too large {}", filePath,
+                MCRUtils.getSizeFormatted(attributes.size()));
             return;
         }
 
@@ -87,7 +124,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
         boolean hasError = false;
         String errorMessage = null;
 
-        try(InputStream is = Files.newInputStream(filePath)){
+        try (InputStream is = Files.newInputStream(filePath)) {
             LOGGER.debug("Extracting text from {} using Tika", filePath);
             client.extractText(is, (jsonReader -> processJsonResponse(document, filePath, attributes, jsonReader)));
         } catch (Exception e) {
@@ -95,7 +132,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
             errorMessage = e.getMessage();
         } finally {
             LOGGER.debug("Extracted text from {} using Tika in {}ms", filePath,
-                    System.currentTimeMillis() - start);
+                System.currentTimeMillis() - start);
         }
 
         document.addField("tika_has_error", hasError);
@@ -103,7 +140,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
     }
 
     public void processJsonResponse(SolrInputDocument document, Path filePath,
-                                    BasicFileAttributes attributes, JsonObject json) throws MCRTikaMappingException {
+        BasicFileAttributes attributes, JsonObject json) throws MCRTikaMappingException {
         for (String key : json.keySet()) {
             String simpleKeyName = MCRTikaMapper.simplifyKeyName(key);
             Optional<MCRTikaMapper> mapper = MCRTikaMapper.getMapper(simpleKeyName);
@@ -115,9 +152,6 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
             }
         }
     }
-
-
-
 
     public synchronized MCRTikaHttpClient getNextClient() {
         if (tikaClientIterator == null || !tikaClientIterator.hasNext()) {
