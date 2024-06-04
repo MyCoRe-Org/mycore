@@ -30,8 +30,11 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * Core instance of a solr server.
@@ -194,7 +197,11 @@ public class MCRSolrCore {
     private void shutdownGracefully(SolrClient client) throws SolrServerException, IOException {
         if (client != null) {
             LOGGER.info("Shutting down solr client: {}", client);
-            client.commit(false, false);
+            UpdateRequest updateRequest = new UpdateRequest();
+            updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
+            MCRSolrAuthenticationFactory.getInstance().addAuthentication(updateRequest,
+                    MCRSolrAuthenticationLevel.INDEX);
+            updateRequest.process(client);
             client.close();
         }
     }
