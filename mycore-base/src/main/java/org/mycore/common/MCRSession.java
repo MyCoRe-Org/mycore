@@ -62,7 +62,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  */
-public class MCRSession implements Cloneable {
+sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private static final URI DEFAULT_URI = URI.create("");
 
