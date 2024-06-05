@@ -19,11 +19,14 @@
 package org.mycore.access;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRScopedSession;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
@@ -45,11 +48,23 @@ class MCRAccessCacheManager implements MCRSessionListener {
         @SuppressWarnings("unchecked")
         MCRCache<MCRPermissionHandle, Boolean> cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
         if (cache == null) {
-            cache = createCache(session);
-            session.put(key, cache);
+            synchronized (getCacheCreationLock(session)) {
+                cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
+                if (cache == null) {
+                    cache = createCache(session);
+                    session.put(key, cache);
+                }
+            }
         }
         return cache;
     });
+
+    private static Object getCacheCreationLock(MCRSession session) {
+        //in a short living scoped session, we should not lock the whole session, but a unique object
+        return Optional.of(session)
+            .map(s -> s.get(MCRScopedSession.SCOPED_HINT))
+            .orElse(session);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -80,7 +95,9 @@ class MCRAccessCacheManager implements MCRSessionListener {
     }
 
     private MCRCache<MCRPermissionHandle, Boolean> createCache(MCRSession session) {
-        return new MCRCache<>(CAPACITY, "Access rights in MCRSession " + session.getID());
+        Object scopedSessionHint = session.get(MCRScopedSession.SCOPED_HINT);
+        String suffix = scopedSessionHint == null ? session.getID() : session.getID() + ",scope=" + UUID.randomUUID();
+        return new MCRCache<>(CAPACITY, "Access rights,MCRSession=" + suffix);
     }
 
     MCRAccessCacheManager() {
