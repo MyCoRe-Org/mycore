@@ -42,12 +42,12 @@
   <xsl:template mode="mods.type" match="mods:mods">
     <xsl:choose>
       <xsl:when
-        test="substring-after(mods:genre[@type='intern']/@valueURI,'#')='article' or
+        test="substring-after(mods:genre[@type='intern'][1]/@valueURI,'#')='article' or
               (mods:relatedItem/mods:genre='periodical' and mods:identifier/@type='doi')" >
         <xsl:value-of select="'article'" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="substring-after(mods:genre[@type='intern']/@valueURI,'#')" />
+        <xsl:value-of select="substring-after(mods:genre[@type='intern'][1]/@valueURI,'#')" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
