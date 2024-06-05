@@ -18,6 +18,7 @@
 
 package org.mycore.common;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,7 @@ import com.google.common.cache.CacheBuilder;
  * @see java.util.Hashtable
  * @author Frank Lützenkirchen
  */
-public class MCRCache<K, V> {
+public class MCRCache<K, V> implements Closeable {
     /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
 

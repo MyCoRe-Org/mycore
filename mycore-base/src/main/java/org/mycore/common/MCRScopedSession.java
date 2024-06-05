@@ -40,6 +40,11 @@ public final class MCRScopedSession extends MCRSession {
     private final ThreadLocal<ScopedValues> scopedValues = new ThreadLocal<>();
 
     /**
+     * If running in a scoped context the session contains this key {@link MCRSession#get(Object)}.
+     */
+    public static final String SCOPED_HINT = MCRScopedSession.class.getCanonicalName();
+
+    /**
      * Executes an action within a restricted scope.
      * <p>
      * The scoped values are set for the duration of the action and then removed.
@@ -53,9 +58,21 @@ public final class MCRScopedSession extends MCRSession {
      * @return the result of the action
      */
     public <T> T doAs(ScopedValues scopeValues, Supplier<T> action) {
-        scopedValues.set(Objects.requireNonNull(scopeValues));
+        Objects.requireNonNull(scopeValues).map.put(SCOPED_HINT, scopeValues);
+        scopedValues.set(scopeValues);
         try {
             return action.get();
+        } finally {
+            clearScopedValues();
+        }
+    }
+
+    private void clearScopedValues() {
+        ScopedValues values = scopedValues.get();
+        try {
+            if (values != null) {
+                MCRSession.clearClosableValues(values.map);
+            }
         } finally {
             scopedValues.remove();
         }
@@ -110,7 +127,7 @@ public final class MCRScopedSession extends MCRSession {
 
     @Override
     public void close() {
-        scopedValues.remove();
+        clearScopedValues();
         super.close();
     }
 
