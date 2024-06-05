@@ -32,4 +32,9 @@
     <servlet-name>MCRStaticXEditorFileServlet</servlet-name>
     <url-pattern>*.xed</url-pattern>
   </servlet-mapping>
+  <filter-mapping>
+    <filter-name>MCRUserAgentFilter</filter-name>
+    <servlet-name>MCRStaticXEditorFileServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
 </web-fragment>
