@@ -106,12 +106,18 @@ public class MCRSessionResource {
 
         String userID = session.getUserInformation().getUserID();
         String ip = session.getCurrentIP();
-        Object httpId = session.get("http.session");
 
         sessionJSON.addProperty("id", session.getID());
+
+        Object httpId = session.get("http.session");
         if (httpId != null) {
-            sessionJSON.addProperty("httpId", httpId.toString());
+            String httpIdString = httpId.toString();
+            int prefixLength = Math.min(8, httpIdString.length() / 4);
+            String prefix = httpIdString.substring(0, prefixLength);
+            String obscuredHttpIdString = prefix + "☓".repeat(httpIdString.length() - prefixLength);
+            sessionJSON.addProperty("httpId", obscuredHttpIdString);
         }
+
         sessionJSON.addProperty("login", userID);
         sessionJSON.addProperty("ip", ip);
         if (resolveHostname) {
