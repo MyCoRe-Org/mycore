@@ -174,19 +174,19 @@ public class MCRSolrCore {
 
     public synchronized void shutdown() {
         try {
-            shutdownGracefully(solrClient);
+            shutdownGracefully(solrClient, true);
             solrClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
-            shutdownGracefully(baseSolrClient);
+            shutdownGracefully(baseSolrClient, false);
             baseSolrClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
-            shutdownGracefully(concurrentClient);
+            shutdownGracefully(concurrentClient, true);
             concurrentClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
@@ -194,14 +194,16 @@ public class MCRSolrCore {
         LOGGER.info("Solr shutdown process completed.");
     }
 
-    private void shutdownGracefully(SolrClient client) throws SolrServerException, IOException {
+    private void shutdownGracefully(SolrClient client, boolean commit) throws SolrServerException, IOException {
         if (client != null) {
             LOGGER.info("Shutting down solr client: {}", client);
-            UpdateRequest updateRequest = new UpdateRequest();
-            updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
-            MCRSolrAuthenticationFactory.getInstance().addAuthentication(updateRequest,
+            if (commit) {
+                UpdateRequest updateRequest = new UpdateRequest();
+                updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
+                MCRSolrAuthenticationFactory.getInstance().addAuthentication(updateRequest,
                     MCRSolrAuthenticationLevel.INDEX);
-            updateRequest.process(client);
+                updateRequest.process(client);
+            }
             client.close();
         }
     }
