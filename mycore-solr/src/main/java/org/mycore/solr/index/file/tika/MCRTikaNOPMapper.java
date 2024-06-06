@@ -23,7 +23,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.solr.common.SolrInputDocument;
 
-import com.google.gson.JsonElement;
+import com.fasterxml.jackson.core.TreeNode;
 
 /**
  * A NOP (no operation) implementation of the MCRTikaMapper interface.
@@ -32,8 +32,8 @@ import com.google.gson.JsonElement;
 public class MCRTikaNOPMapper implements MCRTikaMapper {
 
     @Override
-    public void map(String key, JsonElement element, SolrInputDocument document, Path filePath,
-        BasicFileAttributes attributes) throws MCRTikaMappingException {
+    public void map(String key, TreeNode element, SolrInputDocument document, Path filePath,
+                    BasicFileAttributes attributes) throws MCRTikaMappingException {
         // do nothing
     }
 

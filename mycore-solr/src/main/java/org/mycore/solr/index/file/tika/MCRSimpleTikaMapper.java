@@ -24,7 +24,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.config.annotation.MCRProperty;
 
-import com.google.gson.JsonElement;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 
 /**
  * A simple implementation of the MCRTikaMapper interface. This implementation maps the JSON key to a Solr field name
@@ -70,7 +72,7 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
 
     @Override
     public void map(String key,
-        JsonElement element,
+        TreeNode element,
         SolrInputDocument document,
         Path filePath,
         BasicFileAttributes attributes) throws MCRTikaMappingException {
@@ -78,22 +80,59 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
         String keyWONamespace = isStripNamespace() && key.contains(":") ? key.substring(key.indexOf(":") + 1) : key;
         String simplifiedKey = MCRTikaMapper.simplifyKeyName(keyWONamespace);
 
-        if (element.isJsonPrimitive()) {
-            document.addField(simplifiedKey, element.getAsString());
-        } else if (element.isJsonArray()) {
+        if (element.isValueNode() && element instanceof ValueNode vn) {
+            String value = getValueNodeAsString(vn);
+            if (value == null || value.isEmpty()) {
+                return;
+            }
+            document.addField(simplifiedKey, value);
+        } else if (element.isArray() && element instanceof ArrayNode an) {
             if (isMultiValueField()) {
-                element.getAsJsonArray().forEach(e -> {
-                    if (e.isJsonPrimitive()) {
-                        document.addField(simplifiedKey, e.getAsString());
+                an.forEach(e -> {
+                    if (e.isValueNode() && e instanceof ValueNode vn) {
+                        String value = getValueNodeAsString(vn);
+                        if (value == null || value.isEmpty()) {
+                            return;
+                        }
+                        document.addField(simplifiedKey, value);
                     }
                 });
             } else {
-                document.addField(simplifiedKey, String.join("\n", element.getAsJsonArray()
-                    .asList()
-                    .stream()
-                    .map(JsonElement::getAsString)
-                    .toArray(String[]::new)));
+                StringBuilder sb = new StringBuilder();
+                an.forEach(e -> {
+                    if (e.isValueNode() && e instanceof ValueNode vn) {
+                        if (!sb.isEmpty()) {
+                            sb.append("\n");
+                        }
+                        sb.append(getValueNodeAsString(vn));
+                    }
+                });
+                document.addField(simplifiedKey, sb.toString());
             }
         }
+    }
+
+    protected String getValueNodeAsString(ValueNode vn) {
+        if (vn.isNull()) {
+            return null;
+        }
+
+        if (vn.isBoolean()) {
+            return String.valueOf(vn.booleanValue());
+        }
+
+        if (vn.isIntegralNumber()) {
+            return String.valueOf(vn.intValue());
+        }
+
+        if (vn.isFloatingPointNumber()) {
+            return String.valueOf(vn.doubleValue());
+        }
+
+        if (vn.isTextual()) {
+            return vn.textValue();
+        }
+
+        return null;
     }
 }
