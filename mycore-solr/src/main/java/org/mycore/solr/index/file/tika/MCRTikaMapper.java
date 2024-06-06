@@ -28,7 +28,7 @@ import java.util.Optional;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.config.MCRConfiguration2;
 
-import com.google.gson.JsonElement;
+import com.fasterxml.jackson.core.TreeNode;
 
 /**
  * Interface for mapping Tika extracted metadata to Solr fields.
@@ -76,6 +76,7 @@ public interface MCRTikaMapper {
      * @param attributes The attributes of the file which was processed by Tika
      * @throws MCRTikaMappingException If an error occurs during mapping
      */
-    void map(String key, JsonElement element, SolrInputDocument document, Path filePath,
-        BasicFileAttributes attributes) throws MCRTikaMappingException;
+    void map(String key, TreeNode element, SolrInputDocument document, Path filePath,
+             BasicFileAttributes attributes) throws MCRTikaMappingException;
+
 }

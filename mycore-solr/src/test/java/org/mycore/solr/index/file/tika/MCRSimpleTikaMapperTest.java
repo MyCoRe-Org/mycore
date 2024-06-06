@@ -31,9 +31,9 @@ import org.junit.Assert;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonStreamParser;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import junit.framework.TestCase;
 
@@ -52,22 +52,22 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         }
     }
 
-    public void testMap() throws MCRTikaMappingException {
+    public void testMap() throws MCRTikaMappingException, IOException {
         MCRSimpleTikaMapper simpleTikaMapper = new MCRSimpleTikaMapper();
-        JsonObject rootObject;
+        TreeNode root;
 
         SolrInputDocument doc = new SolrInputDocument();
         try (StringReader stringReader = new StringReader(testJson)) {
-            JsonStreamParser parser = new JsonStreamParser(stringReader);
-            JsonElement root = parser.next();
-            rootObject = root.getAsJsonObject();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonParser parser = mapper.createParser(stringReader);
+            root = mapper.readTree(parser);
         }
 
         // Test with stripNamespace = false and multiValue = true
         simpleTikaMapper.setStripNamespace(false);
         simpleTikaMapper.setMultiValue(true);
         String skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
-        simpleTikaMapper.map(X_TIKA_PARSED_BY, rootObject.get(X_TIKA_PARSED_BY), doc, null, null);
+        simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         SolrInputField field = doc.getField(skName);
         Assert.assertNotNull("There should be a " + skName + " entry", field);
         Assert.assertEquals("There should be two " + skName + " entries", 2, field.getValueCount());
@@ -82,7 +82,7 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         simpleTikaMapper.setStripNamespace(true);
         simpleTikaMapper.setMultiValue(true);
         skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
-        simpleTikaMapper.map(X_TIKA_PARSED_BY, rootObject.get(X_TIKA_PARSED_BY), doc, null, null);
+        simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         field = doc.getField("parsed_by");
         Assert.assertNotNull("There should be a \"parsed_by\" entry", field);
         Assert.assertEquals("There should be two \"parsed_by\" entries", 2, field.getValueCount());
@@ -97,7 +97,7 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         simpleTikaMapper.setStripNamespace(true);
         simpleTikaMapper.setMultiValue(false);
         skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
-        simpleTikaMapper.map(X_TIKA_PARSED_BY, rootObject.get(X_TIKA_PARSED_BY), doc, null, null);
+        simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         field = doc.getField("parsed_by");
         Assert.assertNotNull("There should be a \"parsed_by\" entry", field);
         Assert.assertEquals("There should be just one \"parsed_by\" entries", 1, field.getValueCount());
@@ -110,7 +110,7 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         simpleTikaMapper.setStripNamespace(false);
         simpleTikaMapper.setMultiValue(false);
         skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
-        simpleTikaMapper.map(X_TIKA_PARSED_BY, rootObject.get(X_TIKA_PARSED_BY), doc, null, null);
+        simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         field = doc.getField(skName);
         Assert.assertNotNull("There should be a " + skName + " entry", field);
         Assert.assertEquals("There should be just one " + skName + " entries", 1, field.getValueCount());

@@ -29,9 +29,9 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonStreamParser;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A simple HTTP client to communicate with a Tika server.
@@ -47,7 +47,7 @@ public class MCRTikaHttpClient {
 
     }
 
-    public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<JsonObject, T> responseConsumer)
+    public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<TreeNode, T> responseConsumer)
         throws IOException, T {
         HttpPut httpPut = new HttpPut(url + "tika/text");
         httpPut.setHeader("Accept", "application/json");
@@ -61,11 +61,9 @@ public class MCRTikaHttpClient {
 
                 try (InputStream responseStream = response.getEntity().getContent();
                     InputStreamReader isr = new InputStreamReader(responseStream, StandardCharsets.UTF_8)) {
-                    JsonStreamParser parser = new JsonStreamParser(isr);
-                    JsonElement root = parser.next();
-                    JsonObject rootObject = root.getAsJsonObject();
-
-                    responseConsumer.accept(rootObject);
+                    JsonParser parser = new ObjectMapper().createParser(isr);
+                    TreeNode treeNode = parser.readValueAsTree();
+                    responseConsumer.accept(treeNode);
                 }
             }
         }

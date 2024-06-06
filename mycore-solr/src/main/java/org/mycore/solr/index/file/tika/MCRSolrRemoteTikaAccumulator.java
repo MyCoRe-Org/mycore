@@ -40,7 +40,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.TreeNode;
 
 /**
  * Accumulates text extracted from files using a remote Tika server. The server URL is configured in the
@@ -140,8 +140,10 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
     }
 
     public void processJsonResponse(SolrInputDocument document, Path filePath,
-        BasicFileAttributes attributes, JsonObject json) throws MCRTikaMappingException {
-        for (String key : json.keySet()) {
+        BasicFileAttributes attributes, TreeNode json) throws MCRTikaMappingException {
+        Iterator<String> it = json.fieldNames();
+        while (it.hasNext()) {
+            String key = it.next();
             String simpleKeyName = MCRTikaMapper.simplifyKeyName(key);
             Optional<MCRTikaMapper> mapper = MCRTikaMapper.getMapper(simpleKeyName);
             if (mapper.isPresent()) {
