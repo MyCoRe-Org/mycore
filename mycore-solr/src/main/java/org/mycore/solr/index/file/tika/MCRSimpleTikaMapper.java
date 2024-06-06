@@ -102,7 +102,7 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
                 an.forEach(e -> {
                     if (e.isValueNode() && e instanceof ValueNode vn) {
                         if (!sb.isEmpty()) {
-                            sb.append("\n");
+                            sb.append('\n');
                         }
                         sb.append(getValueNodeAsString(vn));
                     }
