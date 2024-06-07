@@ -86,21 +86,24 @@ public class MCRUserAgentFilter implements Filter {
             }
         }
         final boolean newSession = request.getSession(false) == null;
-        chain.doFilter(sreq, sres);
-        final HttpSession session = request.getSession(false);
-        if (session != null && newSession) {
-            try {
-                if (invalidUserAgent) {
-                    LOGGER.info("Closing session, invalid User-Agent: " + userAgent);
-                    session.invalidate();
-                } else if (agentPattern.matcher(userAgent).find()) {
-                    LOGGER.info("Closing session: {} matches {}", userAgent, agentPattern);
-                    session.invalidate();
-                } else {
-                    LOGGER.debug("{} does not match {}", userAgent, agentPattern);
+        try {
+            chain.doFilter(sreq, sres);
+        } finally {
+            final HttpSession session = request.getSession(false);
+            if (session != null && newSession) {
+                try {
+                    if (invalidUserAgent) {
+                        LOGGER.info("Closing session, invalid User-Agent: " + userAgent);
+                        session.invalidate();
+                    } else if (agentPattern.matcher(userAgent).find()) {
+                        LOGGER.info("Closing session: {} matches {}", userAgent, agentPattern);
+                        session.invalidate();
+                    } else {
+                        LOGGER.debug("{} does not match {}", userAgent, agentPattern);
+                    }
+                } catch (IllegalStateException e) {
+                    LOGGER.warn("Session was allready closed");
                 }
-            } catch (IllegalStateException e) {
-                LOGGER.warn("Session was allready closed");
             }
         }
     }
