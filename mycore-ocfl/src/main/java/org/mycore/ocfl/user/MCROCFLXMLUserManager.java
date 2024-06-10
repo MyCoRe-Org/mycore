@@ -18,12 +18,11 @@
 
 package org.mycore.ocfl.user;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Optional;
-
+import io.ocfl.api.OcflOption;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.api.exception.OverwriteException;
+import io.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.model.VersionInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -42,11 +41,11 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.utils.MCRUserTransformer;
 
-import io.ocfl.api.OcflOption;
-import io.ocfl.api.OcflRepository;
-import io.ocfl.api.exception.OverwriteException;
-import io.ocfl.api.model.ObjectVersionId;
-import io.ocfl.api.model.VersionInfo;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.Optional;
 
 /**
  * XML Manager to handle MCRUsers in a MyCoRe OCFL Repository
