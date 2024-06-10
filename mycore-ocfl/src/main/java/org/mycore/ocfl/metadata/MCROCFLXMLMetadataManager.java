@@ -18,26 +18,18 @@
 
 package org.mycore.ocfl.metadata;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.ZoneOffset;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
+import io.ocfl.api.OcflOption;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.api.exception.NotFoundException;
+import io.ocfl.api.exception.OverwriteException;
+import io.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.VersionDetails;
+import io.ocfl.api.model.VersionInfo;
+import io.ocfl.api.model.VersionNum;
+import io.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.core.extension.storage.layout.HashedNTupleIdEncapsulationLayoutExtension;
+import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
@@ -66,18 +58,25 @@ import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
-import io.ocfl.api.OcflOption;
-import io.ocfl.api.OcflRepository;
-import io.ocfl.api.exception.NotFoundException;
-import io.ocfl.api.exception.OverwriteException;
-import io.ocfl.api.model.ObjectVersionId;
-import io.ocfl.api.model.OcflObjectVersion;
-import io.ocfl.api.model.VersionDetails;
-import io.ocfl.api.model.VersionInfo;
-import io.ocfl.api.model.VersionNum;
-import io.ocfl.core.extension.OcflExtensionConfig;
-import io.ocfl.core.extension.storage.layout.HashedNTupleIdEncapsulationLayoutExtension;
-import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.ZoneOffset;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata. Provides
