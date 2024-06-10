@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
+package org.mycore.ocfl.classification;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -37,13 +37,12 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
-import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
  * @author Thomas Scheffler (yagee)
  */
-public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction {
+public class MCROCFLClassificationTransaction implements MCRPersistenceTransaction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -100,7 +99,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             .getCategory(categoryID, -1);
         if (categoryID == null) {
             throw new IOException(
-                "Could not get classification " + categoryID + " from " + categoryDAO.getClass().getName());
+                "Could not get classification from " + categoryDAO.getClass().getName());
         }
         final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(categoryRoot, false);
         final MCRJDOMContent classContent = new MCRJDOMContent(categoryXML);
@@ -126,7 +125,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
      * @param id The ID of the Classification
      * @param type 'A' for created, 'M' for modified, 'D' deleted
      */
-    public static void addClassficationEvent(MCRCategoryID id, char type) {
+    public static void addClassificationEvent(MCRCategoryID id, char type) {
         if (!Objects.requireNonNull(id).isRootID()) {
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }

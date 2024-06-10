@@ -18,13 +18,12 @@
 
 package org.mycore.ocfl.classification;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.ZoneOffset;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-
+import io.ocfl.api.OcflOption;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.api.exception.NotFoundException;
+import io.ocfl.api.exception.ObjectOutOfSyncException;
+import io.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.model.VersionInfo;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
@@ -40,12 +39,12 @@ import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
-import io.ocfl.api.OcflOption;
-import io.ocfl.api.OcflRepository;
-import io.ocfl.api.exception.NotFoundException;
-import io.ocfl.api.exception.ObjectOutOfSyncException;
-import io.ocfl.api.model.ObjectVersionId;
-import io.ocfl.api.model.VersionInfo;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.ZoneOffset;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * OCFL File Manager for MyCoRe Classifications

@@ -18,13 +18,12 @@
 
 package org.mycore.ocfl.metadata;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.mycore.common.content.MCRContent;
-
 import io.ocfl.api.OcflRepository;
 import io.ocfl.api.model.ObjectVersionId;
+import org.mycore.common.content.MCRContent;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MCROCFLContent extends MCRContent {
 

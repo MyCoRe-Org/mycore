@@ -18,10 +18,20 @@
 
 package org.mycore.ocfl.commands;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,8 +45,10 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -46,19 +58,27 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.MCROCFLPersistenceTransaction;
+import org.mycore.ocfl.classification.MCROCFLClassificationTransaction;
 import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
 import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration;
 import org.mycore.ocfl.metadata.migration.MCROCFLRevisionPruner;
+import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.xml.sax.SAXException;
+
+import com.google.common.collect.MapDifference;
+import com.google.common.collect.Maps;
 
 import io.ocfl.api.OcflRepository;
 
@@ -168,15 +188,15 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "update ocfl classification {0}",
         help = "Update classification {0} in the OCFL Store from database")
     public static void updateOCFLClassification(String classId) {
-        final MCRCategoryID rootID = new MCRCategoryID(classId);
-        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
+        final MCRCategoryID rootID = new MCRCategoryID(classId);;
+        MCROCFLClassificationTransaction.addClassificationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
     }
 
     @MCRCommand(syntax = "delete ocfl classification {0}",
         help = "Delete classification {0} in the OCFL Store")
     public static void deleteOCFLClassification(String classId) {
         final MCRCategoryID rootID = new MCRCategoryID(classId);
-        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.DELETED);
+        MCROCFLClassificationTransaction.addClassificationEvent(rootID, MCRAbstractMetadataVersion.DELETED);
     }
 
     @MCRCommand(syntax = "sync ocfl classifications",
@@ -398,12 +418,96 @@ public class MCROCFLCommands {
         confirmPurgeMarked = false;
     }
 
+    @MCRCommand(syntax = "migrate derivates to ocfl", help = "migrates all ifs2 derivates to ocfl")
+    public static List<String> migrateDerivates() {
+        List<String> derivateIds = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+        return derivateIds.stream().map(derivateId -> {
+            return "migrate derivate " + derivateId + " to ocfl";
+        }).toList();
+    }
+
+    @MCRCommand(syntax = "migrate derivate {0} to ocfl", help = "migrate an ifs2 derivate to ocfl")
+    public static void migrateDerivate(String derivateId) throws IOException {
+        MCRPath source = MCRPath.getPath(derivateId, "/");
+        LOGGER.info("migrating {} to ocfl...", derivateId);
+        if (!Files.exists(source)) {
+            throw new NoSuchFileException(source + " does not exist");
+        }
+        MCROCFLFileSystemProvider ocflFileSystemProvider = MCROCFLFileSystemProvider.get();
+        MCRVersionedPath target = ocflFileSystemProvider.getPath(derivateId, "/");
+        if (Files.exists(target)) {
+            throw new FileAlreadyExistsException(target + " already exists");
+        }
+        ocflFileSystemProvider.getFileSystem().createRoot(derivateId);
+        Files.walkFileTree(source, new MCRTreeCopier(source, target));
+    }
+
+    @MCRCommand(syntax = "validate ocfl derivates", help = "checks if all derivates are synchron in ifs2 and ocfl")
+    public static List<String> validateDerivates() throws IOException {
+        Path errorFilePath = getDerivateMigrationErrorReportPath();
+        Files.deleteIfExists(errorFilePath);
+        LOGGER.info("Validation errors will be written to: '{}'. If this file does not exists, all derivates "
+            + "are successfully migrated to ocfl and can be removed from ifs2.", errorFilePath);
+        List<String> derivateIds = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+        return derivateIds.stream().map(derivateId -> {
+            return "validate ocfl derivate " + derivateId;
+        }).toList();
+    }
+
+    @MCRCommand(syntax = "validate ocfl derivate {0}",
+        help = "checks if the derivate has the same digests in ifs2 and ocfl")
+    public static void validateDerivate(String derivateId) throws IOException {
+        Map<String, MCRDigest> ifs2Map = new HashMap<>();
+        Map<String, MCRDigest> ocflMap = new HashMap<>();
+
+        // collect from ifs2
+        MCRPath source = MCRPath.getPath(derivateId, "/");
+        Files.walkFileTree(source, new DigestFileVisitor(ifs2Map));
+
+        // collect from ocfl
+        MCROCFLFileSystemProvider ocflFileSystemProvider = MCROCFLFileSystemProvider.get();
+        MCRVersionedPath target = ocflFileSystemProvider.getPath(derivateId, "/");
+        Files.walkFileTree(target, new DigestFileVisitor(ocflMap));
+
+        // validate
+        Map<String, String> errorMap = new HashMap<>();
+        MapDifference<String, MCRDigest> difference = Maps.difference(ifs2Map, ocflMap);
+        difference.entriesDiffering().forEach((path, diff) -> {
+            errorMap.put(path, "ifs digest '" + diff.leftValue() + "' vs ocfl digest '" + diff.rightValue() + "'");
+        });
+        difference.entriesOnlyOnLeft().forEach((path, diff) -> {
+            errorMap.put(path, "exist in ifs2 but not in ocfl");
+        });
+        difference.entriesOnlyOnRight().forEach((path, diff) -> {
+            errorMap.put(path, "exist in ocfl but not in ifs2");
+        });
+
+        if (!errorMap.isEmpty()) {
+            Path errorFilePath = getDerivateMigrationErrorReportPath();
+            // Convert the map entries to a list of strings
+            List<String> errorLines = errorMap.entrySet().stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .toList();
+            Files.write(errorFilePath, errorLines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            LOGGER.info("Validation error in '{}'. See '{}' for details.", derivateId, errorFilePath.getFileName());
+        }
+    }
+
     private static void logConfirm(String type) {
         LOGGER.info(() -> String.format(Locale.ROOT, """
             
             \u001B[93mEnter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL\
              hidden/archived OCFL %s.\u001B[0m
             \u001B[41mTHIS ACTION CANNOT BE UNDONE!\u001B[0m""", type));
+    }
+
+    private static Path getDerivateMigrationErrorReportPath() throws IOException {
+        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
+        if (configurationDirectory == null) {
+            throw new IOException("Configuration directory not set!");
+        }
+        Path confPath = configurationDirectory.toPath();
+        return confPath.resolve("ocfl-derivate-migration-errors");
     }
 
     private static List<String> getStaleOCFLClassificationIDs() {
@@ -436,6 +540,33 @@ public class MCROCFLCommands {
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .filter(Predicate.not(userEMList::contains))
             .collect(Collectors.toList());
+    }
+
+    private static class DigestFileVisitor extends SimpleFileVisitor<Path> {
+
+        private final Map<String, MCRDigest> map;
+
+        DigestFileVisitor(Map<String, MCRDigest> map) {
+            this.map = map;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
+            String relativePath = MCRPath.toMCRPath(path).getOwnerRelativePath();
+            if (basicFileAttributes instanceof MCRFileAttributes<?> mcrFileAttributes) {
+                map.put(relativePath, mcrFileAttributes.digest());
+            } else {
+                throw new IOException("Path '" + path + "' should have MCRFileAttributes.");
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path path, IOException e) {
+            map.put(MCRPath.toMCRPath(path).getOwnerRelativePath(), null);
+            return FileVisitResult.CONTINUE;
+        }
+
     }
 
 }

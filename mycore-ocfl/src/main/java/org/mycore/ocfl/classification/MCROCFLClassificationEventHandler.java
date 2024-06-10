@@ -18,8 +18,6 @@
 
 package org.mycore.ocfl.classification;
 
-import static org.mycore.ocfl.MCROCFLPersistenceTransaction.addClassficationEvent;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -27,6 +25,8 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+
+import static org.mycore.ocfl.classification.MCROCFLClassificationTransaction.addClassificationEvent;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
@@ -41,15 +41,15 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
             MCRCategory mcrCg = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
             LOGGER.debug("{} handling {} {}", () -> getClass().getName(), mcrCg::getId, evt::getEventType);
             switch (evt.getEventType()) {
-                case CREATE -> addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
-                case UPDATE -> addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                case CREATE -> addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
+                case UPDATE -> addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                 case DELETE -> {
                     if (mcrCg.getId().isRootID()) {
                         // delete complete classification
-                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
+                        addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
                     } else {
                         // update classification to new version
-                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                        addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                     }
                 }
                 default -> LOGGER.error("No Method available for {}", evt.getEventType());

@@ -18,11 +18,6 @@
 
 package org.mycore.ocfl.metadata.migration;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
 import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Parent;
@@ -32,6 +27,11 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRMetadataVersionType;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A pruner that combines and compares revisions, based on an XPath expression, to decide which to keep and which to
