@@ -18,11 +18,10 @@
 
 package org.mycore.ocfl.layout;
 
-import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
-
 import io.ocfl.api.exception.OcflExtensionException;
 import io.ocfl.core.extension.OcflExtensionConfig;
 import io.ocfl.core.extension.storage.layout.OcflStorageLayoutExtension;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
 
