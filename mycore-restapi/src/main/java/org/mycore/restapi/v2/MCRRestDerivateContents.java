@@ -56,7 +56,7 @@ import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.util.MCRRestContentHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
-import org.mycore.datamodel.niofs.MCRMD5AttributeView;
+import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.jersey.MCRCacheControl;
@@ -232,7 +232,7 @@ public class MCRRestDerivateContents {
     }
 
     private static EntityTag getETag(MCRFileAttributes attrs) {
-        return new EntityTag(attrs.md5sum());
+        return new EntityTag(attrs.digest().toHexString());
     }
 
     private static long getUploadMaxSize() {
@@ -314,7 +314,7 @@ public class MCRRestDerivateContents {
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .tag(getETag(fileAttributes))
-            .header("Digest", getDigestHeader(fileAttributes.md5sum()))
+            .header("Digest", getDigestHeader(fileAttributes.digest().toHexString()))
             .build();
     }
 
@@ -354,7 +354,7 @@ public class MCRRestDerivateContents {
                 content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
                 try {
                     final List<Map.Entry<String, String>> responseHeader = List
-                        .of(Map.entry("Digest", getDigestHeader(fileAttributes.md5sum())));
+                        .of(Map.entry("Digest", getDigestHeader(fileAttributes.digest().toHexString())));
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader, responseHeader);
                 } catch (IOException e) {
                     throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
@@ -498,7 +498,7 @@ public class MCRRestDerivateContents {
                 try {
                     return (ds instanceof SecureDirectoryStream)
                         ? ((SecureDirectoryStream<MCRPath>) ds).getFileAttributeView(MCRPath.toMCRPath(p.getFileName()),
-                            MCRMD5AttributeView.class).readAllAttributes() //usually faster
+                            MCRDigestAttributeView.class).readAllAttributes() //usually faster
                         : Files.readAttributes(p, MCRFileAttributes.class);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
@@ -597,7 +597,7 @@ public class MCRRestDerivateContents {
 
         File(MCRPath p, MCRFileAttributes attr, String mimeType) {
             super(p, attr);
-            this.md5 = attr.md5sum();
+            this.md5 = attr.digest().toHexString();
             this.size = attr.size();
             this.mimeType = mimeType;
         }

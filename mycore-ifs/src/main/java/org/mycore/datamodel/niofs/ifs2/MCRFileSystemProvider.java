@@ -18,11 +18,24 @@
 
 package org.mycore.datamodel.niofs.ifs2;
 
+import com.google.common.collect.Sets;
+import org.mycore.common.events.MCRPathEventHelper;
+import org.mycore.datamodel.ifs2.MCRDirectory;
+import org.mycore.datamodel.ifs2.MCRFile;
+import org.mycore.datamodel.ifs2.MCRFileCollection;
+import org.mycore.datamodel.ifs2.MCRStoredNode;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystemProvider;
+import org.mycore.datamodel.niofs.MCRBasicFileAttributeViewProperties;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
+import org.mycore.datamodel.niofs.MCRDigestAttributeView;
+import org.mycore.datamodel.niofs.MCRPath;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.AccessMode;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
@@ -31,9 +44,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileStore;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemAlreadyExistsException;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
@@ -47,38 +57,16 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
-import java.nio.file.attribute.FileTime;
-import java.nio.file.spi.FileSystemProvider;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.ifs2.MCRDirectory;
-import org.mycore.datamodel.ifs2.MCRFile;
-import org.mycore.datamodel.ifs2.MCRFileCollection;
-import org.mycore.datamodel.ifs2.MCRStoredNode;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
-import org.mycore.datamodel.niofs.MCRFileAttributes;
-import org.mycore.datamodel.niofs.MCRMD5AttributeView;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.fileupload.MCRUploadHelper;
-
-import com.google.common.collect.Sets;
 
 /**
  * MyCoRe IFS2 FileSystemProvider implementation
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRFileSystemProvider extends FileSystemProvider {
+public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
 
     /**
      * scheme part of the IFS file system URI
@@ -90,20 +78,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
-    private static volatile MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
-
-    /**
-     * set of supported copy options
-     */
-    private static final Set<? extends CopyOption> SUPPORTED_COPY_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
-        StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING));
-
-    /**
-     * set of supported open options
-     */
-    private static final Set<? extends OpenOption> SUPPORTED_OPEN_OPTIONS = EnumSet.of(StandardOpenOption.APPEND,
-        StandardOpenOption.DSYNC, StandardOpenOption.READ, StandardOpenOption.SPARSE, StandardOpenOption.SYNC,
-        StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+    private static volatile MCRIFSFileSystem FILE_SYSTEM_INSTANCE;
 
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#getScheme()
@@ -113,12 +88,14 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         return SCHEME;
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.spi.FileSystemProvider#newFileSystem(java.net.URI, java.util.Map)
-     */
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env) {
-        throw new FileSystemAlreadyExistsException();
+    public URI getURI() {
+        return FS_URI;
+    }
+
+    @Override
+    public MCRIFSFileSystem getFileSystem() {
+        return getMCRIFSFileSystem();
     }
 
     /* (non-Javadoc)
@@ -133,31 +110,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 }
             }
         }
-        return getMCRIFSFileSystem();
-    }
-
-    /* (non-Javadoc)
-     * @see java.nio.file.spi.FileSystemProvider#getPath(java.net.URI)
-     */
-    @Override
-    public Path getPath(final URI uri) {
-        if (!FS_URI.getScheme().equals(Objects.requireNonNull(uri).getScheme())) {
-            throw new FileSystemNotFoundException("Unkown filesystem: " + uri);
-        }
-        String path = uri.getPath().substring(1);//URI path is absolute -> remove first slash
-        String owner = null;
-        for (int i = 0; i < path.length(); i++) {
-            if (path.charAt(i) == MCRAbstractFileSystem.SEPARATOR) {
-                break;
-            }
-            if (path.charAt(i) == ':') {
-                owner = path.substring(0, i);
-                path = path.substring(i + 1);
-                break;
-            }
-
-        }
-        return MCRAbstractFileSystem.getPath(owner, path, getMCRIFSFileSystem());
+        return FILE_SYSTEM_INSTANCE;
     }
 
     /* (non-Javadoc)
@@ -170,17 +123,12 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             throw new UnsupportedOperationException("Atomically setting of file attributes is not supported.");
         }
         MCRPath ifsPath = MCRFileSystemUtils.checkPathAbsolute(path);
-        Set<? extends OpenOption> fileOpenOptions = options.stream()
-            .filter(option -> !(option == StandardOpenOption.CREATE || option == StandardOpenOption.CREATE_NEW))
-            .collect(Collectors.toSet());
         boolean create = options.contains(StandardOpenOption.CREATE);
         boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
+        Set<? extends OpenOption> fileOpenOptions = getOpenOptions(options);
         if (create || createNew) {
-            checkNewPathName(ifsPath);
-            for (OpenOption option : fileOpenOptions) {
-                //check before we create any file instance
-                checkOpenOption(option);
-            }
+            checkFileName(ifsPath.getFileName().toString());
+            checkOpenOption(fileOpenOptions);
         }
         boolean channelCreateEvent = createNew || Files.notExists(ifsPath);
         MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(ifsPath, create, createNew, !channelCreateEvent);
@@ -190,24 +138,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         FileChannel baseChannel = (FileChannel) Files.newByteChannel(mcrFile.getLocalPath(), fileOpenOptions);
         return new MCRFileChannel(ifsPath, mcrFile, baseChannel, write, channelCreateEvent);
-    }
-
-    private static void checkNewPathName(MCRPath ifsPath) throws IOException {
-        //check property lazy as on initialization of this class MCRConfiguration2 is not ready
-        if (MCRConfiguration2.getBoolean("MCR.NIO.PathCreateNameCheck").orElse(true)) {
-            try {
-                MCRUploadHelper.checkPathName(ifsPath.getFileName().toString(), true);
-            } catch (MCRException e) {
-                throw new IOException(e.getMessage(), e);
-            }
-        }
-    }
-
-    static void checkOpenOption(OpenOption option) {
-        if (!SUPPORTED_OPEN_OPTIONS.contains(option)) {
-            throw new UnsupportedOperationException("Unsupported OpenOption: " + option.getClass().getSimpleName()
-                + "." + option);
-        }
     }
 
     /* (non-Javadoc)
@@ -233,7 +163,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRDirectory rootDirectory;
-        if (mcrPath.isAbsolute() && mcrPath.getNameCount() == 0) {
+        if (mcrPath.getNameCount() == 0) {
             MCRObjectID derId = MCRObjectID.getInstance(mcrPath.getOwner());
             org.mycore.datamodel.ifs2.MCRFileStore store = MCRFileSystemUtils.getStore(derId.getBase());
             if (store.retrieve(derId.getNumberAsInteger()) != null) {
@@ -243,7 +173,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             return;
         } else {
             //not root directory
-            checkNewPathName(mcrPath);
+            checkFileName(mcrPath.getFileName().toString());
         }
         rootDirectory = MCRFileSystemUtils.getFileCollection(mcrPath.getOwner());
         MCRPath parentPath = mcrPath.getParent();
@@ -392,14 +322,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             .setTimes(srcAttrs.lastModifiedTime(), srcAttrs.lastAccessTime(), srcAttrs.creationTime());
     }
 
-    private void checkCopyOptions(CopyOption[] options) {
-        for (CopyOption option : options) {
-            if (!SUPPORTED_COPY_OPTIONS.contains(option)) {
-                throw new UnsupportedOperationException("Unsupported copy option: " + option);
-            }
-        }
-    }
-
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#move(java.nio.file.Path, java.nio.file.Path, java.nio.file.CopyOption[])
      */
@@ -459,37 +381,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             throw new NoSuchFileException(mcrPath.toString());
         }
         if (node instanceof MCRDirectory) {
-            checkDirectoryAccessModes(modes);
+            checkDirectoryAccessModes(mcrPath, modes);
         } else {
-            checkFile((MCRFile) node, modes);
-        }
-    }
-
-    private void checkDirectoryAccessModes(AccessMode... modes) throws AccessDeniedException {
-        for (AccessMode mode : modes) {
-            switch (mode) {
-                case READ:
-                case WRITE:
-                case EXECUTE:
-                    break;
-                default:
-                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
-            }
-        }
-    }
-
-    private void checkFile(MCRFile file, AccessMode... modes) throws AccessDeniedException {
-        for (AccessMode mode : modes) {
-            switch (mode) {
-                case READ:
-                case WRITE:
-                    break;
-                case EXECUTE:
-                    throw new AccessDeniedException(MCRFileSystemUtils.toPath(file).toString(), null,
-                        "Unsupported AccessMode: " + mode);
-                default:
-                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
-            }
+            checkFileAccessModes(mcrPath, modes);
         }
     }
 
@@ -504,7 +398,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (type == BasicFileAttributeView.class) {
             return (V) new BasicFileAttributeViewImpl(mcrPath);
         }
-        if (type == MCRMD5AttributeView.class) {
+        if (type == MCRDigestAttributeView.class) {
             return (V) new MD5FileAttributeViewImpl(mcrPath);
         }
         return null;
@@ -533,28 +427,15 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         String[] s = splitAttrName(attributes);
-        if (s[0].length() == 0) {
+        if (s[0].isEmpty()) {
             throw new IllegalArgumentException(attributes);
         }
-        BasicFileAttributeViewImpl view = switch (s[0]) {
+        BaseBasicFileAttributeView view = switch (s[0]) {
             case "basic" -> new BasicFileAttributeViewImpl(mcrPath);
             case "md5" -> new MD5FileAttributeViewImpl(mcrPath);
             default -> throw new UnsupportedOperationException("View '" + s[0] + "' not available");
         };
         return view.getAttributeMap(s[1].split(","));
-    }
-
-    private static String[] splitAttrName(String attribute) {
-        String[] s = new String[2];
-        int pos = attribute.indexOf(':');
-        if (pos == -1) {
-            s[0] = "basic";
-            s[1] = attribute;
-        } else {
-            s[0] = attribute.substring(0, pos++);
-            s[1] = (pos == attribute.length()) ? "" : attribute.substring(pos);
-        }
-        return s;
     }
 
     /* (non-Javadoc)
@@ -570,35 +451,14 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
         return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? MCRAbstractFileSystem.getInstance(SCHEME)
-            : FILE_SYSTEM_INSTANCE);
+                                                                : FILE_SYSTEM_INSTANCE);
     }
 
-    static class BasicFileAttributeViewImpl extends MCRBasicFileAttributeViewImpl {
-        private static final String SIZE_NAME = "size";
-
-        private static final String CREATION_TIME_NAME = "creationTime";
-
-        private static final String LAST_ACCESS_TIME_NAME = "lastAccessTime";
-
-        private static final String LAST_MODIFIED_TIME_NAME = "lastModifiedTime";
-
-        private static final String FILE_KEY_NAME = "fileKey";
-
-        private static final String IS_DIRECTORY_NAME = "isDirectory";
-
-        private static final String IS_REGULAR_FILE_NAME = "isRegularFile";
-
-        private static final String IS_SYMBOLIC_LINK_NAME = "isSymbolicLink";
-
-        private static final String IS_OTHER_NAME = "isOther";
-
-        private static HashSet<String> allowedAttr = Sets.newHashSet("*", SIZE_NAME, CREATION_TIME_NAME,
-            LAST_ACCESS_TIME_NAME, LAST_MODIFIED_TIME_NAME, FILE_KEY_NAME, IS_DIRECTORY_NAME, IS_REGULAR_FILE_NAME,
-            IS_SYMBOLIC_LINK_NAME, IS_OTHER_NAME);
+    static abstract class BaseBasicFileAttributeView extends MCRBasicFileAttributeViewImpl {
 
         protected MCRPath path;
 
-        BasicFileAttributeViewImpl(Path path) {
+        BaseBasicFileAttributeView(Path path) {
             this.path = MCRPath.toMCRPath(path);
             if (!path.isAbsolute()) {
                 throw new InvalidPathException(path.toString(), "'path' must be absolute.");
@@ -610,80 +470,34 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             return MCRFileSystemUtils.resolvePath(this.path);
         }
 
-        public Map<String, Object> getAttributeMap(String... attributes) throws IOException {
-            Set<String> allowed = getAllowedAttributes();
-            boolean copyAll = false;
-            for (String attr : attributes) {
-                if (!allowed.contains(attr)) {
-                    throw new IllegalArgumentException("'" + attr + "' not recognized");
-                }
-                if (Objects.equals(attr, "*")) {
-                    copyAll = true;
-                }
-            }
-            Set<String> requested = copyAll ? allowed : Sets.newHashSet(attributes);
-            return buildMap(requested, readAttributes());
-        }
+        abstract Map<String, Object> getAttributeMap(String... attributes) throws IOException;
 
-        protected Map<String, Object> buildMap(Set<String> requested, MCRFileAttributes<String> attrs) {
-            HashMap<String, Object> map = new HashMap<>();
-            for (String attr : map.keySet()) {
-                switch (attr) {
-                    case SIZE_NAME -> map.put(attr, attrs.size());
-                    case CREATION_TIME_NAME -> map.put(attr, attrs.creationTime());
-                    case LAST_ACCESS_TIME_NAME -> map.put(attr, attrs.lastAccessTime());
-                    case LAST_MODIFIED_TIME_NAME -> map.put(attr, attrs.lastModifiedTime());
-                    case FILE_KEY_NAME -> map.put(attr, attrs.fileKey());
-                    case IS_DIRECTORY_NAME -> map.put(attr, attrs.isDirectory());
-                    case IS_REGULAR_FILE_NAME -> map.put(attr, attrs.isRegularFile());
-                    case IS_SYMBOLIC_LINK_NAME -> map.put(attr, attrs.isSymbolicLink());
-                    case IS_OTHER_NAME -> map.put(attr, attrs.isOther());
-                    default -> {
-                    }
-                    //ignored
-                }
-            }
-            return map;
-        }
-
-        public void setAttribute(String name, Object value) throws IOException {
-            Set<String> allowed = getAllowedAttributes();
-            if (Objects.equals(name, "*") || !allowed.contains(name)) {
-                throw new IllegalArgumentException("'" + name + "' not recognized");
-            }
-            switch (name) {
-                case CREATION_TIME_NAME -> this.setTimes(null, null, (FileTime) value);
-                case LAST_ACCESS_TIME_NAME -> this.setTimes(null, (FileTime) value, null);
-                case LAST_MODIFIED_TIME_NAME -> this.setTimes((FileTime) value, null, null);
-                case SIZE_NAME,
-                    FILE_KEY_NAME,
-                    IS_DIRECTORY_NAME,
-                    IS_REGULAR_FILE_NAME,
-                    IS_SYMBOLIC_LINK_NAME,
-                    IS_OTHER_NAME -> throw new IllegalArgumentException(
-                        "'" + name + "' is a read-only attribute.");
-                default -> {
-                    //ignored
-                }
-            }
-
-        }
-
-        protected Set<String> getAllowedAttributes() {
-            return allowedAttr;
-        }
     }
 
-    private static class MD5FileAttributeViewImpl extends BasicFileAttributeViewImpl implements
-        MCRMD5AttributeView<String> {
+    static class BasicFileAttributeViewImpl extends BaseBasicFileAttributeView {
 
-        private static String MD5_NAME = "md5";
+        protected MCRBasicFileAttributeViewProperties<BasicFileAttributeViewImpl> properties;
 
-        private static Set<String> allowedAttr = Sets.union(BasicFileAttributeViewImpl.allowedAttr,
-            Sets.newHashSet(MD5_NAME));
+        BasicFileAttributeViewImpl(Path path) {
+            super(path);
+            this.properties = new MCRBasicFileAttributeViewProperties<>(this);
+        }
+
+        @Override
+        public Map<String, Object> getAttributeMap(String... attributes) throws IOException {
+            return this.properties.getAttributeMap(attributes);
+        }
+
+    }
+
+    private static class MD5FileAttributeViewImpl extends BaseBasicFileAttributeView
+        implements MCRDigestAttributeView<String> {
+
+        protected MD5FileAttributeViewProperties properties;
 
         MD5FileAttributeViewImpl(Path path) {
             super(path);
+            this.properties = new MD5FileAttributeViewProperties(this);
         }
 
         @Override
@@ -692,20 +506,38 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
 
         @Override
+        public Map<String, Object> getAttributeMap(String... attributes) throws IOException {
+            return this.properties.getAttributeMap(attributes);
+        }
+
+        @Override
         public String name() {
             return "md5";
         }
 
-        @Override
-        protected Set<String> getAllowedAttributes() {
-            return allowedAttr;
+    }
+
+    private static class MD5FileAttributeViewProperties
+        extends MCRBasicFileAttributeViewProperties<MD5FileAttributeViewImpl> {
+
+        private static final String MD5_NAME = "md5";
+
+        private static final Set<String> ALLOWED_ATTRIBUTES = Sets.union(
+            MCRBasicFileAttributeViewProperties.ALLOWED_ATTRIBUTES,
+            Sets.newHashSet(MD5_NAME)
+        );
+
+        MD5FileAttributeViewProperties(MD5FileAttributeViewImpl view) {
+            super(view);
         }
 
         @Override
-        protected Map<String, Object> buildMap(Set<String> requested, MCRFileAttributes<String> attrs) {
-            Map<String, Object> buildMap = super.buildMap(requested, attrs);
+        protected Map<String, Object> buildMap(Set<String> requested)
+            throws IOException {
+            Map<String, Object> buildMap = super.buildMap(requested);
+            MCRFileAttributes<String> attrs = getView().readAttributes();
             if (requested.contains(MD5_NAME)) {
-                buildMap.put(MD5_NAME, attrs.md5sum());
+                buildMap.put(MD5_NAME, attrs.digest());
             }
             return buildMap;
         }
@@ -713,14 +545,19 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         @Override
         public void setAttribute(String name, Object value) throws IOException {
             if (MD5_NAME.equals(name)) {
-                MCRStoredNode node = resolveNode();
+                MCRStoredNode node = getView().resolveNode();
                 if (node instanceof MCRDirectory) {
-                    throw new IOException("Cannot set md5sum on directories: " + path);
+                    throw new IOException("Cannot set md5sum on directories: " + node);
                 }
                 ((MCRFile) node).setMD5((String) value);
-            } else {
-                super.setAttribute(name, value);
+                return;
             }
+            super.setAttribute(name, value);
+        }
+
+        @Override
+        public Set<String> getAllowedAttributes() {
+            return ALLOWED_ATTRIBUTES;
         }
 
     }

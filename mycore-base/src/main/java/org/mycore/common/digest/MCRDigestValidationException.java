@@ -16,23 +16,22 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.niofs;
+package org.mycore.common.digest;
 
-import java.io.IOException;
-import java.nio.file.attribute.BasicFileAttributeView;
+import org.mycore.common.MCRException;
 
 /**
- * @author Thomas Scheffler (yagee)
- *
+ * Exception thrown when an error occurs in digest validation.
  */
-public interface MCRMD5AttributeView<T> extends BasicFileAttributeView {
+public class MCRDigestValidationException extends MCRException {
 
     /**
-     * Returns the name of the attribute view. Attribute views of this type have the name "md5".
+     * Constructs a new digest validation exception with the specified detail message.
+     *
+     * @param message The detail message.
      */
-    @Override
-    String name();
-
-    MCRFileAttributes<T> readAllAttributes() throws IOException;
+    public MCRDigestValidationException(String message) {
+        super(message);
+    }
 
 }

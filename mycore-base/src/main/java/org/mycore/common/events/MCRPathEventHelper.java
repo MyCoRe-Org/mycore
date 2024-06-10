@@ -16,16 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.niofs.ifs2;
+package org.mycore.common.events;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventManager;
+public class MCRPathEventHelper {
 
-class MCRPathEventHelper {
+    private static void fireFileEvent(MCREvent.EventType event, Path file) throws IOException {
+        BasicFileAttributes attrs = Files.getFileAttributeView(file, BasicFileAttributeView.class).readAttributes();
+        fireFileEvent(event, file, attrs);
+    }
 
     private static void fireFileEvent(MCREvent.EventType event, Path file, BasicFileAttributes attrs) {
         MCREvent fileEvent = new MCREvent(MCREvent.ObjectType.PATH, event);
@@ -36,16 +41,31 @@ class MCRPathEventHelper {
         MCREventManager.instance().handleEvent(fileEvent);
     }
 
-    static void fireFileCreateEvent(Path file, BasicFileAttributes attrs) {
+    public static void fireFileCreateEvent(Path file) throws IOException {
+        BasicFileAttributes attrs = Files.getFileAttributeView(file, BasicFileAttributeView.class).readAttributes();
+        fireFileCreateEvent(file, attrs);
+    }
+
+    public static void fireFileCreateEvent(Path file, BasicFileAttributes attrs) {
         fireFileEvent(MCREvent.EventType.CREATE, file, Objects.requireNonNull(attrs));
     }
 
-    static void fireFileUpdateEvent(Path file, BasicFileAttributes attrs) {
+    public static void fireFileUpdateEvent(Path file) throws IOException {
+        BasicFileAttributes attrs = Files.getFileAttributeView(file, BasicFileAttributeView.class).readAttributes();
+        fireFileUpdateEvent(file, attrs);
+    }
+
+    public static void fireFileUpdateEvent(Path file, BasicFileAttributes attrs) {
         fireFileEvent(MCREvent.EventType.UPDATE, file, Objects.requireNonNull(attrs));
     }
 
-    static void fireFileDeleteEvent(Path file) {
+    public static void fireFileDeleteEvent(Path file) {
         fireFileEvent(MCREvent.EventType.DELETE, file, null);
+    }
+
+    public static void fireFileMoveEvent(Path source, Path target, boolean create) throws IOException {
+        MCRPathEventHelper.fireFileEvent(create ? MCREvent.EventType.CREATE : MCREvent.EventType.UPDATE, target);
+        MCRPathEventHelper.fireFileDeleteEvent(source);
     }
 
 }

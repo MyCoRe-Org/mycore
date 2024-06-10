@@ -30,12 +30,13 @@ import java.util.stream.Collectors;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -67,10 +68,10 @@ public class MCRORCIDUtils {
      */
     public static String hashString(String input) {
         final byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
-        final MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
+        final MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRMD5Digest.ALGORITHM);
         md5Digest.update(bytes);
         final byte[] digest = md5Digest.digest();
-        return MCRMD5InputStream.getMD5String(digest);
+        return MCRUtils.toHexString(digest);
     }
 
     /**

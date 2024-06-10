@@ -16,37 +16,40 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.niofs;
-
-import java.nio.file.attribute.BasicFileAttributes;
-
-import org.mycore.common.digest.MCRDigest;
+package org.mycore.common.digest;
 
 /**
- * @author Thomas Scheffler (yagee)
+ * Digest implementation for SHA-512.
  */
-public interface MCRFileAttributes<T> extends BasicFileAttributes {
+public final class MCRSHA512Digest extends MCRDigest {
 
-    enum FileType {
-        file, directory, link, other;
+    public static SHA512Algorithm ALGORITHM;
 
-        public static FileType fromAttribute(BasicFileAttributes attrs) {
-            if (attrs.isRegularFile()) {
-                return file;
-            }
-            if (attrs.isDirectory()) {
-                return directory;
-            }
-            if (attrs.isSymbolicLink()) {
-                return link;
-            }
-            return other;
-        }
+    static {
+        ALGORITHM = new MCRSHA512Digest.SHA512Algorithm();
     }
 
-    MCRDigest digest();
+    /**
+     * Creates a new SHA-512 digest instance.
+     *
+     * @param digest The SHA-512 digest value.
+     * @throws MCRDigestValidationException If the digest value is invalid.
+     */
+    public MCRSHA512Digest(String digest) throws MCRDigestValidationException {
+        super(digest);
+    }
 
     @Override
-    T fileKey();
+    public Algorithm getAlgorithm() {
+        return ALGORITHM;
+    }
+
+    public static class SHA512Algorithm extends Algorithm {
+
+        public SHA512Algorithm() {
+            super("sha-512");
+        }
+
+    }
 
 }

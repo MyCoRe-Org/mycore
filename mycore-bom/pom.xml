@@ -44,7 +44,7 @@
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.6.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
-    <ocfl-java.version>2.0.0</ocfl-java.version>
+    <ocfl-java.version>2.1.0</ocfl-java.version>
     <rdf4j.version>4.3.6</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
     <verapdf.version>1.24.1</verapdf.version>

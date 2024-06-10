@@ -49,6 +49,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.common.events.MCRPathEventHelper;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
