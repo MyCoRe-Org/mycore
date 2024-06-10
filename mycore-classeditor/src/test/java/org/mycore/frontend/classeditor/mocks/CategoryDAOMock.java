@@ -201,6 +201,11 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     @Override
+    public List<MCRCategory> getCategoriesByClassAndLang(String classId, String lang) {
+        return null;
+    }
+
+    @Override
     public long getLastModified(String root) {
         return 0;
     }
