@@ -4,11 +4,15 @@
   xmlns="http://www.w3.org/TR/REC-html40"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:mcrstring="http://www.mycore.de/xslt/stringutils"
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:work="http://www.orcid.org/ns/work"
   xmlns:common="http://www.orcid.org/ns/common">
 
+  <xsl:include href="resource:xsl/functions/stringutils.xsl"/>
+
   <xsl:param name="MCR.ORCID2.Work.SourceURL" />
+  <xsl:variable name="short-description-max-length" select="5000"/>
 
   <xsl:template match="mycoreobject">
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
@@ -25,7 +29,6 @@
       <xsl:call-template name="externalIDs" />
       <xsl:apply-templates select="(mods:location/mods:url)[1]" />
       <xsl:call-template name="workContributors" />
-      <xsl:apply-templates select="mods:language" />
     </work:work>
   </xsl:template>
 
@@ -84,7 +87,7 @@
 
   <xsl:template match="mods:abstract">
     <work:short-description>
-      <xsl:value-of select="text()" />
+      <xsl:value-of select="mcrstring:shorten(text(), ($short-description-max-length - 1), '…')"/>
     </work:short-description>
   </xsl:template>
 
@@ -256,12 +259,6 @@
         <xsl:when test=".='hst'">chair-or-translator</xsl:when>
       </xsl:choose>
     </work:contributor-role>
-  </xsl:template>
-
-  <xsl:template match="mods:language">
-    <common:language-code>
-      <xsl:value-of select="mods:languageTerm[@type='code']" />
-    </common:language-code>
   </xsl:template>
 
   <xsl:template match="*">
