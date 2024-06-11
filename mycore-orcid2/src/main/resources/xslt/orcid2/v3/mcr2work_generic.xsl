@@ -9,7 +9,7 @@
   xmlns:work="http://www.orcid.org/ns/work"
   xmlns:common="http://www.orcid.org/ns/common">
 
-  <xsl:include href="resource:xsl/functions/stringutils.xsl"/>
+  <xsl:include href="resource:xslt/functions/stringutils.xsl"/>
 
   <xsl:param name="MCR.ORCID2.Work.SourceURL" />
   <xsl:variable name="short-description-max-length" select="5000"/>

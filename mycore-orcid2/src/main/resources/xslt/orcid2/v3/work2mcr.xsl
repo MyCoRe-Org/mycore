@@ -7,7 +7,7 @@
   xmlns:common="http://www.orcid.org/ns/common"
   exclude-result-prefixes="xsl">
 
-  <xsl:import href="resource:xsl/orcid2/v3/work2mcr_generic.xsl" />
+  <xsl:import href="resource:xslt/orcid2/v3/work2mcr_generic.xsl" />
 
   <!-- ORCID.org work types to MODS genre mapping -->
   <xsl:template match="work:type">
