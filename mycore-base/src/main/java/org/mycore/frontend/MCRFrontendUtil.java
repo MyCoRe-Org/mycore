@@ -236,8 +236,7 @@ public class MCRFrontendUtil {
      * @throws IllegalStateException if {@link MCRSessionMgr#hasCurrentSession()} returns false
      */
     private static void setAsCurrent(MCRSession session, MCRServletJob job) throws IllegalStateException {
-        session.setFirstURI(() -> URI.create(job.getRequest().getRequestURI()));
-        session.setFirstUserAgent(() -> job.getRequest().getHeader("User-Agent"));
+        session.logHttpRequest(job.getRequest());
         CURRENT_SERVLET_JOB.set(Map.entry(session.getID(), job));
     }
 

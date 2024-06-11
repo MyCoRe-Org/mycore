@@ -133,8 +133,9 @@ public class MCRSessionResource {
         sessionJSON.addProperty("createTime", session.getCreateTime());
         sessionJSON.addProperty("lastAccessTime", session.getLastAccessedTime());
         sessionJSON.addProperty("loginTime", session.getLoginTime());
-        session.getFirstURI().ifPresent(u -> sessionJSON.addProperty("firstURI", u.toString()));
+        session.getFirstURI().ifPresent(u -> sessionJSON.addProperty("firstURI", u));
         session.getFirstUserAgent().ifPresent(u -> sessionJSON.addProperty("firstUserAgent", u));
+        session.getLastURI().ifPresent(u -> sessionJSON.addProperty("lastURI", u));
         sessionJSON.add("constructingStacktrace", buildStacktrace(session));
         return sessionJSON;
     }

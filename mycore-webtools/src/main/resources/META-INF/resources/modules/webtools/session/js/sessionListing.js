@@ -163,6 +163,10 @@ mycore.session.listing = {
       html += "<br/>";
       html += window["component.session-listing.firstUserAgent"] + ": " + session.firstUserAgent;
     }
+        if (session.lastURI != null) {
+          html += "<br/>";
+          html += window["component.session-listing.lastURI"] + ": " + session.lastURI;
+        }
     header.find(".modal-title").html(html);
     header.show();
     var content = "";

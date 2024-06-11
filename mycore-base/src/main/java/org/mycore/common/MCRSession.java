@@ -23,7 +23,6 @@ import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -45,7 +44,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,6 +55,8 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * Instances of this class collect information kept during a session like the currently active user, the preferred
  * language etc.
@@ -66,8 +66,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author Frank Lützenkirchen
  */
 sealed public class MCRSession implements Cloneable permits MCRScopedSession {
-
-    private static final URI DEFAULT_URI = URI.create("");
 
     /** A map storing arbitrary session data * */
     private Map<Object, Object> map = new Hashtable<>();
@@ -105,9 +103,11 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private StackTraceElement[] constructingStackTrace;
 
-    private Optional<URI> firstURI = Optional.empty();
+    private Optional<String> firstURI = Optional.empty();
 
     private Optional<String> firstUserAgent = Optional.empty();
+
+    private Optional<String> lastURI = Optional.empty();
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
@@ -323,16 +323,18 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         return lastAccessTime;
     }
 
-    public void setFirstURI(Supplier<URI> uri) {
+    public void logHttpRequest(HttpServletRequest request) {
+        lastURI = Optional.of(getFullRequestURI(request));
         if (firstURI.isEmpty()) {
-            firstURI = Optional.of(uri.get());
+            firstURI = lastURI;
+            firstUserAgent = Optional.ofNullable(request.getHeader("User-Agent"));
         }
     }
 
-    public void setFirstUserAgent(Supplier<String> userAgent) {
-        if (firstUserAgent.isEmpty()) {
-            firstUserAgent = Optional.of(userAgent.get());
-        }
+    private String getFullRequestURI(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        String queryString = request.getQueryString();
+        return queryString == null ? requestURI : requestURI + "?" + queryString;
     }
 
     /**
@@ -368,10 +370,13 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
             LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
         }
         if (firstURI.isEmpty()) {
-            firstURI = Optional.of(DEFAULT_URI);
+            firstURI = Optional.of("");
         }
         if (firstUserAgent.isEmpty()) {
             firstUserAgent = Optional.of("");
+        }
+        if (lastURI.isEmpty()) {
+            lastURI = Optional.of("");
         }
         onCommitTasks.remove();
     }
@@ -447,12 +452,16 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         return constructingStackTrace;
     }
 
-    public Optional<URI> getFirstURI() {
+    public Optional<String> getFirstURI() {
         return firstURI;
     }
 
     public Optional<String> getFirstUserAgent() {
         return firstUserAgent;
+    }
+
+    public Optional<String> getLastURI() {
+        return lastURI;
     }
 
     /**
