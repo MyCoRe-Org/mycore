@@ -23,6 +23,7 @@ import net.sf.saxon.s9api.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMResult;
@@ -34,6 +35,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -68,8 +71,20 @@ public class MCRTestCaseXSLTUtil {
      * @return an XML document with the name as root element and the content of the given XML tree as children
      */
     public static Document prepareTestDocument(String rootName, Element xml) {
+        return prepareTestDocument(rootName, Collections.singletonList(xml));
+    }
+
+    /**
+     * Returns an XML document with the given name as root element and the content of the given XML tree as
+     * child elements. The resulting document can be used for calling XSLT test files using template matching.
+     *
+     * @param rootName the name used as root element name
+     * @param xml      the XML tree
+     * @return an XML document with the name as root element and the content of the given XML tree as children
+     */
+    public static Document prepareTestDocument(String rootName, List<? extends Content> xml) {
         final Element root = new Element(rootName);
-        root.addContent(xml.detach());
+        root.addContent(xml);
 
         return new Document(root);
     }
