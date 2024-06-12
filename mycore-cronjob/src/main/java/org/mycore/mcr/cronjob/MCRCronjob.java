@@ -123,7 +123,7 @@ public abstract class MCRCronjob implements Runnable {
     }
 
     /**
-     * Set the cron description (i.e. a string like like "42 23 * * *") that describes
+     * Set the cron description (i.e. a string like "42 23 * * *") that describes
      * when this Cronjob is executed. The interpretation of this string is dependent on the
      * set cron type.
      *

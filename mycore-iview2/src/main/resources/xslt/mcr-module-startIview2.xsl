@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
-                xmlns:mcrproperty="http://www.mycore.de/xslt/property"
 >
 
 
@@ -9,11 +8,8 @@
     <xsl:param name="derivID" />
     <xsl:choose>
       <xsl:when test="$derivID">
-        <xsl:variable name="supportedContentTypeStr" select="mcrproperty:one('MCR.Module-iview2.SupportedContentTypes')" />
         <xsl:variable name="mainFile" select="mcrderivate:get-main-file($derivID)" />
-        <xsl:variable name="contentType" select="mcrderivate:get-file-content-type($derivID, $mainFile)" />
-        <xsl:variable name="supportedContentTypes" select="tokenize($supportedContentTypeStr, ',')" />
-        <xsl:if test="contains($supportedContentTypes, $contentType)">
+        <xsl:if test="string-length($mainFile) &gt; 0 and count(document(concat('iview2:isFileSupported:', $mainFile))/true)&gt;0">
           <xsl:value-of select="$mainFile" />
         </xsl:if>
       </xsl:when>

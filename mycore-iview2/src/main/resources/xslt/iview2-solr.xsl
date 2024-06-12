@@ -8,7 +8,7 @@
   </xsl:template>
 
   <xsl:template match="mycorederivate/derivate/internals/internal" mode="iview2">
-    <xsl:if test="@maindoc and count(document(concat('iview2:isFileSupported:', @maindoc))/true)&gt;0">
+    <xsl:if test="string-length(@maindoc)&gt;0 and count(document(concat('iview2:isFileSupported:', @maindoc))/true)&gt;0">
       <field name="iviewFile">
         <xsl:value-of select="@maindoc"/>
       </field>

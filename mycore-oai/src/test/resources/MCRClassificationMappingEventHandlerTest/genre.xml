@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd"
+  ID="mir_genres">
+  <label xml:lang="en" text="genre" description="A list of publication types" />
+  <label xml:lang="x-uri" text="http://www.mycore.org/classifications/mir_genres" />
+  <label xml:lang="de" text="Genre" description="Liste der Publikationsarten" />
+  <categories>
+    <category ID="article" counter="1">
+      <label xml:lang="en" text="Article / Chapter" />
+      <label xml:lang="x-mapping" text="diniPublType:article schemaOrg:Article" />
+      <label xml:lang="de" text="Artikel / Aufsatz" />
+      <label xml:lang="x-hosts" text="journal newspaper collection festschrift proceedings standalone" />
+      <category ID="chapter" counter="0">
+        <label xml:lang="en" text="Book chapter" />
+        <label xml:lang="de" text="Buchkapitel" />
+        <label xml:lang="x-hosts" text="book collection" />
+      </category>
+      <category ID="entry" counter="0">
+        <label xml:lang="en" text="Encyclopedia entry" />
+        <label xml:lang="x-hosts" text="lexicon" />
+        <label xml:lang="de" text="Lexikoneintrag" />
+      </category>
+      <category ID="preface" counter="0">
+        <label xml:lang="de" text="Vorwort / Nachwort" />
+        <label xml:lang="x-hosts" text="journal collection festschrift proceedings lexicon" />
+        <label xml:lang="en" text="Preface (foreword) / Postface" />
+      </category>
+      <category ID="speech" counter="0">
+        <label xml:lang="en" text="Lecture / Speech" />
+        <label xml:lang="de" text="Vortrag" />
+        <label xml:lang="x-hosts" text="proceedings standalone" />
+      </category>
+      <category ID="review" counter="0">
+        <label xml:lang="de" text="Rezension" />
+        <label xml:lang="en" text="Review" />
+        <label xml:lang="x-hosts" text="journal newspaper collection festschrift proceedings standalone" />
+      </category>
+    </category>
+  </categories>
+</mycoreclass>
