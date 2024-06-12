@@ -145,6 +145,11 @@ mycore.session.listing = {
   },
 
   showStacktrace: function(id) {
+    var escapeHtml = function(text) {
+      let element = document.createElement('div');
+      element.textContent = text;
+      return element.innerHTML;
+    }
     var dialog = $("#stacktraceModalBody");
     dialog.empty();
     var session = mycore.session.listing.getSession(id);
@@ -157,15 +162,15 @@ mycore.session.listing = {
     }
     if (session.firstURI != null) {
       html += "<br/>";
-      html += window["component.session-listing.firstURI"] + ": " + session.firstURI;
+      html += window["component.session-listing.firstURI"] + ": " + escapeHtml(session.firstURI);
     }
     if (session.firstUserAgent != null) {
       html += "<br/>";
-      html += window["component.session-listing.firstUserAgent"] + ": " + session.firstUserAgent;
+      html += window["component.session-listing.firstUserAgent"] + ": " + escapeHtml(session.firstUserAgent);
     }
         if (session.lastURI != null) {
           html += "<br/>";
-          html += window["component.session-listing.lastURI"] + ": " + session.lastURI;
+          html += window["component.session-listing.lastURI"] + ": " + escapeHtml(session.lastURI);
         }
     header.find(".modal-title").html(html);
     header.show();
