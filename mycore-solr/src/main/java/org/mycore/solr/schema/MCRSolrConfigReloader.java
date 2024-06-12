@@ -46,7 +46,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -103,7 +103,7 @@ public class MCRSolrConfigReloader {
      */
     public static void reset(String configType, String coreID) {
         LOGGER.info(() -> "Resetting config definitions for core " + coreID + " using configuration " + configType);
-        String coreURL = MCRSolrClientFactory.get(coreID)
+        String coreURL = MCRSolrCoreManager.get(coreID)
             .map(MCRSolrCore::getV1CoreURL)
             .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
         JsonObject currentSolrConfig = retrieveCurrentSolrConfigOverlay(coreURL);
@@ -142,7 +142,7 @@ public class MCRSolrConfigReloader {
     public static void processConfigFiles(String configType, String coreID) {
         LOGGER.info(() -> "Load config definitions for core " + coreID + " using configuration " + configType);
         try {
-            String coreURL = MCRSolrClientFactory.get(coreID)
+            String coreURL = MCRSolrCoreManager.get(coreID)
                 .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID)).getV1CoreURL();
             List<String> observedTypes = getObserverConfigTypes();
             JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreURL);

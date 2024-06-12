@@ -64,7 +64,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.http.MCRIdleConnectionMonitorThread;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -313,7 +313,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      * @return a method to make the request
      */
     private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String type) {
-        String serverURL = MCRSolrClientFactory.get(type).get().getV1CoreURL();
+        String serverURL = MCRSolrCoreManager.get(type).get().getV1CoreURL();
 
         return new HttpGet(new MessageFormat("{0}{1}{2}", Locale.ROOT)
             .format(new Object[] { serverURL, queryHandlerPath, params.toQueryString() }));

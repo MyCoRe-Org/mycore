@@ -30,11 +30,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
@@ -60,12 +60,12 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
      * 
      * @param mcrID id of the derivate or mcrobject, if you put a mcrobject id here
      * all files of each derivate are indexed
-     * @param solrClient where to index
      */
-    public MCRSolrFilesIndexHandler(String mcrID, SolrClient solrClient) {
-        super(solrClient);
+    public MCRSolrFilesIndexHandler(String mcrID) {
+        super();
         this.mcrID = mcrID;
         this.subHandlerList = new ArrayList<>();
+        setCoreType(MCRSolrCoreType.MAIN);
     }
 
     @Override
@@ -87,7 +87,6 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         final MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.getInstance();
         final List<MCRSolrIndexHandler> subHandlerList = this.subHandlerList;
         final List<SolrInputDocument> docs = new ArrayList<>();
-        final SolrClient solrClient = this.solrClient;
         Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
 
             @Override
@@ -95,9 +94,9 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
                 boolean sendContent = ihf.checkFile(file, attrs);
                 try {
                     if (sendContent) {
-                        subHandlerList.add(ihf.getIndexHandler(file, attrs, solrClient, true));
+                        subHandlerList.add(ihf.getIndexHandler(file, attrs, true));
                     } else {
-                        subHandlerList.add(ihf.getIndexHandler(file, attrs, solrClient, false));
+                        subHandlerList.add(ihf.getIndexHandler(file, attrs, false));
                     }
                 } catch (Exception ex) {
                     LOGGER.error("Error creating transfer thread", ex);
@@ -108,8 +107,8 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         });
         int fileCount = subHandlerList.size() + docs.size();
         LOGGER.info("Sending {} file(s) for derivate \"{}\"", fileCount, derivateID);
-        if (!docs.isEmpty()) {
-            MCRSolrInputDocumentsHandler subHandler = new MCRSolrInputDocumentsHandler(docs, solrClient);
+        if (!docs.isEmpty()) { // TODO: check this crap
+            MCRSolrInputDocumentsHandler subHandler = new MCRSolrInputDocumentsHandler(docs, MCRSolrCoreType.MAIN);
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }

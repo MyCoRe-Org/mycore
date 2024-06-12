@@ -19,6 +19,7 @@
 package org.mycore.solr.index.handlers.document;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +29,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.solr.MCRSolrConstants;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.MCRSolrIndexer;
@@ -46,14 +48,11 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
 
     Supplier<SolrInputDocument> documentSupplier;
 
-    public MCRSolrInputDocumentHandler(Supplier<SolrInputDocument> documentSupplier, SolrClient solrClient, String id) {
-        super(solrClient);
+    public MCRSolrInputDocumentHandler(Supplier<SolrInputDocument> documentSupplier, String id,
+                                       MCRSolrCoreType coreType) {
         this.documentSupplier = documentSupplier;
         this.id = id;
-    }
-
-    public MCRSolrInputDocumentHandler(Supplier<SolrInputDocument> documentSupplier, String id) {
-        this(documentSupplier, null, id);
+        this.setCoreType(coreType);
     }
 
     /* (non-Javadoc)
@@ -63,16 +62,21 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
     public void index() throws IOException, SolrServerException {
         SolrInputDocument document = documentSupplier.get();
         String id = String.valueOf(document.getFieldValue("id"));
-        SolrClient solrClient = getSolrClient();
+        List<SolrClient> solrClients = getClients();
+
         LOGGER.info("Sending {} to SOLR...", id);
         if (MCRSolrUtils.useNestedDocuments()) {
-            MCRSolrIndexer.deleteById(solrClient, id);
+            for (SolrClient solrClient : solrClients) {
+                MCRSolrIndexer.deleteById(solrClient, id);
+            }
         }
         UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
         getSolrAuthenticationFactory().applyAuthentication(updateRequest,
             MCRSolrAuthenticationLevel.INDEX);
         updateRequest.add(document);
-        updateRequest.process(solrClient);
+        for (SolrClient solrClient : solrClients) {
+            updateRequest.process(solrClient);
+        }
     }
 
     /* (non-Javadoc)

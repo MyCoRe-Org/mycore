@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -43,9 +44,11 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
         getSolrAuthenticationFactory().applyAuthentication(updateRequest,
             MCRSolrAuthenticationLevel.INDEX);
         updateRequest.setAction(UpdateRequest.ACTION.OPTIMIZE, true, true, 1);
-        UpdateResponse response = updateRequest.process(getSolrClient(), null);
-        LOGGER.info("Optimize was {}({}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
-            response.getElapsedTime());
+        for (SolrClient client : getClients()) {
+            UpdateResponse response = updateRequest.process(client, null);
+            LOGGER.info("Optimize was {}({}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
+                    response.getElapsedTime());
+        }
     }
 
     @Override

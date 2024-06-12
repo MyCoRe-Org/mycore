@@ -29,7 +29,7 @@ import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCoreManager;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.DefaultValue;
@@ -98,7 +98,7 @@ public class MCRRestAPISearch {
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount,
         @QueryParam("json.wrf") String jsonWrf) {
-        StringBuilder url = new StringBuilder(MCRSolrClientFactory.getMainSolrCore().getV1CoreURL());
+        StringBuilder url = new StringBuilder(MCRSolrCoreManager.getMainSolrCore().getV1CoreURL());
         url.append("/select?");
 
         if (query != null) {

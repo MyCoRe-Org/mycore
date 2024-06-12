@@ -27,13 +27,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
@@ -54,14 +54,11 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
     private Map<MCRObjectID, MCRContent> contentMap;
 
-    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
-        this(contentMap, MCRSolrClientFactory.getMainSolrClient());
-    }
-
-    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, SolrClient solrClient) {
+    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, MCRSolrCoreType type) {
         super();
         this.contentMap = contentMap;
         this.subhandlers = new ArrayList<>(contentMap.size());
+        this.setCoreType(type);
     }
 
     @Override
@@ -74,15 +71,18 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
         int totalCount = contentMap.size();
         LOGGER.info("Handling {} documents", totalCount);
         //multithread processing will result in too many http request
-        UpdateResponse updateResponse;
+        UpdateResponse updateResponse = null;
         try {
             Iterator<SolrInputDocument> documents = MCRSolrInputDocumentFactory.getInstance().getDocuments(contentMap);
-            SolrClient solrClient = getSolrClient();
-            if (solrClient instanceof ConcurrentUpdateSolrClient) {
-                //split up to speed up processing
-                splitup(documents);
-                return;
+
+            for (SolrClient client : getClients()) {
+                if (client instanceof ConcurrentUpdateSolrClient) {
+                    //split up to speed up processing
+                    makeConcurrent(documents);
+                    return;
+                }
             }
+
             if (LOGGER.isDebugEnabled()) {
                 ArrayList<SolrInputDocument> debugList = new ArrayList<>();
                 while (documents.hasNext()) {
@@ -95,47 +95,52 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             UpdateRequest req = new UpdateRequest();
             getSolrAuthenticationFactory().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
 
-            if (solrClient instanceof HttpSolrClient) {
-                req.setDocIterator(documents);
-            } else {
-                ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
-                while (documents.hasNext()) {
-                    docs.add(documents.next());
-                }
-                req.add(docs);
+            ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
+            while (documents.hasNext()) {
+                docs.add(documents.next());
             }
+            req.add(docs);
 
-            updateResponse = req.process(solrClient);
+            for (MCRSolrCore destinationCore : getDestinationCores()) {
+                try {
+                    updateResponse = req.process(destinationCore.getClient());
+                    if (updateResponse != null && updateResponse.getStatus() != 0) {
+                        LOGGER.error("Error while indexing document collection. Split and retry: {}",
+                                updateResponse.getResponse());
+                        splitup(List.of(destinationCore));
+                    } else {
+                        LOGGER.info("Sending {} documents was successful in {} ms.", totalCount,
+                                updateResponse.getElapsedTime());
+                    }
+                } catch (Throwable e) {
+                    LOGGER.warn("Error while indexing document collection. Split and retry.", e);
+                    splitup(List.of(destinationCore));
+                    return;
+                }
+            }
         } catch (Throwable e) {
-            LOGGER.warn("Error while indexing document collection. Split and retry.", e);
-            splitup();
-            return;
-        }
-        if (updateResponse.getStatus() != 0) {
-            LOGGER.error("Error while indexing document collection. Split and retry: {}", updateResponse.getResponse());
-            splitup();
-        } else {
-            LOGGER.info("Sending {} documents was successful in {} ms.", totalCount, updateResponse.getElapsedTime());
+            splitup(getDestinationCores());
         }
 
     }
 
-    private void splitup(Iterator<SolrInputDocument> documents) {
+    private void makeConcurrent(Iterator<SolrInputDocument> documents) {
         while (documents.hasNext()) {
             SolrInputDocument nextDocument = documents.next();
             MCRSolrInputDocumentHandler subhandler = new MCRSolrInputDocumentHandler(() -> nextDocument,
-                nextDocument.get("id").toString());
+                nextDocument.get("id").toString(), getCoreType());
             subhandler.setCommitWithin(getCommitWithin());
             subhandlers.add(subhandler);
         }
         contentMap.clear();
     }
 
-    private void splitup() {
+    private void splitup(List<MCRSolrCore> cores) {
         for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
             MCRSolrMCRContentIndexHandler subHandler = new MCRSolrMCRContentIndexHandler(entry.getKey(),
-                entry.getValue(), getSolrClient());
+                entry.getValue(), getCoreType());
             subHandler.setCommitWithin(getCommitWithin());
+            subHandler.setDestinationCores(cores);
             subhandlers.add(subHandler);
         }
         contentMap.clear();

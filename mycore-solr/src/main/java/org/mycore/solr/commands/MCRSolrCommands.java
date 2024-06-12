@@ -18,34 +18,19 @@
 
 package org.mycore.solr.commands;
 
-import static org.mycore.solr.MCRSolrConstants.DEFAULT_SOLR_SERVER_URL;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
-
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
-import org.mycore.solr.schema.MCRSolrConfigReloader;
-import org.mycore.solr.schema.MCRSolrSchemaReloader;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
@@ -55,171 +40,64 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
  * @author Sebastian Hofmann
  */
 @MCRCommandGroup(
-    name = "SOLR Commands")
+    name = "SOLR Index and Search Commands")
 public class MCRSolrCommands extends MCRAbstractCommands {
-
-    private static Logger LOGGER = LogManager.getLogger();
-
-    /**
-     * This command displays the MyCoRe properties,
-     * which have to be set, to reload the current Solr / Solr Core configuration
-     * on the next start of the MyCoRe application.
-     */
-    @MCRCommand(
-        syntax = "show solr configuration",
-        help = "displays MyCoRe properties for the current Solr configuration",
-        order = 10)
-    public static void listConfig() {
-        LOGGER.info("List core configuration: {}{}{}{}", System.lineSeparator(),
-            SOLR_CONFIG_PREFIX + "ServerURL=" + DEFAULT_SOLR_SERVER_URL,
-            System.lineSeparator(),
-            MCRSolrClientFactory.getCoreMap().entrySet().stream().map(
-                (entry) -> {
-                    String coreID = entry.getKey();
-                    MCRSolrCore core = entry.getValue();
-
-                    String format = "{0}{1}{2}={3}";
-                    if (!DEFAULT_SOLR_SERVER_URL.equals(core.getServerURL())) {
-                        format += "\n{0}{1}{5}={4}";
-                    }
-                    if(core.getConfigSet() != null) {
-                        format += "\n{0}{1}{6}={7}";
-                    }
-                    if(core.getShardCount() > 1){
-                        format += "\n{0}{1}{8}={9}";
-                    }
-
-                    return new MessageFormat(format, Locale.ROOT).format(new String[] { SOLR_CORE_PREFIX, coreID,
-                        SOLR_CORE_NAME_SUFFIX, core.getName(), core.getServerURL(), SOLR_CORE_SERVER_SUFFIX,
-                            SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX, core.getConfigSet(),
-                            SOLR_CORE_SHARD_COUNT_SUFFIX, core.getShardCount() + ""});
-                }).collect(Collectors.joining("\n")));
-    }
-
-    @MCRCommand(
-            syntax = "register solr core with name {0} and configset {1} and shards {2} on server {3} as core {4}",
-            help = "registers a Solr core within MyCoRe",
-            order = 30)
-    public static void registerSolrCore(String coreName, String configSetName, int shards, String server,
-                                        String coreID) {
-        MCRSolrClientFactory.addCore(server, coreName, configSetName, shards, coreID);
-    }
-
-    @MCRCommand(
-            syntax = "register solr core with name {0} and configset {1} on server {2} as core {3}",
-            help = "registers a Solr core within MyCoRe",
-            order = 35)
-    public static void registerSolrCore(String coreName, String configSetName, String server, String coreID) {
-        MCRSolrClientFactory.addCore(server, coreName, configSetName, coreID);
-    }
-
-    @MCRCommand(
-        syntax = "register solr core with name {0} on server {1} as core {2}",
-        help = "registers a Solr core within MyCoRe",
-        order = 40)
-    public static void registerSolrCore(String coreName, String server, String coreID) {
-        MCRSolrClientFactory.addCore(server, coreName, coreID);
-    }
-
-    @MCRCommand(
-        syntax = "register solr core with name {0} as core {1}",
-        help = "registers a Solr core on the configured default Solr server within MyCoRe",
-        order = 50)
-    public static void registerSolrCore(String coreName, String coreID) {
-        MCRSolrClientFactory.addCore(DEFAULT_SOLR_SERVER_URL, coreName, coreID);
-    }
-
-    @MCRCommand(
-        syntax = "switch solr core {0} with core {1}",
-        help = "switches between two Solr core configurations",
-        order = 60)
-    public static void switchSolrCore(String coreID1, String coreID2) {
-        MCRSolrCore core1 = getCore(coreID1);
-        MCRSolrCore core2 = getCore(coreID2);
-
-        MCRSolrClientFactory.add(coreID1, core2);
-        MCRSolrClientFactory.add(coreID2, core1);
-    }
-
-    /**
-     * This command recreates the managed-schema.xml and solrconfig.xml files. First it removes all
-     * schema definitions, except for some MyCoRe default types and fields. Second it parses the available
-     * MyCoRe modules and components and adds / updates / deletes the schema definition.
-     * Finally it does the same for the solrconfig.xml definition.
-     *
-     * see https://github.com/MyCoRe-Org/mycore_solr_configset_main
-     *
-     * @param coreID the core type of the core that should be reloaded; the MyCoRe default application
-     * coreID is <b>main</b>
-     */
-    @MCRCommand(
-        syntax = "reload solr configuration {0} in core {1}",
-        help = "reloads the schema and the configuration in Solr "
-            + "by using the Solr schema api for core with the id {0}",
-        order = 70)
-    public static void reloadSolrConfiguration(String configType, String coreID) {
-        MCRSolrConfigReloader.reset(configType, coreID);
-        MCRSolrSchemaReloader.reset(configType, coreID);
-        MCRSolrSchemaReloader.processSchemaFiles(configType, coreID);
-        MCRSolrConfigReloader.processConfigFiles(configType, coreID);
-    }
 
     @MCRCommand(
         syntax = "rebuild solr metadata and content index in core {0}",
         help = "rebuilds metadata and content index in Solr for core with the id {0}",
         order = 110)
-    public static void rebuildMetadataAndContentIndex(String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        HttpSolrClient client = core.getClient();
-        MCRSolrIndexer.rebuildMetadataIndex(client);
-        MCRSolrIndexer.rebuildContentIndex(client);
-        MCRSolrIndexer.optimize(client);
+    public static void rebuildMetadataAndContentIndex(String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.rebuildMetadataIndex(cores);
+        MCRSolrIndexer.rebuildContentIndex(cores);
+        MCRSolrIndexer.optimize(cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr metadata index for all objects of type {0} in core {1}",
         help = "rebuilds the metadata index in Solr for all objects of type {0} in core with the id {1}",
         order = 130)
-    public static void rebuildMetadataIndexType(String type, String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.rebuildMetadataIndex(type, core.getClient());
+    public static void rebuildMetadataIndexType(String type, String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.rebuildMetadataIndex(type, cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr metadata index for all objects of base {0} in core {1}",
         help = "rebuilds the metadata index in Solr for all objects of base {0} in core with the id {1}",
         order = 130)
-    public static void rebuildMetadataIndexBase(String base, String coreID) throws Exception {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.rebuildMetadataIndexForObjectBase(base, core.getClient());
+    public static void rebuildMetadataIndexBase(String base, String coreIDs) throws Exception {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.rebuildMetadataIndexForObjectBase(base, cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr metadata index for object {0} in core {1}",
         help = "rebuilds metadata index in Solr for the given object in core with the id {1}",
         order = 120)
-    public static void rebuildMetadataIndexObject(String object, String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.rebuildMetadataIndex(Stream.of(object).collect(Collectors.toList()), core.getClient());
+    public static void rebuildMetadataIndexObject(String object, String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.rebuildMetadataIndex(Stream.of(object).collect(Collectors.toList()), cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr metadata index for selected in core {0}",
         help = "rebuilds content index in Solr for selected objects and or derivates in core with the id {0}",
         order = 140)
-    public static void rebuildMetadataIndexForSelected(String coreID) {
-        MCRSolrCore core = getCore(coreID);
+    public static void rebuildMetadataIndexForSelected(String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
-        MCRSolrIndexer.rebuildMetadataIndex(selectedObjects, core.getClient());
+        MCRSolrIndexer.rebuildMetadataIndex(selectedObjects, cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr metadata index in core {0}",
         help = "rebuilds metadata index in Solr in core with the id {0}",
         order = 150)
-    public static void rebuildMetadataIndex(String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.rebuildMetadataIndex(core.getClient());
+    public static void rebuildMetadataIndex(String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.rebuildMetadataIndex(cores);
     }
 
     @MCRCommand(
@@ -227,37 +105,37 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "rebuilds content index in Solr for the all derivates of object with the id {0} "
             + "in core with the id {1}",
         order = 160)
-    public static void rebuildContentIndexObject(String objectID, String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.rebuildContentIndex(Stream.of(objectID).collect(Collectors.toList()), core.getClient());
+    public static void rebuildContentIndexObject(String objectID, String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.rebuildContentIndex(Stream.of(objectID).collect(Collectors.toList()), cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr content index for selected in core {0}",
         help = "rebuilds content index in Solr for alll derivates of selected objects in core with the id {0}",
         order = 170)
-    public static void rebuildContentIndexForSelected(String coreID) {
-        MCRSolrCore core = getCore(coreID);
+    public static void rebuildContentIndexForSelected(String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
-        MCRSolrIndexer.rebuildContentIndex(selectedObjects, core.getClient());
+        MCRSolrIndexer.rebuildContentIndex(selectedObjects, cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr content index in core {0}",
         help = "rebuilds content index in Solr in core with the id {0}",
         order = 180)
-    public static void rebuildContentIndex(String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.rebuildContentIndex(core.getClient());
+    public static void rebuildContentIndex(String coreIDs) {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.rebuildContentIndex(cores);
     }
 
     @MCRCommand(
         syntax = "rebuild solr classification index in core {0}",
         help = "rebuilds classification index in Solr in the core with the id {0}",
         order = 190)
-    public static void rebuildClassificationIndex(String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrClassificationUtil.rebuildIndex(core.getClient());
+    public static void rebuildClassificationIndex(String coreIDs) {
+        List<MCRSolrCore> core = getCoreList(coreIDs);
+        MCRSolrClassificationUtil.rebuildIndex(core);
     }
 
     @MCRCommand(
@@ -321,12 +199,12 @@ public class MCRSolrCommands extends MCRAbstractCommands {
             + "since it is very expensive and involves reading and re-writing the entire index",
         order = 410)
     public static void optimize(String coreID) {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.optimize(core.getClient());
+        List<MCRSolrCore> cores = getCoreList(coreID);
+        MCRSolrIndexer.optimize(cores);
     }
 
     private static MCRSolrCore getCore(String coreID) {
-        return MCRSolrClientFactory.get(coreID)
+        return MCRSolrCoreManager.get(coreID)
             .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
     }
 
@@ -335,25 +213,30 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of type {0}",
         order = 420)
     public static void synchronizeMetadataIndex(String objectType, String coreID) throws Exception {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.synchronizeMetadataIndex(core.getClient(), objectType);
+        List<MCRSolrCore> cores = getCoreList(coreID);
+        MCRSolrIndexer.synchronizeMetadataIndex(cores, objectType);
     }
 
     @MCRCommand(
         syntax = "synchronize solr metadata index for all objects of base {0} in core {1}",
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of base {0}",
         order = 420)
-    public static void synchronizeMetadataIndexForObjectBase(String objectBase, String coreID) throws Exception {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.synchronizeMetadataIndexForObjectBase(core.getClient(), objectBase);
+    public static void synchronizeMetadataIndexForObjectBase(String objectBase, String coreIDs) throws Exception {
+        List<MCRSolrCore> core = getCoreList(coreIDs);
+        MCRSolrIndexer.synchronizeMetadataIndexForObjectBase(core, objectBase);
     }
 
     @MCRCommand(
         syntax = "synchronize solr metadata index in core {0}",
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {0}",
         order = 430)
-    public static void synchronizeMetadataIndex(String coreID) throws Exception {
-        MCRSolrCore core = getCore(coreID);
-        MCRSolrIndexer.synchronizeMetadataIndex(core.getClient());
+    public static void synchronizeMetadataIndex(String coreIDs) throws Exception {
+        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        MCRSolrIndexer.synchronizeMetadataIndex(cores);
+    }
+
+    private static List<MCRSolrCore> getCoreList(String coreIDs) {
+        return Stream.of(coreIDs.split("[, ]")).map(MCRSolrCommands::getCore)
+                .toList();
     }
 }
