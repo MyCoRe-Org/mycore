@@ -84,7 +84,10 @@ public class MCRTestCaseXSLTUtil {
      */
     public static Document prepareTestDocument(String rootName, List<? extends Content> xml) {
         final Element root = new Element(rootName);
-        root.addContent(xml);
+
+        for (Content xmlContent : xml) {
+            root.addContent(xmlContent.detach());
+        }
 
         return new Document(root);
     }
