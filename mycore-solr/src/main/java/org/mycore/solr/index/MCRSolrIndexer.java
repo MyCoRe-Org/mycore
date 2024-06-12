@@ -203,7 +203,6 @@ public class MCRSolrIndexer {
      *
      * <a href="https://issues.apache.org/jira/browse/SOLR-6357">SOLR-6357</a>
      *
-     * @return the response or null if {@link MCRSolrUtils#useNestedDocuments()} returns false
      * @throws SolrServerException solr server exception
      * @throws IOException io exception
      */
