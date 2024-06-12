@@ -28,9 +28,9 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
-import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -118,7 +118,7 @@ public class MCRAltoHighlightResource {
         try {
             QueryRequest queryRequest = new QueryRequest(p);
             SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
-            QueryResponse solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
+            QueryResponse solrResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
             JsonArray response = buildQueryResponse(solrResponse.getHighlighting());
             return Response.ok().entity(new Gson().toJson(response)).build();
         } catch (Exception exc) {

@@ -22,6 +22,7 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,21 +71,7 @@ public class MCRSolrCore {
             .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled", Boolean::parseBoolean);
     }
 
-    /**
-     * Creates a new solr server core instance. The last part of this url should be the core.
-     *
-     * @param serverURL
-     *            whole url e.g. http://localhost:8296/docportal
-     * @deprecated use {@link #MCRSolrCore(String, String)} instead
-     */
-    @Deprecated
-    public MCRSolrCore(String serverURL) {
-        if (serverURL.endsWith("/")) {
-            serverURL = serverURL.substring(0, serverURL.length() - 1);
-        }
-        int i = serverURL.lastIndexOf("/") + 1;
-        setup(serverURL.substring(0, i), serverURL.substring(i), null, DEFAULT_SHARD_COUNT);
-    }
+    private Set<MCRSolrCoreType> types;
 
     /**
      * Creates a new solr server core instance.
@@ -93,9 +80,13 @@ public class MCRSolrCore {
      *            base url of the solr server e.g. http://localhost:8296
      * @param name
      *            name of the core e.g. docportal
+     * @deprecated use {@link #MCRSolrCore(String, String, String, Integer, Set)} instead
      */
+    @Deprecated
     public MCRSolrCore(String serverURL, String name) {
-        setup(serverURL, name, null, DEFAULT_SHARD_COUNT);
+
+        setup(serverURL, name, null, DEFAULT_SHARD_COUNT, name.equals("classification") ?
+                Set.of(MCRSolrCoreType.CLASSIFICATION) : Set.of(MCRSolrCoreType.MAIN));
     }
 
     /**
@@ -110,11 +101,12 @@ public class MCRSolrCore {
      * @param shardCount
      *            number of shards
      */
-    MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount) {
-        setup(serverURL, name, configSet, shardCount);
+    public MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount, Set<MCRSolrCoreType> type) {
+        setup(serverURL, name, configSet, shardCount, type);
     }
 
-    protected void setup(String serverURL, String name, String configSet, Integer shardCount) {
+    protected void setup(String serverURL, String name, String configSet,
+                         Integer shardCount, Set<MCRSolrCoreType> type) {
         if (!serverURL.endsWith("/")) {
             serverURL += "/";
         }
@@ -122,6 +114,7 @@ public class MCRSolrCore {
         this.name = name;
         this.configSet = configSet;
         this.shardCount = Objects.requireNonNull(shardCount, "shardCount must not be null");
+        this.types = Objects.requireNonNull(type, "type must not be null");
         String coreURL = getV1CoreURL();
         int connectionTimeout = MCRConfiguration2
             .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout", Integer::parseInt);
@@ -262,4 +255,11 @@ public class MCRSolrCore {
         return shardCount;
     }
 
+    /**
+     * Returns which type of core this is
+     * @return the type of core
+     */
+    public Set<MCRSolrCoreType> getTypes() {
+        return types;
+    }
 }

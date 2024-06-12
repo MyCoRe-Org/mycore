@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.content.MCRSolrMCRContentIndexHandler;
 import org.mycore.solr.index.handlers.content.MCRSolrMCRContentMapIndexHandler;
@@ -35,7 +36,7 @@ public class MCRSolrLazyInputDocumentHandlerFactory extends MCRSolrIndexHandlerF
 
     @Override
     public MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id) {
-        return new MCRSolrMCRContentIndexHandler(id, content);
+        return new MCRSolrMCRContentIndexHandler(id, content, MCRSolrCoreType.MAIN);
     }
 
     /* (non-Javadoc)
@@ -45,7 +46,7 @@ public class MCRSolrLazyInputDocumentHandlerFactory extends MCRSolrIndexHandlerF
     public MCRSolrIndexHandler getIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
         //contentMap is reused in different threads
         HashMap<MCRObjectID, MCRContent> copyMap = new HashMap<>(contentMap);
-        return new MCRSolrMCRContentMapIndexHandler(copyMap);
+        return new MCRSolrMCRContentMapIndexHandler(copyMap, MCRSolrCoreType.MAIN);
     }
 
 }

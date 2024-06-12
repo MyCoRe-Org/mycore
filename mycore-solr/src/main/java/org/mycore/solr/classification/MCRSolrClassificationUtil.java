@@ -42,8 +42,8 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
@@ -66,15 +66,15 @@ public abstract class MCRSolrClassificationUtil {
      * Reindex the whole classification system with the default classification solr core.
      */
     public static void rebuildIndex() {
-        rebuildIndex(getCore().getClient());
+        rebuildIndex(List.of(getCore()));
     }
 
     /**
      * Reindex the whole classification system.
      *
-     * @param client the target solr client
+     * @param cores the solr cores to use
      */
-    public static void rebuildIndex(final SolrClient client) {
+    public static void rebuildIndex(List<MCRSolrCore> cores) {
         LOGGER.info("rebuild classification index...");
         // categories
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
@@ -85,14 +85,15 @@ public abstract class MCRSolrClassificationUtil {
             List<MCRCategory> categoryList = getDescendants(rootCategory);
             categoryList.add(rootCategory);
             List<SolrInputDocument> solrDocumentList = toSolrDocument(categoryList);
-            bulkIndex(client, solrDocumentList);
+
+            bulkIndex(cores, solrDocumentList);
         }
         // links
         MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);
-            bulkIndex(client, linkService.getLinks(linkType)
+            bulkIndex(cores, linkService.getLinks(linkType)
                 .stream()
                 .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
                     link.getObjectReference()))
@@ -106,7 +107,7 @@ public abstract class MCRSolrClassificationUtil {
      *
      * @param solrDocumentList the list to index
      */
-    public static void bulkIndex(final SolrClient client, List<SolrInputDocument> solrDocumentList) {
+    public static void bulkIndex(final List<MCRSolrCore> client, List<SolrInputDocument> solrDocumentList) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
             int docNum = solrDocumentList.size();
@@ -118,7 +119,9 @@ public abstract class MCRSolrClassificationUtil {
                     req.setCommitWithin(500);
                     MCRSolrAuthenticationManager.getInstance().applyAuthentication(req,
                         MCRSolrAuthenticationLevel.INDEX);
-                    req.process(client);
+                    for (MCRSolrCore core : client) {
+                        req.process(core.getClient());
+                    }
                     added += part.size();
                     LOGGER.info("Added {}/{} documents", added, docNum);
                 } catch (SolrServerException | IOException e) {
@@ -259,7 +262,7 @@ public abstract class MCRSolrClassificationUtil {
      * Returns the solr classification core.
      */
     public static MCRSolrCore getCore() {
-        Optional<MCRSolrCore> classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_TYPE);
+        Optional<MCRSolrCore> classCore = MCRSolrCoreManager.get(CLASSIFICATION_CORE_TYPE);
         return classCore.orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(CLASSIFICATION_CORE_TYPE));
     }
 

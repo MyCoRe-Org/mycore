@@ -32,6 +32,9 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -49,11 +52,11 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         super.setLinks(objectReference, categories);
         // solr
-        SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-
+        List<MCRSolrCore> cores = MCRSolrCoreManager.getCoresForType(MCRSolrCoreType.CLASSIFICATION);
         List<SolrInputDocument> solrDocumentList = MCRSolrClassificationUtil
             .toSolrDocument(objectReference, categories);
-        MCRSolrClassificationUtil.bulkIndex(solrClient, solrDocumentList);
+
+        MCRSolrClassificationUtil.bulkIndex(cores, solrDocumentList);
     }
 
     @Override

@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
@@ -105,9 +105,9 @@ public class MCRSolrQueryResolver implements URIResolver {
                 }
             }
 
-            HttpSolrClient client = core.flatMap(MCRSolrClientFactory::get)
+            HttpSolrClient client = core.flatMap(MCRSolrCoreManager::get)
                 .map(MCRSolrCore::getClient)
-                .orElse((HttpSolrClient) MCRSolrClientFactory.getMainSolrClient());
+                .orElse((HttpSolrClient) MCRSolrCoreManager.getMainSolrClient());
 
             if (query.isPresent()) {
                 MCRSolrURL solrURL = new MCRSolrURL(client, query.get());
