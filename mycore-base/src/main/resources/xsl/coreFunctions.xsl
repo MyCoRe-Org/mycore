@@ -9,7 +9,6 @@
   xmlns:layoutUtils="xalan://org.mycore.frontend.MCRLayoutUtilities">
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
-  <xsl:param name="HttpSession" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="loaded_navigation_xml" />
   <xsl:param name="browserAddress" />
@@ -17,54 +16,6 @@
   <xsl:param name="RequestURL" />
   <xsl:param name="WebApplicationBaseURL" />
 
-    <!--
-        Template: UrlSetParam
-        synopsis: Inserts a $HttpSession to an URL
-        param:
-
-        url: URL to include the session
-    -->
-  <xsl:template name="UrlAddSession">
-    <xsl:param name="url" />
-        <!-- There are two possibility for a parameter to appear in an URL:
-            1.) after a ? sign
-            2.) after a & sign
-            In both cases the value is either limited by a & sign or the string end
-            //-->
-    <xsl:choose>
-      <xsl:when test="starts-with($url,$WebApplicationBaseURL)">
-                <!--The document is on our server-->
-        <xsl:variable name="pathPart">
-          <xsl:choose>
-            <xsl:when test="contains($url,'?')">
-              <xsl:value-of select="substring-before($url,'?')" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$url" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="queryPart">
-          <xsl:value-of select="substring-after($url,$pathPart)" />
-        </xsl:variable>
-        <xsl:value-of select="concat($pathPart,$HttpSession,$queryPart)" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$url" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-    <!--
-        Template: UrlDeleteParam
-        synopsis: removes a jsessionID parameter from a URL
-        param:
-
-        url: URL to remove the session
-    -->
-  <xsl:template name="UrlDeleteSession">
-    <xsl:param name="url" />
-    <xsl:value-of select="mcrxml:regexp($url, ';jsessionid=[^?#]+', '')" />
-  </xsl:template>
     <!--
         Template: UrlSetParam
         synopsis: Replaces a parameter value or adds a parameter to an URL
@@ -312,7 +263,7 @@
             MCRSearchServlet?mode=results&amp;id={@id}&amp;numPerPage={@numPerPage}&amp;page={number(@page)+1}
         -->
     <xsl:param name="i" select="1" />
-    <xsl:param name="href" select="concat($ServletsBaseURL, 'MCRSearchServlet',$HttpSession,'?mode=results')" />
+    <xsl:param name="href" select="concat($ServletsBaseURL, 'MCRSearchServlet?mode=results')" />
     <xsl:param name="id" />
     <xsl:param name="size" />
     <xsl:param name="currentpage" />

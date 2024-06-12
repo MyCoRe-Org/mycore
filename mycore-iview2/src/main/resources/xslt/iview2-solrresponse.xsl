@@ -18,7 +18,7 @@
       <xsl:when test="key('derivate',$mcrid)[str/@name='iviewFile' and str[@name='id']=$derivateId]">
         <!-- iview support detected generate link to image viewer -->
         <xsl:variable name="toolTipImg"
-          select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId, encode-for-uri($filePath),$HttpSession)" />
+          select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId, encode-for-uri($filePath))" />
         <xsl:choose>
           <xsl:when test="$MCR.Module-iview2.useNewViewer='true'">
             <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()" href="{$WebApplicationBaseURL}rsc/viewer/{$derivateId}/{$filePath}"
@@ -37,7 +37,7 @@
 
       </xsl:when>
       <xsl:otherwise>
-        <a href="{concat($fileNodeServlet,$derivateId,encode-for-uri($filePath),$HttpSession)}">
+        <a href="{concat($fileNodeServlet,$derivateId,encode-for-uri($filePath))}">
           <xsl:value-of select="$fileName" />
         </a>
       </xsl:otherwise>

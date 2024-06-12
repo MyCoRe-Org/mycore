@@ -60,7 +60,7 @@
                 <xsl:variable name="queryPart">
                     <xsl:value-of select="substring-after($url,$pathPart)" />
                 </xsl:variable>
-                <xsl:value-of select="concat($pathPart,$HttpSession,$queryPart)" />
+                <xsl:value-of select="concat($pathPart,$queryPart)" />
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$url" />

@@ -330,7 +330,7 @@
                     <ul>
                       <xsl:if test="$derivateWithURN=false()">
                         <li>
-                          <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
+                          <a href="{$ServletsBaseURL}derivate/update?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
                             <xsl:value-of select="i18n:translate('component.mods.derivate.addFile')" />
                           </a>
                         </li>
@@ -339,7 +339,7 @@
                         <xsl:if test="not($derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID))">
                           <xsl:attribute name="class">last</xsl:attribute>
                         </xsl:if>
-                        <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
+                        <a href="{$ServletsBaseURL}derivate/update?id={@xlink:href}{$suffix}">
                           <xsl:value-of select="i18n:translate('component.mods.derivate.editDerivate')" />
                         </a>
                       </li>
@@ -351,14 +351,14 @@
                           <xsl:if test="not(acl:checkPermission(./@xlink:href,'deletedb'))">
                             <xsl:attribute name="class">last</xsl:attribute>
                           </xsl:if>
-                          <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={@xlink:href}" onclick="{concat('return confirm(',$apos, i18n:translate('component.mods.metaData.options.urn.confirm'), $apos, ');')}">
+                          <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet?object={@xlink:href}" onclick="{concat('return confirm(',$apos, i18n:translate('component.mods.metaData.options.urn.confirm'), $apos, ');')}">
                             <xsl:value-of select="i18n:translate('component.mods.metaData.options.urn')" />
                           </a>
                         </li>
                       </xsl:if>
                       <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb') and $derivateWithURN=false()">
                         <li class="last">
-                          <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}" class="confirm_derivate_deletion">
+                          <a href="{$ServletsBaseURL}derivate/delete?id={@xlink:href}" class="confirm_derivate_deletion">
                             <xsl:value-of select="i18n:translate('component.mods.derivate.delDerivate')" />
                           </a>
                         </li>
@@ -462,7 +462,7 @@
                                   string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
                       <xsl:attribute name="class">last</xsl:attribute>
                     </xsl:if>
-                    <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                    <a href="{$ServletsBaseURL}derivate/create?id={$id}">
                       <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
                     </a>
                   </li>
@@ -478,7 +478,7 @@
                       <xsl:value-of select="i18n:translate('object.hasChildren')" />
                     </xsl:when>
                     <xsl:otherwise>
-                      <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
+                      <a href="{$ServletsBaseURL}object/delete?id={$id}" id="confirm_deletion">
                         <xsl:value-of select="i18n:translate('object.delObject')" />
                       </a>
                     </xsl:otherwise>
@@ -489,7 +489,7 @@
                 <xsl:choose>
                   <xsl:when test="$mods-type = 'series'">
                     <li>
-                      <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
+                      <a href="{$ServletsBaseURL}object/create?type=mods&amp;layout=book&amp;parentId={./@ID}">
                         <xsl:value-of select="i18n:translate('component.mods.metaData.types.book')" />
                       </a>
                     </li>
@@ -497,7 +497,7 @@
                       <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
                         <xsl:attribute name="class">last</xsl:attribute>
                       </xsl:if>
-                      <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
+                      <a href="{$ServletsBaseURL}object/create?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
                         <xsl:value-of select="i18n:translate('component.mods.metaData.types.confpro')" />
                       </a>
                     </li>
@@ -507,7 +507,7 @@
                       <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
                         <xsl:attribute name="class">last</xsl:attribute>
                       </xsl:if>
-                      <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
+                      <a href="{$ServletsBaseURL}object/create?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
                         <xsl:value-of select="i18n:translate(concat('component.mods.metaData.types.',$child-layout))" />
                       </a>
                     </li>
@@ -569,15 +569,10 @@
         <xsl:choose>
           <xsl:when test="string-length($url)=0" />
           <xsl:otherwise>
-            <xsl:variable name="urlWithParam">
-              <xsl:call-template name="UrlSetParam">
-                <xsl:with-param name="url" select="$url"/>
-                <xsl:with-param name="par" select="'id'"/>
-                <xsl:with-param name="value" select="$id" />
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:call-template name="UrlAddSession">
-              <xsl:with-param name="url" select="$urlWithParam" />
+            <xsl:call-template name="UrlSetParam">
+              <xsl:with-param name="url" select="$url"/>
+              <xsl:with-param name="par" select="'id'"/>
+              <xsl:with-param name="value" select="$id" />
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -590,7 +585,7 @@
           </xsl:if>
         </xsl:variable>
         <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
-        <xsl:value-of select="concat($WebApplicationBaseURL,$form,$HttpSession,'?id=',$id)" />
+        <xsl:value-of select="concat($WebApplicationBaseURL,$form,'?id=',$id)" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

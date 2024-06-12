@@ -15,9 +15,6 @@
             - ServletsBaseURL
             - DefaultLang
             - User-Agent
-        * setSessionID
-            - HttpSession
-            - JSessionID
     -->
 
     <xsl:param name="RequestURL" />
@@ -29,8 +26,5 @@
     <xsl:param name="ServletsBaseURL" />
     <xsl:param name="DefaultLang" />
     <xsl:param name="User-Agent" />
-    <xsl:param name="HttpSession" />
-    <xsl:param name="JSessionID" />
-
 
 </xsl:stylesheet>
