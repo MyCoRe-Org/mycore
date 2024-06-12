@@ -123,7 +123,7 @@
               <xsl:value-of select="concat('?',$addParameter)"/>
             </xsl:if>
           </xsl:variable>
-          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,$MCR.classbrowser.Servlet,$HttpSession,$addParam)" />', requestParam, f );
+          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,$MCR.classbrowser.Servlet,$addParam)" />', requestParam, f );
         }
 
         function toogle(categID, closedImageURL, openImageURL) {

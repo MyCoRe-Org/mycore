@@ -58,7 +58,7 @@
         <div class="result_options">
           <div class="btn-group">
             <xsl:if test="$searchMask">
-              <a class="btn btn-default" href="{$WebApplicationBaseURL}{$searchMask}{$HttpSession}">
+              <a class="btn btn-default" href="{$WebApplicationBaseURL}{$searchMask}">
                 <i class="icon-search">
                   <xsl:value-of select="' '" />
                 </i>
@@ -66,7 +66,7 @@
               </a>
             </xsl:if>
             <xsl:if test="doc|arr[@name='groups']/lst">
-              <form action="{$ServletsBaseURL}MCRBasketServlet{$HttpSession}" method="post" class="basket_form">
+              <form action="{$ServletsBaseURL}MCRBasketServlet" method="post" class="basket_form">
                 <input type="hidden" name="action" value="add" />
                 <input type="hidden" name="redirect" value="referer" />
                 <input type="hidden" name="type" value="objects" />
@@ -178,7 +178,7 @@
           </li>
           <li>
             <a
-              href="{$ServletsBaseURL}MCRBasketServlet{$HttpSession}?type=objects&amp;action=add&amp;id={$mcrobj/@ID}&amp;uri=mcrobject:{$mcrobj/@ID}&amp;redirect=referer">
+              href="{$ServletsBaseURL}MCRBasketServlet?type=objects&amp;action=add&amp;id={$mcrobj/@ID}&amp;uri=mcrobject:{$mcrobj/@ID}&amp;redirect=referer">
               <i class="icon-plus"></i>
               <xsl:value-of select="mcri18n:translate('basket.add')" />
             </a>

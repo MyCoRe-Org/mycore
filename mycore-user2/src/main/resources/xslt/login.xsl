@@ -55,7 +55,7 @@
     </xsl:template>
 
     <xsl:template match="form">
-        <form action="{@action}{$HttpSession}" method="post" role="form" class="form-login">
+        <form action="{@action}" method="post" role="form" class="form-login">
             <h2 class="form-login-heading">
                 <xsl:value-of select="mcri18n:translate('component.user2.login.heading')" />
             </h2>

@@ -205,7 +205,7 @@
             <xsl:value-of select="url/@xlink:href" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href,$HttpSession)" />
+            <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href)" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>

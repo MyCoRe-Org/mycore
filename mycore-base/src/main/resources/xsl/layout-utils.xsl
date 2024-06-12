@@ -6,8 +6,6 @@
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="RequestURL" />
-  <xsl:param name="HttpSession" />
-  <xsl:param name="JSessionID" />
   <xsl:param name="CurrentUser" />
   <!-- TODO: remove printMetaDate, derivateLink and maybe others -->
   <xsl:include href="coreFunctions.xsl" />
@@ -103,7 +101,7 @@
         <xsl:variable name="obj_id" select="$mcrobj/@ID" />
         <xsl:choose>
           <xsl:when test="acl:checkPermission($obj_id,'read')">
-            <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}">
+            <a href="{$WebApplicationBaseURL}receive/{$obj_id}">
               <xsl:attribute name="title"><xsl:apply-templates select="$mcrobj" mode="fulltitle" /></xsl:attribute>
               <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
             </a>
@@ -111,7 +109,7 @@
           <xsl:otherwise>
             <!-- Build Login URL for LoginServlet -->
             <xsl:variable xmlns:encoder="xalan://java.net.URLEncoder" name="LoginURL"
-              select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
+              select="concat( $ServletsBaseURL, 'MCRLoginServlet?url=', encoder:encode( string( $RequestURL ) ) )" />
             <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
             &#160;
             <a href="{$LoginURL}">
@@ -125,14 +123,14 @@
         <xsl:variable name="mcrobj" select="document(concat('mcrobject:',$obj_id))/mycoreobject" />
         <xsl:choose>
           <xsl:when test="acl:checkPermission($obj_id,'read')">
-            <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}">
+            <a href="{$WebApplicationBaseURL}receive/{$obj_id}">
               <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
             </a>
           </xsl:when>
           <xsl:otherwise>
             <!-- Build Login URL for LoginServlet -->
             <xsl:variable xmlns:encoder="xalan://java.net.URLEncoder" name="LoginURL"
-              select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
+              select="concat( $ServletsBaseURL, 'MCRLoginServlet?url=', encoder:encode( string( $RequestURL ) ) )" />
             <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
             &#160;
             <a href="{$LoginURL}">
@@ -166,7 +164,7 @@
                 <xsl:value-of select="url/@xlink:href" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href,$HttpSession)" />
+                <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href)" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:if>
@@ -214,7 +212,7 @@
                 <xsl:value-of select="url/@xlink:href" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href,$HttpSession)" />
+                <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href)" />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:if>

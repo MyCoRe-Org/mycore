@@ -110,10 +110,6 @@ public class MCRParameterCollector {
         setFromRequestAttributes(request);
         setFromRequestHeader(request);
 
-        if (session != null) {
-            setSessionID(session, request.isRequestedSessionIdFromCookie());
-        }
-
         debugSessionParameters();
     }
 
@@ -270,18 +266,6 @@ public class MCRParameterCollector {
     }
 
     /**
-     * Sets the ID of the current session as parameter
-     */
-    private void setSessionID(HttpSession session, boolean isFromCookie) {
-        String sessionParam = MCRConfiguration2.getString("MCR.Session.Param").orElse(";jsessionid=");
-        String jSessionID = sessionParam + session.getId();
-        parameters.put("JSessionID", jSessionID);
-        if (!isFromCookie) {
-            parameters.put("HttpSession", jSessionID);
-        }
-    }
-
-    /**
      * Sets some parameters that must not be overwritten by the request, for example
      * the user ID and the URL of the web application.
      *
@@ -302,8 +286,6 @@ public class MCRParameterCollector {
     }
 
     private void debugSessionParameters() {
-        LOGGER.debug("XSL.HttpSession ={}", parameters.get("HttpSession"));
-        LOGGER.debug("XSL.JSessionID ={}", parameters.get("JSessionID"));
         LOGGER.debug("XSL.CurrentUser ={}", parameters.get("CurrentUser"));
         LOGGER.debug("XSL.Referer ={}", parameters.get("Referer"));
     }

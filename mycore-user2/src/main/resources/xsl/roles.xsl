@@ -39,13 +39,8 @@
         <xsl:with-param name="value" select="'chooseCategory'" />
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="url">
-      <xsl:call-template name="UrlAddSession">
-        <xsl:with-param name="url" select="$url2" />
-      </xsl:call-template>
-    </xsl:variable>
     <li>
-      <a href="{$url}">
+      <a href="{$url2}">
         <xsl:value-of select="@label" />
       </a>
     </li>

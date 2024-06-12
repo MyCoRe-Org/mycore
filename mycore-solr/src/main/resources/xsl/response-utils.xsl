@@ -6,7 +6,7 @@
 
   <xsl:variable name="response" select="/response|/mycoreobject/response" />
   <xsl:variable name="loginURL"
-    select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
+    select="concat( $ServletsBaseURL, 'MCRLoginServlet?url=', encoder:encode( string( $RequestURL ) ) )" />
   <xsl:key name="derivate" match="response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
   <xsl:key name="files-by-object"
     match="response/response[@subresult='unmerged']/result/doc|response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[str[@name='objectType']='data_file']"
@@ -78,9 +78,6 @@
   <xsl:variable name="query" select="xalan:nodeset($params)/str[@name='q']" />
   <xsl:variable name="proxyBaseURL">
     <xsl:choose>
-      <xsl:when test="string-length($HttpSession) &gt; 0 and contains($RequestURL, $HttpSession)">
-        <xsl:value-of select="substring-before($RequestURL, $HttpSession)" />
-      </xsl:when>
       <xsl:when test="contains($RequestURL, '?')">
         <xsl:value-of select="substring-before($RequestURL, '?')" />
       </xsl:when>
@@ -129,7 +126,7 @@
 
   <xsl:template name="solr.Pagination">
     <xsl:param name="i" select="1" />
-    <xsl:param name="href" select="concat($proxyBaseURL,$HttpSession,$solrParams)" />
+    <xsl:param name="href" select="concat($proxyBaseURL,$solrParams)" />
     <xsl:param name="size" />
     <xsl:param name="currentpage" />
     <xsl:param name="totalpage" />
@@ -189,7 +186,7 @@
 
   <xsl:template name="solr.PageGen">
     <xsl:param name="i" select="1" />
-    <xsl:param name="href" select="concat($proxyBaseURL,$HttpSession,$solrParams)" />
+    <xsl:param name="href" select="concat($proxyBaseURL,$solrParams)" />
     <xsl:param name="size" />
     <xsl:param name="currentpage" />
     <xsl:param name="totalpage" />
@@ -318,7 +315,7 @@
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="acl:checkPermission($identifier,'read')">
-              <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/',$identifier,$HttpSession)" />
+              <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/',$identifier)" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$loginURL" />
@@ -401,7 +398,7 @@
     <!-- doc element of 'unmerged' response -->
     <xsl:variable name="filePath" select="str[@name='filePath']" />
     <xsl:variable name="fileName" select="str[@name='fileName']" />
-    <a href="{concat($fileNodeServlet,$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)}">
+    <a href="{concat($fileNodeServlet,$derivateId,mcrxsl:encodeURIPath($filePath))}">
       <xsl:value-of select="$fileName" />
     </a>
   </xsl:template>
