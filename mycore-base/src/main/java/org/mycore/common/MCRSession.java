@@ -45,7 +45,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -325,11 +324,11 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         return lastAccessTime;
     }
 
-    public void logHttpRequest(URI uri, Supplier<String> userAgent) {
+    public void logHttpRequest(URI uri, String userAgent) {
         lastURI = uri;
         if (firstURI == null) {
             firstURI = lastURI;
-            firstUserAgent = userAgent.get();
+            firstUserAgent = userAgent;
         }
     }
 
