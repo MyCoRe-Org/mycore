@@ -236,8 +236,15 @@ public class MCRFrontendUtil {
      * @throws IllegalStateException if {@link MCRSessionMgr#hasCurrentSession()} returns false
      */
     private static void setAsCurrent(MCRSession session, MCRServletJob job) throws IllegalStateException {
-        session.logHttpRequest(job.getRequest());
+        session.logHttpRequest(() -> getFullRequestURI(job.getRequest()),
+            () -> job.getRequest().getHeader("User-Agent"));
         CURRENT_SERVLET_JOB.set(Map.entry(session.getID(), job));
+    }
+
+    private static URI getFullRequestURI(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        String queryString = request.getQueryString();
+        return queryString == null ? URI.create(requestURI) : URI.create(requestURI + "?" + queryString);
     }
 
     /**
