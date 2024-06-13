@@ -325,8 +325,8 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         return lastAccessTime;
     }
 
-    public void logHttpRequest(Supplier<URI> uri, Supplier<String> userAgent) {
-        lastURI = uri.get();
+    public void logHttpRequest(URI uri, Supplier<String> userAgent) {
+        lastURI = uri;
         if (firstURI == null) {
             firstURI = lastURI;
             firstUserAgent = userAgent.get();
