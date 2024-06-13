@@ -69,7 +69,8 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
         String[] pathParts = path.split("/", -1);
         final int mcrIdPos = 1;
         final int derIdPos = 3;
-        if (pathParts.length <= mcrIdPos || !"objects".equals(pathParts[mcrIdPos - 1])) {
+        if (pathParts.length <= mcrIdPos || !"objects".equals(pathParts[mcrIdPos - 1])
+            || pathParts[mcrIdPos].isEmpty()) {
             return;
         }
 
