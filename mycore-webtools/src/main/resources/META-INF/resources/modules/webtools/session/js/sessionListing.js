@@ -95,11 +95,11 @@ mycore.session.listing = {
 
   render: function() {
     const escaperElement = document.createElement('div');
-    const escapeHtml = function(unsafe) {
-      if(!unsafe) {
+    const escapeHtml = function(unsafeText) {
+      if(!unsafeText) {
         return '';
       }
-      escaperElement.innerText = unsafe;
+      escaperElement.innerText = unsafeText;
       return escaperElement.innerHTML;
     };
     var spinner = $("#sessionListingLoadingSpinner");
@@ -145,17 +145,26 @@ mycore.session.listing = {
   },
 
   showStacktrace: function(id) {
+    const escaperElement = document.createElement('div');
+    const escapeHtml = function(unsafeText) {
+      if(!unsafeText) {
+        return '';
+      }
+      escaperElement.innerText = unsafeText;
+      return escaperElement.innerHTML;
+    };
     var dialog = $("#stacktraceModalBody");
     dialog.empty();
     var session = mycore.session.listing.getSession(id);
     var stacktrace = session.constructingStacktrace.stacktrace;
     var header = dialog.parents(".modal-dialog").find(".modal-header");
-    if (session.firstURI != null) {
-      header.find(".modal-title").html(session.firstURI);
-      header.show();
-    } else {
-      header.hide();
-    }
+    var html = "ID: " + escapeHtml(session.id)
+     + "<br/>" + "HTTP ID: " + escapeHtml(session.httpId)
+     + "<br/>" + window["component.session-listing.firstURI"] + ": " + escapeHtml(session.firstURI)
+     + "<br/>" + window["component.session-listing.firstUserAgent"] + ": " + escapeHtml(session.firstUserAgent)
+     + "<br/>" + window["component.session-listing.lastURI"] + ": " + escapeHtml(session.lastURI);
+    header.find(".modal-title").html(html);
+    header.show();
     var content = "";
     for (var line of stacktrace) {
       content += line.class + "." + line.method + " (" + line.file + ":" + line.line + ")\n";

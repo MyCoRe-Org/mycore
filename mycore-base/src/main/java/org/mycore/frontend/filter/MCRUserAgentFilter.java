@@ -93,16 +93,18 @@ public class MCRUserAgentFilter implements Filter {
             if (session != null && newSession) {
                 try {
                     if (invalidUserAgent) {
-                        LOGGER.info("Closing session, invalid User-Agent: " + userAgent);
+                        LOGGER.info("Closing session {}, invalid User-Agent: {}", session.getId(), userAgent);
                         session.invalidate();
                     } else if (agentPattern.matcher(userAgent).find()) {
-                        LOGGER.info("Closing session: {} matches {}", userAgent, agentPattern);
+                        LOGGER.info("Closing session {}, {} matches {}", session.getId(), userAgent,
+                            agentPattern);
                         session.invalidate();
                     } else {
-                        LOGGER.debug("{} does not match {}", userAgent, agentPattern);
+                        LOGGER.debug("Keeping session {}, {} doesn't match {}", session.getId(), userAgent,
+                            agentPattern);
                     }
                 } catch (IllegalStateException e) {
-                    LOGGER.warn("Session was allready closed");
+                    LOGGER.warn("Session " + session.getId() + " was already closed");
                 }
             }
         }

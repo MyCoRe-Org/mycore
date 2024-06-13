@@ -108,6 +108,16 @@ public class MCRSessionResource {
         String ip = session.getCurrentIP();
 
         sessionJSON.addProperty("id", session.getID());
+
+        Object httpId = session.get("http.session");
+        if (httpId != null) {
+            String httpIdString = httpId.toString();
+            int prefixLength = Math.min(8, httpIdString.length() / 4);
+            String prefix = httpIdString.substring(0, prefixLength);
+            String obscuredHttpIdString = prefix + "☓".repeat(httpIdString.length() - prefixLength);
+            sessionJSON.addProperty("httpId", obscuredHttpIdString);
+        }
+
         sessionJSON.addProperty("login", userID);
         sessionJSON.addProperty("ip", ip);
         if (resolveHostname) {
@@ -124,6 +134,8 @@ public class MCRSessionResource {
         sessionJSON.addProperty("lastAccessTime", session.getLastAccessedTime());
         sessionJSON.addProperty("loginTime", session.getLoginTime());
         session.getFirstURI().ifPresent(u -> sessionJSON.addProperty("firstURI", u.toString()));
+        session.getFirstUserAgent().ifPresent(u -> sessionJSON.addProperty("firstUserAgent", u));
+        session.getLastURI().ifPresent(u -> sessionJSON.addProperty("lastURI", u.toString()));
         sessionJSON.add("constructingStacktrace", buildStacktrace(session));
         return sessionJSON;
     }

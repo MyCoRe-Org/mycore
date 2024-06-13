@@ -45,7 +45,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -105,7 +104,11 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private StackTraceElement[] constructingStackTrace;
 
-    private Optional<URI> firstURI = Optional.empty();
+    private URI firstURI;
+
+    private String firstUserAgent;
+
+    private URI lastURI;
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
@@ -321,9 +324,11 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         return lastAccessTime;
     }
 
-    public void setFirstURI(Supplier<URI> uri) {
-        if (firstURI.isEmpty()) {
-            firstURI = Optional.of(uri.get());
+    public void logHttpRequest(URI uri, String userAgent) {
+        lastURI = uri;
+        if (firstURI == null) {
+            firstURI = lastURI;
+            firstUserAgent = userAgent;
         }
     }
 
@@ -359,8 +364,14 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         } else {
             LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
         }
-        if (firstURI.isEmpty()) {
-            firstURI = Optional.of(DEFAULT_URI);
+        if (firstURI == null) {
+            firstURI = DEFAULT_URI;
+        }
+        if (firstUserAgent == null) {
+            firstUserAgent = "";
+        }
+        if (lastURI == null) {
+            lastURI = DEFAULT_URI;
         }
         onCommitTasks.remove();
     }
@@ -437,7 +448,15 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     }
 
     public Optional<URI> getFirstURI() {
-        return firstURI;
+        return Optional.ofNullable(firstURI);
+    }
+
+    public Optional<String> getFirstUserAgent() {
+        return Optional.ofNullable(firstUserAgent);
+    }
+
+    public Optional<URI> getLastURI() {
+        return Optional.ofNullable(lastURI);
     }
 
     /**
