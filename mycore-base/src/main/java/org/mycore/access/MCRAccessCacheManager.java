@@ -30,20 +30,17 @@ import org.mycore.common.MCRScopedSession;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.events.MCRSessionEvent;
-import org.mycore.common.events.MCRSessionListener;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-class MCRAccessCacheManager implements MCRSessionListener {
+class MCRAccessCacheManager {
     private static final int CAPACITY = MCRConfiguration2.getOrThrow("MCR.Access.Cache.Size", Integer::valueOf);
 
     private static String key = MCRAccessCacheManager.class.getCanonicalName();
 
-    ThreadLocal<MCRCache<MCRPermissionHandle, Boolean>> accessCache = ThreadLocal.withInitial(() -> {
-        //this is only called for every session that was created before this class could attach to session events
+    private MCRCache<MCRPermissionHandle, Boolean> getSessionPermissionCache() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         @SuppressWarnings("unchecked")
         MCRCache<MCRPermissionHandle, Boolean> cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
@@ -57,37 +54,13 @@ class MCRAccessCacheManager implements MCRSessionListener {
             }
         }
         return cache;
-    });
+    }
 
     private static Object getCacheCreationLock(MCRSession session) {
         //in a short living scoped session, we should not lock the whole session, but a unique object
         return Optional.of(session)
             .map(s -> s.get(MCRScopedSession.SCOPED_HINT))
             .orElse(session);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void sessionEvent(MCRSessionEvent event) {
-        MCRCache<MCRPermissionHandle, Boolean> cache;
-        MCRSession session = event.getSession();
-        switch (event.getType()) {
-            case created:
-            case activated:
-                break;
-            case passivated:
-                accessCache.remove();
-                break;
-
-            case destroyed:
-                cache = getCacheFromSession(session);
-                if (cache != null) {
-                    cache.close();
-                }
-                break;
-            default:
-                break;
-        }
     }
 
     private MCRCache<MCRPermissionHandle, Boolean> getCacheFromSession(MCRSession session) {
@@ -101,30 +74,28 @@ class MCRAccessCacheManager implements MCRSessionListener {
     }
 
     MCRAccessCacheManager() {
-        //init for current user done
-        MCRSessionMgr.addSessionListener(this);
     }
 
     public Boolean isPermitted(String id, String permission) {
         MCRPermissionHandle handle = new MCRPermissionHandle(id, permission);
-        MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
+        MCRCache<MCRPermissionHandle, Boolean> permissionCache = getSessionPermissionCache();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
         return permissionCache.getIfUpToDate(handle, currentSession.getLoginTime());
     }
 
     public void cachePermission(String id, String permission, boolean permitted) {
         MCRPermissionHandle handle = new MCRPermissionHandle(id, permission);
-        accessCache.get().put(handle, permitted);
+        getSessionPermissionCache().put(handle, permitted);
     }
 
     public void removePermission(String id, String permission) {
         MCRPermissionHandle handle = new MCRPermissionHandle(id, permission);
-        MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
+        MCRCache<MCRPermissionHandle, Boolean> permissionCache = getSessionPermissionCache();
         permissionCache.remove(handle);
     }
 
     public void removePermission(String... ids) {
-        MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
+        MCRCache<MCRPermissionHandle, Boolean> permissionCache = getSessionPermissionCache();
         removePermissionFromCache(permissionCache, Stream.of(ids).collect(Collectors.toSet()));
     }
 
