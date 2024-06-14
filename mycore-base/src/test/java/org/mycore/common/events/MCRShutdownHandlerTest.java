@@ -46,7 +46,7 @@ public class MCRShutdownHandlerTest {
 
     /**
      * Resets the {@link MCRShutdownHandler.Closeable} requests in the shutdown handler.
-     * This method checks if there is a previous state ({@link #mark()}) and, if present, resets the shuttingDown
+     * This method checks if there is a previous state ({@link #saveClosables()}) and, if present, resets the shuttingDown
      * and requests fields to their values from the mark.
      * The operation is performed under a write lock to ensure thread safety.
      * <p>
