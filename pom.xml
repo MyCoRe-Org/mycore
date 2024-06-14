@@ -24,10 +24,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>55</version>
+    <version>56-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2024.05</version>
+  <version>2024.06.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -49,13 +49,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2024.05</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <argLine />
-    <changelog.since>2024-02-28</changelog.since>
+    <changelog.since>2024-06-14</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2024.05</changes.version>
+    <changes.version>2024.06.0</changes.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
