@@ -90,11 +90,11 @@ public class MCRAclEditorResource {
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Produces(MediaType.TEXT_HTML)
     public InputStream start() throws Exception {
-        return transform("webpage.xml");
+        return transform("xml/webpage.xml");
     }
 
     protected InputStream transform(String xmlFile) throws Exception {
-        InputStream guiXML = getAclEditorResource(xmlFile);
+        InputStream guiXML = getAclEditorGuiResource(xmlFile);
         if (guiXML == null) {
             throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).build());
         }
@@ -349,7 +349,7 @@ public class MCRAclEditorResource {
         return new MCRAccessRule(newRuleID, uid, new Date(), ruleText, ruleDesc);
     }
 
-    private InputStream getAclEditorResource(String filename) {
+    private InputStream getAclEditorGuiResource(String filename) {
         return MCRResourceHelper.getWebResourceAsStream("/modules/acl-editor2/gui/" + filename);
     }
     
