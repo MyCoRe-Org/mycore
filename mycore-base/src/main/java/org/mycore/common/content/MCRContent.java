@@ -39,7 +39,6 @@ import java.util.Base64;
 import javax.xml.transform.Source;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -161,7 +160,7 @@ public abstract class MCRContent {
      */
     public void sendTo(OutputStream out) throws IOException {
         try (InputStream in = getInputStream()) {
-            IOUtils.copy(in, out);
+            in.transferTo(out);
         }
     }
 

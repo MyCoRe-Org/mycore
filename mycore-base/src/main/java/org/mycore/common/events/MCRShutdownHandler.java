@@ -56,11 +56,11 @@ public class MCRShutdownHandler {
 
     private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
 
-    private final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
+    final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
 
-    private final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
+    final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
-    private volatile boolean shuttingDown = false;
+    volatile boolean shuttingDown = false;
 
     boolean isWebAppRunning;
 

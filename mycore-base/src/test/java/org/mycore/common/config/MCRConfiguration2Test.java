@@ -49,9 +49,9 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRTestProperty(key = "MCR.C2.Object.class", classNameOf = TestObject.class)
     })
     public final void testObjectInstanceIsReturned() {
-        assertTrue(MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object").isPresent());
-        assertTrue(MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object.Class").isPresent());
-        assertTrue(MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object.class").isPresent());
+        assertTrue(MCRConfiguration2.getInstanceOf(TestObject.class, "MCR.C2.Object").isPresent());
+        assertTrue(MCRConfiguration2.getInstanceOf(TestObject.class, "MCR.C2.Object.Class").isPresent());
+        assertTrue(MCRConfiguration2.getInstanceOf(TestObject.class, "MCR.C2.Object.class").isPresent());
     }
 
     @Test
@@ -59,9 +59,8 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRTestProperty(key = "MCR.C2.Object", classNameOf = TestObject.class),
         @MCRTestProperty(key = "MCR.C2.Object.Foo", string = "Bar")
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testObjectInstanceWithoutSuffixIsConfigured() {
-        TestObject instance = MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object").get();
+        TestObject instance = MCRConfiguration2.getInstanceOfOrThrow(TestObject.class, "MCR.C2.Object");
         assertEquals("Bar", instance.getFoo());
     }
 
@@ -70,9 +69,8 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRTestProperty(key = "MCR.C2.Object.Class", classNameOf = TestObject.class),
         @MCRTestProperty(key = "MCR.C2.Object.Foo", string = "Bar")
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testObjectInstanceWithUpperCaseSuffixIsConfigured() {
-        TestObject instance = MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object.Class").get();
+        TestObject instance = MCRConfiguration2.getInstanceOfOrThrow(TestObject.class, "MCR.C2.Object.Class");
         assertEquals("Bar", instance.getFoo());
     }
 
@@ -81,9 +79,8 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRTestProperty(key = "MCR.C2.Object.class", classNameOf = TestObject.class),
         @MCRTestProperty(key = "MCR.C2.Object.Foo", string = "Bar")
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testObjectInstanceWithLowerCaseSuffixIsConfigured() {
-        TestObject instance = MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object.class").get();
+        TestObject instance = MCRConfiguration2.getInstanceOfOrThrow(TestObject.class, "MCR.C2.Object.class");
         assertEquals("Bar", instance.getFoo());
     }
 
@@ -91,10 +88,9 @@ public class MCRConfiguration2Test extends MCRTestCase {
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.C2.Object", classNameOf = TestObject.class)
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testObjectInstanceIsNotShared() {
-        TestObject instance1 = MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object").get();
-        TestObject instance2 = MCRConfiguration2.<TestObject>getInstanceOf("MCR.C2.Object").get();
+        TestObject instance1 = MCRConfiguration2.getInstanceOfOrThrow(TestObject.class, "MCR.C2.Object");
+        TestObject instance2 = MCRConfiguration2.getInstanceOfOrThrow(TestObject.class, "MCR.C2.Object");
         assertNotEquals(instance1, instance2);
     }
 
@@ -102,10 +98,9 @@ public class MCRConfiguration2Test extends MCRTestCase {
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.C2.SameObject", classNameOf = TestObject.class)
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testSingleObjectInstanceWithSameKeyIsShared() {
-        TestObject instance1 = MCRConfiguration2.<TestObject>getSingleInstanceOf("MCR.C2.SameObject").get();
-        TestObject instance2 = MCRConfiguration2.<TestObject>getSingleInstanceOf("MCR.C2.SameObject").get();
+        TestObject instance1 = MCRConfiguration2.getSingleInstanceOfOrThrow(TestObject.class, "MCR.C2.SameObject");
+        TestObject instance2 = MCRConfiguration2.getSingleInstanceOfOrThrow(TestObject.class, "MCR.C2.SameObject");
         assertEquals(instance1, instance2);
     }
 
@@ -114,10 +109,11 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRTestProperty(key = "MCR.C2.DifferentObject1", classNameOf = TestObject.class),
         @MCRTestProperty(key = "MCR.C2.DifferentObject2", classNameOf = TestObject.class)
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testSingleObjectInstanceWithDifferentKeyIsNotShared() {
-        TestObject instance1 = MCRConfiguration2.<TestObject>getSingleInstanceOf("MCR.C2.DifferentObject1").get();
-        TestObject instance2 = MCRConfiguration2.<TestObject>getSingleInstanceOf("MCR.C2.DifferentObject2").get();
+        TestObject instance1 = MCRConfiguration2.getSingleInstanceOfOrThrow(TestObject.class,
+            "MCR.C2.DifferentObject1");
+        TestObject instance2 = MCRConfiguration2.getSingleInstanceOfOrThrow(TestObject.class,
+            "MCR.C2.DifferentObject2");
         assertNotEquals(instance1, instance2);
     }
 
@@ -126,10 +122,9 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRTestProperty(key = "MCR.C2.Singleton", classNameOf = TestSingleton.class),
         @MCRTestProperty(key = "MCR.C2.Singleton.Foo", string = "Bar")
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testSingletonInstanceIsShared() {
-        TestSingleton instance1 = MCRConfiguration2.<TestSingleton>getInstanceOf("MCR.C2.Singleton").get();
-        TestSingleton instance2 = MCRConfiguration2.<TestSingleton>getInstanceOf("MCR.C2.Singleton").get();
+        TestSingleton instance1 = MCRConfiguration2.getInstanceOfOrThrow(TestSingleton.class, "MCR.C2.Singleton");
+        TestSingleton instance2 = MCRConfiguration2.getInstanceOfOrThrow(TestSingleton.class, "MCR.C2.Singleton");
         assertSame(instance1, instance2);
     }
 
@@ -138,9 +133,8 @@ public class MCRConfiguration2Test extends MCRTestCase {
         @MCRTestProperty(key = "MCR.C2.Singleton", classNameOf = TestSingleton.class),
         @MCRTestProperty(key = "MCR.C2.Singleton.Foo", string = "Bar")
     })
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public final void testSingletonInstanceIsConfigured() {
-        TestSingleton instance = MCRConfiguration2.<TestSingleton>getInstanceOf("MCR.C2.Singleton").get();
+        TestSingleton instance = MCRConfiguration2.getInstanceOfOrThrow(TestSingleton.class, "MCR.C2.Singleton");
         assertEquals("Bar", instance.getFoo());
     }
 

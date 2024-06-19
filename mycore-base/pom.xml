@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2024.05-SNAPSHOT</version>
+    <version>2024.06.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-base</artifactId>
@@ -116,8 +116,6 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <forkCount>1</forkCount>
-          <reuseForks>false</reuseForks>
           <includes>
             <include>**/*Test*.java</include>
           </includes>
@@ -133,6 +131,9 @@
               <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
             </property>
           </properties>
+          <systemPropertyVariables>
+            <jersey.config.test.container.port>0</jersey.config.test.container.port>
+          </systemPropertyVariables>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
       </plugin>

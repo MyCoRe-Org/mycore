@@ -19,7 +19,7 @@
 package org.mycore.frontend.cli;
 
 import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -38,9 +37,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.MCRResourceResolver;
-import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -48,6 +44,9 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.MCRResourceResolver;
+import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.common.base.Splitter;
@@ -261,9 +260,10 @@ public class MCRDeveloperCommands {
         try {
             URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
             if (url != null) {
-                StringWriter writer = new StringWriter();
-                IOUtils.copy(url.openStream(), writer, Charset.forName(charset));
-                LOGGER.info("Resolved resource {} as {}:\n{}", path, url, writer.toString());
+                try (InputStream is = url.openStream()) {
+                    String out = new String(is.readAllBytes(), Charset.forName(charset));
+                    LOGGER.info("Resolved resource {} as {}:\n{}", path, url, out);
+                }
             } else {
                 LOGGER.info("Resource {} not found", path);
             }
@@ -279,7 +279,6 @@ public class MCRDeveloperCommands {
     public static void resolveTextualResource(String path) {
         MCRDeveloperCommands.resolveTextualResource(path, Charset.defaultCharset().name());
     }
-
 
     @MCRCommand(
         syntax = "resolve textual web resource {0}",
@@ -317,10 +316,12 @@ public class MCRDeveloperCommands {
         try {
             URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
             if (url != null) {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                IOUtils.copy(url.openStream(), stream);
-                String encodedContent = getEncoder(encoder).apply(stream.toByteArray());
-                LOGGER.info("Resolved resource {} as {}:\n{}", path, url, encodedContent);
+                try (InputStream is = url.openStream();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+                    is.transferTo(stream);
+                    String encodedContent = getEncoder(encoder).apply(stream.toByteArray());
+                    LOGGER.info("Resolved resource {} as {}:\n{}", path, url, encodedContent);
+                }
             } else {
                 LOGGER.info("Resource {} not found", path);
             }

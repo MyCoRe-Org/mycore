@@ -30,6 +30,29 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
+
+  <xsl:function name="mcrclass:label" as="element()?">
+    <xsl:param name="lang" as="xs:string"/>
+    <xsl:param name="class" as="element()?"/>
+
+    <xsl:choose>
+      <xsl:when test="$class[@classid and @categid]">
+        <xsl:sequence select="mcrclass:label($lang, document(concat('classification:metadata:0:children:',$class/@classid,':',$class/@categid))//category)" />
+      </xsl:when>
+      <xsl:when test="string-length($lang) > 0 and $class/label[lang($lang)]">
+        <xsl:sequence select="$class/label[lang($lang)]" />
+      </xsl:when>
+      <xsl:when test="$class/label[lang($CurrentLang)]">
+        <xsl:sequence select="$class/label[lang($CurrentLang)]" />
+      </xsl:when>
+      <xsl:when test="$class/label[lang($DefaultLang)]">
+        <xsl:sequence select="$class/label[lang($DefaultLang)]" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$class/label[1]" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
   
   <xsl:function name="mcrclass:current-label-text" as="xs:string?">
     <xsl:param name="class" as="element()?" />
@@ -40,6 +63,24 @@
       </xsl:when>
       <xsl:when test="$class/@ID">
         <xsl:sequence select="fn:concat('??', $class/@ID, '@', $CurrentLang, '??')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="()" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <xsl:function name="mcrclass:label-text" as="xs:string?">
+    <xsl:param name="lang" as="xs:string"/>
+    <xsl:param name="class" as="element()?"/>
+
+    <xsl:variable name="label" select="mcrclass:label($lang, $class)"/>
+    <xsl:choose>
+      <xsl:when test="$label">
+        <xsl:sequence select="$label/@text" />
+      </xsl:when>
+      <xsl:when test="$class/@ID">
+        <xsl:sequence select="concat('??', $class/@ID, '@', $lang, '??')" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="()" />

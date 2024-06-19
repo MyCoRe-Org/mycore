@@ -18,6 +18,12 @@
 
 package org.mycore.iview.tests;
 
+import java.net.InetSocketAddress;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.logging.log4j.LogManager;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -25,6 +31,9 @@ import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.mycore.iview.tests.controller.ApplicationController;
 import org.mycore.iview.tests.controller.ImageViewerController;
 import org.mycore.iview.tests.model.TestDerivate;
+
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.SimpleFileServer;
 
 public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
@@ -38,14 +47,44 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
     private ApplicationController applicationController;
 
+    HttpServer httpServer;
+
+    private static ThreadLocal<AtomicLong> waitTime = ThreadLocal.withInitial(AtomicLong::new);
+
+    @AfterClass
+    public static void printWaitTime() {
+        LogManager.getLogger().info("Total wait time: {}", Duration.ofMillis(waitTime.get().get()));
+        waitTime.remove();
+    }
+
+    public static void sleep(long millis) throws InterruptedException {
+        waitTime.get().addAndGet(millis);
+        Thread.sleep(millis);
+    }
+
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        InetSocketAddress serverAddress = new InetSocketAddress(0);
+        Path baseDir = Path.of("target").toAbsolutePath();
+        httpServer = SimpleFileServer.createFileServer(serverAddress, baseDir, SimpleFileServer.OutputLevel.INFO);
+        httpServer.start();
+
+        String baseURL = getBaseURL();
+        LogManager.getLogger().info("Server online: " + baseURL);
+
         initController();
-        getAppController().setUpDerivate(this.getDriver(), getTestDerivate());
+        getAppController().setUpDerivate(this.getDriver(), getBaseURL(), getTestDerivate());
+    }
+
+    protected String getBaseURL() {
+        return "http://localhost:" + httpServer.getAddress().getPort();
     }
 
     @After
     public void tearDown() {
+        if (httpServer != null) {
+            httpServer.stop(0);
+        }
         this.takeScreenshot();
     }
 

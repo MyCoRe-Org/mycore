@@ -39,7 +39,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.iiif.image.MCRIIIFImageUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
@@ -87,15 +86,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         if (tileFileProviderClassName == null) {
             tileFileProvider = new MCRDefaultTileFileProvider();
         } else {
-            Optional<MCRTileFileProvider> optTFP = MCRConfiguration2
-                .getInstanceOf(getConfigPrefix() + TILE_FILE_PROVIDER_PROPERTY);
-            if (optTFP.isPresent()) {
-                tileFileProvider = optTFP.get();
-            } else {
-                throw new MCRConfigurationException(
-                    "Configurated class (" + TILE_FILE_PROVIDER_PROPERTY + ") not found: "
-                        + tileFileProviderClassName);
-            }
+            tileFileProvider = MCRConfiguration2.getInstanceOfOrThrow(
+                MCRTileFileProvider.class, getConfigPrefix() + TILE_FILE_PROVIDER_PROPERTY);
         }
 
         transparentFormats = Arrays.asList(properties.get("TransparentFormats").split(","));

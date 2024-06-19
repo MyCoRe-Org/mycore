@@ -3,6 +3,13 @@
                 xmlns:mcri18n="http://www.mycore.de/xslt/i18n">
 
   <xsl:template match="sessionListing">
+
+    <script type="text/javascript">
+      window["component.session-listing.firstURI"] = &quot;<xsl:value-of select="mcri18n:translate('component.session-listing.firstURI')"/>&quot;;
+      window["component.session-listing.firstUserAgent"] = &quot;<xsl:value-of select="mcri18n:translate('component.session-listing.firstUserAgent')"/>&quot;;
+      window["component.session-listing.lastURI"] = &quot;<xsl:value-of select="mcri18n:translate('component.session-listing.lastURI')"/>&quot;;
+    </script>
+
     <div id="sessionListingContainer" style="margin-top: 16px;">
 
       <div id="sessionListingLoadingSpinner">

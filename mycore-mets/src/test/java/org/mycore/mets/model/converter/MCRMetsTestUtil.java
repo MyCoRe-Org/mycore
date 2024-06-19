@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -44,12 +43,9 @@ public class MCRMetsTestUtil {
     private static Properties PROPERTIES = new Properties();
 
     public static String readJsonFile(String path) throws IOException {
-        InputStream resourceAsStream = MCRMetsTestUtil.class.getClassLoader().getResourceAsStream("json/" + path);
-        List<String> stringList = IOUtils.readLines(resourceAsStream, StandardCharsets.UTF_8);
-        StringBuilder sb = new StringBuilder();
-        stringList.forEach(sb::append);
-        return sb.toString();
-
+        try (InputStream is = MCRMetsTestUtil.class.getClassLoader().getResourceAsStream("json/" + path)) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     public static Document readXMLFile(String path) throws JDOMException, IOException {

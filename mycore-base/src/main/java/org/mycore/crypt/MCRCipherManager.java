@@ -47,11 +47,8 @@ public class MCRCipherManager {
 
     public static MCRCipher getCipher(String id) throws MCRCryptKeyFileNotFoundException {
         LOGGER.debug("getCipher for id {} .", id);
-        String propertiy = "MCR.Crypt.Cipher." + id + ".class";
-        MCRCipher cipher = MCRConfiguration2.<MCRCipher>getSingleInstanceOf(propertiy)
-            .orElseThrow(
-                () -> new MCRCryptCipherConfigurationException(
-                    "Property " + propertiy + "not configured or class not found."));
+        String property = "MCR.Crypt.Cipher." + id + ".class";
+        MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, property);
         if (!cipher.isInitialised()) {
             LOGGER.debug("init Cipher for id {} .", id);
             try {
@@ -74,11 +71,8 @@ public class MCRCipherManager {
 
     public static MCRCipher getUnIntitialisedCipher(String id) {
         LOGGER.debug("getCipher for id {} .", id);
-        String propertiy = "MCR.Crypt.Cipher." + id + ".class";
-        MCRCipher cipher = MCRConfiguration2.<MCRCipher>getSingleInstanceOf(propertiy)
-            .orElseThrow(
-                () -> new MCRCryptCipherConfigurationException(
-                    "Property " + propertiy + "not configured or class not found."));
+        String property = "MCR.Crypt.Cipher." + id + ".class";
+        MCRCipher cipher = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCipher.class, property);
         cipher.reset();
         return cipher;
     }

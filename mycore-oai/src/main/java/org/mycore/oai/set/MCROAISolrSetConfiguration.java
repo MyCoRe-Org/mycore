@@ -38,16 +38,20 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
 
     private String uri;
 
-    private MCROAISetHandler<SolrQuery, SolrDocument, String> handler;
+    private MCROAISolrSetHandler handler;
 
     public MCROAISolrSetConfiguration(String configPrefix, String setId) {
         String setConfigPrefix = configPrefix + SETS_PREFIX + setId;
-        String defaultname = getFallbackHandler(configPrefix, setId);
-        MCROAISetHandler<SolrQuery, SolrDocument, String> handler = defaultname == null
-            ? MCRConfiguration2.getOrThrow(setConfigPrefix + ".Handler", MCRConfiguration2::instantiateClass)
-            : MCRConfiguration2.<MCROAISetHandler<SolrQuery, SolrDocument, String>>getInstanceOf(
-                setConfigPrefix + ".Handler")
-                .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultname));
+        MCROAISolrSetHandler handler = MCRConfiguration2.getInstanceOf(
+            MCROAISolrSetHandler.class, setConfigPrefix + ".Handler")
+            .orElseGet(() -> {
+                String fallbackHandlerClassName = getFallbackHandler(configPrefix, setId);
+                if (fallbackHandlerClassName == null) {
+                    throw new MCRConfigurationException("Configuration property " + setConfigPrefix
+                        + ".Handler is not set and no fallback handler could be determined.");
+                }
+                return MCRConfiguration2.instantiateClass(fallbackHandlerClassName);
+            });
         handler.init(configPrefix, setId);
         this.id = setId;
         this.uri = getURI(setConfigPrefix);

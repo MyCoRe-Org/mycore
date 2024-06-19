@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -35,10 +36,10 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.Parent;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
-import org.w3c.dom.Node;
 
 import jakarta.xml.bind.util.JAXBSource;
 
@@ -51,70 +52,68 @@ public class MCRSourceContent extends MCRWrappedContent {
     private Source source;
 
     public MCRSourceContent(Source source) {
-        if (source == null) {
-            throw new NullPointerException("Source cannot be null");
-        }
+        Objects.requireNonNull(source, "Source cannot be null");
         this.source = source;
-        MCRContent baseContent = null;
-        if (source instanceof JDOMSource src) {
-            Document xml = src.getDocument();
-            if (xml != null) {
-                baseContent = new MCRJDOMContent(xml);
-            } else {
-                for (Object node : src.getNodes()) {
-                    if (node instanceof Element element) {
-                        Document doc = element.getDocument();
-                        if (doc == null) {
-                            baseContent = new MCRJDOMContent(element);
-                        } else {
-                            if (doc.getRootElement() == element) {
-                                baseContent = new MCRJDOMContent(doc);
-                            } else {
-                                baseContent = new MCRJDOMContent(element.clone());
-                            }
-                        }
-                        break;
-                    } else if (node instanceof Document doc) {
-                        baseContent = new MCRJDOMContent(doc);
-                        break;
-                    }
-                }
-            }
-        } else if (source instanceof JAXBSource) {
-            TransformerFactory transformerFactory = TransformerFactory.newDefaultInstance();
-            try {
-                Transformer transformer = transformerFactory.newTransformer();
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                transformer.transform(source, new StreamResult(bout));
-                baseContent = new MCRByteContent(bout.toByteArray());
-            } catch (TransformerException e) {
-                throw new MCRException("Error while resolving JAXBSource", e);
-            }
-        } else if (source instanceof SAXSource src) {
-            baseContent = new MCRSAXContent(src.getXMLReader(), src.getInputSource());
-        } else if (source instanceof DOMSource domSource) {
-            Node node = domSource.getNode();
-            baseContent = new MCRDOMContent(node.getOwnerDocument());
-        } else if (source instanceof StreamSource streamSource) {
-            InputStream inputStream = streamSource.getInputStream();
-            if (inputStream != null) {
-                baseContent = new MCRStreamContent(inputStream);
-            } else {
-                try {
-                    URI uri = new URI(source.getSystemId());
-                    baseContent = new MCRURLContent(uri.toURL());
-                } catch (URISyntaxException | MalformedURLException e) {
-                    throw new MCRException("Could not create instance of MCRURLContent for SYSTEMID: "
-                        + source.getSystemId(), e);
-                }
-            }
-        }
+        MCRContent baseContent = switch (source) {
+            case JDOMSource src -> getBaseContent(src);
+            case JAXBSource jaxbSource -> getBaseContent(jaxbSource);
+            case SAXSource src -> new MCRSAXContent(src.getXMLReader(), src.getInputSource());
+            case DOMSource domSource -> new MCRDOMContent(domSource.getNode().getOwnerDocument());
+            case StreamSource streamSource -> getBaseContent(streamSource);
+            default -> null;
+        };
         if (baseContent == null) {
             throw new MCRException("Could not get MCRContent from " + source.getClass().getCanonicalName()
                 + ", systemId:" + source.getSystemId());
         }
         baseContent.setSystemId(getSystemId());
         this.setBaseContent(baseContent);
+    }
+
+    private static MCRContent getBaseContent(StreamSource streamSource) {
+        InputStream inputStream = streamSource.getInputStream();
+        if (inputStream != null) {
+            return new MCRStreamContent(inputStream);
+        } else {
+            try {
+                URI uri = new URI(streamSource.getSystemId());
+                return new MCRURLContent(uri.toURL());
+            } catch (URISyntaxException | MalformedURLException e) {
+                throw new MCRException("Could not create instance of MCRURLContent for SYSTEMID: "
+                    + streamSource.getSystemId(), e);
+            }
+        }
+    }
+
+    private static MCRByteContent getBaseContent(JAXBSource source) {
+        TransformerFactory transformerFactory = TransformerFactory.newDefaultInstance();
+        try {
+            Transformer transformer = transformerFactory.newTransformer();
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            transformer.transform(source, new StreamResult(bout));
+            return new MCRByteContent(bout.toByteArray());
+        } catch (TransformerException e) {
+            throw new MCRException("Error while resolving JAXBSource", e);
+        }
+    }
+
+    private static MCRJDOMContent getBaseContent(JDOMSource src) {
+        Document xml = src.getDocument();
+        if (xml != null) {
+            return new MCRJDOMContent(xml);
+        }
+        return src.getNodes().stream()
+            .filter(Parent.class::isInstance) //only Element or Document matter
+            .map(Parent.class::cast)
+            .findFirst()
+            .map(p -> switch (p){
+                case Element element when element.isRootElement() -> new MCRJDOMContent(element.getDocument());
+                case Element element when element.getParent() == null -> new MCRJDOMContent(element);
+                case Element element -> new MCRJDOMContent(element.clone());
+                case Document doc -> new MCRJDOMContent(doc);
+                default -> null;
+            })
+            .orElse(null);
     }
 
     /**

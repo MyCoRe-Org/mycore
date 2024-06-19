@@ -355,7 +355,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         if (rule.getChildren() == null || rule.getChildren().size() == 0) {
             return "false";
         }
-        Element normalizedRule = normalize(rule.getChildren().get(0));
+        Element normalizedRule = normalize(rule.getChildren().getFirst());
         MCRRuleParser parser = new MCRRuleParser();
         return parser.parse(normalizedRule).toString();
     }

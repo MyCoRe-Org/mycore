@@ -51,10 +51,12 @@ public class MCRMODSDOIMetadataServiceTest extends MCRTestCase {
     @Test
     public void testInsert() throws URISyntaxException, IOException, MCRPersistentIdentifierException, JDOMException {
 
-        final MCRMODSDOIMetadataService service1 = (MCRMODSDOIMetadataService) MCRConfiguration2
-            .getInstanceOf(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_1).get();
-        final MCRMODSDOIMetadataService service2 = (MCRMODSDOIMetadataService) MCRConfiguration2
-            .getInstanceOf(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_2).get();
+        final MCRMODSDOIMetadataService service1 = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRMODSDOIMetadataService.class,
+            MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_1);
+        final MCRMODSDOIMetadataService service2 = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRMODSDOIMetadataService.class,
+            MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_2);
 
         final URL modsURL = MCRMODSDOIMetadataService.class.getClassLoader()
             .getResource("MCRMODSDOIMetadataServiceTest/mods.xml");

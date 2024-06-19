@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2024.05-SNAPSHOT</version>
+    <version>2024.06.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-mets</artifactId>
@@ -32,7 +32,7 @@
   <name>MyCoRe METS</name>
   <properties>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
-    <jetty.port>9301</jetty.port>
+    <failsafe.arg />
     <manifest.priority>45</manifest.priority>
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
@@ -73,10 +73,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
@@ -153,57 +149,16 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
-            <version>${jetty.version}</version>
-            <configuration>
-              <supportedPackagings>jar</supportedPackagings>
-              <webAppSourceDirectory>${basedir}/target/</webAppSourceDirectory>
-              <scanIntervalSeconds>10</scanIntervalSeconds>
-              <stopKey>foo</stopKey>
-              <stopPort>9202</stopPort>
-              <webApp>
-                <webInfIncludeJarPattern>doNotIncludeAnyJarsPattern</webInfIncludeJarPattern>
-              </webApp>
-              <systemProperties>
-                <jetty.port>${jetty.port}</jetty.port>
-                <MCR.Home>${project.build.testOutputDirectory}/mycore-home</MCR.Home>
-                <MCR.AppName>${project.artifactId}</MCR.AppName>
-                <MCRRuntimeComponentDetector.underTesting>${project.artifactId}</MCRRuntimeComponentDetector.underTesting>
-              </systemProperties>
-            </configuration>
-            <executions>
-              <execution>
-                <id>start-jetty</id>
-                <goals>
-                  <goal>start</goal>
-                </goals>
-                <phase>pre-integration-test</phase>
-                <configuration>
-                  <scanIntervalSeconds>0</scanIntervalSeconds>
-                </configuration>
-              </execution>
-              <execution>
-                <id>stop-jetty</id>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-                <phase>post-integration-test</phase>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
                 <project.build.directory>${project.build.directory}</project.build.directory>
-                <BaseUrlPort>${jetty.port}</BaseUrlPort>
                 <ResultFolder>${TestResultDir}</ResultFolder>
               </systemPropertyVariables>
               <trimStackTrace>false</trimStackTrace>
               <runOrder>alphabetical</runOrder>
-              <argLine>${env.MAVEN_OPTS}</argLine>
+              <argLine>${failsafe.arg}</argLine>
             </configuration>
             <executions>
               <execution>

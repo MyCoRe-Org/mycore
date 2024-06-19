@@ -48,7 +48,7 @@ public class MCRCreatorCache {
             public String load(final MCRObjectID objectId) {
                 return Optional.ofNullable(MCRMetadataManager.retrieveMCRObject(objectId).getService()).map(os -> {
                     if (os.isFlagTypeSet("createdby")) {
-                        final String creator = os.getFlags("createdby").get(0);
+                        final String creator = os.getFlags("createdby").getFirst();
                         LOGGER.info("Found creator {} of {}", creator, objectId);
                         return creator;
                     }

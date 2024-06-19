@@ -515,6 +515,24 @@ public class MCRLinkTableManager {
         }
     }
 
+    /**
+     * Updates all references of this object. Old ones will be removed and new links will be created.
+     * @param der the mycore derivate
+     */
+    public void update(MCRDerivate der) {
+        delete(der.getId());
+        create(der);
+    }
+
+    /**
+     * Creates all references for the given object. You should call {@link #delete(MCRObjectID)} before using this
+     * @param obj the object to create the references
+     */
+    public void update(MCRObject obj) {
+        delete(obj.getId());
+        create(obj);
+    }
+
     public void create(MCRDerivate der) {
         Collection<MCRCategoryID> categoryList = new HashSet<>(der.getDerivate().getClassifications()
             .stream()

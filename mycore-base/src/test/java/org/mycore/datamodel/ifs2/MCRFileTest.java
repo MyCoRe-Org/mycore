@@ -31,7 +31,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
@@ -112,7 +111,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         src.deleteOnExit();
         byte[] content = "Hello World".getBytes(StandardCharsets.UTF_8);
         try (FileOutputStream fo = new FileOutputStream(src)) {
-            IOUtils.copy(new ByteArrayInputStream(content), fo);
+            new ByteArrayInputStream(content).transferTo(fo);
         }
         file.setContent(new MCRFileContent(src));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));

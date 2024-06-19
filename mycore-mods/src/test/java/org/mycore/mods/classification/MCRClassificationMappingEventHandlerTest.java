@@ -94,6 +94,46 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
+    /**
+     * Tests if an XPath-mapping is properly added into a Mods-Document.
+     * @throws IOException in case of error
+     * @throws JDOMException in case of error
+     * @throws URISyntaxException in case of error
+     */
+    @Test
+    public void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.isTransactionActive();
+        ClassLoader classLoader = getClass().getClassLoader();
+        SAXBuilder saxBuilder = new SAXBuilder();
+
+        loadCategory("genre.xml");
+        loadCategory("orcidWorkType.xml");
+
+        Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods2.xml"));
+        MCRObject mcro = new MCRObject();
+
+        MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 1);
+
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        mapper.handleObjectUpdated(null, mcro);
+
+        Document xml = mcro.createXML();
+
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+
+        String expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2orcidWorkType') and contains(@valueURI, 'journal-article')]";
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+    }
+
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();

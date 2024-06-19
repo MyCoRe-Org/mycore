@@ -22,7 +22,6 @@ import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.backend.jpa.access.MCRJPARuleStore;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -60,15 +59,10 @@ public abstract class MCRRuleStore {
     public abstract int getNextFreeRuleID(String prefix);
 
     public static MCRRuleStore getInstance() {
-        try {
-            if (implementation == null) {
-                implementation = MCRConfiguration2
-                    .getSingleInstanceOf("MCR.Persistence.Rule.Store_Class", MCRJPARuleStore.class).get();
-            }
-        } catch (Exception e) {
-            LOGGER.error(e);
+        if (implementation == null) {
+            implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
+                MCRRuleStore.class, "MCR.Persistence.Rule.Store_Class");
         }
-
         return implementation;
     }
 }

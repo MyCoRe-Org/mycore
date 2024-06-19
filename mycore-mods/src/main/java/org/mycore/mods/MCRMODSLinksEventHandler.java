@@ -26,13 +26,10 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -92,19 +89,6 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             return;
         }
         handleObjectCreated(evt, obj);
-        //may have to reindex children, if they inherit any information
-        // TODO: remove this code, it is not part of this classes responsibility. if information is inherited, i.e.
-        //  because of a metadata share agent, that process should, in turn, cause a reindexing of affected objects
-        if (INDEX_ALL_CHILDREN) {
-            for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
-                MCRObjectID childID = childLinkID.getXLinkHrefID();
-                if (MCRMetadataManager.exists(childID)) {
-                    MCREvent childEvent = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.INDEX);
-                    childEvent.put(MCREvent.OBJECT_KEY, MCRMetadataManager.retrieve(childID));
-                    MCREventManager.instance().handleEvent(childEvent);
-                }
-            }
-        }
     }
 
     /* (non-Javadoc)

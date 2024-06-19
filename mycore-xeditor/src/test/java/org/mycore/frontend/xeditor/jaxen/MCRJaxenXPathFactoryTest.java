@@ -91,7 +91,7 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
     }
 
     public static String testOneArg(List<Element> nodes) {
-        return nodes.get(0).getAttributeValue("id");
+        return nodes.getFirst().getAttributeValue("id");
     }
 
     public static boolean testTwoArgs(String id, String href) {

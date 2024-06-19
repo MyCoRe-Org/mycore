@@ -102,7 +102,7 @@ public class MCRXMLSimpleModelConverterTest {
 
         String message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "first", ROOT_SECTION_FIRST_CHILD_LABEL,
             "label");
-        Assert.assertEquals(message, metsSectionList.get(0).getLabel(), ROOT_SECTION_FIRST_CHILD_LABEL);
+        Assert.assertEquals(message, metsSectionList.getFirst().getLabel(), ROOT_SECTION_FIRST_CHILD_LABEL);
 
         message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "first", COVER_FRONT_TYPE, "type");
         Assert.assertEquals(message, metsSectionList.get(0).getType(), COVER_FRONT_TYPE);

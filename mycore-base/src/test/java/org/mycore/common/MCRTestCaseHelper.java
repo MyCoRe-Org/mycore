@@ -69,8 +69,13 @@ public class MCRTestCaseHelper {
     }
 
     public static void after() {
-        MCRConfigurationBase.initialize(Collections.emptyMap(), Collections.emptyMap(), true);
-        MCRSessionMgr.releaseCurrentSession();
+        if (MCRSessionMgr.hasCurrentSession()) {
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            MCRSessionMgr.releaseCurrentSession();
+            currentSession.close();
+        }
+        MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
+        MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), configurationLoader.load(), true);
     }
 
     public static String getCurrentComponentName() {

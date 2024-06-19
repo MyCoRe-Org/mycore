@@ -21,6 +21,8 @@ package org.mycore.resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.mycore.common.MCRException;
@@ -111,8 +113,8 @@ public final class MCRResourceHelper {
      */
     public static MCRResourcePath getResourcePath(String resourceUrl) {
         try {
-            return MCRResourceResolver.instance().reverse(new URL(resourceUrl)).orElse(null);
-        } catch (MalformedURLException e) {
+            return MCRResourceResolver.instance().reverse(new URI(resourceUrl).toURL()).orElse(null);
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new MCRException("Unable to convert string tu URL", e);
         }
     }

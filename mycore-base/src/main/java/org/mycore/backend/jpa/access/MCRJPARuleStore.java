@@ -193,7 +193,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
         if (l.isEmpty()) {
             return 1;
         }
-        String max = l.get(0);
+        String max = l.getFirst();
         if (max != null) {
             int lastNumber = Integer.parseInt(max.substring(prefix.length()));
             ret = lastNumber + 1;

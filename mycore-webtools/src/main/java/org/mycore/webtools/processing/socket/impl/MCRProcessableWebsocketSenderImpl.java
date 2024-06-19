@@ -123,11 +123,10 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
     }
 
     public synchronized Integer remove(Object object) {
-        Integer id = ID_MAP.get(object);
+        Integer id = ID_MAP.remove(object);
         if (id == null) {
             return null;
         }
-        ID_MAP.remove(id);
         if (object instanceof MCRProcessable) {
             PROCESSABLE_COLLECTION_MAP.remove(id);
         } else if (object instanceof MCRProcessableCollection) {

@@ -17,6 +17,8 @@
  */
 package org.mycore.datamodel.common;
 
+import java.util.Collection;
+
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -72,5 +74,11 @@ public interface MCRObjectIDGenerator {
      *         type
      */
     MCRObjectID getLastID(String baseId);
+
+    /**
+     * Returns all the base IDs that have been used to generate object IDs.
+     * @return a collection of base IDs
+     */
+    Collection<String> getBaseIDs();
 
 }

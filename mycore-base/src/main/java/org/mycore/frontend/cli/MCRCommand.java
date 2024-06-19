@@ -242,7 +242,7 @@ public class MCRCommand {
         initMethod(classLoader);
         prepareInvocationParameters(commandParameters);
         Object result = method.invoke(null, commandParameters);
-        if (result instanceof List resultList && !resultList.isEmpty() && resultList.get(0) instanceof String) {
+        if (result instanceof List resultList && !resultList.isEmpty() && resultList.getFirst() instanceof String) {
             return (List<String>) result;
         } else {
             return new ArrayList<>();

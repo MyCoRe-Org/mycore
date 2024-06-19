@@ -67,11 +67,45 @@ class MCRConfigurableInstanceHelper {
      */
     public static boolean isSingleton(String property) {
         return MCRConfiguration2.getString(property).stream()
-            .anyMatch(propertyVal -> getClass(property, propertyVal).getDeclaredAnnotation(Singleton.class) != null);
+            .anyMatch(propertyVal -> isSingleton(getClass(property, propertyVal)));
     }
 
     /**
-     * Creates a configured instance of a class .
+     * Checks if a class is annotated with {@link Singleton}.
+     *
+     * @param targetClass the class
+     * @return true if the class in the property is annotated with {@link Singleton}
+     */
+    public static boolean isSingleton(Class<?> targetClass) {
+        return targetClass.getDeclaredAnnotation(Singleton.class) != null;
+    }
+
+    /**
+     * Creates a configured instance of a class.
+     *
+     * @param superClass the intended super class of the instantiated class
+     * @param name the property which contains the class name
+     * @return the configured instance of T
+     * @throws MCRConfigurationException if the property is not right configured.
+     */
+    public static <S> Optional<S> getInstance(Class<S> superClass, String name) throws MCRConfigurationException {
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
+        String className = configuration.className();
+        if (className == null || className.isBlank()) {
+            return Optional.empty();
+        }
+        Object instance = getInstance(configuration);
+        if (superClass.isAssignableFrom(instance.getClass())) {
+            return Optional.of(superClass.cast(instance));
+        } else {
+            throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
+                + " is incompatible with intended super class " + superClass.getName()
+                + "' in configured class " + name);
+        }
+    }
+
+    /**
+     * Creates a configured instance of a class.
      *
      * @param name the property which contains the class name
      * @return the configured instance of T
@@ -278,7 +312,7 @@ class MCRConfigurableInstanceHelper {
                     + " factory methods (" + methodNames(factoryMethods) + ")");
             }
 
-            return factoryMethods.get(0);
+            return factoryMethods.getFirst();
 
         }
 
@@ -324,7 +358,7 @@ class MCRConfigurableInstanceHelper {
                     + ") in configured class " + targetClass.getName());
             }
 
-            Source<?, ?> source = sources.get(0);
+            Source<?, ?> source = sources.getFirst();
 
             if (!source.allowedTargetTypes().contains(target.type())) {
                 throw new MCRConfigurationException("Target " + targetTypeName(target) + " '"

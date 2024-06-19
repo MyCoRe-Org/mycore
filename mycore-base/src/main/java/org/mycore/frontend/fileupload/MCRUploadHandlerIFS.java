@@ -199,7 +199,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 @SuppressWarnings("rawtypes")
                 MCRFileAttributes attrs = Files.readAttributes(child, MCRFileAttributes.class);
                 shouldAcceptFile = attrs.size() != length
-                    || !(checksum.equals(attrs.md5sum()) && child.getFileSystem().verifies(child, attrs));
+                    || !(checksum.equals(attrs.digest().toHexString()) && child.getFileSystem().verifies(child, attrs));
             }
         }
         LOGGER.debug("Should the client send this file? {}", shouldAcceptFile);

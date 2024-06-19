@@ -122,6 +122,6 @@ public class MCRChangeData {
 
     public Attribute text2attribute(String text) {
         String xtext = "<x " + text + " />";
-        return text2element(xtext).getAttributes().get(0).detach();
+        return text2element(xtext).getAttributes().getFirst().detach();
     }
 }

@@ -62,11 +62,16 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
             }
         });
 
-    private final MCRPath emptyPath;
+    private final MCRAbstractFileSystemProvider provider;
 
-    public MCRAbstractFileSystem() {
+    public MCRAbstractFileSystem(MCRAbstractFileSystemProvider provider) {
         super();
-        emptyPath = getPath(null, "", this);
+        this.provider = provider;
+    }
+
+    @Override
+    public MCRAbstractFileSystemProvider provider() {
+        return this.provider;
     }
 
     /**
@@ -75,7 +80,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
      * @see FileSystemProvider#getScheme()
      * @throws FileSystemNotFoundException if no filesystem handles this scheme
      */
-    public static MCRAbstractFileSystem getInstance(String scheme) {
+    public static MCRAbstractFileSystem getInstance(String scheme) throws FileSystemNotFoundException {
         URI uri;
         try {
             uri = MCRPaths.getURI(scheme, "helper", SEPARATOR_STRING);
@@ -93,18 +98,11 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     public static MCRPath getPath(final String owner, final String path, final MCRAbstractFileSystem fs) {
         Objects.requireNonNull(fs, MCRAbstractFileSystem.class.getSimpleName() + " instance may not be null.");
-        return new MCRPath(owner, path) {
-
-            @Override
-            public MCRAbstractFileSystem getFileSystem() {
-                return fs;
-            }
-        };
+        return fs.provider().getPath(owner, path);
     }
 
     /**
      * Creates a new root under the given name.
-     * 
      * After calling this method the implementing FileSystem should
      * be ready to accept data for this root.
      * 
@@ -116,7 +114,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     /**
      * Checks if the file for given Path is still valid.
-     * 
      * This should check if the file is still completely readable and the MD5 sum still matches the recorded value.
      * @param path Path to the file to check
      * @return if the file is still in good condition
@@ -133,7 +130,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     /**
      * Checks if the file for given Path is still valid.
-     * 
      * This should check if the file is still completely readable and the MD5 sum still matches the recorded value.
      * This method does the same as {@link #verifies(MCRPath)} but uses the given attributes to save a file access.
      * @param path Path to the file to check
@@ -144,23 +140,22 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
             throw new NoSuchFileException(path.toString());
         }
         Objects.requireNonNull(attrs, "attrs may not be null");
-        String md5Sum;
+        String digest;
         try {
-            md5Sum = MCRUtils.getMD5Sum(Files.newInputStream(path));
+            digest = MCRUtils.getDigest(attrs.digest().getAlgorithm(), Files.newInputStream(path));
         } catch (IOException e) {
             LogManager.getLogger(getClass()).error("Could not verify path: {}", path, e);
             return false;
         }
-        boolean returns = md5Sum.matches(attrs.md5sum());
+        boolean returns = digest.matches(attrs.digest().toHexString());
         if (!returns) {
-            LogManager.getLogger(getClass()).warn("MD5sum does not match: {}", path);
+            LogManager.getLogger(getClass()).warn("digest does not match: {}", path);
         }
         return returns;
     }
 
     /**
      * Removes a root with the given name.
-     * 
      * Call this method if you want to remove a stalled directory that is not in use anymore.
      * 
      * @param owner ,e.g. derivate ID
@@ -176,7 +171,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     }
 
     public MCRPath emptyPath() {
-        return emptyPath;
+        return getPath(null, "", this);
     }
 
     @Override
@@ -190,7 +185,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         } else {
             path.append(first);
         }
-        boolean addSep = path.length() > 0;
+        boolean addSep = !path.isEmpty();
         for (final String element : more) {
             if (!element.isEmpty()) {
                 if (addSep) {
@@ -207,7 +202,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     @Override
     public PathMatcher getPathMatcher(final String syntaxAndPattern) {
         final int pos = syntaxAndPattern.indexOf(':');
-        if (pos <= 0 || pos == syntaxAndPattern.length()) {
+        if (pos <= 0 || pos == syntaxAndPattern.length() - 1) {
             throw new IllegalArgumentException();
         }
         final String syntax = syntaxAndPattern.substring(0, pos);

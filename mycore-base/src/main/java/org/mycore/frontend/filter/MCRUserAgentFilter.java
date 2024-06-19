@@ -65,7 +65,7 @@ public class MCRUserAgentFilter implements Filter {
     @Override
     public void init(final FilterConfig arg0) {
         final String agentRegEx = MCRConfiguration2.getStringOrThrow("MCR.Filter.UserAgent.BotPattern");
-        agentPattern = Pattern.compile(agentRegEx);
+        agentPattern = Pattern.compile(agentRegEx, Pattern.CASE_INSENSITIVE);
     }
 
     @Override
@@ -86,21 +86,26 @@ public class MCRUserAgentFilter implements Filter {
             }
         }
         final boolean newSession = request.getSession(false) == null;
-        chain.doFilter(sreq, sres);
-        final HttpSession session = request.getSession(false);
-        if (session != null && newSession) {
-            try {
-                if (invalidUserAgent) {
-                    LOGGER.info("Closing session, invalid User-Agent: " + userAgent);
-                    session.invalidate();
-                } else if (agentPattern.matcher(userAgent).find()) {
-                    LOGGER.info("Closing session: {} matches {}", userAgent, agentPattern);
-                    session.invalidate();
-                } else {
-                    LOGGER.debug("{} does not match {}", userAgent, agentPattern);
+        try {
+            chain.doFilter(sreq, sres);
+        } finally {
+            final HttpSession session = request.getSession(false);
+            if (session != null && newSession) {
+                try {
+                    if (invalidUserAgent) {
+                        LOGGER.info("Closing session {}, invalid User-Agent: {}", session.getId(), userAgent);
+                        session.invalidate();
+                    } else if (agentPattern.matcher(userAgent).find()) {
+                        LOGGER.info("Closing session {}, {} matches {}", session.getId(), userAgent,
+                            agentPattern);
+                        session.invalidate();
+                    } else {
+                        LOGGER.debug("Keeping session {}, {} doesn't match {}", session.getId(), userAgent,
+                            agentPattern);
+                    }
+                } catch (IllegalStateException e) {
+                    LOGGER.warn("Session " + session.getId() + " was already closed");
                 }
-            } catch (IllegalStateException e) {
-                LOGGER.warn("Session was allready closed");
             }
         }
     }

@@ -17,7 +17,11 @@
  */
 package org.mycore.oai.classmapping;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,8 +31,10 @@ import org.jdom2.filter.Filters;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -40,14 +46,21 @@ import org.mycore.datamodel.metadata.MCRObject;
 /**
  * This class implements an event handler, which reloads classification entries
  * stored in datafield mappings/mapping. These entries are retrieved from other 
- * classifications where they are stored in as labels with language "x-mapping".
- * 
+ * classifications where they are stored in as labels with language "x-mapping" or "x-mapping-xpath".
+ *
  * @author Robert Stephan
- * 
+ *
  */
 public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
+
+    public static final String LABEL_LANG_XPATH_MAPPING = "x-mapping-xpath";
+    public static final String LABEL_LANG_X_MAPPING = "x-mapping";
+
+    /** This configuration lists all eligible classifications for x-path-mapping */
+    private static final String X_PATH_MAPPING_CLASSIFICATIONS
+        = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
 
     private MCRMetaElement oldMappings = null;
 
@@ -81,6 +94,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         undo(obj);
     }
 
+    /**
+     * Creates x-mappings and XPath-mappings for a given object.
+     * @param obj the {@link MCRObject} to add mappings to
+     */
     private void createMapping(MCRObject obj) {
         MCRMetaElement mappings = obj.getMetadata().getMetadataElement("mappings");
         if (mappings != null) {
@@ -88,34 +105,22 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             obj.getMetadata().removeMetadataElement("mappings");
         }
 
-        Element currentClassElement = null;
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+
         try {
             Document doc = new Document(obj.getMetadata().createXML().detach());
-            XPathExpression<Element> classElementPath = XPathFactory.instance().compile("//*[@categid]",
-                Filters.element());
-            List<Element> classList = classElementPath.evaluate(doc);
-            if (classList.size() > 0) {
-                mappings = new MCRMetaElement();
-                mappings.setTag("mappings");
-                mappings.setClass(MCRMetaClassification.class);
-                mappings.setHeritable(false);
-                mappings.setNotInherit(true);
+            List<MCRCategory> relevantCategories = new ArrayList<>();
+
+            relevantCategories.addAll(getXMappingCategories(doc, dao));
+            relevantCategories.addAll(getXPathMappingCategories(doc, dao));
+
+            if (!relevantCategories.isEmpty()) {
+                mappings = createMappingsElement();
                 obj.getMetadata().setMetadataElement(mappings);
             }
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-            for (Element classElement : classList) {
-                currentClassElement = classElement;
-                MCRCategory categ = dao.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"),
-                    classElement.getAttributeValue("categid")), 0);
-                addMappings(mappings, categ);
-            }
+            addMappings(mappings, relevantCategories);
         } catch (Exception je) {
-            if (currentClassElement == null) {
-                LOGGER.error("Error while finding classification elements", je);
-            } else {
-                LOGGER.error("Error while finding classification elements for {}",
-                    new XMLOutputter().outputString(currentClassElement), je);
-            }
+            LOGGER.error("Error while finding classification elements", je);
         } finally {
             if (mappings == null || mappings.size() == 0) {
                 obj.getMetadata().removeMetadataElement("mappings");
@@ -123,9 +128,89 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         }
     }
 
-    private void addMappings(MCRMetaElement mappings, MCRCategory categ) {
-        if (categ != null) {
-            categ.getLabel("x-mapping").ifPresent(label -> {
+    /**
+     * Helper-method to create an empty element with the "mappings"-tag that will later contain all generated mappings
+     * @return an {@link MCRMetaElement} containing the mappings
+     */
+    private MCRMetaElement createMappingsElement() {
+        MCRMetaElement mappings = new MCRMetaElement();
+        mappings.setTag("mappings");
+        mappings.setClass(MCRMetaClassification.class);
+        mappings.setHeritable(false);
+        mappings.setNotInherit(true);
+        return mappings;
+    }
+
+    /**
+     * Searches for elements marked as a category inside a {@link Document} and
+     * returns all matching {@link MCRCategory MCRCategories} that were found through the given DAO.
+     * @param doc the document to search
+     * @param dao the {@link MCRCategoryDAO} that gives access to all stored categories
+     * @return a list of all categories matching the document
+     */
+    private List<MCRCategory> getXMappingCategories(Document doc, MCRCategoryDAO dao) {
+        List<MCRCategory> categories = new ArrayList<>();
+        XPathExpression<Element> classElementPath = XPathFactory.instance().compile("//*[@categid]",
+            Filters.element());
+        List<Element> classList = classElementPath.evaluate(doc);
+        for (Element classElement : classList) {
+            MCRCategory category = dao.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"),
+                classElement.getAttributeValue("categid")), 0);
+            if (category == null) {
+                LOGGER.warn("Could not find a category for {}", new XMLOutputter().outputString(classElement));
+            } else {
+                categories.add(category);
+            }
+        }
+        return categories;
+    }
+
+    /**
+     * For a list of configured classifications
+     * (see {@link MCRClassificationMappingEventHandler#X_PATH_MAPPING_CLASSIFICATIONS}),
+     * searches for categories with the label {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}
+     * through a given DAO. The XPaths attached to those categories are then evaluated against a given document.
+     * A list with all {@link MCRCategory MCRCategories} with matching XPaths is returned.
+     * @param doc the document to evaluate XPaths against
+     * @param dao the {@link MCRCategoryDAO} that gives access to all stored categories
+     * @return a list of all categories with matching XPaths in the document
+     */
+    private List<MCRCategory> getXPathMappingCategories(Document doc, MCRCategoryDAO dao) {
+        List<MCRCategory> listToAdd = new ArrayList<>();
+        final List<MCRCategory> xPathMappingRelevantCategories = Arrays
+            .stream(X_PATH_MAPPING_CLASSIFICATIONS.trim().split(",")).flatMap(
+                relevantClass -> dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream())
+            .toList();
+
+        for (MCRCategory category : xPathMappingRelevantCategories) {
+            if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
+
+                String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
+
+                if (evaluator.test(xPath)) {
+                    String taskMessage = String.format(Locale.ROOT, "adding x-path-mapping from '%s'",
+                        category.getId().toString());
+                    LOGGER.info(taskMessage);
+                    listToAdd.add(category);
+                }
+            }
+        }
+        return listToAdd;
+    }
+
+    /**
+     * Searches a given list with {@link MCRCategory MCRCategories} for labels that signal a mapping to a
+     * classification. When the relevant labels are found, new mappings are added to the given
+     * {@link MCRMetaElement mappings-element}.
+     * The relevant language labels are: {@link MCRClassificationMappingEventHandler#LABEL_LANG_X_MAPPING} and
+     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}.
+     * @param mappings the element that contains all mappings
+     * @param categories the relevant categories that should be searched for specific language labels
+     */
+    private void addMappings(MCRMetaElement mappings, List<MCRCategory> categories) {
+        for (MCRCategory category : categories) {
+            category.getLabel(LABEL_LANG_X_MAPPING).ifPresent(label -> {
                 String[] str = label.getText().split("\\s");
                 for (String s : str) {
                     if (s.contains(":")) {
@@ -136,15 +221,28 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     }
                 }
             });
+            // If category is in list, the XPath is already successfully evaluated
+            category.getLabel(LABEL_LANG_XPATH_MAPPING).ifPresent(label -> {
+                MCRMetaClassification metaClass
+                    = new MCRMetaClassification("mapping", 0, null, category.getId().getRootID(),
+                        category.getId().getId());
+                mappings.addMetaObject(metaClass);
+            });
         }
     }
 
+    /**
+     * Undos an executed mapping event by either removing all mappings or restoring mappings from before the execution.
+     * @param obj the {@link MCRObject} in which changes are rolled back
+     */
     private void undo(MCRObject obj) {
         if (oldMappings == null) {
             obj.getMetadata().removeMetadataElement("mappings");
         } else {
             MCRMetaElement mmap = obj.getMetadata().getMetadataElement("mappings");
-
+            if (mmap == null) {
+                obj.getMetadata().setMetadataElement(createMappingsElement());
+            }
             for (int i = 0; i < oldMappings.size(); i++) {
                 mmap.addMetaObject(oldMappings.getElement(i));
             }

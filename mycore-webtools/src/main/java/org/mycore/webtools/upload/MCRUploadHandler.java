@@ -27,6 +27,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.webtools.upload.exception.MCRInvalidFileException;
 import org.mycore.webtools.upload.exception.MCRInvalidUploadParameterException;
 import org.mycore.webtools.upload.exception.MCRMissingParameterException;
+import org.mycore.webtools.upload.exception.MCRUploadException;
 import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
 import org.mycore.webtools.upload.exception.MCRUploadServerException;
 
@@ -52,9 +53,9 @@ public interface MCRUploadHandler {
      * {@link MCRMetaClassification} that should be assigned to the new
      * {@link org.mycore.datamodel.metadata.MCRDerivate}
      * @param bucket the {@link MCRFileUploadBucket} to traverse
-     * @throws MCRUploadServerException  if something went wrong serverside while commiting
+     * @throws MCRUploadException  if something went wrong serverside while commiting
      */
-    URI commit(MCRFileUploadBucket bucket) throws MCRUploadServerException;
+    URI commit(MCRFileUploadBucket bucket) throws MCRUploadException;
 
     /**
      * Validates if the file name and size

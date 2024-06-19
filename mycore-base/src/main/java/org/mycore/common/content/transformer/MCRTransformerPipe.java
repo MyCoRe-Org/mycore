@@ -74,27 +74,27 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
 
     @Override
     public String getMimeType() throws Exception {
-        return transformers.get(transformers.size() - 1).getMimeType();
+        return transformers.getLast().getMimeType();
     }
 
     @Override
     public String getEncoding() throws Exception {
-        return transformers.get(transformers.size() - 1).getEncoding();
+        return transformers.getLast().getEncoding();
     }
 
     @Override
     public String getContentDisposition() {
-        return transformers.get(transformers.size() - 1).getContentDisposition();
+        return transformers.getLast().getContentDisposition();
     }
 
     @Override
     protected String getDefaultExtension() {
-        return transformers.get(transformers.size() - 1).getDefaultExtension();
+        return transformers.getLast().getDefaultExtension();
     }
 
     @Override
     public String getFileExtension() throws Exception {
-        return transformers.get(transformers.size() - 1).getFileExtension();
+        return transformers.getLast().getFileExtension();
     }
 
     @Override

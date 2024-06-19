@@ -43,9 +43,8 @@ import jakarta.xml.bind.JAXBException;
 
 public class MCRWCMSNavigationUtils {
 
-    private static MCRWCMSNavigationProvider NAVIGATION_PROVIDER = MCRConfiguration2
-        .<MCRWCMSNavigationProvider>getInstanceOf("MCR.WCMS2.navigationProvider")
-        .orElseGet(MCRWCMSDefaultNavigationProvider::new);
+    private static MCRWCMSNavigationProvider NAVIGATION_PROVIDER = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRWCMSNavigationProvider.class, "MCR.WCMS2.NavigationProvider");
 
     /**
      * @see MCRWCMSNavigationProvider#toJSON(MCRNavigation)

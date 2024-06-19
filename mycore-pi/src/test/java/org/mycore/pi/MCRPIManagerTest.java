@@ -151,11 +151,11 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     }
 
     private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) {
-        MCRMockIdentifierGenerator mcruuidurnGenerator = (MCRMockIdentifierGenerator) MCRConfiguration2
-            .getInstanceOf("MCR.PI.Generator." + MOCK_PID_GENERATOR).get();
+        MCRMockIdentifierGenerator mcrUuidUrnGenerator = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRMockIdentifierGenerator.class, "MCR.PI.Generator." + MOCK_PID_GENERATOR);
         MCRObject mcrObject = new MCRObject();
         mcrObject.setId(mycoreID);
-        return mcruuidurnGenerator.generate(mcrObject, "");
+        return mcrUuidUrnGenerator.generate(mcrObject, "");
     }
 
     @Before

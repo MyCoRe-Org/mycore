@@ -188,7 +188,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         startNewTransaction();
         List<String> results = ACCESS_STORE.getMappedObjectId(permission);
         assertEquals(1, results.size());
-        assertEquals(objID, results.get(0));
+        assertEquals(objID, results.getFirst());
     }
 
     /**
@@ -203,7 +203,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         startNewTransaction();
         List<String> results = ACCESS_STORE.getPoolsForObject(objID);
         assertEquals(1, results.size());
-        assertEquals(permission, results.get(0));
+        assertEquals(permission, results.getFirst());
     }
 
     /**
@@ -218,7 +218,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         startNewTransaction();
         List<String> results = ACCESS_STORE.getDatabasePools();
         assertEquals(1, results.size());
-        assertEquals(permission, results.get(0));
+        assertEquals(permission, results.getFirst());
     }
 
     /**
@@ -249,7 +249,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         startNewTransaction();
         List<String> results = ACCESS_STORE.getDistinctStringIDs();
         assertEquals(1, results.size());
-        assertEquals(objID, results.get(0));
+        assertEquals(objID, results.getFirst());
     }
 
 }

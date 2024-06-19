@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2024.05-SNAPSHOT</version>
+    <version>2024.06.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-bom</artifactId>
@@ -44,10 +44,11 @@
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.6.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
-    <ocfl-java.version>2.0.0</ocfl-java.version>
+    <ocfl-java.version>2.1.0</ocfl-java.version>
     <rdf4j.version>4.3.6</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
     <verapdf.version>1.24.1</verapdf.version>
+    <vis-network.version>9.1.2</vis-network.version>
     <xalan.version>2.7.3</xalan.version>
     <xsonify.version>1.0</xsonify.version>
   </properties>
@@ -224,7 +225,7 @@
       <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>citeproc-java</artifactId>
-        <version>3.0.0-beta.2</version>
+        <version>3.1.0</version>
       </dependency>
       <dependency>
         <groupId>io.bit3</groupId>
@@ -445,7 +446,7 @@
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>8.11.2</version>
+        <version>8.11.3</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -923,6 +924,11 @@
             <artifactId>jaxb-core</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>vis-network</artifactId>
+        <version>${vis-network.version}</version>
       </dependency>
       <dependency>
         <groupId>se.jiderhamn.classloader-leak-prevention</groupId>

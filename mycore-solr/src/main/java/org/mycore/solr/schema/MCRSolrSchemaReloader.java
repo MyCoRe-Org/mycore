@@ -145,7 +145,7 @@ public class MCRSolrSchemaReloader {
             String fieldSrc = copyField.get("source").toString();
             List<String> fieldDest = new ArrayList<>();
             fieldDest.add(copyField.get("dest").toString());
-            LOGGER.debug("remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.get(0));
+            LOGGER.debug("remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.getFirst());
             SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
             delCopyField.process(solrClient);
         }

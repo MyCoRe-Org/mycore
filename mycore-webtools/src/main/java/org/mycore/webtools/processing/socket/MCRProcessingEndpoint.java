@@ -60,16 +60,16 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static Map<String, SessionListener> SESSIONS;
+    private static final Map<String, SessionListener> SESSIONS;
 
     static {
         SESSIONS = Collections.synchronizedMap(new HashMap<>());
     }
 
-    private MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
+    private final MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
 
-    private MCRProcessableWebsocketSender sender = MCRConfiguration2
-        .<MCRProcessableWebsocketSender>getInstanceOf("MCR.Processable.WebsocketSender.Class").orElseThrow();
+    private final MCRProcessableWebsocketSender sender = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRProcessableWebsocketSender.class, "MCR.Processable.WebsocketSender.Class");
 
     @OnMessage
     public void onMessage(Session session, JsonObject request) {
@@ -124,9 +124,9 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     private static class SessionListener implements MCRProcessableRegistryListener, MCRProcessableCollectionListener,
         MCRProcessableStatusListener, MCRProgressableListener {
 
-        private Session session;
+        private final Session session;
 
-        private MCRProcessableWebsocketSender sender;
+        private final MCRProcessableWebsocketSender sender;
 
         SessionListener(Session session, MCRProcessableWebsocketSender sender) {
             this.session = session;

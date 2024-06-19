@@ -109,6 +109,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public CSLItemData retrieveItem(String id) {
         final CSLItemDataBuilder idb = new CSLItemDataBuilder().id(id);
 
+        processMyCoReId(id, idb);
         processURL(id, idb);
         processGenre(idb);
         processTitles(idb);
@@ -128,6 +129,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
 
         return build;
+    }
+
+    private void processMyCoReId(String id, CSLItemDataBuilder idb) {
+        idb.citationKey(id);
     }
 
     private void processSubject(CSLItemDataBuilder idb) {
@@ -213,29 +218,28 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
             final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
             final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
-
+            
             if (list != null) {
                 idb.page(list);
+            } else if (start != null && end != null && start.matches("\\d+") && end.matches("\\d+")) {
+                idb.page(Integer.parseInt(start) , Integer.parseInt(end));
             } else if (start != null && end != null) {
-                idb.pageFirst(start);
                 idb.page(start + "-" + end);
             } else if (start != null && total != null) {
-                idb.pageFirst(start);
+                idb.page(start);
 
                 try {
-                    final int totalI = Integer.parseInt(total);
                     final int startI = Integer.parseInt(start);
-                    idb.page(start + "-" + (totalI - startI));
+                    final int totalI = Integer.parseInt(total);
+                    idb.page(startI, (totalI - startI));
                 } catch (NumberFormatException e) {
                     idb.page(start);
                 }
 
                 idb.numberOfPages(total);
             } else if (start != null) {
-                idb.pageFirst(start);
                 idb.page(start);
             } else if (end != null) {
-                idb.pageFirst(end);
                 idb.page(end);
             }
         }
@@ -255,7 +259,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-        if (genres.contains("article")) {
+        if (genres.contains("article") || genres.contains ("review_article")) {
             if (parentGenres.contains("journal")) {
                 idb.type(CSLType.ARTICLE_JOURNAL);
             } else if (parentGenres.contains("newspaper")) {
@@ -263,6 +267,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             } else {
                 idb.type(CSLType.ARTICLE);
             }
+        } else if (genres.contains("conference_essay") || genres.contains ("abstract")) {
+            idb.type(CSLType.PAPER_CONFERENCE);
         } else if (genres.contains("book") || genres.contains("proceedings") || genres.contains("collection")
             || genres.contains("festschrift") || genres.contains("lexicon") || genres.contains("monograph")
             || genres.contains("lecture")) {
@@ -281,7 +287,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.type(CSLType.ARTICLE);
         } else if (genres.contains("speech") || genres.contains("poster")) {
             idb.type(CSLType.SPEECH);
-        } else if (genres.contains("video")) {
+        } else if (genres.contains("video") || genres.contains("video_contribution")) {
             idb.type(CSLType.MOTION_PICTURE);
         } else if (genres.contains("broadcasting")) {
             idb.type(CSLType.BROADCAST);
@@ -298,7 +304,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             || genres.contains("magister_thesis")) {
             idb.type(CSLType.THESIS);
         } else if (genres.contains("report") || genres.contains("research_results") || genres.contains("in_house")
-            || genres.contains("press_release") || genres.contains("declaration")) {
+            || genres.contains("press_release") || genres.contains("declaration") || genres.contains("researchpaper")) {
             idb.type(CSLType.REPORT);
             /* } else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
                || genres.contains("course_resources")) {

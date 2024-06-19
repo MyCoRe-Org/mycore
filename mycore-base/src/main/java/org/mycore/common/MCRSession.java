@@ -21,6 +21,7 @@ package org.mycore.common;
 import static org.mycore.common.events.MCRSessionEvent.Type.activated;
 import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -38,12 +39,12 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +64,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  */
-public class MCRSession implements Cloneable {
+sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private static final URI DEFAULT_URI = URI.create("");
 
@@ -103,7 +104,11 @@ public class MCRSession implements Cloneable {
 
     private StackTraceElement[] constructingStackTrace;
 
-    private Optional<URI> firstURI = Optional.empty();
+    private URI firstURI;
+
+    private String firstUserAgent;
+
+    private URI lastURI;
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
@@ -115,8 +120,9 @@ public class MCRSession implements Cloneable {
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRSession-OnCommitService-#%d")
+            .setThreadFactory(Thread.ofVirtual().factory())
             .build();
-        COMMIT_SERVICE = Executors.newFixedThreadPool(4, threadFactory);
+        COMMIT_SERVICE = Executors.newThreadPerTaskExecutor(threadFactory);
         MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
 
             @Override
@@ -279,9 +285,33 @@ public class MCRSession implements Cloneable {
         MCRSessionMgr.removeSession(this);
         // clear bound objects
         LOGGER.debug("Clearing local map.");
-        map.clear();
-        mapEntries = null;
-        sessionID = null;
+        try {
+            clearClosableValues(map);
+        } finally {
+            map.clear();
+            mapEntries = null;
+            sessionID = null;
+        }
+    }
+
+    static void clearClosableValues(Map<Object, Object> map) {
+        Queue<Exception> exceptions = new ConcurrentLinkedQueue<>();
+        map.values().stream()
+            .filter(java.io.Closeable.class::isInstance)
+            .map(java.io.Closeable.class::cast)
+            .forEach(c -> {
+                try {
+                    LOGGER.debug(() -> "Closing: " + c);
+                    c.close();
+                } catch (IOException | RuntimeException e) {
+                    exceptions.add(e);
+                }
+            });
+        if (!exceptions.isEmpty()) {
+            MCRException e = new MCRException("Exceptions while closing scoped values.");
+            exceptions.forEach(e::addSuppressed);
+            throw e;
+        }
     }
 
     @Override
@@ -294,9 +324,11 @@ public class MCRSession implements Cloneable {
         return lastAccessTime;
     }
 
-    public void setFirstURI(Supplier<URI> uri) {
-        if (firstURI.isEmpty()) {
-            firstURI = Optional.of(uri.get());
+    public void logHttpRequest(URI uri, String userAgent) {
+        lastURI = uri;
+        if (firstURI == null) {
+            firstURI = lastURI;
+            firstUserAgent = userAgent;
         }
     }
 
@@ -332,8 +364,14 @@ public class MCRSession implements Cloneable {
         } else {
             LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
         }
-        if (firstURI.isEmpty()) {
-            firstURI = Optional.of(DEFAULT_URI);
+        if (firstURI == null) {
+            firstURI = DEFAULT_URI;
+        }
+        if (firstUserAgent == null) {
+            firstUserAgent = "";
+        }
+        if (lastURI == null) {
+            lastURI = DEFAULT_URI;
         }
         onCommitTasks.remove();
     }
@@ -410,7 +448,15 @@ public class MCRSession implements Cloneable {
     }
 
     public Optional<URI> getFirstURI() {
-        return firstURI;
+        return Optional.ofNullable(firstURI);
+    }
+
+    public Optional<String> getFirstUserAgent() {
+        return Optional.ofNullable(firstUserAgent);
+    }
+
+    public Optional<URI> getLastURI() {
+        return Optional.ofNullable(lastURI);
     }
 
     /**

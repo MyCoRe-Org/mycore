@@ -33,14 +33,14 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public class MCRMergerFactory {
 
+    private static final String CONFIG_PREFIX = "MCR.MODS.Merger.";
+
     /**
      * Returns an MCRMerger instance usable for merging MODS elements with the given name
      */
     private static MCRMerger getEntryInstance(String name) {
-        String prefix = "MCR.MODS.Merger.";
-        String defaultClass = MCRConfiguration2.getStringOrThrow(prefix + "default");
-        return MCRConfiguration2.<MCRMerger>getInstanceOf(prefix + name)
-            .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultClass));
+        return MCRConfiguration2.getInstanceOf(MCRMerger.class, CONFIG_PREFIX + name)
+            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRMerger.class, CONFIG_PREFIX + "default"));
     }
 
     /**

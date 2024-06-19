@@ -54,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.mods.enrichment.MCREnricher;
 import org.mycore.mods.rss.MCRRSSFeedImporter;
 import org.xml.sax.SAXException;
 
@@ -166,6 +167,20 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         order = 30)
     public static void importFromRSSFeed(String sourceSystemID, String projectID) throws Exception {
         MCRRSSFeedImporter.importFromFeed(sourceSystemID, projectID);
+    }
+
+    @MCRCommand(syntax = "enrich {0} with config {1}",
+        help = "Enriches existing MODS metadata {0} with a given enrichment configuration {1}", order = 40)
+    public static void enrichMods(String modsId, String configID) {
+        try {
+            MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modsId));
+            Element mods = new MCRMODSWrapper(obj).getMODS();
+            MCREnricher enricher = new MCREnricher(configID);
+            enricher.enrich(mods);
+            MCRMetadataManager.update(obj);
+        } catch (MCRException | MCRAccessException e) {
+            LOGGER.error("Error while trying to enrich {} with configuration {}: ", modsId, configID, e);
+        }
     }
 
     private static MCRDerivate createDerivate(MCRObjectID documentID, File fileDir)

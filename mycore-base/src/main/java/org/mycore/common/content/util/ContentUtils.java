@@ -34,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
@@ -121,11 +120,10 @@ final class ContentUtils {
         } else {
             try (InputStream contentIS = content.getInputStream();
                 InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS
-                    : new BufferedInputStream(
-                        contentIS, inputBufferSize)) {
+                    : new BufferedInputStream(contentIS, inputBufferSize)) {
                 endCurrentTransaction();
                 // Copy the inputBufferSize stream to the outputBufferSize stream
-                bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);
+                bytesCopied = copyLarge(in, out, 0, length, new byte[outputBufferSize]);
             }
         }
         if (length >= 0 && length != bytesCopied) {
@@ -310,8 +308,7 @@ final class ContentUtils {
      * Called before sending data to end hibernate transaction, if any.
      */
     static void endCurrentTransaction() {
-        if (!MCRSessionMgr.isLocked()) {
-            MCRSessionMgr.getCurrentSession();
+        if (!MCRSessionMgr.isLocked() && MCRSessionMgr.hasCurrentSession()) {
             MCRTransactionHelper.commitTransaction();
         }
     }

@@ -196,7 +196,7 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
                 UNIQUE_OBJECT_TRANSLATION_KEY, true);
         }
 
-        String oidString = oidList.get(0);
+        String oidString = oidList.getFirst();
         if (!MCRObjectID.isValid(oidString)) {
             throw new MCRInvalidUploadParameterException(OBJ_OR_DERIVATE_ID_PARAMETER_NAME, oidString,
                 INVALID_OBJECT_TRANSLATION_KEY, true);
@@ -215,7 +215,7 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
      * @return the object id
      */
     public static MCRObjectID getObjectID(Map<String, List<String>> parameters) {
-        return MCRObjectID.getInstance(parameters.get(OBJ_OR_DERIVATE_ID_PARAMETER_NAME).get(0));
+        return MCRObjectID.getInstance(parameters.get(OBJ_OR_DERIVATE_ID_PARAMETER_NAME).getFirst());
     }
 
     /**

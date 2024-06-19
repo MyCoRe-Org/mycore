@@ -142,9 +142,8 @@ public class MCRLayoutService {
             String style = parameter.getParameter("Style", "default");
             transformerId = new MessageFormat("{0}-{1}", Locale.ROOT).format(new Object[] { docType, style });
         }
-        MCRLayoutTransformerFactory factory = MCRConfiguration2.<MCRLayoutTransformerFactory>getInstanceOf(
-            TRANSFORMER_FACTORY_PROPERTY)
-            .orElseGet(MCRLayoutTransformerFactory::new);
+        MCRLayoutTransformerFactory factory = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRLayoutTransformerFactory.class, TRANSFORMER_FACTORY_PROPERTY);
         return factory.getTransformer(transformerId);
     }
 
@@ -212,12 +211,12 @@ public class MCRLayoutService {
         } catch (Exception e) {
             Throwable cause = e.getCause();
             while (cause != null) {
-                if (cause instanceof TransformerException te) {
-                    throw te;
-                } else if (cause instanceof SAXException se) {
-                    throw se;
-                } else if (cause instanceof IOException ioe) {
-                    throw ioe;
+                switch (cause) {
+                    case TransformerException te -> throw te;
+                    case SAXException se -> throw se;
+                    case IOException ioe -> throw ioe;
+                    default -> {
+                    }
                 }
                 cause = cause.getCause();
             }

@@ -40,8 +40,8 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        doiGenerator = (MCRMapObjectIDDOIGenerator) MCRConfiguration2.getInstanceOf("MCR.PI.Generator.MapObjectIDDOI")
-            .get();
+        doiGenerator = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRMapObjectIDDOIGenerator.class, "MCR.PI.Generator.MapObjectIDDOI");
     }
 
     @Test

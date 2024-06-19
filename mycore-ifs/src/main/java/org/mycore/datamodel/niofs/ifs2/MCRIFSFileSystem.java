@@ -41,11 +41,8 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRIFSFileSystem extends MCRAbstractFileSystem {
 
-    private MCRFileSystemProvider provider;
-
     MCRIFSFileSystem(MCRFileSystemProvider provider) {
-        super();
-        this.provider = provider;
+        super(provider);
         try {
             initStores();
         } catch (IOException e) {
@@ -58,12 +55,9 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
             .forEach(MCRFileSystemUtils::getStore);
     }
 
-    /* (non-Javadoc)
-     * @see java.nio.file.FileSystem#provider()
-     */
     @Override
     public MCRFileSystemProvider provider() {
-        return provider;
+        return (MCRFileSystemProvider) super.provider();
     }
 
     /* (non-Javadoc)
@@ -77,7 +71,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
             .flatMap(s -> s.getStoredIDs()
                 .mapToObj(
                     i -> MCRObjectID.formatID(s.getID().substring(MCRFileSystemUtils.STORE_ID_PREFIX.length()), i)))
-            .map(owner -> MCRAbstractFileSystem.getPath(owner, "/", this))
+            .map(owner -> getPath(owner, "/", this))
             .map(Path.class::cast)::iterator;
     }
 

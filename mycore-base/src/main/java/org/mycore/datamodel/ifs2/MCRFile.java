@@ -24,13 +24,14 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRDevNull;
+import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.niofs.MCRDefaultFileAttributes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 /**
@@ -94,7 +95,7 @@ public class MCRFile extends MCRStoredNode {
      * @return the md5 checksum of the file's content.
      */
     public String getMD5() {
-        return readData(e -> e.getAttributeValue("md5"));
+        return readData(e -> e.getAttributeValue(MCRMD5Digest.ALGORITHM.toLowerCase()));
     }
 
     /**
@@ -143,7 +144,7 @@ public class MCRFile extends MCRStoredNode {
     @Override
     void repairMetadata() throws IOException {
         MCRContentInputStream cis = getContent().getContentInputStream();
-        IOUtils.copy(cis, DEV_NULL);
+        cis.transferTo(DEV_NULL);
         cis.close();
         String path = getPath();
         writeData(e -> {
@@ -162,6 +163,7 @@ public class MCRFile extends MCRStoredNode {
     @Override
     public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
         BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-        return MCRFileAttributes.fromAttributes(attrs, getMD5());
+        return MCRDefaultFileAttributes.fromAttributes(attrs, new MCRMD5Digest(getMD5()));
     }
+
 }

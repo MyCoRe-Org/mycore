@@ -118,7 +118,7 @@ public abstract class MCRRestContentHelper {
             response.status(Response.Status.PARTIAL_CONTENT);
 
             if (ranges.size() == 1) {
-                final Range range = ranges.get(0);
+                final Range range = ranges.getFirst();
                 response.header("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
                 final long length = range.end - range.start + 1;
                 response.header(HttpHeaders.CONTENT_LENGTH, length);

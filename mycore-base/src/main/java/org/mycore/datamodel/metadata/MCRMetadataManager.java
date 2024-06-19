@@ -48,7 +48,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.common.MCRDefaultObjectIDGenerator;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRMarkManager.Operation;
@@ -80,9 +79,8 @@ public final class MCRMetadataManager {
 
     private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
-    private static final MCRObjectIDGenerator MCROBJECTID_GENERATOR
-        = MCRConfiguration2.getSingleInstanceOf("MCR.Metadata.ObjectID.Generator.Class",
-            MCRDefaultObjectIDGenerator.class).get();
+    private static final MCRObjectIDGenerator MCROBJECTID_GENERATOR = MCRConfiguration2.getSingleInstanceOfOrThrow(
+        MCRObjectIDGenerator.class, "MCR.Metadata.ObjectID.Generator.Class");
 
     private MCRMetadataManager() {
 

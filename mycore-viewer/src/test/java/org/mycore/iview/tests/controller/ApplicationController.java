@@ -27,9 +27,9 @@ public abstract class ApplicationController {
 
     public abstract void init();
 
-    public abstract void setUpDerivate(WebDriver webdriver, TestDerivate testDerivate);
+    public abstract void setUpDerivate(WebDriver webdriver, String baseURL, TestDerivate testDerivate);
 
     public abstract void shutDownDerivate(WebDriver webdriver, TestDerivate testDerivate);
 
-    public abstract void openViewer(WebDriver webdriver, TestDerivate testDerivate);
+    public abstract void openViewer(WebDriver webdriver, String baseURL, TestDerivate testDerivate);
 }

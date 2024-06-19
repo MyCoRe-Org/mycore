@@ -302,7 +302,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                     }
                 }
                 if (orcidUsers.size() == 1) {
-                    userOrcidPair.put(orcid, orcidUsers.get(0));
+                    userOrcidPair.put(orcid, orcidUsers.getFirst());
                 } else if (orcidUsers.size() > 1) {
                     LOGGER.warn("This case is not implemented");
                 }

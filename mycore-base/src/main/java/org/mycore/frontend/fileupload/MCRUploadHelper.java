@@ -118,7 +118,7 @@ public abstract class MCRUploadHelper {
             checkReservedNames(pathElement);
             checkInvalidCharacters(pathElement);
         });
-        String actualFileName = pathParts.get(pathParts.size() - 1);
+        String actualFileName = pathParts.getLast();
         if (checkFilePattern && !FILE_NAME_PREDICATE.test(actualFileName)) {
             throw new MCRException(
                 "File name does not match " + FILE_NAME_PATTERN + " defined in " + FILE_NAME_PATTERN_PROPERTY + "!");
@@ -247,7 +247,7 @@ public abstract class MCRUploadHelper {
         paths.sort(Comparator.comparing(Path::getNameCount)
             .thenComparing(Path::getFileName));
         //extract first file, before filtering
-        MCRPath firstPath = MCRPath.toMCRPath(paths.get(0));
+        MCRPath firstPath = MCRPath.toMCRPath(paths.getFirst());
 
         //filter files, remove files that should be ignored for mainfile
         return paths.stream()

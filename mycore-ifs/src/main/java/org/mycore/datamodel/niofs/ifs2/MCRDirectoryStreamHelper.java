@@ -31,6 +31,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -43,19 +44,22 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.digest.MCRMD5Digest;
+import org.mycore.common.events.MCRPathEventHelper;
 import org.mycore.common.function.MCRThrowFunction;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
 import org.mycore.datamodel.ifs2.MCRStoredNode;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRDefaultFileAttributes;
+import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
-import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
- * A {@link SecureDirectoryStream} on internal file system. This implementation uses IFS directly. Do use this class but
- * stick to the interface.
+ * A {@link MCRSecureDirectoryStream} on internal file system. This implementation uses IFS directly.
+ * Do use this class but stick to the interface.
  *
  * @author Thomas Scheffler (yagee)
  */
@@ -68,10 +72,9 @@ class MCRDirectoryStreamHelper {
         LOGGER.debug("Dir {}, class {}, filter {}", path, dir.getClass(), filter.getClass());
         DirectoryStream<Path> baseDirectoryStream = Files.newDirectoryStream(dir.getLocalPath(), filter);
         LOGGER.debug("baseStream {}", baseDirectoryStream.getClass());
-        if (baseDirectoryStream instanceof java.nio.file.SecureDirectoryStream) {
+        if (baseDirectoryStream instanceof SecureDirectoryStream secureDirectoryStream) {
             LOGGER.debug("Returning SecureDirectoryStream");
-            return new SecureDirectoryStream(dir, path,
-                (java.nio.file.SecureDirectoryStream<Path>) baseDirectoryStream);
+            return new MCRSecureDirectoryStream(dir, path, secureDirectoryStream);
         }
         return new SimpleDirectoryStream<>(path, baseDirectoryStream);
     }
@@ -124,31 +127,29 @@ class MCRDirectoryStreamHelper {
         }
     }
 
-    private static class SecureDirectoryStream extends SimpleDirectoryStream<java.nio.file.SecureDirectoryStream<Path>>
-        implements java.nio.file.SecureDirectoryStream<Path> {
+    private static class MCRSecureDirectoryStream extends SimpleDirectoryStream<SecureDirectoryStream<Path>>
+        implements SecureDirectoryStream<Path> {
 
         private final MCRDirectory dir;
 
-        SecureDirectoryStream(MCRDirectory dir, MCRPath dirPath,
-            java.nio.file.SecureDirectoryStream<Path> baseStream) {
+        MCRSecureDirectoryStream(MCRDirectory dir, MCRPath dirPath, SecureDirectoryStream<Path> baseStream) {
             super(dirPath, baseStream);
             this.dir = dir;
         }
 
         @Override
-        public java.nio.file.SecureDirectoryStream<Path> newDirectoryStream(Path path, LinkOption... options)
+        public SecureDirectoryStream<Path> newDirectoryStream(Path path, LinkOption... options)
             throws IOException {
             checkClosed();
             if (path.isAbsolute()) {
-                return (SecureDirectoryStream) Files.newDirectoryStream(path);
+                return (MCRSecureDirectoryStream) Files.newDirectoryStream(path);
             }
             MCRStoredNode nodeByPath = resolve(path);
             if (!nodeByPath.isDirectory()) {
                 throw new NotDirectoryException(nodeByPath.getPath());
             }
             MCRDirectory newDir = (MCRDirectory) nodeByPath;
-            return (java.nio.file.SecureDirectoryStream<Path>) MCRDirectoryStreamHelper.getInstance(newDir,
-                getCurrentSecurePath(newDir));
+            return (SecureDirectoryStream<Path>) getInstance(newDir, getCurrentSecurePath(newDir));
         }
 
         private MCRStoredNode resolve(Path path) {
@@ -200,7 +201,7 @@ class MCRDirectoryStreamHelper {
         }
 
         @Override
-        public void move(Path srcpath, java.nio.file.SecureDirectoryStream<Path> targetdir, Path targetpath)
+        public void move(Path srcpath, SecureDirectoryStream<Path> targetdir, Path targetpath)
             throws IOException {
             checkClosed();
             MCRPath src = checkFileSystem(srcpath);
@@ -209,7 +210,7 @@ class MCRDirectoryStreamHelper {
             if (srcFile == null) {
                 throw new NoSuchFileException(this.dirPath.toString(), srcpath.toString(), null);
             }
-            if (!targetpath.isAbsolute() && targetdir instanceof SecureDirectoryStream that) {
+            if (!targetpath.isAbsolute() && targetdir instanceof MCRSecureDirectoryStream that) {
                 LOGGER.debug("Move Case #1");
                 MCRFile file = getMCRFile(that, targetpath);
                 Files.delete(file.getLocalPath()); //delete for move
@@ -247,7 +248,7 @@ class MCRDirectoryStreamHelper {
             MCRPathEventHelper.fireFileDeleteEvent(this.dirPath.resolve(src));
         }
 
-        private static MCRFile getMCRFile(SecureDirectoryStream ds, Path relativePath) throws IOException {
+        private static MCRFile getMCRFile(MCRSecureDirectoryStream ds, Path relativePath) throws IOException {
             MCRStoredNode storedNode = ds.resolve(relativePath);
             if (storedNode != null) {
                 throw new FileAlreadyExistsException(ds.dirPath.resolve(relativePath).toString());
@@ -272,7 +273,7 @@ class MCRDirectoryStreamHelper {
             if (fileAttributeView != null) {
                 return fileAttributeView;
             }
-            if (type == MCRMD5AttributeView.class) {
+            if (type == MCRDigestAttributeView.class) {
                 BasicFileAttributeView baseView = baseStream.getFileAttributeView(BasicFileAttributeView.class);
                 return (V) new MD5FileAttributeViewImpl(baseView, (v) -> dir);
             }
@@ -282,7 +283,7 @@ class MCRDirectoryStreamHelper {
         @Override
         public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
             Path localRelativePath = toLocalPath(path);
-            if (type == MCRMD5AttributeView.class) {
+            if (type == MCRDigestAttributeView.class) {
                 BasicFileAttributeView baseView = baseStream.getFileAttributeView(localRelativePath,
                     BasicFileAttributeView.class, options);
                 return (V) new MD5FileAttributeViewImpl(baseView, (v) -> resolve(path));
@@ -338,7 +339,7 @@ class MCRDirectoryStreamHelper {
     }
 
     private record MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
-        MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) implements MCRMD5AttributeView {
+        MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) implements MCRDigestAttributeView {
 
         @Override
         public String name() {
@@ -360,9 +361,10 @@ class MCRDirectoryStreamHelper {
         public MCRFileAttributes readAllAttributes() throws IOException {
             MCRStoredNode node = nodeSupplier.apply(null);
             if (node instanceof MCRFile file) {
-                return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), file.getMD5());
+                return MCRDefaultFileAttributes.fromAttributes(baseAttrView.readAttributes(),
+                    new MCRMD5Digest(file.getMD5()));
             }
-            return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
+            return MCRDefaultFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
         }
     }
 }

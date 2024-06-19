@@ -44,9 +44,8 @@ public class MCRIView2XSLFunctionsAdapter {
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return MCRConfiguration2
-            .<MCRIView2XSLFunctionsAdapter>getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter")
-            .orElseGet(MCRIView2XSLFunctionsAdapter::new);
+        return MCRConfiguration2.getInstanceOfOrThrow(
+            MCRIView2XSLFunctionsAdapter.class, MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter");
     }
 
     public boolean hasMETSFile(String derivateID) {

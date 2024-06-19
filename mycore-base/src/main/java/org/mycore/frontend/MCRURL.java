@@ -116,7 +116,7 @@ public class MCRURL {
 
     public String getParameter(String name) {
         List<String> valueList = getParameterMap().get(name);
-        return valueList != null ? valueList.get(0) : null;
+        return valueList != null ? valueList.getFirst() : null;
     }
 
     public List<String> getParameterValues(String name) {

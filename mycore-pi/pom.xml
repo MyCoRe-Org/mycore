@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2024.05-SNAPSHOT</version>
+    <version>2024.06.0-SNAPSHOT</version>
   </parent>
   <artifactId>mycore-pi</artifactId>
   <name>MyCoRe Persistent Identifier</name>
@@ -62,10 +62,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.persistence</groupId>

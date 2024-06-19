@@ -122,4 +122,9 @@ public class MCRTextNormalizerTest extends MCRTestCase {
         assertEquals("a a", MCRTextNormalizer.normalizeText(" a   a "));
     }
 
+    @Test
+    public void testNormalizeHtml() {
+        assertEquals("a", MCRTextNormalizer.normalizeText("<p>a</p>"));
+    }
+
 }

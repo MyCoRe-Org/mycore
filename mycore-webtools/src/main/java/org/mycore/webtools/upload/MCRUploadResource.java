@@ -41,6 +41,7 @@ import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
 import org.mycore.webtools.upload.exception.MCRInvalidFileException;
 import org.mycore.webtools.upload.exception.MCRInvalidUploadParameterException;
 import org.mycore.webtools.upload.exception.MCRMissingParameterException;
+import org.mycore.webtools.upload.exception.MCRUploadException;
 import org.mycore.webtools.upload.exception.MCRUploadForbiddenException;
 import org.mycore.webtools.upload.exception.MCRUploadServerException;
 
@@ -141,7 +142,9 @@ public class MCRUploadResource {
 
         try {
             location = bucket.getUploadHandler().commit(bucket);
-        } catch (MCRUploadServerException e) {
+        } catch (MCRInvalidFileException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (MCRUploadException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         } finally {
             try {
@@ -157,9 +160,8 @@ public class MCRUploadResource {
     }
 
     public static MCRUploadHandler getUploadHandler(String uploadHandlerID) {
-        Optional<MCRUploadHandler> uploadHandler = MCRConfiguration2
-            .getSingleInstanceOf("MCR.Upload.Handler." + Optional.ofNullable(uploadHandlerID).orElse("Default"));
-
+        Optional<MCRUploadHandler> uploadHandler = MCRConfiguration2.getSingleInstanceOf(MCRUploadHandler.class,
+            "MCR.Upload.Handler." + Optional.ofNullable(uploadHandlerID).orElse("Default"));
         if (uploadHandler.isEmpty()) {
             throw new BadRequestException("The UploadHandler " + uploadHandlerID + " is invalid!");
         }

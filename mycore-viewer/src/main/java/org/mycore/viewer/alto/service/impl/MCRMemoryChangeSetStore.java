@@ -35,14 +35,14 @@ import org.mycore.viewer.alto.service.MCRDerivateTitleResolver;
 
 public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
 
-    private MCRDerivateTitleResolver titleResolver = MCRConfiguration2
-        .<MCRDerivateTitleResolver>getInstanceOf("MCR.Viewer.DerivateTitleResolver.Class").orElseThrow();
+    private final MCRDerivateTitleResolver titleResolver = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRDerivateTitleResolver.class, "MCR.Viewer.DerivateTitleResolver.Class");
 
-    private Map<String, List<MCRStoredChangeSet>> derivateChangeSet = new HashMap<>();
+    private final Map<String, List<MCRStoredChangeSet>> derivateChangeSet = new HashMap<>();
 
-    private Map<String, List<MCRStoredChangeSet>> sessionIDChangeSet = new HashMap<>();
+    private final Map<String, List<MCRStoredChangeSet>> sessionIDChangeSet = new HashMap<>();
 
-    private Map<String, MCRStoredChangeSet> idChangeSet = new HashMap<>();
+    private final Map<String, MCRStoredChangeSet> idChangeSet = new HashMap<>();
 
     public MCRMemoryChangeSetStore() {
     }

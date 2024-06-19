@@ -19,12 +19,14 @@
 package org.mycore.backend.jpa;
 
 import org.mycore.common.MCRPersistenceTransaction;
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCREntityTransaction implements MCRPersistenceTransaction {
 
     @Override
     public boolean isReady() {
-        return MCREntityManagerProvider.getEntityManagerFactory() != null;
+        return MCREntityManagerProvider.getEntityManagerFactory() != null &&
+            MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true);
     }
 
     @Override

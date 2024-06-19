@@ -58,7 +58,7 @@ public class NavbarIT extends ViewerTestBase {
     @Test
     public void testBasicElementsPresent() {
         this.setTestName(getClassname() + "-testBasicElementsPresent");
-        this.getAppController().openViewer(this.getDriver(), this.getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
 
         Assert.assertTrue("Sidebar button should be present",
@@ -68,7 +68,7 @@ public class NavbarIT extends ViewerTestBase {
     @Test
     public void testActionGroup() {
         this.setTestName(getClassname() + "-testActionElementsPresent");
-        this.getAppController().openViewer(this.getDriver(), this.getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
         Assert.assertTrue("Share button should be present", driver.findElement(By.xpath("//*[@data-id='ShareButton']"))
             .isDisplayed());
@@ -77,7 +77,7 @@ public class NavbarIT extends ViewerTestBase {
     @Test
     public void testModificationGroup() {
         this.setTestName(getClassname() + "-testModifactionElementsPresent");
-        this.getAppController().openViewer(this.getDriver(), this.getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
         Assert.assertTrue("RotateButton should be present", driver
             .findElement(By.xpath("//*[@data-id='RotateButton']")).isDisplayed());
@@ -86,7 +86,7 @@ public class NavbarIT extends ViewerTestBase {
     @Test
     public void testImageChangeGroup() {
         this.setTestName(getClassname() + "-testImageChangePresent");
-        this.getAppController().openViewer(this.getDriver(), this.getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
         Assert.assertTrue("PreviousImageButton should be present",
             driver.findElement(By.xpath("//*[@data-id='PreviousImageButton']")).isDisplayed());
@@ -97,7 +97,7 @@ public class NavbarIT extends ViewerTestBase {
     @Test
     public void testZoomGroup() {
         this.setTestName(getClassname() + "-testZoomElementsPresent");
-        this.getAppController().openViewer(this.getDriver(), this.getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
         Assert.assertTrue("ZoomIn button should be present",
             driver.findElement(By.xpath("//*[@data-id='ZoomInButton']")).isDisplayed());
@@ -113,7 +113,7 @@ public class NavbarIT extends ViewerTestBase {
     public void testNavigationPrev() throws InterruptedException {
         this.setTestName(getClassname() + "-testStructureOverview");
         this.getDriver();
-        this.getAppController().openViewer(this.getDriver(), getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
 
@@ -140,7 +140,7 @@ public class NavbarIT extends ViewerTestBase {
     public void testNavigationNext() throws InterruptedException {
         this.setTestName(getClassname() + "-testStructureOverview");
         this.getDriver();
-        this.getAppController().openViewer(this.getDriver(), getTestDerivate());
+        this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
 
@@ -166,7 +166,7 @@ public class NavbarIT extends ViewerTestBase {
     private int selectPrevImgAndCountColor(ToolBarController tbController, String label, Color color)
         throws InterruptedException {
         tbController.pressButton(ToolBarController.BUTTON_ID_PREV_IMG);
-        Thread.sleep(500);
+        ViewerTestBase.sleep(500);
 
         return countColor(tbController, label, color);
     }
@@ -174,7 +174,7 @@ public class NavbarIT extends ViewerTestBase {
     private int selectNextImgAndCountColor(ToolBarController tbController, String label, Color color)
         throws InterruptedException {
         tbController.pressButton(ToolBarController.BUTTON_ID_NEXT_IMG);
-        Thread.sleep(500);
+        ViewerTestBase.sleep(500);
 
         return countColor(tbController, label, color);
     }
@@ -202,7 +202,7 @@ public class NavbarIT extends ViewerTestBase {
     private int selectImgAndCountColor(ToolBarController tbController, String label, Color color)
         throws InterruptedException {
         tbController.selectPictureWithOrder(label);
-        Thread.sleep(500);
+        ViewerTestBase.sleep(500);
 
         return countColor(tbController, label, color);
     }

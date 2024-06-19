@@ -57,8 +57,8 @@ public class MCRPIServiceManager {
     }
 
     public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(String id) {
-        return MCRConfiguration2
-            .<MCRPIService<T>>getSingleInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + id).get();
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCRPIService.class, MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + id);
     }
 
     private static class InstanceHolder {

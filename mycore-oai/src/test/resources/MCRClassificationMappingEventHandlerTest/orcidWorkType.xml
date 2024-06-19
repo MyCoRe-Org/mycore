@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<mycoreclass ID="orcidWorkType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+  <label xml:lang="de" text="ORCID Werktyp" />
+  <label xml:lang="en" text="ORCID work type" />
+  <categories>
+    <category ID="journal-article">
+      <label xml:lang="de" text="Zeitschriftenartikel" />
+      <label xml:lang="en" text="Journal article"
+        description="Articles in peer-reviewed publications that disseminate the results of original research and scholarship." />
+      <label xml:lang="x-mapping-xpath"
+        text="//*[@classid='mir_genres' and @categid='article'] and //publishedin[@type='journal']" />
+    </category>
+  </categories>
+</mycoreclass>

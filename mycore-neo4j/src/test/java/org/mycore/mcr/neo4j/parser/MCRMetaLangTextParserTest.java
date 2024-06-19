@@ -36,8 +36,8 @@ public class MCRMetaLangTextParserTest extends AbstractNeo4JParserTest {
         final List<Neo4JNode> result = new MCRNeo4JMetaLangTextParser().parse(mss01);
 
         assertEquals(1, result.size());
-        assertNull(result.get(0).lang());
-        assertEquals("Test 1", result.get(0).text());
+        assertNull(result.getFirst().lang());
+        assertEquals("Test 1", result.getFirst().text());
     }
 
     @Test

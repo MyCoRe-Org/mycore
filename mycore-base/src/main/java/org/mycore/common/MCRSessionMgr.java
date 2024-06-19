@@ -61,7 +61,7 @@ public class MCRSessionMgr {
      * 
      * @see ThreadLocal
      */
-    private static ThreadLocal<MCRSession> theThreadLocalSession = ThreadLocal.withInitial(MCRSession::new);
+    private static ThreadLocal<MCRSession> theThreadLocalSession = ThreadLocal.withInitial(MCRScopedSession::new);
 
     private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
 

@@ -94,6 +94,14 @@ mycore.session.listing = {
   },
 
   render: function() {
+    const escaperElement = document.createElement('div');
+    const escapeHtml = function(unsafeText) {
+      if(!unsafeText) {
+        return '';
+      }
+      escaperElement.innerText = unsafeText;
+      return escaperElement.innerHTML;
+    };
     var spinner = $("#sessionListingLoadingSpinner");
     spinner.addClass("d-none");
     var contentDiv = $("#sessionListingContent");
@@ -119,17 +127,17 @@ mycore.session.listing = {
 
     // print table
     for (var session of mycore.session.listing.filteredSessions) {
-      var tr = $("<tr id='" + session.id + "' class='table-session-entry'>" +
-        "<td>" + session.login + (session.realName != null ? (" (" + session.realName + ")") : "") + "</td>" +
-        "<td>" + session.ip + (session.hostname != null ? ("(" + session.hostname + ")") : "") + "</td>" +
+      var tr = $("<tr id='" + escapeHtml(session.id) + "' class='table-session-entry'>" +
+        "<td>" + escapeHtml(session.login) + (session.realName != null ? (" (" + escapeHtml(session.realName) + ")") : "") + "</td>" +
+        "<td>" + escapeHtml(session.ip) + (session.hostname != null ? ("(" + escapeHtml(session.hostname) + ")") : "") + "</td>" +
         "<td>" + new Date(session.createTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td>" + new Date(session.lastAccessTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td align='center'>" +
         "<div style='height: 15px; width: 15px; background-color: " + session.constructingStacktrace.color + "; border: 1px solid #999; cursor: pointer;'" +
-        " onclick='mycore.session.listing.showStacktrace(\"" + session.id + "\");'" +
+        " onclick='mycore.session.listing.showStacktrace(\"" + escapeHtml(session.id) + "\");'" +
         " data-toggle='modal' data-target='#stacktraceModal'></div>" +
         "</td>" +
-        "<td><i href='javascript:void(0)' onclick='mycore.session.listing.kill(`" + session.id + "`)' class='fas fa-times' style='cursor: pointer;'></i></td>" +
+        "<td><i href='javascript:void(0)' onclick='mycore.session.listing.kill(`" + escapeHtml(session.id) + "`)' class='fas fa-times' style='cursor: pointer;'></i></td>" +
         "</tr>"
       );
       table.append(tr);
@@ -137,17 +145,26 @@ mycore.session.listing = {
   },
 
   showStacktrace: function(id) {
+    const escaperElement = document.createElement('div');
+    const escapeHtml = function(unsafeText) {
+      if(!unsafeText) {
+        return '';
+      }
+      escaperElement.innerText = unsafeText;
+      return escaperElement.innerHTML;
+    };
     var dialog = $("#stacktraceModalBody");
     dialog.empty();
     var session = mycore.session.listing.getSession(id);
     var stacktrace = session.constructingStacktrace.stacktrace;
     var header = dialog.parents(".modal-dialog").find(".modal-header");
-    if (session.firstURI != null) {
-      header.find(".modal-title").html(session.firstURI);
-      header.show();
-    } else {
-      header.hide();
-    }
+    var html = "ID: " + escapeHtml(session.id)
+     + "<br/>" + "HTTP ID: " + escapeHtml(session.httpId)
+     + "<br/>" + window["component.session-listing.firstURI"] + ": " + escapeHtml(session.firstURI)
+     + "<br/>" + window["component.session-listing.firstUserAgent"] + ": " + escapeHtml(session.firstUserAgent)
+     + "<br/>" + window["component.session-listing.lastURI"] + ": " + escapeHtml(session.lastURI);
+    header.find(".modal-title").html(html);
+    header.show();
     var content = "";
     for (var line of stacktrace) {
       content += line.class + "." + line.method + " (" + line.file + ":" + line.line + ")\n";

@@ -42,10 +42,6 @@ public class MCRMaxIntegerValidator extends MCRIntegerValidator {
 
     @Override
     protected boolean isValid(String value) {
-        if (!super.isValid(value)) {
-            return false;
-        } else {
-            return Integer.parseInt(value) <= max;
-        }
+        return super.isValid(value) && Integer.parseInt(value) <= max;
     }
 }

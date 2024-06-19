@@ -38,7 +38,6 @@ import javax.xml.catalog.CatalogFeatures;
 import javax.xml.catalog.CatalogManager;
 import javax.xml.catalog.CatalogResolver;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
@@ -247,7 +246,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
             final byte[] bytes;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 InputStream in = resourceURL.openStream()) {
-                IOUtils.copy(in, baos);
+                in.transferTo(baos);
                 bytes = baos.toByteArray();
             }
             is = new InputSourceProvider(bytes, resourceURL);

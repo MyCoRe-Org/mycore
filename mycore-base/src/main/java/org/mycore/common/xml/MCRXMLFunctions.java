@@ -46,9 +46,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -77,7 +74,6 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -95,6 +91,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.resource.MCRResourceHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -127,6 +124,7 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
+    public static volatile MimetypesFileTypeMap MIMETYPE_MAP = null;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -274,6 +272,20 @@ public class MCRXMLFunctions {
         }
     }
 
+    /**
+     * Get the string matching the regular expression from the source paramater.
+     *
+     * @param source the string to search
+     * @param regex the regular expression
+     *
+     * @return the string matching in the source parameter matching the given regular expression
+     */
+    public static String getMatchingString(String source, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(source);
+        return m.find() ? m.group() : "";
+    }
+
     public static boolean classAvailable(String className) {
         try {
             MCRClassTools.forName(className);
@@ -375,13 +387,12 @@ public class MCRXMLFunctions {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
-        CompletableFuture<Boolean> permission = MCRAccessManager.checkPermission(
-            MCRSystemUserInformation.getGuestInstance(),
-            () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
-                && checkReadPermissionOfDerivates(mcrObjectID));
         try {
-            return permission.join();
-        } catch (CancellationException | CompletionException e) {
+            return MCRAccessManager.checkPermission(
+                MCRSystemUserInformation.getGuestInstance(),
+                () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
+                    && checkReadPermissionOfDerivates(mcrObjectID));
+        } catch (RuntimeException e) {
             LOGGER.error("Error while retriving ACL information for Object {}", objId, e);
             return false;
         }
@@ -411,12 +422,11 @@ public class MCRXMLFunctions {
             return false;
         }
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
-        CompletableFuture<Boolean> permission = MCRAccessManager.checkPermission(
-            MCRSystemUserInformation.getGuestInstance(),
-            () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ));
         try {
-            return permission.join();
-        } catch (CancellationException | CompletionException e) {
+            return MCRAccessManager.checkPermission(
+                MCRSystemUserInformation.getGuestInstance(),
+                () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ));
+        } catch (RuntimeException e) {
             LOGGER.error("Error while retriving ACL information for Object {}", objId, e);
             return false;
         }
@@ -520,8 +530,16 @@ public class MCRXMLFunctions {
         if (f == null) {
             return "application/octet-stream";
         }
-        MimetypesFileTypeMap mTypes = new MimetypesFileTypeMap();
-        return mTypes.getContentType(f.toLowerCase(Locale.ROOT));
+
+        if (MIMETYPE_MAP == null) {
+            synchronized (MCRXMLFunctions.class) {
+                if (MIMETYPE_MAP == null) {
+                    MIMETYPE_MAP = new MimetypesFileTypeMap();
+                }
+            }
+        }
+
+        return MIMETYPE_MAP.getContentType(f.toLowerCase(Locale.ROOT));
     }
 
     /**

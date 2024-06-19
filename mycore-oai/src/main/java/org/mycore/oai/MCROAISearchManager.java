@@ -29,7 +29,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.logging.log4j.LogManager;
@@ -80,8 +79,6 @@ public class MCROAISearchManager {
 
     protected int partitionSize;
 
-    private ExecutorService executorService;
-
     private boolean runListRecordsParallel;
 
     static {
@@ -91,26 +88,8 @@ public class MCROAISearchManager {
 
     public MCROAISearchManager() {
         this.resultMap = new ConcurrentHashMap<>();
-        TimerTask tt = new TimerTask() {
-            @Override
-            public void run() {
-                for (Map.Entry<String, MCROAISearcher> entry : resultMap.entrySet()) {
-                    String searchId = entry.getKey();
-                    MCROAISearcher searcher = entry.getValue();
-                    if ((searcher != null) && searcher.isExpired()) {
-                        LOGGER.info("Removing expired resumption token {}", searchId);
-                        resultMap.remove(searchId);
-                    }
-                }
-            }
-        };
-        new Timer().schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
         runListRecordsParallel = MCRConfiguration2
             .getOrThrow(MCROAIAdapter.PREFIX + "RunListRecordsParallel", Boolean::parseBoolean);
-        if (runListRecordsParallel) {
-            executorService = Executors.newWorkStealingPool();
-            MCRShutdownHandler.getInstance().addCloseable(executorService::shutdownNow);
-        }
     }
 
     public void init(MCROAIIdentify identify, MCROAIObjectManager objManager, MCROAISetManager setManager,
@@ -119,6 +98,22 @@ public class MCROAISearchManager {
         this.objManager = objManager;
         this.setManager = setManager;
         this.partitionSize = partitionSize;
+        TimerTask tt = new TimerTask() {
+            @Override
+            public void run() {
+                for (Map.Entry<String, MCROAISearcher> entry : resultMap.entrySet()) {
+                    String searchId = entry.getKey();
+                    MCROAISearcher searcher = entry.getValue();
+                    if (searcher.isExpired()) {
+                        LOGGER.info("Removing expired resumption token {}", searchId);
+                        resultMap.remove(searchId);
+                    }
+                }
+            }
+        };
+        Timer cleanupTimer = new Timer("OAISearchManager-Timer " + identify.getConfigPrefix());
+        cleanupTimer.schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
+        MCRShutdownHandler.getInstance().addCloseable(() -> cleanupTimer.cancel());
     }
 
     public Optional<Header> getHeader(String oaiId) {
@@ -194,13 +189,14 @@ public class MCROAISearchManager {
         CompletableFuture[] futures = new CompletableFuture[listSize];
         MetadataFormat metadataFormat = searcher.getMetadataFormat();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        for (int i = 0; i < listSize; i++) {
-            Header header = headerList.get(i);
-            int resultIndex = i;
-            MCRTransactionableRunnable r = new MCRTransactionableRunnable(
-                () -> records[resultIndex] = this.objManager.getRecord(header, metadataFormat), mcrSession);
-            CompletableFuture<Void> future = CompletableFuture.runAsync(r, executorService);
-            futures[i] = future;
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < listSize; i++) {
+                Header header = headerList.get(i);
+                int resultIndex = i;
+                MCRTransactionableRunnable r = new MCRTransactionableRunnable(
+                    () -> records[resultIndex] = this.objManager.getRecord(header, metadataFormat), mcrSession);
+                futures[i] = CompletableFuture.runAsync(r, executor);
+            }
         }
         CompletableFuture.allOf(futures).join();
         OAIDataList<Record> recordList = new OAIDataList<>();
@@ -249,8 +245,9 @@ public class MCROAISearchManager {
     public static MCROAISearcher getSearcher(MCROAIIdentify identify, MetadataFormat format, int partitionSize,
         MCROAISetManager setManager, MCROAIObjectManager objectManager) {
         String className = identify.getConfigPrefix() + "Searcher";
-        MCROAISearcher searcher = MCRConfiguration2.<MCROAISearcher>getInstanceOf(className)
-            .orElseGet(MCROAICombinedSearcher::new);
+        MCROAISearcher searcher = MCRConfiguration2.getInstanceOf(MCROAISearcher.class, className)
+            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
+                MCROAISearcher.class, MCROAIAdapter.PREFIX + "DefaultSearcher"));
         searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
         return searcher;
     }

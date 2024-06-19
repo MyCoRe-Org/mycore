@@ -27,8 +27,9 @@ import java.util.List;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.streams.MCRMD5InputStream;
+import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -180,9 +181,9 @@ public class MCROAuthClient {
     static String buildStateParam() {
         String userID = MCRUserManager.getCurrentUser().getUserID();
         byte[] bytes = userID.getBytes(StandardCharsets.UTF_8);
-        MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
+        MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRMD5Digest.ALGORITHM);
         md5Digest.update(bytes);
         byte[] digest = md5Digest.digest();
-        return MCRMD5InputStream.getMD5String(digest);
+        return MCRUtils.toHexString(digest);
     }
 }

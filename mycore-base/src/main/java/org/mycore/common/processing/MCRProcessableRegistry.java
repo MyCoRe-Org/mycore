@@ -36,8 +36,8 @@ public interface MCRProcessableRegistry {
      * @return the singleton instance
      */
     static MCRProcessableRegistry getSingleInstance() {
-        return MCRConfiguration2
-            .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCRProcessableRegistry.class, "MCR.Processable.Registry.Class");
     }
 
     /**

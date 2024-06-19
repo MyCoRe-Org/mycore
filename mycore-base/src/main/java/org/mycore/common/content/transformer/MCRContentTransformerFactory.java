@@ -54,8 +54,9 @@ public class MCRContentTransformerFactory {
             //check for reasonable default:
             return null;
         }
-        MCRContentTransformer transformer = MCRConfiguration2.<MCRContentTransformer>getInstanceOf(property)
-            .orElseGet(MCRXSLTransformer::new);
+        MCRContentTransformer transformer = MCRConfiguration2.getInstanceOf(MCRContentTransformer.class, property)
+            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(MCRContentTransformer.class,
+                "MCR.ContentTransformer.Default.Class"));
         transformer.init(id);
         transformers.put(id, transformer);
         return transformer;

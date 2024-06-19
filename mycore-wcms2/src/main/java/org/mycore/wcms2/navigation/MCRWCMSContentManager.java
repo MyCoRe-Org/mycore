@@ -57,15 +57,15 @@ public class MCRWCMSContentManager {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRWCMSContentManager.class);
 
-    private MCRWCMSSectionProvider sectionProvider;
+    private final MCRWCMSSectionProvider sectionProvider;
 
     public enum ErrorType {
         notExist, invalidFile, notMyCoReWebPage, invalidDirectory, couldNotSave, couldNotMove
     }
 
     public MCRWCMSContentManager() {
-        this.sectionProvider = MCRConfiguration2.<MCRWCMSSectionProvider>getInstanceOf("MCR.WCMS2.sectionProvider")
-            .orElseGet(MCRWCMSDefaultSectionProvider::new);
+        this.sectionProvider = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRWCMSSectionProvider.class, "MCR.WCMS2.sectionProvider");
     }
 
     /**

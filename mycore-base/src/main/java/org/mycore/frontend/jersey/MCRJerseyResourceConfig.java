@@ -21,7 +21,6 @@ package org.mycore.frontend.jersey;
 import org.apache.logging.log4j.LogManager;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Entry point for mycore jersey configuration. Loads the {@link MCRJerseyConfiguration} defined in
@@ -34,14 +33,8 @@ public class MCRJerseyResourceConfig extends ResourceConfig {
     public MCRJerseyResourceConfig() {
         super();
         LogManager.getLogger().info("Loading jersey resource config...");
-        MCRJerseyConfiguration configuration;
-        try {
-            configuration = MCRConfiguration2.<MCRJerseyDefaultConfiguration>getInstanceOf("MCR.Jersey.Configuration")
-                .orElseGet(MCRJerseyDefaultConfiguration::new);
-        } catch (MCRConfigurationException exc) {
-            LogManager.getLogger().error("Unable to initialize jersey.", exc);
-            return;
-        }
+        MCRJerseyConfiguration configuration = MCRConfiguration2.getInstanceOfOrThrow(
+                MCRJerseyDefaultConfiguration.class, "MCR.Jersey.Configuration");
         try {
             configuration.configure(this);
         } catch (Exception exc) {

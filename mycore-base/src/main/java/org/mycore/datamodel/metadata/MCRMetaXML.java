@@ -60,11 +60,10 @@ public class MCRMetaXML extends MCRMetaDefault {
     }
 
     /**
-     * This method read the XML input stream part from a DOM part for the
+     * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
      * 
-     * @param element
-     *            a relevant JDOM element for the metadata
+     * @param element - a relevant JDOM2 element for the metadata
      */
     @Override
     public void setFromDOM(Element element) {
@@ -72,6 +71,10 @@ public class MCRMetaXML extends MCRMetaDefault {
         content = element.cloneContent();
     }
 
+    /**
+     * This methods adds XML content (as JDOM2 Content object) to this metadata object.
+     * @param content - a JDOM2 Content object
+     */
     public void addContent(Content content) {
         if (this.content == null) {
             this.content = new ArrayList<>();
@@ -80,17 +83,37 @@ public class MCRMetaXML extends MCRMetaDefault {
         this.content.add(content);
     }
 
+    /**
+     * This method returns the XML content of this metadata object.
+     * @return a list of JDOM2 Content objects
+     */
     public List<Content> getContent() {
         return content;
     }
 
     /**
-     * This method create a XML stream for all data in this class, defined by
+     * This method returns all JDOM2 Element objects from content.
+     * @return list of JDOM2 Elements
+     */
+    public List<Element> getContentElements() {
+        return content.stream().filter(Element.class::isInstance).map(Element.class::cast).toList();
+    }
+
+    /**
+     * This method returns the first JDOM2 Element object from content.
+     * @return a JDOM2 Element or null
+     */
+    public Element getFirstContentElement() {
+        return content.stream().filter(Element.class::isInstance).map(Element.class::cast).findFirst().orElse(null);
+    }
+
+    /**
+     * This method creates a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaLangText definition for the given subtag.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
-     * @return a JDOM Element with the XML MCRMetaLangText part
+     * @return a JDOM2 Element with the XML MCRMetaLangText part
      */
     @Override
     public Element createXML() throws MCRException {

@@ -68,7 +68,7 @@ public abstract class MCRSolrSearchUtils {
         p.set("q", query);
         p.set("rows", 1);
         QueryResponse response = solrClient.query(p);
-        return response.getResults().isEmpty() ? null : response.getResults().get(0);
+        return response.getResults().isEmpty() ? null : response.getResults().getFirst();
     }
 
     @SuppressWarnings("rawtypes")

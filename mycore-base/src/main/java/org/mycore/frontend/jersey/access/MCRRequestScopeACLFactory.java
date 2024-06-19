@@ -48,12 +48,7 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
         @Override
         public boolean checkPermission(String privilege) {
             if (!isPrivate()) {
-                MCRAccessManager.checkPermission(GUEST, () -> MCRAccessManager.checkPermission(privilege))
-                    .thenAccept(b -> {
-                        if (!b) {
-                            isPrivate = true; //not for guest user
-                        }
-                    }).join();
+                isPrivate = !MCRAccessManager.checkPermission(GUEST, () -> MCRAccessManager.checkPermission(privilege));
             }
             if (isPrivate()) {
                 return MCRAccessManager.checkPermission(privilege);
@@ -64,15 +59,11 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
         @Override
         public boolean checkPermission(String id, String permission) {
             if (!isPrivate()) {
-                MCRAccessManager.checkPermission(GUEST, () -> MCRAccessManager.checkPermission(id, permission))
-                    .thenAccept(b -> {
-                        if (!b) {
-                            isPrivate = true;
-                            LogManager.getLogger().debug("response is private");
-                        }
-                    }).join();
+                isPrivate = !MCRAccessManager.checkPermission(GUEST,
+                    () -> MCRAccessManager.checkPermission(id, permission));
             }
             if (isPrivate()) {
+                LogManager.getLogger().debug("response is private");
                 return MCRAccessManager.checkPermission(id, permission);
             }
             return true;

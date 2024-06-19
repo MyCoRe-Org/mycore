@@ -136,12 +136,16 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         throws MCRPersistenceException {
         String ocflObjectID = getOCFLObjectID(mcrid);
         VersionInfo info = buildVersionInfo(MESSAGE_CREATED, lastModified, user);
-        try (InputStream objectAsStream = xml.getInputStream()) {
+        try (InputStream objectAsStream = getContentStream(xml)) {
             getRepository().updateObject(ObjectVersionId.head(ocflObjectID), info,
                 init -> init.writeFile(objectAsStream, buildFilePath(mcrid)));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to create object '" + ocflObjectID + "'", e);
         }
+    }
+
+    protected InputStream getContentStream(MCRContent xml) throws IOException {
+        return xml.getInputStream();
     }
 
     @Override
@@ -193,7 +197,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         if (!exists(mcrid)) {
             throw new MCRUsageException("Cannot update nonexistent object '" + ocflObjectID + "'");
         }
-        try (InputStream objectAsStream = xml.getInputStream()) {
+        try (InputStream objectAsStream = getContentStream(xml)) {
             VersionInfo versionInfo = buildVersionInfo(MESSAGE_UPDATED, lastModified, user);
             getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
                 init -> init.writeFile(objectAsStream, buildFilePath(mcrid), OcflOption.OVERWRITE));
@@ -212,7 +216,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             : MCROCFLObjectIDPrefixHelper.MCROBJECT + mcrid;
     }
 
-    private String buildFilePath(MCRObjectID mcrid) {
+    protected String buildFilePath(MCRObjectID mcrid) {
         return "metadata/" + mcrid + ".xml";
     }
 
@@ -232,11 +236,15 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         }
 
         // "metadata/" +
-        try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
+        try (InputStream storedContentStream = getStoredContentStream(mcrid, storeObject)) {
             return new MCRJDOMContent(new MCRStreamContent(storedContentStream).asXML());
         } catch (JDOMException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);
         }
+    }
+
+    protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
+        return storeObject.getFile(buildFilePath(mcrid)).getStream();
     }
 
     @Override
@@ -259,7 +267,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             throw new IOException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
 
-        try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
+        try (InputStream storedContentStream = getStoredContentStream(mcrid, storeObject)) {
             Document xml = new MCRStreamContent(storedContentStream).asXML();
             xml.getRootElement().setAttribute("rev", revision); // bugfix: MCR-2510, PR #1373
             return new MCRJDOMContent(xml);
@@ -297,13 +305,17 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             VersionDetails details = v.getValue();
             VersionInfo versionInfo = details.getVersionInfo();
 
-            MCROCFLContent content = new MCROCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
-                key.toString());
+            MCROCFLContent content = getContent(id, ocflObjectID, key);
             return new MCROCFLMetadataVersion(content,
                 key.toString(),
                 versionInfo.getUser().getName(),
                 Date.from(details.getCreated().toInstant()), convertMessageToType(versionInfo.getMessage()));
         }).collect(Collectors.toList());
+    }
+
+    protected MCROCFLContent getContent(MCRObjectID id, String ocflObjectID, VersionNum key) {
+        return new MCROCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
+                key.toString());
     }
 
     private boolean isMetadata(String id) {
@@ -329,9 +341,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public int getHighestStoredID(String project, String type) {
         int highestStoredID = 0;
         int maxDepth = Integer.MAX_VALUE;
-        MCROCFLRepositoryProvider oclfRepoProvider = MCRConfiguration2
-            .getSingleInstanceOf("MCR.OCFL.Repository." + repositoryKey)
-            .map(MCROCFLRepositoryProvider.class::cast).orElseThrow();
+        MCROCFLRepositoryProvider oclfRepoProvider = MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCROCFLRepositoryProvider.class, "MCR.OCFL.Repository." + repositoryKey);
 
         OcflExtensionConfig config = oclfRepoProvider.getExtensionConfig();
         Path basePath = null;

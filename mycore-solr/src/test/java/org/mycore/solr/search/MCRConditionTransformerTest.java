@@ -62,8 +62,8 @@ public class MCRConditionTransformerTest extends MCRTestCase {
         assertEquals("+(objectType:\"mods\" objectType:\"cbu\") +derCount:[* TO 0]",
             MCRConditionTransformer.toSolrQueryString(andCondition, usedFields));
         MCRNotCondition<Void> notCond = new MCRNotCondition<>(orCond);
-        andCondition.getChildren().remove(0);
-        andCondition.getChildren().add(0, notCond);
+        andCondition.getChildren().removeFirst();
+        andCondition.getChildren().addFirst(notCond);
         assertEquals("-(objectType:\"mods\" objectType:\"cbu\") +derCount:[* TO 0]",
             MCRConditionTransformer.toSolrQueryString(andCondition, usedFields));
     }

@@ -15,7 +15,10 @@
     <xsl:param name="length" as="xs:integer" />
     <xsl:value-of select="mcrstring:shorten($input, $length, '…')" />
   </xsl:function>
-  
+
+  <!-- Function shortens the text to the desired length and then adds the ellipsis. Thus, you might need to substract
+    the length of the ellipsis from the length parameter to match the actual desired length.
+   -->
   <xsl:function name="mcrstring:shorten" as="xs:string">
     <xsl:param name="input" as="xs:string" />
     <xsl:param name="length" as="xs:integer" />

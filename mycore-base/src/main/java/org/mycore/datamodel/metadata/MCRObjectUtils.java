@@ -103,7 +103,7 @@ public abstract class MCRObjectUtils {
      */
     public static MCRObject getRoot(MCRObject mcrObject) {
         List<MCRObject> ancestorList = getAncestors(mcrObject);
-        return ancestorList.isEmpty() ? null : ancestorList.get(ancestorList.size() - 1);
+        return ancestorList.isEmpty() ? null : ancestorList.getLast();
     }
 
     /**
