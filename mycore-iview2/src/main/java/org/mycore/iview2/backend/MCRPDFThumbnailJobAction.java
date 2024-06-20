@@ -69,15 +69,15 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         MCRTileInfo tileInfo = new MCRTileInfo(derivate.getId().toString(),
             derivate.getDerivate().getInternals().getMainDoc(), null);
-        if (tileInfo.getImagePath().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+        if (tileInfo.imagePath().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
             try {
-                Path p = MCRPath.getPath(tileInfo.getDerivate(), tileInfo.getImagePath());
+                Path p = MCRPath.getPath(tileInfo.derivate(), tileInfo.imagePath());
                 BufferedImage bImage = MCRPDFTools.getThumbnail(-1, p, false);
                 Path pImg = Files.createTempFile("MyCoRe-Thumbnail-", ".png");
                 try (OutputStream os = Files.newOutputStream(pImg)) {
                     ImageIO.write(bImage, "png", os);
 
-                    MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
+                    MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.derivate(), tileInfo.imagePath());
                     mcrImage.setTileDir(MCRIView2Tools.getTileDir());
                     mcrImage.tile();
                 } finally {

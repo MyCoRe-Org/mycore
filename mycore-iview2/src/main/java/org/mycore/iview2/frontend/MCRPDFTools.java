@@ -57,17 +57,6 @@ public class MCRPDFTools implements AutoCloseable {
     }
 
     /**
-     * The old method did not take the thumbnail size into account, if centered =
-     * false;
-     *
-     * @see #getThumbnail(int, Path, boolean)
-     */
-    @Deprecated
-    public static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
-        return getThumbnail(-1, pdfFile, false);
-    }
-
-    /**
      * This method returns a Buffered Image as thumbnail if an initial page was set,
      * it will be return - if not the first page
      *
@@ -164,7 +153,7 @@ public class MCRPDFTools implements AutoCloseable {
 
     MCRContent getThumnail(Path pdfFile, BasicFileAttributes attrs, int thumbnailSize, boolean centered)
         throws IOException {
-        BufferedImage thumbnail = MCRPDFTools.getThumbnail(pdfFile, thumbnailSize, centered);
+        BufferedImage thumbnail = getThumbnail(thumbnailSize, pdfFile, centered);
         MCRContent pngContent = pngTools.toPNGContent(thumbnail);
         BasicFileAttributes fattrs = attrs != null ? attrs : Files.readAttributes(pdfFile, BasicFileAttributes.class);
         pngContent.setLastModified(fattrs.lastModifiedTime().toMillis());

@@ -23,37 +23,5 @@ package org.mycore.iview2.backend;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRTileInfo {
-
-    private String derivate;
-
-    private String imagePath;
-
-    private String tile;
-
-    public MCRTileInfo(final String derivate, final String imagePath, final String tile) {
-        this.derivate = derivate;
-        this.imagePath = imagePath;
-        this.tile = tile;
-    }
-
-    /**
-     * returns "TileInfo [derivate=" + derivate + ", imagePath=" + imagePath + ", tile=" + tile + "]"
-     */
-    @Override
-    public String toString() {
-        return "TileInfo [derivate=" + derivate + ", imagePath=" + imagePath + ", tile=" + tile + "]";
-    }
-
-    public String getDerivate() {
-        return derivate;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public String getTile() {
-        return tile;
-    }
+public record MCRTileInfo(String derivate, String imagePath, String tile) {
 }

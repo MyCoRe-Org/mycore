@@ -298,16 +298,16 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         if (!Files.exists(tileFilePath)) {
             throw new MCRIIIFImageNotFoundException(identifier);
         }
-        if (tileInfo.getDerivate() != null
+        if (tileInfo.derivate() != null
             && !checkPermission(identifier, tileInfo)) {
             throw MCRAccessException.missingPermission(
-                "View the file " + tileInfo.getImagePath() + " in " + tileInfo.getDerivate(), tileInfo.getDerivate(),
+                "View the file " + tileInfo.imagePath() + " in " + tileInfo.derivate(), tileInfo.derivate(),
                 MCRAccessManager.PERMISSION_VIEW);
         }
     }
 
     protected boolean checkPermission(String identifier, MCRTileInfo tileInfo) {
-        return MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_VIEW) ||
-            MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
+        return MCRAccessManager.checkPermission(tileInfo.derivate(), MCRAccessManager.PERMISSION_VIEW) ||
+            MCRAccessManager.checkPermission(tileInfo.derivate(), MCRAccessManager.PERMISSION_READ);
     }
 }
