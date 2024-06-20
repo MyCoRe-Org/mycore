@@ -72,8 +72,8 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
         Optional<MCRObjectID> mcrObjId = calculateMCRObjectID(identifier);
         if (mcrObjId.isPresent()) {
             return MCRAccessManager.checkPermission(mcrObjId.get(), MCRAccessManager.PERMISSION_PREVIEW) ||
-                MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_VIEW) ||
-                MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
+                MCRAccessManager.checkPermission(tileInfo.derivate(), MCRAccessManager.PERMISSION_VIEW) ||
+                MCRAccessManager.checkPermission(tileInfo.derivate(), MCRAccessManager.PERMISSION_READ);
         }
         return false;
     }

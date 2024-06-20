@@ -42,6 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRTileServlet extends HttpServlet {
     /**
      * how long should a tile be cached by the client
@@ -75,7 +76,7 @@ public class MCRTileServlet extends HttpServlet {
         }
         try (FileSystem iviewFS = MCRIView2Tools.getFileSystem(iviewFile)) {
             Path root = iviewFS.getRootDirectories().iterator().next();
-            Path tilePath = root.resolve(tileInfo.getTile());
+            Path tilePath = root.resolve(tileInfo.tile());
             BasicFileAttributes fileAttributes;
             try {
                 fileAttributes = Files.readAttributes(tilePath, BasicFileAttributes.class);
@@ -85,7 +86,7 @@ public class MCRTileServlet extends HttpServlet {
             }
             resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
             resp.setDateHeader("Last-Modified", fileAttributes.lastModifiedTime().toMillis());
-            if (tileInfo.getTile().endsWith("xml")) {
+            if (tileInfo.tile().endsWith("xml")) {
                 resp.setContentType("text/xml");
             } else {
                 resp.setContentType("image/jpeg");

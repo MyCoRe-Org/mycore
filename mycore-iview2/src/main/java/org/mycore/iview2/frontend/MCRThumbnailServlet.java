@@ -64,6 +64,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRThumbnailServlet extends MCRServlet {
     private static final long serialVersionUID = 1506443527774956290L;
 

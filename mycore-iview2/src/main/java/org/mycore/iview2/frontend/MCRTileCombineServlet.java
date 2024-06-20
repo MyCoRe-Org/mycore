@@ -61,6 +61,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRTileCombineServlet extends MCRServlet {
 
     /** key of request attribute for {@link BufferedImage}. */

@@ -39,6 +39,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRPDFThumbnailServlet extends MCRContentServlet {
 
     private static final long serialVersionUID = 1L;
