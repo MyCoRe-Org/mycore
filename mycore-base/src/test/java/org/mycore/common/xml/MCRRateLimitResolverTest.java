@@ -7,6 +7,7 @@ import org.jdom2.transform.JDOMSource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRRateLimitBuckets;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -25,6 +26,7 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        MCRConfiguration2.set("MCR.URIResolver.ModuleResolver.ratelimit", "org.mycore.common.xml.MCRRateLimitResolver");
         MCRMockResolver.setResultSource(resultSource);
         MCRRateLimitBuckets.clearAllBuckets();
     }

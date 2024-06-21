@@ -1,4 +1,4 @@
-package org.mycore.common.xml;
+package org.mycore.common;
 
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.local.LocalBucketBuilder;
