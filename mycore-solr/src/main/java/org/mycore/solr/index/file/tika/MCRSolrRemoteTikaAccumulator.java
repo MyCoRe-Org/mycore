@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -65,11 +64,11 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Set<MCRTikaHttpClient> tikaClient;
+    private final Set<MCRTikaHttpClient> tikaClients;
 
     private final boolean enabled;
 
-    private final Set<Pattern> ignoredFilesPattern;
+    private final Set<Pattern> ignoredFilesPatterns;
 
     private final long maxFileSize;
 
@@ -78,7 +77,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
     public MCRSolrRemoteTikaAccumulator() {
         Optional<String> serverList = MCRConfiguration2.getString(TIKA_SERVER_PROPERTY);
 
-        ignoredFilesPattern = Collections.synchronizedSet(MCRConfiguration2
+        ignoredFilesPatterns = Collections.synchronizedSet(MCRConfiguration2
             .getOrThrow(TIKA_MAPPER_IGNORED_FILES_PROPERTY,
                 MCRConfiguration2::splitValue)
             .map(Pattern::compile)
@@ -87,13 +86,11 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
         maxFileSize = MCRConfiguration2.getLong(TIKA_MAPPER_MAX_FILE_SIZE).orElseThrow(
             () -> MCRConfiguration2.createConfigurationException(TIKA_MAPPER_MAX_FILE_SIZE));
 
-        Set<MCRTikaHttpClient> tikaClients = null;
-        if (serverList.isPresent()) {
-            List<String> servers = MCRConfiguration2.splitValue(serverList.get()).toList();
-            tikaClients = servers.stream().map(MCRTikaHttpClient::new).collect(Collectors.toSet());
-        }
-        this.tikaClient = tikaClients;
-        enabled = tikaClients != null && !tikaClients.isEmpty();
+
+        this.tikaClients = MCRConfiguration2.splitValue(serverList.orElse(""))
+                .map(MCRTikaHttpClient::new)
+                .collect(Collectors.toSet());
+        enabled = !tikaClients.isEmpty();
     }
 
     @Override
@@ -103,7 +100,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
         }
 
         if (filePath instanceof MCRPath mcrPath) {
-            Optional<Pattern> matching = ignoredFilesPattern.stream()
+            Optional<Pattern> matching = ignoredFilesPatterns.stream()
                 .filter(p -> p.matcher(mcrPath.getOwnerRelativePath()).matches())
                 .findAny();
             if (matching.isPresent()) {
@@ -157,7 +154,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
 
     public synchronized MCRTikaHttpClient getNextClient() {
         if (tikaClientIterator == null || !tikaClientIterator.hasNext()) {
-            tikaClientIterator = tikaClient.iterator();
+            tikaClientIterator = tikaClients.iterator();
         }
         return tikaClientIterator.next();
     }
