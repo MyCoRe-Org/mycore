@@ -21,8 +21,9 @@ package org.mycore.mets.resource;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 
-public class MCRAltoHighlightResourceTest {
+public class MCRAltoHighlightResourceTest extends MCRTestCase {
 
     @Test
     public void buildQuery() {
