@@ -200,7 +200,7 @@ public class MCRSolrCore {
             if (commit) {
                 UpdateRequest updateRequest = new UpdateRequest();
                 updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
-                MCRSolrAuthenticationFactory.getInstance().addAuthentication(updateRequest,
+                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(updateRequest,
                     MCRSolrAuthenticationLevel.INDEX);
                 updateRequest.process(client);
             }

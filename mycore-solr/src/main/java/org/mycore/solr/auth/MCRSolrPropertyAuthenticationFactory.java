@@ -40,17 +40,17 @@ public class MCRSolrPropertyAuthenticationFactory implements MCRSolrAuthenticati
         return instance;
     }
 
-    public void addAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level) {
+    public void applyAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level) {
         Optional<MCRSolrAuthentication> optImpl = loadImplementation(level);
         optImpl.ifPresent(instance -> {
-            instance.addAuthentication(request);
+            instance.applyAuthentication(request);
         });
     }
 
-    public void addAuthentication(HttpRequestBase request, MCRSolrAuthenticationLevel level) {
+    public void applyAuthentication(HttpRequestBase request, MCRSolrAuthenticationLevel level) {
         Optional<MCRSolrAuthentication> optImpl = loadImplementation(level);
         optImpl.ifPresent(instance -> {
-            instance.addAuthentication(request);
+            instance.applyAuthentication(request);
         });
     }
 

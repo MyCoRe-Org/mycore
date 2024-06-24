@@ -117,7 +117,7 @@ public class MCRAltoHighlightResource {
         p.set("hl.maxAnalyzedChars", Integer.MAX_VALUE - 1);
         try {
             QueryRequest queryRequest = new QueryRequest(p);
-            SOLR_AUTHENTICATION_FACTORY.addAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
+            SOLR_AUTHENTICATION_FACTORY.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
             JsonArray response = buildQueryResponse(solrResponse.getHighlighting());
             return Response.ok().entity(new Gson().toJson(response)).build();

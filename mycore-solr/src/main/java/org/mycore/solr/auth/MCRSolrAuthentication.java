@@ -34,12 +34,12 @@ public interface MCRSolrAuthentication {
      * Add authentication to a Solr request.
      * @param request the request to add authentication to
      */
-    void addAuthentication(SolrRequest<?> request);
+    void applyAuthentication(SolrRequest<?> request);
 
     /**
      * Add authentication to an HTTP request.
      * @param request the request to add authentication to
      */
-    void addAuthentication(HttpRequestBase request);
+    void applyAuthentication(HttpRequestBase request);
 
 }

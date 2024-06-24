@@ -181,7 +181,7 @@ public final class MCRGoogleSitemapCommon {
 
         try {
             QueryRequest queryRequest = new QueryRequest(query);
-            SOLR_AUTHENTICATION_FACTORY.addAuthentication(queryRequest,
+            SOLR_AUTHENTICATION_FACTORY.applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             response = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
             objidlist = response.getResults().stream().map((document) -> {

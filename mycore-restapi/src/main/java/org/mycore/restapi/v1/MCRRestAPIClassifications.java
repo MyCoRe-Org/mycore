@@ -494,7 +494,7 @@ public class MCRRestAPIClassifications {
             solrQquery.setRows(0);
             try {
                 QueryRequest queryRequest = new QueryRequest(solrQquery);
-                MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
                     MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse response = queryRequest.process(solrClient);
                 SolrDocumentList solrResults = response.getResults();

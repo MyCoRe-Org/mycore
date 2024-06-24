@@ -87,7 +87,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         UpdateResponse updateResponse;
         try {
             UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
-            getSolrAuthenticationFactory().addAuthentication(updateRequest,
+            getSolrAuthenticationFactory().applyAuthentication(updateRequest,
                 MCRSolrAuthenticationLevel.INDEX);
             updateRequest.add(documents);
             updateResponse = updateRequest.process(getSolrClient());

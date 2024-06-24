@@ -84,7 +84,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     protected UpdateRequest getUpdateRequest(String path) {
         UpdateRequest req = path != null ? new UpdateRequest(path) : new UpdateRequest();
-        MCRSolrAuthenticationFactory.getInstance().addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.setCommitWithin(getCommitWithin());
         return req;
     }

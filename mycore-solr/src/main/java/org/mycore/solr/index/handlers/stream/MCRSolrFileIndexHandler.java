@@ -67,7 +67,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         }
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(SOLR_EXTRACT_PATH);
-        getSolrAuthenticationFactory().addAuthentication(updateRequest,
+        getSolrAuthenticationFactory().applyAuthentication(updateRequest,
             MCRSolrAuthenticationLevel.INDEX);
         try (MCRSolrPathContentStream stream = getStream()) {
             updateRequest.addContentStream(stream);

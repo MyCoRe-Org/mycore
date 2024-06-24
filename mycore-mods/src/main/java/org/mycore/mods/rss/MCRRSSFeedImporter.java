@@ -226,7 +226,7 @@ public class MCRRSSFeedImporter {
         SolrDocumentList results;
         try {
             QueryRequest queryRequest = new QueryRequest(query);
-            solrAuthenticationFactory.addAuthentication(queryRequest,
+            solrAuthenticationFactory.applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             results = queryRequest.process(solrClient).getResults();
 

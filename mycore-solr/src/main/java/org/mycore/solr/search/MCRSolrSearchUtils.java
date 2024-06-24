@@ -71,7 +71,7 @@ public abstract class MCRSolrSearchUtils {
         p.set("q", query);
         p.set("rows", 1);
         QueryRequest queryRequest = new QueryRequest(p);
-        MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
         QueryResponse response = queryRequest.process(solrClient);
         return response.getResults().isEmpty() ? null : response.getResults().getFirst();
@@ -189,7 +189,7 @@ public abstract class MCRSolrSearchUtils {
                 sizeParams.set("rows", 0);
                 try {
                     QueryRequest queryRequest = new QueryRequest(sizeParams);
-                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
                     QueryResponse response = queryRequest.process(solrClient);
                     this.size = response.getResults().getNumFound();
@@ -222,7 +222,7 @@ public abstract class MCRSolrSearchUtils {
         protected QueryResponse query(SolrParams params) {
             try {
                 QueryRequest queryRequest = new QueryRequest(params);
-                MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
                     MCRSolrAuthenticationLevel.SEARCH);
                 return queryRequest.process(solrClient);
             } catch (SolrServerException | IOException e) {

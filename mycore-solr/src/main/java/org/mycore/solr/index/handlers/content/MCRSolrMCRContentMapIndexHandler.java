@@ -93,7 +93,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                 documents = debugList.iterator();
             }
             UpdateRequest req = new UpdateRequest();
-            getSolrAuthenticationFactory().addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+            getSolrAuthenticationFactory().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
 
             if (solrClient instanceof HttpSolrClient) {
                 req.setDocIterator(documents);

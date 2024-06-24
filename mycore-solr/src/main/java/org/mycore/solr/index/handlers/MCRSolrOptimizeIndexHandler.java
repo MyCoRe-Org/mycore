@@ -40,7 +40,7 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
     public void index() throws IOException, SolrServerException {
         LOGGER.info("Sending optimize request to solr");
         UpdateRequest updateRequest = new UpdateRequest();
-        getSolrAuthenticationFactory().addAuthentication(updateRequest,
+        getSolrAuthenticationFactory().applyAuthentication(updateRequest,
             MCRSolrAuthenticationLevel.INDEX);
         updateRequest.setAction(UpdateRequest.ACTION.OPTIMIZE, true, true, 1);
         UpdateResponse response = updateRequest.process(getSolrClient(), null);

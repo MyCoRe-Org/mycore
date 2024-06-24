@@ -82,7 +82,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                 params.set("q", query);
 
                 QueryRequest queryRequest = new QueryRequest(params);
-                SOLR_AUTHENTICATION_FACTORY.addAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
+                SOLR_AUTHENTICATION_FACTORY.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 solrResponse
                     .getResults()

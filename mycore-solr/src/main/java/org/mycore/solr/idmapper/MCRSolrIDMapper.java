@@ -100,7 +100,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 QueryResponse solrResponse = null;
                 try {
                     QueryRequest queryRequest = new QueryRequest(params);
-                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
                     solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {
@@ -145,7 +145,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 QueryResponse solrResponse = null;
                 try {
                     QueryRequest queryRequest = new QueryRequest(params);
-                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(queryRequest,
+                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
                     solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {

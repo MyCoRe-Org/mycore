@@ -66,7 +66,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
             MCRSolrIndexer.deleteById(solrClient, id);
         }
         UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
-        getSolrAuthenticationFactory().addAuthentication(updateRequest,
+        getSolrAuthenticationFactory().applyAuthentication(updateRequest,
             MCRSolrAuthenticationLevel.INDEX);
         updateRequest.add(document);
         updateRequest.process(solrClient);

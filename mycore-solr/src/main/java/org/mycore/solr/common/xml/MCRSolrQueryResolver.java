@@ -115,7 +115,7 @@ public class MCRSolrQueryResolver implements URIResolver {
 
                 try {
                     HttpGet get = new HttpGet(solrURL.getUrl().toURI());
-                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(get,
+                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(get,
                             MCRSolrAuthenticationLevel.SEARCH);
 
                     try {

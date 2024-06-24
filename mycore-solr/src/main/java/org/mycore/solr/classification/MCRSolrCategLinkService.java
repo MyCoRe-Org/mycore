@@ -90,7 +90,7 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
         UpdateRequest req = new UpdateRequest();
         req.deleteByQuery("+type:link +object:" + reference.getObjectID());
         req.setCommitWithin(500);
-        MCRSolrAuthenticationFactory.getInstance().addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.process(solrClient);
     }
 

@@ -214,7 +214,7 @@ public class MCRSolrIndexer {
         UpdateRequest req = new UpdateRequest();
         req.deleteByQuery("-({!join from=id to=_root_ score=none}_root_:*) +_root_:*");
         req.setCommitWithin(0);
-        SOLR_AUTHENTICATION_FACTORY.addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        SOLR_AUTHENTICATION_FACTORY.applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         return req.process(solrClient);
     }
 
@@ -234,7 +234,7 @@ public class MCRSolrIndexer {
         try {
             LOGGER.debug("Deleting \"{}\" from solr", Arrays.asList(solrIDs));
             UpdateRequest req = new UpdateRequest();
-            SOLR_AUTHENTICATION_FACTORY.addAuthentication(req,
+            SOLR_AUTHENTICATION_FACTORY.applyAuthentication(req,
                 MCRSolrAuthenticationLevel.INDEX);
             //delete all documents rooted at this id
             if (MCRSolrUtils.useNestedDocuments()) {
@@ -281,7 +281,7 @@ public class MCRSolrIndexer {
         try {
             LOGGER.debug("Deleting derivate \"{}\" from solr", id);
             UpdateRequest req = new UpdateRequest();
-            SOLR_AUTHENTICATION_FACTORY.addAuthentication(req,
+            SOLR_AUTHENTICATION_FACTORY.applyAuthentication(req,
                 MCRSolrAuthenticationLevel.INDEX);
             StringBuilder deleteQuery = new StringBuilder();
             deleteQuery.append("id:").append(id).append(' ');
@@ -306,7 +306,7 @@ public class MCRSolrIndexer {
     private static void commit(SolrClient solrClient) throws SolrServerException, IOException {
         UpdateRequest commitRequest = new UpdateRequest();
         commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
-        SOLR_AUTHENTICATION_FACTORY.addAuthentication(commitRequest,
+        SOLR_AUTHENTICATION_FACTORY.applyAuthentication(commitRequest,
                 MCRSolrAuthenticationLevel.INDEX);
         commitRequest.process(solrClient);
     }
@@ -499,7 +499,7 @@ public class MCRSolrIndexer {
         UpdateRequest req = new UpdateRequest();
         req.deleteByQuery("*:*");
         req.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-        SOLR_AUTHENTICATION_FACTORY.addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        SOLR_AUTHENTICATION_FACTORY.applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.process(client);
         LOGGER.info("Dropping solr index...done");
     }
@@ -516,7 +516,7 @@ public class MCRSolrIndexer {
         UpdateRequest req = new UpdateRequest();
         req.deleteByQuery(deleteQuery);
         req.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-        SOLR_AUTHENTICATION_FACTORY.addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        SOLR_AUTHENTICATION_FACTORY.applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.process(client);
         LOGGER.info("Dropping solr index for type {}...done", type);
     }
@@ -534,7 +534,7 @@ public class MCRSolrIndexer {
         UpdateRequest req = new UpdateRequest();
         req.deleteByQuery(deleteQuery);
         req.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-        SOLR_AUTHENTICATION_FACTORY.addAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        SOLR_AUTHENTICATION_FACTORY.applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.process(client);
         LOGGER.info("Dropping solr index for base {}...done", base);
     }

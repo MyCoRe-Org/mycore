@@ -225,7 +225,7 @@ public class MCRSolrConfigReloader {
      */
     private static void executeSolrCommand(String coreURL, JsonObject command) throws UnsupportedEncodingException {
         HttpPost post = new HttpPost(coreURL + "/config");
-        MCRSolrAuthenticationFactory.getInstance().addAuthentication(post, MCRSolrAuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(post, MCRSolrAuthenticationLevel.ADMIN);
         post.setHeader("Content-type", "application/json");
         post.setEntity(new StringEntity(command.toString()));
         String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
@@ -269,7 +269,7 @@ public class MCRSolrConfigReloader {
      */
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
         HttpGet getConfig = new HttpGet(coreURL + "/config");
-        MCRSolrAuthenticationFactory.getInstance().addAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
         return getJSON(getConfig);
     }
 
@@ -280,7 +280,7 @@ public class MCRSolrConfigReloader {
      */
     private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
         HttpGet getConfig = new HttpGet(coreURL + "/config/overlay");
-        MCRSolrAuthenticationFactory.getInstance().addAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
         return getJSON(getConfig);
     }
 

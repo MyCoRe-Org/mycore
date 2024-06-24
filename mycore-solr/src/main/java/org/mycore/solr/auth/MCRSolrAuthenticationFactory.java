@@ -34,7 +34,7 @@ public interface MCRSolrAuthenticationFactory {
      * @param request the request to add the authentication to
      * @param level the level of authentication to add
      */
-    void addAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level);
+    void applyAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level);
 
     /**
      * Add basic authentication to the request, if username and password are configured.
@@ -42,7 +42,7 @@ public interface MCRSolrAuthenticationFactory {
      * @param request the request to add the authentication to
      * @param level the level of authentication to add
      */
-     void addAuthentication(HttpRequestBase request, MCRSolrAuthenticationLevel level);
+     void applyAuthentication(HttpRequestBase request, MCRSolrAuthenticationLevel level);
 
 
      static MCRSolrAuthenticationFactory getInstance() {

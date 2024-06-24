@@ -116,7 +116,7 @@ public abstract class MCRSolrClassificationUtil {
                     UpdateRequest req = new UpdateRequest();
                     req.add(part);
                     req.setCommitWithin(500);
-                    MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(req,
                         MCRSolrAuthenticationLevel.INDEX);
                     req.process(client);
                     added += part.size();
@@ -135,7 +135,7 @@ public abstract class MCRSolrClassificationUtil {
         try {
             SolrClient solrClient = getCore().getConcurrentClient();
             UpdateRequest req = new UpdateRequest();
-            MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(req,
                 MCRSolrAuthenticationLevel.INDEX);
             req.deleteByQuery("*:*");
             req.process(solrClient);
@@ -214,7 +214,7 @@ public abstract class MCRSolrClassificationUtil {
             try {
                 UpdateRequest req = new UpdateRequest();
                 req.add(solrCategory.toSolrDocument());
-                MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(req,
                     MCRSolrAuthenticationLevel.INDEX);
                 req.process(solrClient);
             } catch (Exception exc) {
@@ -224,7 +224,7 @@ public abstract class MCRSolrClassificationUtil {
         try {
             UpdateRequest commitRequest = new UpdateRequest();
             commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
-            MCRSolrAuthenticationFactory.getInstance().addAuthentication(commitRequest,
+            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(commitRequest,
                     MCRSolrAuthenticationLevel.INDEX);
             commitRequest.process(solrClient);
         } catch (Exception exc) {
@@ -281,7 +281,7 @@ public abstract class MCRSolrClassificationUtil {
             toDelete.add(id.toString());
             UpdateRequest req = new UpdateRequest();
             req.deleteById(toDelete);
-            MCRSolrAuthenticationFactory.getInstance().addAuthentication(req,
+            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(req,
                 MCRSolrAuthenticationLevel.INDEX);
             req.process(solrClient);
             // reindex parent

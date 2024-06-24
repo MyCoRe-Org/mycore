@@ -234,7 +234,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
             Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
 
-        SOLR_AUTHENTICATION_FACTORY.addAuthentication(solrHttpMethod, MCRSolrAuthenticationLevel.SEARCH);
+        SOLR_AUTHENTICATION_FACTORY.applyAuthentication(solrHttpMethod, MCRSolrAuthenticationLevel.SEARCH);
 
         try {
             LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());

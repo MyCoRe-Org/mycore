@@ -304,7 +304,7 @@ public class MCRClassificationEditorResource {
         String query = new MessageFormat(configQuery, Locale.ROOT).format(new String[] { id.replaceAll(":", "\\\\:") });
         params.set("q", query);
         QueryRequest queryRequest = new QueryRequest(params);
-        SOLR_AUTHENTICATION_FACTORY.addAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
+        SOLR_AUTHENTICATION_FACTORY.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
         QueryResponse solrResponse = queryRequest.process(solrClient);
 
         SolrDocumentList solrResults = solrResponse.getResults();

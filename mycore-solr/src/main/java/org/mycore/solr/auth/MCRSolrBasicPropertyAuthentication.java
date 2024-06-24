@@ -51,12 +51,12 @@ public class MCRSolrBasicPropertyAuthentication implements MCRSolrAuthentication
     }
 
     @Override
-    public void addAuthentication(SolrRequest<?> request) {
+    public void applyAuthentication(SolrRequest<?> request) {
         request.setBasicAuthCredentials(username, password);
     }
 
     @Override
-    public void addAuthentication(HttpRequestBase request) {
+    public void applyAuthentication(HttpRequestBase request) {
         String authString = username + ":" + password;
         request.addHeader("Authorization", "Basic " +
                 Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8)));
