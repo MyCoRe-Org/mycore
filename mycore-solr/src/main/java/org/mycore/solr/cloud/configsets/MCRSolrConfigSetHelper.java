@@ -163,5 +163,5 @@ public class MCRSolrConfigSetHelper {
 
         LOGGER.info("Config set {} deleted from remote Solr server.", core.getConfigSet());
     }
-    
+
 }

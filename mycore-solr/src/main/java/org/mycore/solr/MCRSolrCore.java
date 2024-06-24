@@ -45,6 +45,8 @@ public class MCRSolrCore {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrCore.class);
 
+    public static final int DEFAULT_SHARD_COUNT = 1;
+
     private static boolean USE_CONCURRENT_SERVER;
 
     protected String serverURL;
@@ -81,7 +83,7 @@ public class MCRSolrCore {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
         int i = serverURL.lastIndexOf("/") + 1;
-        setup(serverURL.substring(0, i), serverURL.substring(i), null, 1);
+        setup(serverURL.substring(0, i), serverURL.substring(i), null, DEFAULT_SHARD_COUNT);
     }
 
     /**
@@ -93,7 +95,7 @@ public class MCRSolrCore {
      *            name of the core e.g. docportal
      */
     public MCRSolrCore(String serverURL, String name) {
-        setup(serverURL, name, null, 1);
+        setup(serverURL, name, null, DEFAULT_SHARD_COUNT);
     }
 
     /**
