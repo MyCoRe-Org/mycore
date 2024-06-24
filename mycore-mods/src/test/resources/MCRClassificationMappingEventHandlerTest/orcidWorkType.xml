@@ -10,5 +10,23 @@
                    description="Articles in peer-reviewed publications that disseminate the results of original research and scholarship."/>
             <label xml:lang="x-mapping-xpath" text="mods:genre[substring-after(@valueURI,'#')='article'] and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='journal']" />
         </category>
+        <category ID="newspaper-article">
+            <label xml:lang="de" text="Zeitungsartikel"/>
+            <label xml:lang="en" text="Newspaper article"
+                   description="Articles in a daily, weekly or monthly publication reporting on news and social issues aimed at the public."/>
+            <label xml:lang="x-mapping-xpath" text="mods:genre[substring-after(@valueURI,'#')='article'] and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='newspaper']" />
+        </category>
+        <category ID="online-resource">
+            <label xml:lang="de" text="Online Ressource"/>
+            <label xml:lang="en" text="Online resource"
+                   description="Information accessible only on the web via traditional technical methods"/>
+            <label xml:lang="x-mapping-xpath" text="mods:genre[substring-after(@valueURI,'#')='article'] and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='blog'])" />
+            <label xml:lang="x-mapping-xpathfb" text="mods:genre[substring-after(@valueURI,'#')='article']" />
+        </category>
+        <category ID="no-xpath-mapping">
+            <label xml:lang="de" text="Test Ressource"/>
+            <label xml:lang="en" text="test resource"
+                   description="category only for test purposes"/>
+        </category>
     </categories>
 </mycoreclass>
