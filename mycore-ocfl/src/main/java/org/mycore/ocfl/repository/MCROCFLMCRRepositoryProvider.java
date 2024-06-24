@@ -18,22 +18,22 @@
 
 package org.mycore.ocfl.repository;
 
-import java.io.IOException;
-
+import io.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.core.extension.OcflExtensionRegistry;
+import io.ocfl.core.storage.OcflStorageBuilder;
+import jakarta.inject.Singleton;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
 
-import io.ocfl.core.extension.OcflExtensionConfig;
-import io.ocfl.core.extension.OcflExtensionRegistry;
-import jakarta.inject.Singleton;
+import java.io.IOException;
 
 /**
  * Repository Provider for the MyCoRe-Storage-Layout
  * @author Tobias Lenhardt [Hammer1279]
  */
 @Singleton
-public class MCROCFLMCRRepositoryProvider extends MCROCFLHashRepositoryProvider {
+public class MCROCFLMCRRepositoryProvider extends MCROCFLRepositoryProvider {
 
     @Override
     @MCRPostConstruction
@@ -46,4 +46,10 @@ public class MCROCFLMCRRepositoryProvider extends MCROCFLHashRepositoryProvider 
     public OcflExtensionConfig getExtensionConfig() {
         return new MCRStorageLayoutConfig();
     }
+
+    @Override
+    public OcflStorageBuilder getStorage(OcflStorageBuilder storageBuilder) {
+        return storageBuilder.fileSystem(repositoryRoot);
+    }
+
 }
