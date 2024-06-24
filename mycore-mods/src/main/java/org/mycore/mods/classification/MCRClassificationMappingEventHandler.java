@@ -111,8 +111,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * (see {@link MCRClassificationMappingEventHandler#X_PATH_MAPPING_CLASSIFICATIONS}) for categories
      * with language labels {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING} or
      * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}.
-     * All categories with said label and present in database are returned in a Map of Sets, separated by their classification.
-     * @return a Map with classification-IDs as key and Sets of {@link MCRCategory categories} with the XPath-Mapping label as value
+     * All categories with said label and present in database are returned in a Map of Sets,
+     * separated by their classification.
+     * @return a Map with classification-IDs as key and Sets of {@link MCRCategory categories}
+     * with the XPath-Mapping label as value
      */
     private static Map<String, Set<MCRCategory>> loadAllXPathMappings() {
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
