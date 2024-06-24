@@ -112,30 +112,30 @@ public class MCRSolrQueryResolver implements URIResolver {
             if (query.isPresent()) {
                 MCRSolrURL solrURL = new MCRSolrURL(client, query.get());
                 requestHandler.map("/"::concat).ifPresent(solrURL::setRequestHandler);
+                HttpGet get;
 
                 try {
-                    HttpGet get = new HttpGet(solrURL.getUrl().toURI());
-                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(get,
-                            MCRSolrAuthenticationLevel.SEARCH);
-
-                    try {
-                        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-                        try(CloseableHttpClient httpClient = clientBuilder.build();
-                            CloseableHttpResponse response = httpClient.execute(get)) {
-
-                            if(response.getStatusLine().getStatusCode() != 200) {
-                               throw new MCRException("Error while executing request: " + response.getStatusLine());
-                            }
-
-                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                            response.getEntity().getContent().transferTo(byteArrayOutputStream);
-                            return new MCRByteContent(byteArrayOutputStream.toByteArray()).getSource();
-                        }
-                    } catch (IOException e) {
-                        throw new MCRException("Error while executing request", e);
-                    }
+                    get = new HttpGet(solrURL.getUrl().toURI());
                 } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("Could not create URI from " + solrURL.getUrl(), e);
+                }
+
+                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(get,
+                    MCRSolrAuthenticationLevel.SEARCH);
+
+                HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+                try (CloseableHttpClient httpClient = clientBuilder.build();
+                    CloseableHttpResponse response = httpClient.execute(get)) {
+
+                    if (response.getStatusLine().getStatusCode() != 200) {
+                        throw new MCRException("Error while executing request: " + response.getStatusLine());
+                    }
+
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    response.getEntity().getContent().transferTo(byteArrayOutputStream);
+                    return new MCRByteContent(byteArrayOutputStream.toByteArray()).getSource();
+                } catch (IOException e) {
+                    throw new MCRException("Error while executing request", e);
                 }
             }
         }
