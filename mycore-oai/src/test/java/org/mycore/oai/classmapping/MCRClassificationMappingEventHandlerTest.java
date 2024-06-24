@@ -40,7 +40,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        MCRConfiguration2.set("MCR.Category.XPathMapping.ClassIDs", "orcidWorkType");
+        MCRConfiguration2.set("MCR.Category.XPathMapping.ClassIDs", "orcidWorkType,dummyClassification");
     }
 
     /**
@@ -58,6 +58,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
         loadCategory("genre.xml");
         loadCategory("orcidWorkType.xml");
+        loadCategory("dummyClassification.xml");
 
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject.xml"));
         MCRObject mcro = new MCRObject(document);
@@ -89,6 +90,60 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         expressionObject = XPathFactory.instance()
             .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        String expression4
+            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+                + "and @categid='dummy-article']";
+        expressionObject = XPathFactory.instance()
+            .compile(expression4, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+    }
+
+    /**
+     * Tests if the XPath-mappings-fallback mechanism is working correctly and that fallbacks are
+     * evaluated per classification.
+     * @throws IOException in case of error
+     * @throws JDOMException in case of error
+     * @throws URISyntaxException in case of error
+     */
+    @Test
+    public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.isTransactionActive();
+        ClassLoader classLoader = getClass().getClassLoader();
+        SAXBuilder saxBuilder = new SAXBuilder();
+
+        loadCategory("orcidWorkType.xml");
+        loadCategory("dummyClassification.xml");
+
+        Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject2.xml"));
+        MCRObject mcro = new MCRObject(document);
+
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        mapper.handleObjectUpdated(null, mcro);
+        Document xml = mcro.createXML();
+
+        String expression3
+            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
+                + "and @categid='journal-article']";
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+        Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        String expression4
+            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+                + "and @categid='dummy-article']";
+        expressionObject = XPathFactory.instance()
+            .compile(expression4, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 

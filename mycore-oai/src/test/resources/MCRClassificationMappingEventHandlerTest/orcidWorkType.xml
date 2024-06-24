@@ -10,6 +10,8 @@
         description="Articles in peer-reviewed publications that disseminate the results of original research and scholarship." />
       <label xml:lang="x-mapping-xpath"
         text="//*[@classid='mir_genres' and @categid='article'] and //publishedin[@type='journal']" />
+      <label xml:lang="x-mapping-xpathfb"
+             text="//*[@classid='mir_genres' and @categid='article']" />
     </category>
   </categories>
 </mycoreclass>
