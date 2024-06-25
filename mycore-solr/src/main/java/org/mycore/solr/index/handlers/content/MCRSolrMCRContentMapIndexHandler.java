@@ -120,6 +120,8 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             }
         } catch (Throwable e) {
             splitup(getDestinationCores());
+        } finally {
+            contentMap.clear();
         }
 
     }
@@ -143,7 +145,6 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             subHandler.setDestinationCores(cores);
             subhandlers.add(subHandler);
         }
-        contentMap.clear();
     }
 
     @Override

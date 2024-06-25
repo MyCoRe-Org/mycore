@@ -21,6 +21,7 @@ package org.mycore.solr;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -114,7 +115,7 @@ public class MCRSolrCore {
         this.name = name;
         this.configSet = configSet;
         this.shardCount = Objects.requireNonNull(shardCount, "shardCount must not be null");
-        this.types = Objects.requireNonNull(type, "type must not be null");
+        this.types = new LinkedHashSet<>(Objects.requireNonNull(type, "type must not be null"));
         String coreURL = getV1CoreURL();
         int connectionTimeout = MCRConfiguration2
             .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout", Integer::parseInt);
@@ -253,6 +254,30 @@ public class MCRSolrCore {
      */
     public Integer getShardCount() {
         return shardCount;
+    }
+
+    /**
+     * Sets the shard count, it does not change an existing core, but is used for creating a new core.
+     * @param shardCount the new shard count
+     */
+    public void setShardCount(Integer shardCount) {
+        this.shardCount = shardCount;
+    }
+
+    /**
+     * Sets the ConfigSet, it does not change an existing core, but is used for creating a new core.
+     * @param configSet the new ConfigSet
+     */
+    public void setConfigSet(String configSet) {
+        this.configSet = configSet;
+    }
+
+    /**
+     * Sets the server URL, it does not change an existing core, but is used for creating a new core.
+     * @param serverURL the new server URL
+     */
+    public void setServerURL(String serverURL) {
+        this.serverURL = serverURL;
     }
 
     /**
