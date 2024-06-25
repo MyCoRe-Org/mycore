@@ -95,7 +95,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     }
 
     /**
-     * Tests if an XPath-mapping is properly added into a Mods-Document. Also tests, if multiple fallbacks per classification are considered
+     * Tests if an XPath-mapping is properly added into a Mods-Document. Also tests, if multiple fallbacks per
+     * classification are considered
      * @throws IOException in case of error
      * @throws JDOMException in case of error
      * @throws URISyntaxException in case of error
