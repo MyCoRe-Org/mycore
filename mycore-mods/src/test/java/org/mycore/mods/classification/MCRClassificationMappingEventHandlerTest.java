@@ -95,7 +95,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     }
 
     /**
-     * Tests if an XPath-mapping is properly added into a Mods-Document.
+     * Tests if an XPath-mapping is properly added into a Mods-Document. Also tests, if multiple fallbacks per classification are considered
      * @throws IOException in case of error
      * @throws JDOMException in case of error
      * @throws URISyntaxException in case of error
@@ -133,7 +133,15 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
                 xml));
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
-            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-article')]";
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-text')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-fbonly')]";
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
@@ -182,7 +190,15 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
                 xml));
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
-            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-article')]";
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-text')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-fbonly')]";
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 

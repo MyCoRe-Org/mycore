@@ -20,7 +20,7 @@
             <label xml:lang="de" text="Online Ressource"/>
             <label xml:lang="en" text="Online resource"
                    description="Information accessible only on the web via traditional technical methods"/>
-            <label xml:lang="x-mapping-xpath" text="mods:genre[substring-after(@valueURI,'#')='article'] and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='blog'])" />
+            <label xml:lang="x-mapping-xpath" text="mods:genre[substring-after(@valueURI,'#')='article'] and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='blog']" />
             <label xml:lang="x-mapping-xpathfb" text="mods:genre[substring-after(@valueURI,'#')='article']" />
         </category>
         <category ID="no-xpath-mapping">
