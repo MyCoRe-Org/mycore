@@ -1,0 +1,52 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@font-face {
+    font-family: 'junicode';
+    src: url('../webfonts/junicode/Junicode.ttf.eot');
+    src: url('../webfonts/junicode/Junicode.ttf?iefix') format('eot'),
+    url('../webfonts/junicode/Junicode.ttf.woff') format('woff'),
+    url('../webfonts/junicode/Junicode.ttf.svg#webfont') format('svg');
+}
+
+.transcription {
+    font-family: 'junicode', serif;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+}
+
+a:hover {
+    color: #FFBF00;
+}
+
+a:active {
+    color: #FF0000;
+}
+
+.linebreak_none br {
+    display: none;
+}
+
+:target {
+    border: 3px solid #FFFF00;
+}
