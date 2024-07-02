@@ -28,7 +28,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.swordapp.server.SwordServerException;
 
@@ -57,7 +57,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
             queryCopy.setStart(0);
             queryCopy.setRows(0);
             QueryRequest queryRequest = new QueryRequest(queryCopy);
-            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             final QueryResponse queryResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
 
@@ -76,7 +76,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
         queryCopy.setRows(count);
         try {
             QueryRequest queryRequest = new QueryRequest(queryCopy);
-            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             final QueryResponse queryResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
             return queryResponse.getResults().stream()

@@ -51,7 +51,7 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.gson.stream.JsonWriter;
@@ -494,7 +494,7 @@ public class MCRRestAPIClassifications {
             solrQquery.setRows(0);
             try {
                 QueryRequest queryRequest = new QueryRequest(solrQquery);
-                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+                MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                     MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse response = queryRequest.process(solrClient);
                 SolrDocumentList solrResults = response.getResults();

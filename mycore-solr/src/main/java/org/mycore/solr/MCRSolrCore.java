@@ -33,7 +33,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -202,7 +202,7 @@ public class MCRSolrCore {
             if (commit) {
                 UpdateRequest updateRequest = new UpdateRequest();
                 updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
-                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(updateRequest,
+                MCRSolrAuthenticationManager.getInstance().applyAuthentication(updateRequest,
                     MCRSolrAuthenticationLevel.INDEX);
                 updateRequest.process(client);
             }

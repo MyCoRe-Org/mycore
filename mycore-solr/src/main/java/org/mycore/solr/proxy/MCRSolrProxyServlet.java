@@ -66,7 +66,7 @@ import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.http.MCRIdleConnectionMonitorThread;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.xml.sax.SAXException;
 
@@ -108,8 +108,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     public static final String QUERY_CORE_PARAMETER = "core";
 
-    public static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY =
-            MCRSolrAuthenticationFactory.getInstance();
+    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_FACTORY =
+            MCRSolrAuthenticationManager.getInstance();
 
     private static int MAX_CONNECTIONS = MCRConfiguration2
         .getOrThrow(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections", Integer::parseInt);

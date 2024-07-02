@@ -31,7 +31,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -90,7 +90,7 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
         UpdateRequest req = new UpdateRequest();
         req.deleteByQuery("+type:link +object:" + reference.getObjectID());
         req.setCommitWithin(500);
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.process(solrClient);
     }
 

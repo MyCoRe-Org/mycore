@@ -26,7 +26,7 @@ import org.mycore.solr.MCRSolrConstants;
 /**
  * Interface for adding authentication to Solr requests.
  */
-public interface MCRSolrAuthenticationFactory {
+public interface MCRSolrAuthenticationManager {
 
     /**
      * Add basic authentication to the request, if username and password are configured.
@@ -45,8 +45,8 @@ public interface MCRSolrAuthenticationFactory {
      void applyAuthentication(HttpRequestBase request, MCRSolrAuthenticationLevel level);
 
 
-     static MCRSolrAuthenticationFactory getInstance() {
-         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationFactory.class,
-                 MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Factory.Class");
+     static MCRSolrAuthenticationManager getInstance() {
+         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationManager.class,
+                 MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Manager.Class");
      }
 }

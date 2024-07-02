@@ -44,7 +44,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -71,7 +71,7 @@ public abstract class MCRSolrSearchUtils {
         p.set("q", query);
         p.set("rows", 1);
         QueryRequest queryRequest = new QueryRequest(p);
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
         QueryResponse response = queryRequest.process(solrClient);
         return response.getResults().isEmpty() ? null : response.getResults().getFirst();
@@ -189,7 +189,7 @@ public abstract class MCRSolrSearchUtils {
                 sizeParams.set("rows", 0);
                 try {
                     QueryRequest queryRequest = new QueryRequest(sizeParams);
-                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+                    MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
                     QueryResponse response = queryRequest.process(solrClient);
                     this.size = response.getResults().getNumFound();
@@ -222,7 +222,7 @@ public abstract class MCRSolrSearchUtils {
         protected QueryResponse query(SolrParams params) {
             try {
                 QueryRequest queryRequest = new QueryRequest(params);
-                MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+                MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                     MCRSolrAuthenticationLevel.SEARCH);
                 return queryRequest.process(solrClient);
             } catch (SolrServerException | IOException e) {

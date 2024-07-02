@@ -52,7 +52,7 @@ import org.mycore.oai.set.MCROAISolrSetHandler;
 import org.mycore.oai.set.MCRSet;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -90,7 +90,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
             QueryRequest queryRequest = new QueryRequest(query);
-            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
 
@@ -159,7 +159,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         QueryRequest queryRequest = new QueryRequest(query);
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
         QueryResponse response = queryRequest.process(solrClient);
         Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
@@ -266,7 +266,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
             QueryRequest queryRequest = new QueryRequest(params);
-            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
             SolrDocumentList list = response.getResults();

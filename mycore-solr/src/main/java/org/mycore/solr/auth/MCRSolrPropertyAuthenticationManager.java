@@ -29,7 +29,7 @@ import org.mycore.solr.MCRSolrConstants;
  * Factory for creating {@link MCRSolrAuthentication} instances based on configuration.
  * The factory uses the configuration property {@code Server.Auth.<level>.Class} to determine the implementation
  */
-public class MCRSolrPropertyAuthenticationFactory implements MCRSolrAuthenticationFactory {
+public class MCRSolrPropertyAuthenticationManager implements MCRSolrAuthenticationManager {
 
     private static final String SOLR_AUTH_PROPERTY_PREFIX = MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.";
 

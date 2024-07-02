@@ -37,7 +37,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.cronjob.MCRCronjob;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
 
@@ -48,8 +48,8 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    protected static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY =
-            MCRSolrAuthenticationFactory.getInstance();
+    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_FACTORY =
+            MCRSolrAuthenticationManager.getInstance();
 
     @Override
     public String getDescription() {

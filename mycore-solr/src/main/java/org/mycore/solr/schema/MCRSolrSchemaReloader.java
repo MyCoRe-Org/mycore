@@ -45,7 +45,7 @@ import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.common.io.ByteStreams;
@@ -61,8 +61,8 @@ import com.google.gson.JsonParser;
  * @author Jens Kupferschmidt
  */
 public class MCRSolrSchemaReloader {
-    private static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY =
-            MCRSolrAuthenticationFactory.getInstance();
+    private static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_FACTORY =
+            MCRSolrAuthenticationManager.getInstance();
 
     private static Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
 

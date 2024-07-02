@@ -29,7 +29,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.gson.Gson;
@@ -96,8 +96,8 @@ import jakarta.ws.rs.core.Response;
 @Path("/alto/highlight")
 public class MCRAltoHighlightResource {
 
-    protected static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY
-            = MCRSolrAuthenticationFactory.getInstance();
+    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_FACTORY
+            = MCRSolrAuthenticationManager.getInstance();
 
     @GET
     @Path("{derivateId}")

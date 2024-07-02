@@ -36,7 +36,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
 import org.mycore.frontend.idmapper.MCRIDMapper;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -100,7 +100,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 QueryResponse solrResponse = null;
                 try {
                     QueryRequest queryRequest = new QueryRequest(params);
-                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+                    MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
                     solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {
@@ -145,7 +145,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 QueryResponse solrResponse = null;
                 try {
                     QueryRequest queryRequest = new QueryRequest(params);
-                    MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+                    MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
                     solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {

@@ -35,7 +35,7 @@ import org.mycore.oai.MCROAIUtils;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -81,7 +81,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         p.set(CommonParams.FL, "id");
         try {
             QueryRequest queryRequest = new QueryRequest(p);
-            MCRSolrAuthenticationFactory.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
             return response.getResults().isEmpty();

@@ -53,7 +53,7 @@ import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
@@ -95,8 +95,8 @@ public class MCRSolrIndexer {
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
-    public static final MCRSolrAuthenticationFactory SOLR_AUTHENTICATION_FACTORY =
-            MCRSolrAuthenticationFactory.getInstance();
+    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_FACTORY =
+            MCRSolrAuthenticationManager.getInstance();
 
     static {
         MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();

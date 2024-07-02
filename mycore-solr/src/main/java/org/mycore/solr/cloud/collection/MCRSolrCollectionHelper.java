@@ -27,7 +27,7 @@ import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.mycore.common.MCRException;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -41,7 +41,7 @@ public class MCRSolrCollectionHelper {
     public static void createCollection(MCRSolrCore core) throws SolrServerException, IOException {
         CollectionAdminRequest.Create collectionCreateRequest = CollectionAdminRequest
             .createCollection(core.getName(), core.buildRemoteConfigSetName(), core.getShardCount(), null, null, null);
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(collectionCreateRequest,
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(collectionCreateRequest,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionCreateRequest
             .process(core.getBaseClient());
@@ -57,7 +57,7 @@ public class MCRSolrCollectionHelper {
     public static void removeCollection(MCRSolrCore core) throws SolrServerException,
             IOException {
         CollectionAdminRequest.Delete collectionDeleteReq = CollectionAdminRequest.deleteCollection(core.getName());
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(collectionDeleteReq,
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(collectionDeleteReq,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionDeleteReq
             .process(core.getBaseClient());

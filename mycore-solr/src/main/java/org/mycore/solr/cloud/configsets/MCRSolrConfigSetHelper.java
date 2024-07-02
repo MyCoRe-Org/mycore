@@ -37,7 +37,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -61,7 +61,7 @@ public class MCRSolrConfigSetHelper {
     public static List<String> getRemoteConfigSetNames(MCRSolrCore core) throws URISyntaxException, IOException,
             SolrServerException {
         ConfigSetAdminRequest.List listRequest = new ConfigSetAdminRequest.List();
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(listRequest,
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(listRequest,
             MCRSolrAuthenticationLevel.ADMIN);
 
         SolrClient solrClient = core.getBaseClient();
@@ -112,7 +112,7 @@ public class MCRSolrConfigSetHelper {
         }
 
         ConfigSetAdminRequest.Upload request = new ConfigSetAdminRequest.Upload();
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(request, MCRSolrAuthenticationLevel.ADMIN);
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(request, MCRSolrAuthenticationLevel.ADMIN);
         request.setConfigSetName(remoteName);
 
         MCRSolrConfigSetProvider configSetProvider = getLocalConfigSets().get(core.getConfigSet());
@@ -146,7 +146,7 @@ public class MCRSolrConfigSetHelper {
      */
     public static void deleteConfigSetFromRemoteSolrServer(MCRSolrCore core) {
         ConfigSetAdminRequest.Delete request = new ConfigSetAdminRequest.Delete();
-        MCRSolrAuthenticationFactory.getInstance().applyAuthentication(request,
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(request,
             MCRSolrAuthenticationLevel.ADMIN);
 
         request.setConfigSetName(core.buildRemoteConfigSetName());

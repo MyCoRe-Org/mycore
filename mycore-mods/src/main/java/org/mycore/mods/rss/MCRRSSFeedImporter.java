@@ -56,7 +56,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -98,7 +98,7 @@ import com.rometools.rome.io.XmlReader;
  */
 public class MCRRSSFeedImporter {
 
-    protected final MCRSolrAuthenticationFactory solrAuthenticationFactory;
+    protected final MCRSolrAuthenticationManager solrAuthenticationFactory;
 
     private String sourceSystemID;
 
@@ -125,7 +125,7 @@ public class MCRRSSFeedImporter {
 
     public MCRRSSFeedImporter(String sourceSystemID) {
         this.sourceSystemID = sourceSystemID;
-        this.solrAuthenticationFactory = MCRSolrAuthenticationFactory.getInstance();
+        this.solrAuthenticationFactory = MCRSolrAuthenticationManager.getInstance();
 
         String prefix = "MCR.MODS.RSSFeedImporter." + sourceSystemID + ".";
 
