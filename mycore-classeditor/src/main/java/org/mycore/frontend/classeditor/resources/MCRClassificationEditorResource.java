@@ -58,9 +58,9 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -295,7 +295,7 @@ public class MCRClassificationEditorResource {
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
         @QueryParam("rows") Integer rows) throws SolrServerException, IOException {
         // do solr query
-        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
+        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("start", start != null ? start : 0);
         params.set("rows", rows != null ? rows : 50);

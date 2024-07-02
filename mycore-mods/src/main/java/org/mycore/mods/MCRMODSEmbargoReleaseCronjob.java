@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
@@ -36,7 +35,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.cronjob.MCRCronjob;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
@@ -69,7 +68,6 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
 
                 LOGGER.info("Searching embargoed objects");
 
-                SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
                 String today = LocalDate.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE);
                 String query = "mods.embargo.date:[* TO " + today + "]";
 
@@ -83,7 +81,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
 
                 QueryRequest queryRequest = new QueryRequest(params);
                 SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
-                QueryResponse solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
+                QueryResponse solrResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
                 solrResponse
                     .getResults()
                     .stream()

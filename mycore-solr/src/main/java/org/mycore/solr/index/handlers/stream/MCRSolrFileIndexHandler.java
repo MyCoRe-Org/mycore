@@ -35,6 +35,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRUtils;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.cs.MCRSolrPathContentStream;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
@@ -49,10 +50,10 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     protected BasicFileAttributes attrs;
 
-    public MCRSolrFileIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient) {
-        super(solrClient);
+    public MCRSolrFileIndexHandler(Path file, BasicFileAttributes attrs) {
         this.file = file;
         this.attrs = attrs;
+        this.setCoreType(MCRSolrCoreType.MAIN);
     }
 
     public MCRSolrPathContentStream getStream() {
@@ -69,25 +70,30 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(SOLR_EXTRACT_PATH);
         getSolrAuthenticationFactory().applyAuthentication(updateRequest,
             MCRSolrAuthenticationLevel.INDEX);
-        try (MCRSolrPathContentStream stream = getStream()) {
-            updateRequest.addContentStream(stream);
+        for (SolrClient client : getClients()) {
+            try (MCRSolrPathContentStream stream = getStream()) {
+                updateRequest.addContentStream(stream);
 
-            /* set the additional parameters */
-            updateRequest.setParams(getSolrParams(file, attrs));
-            updateRequest.setCommitWithin(getCommitWithin());
+                /* set the additional parameters */
+                ModifiableSolrParams solrParams = getSolrParams(file, attrs);
+                updateRequest.setParams(solrParams);
+                updateRequest.setCommitWithin(getCommitWithin());
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: sending binary data ({} ({}), size is {}) to solr server.", file, solrID,
-                    MCRUtils.getSizeFormatted(attrs.size()));
-            }
-            long t = System.currentTimeMillis();
-            /* actually send the request */
-            getSolrClient().request(updateRequest);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: sending binary data \"{} ({})\" done in {}ms", file, solrID,
-                    System.currentTimeMillis() - t);
-            }
-        } //MCR-1911: close any open resource
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Solr: sending binary data ({} ({}), size is {}) to solr server.", file, solrID,
+                        MCRUtils.getSizeFormatted(attrs.size()));
+                }
+                long t = System.currentTimeMillis();
+                /* actually send the request */
+
+                client.request(updateRequest);
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Solr: sending binary data \"{} ({})\" done in {}ms", file, solrID,
+                        System.currentTimeMillis() - t);
+                }
+            } //MCR-1911: close any open resource
+        }
     }
 
     private ModifiableSolrParams getSolrParams(Path file, BasicFileAttributes attrs) {

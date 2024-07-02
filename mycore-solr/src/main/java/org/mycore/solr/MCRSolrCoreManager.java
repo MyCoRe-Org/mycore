@@ -19,8 +19,10 @@
 package org.mycore.solr;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,9 +37,9 @@ import org.mycore.common.config.MCRConfigurationException;
  * @author Matthias Eichner
  * @author Jens Kupferschmidt
  */
-public final class MCRSolrClientFactory {
+public final class MCRSolrCoreManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrClientFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCoreManager.class);
 
     private static Map<String, MCRSolrCore> CORE_MAP;
 
@@ -49,7 +51,7 @@ public final class MCRSolrClientFactory {
         }
     }
 
-    private MCRSolrClientFactory() {
+    private MCRSolrCoreManager() {
     }
 
     /**
@@ -69,7 +71,7 @@ public final class MCRSolrClientFactory {
                 return indexOfDot != -1 ? cp.substring(0, indexOfDot) : cp;
             })
             .distinct()
-            .collect(Collectors.toMap(coreID -> coreID, MCRSolrClientFactory::initializeSolrCore));
+            .collect(Collectors.toMap(coreID -> coreID, MCRSolrCoreManager::initializeSolrCore));
     }
 
     private static MCRSolrCore initializeSolrCore(String coreID) {
@@ -91,22 +93,18 @@ public final class MCRSolrClientFactory {
 
         String configSetTemplate = MCRConfiguration2.getString(configSetTemplateKey).orElse(null);
 
-        Integer shardCount = MCRConfiguration2.getInt(shardCountKey).orElse(1);
+        Integer shardCount = MCRConfiguration2.getInt(shardCountKey).orElse(MCRSolrCore.DEFAULT_SHARD_COUNT);
 
-        return new MCRSolrCore(coreServer, coreName, configSetTemplate, shardCount);
+        String coreTypeKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_TYPE_SUFFIX;
+        Set<MCRSolrCoreType> coreTypes = MCRConfiguration2.getOrThrow(coreTypeKey, MCRConfiguration2::splitValue)
+                .map(MCRSolrCoreType::new)
+                .collect(Collectors.toSet());
+
+
+        return new MCRSolrCore(coreServer, coreName, configSetTemplate, shardCount, coreTypes);
     }
 
-    public static MCRSolrCore addCore(String server, String coreName, String coreID) {
-       return addCore(server, coreName, null, 1, coreID);
-    }
-
-    public static MCRSolrCore addCore(String server, String coreName, String configSetName, String coreID) {
-        return addCore(server, coreName, configSetName, 1, coreID);
-    }
-
-    public static MCRSolrCore addCore(String server, String coreName, String configSetName, Integer shards,
-                                      String coreID) {
-        final MCRSolrCore core = new MCRSolrCore(server, coreName, configSetName, shards);
+    public static MCRSolrCore addCore(String coreID, MCRSolrCore core) {
         CORE_MAP.put(coreID, core);
         return core;
     }
@@ -140,6 +138,15 @@ public final class MCRSolrClientFactory {
     public static MCRSolrCore getMainSolrCore() {
         return get(MCRSolrConstants.MAIN_CORE_TYPE)
             .orElseThrow(() -> new MCRConfigurationException("The core main is not configured!"));
+    }
+
+    /**
+     * Returns the solr cores which should be used for a specific type.
+     * @param type the type of the core
+     * @return a list of cores
+     */
+    public static List<MCRSolrCore> getCoresForType(MCRSolrCoreType type) {
+        return CORE_MAP.values().stream().filter(c -> c.getTypes().contains(type)).collect(Collectors.toList());
     }
 
     /**

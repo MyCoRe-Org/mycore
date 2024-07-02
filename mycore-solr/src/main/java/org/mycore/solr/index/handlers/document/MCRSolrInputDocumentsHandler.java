@@ -29,8 +29,8 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
-import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
@@ -48,13 +48,9 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
 
     private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentsHandler.class);
 
-    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents) {
-        this(documents, MCRSolrClientFactory.getMainSolrClient());
-    }
-
-    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, SolrClient solrClient) {
-        super(solrClient);
+    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRSolrCoreType coreType) {
         this.documents = documents;
+        setCoreType(coreType);
     }
 
     /* (non-Javadoc)
@@ -76,39 +72,45 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         }
         int totalCount = documents.size();
         LOGGER.info("Handling {} documents", totalCount);
-        SolrClient solrClient = getSolrClient();
-        if (solrClient instanceof ConcurrentUpdateSolrClient) {
-            LOGGER.info("Detected ConcurrentUpdateSolrClient. Split up batch update.");
-            splitDocuments();
-            //for statistics:
-            documents.clear();
-            return;
+        for (SolrClient client : getClients()) {
+            if (client instanceof ConcurrentUpdateSolrClient) {
+                LOGGER.info("Detected ConcurrentUpdateSolrClient. Split up batch update.");
+                splitDocuments();
+                //for statistics:
+                documents.clear();
+                return;
+            }
         }
-        UpdateResponse updateResponse;
-        try {
-            UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
-            getSolrAuthenticationFactory().applyAuthentication(updateRequest,
-                MCRSolrAuthenticationLevel.INDEX);
-            updateRequest.add(documents);
-            updateResponse = updateRequest.process(getSolrClient());
-        } catch (Throwable e) {
-            LOGGER.warn("Error while indexing document collection. Split and retry.");
-            splitDocuments();
-            return;
-        }
-        if (updateResponse.getStatus() != 0) {
-            LOGGER.error("Error while indexing document collection. Split and retry: {}", updateResponse.getResponse());
-            splitDocuments();
-        } else {
-            LOGGER.info("Sending {} documents was successful in {} ms.", totalCount, updateResponse.getElapsedTime());
+        for (SolrClient client : getClients()) {
+            UpdateResponse updateResponse;
+            try {
+                UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
+                getSolrAuthenticationFactory().applyAuthentication(updateRequest,
+                        MCRSolrAuthenticationLevel.INDEX);
+                updateRequest.add(documents);
+                updateResponse = updateRequest.process(client);
+            } catch (Throwable e) {
+                LOGGER.warn("Error while indexing document collection. Split and retry.");
+                splitDocuments();
+                return;
+            }
+            if (updateResponse.getStatus() != 0) {
+                LOGGER.error("Error while indexing document collection. Split and retry: {}",
+                        updateResponse.getResponse());
+                splitDocuments();
+            } else {
+                LOGGER.info("Sending {} documents was successful in {} ms.", totalCount,
+                        updateResponse.getElapsedTime());
+            }
         }
     }
+
 
     private void splitDocuments() {
         subHandlerList = new ArrayList<>(documents.size());
         for (SolrInputDocument document : documents) {
-            MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(() -> document, getSolrClient(),
-                String.valueOf(document.getFieldValue("id")));
+            MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(() -> document,
+                    String.valueOf(document.getFieldValue("id")), getCoreType());
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }
