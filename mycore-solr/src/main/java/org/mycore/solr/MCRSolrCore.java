@@ -35,8 +35,8 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Core instance of a solr server.
@@ -102,12 +102,13 @@ public class MCRSolrCore {
      * @param shardCount
      *            number of shards
      */
-    public MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount, Set<MCRSolrCoreType> type) {
-        setup(serverURL, name, configSet, shardCount, type);
+    public MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount,
+                       Set<MCRSolrCoreType> types) {
+        setup(serverURL, name, configSet, shardCount, types);
     }
 
     protected void setup(String serverURL, String name, String configSet,
-                         Integer shardCount, Set<MCRSolrCoreType> type) {
+                         Integer shardCount, Set<MCRSolrCoreType> types) {
         if (!serverURL.endsWith("/")) {
             serverURL += "/";
         }
@@ -115,7 +116,7 @@ public class MCRSolrCore {
         this.name = name;
         this.configSet = configSet;
         this.shardCount = Objects.requireNonNull(shardCount, "shardCount must not be null");
-        this.types = new LinkedHashSet<>(Objects.requireNonNull(type, "type must not be null"));
+        this.types = new LinkedHashSet<>(Objects.requireNonNull(types, "type must not be null"));
         String coreURL = getV1CoreURL();
         int connectionTimeout = MCRConfiguration2
             .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout", Integer::parseInt);

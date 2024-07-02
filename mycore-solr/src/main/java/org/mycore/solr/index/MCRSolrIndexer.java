@@ -326,8 +326,8 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's metadata index.
      */
-    public static void rebuildMetadataIndex(List<MCRSolrCore> solrCore) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), solrCore);
+    public static void rebuildMetadataIndex(List<MCRSolrCore> solrCores) {
+        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), solrCores);
     }
 
     /**

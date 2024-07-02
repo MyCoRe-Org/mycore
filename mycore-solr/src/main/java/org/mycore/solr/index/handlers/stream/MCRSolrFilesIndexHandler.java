@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -38,7 +37,6 @@ import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
-import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentsHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
 /**
@@ -86,7 +84,6 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         MCRPath rootPath = MCRPath.getPath(derivateID.toString(), "/");
         final MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.getInstance();
         final List<MCRSolrIndexHandler> subHandlerList = this.subHandlerList;
-        final List<SolrInputDocument> docs = new ArrayList<>();
         Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
 
             @Override
@@ -105,13 +102,8 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
             }
 
         });
-        int fileCount = subHandlerList.size() + docs.size();
+        int fileCount = subHandlerList.size();
         LOGGER.info("Sending {} file(s) for derivate \"{}\"", fileCount, derivateID);
-        if (!docs.isEmpty()) { // TODO: check this crap
-            MCRSolrInputDocumentsHandler subHandler = new MCRSolrInputDocumentsHandler(docs, MCRSolrCoreType.MAIN);
-            subHandler.setCommitWithin(getCommitWithin());
-            this.subHandlerList.add(subHandler);
-        }
     }
 
     protected void indexObject(MCRObjectID objectID) throws IOException {
