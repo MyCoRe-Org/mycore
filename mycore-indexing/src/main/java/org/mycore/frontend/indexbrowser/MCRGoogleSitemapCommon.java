@@ -45,8 +45,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * This class implements all common methods to create the sitemap data.
@@ -108,7 +108,7 @@ public final class MCRGoogleSitemapCommon {
     /** The filter query for selecting objects to present in google sitemap */
     private static final String SOLR_QUERY = MCRConfiguration2.getStringOrThrow("MCR.GoogleSitemap.SolrQuery");
 
-    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_FACTORY
+    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
             = MCRSolrAuthenticationManager.getInstance();
 
     /** The logger */
@@ -181,7 +181,7 @@ public final class MCRGoogleSitemapCommon {
 
         try {
             QueryRequest queryRequest = new QueryRequest(query);
-            SOLR_AUTHENTICATION_FACTORY.applyAuthentication(queryRequest,
+            SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             response = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
             objidlist = response.getResults().stream().map((document) -> {
