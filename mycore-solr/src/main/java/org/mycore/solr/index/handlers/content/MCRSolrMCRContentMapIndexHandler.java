@@ -122,7 +122,9 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
     private void splitup(Iterator<SolrInputDocument> documents) {
         while (documents.hasNext()) {
-            MCRSolrInputDocumentHandler subhandler = new MCRSolrInputDocumentHandler(documents.next());
+            SolrInputDocument nextDocument = documents.next();
+            MCRSolrInputDocumentHandler subhandler = new MCRSolrInputDocumentHandler(() -> nextDocument,
+                nextDocument.get("id").toString());
             subhandler.setCommitWithin(getCommitWithin());
             subhandlers.add(subhandler);
         }

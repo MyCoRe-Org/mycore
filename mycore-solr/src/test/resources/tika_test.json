@@ -1,0 +1,42 @@
+{
+  "pdf:unmappedUnicodeCharsPerPage": "0",
+  "pdf:PDFVersion": "1.7",
+  "pdf:hasXFA": "false",
+  "access_permission:modify_annotations": "true",
+  "access_permission:can_print_degraded": "true",
+  "X-TIKA:Parsed-By-Full-Set": [
+    "org.apache.tika.parser.DefaultParser",
+    "org.apache.tika.parser.pdf.PDFParser"
+  ],
+  "pdf:num3DAnnotations": "0",
+  "dcterms:created": "2021-08-02T14:14:13Z",
+  "dcterms:modified": "2021-08-02T14:14:13Z",
+  "dc:format": "application/pdf; version=1.7",
+  "pdf:overallPercentageUnmappedUnicodeChars": "0.0",
+  "access_permission:fill_in_form": "true",
+  "pdf:docinfo:modified": "2021-08-02T14:14:13Z",
+  "pdf:hasCollection": "false",
+  "pdf:encrypted": "false",
+  "pdf:containsNonEmbeddedFont": "true",
+  "Content-Length": "1406",
+  "pdf:hasMarkedContent": "false",
+  "Content-Type": "application/pdf",
+  "pdf:producer": "iText® 7.1.15 ©2000-2021 iText Group NV (AGPL-version)",
+  "pdf:totalUnmappedUnicodeChars": "0",
+  "access_permission:extract_for_accessibility": "true",
+  "access_permission:assemble_document": "true",
+  "xmpTPg:NPages": "1",
+  "pdf:hasXMP": "false",
+  "pdf:charsPerPage": "469",
+  "access_permission:extract_content": "true",
+  "access_permission:can_print": "true",
+  "X-TIKA:Parsed-By": [
+    "org.apache.tika.parser.DefaultParser",
+    "org.apache.tika.parser.pdf.PDFParser"
+  ],
+  "X-TIKA:content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBecker, Klaus : Einschränkungen im Lehrbetrieb gravierender als in Forschung und Transfer: Die \nAuswirkungen der Corona-Pandemie auf Forschung und Transfer an der Technischen \nHochschule (TH) Köln – ein Einblick. In: DUZ Wissenschaft & Management . Berlin, DUZ \nVerlags- und Medienhaus GmbH (2020a), Nr. 10, S. 50–52\n\nBecker, Klaus : Transfer an der TH Köln: Wissen auch gesellschaftlich wirksam machen – mit \nund in der Region Köln. In: Köln-Magazin (2020b), Nr. 2, S. 54–55\n\n\n",
+  "access_permission:can_modify": "true",
+  "pdf:docinfo:producer": "iText® 7.1.15 ©2000-2021 iText Group NV (AGPL-version)",
+  "pdf:docinfo:created": "2021-08-02T14:14:13Z",
+  "pdf:containsDamagedFont": "false"
+}

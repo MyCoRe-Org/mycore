@@ -19,6 +19,7 @@
 package org.mycore.solr.index.handlers.document;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,17 +42,18 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
 
     private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentHandler.class);
+    private final String id;
 
-    SolrInputDocument document;
+    Supplier<SolrInputDocument> documentSupplier;
 
-    public MCRSolrInputDocumentHandler(SolrInputDocument document) {
-        super();
-        this.document = document;
+    public MCRSolrInputDocumentHandler(Supplier<SolrInputDocument> documentSupplier, SolrClient solrClient, String id) {
+        super(solrClient);
+        this.documentSupplier = documentSupplier;
+        this.id = id;
     }
 
-    public MCRSolrInputDocumentHandler(SolrInputDocument document, SolrClient solrClient) {
-        super(solrClient);
-        this.document = document;
+    public MCRSolrInputDocumentHandler(Supplier<SolrInputDocument> documentSupplier, String id) {
+        this(documentSupplier, null, id);
     }
 
     /* (non-Javadoc)
@@ -59,6 +61,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
      */
     @Override
     public void index() throws IOException, SolrServerException {
+        SolrInputDocument document = documentSupplier.get();
         String id = String.valueOf(document.getFieldValue("id"));
         SolrClient solrClient = getSolrClient();
         LOGGER.info("Sending {} to SOLR...", id);
@@ -82,7 +85,10 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
 
     @Override
     public String toString() {
-        return "index " + document.getFieldValue("id");
+        return "index " + this.id;
     }
 
+    public String getId() {
+        return id;
+    }
 }
