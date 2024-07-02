@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test label="Testing conditions">
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="document">
+
+        <xed:if test="$switch = 'off'">
+          <label>The switch is off.</label>
+        </xed:if>
+        <xed:if test="$switch = 'on'">
+          <label>The switch is on.</label>
+        </xed:if>
+
+        <xed:if test="/document/author">
+          <label>There is author information.</label>
+        </xed:if>
+        <xed:if test="edition">
+          <label>There is edition information.</label>
+        </xed:if>
+
+        <xed:choose>
+          <xed:when test="$case='1'">
+            <label>The value is 1.</label>
+          </xed:when>
+          <xed:when test="$case &lt; 3">
+            <label>The value is less than 3.</label>
+          </xed:when>
+          <xed:otherwise>
+            <label>The value is bigger than 2</label>
+          </xed:otherwise>
+        </xed:choose>
+
+        <xed:choose>
+          <xed:when test="$case='2'">
+            <label>The value is 2.</label>
+          </xed:when>
+          <xed:when test="$case &gt; 1">
+            <label>The value is bigger than 1 but not 2.</label>
+          </xed:when>
+          <xed:otherwise>
+            <label>The value is bigger than 2.</label>
+          </xed:otherwise>
+        </xed:choose>
+
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <param name="switch">on</param>
+  <param name="case">2</param>
+  <param name="key">testConditions</param>
+
+  <source id="testConditions">
+    <document>
+      <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
+      <author>
+        <firstName>Frank</firstName>
+        <lastName>Lützenkirchen</lastName>
+      </author>
+    </document>
+  </source>
+
+  <transform />
+
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <label>The switch is on.</label>
+      <label>There is author information.</label>
+      <label>The value is less than 3.</label>
+      <label>The value is 2.</label>
+      <div style="visibility:hidden">
+        <input value="2" name="case" type="hidden" />
+        <input value="testConditions" name="key" type="hidden" />
+        <input value="on" name="switch" type="hidden" />
+        <input value="1-2" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </html>
+
+</test>

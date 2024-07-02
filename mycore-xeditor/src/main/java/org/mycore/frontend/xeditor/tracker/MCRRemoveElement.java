@@ -19,17 +19,30 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
 
-public class MCRRemoveElement implements MCRChange {
+/**
+ * Removes an element from the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRRemoveElement extends MCRChange {
 
-    public static MCRChangeData remove(Element element) {
-        Element parent = element.getParentElement();
-        MCRChangeData data = new MCRChangeData("removed-element", element, parent.indexOf(element), parent);
-        element.detach();
-        return data;
+    private Element removedElement;
+
+    private Element parent;
+
+    private int positionInParent;
+
+    public MCRRemoveElement(Element element) {
+        this.message = "Removed element " + MCRXPathBuilder.buildXPath(element);
+        this.parent = element.getParentElement();
+        this.positionInParent = parent.indexOf(element);
+        this.removedElement = element.detach();
     }
 
-    public void undo(MCRChangeData data) {
-        data.getContext().addContent(data.getPosition(), data.getElement());
+    @Override
+    public void undo() {
+        parent.addContent(positionInParent, removedElement);
     }
 }
