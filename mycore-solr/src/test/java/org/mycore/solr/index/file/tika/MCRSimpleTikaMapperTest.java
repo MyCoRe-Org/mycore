@@ -39,13 +39,13 @@ import junit.framework.TestCase;
 
 public class MCRSimpleTikaMapperTest extends TestCase {
 
-    public String testJson;
     public static final String X_TIKA_PARSED_BY = "X-TIKA:Parsed-By";
+    public String testJson;
 
     public MCRSimpleTikaMapperTest() {
         super();
 
-        try(InputStream is =MCRClassTools.getClassLoader().getResourceAsStream("tika_test.json")){
+        try (InputStream is = MCRClassTools.getClassLoader().getResourceAsStream("tika_test.json")) {
             testJson = new String(Objects.requireNonNull(is).readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new MCRException(e);
@@ -102,7 +102,9 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         Assert.assertNotNull("There should be a \"parsed_by\" entry", field);
         Assert.assertEquals("There should be just one \"parsed_by\" entries", 1, field.getValueCount());
         Assert.assertEquals(
-            "The \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser'",
+
+            "The \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser\n" +
+                "org.apache.tika.parser.pdf.PDFParser'",
             "org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser", field.getValue());
 
         // Test with stripNamespace = false and multiValue = false
