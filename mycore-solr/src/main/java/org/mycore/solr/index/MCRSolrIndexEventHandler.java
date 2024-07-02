@@ -190,12 +190,12 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             //MCR-2349 initialize solr client early enough
-            final List<MCRSolrCore> mainSolrClient = MCRSolrCoreManager.getCoresForType(MCRSolrCoreType.MAIN);
+            final List<MCRSolrCore> mainSolrCores = MCRSolrCoreManager.getCoresForType(MCRSolrCoreType.MAIN);
             putIntoTaskQueue(new MCRDelayedRunnable("updateDerivateFileIndex_" + derivate.getId().toString(),
                 DELAY_IN_MS,
                 new MCRTransactionableRunnable(
                     () -> MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
-                            mainSolrClient, MCRSolrIndexer.HIGH_PRIORITY))));
+                            mainSolrCores, MCRSolrIndexer.HIGH_PRIORITY))));
         });
     }
 

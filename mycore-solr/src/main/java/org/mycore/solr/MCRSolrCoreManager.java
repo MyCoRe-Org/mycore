@@ -93,7 +93,7 @@ public final class MCRSolrCoreManager {
 
         String configSetTemplate = MCRConfiguration2.getString(configSetTemplateKey).orElse(null);
 
-        Integer shardCount = MCRConfiguration2.getInt(shardCountKey).orElse(1);
+        Integer shardCount = MCRConfiguration2.getInt(shardCountKey).orElse(MCRSolrCore.DEFAULT_SHARD_COUNT);
 
         String coreTypeKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_TYPE_SUFFIX;
         Set<MCRSolrCoreType> coreTypes = MCRConfiguration2.getOrThrow(coreTypeKey, MCRConfiguration2::splitValue)
