@@ -23,7 +23,9 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
@@ -37,7 +39,11 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public void index() throws IOException, SolrServerException {
         LOGGER.info("Sending optimize request to solr");
-        UpdateResponse response = getSolrClient().optimize();
+        UpdateRequest updateRequest = new UpdateRequest();
+        getSolrAuthenticationFactory().applyAuthentication(updateRequest,
+            MCRSolrAuthenticationLevel.INDEX);
+        updateRequest.setAction(UpdateRequest.ACTION.OPTIMIZE, true, true, 1);
+        UpdateResponse response = updateRequest.process(getSolrClient(), null);
         LOGGER.info("Optimize was {}({}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
             response.getElapsedTime());
     }

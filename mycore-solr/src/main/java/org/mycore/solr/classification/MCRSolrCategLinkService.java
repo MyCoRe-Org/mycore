@@ -26,10 +26,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * Solr extension of the category link service. Updates the solr index on set and delete
@@ -84,7 +87,11 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
      */
     protected void delete(SolrClient solrClient, MCRCategLinkReference reference) throws SolrServerException,
         IOException {
-        solrClient.deleteByQuery("+type:link +object:" + reference.getObjectID(), 500);
+        UpdateRequest req = new UpdateRequest();
+        req.deleteByQuery("+type:link +object:" + reference.getObjectID());
+        req.setCommitWithin(500);
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        req.process(solrClient);
     }
 
 }

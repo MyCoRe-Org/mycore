@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocumentList;
@@ -35,6 +36,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
 import org.mycore.frontend.idmapper.MCRIDMapper;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * implementation of an MCRIDMapper
@@ -96,7 +99,10 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 params.set("q", key + ":" + ClientUtils.escapeQueryChars(value));
                 QueryResponse solrResponse = null;
                 try {
-                    solrResponse = MCRSolrClientFactory.getMainSolrClient().query(params);
+                    QueryRequest queryRequest = new QueryRequest(params);
+                    MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+                        MCRSolrAuthenticationLevel.SEARCH);
+                    solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {
                     LOGGER.error("Error retrieving object id from SOLR", e);
                 }
@@ -138,7 +144,10 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 params.set("sort", "derivateOrder asc");
                 QueryResponse solrResponse = null;
                 try {
-                    solrResponse = MCRSolrClientFactory.getMainSolrClient().query(params);
+                    QueryRequest queryRequest = new QueryRequest(params);
+                    MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+                        MCRSolrAuthenticationLevel.SEARCH);
+                    solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
                 } catch (Exception e) {
                     LOGGER.error("Error retrieving derivate id from SOLR", e);
                 }

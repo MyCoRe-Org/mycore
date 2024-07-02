@@ -21,6 +21,7 @@ package org.mycore.solr;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,8 +30,11 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
  * Core instance of a solr server.
@@ -41,13 +45,23 @@ public class MCRSolrCore {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrCore.class);
 
+    public static final int DEFAULT_SHARD_COUNT = 1;
+
     private static boolean USE_CONCURRENT_SERVER;
 
     protected String serverURL;
 
     protected String name;
 
+    protected String configSet;
+
+    protected Integer shardCount;
+
+    // todo: maybe add support for replicaCount and compositeId if required
+
     protected HttpSolrClient solrClient;
+
+    protected HttpSolrClient baseSolrClient;
 
     protected ConcurrentUpdateSolrClient concurrentClient;
 
@@ -69,7 +83,7 @@ public class MCRSolrCore {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
         int i = serverURL.lastIndexOf("/") + 1;
-        setup(serverURL.substring(0, i), serverURL.substring(i));
+        setup(serverURL.substring(0, i), serverURL.substring(i), null, DEFAULT_SHARD_COUNT);
     }
 
     /**
@@ -81,15 +95,33 @@ public class MCRSolrCore {
      *            name of the core e.g. docportal
      */
     public MCRSolrCore(String serverURL, String name) {
-        setup(serverURL, name);
+        setup(serverURL, name, null, DEFAULT_SHARD_COUNT);
     }
 
-    protected void setup(String serverURL, String name) {
+    /**
+     * Creates a new solr server core instance.
+     *
+     * @param serverURL
+     *            base url of the solr server e.g. http://localhost:8296
+     * @param name
+     *            name of the core e.g. docportal
+     * @param configSet
+     *            name of the config set
+     * @param shardCount
+     *            number of shards
+     */
+    MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount) {
+        setup(serverURL, name, configSet, shardCount);
+    }
+
+    protected void setup(String serverURL, String name, String configSet, Integer shardCount) {
         if (!serverURL.endsWith("/")) {
             serverURL += "/";
         }
         this.serverURL = serverURL;
         this.name = name;
+        this.configSet = configSet;
+        this.shardCount = Objects.requireNonNull(shardCount, "shardCount must not be null");
         String coreURL = getV1CoreURL();
         int connectionTimeout = MCRConfiguration2
             .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout", Integer::parseInt);
@@ -102,6 +134,13 @@ public class MCRSolrCore {
             .withSocketTimeout(socketTimeout)
             .build();
         solrClient.setRequestWriter(new BinaryRequestWriter());
+
+        baseSolrClient = new HttpSolrClient.Builder(getServerURL() + "solr/")
+                .withConnectionTimeout(connectionTimeout)
+                .withSocketTimeout(socketTimeout)
+                .build();
+        baseSolrClient.setRequestWriter(new BinaryRequestWriter());
+
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
             int queueSize = MCRConfiguration2
@@ -137,13 +176,19 @@ public class MCRSolrCore {
 
     public synchronized void shutdown() {
         try {
-            shutdownGracefully(solrClient);
+            shutdownGracefully(solrClient, true);
             solrClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
-            shutdownGracefully(concurrentClient);
+            shutdownGracefully(baseSolrClient, false);
+            baseSolrClient = null;
+        } catch (SolrServerException | IOException e) {
+            LOGGER.error("Error while shutting down SOLR client.", e);
+        }
+        try {
+            shutdownGracefully(concurrentClient, true);
             concurrentClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
@@ -151,10 +196,16 @@ public class MCRSolrCore {
         LOGGER.info("Solr shutdown process completed.");
     }
 
-    private void shutdownGracefully(SolrClient client) throws SolrServerException, IOException {
+    private void shutdownGracefully(SolrClient client, boolean commit) throws SolrServerException, IOException {
         if (client != null) {
             LOGGER.info("Shutting down solr client: {}", client);
-            client.commit(false, false);
+            if (commit) {
+                UpdateRequest updateRequest = new UpdateRequest();
+                updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
+                MCRSolrAuthenticationManager.getInstance().applyAuthentication(updateRequest,
+                    MCRSolrAuthenticationLevel.INDEX);
+                updateRequest.process(client);
+            }
             client.close();
         }
     }
@@ -178,10 +229,37 @@ public class MCRSolrCore {
     }
 
     /**
+     * Returns the base solr client instance, without core information. Use this for admin operations.
+     */
+    public HttpSolrClient getBaseClient() {
+        return baseSolrClient;
+    }
+
+    public String buildRemoteConfigSetName() {
+        return this.getName() + "_" + this.getConfigSet();
+    }
+
+    /**
      * Returns the concurrent solr client instance. Use this for indexing.
      */
     public SolrClient getConcurrentClient() {
         return concurrentClient != null ? concurrentClient : solrClient;
+    }
+
+    /**
+     * Returns the ConfigSet assigned in the properties
+     * @return the ConfigSet
+     */
+    public String getConfigSet() {
+        return configSet;
+    }
+
+    /**
+     * Returns the shard count assigned in the properties
+     * @return the shard count
+     */
+    public Integer getShardCount() {
+        return shardCount;
     }
 
 }

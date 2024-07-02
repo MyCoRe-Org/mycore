@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -44,6 +45,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 import com.google.common.collect.Lists;
@@ -110,7 +113,12 @@ public abstract class MCRSolrClassificationUtil {
             int added = 0;
             for (List<SolrInputDocument> part : partitionList) {
                 try {
-                    client.add(part, 500);
+                    UpdateRequest req = new UpdateRequest();
+                    req.add(part);
+                    req.setCommitWithin(500);
+                    MCRSolrAuthenticationManager.getInstance().applyAuthentication(req,
+                        MCRSolrAuthenticationLevel.INDEX);
+                    req.process(client);
                     added += part.size();
                     LOGGER.info("Added {}/{} documents", added, docNum);
                 } catch (SolrServerException | IOException e) {
@@ -126,7 +134,11 @@ public abstract class MCRSolrClassificationUtil {
     public static void dropIndex() {
         try {
             SolrClient solrClient = getCore().getConcurrentClient();
-            solrClient.deleteByQuery("*:*");
+            UpdateRequest req = new UpdateRequest();
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(req,
+                MCRSolrAuthenticationLevel.INDEX);
+            req.deleteByQuery("*:*");
+            req.process(solrClient);
         } catch (Exception exc) {
             LOGGER.error("Unable to drop solr classification index", exc);
         }
@@ -200,13 +212,21 @@ public abstract class MCRSolrClassificationUtil {
             }
             MCRSolrCategory solrCategory = new MCRSolrCategory(category);
             try {
-                solrClient.add(solrCategory.toSolrDocument());
+                UpdateRequest req = new UpdateRequest();
+                req.add(solrCategory.toSolrDocument());
+                MCRSolrAuthenticationManager.getInstance().applyAuthentication(req,
+                    MCRSolrAuthenticationLevel.INDEX);
+                req.process(solrClient);
             } catch (Exception exc) {
                 LOGGER.error("Unable to reindex {}", category.getId(), exc);
             }
         }
         try {
-            solrClient.commit();
+            UpdateRequest commitRequest = new UpdateRequest();
+            commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(commitRequest,
+                    MCRSolrAuthenticationLevel.INDEX);
+            commitRequest.process(solrClient);
         } catch (Exception exc) {
             LOGGER.error("Unable to commit reindexed categories", exc);
         }
@@ -259,7 +279,11 @@ public abstract class MCRSolrClassificationUtil {
             List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
                 "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
             toDelete.add(id.toString());
-            solrClient.deleteById(toDelete);
+            UpdateRequest req = new UpdateRequest();
+            req.deleteById(toDelete);
+            MCRSolrAuthenticationManager.getInstance().applyAuthentication(req,
+                MCRSolrAuthenticationLevel.INDEX);
+            req.process(solrClient);
             // reindex parent
             if (parent != null) {
                 MCRSolrClassificationUtil.reindex(parent);

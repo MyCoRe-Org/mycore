@@ -27,9 +27,13 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 
 public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler {
+
+    protected final MCRSolrAuthenticationManager solrAuthenticationFactory;
 
     protected SolrClient solrClient;
 
@@ -42,6 +46,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     public MCRSolrAbstractIndexHandler(SolrClient solrClient) {
         this.solrClient = solrClient != null ? solrClient : MCRSolrClientFactory.getMainSolrClient();
         this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithIn").orElseThrow();
+        this.solrAuthenticationFactory = MCRSolrAuthenticationManager.getInstance();
     }
 
     public SolrClient getSolrClient() {
@@ -79,8 +84,12 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     protected UpdateRequest getUpdateRequest(String path) {
         UpdateRequest req = path != null ? new UpdateRequest(path) : new UpdateRequest();
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.setCommitWithin(getCommitWithin());
         return req;
     }
 
+    public MCRSolrAuthenticationManager getSolrAuthenticationFactory() {
+        return solrAuthenticationFactory;
+    }
 }

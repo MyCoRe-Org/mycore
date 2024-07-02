@@ -36,6 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -44,6 +45,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * This class implements all common methods to create the sitemap data.
@@ -104,6 +107,9 @@ public final class MCRGoogleSitemapCommon {
 
     /** The filter query for selecting objects to present in google sitemap */
     private static final String SOLR_QUERY = MCRConfiguration2.getStringOrThrow("MCR.GoogleSitemap.SolrQuery");
+
+    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
+            = MCRSolrAuthenticationManager.getInstance();
 
     /** The logger */
     private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
@@ -174,7 +180,10 @@ public final class MCRGoogleSitemapCommon {
         query.setParam("fl", "id,modified");
 
         try {
-            response = MCRSolrClientFactory.getMainSolrClient().query(query);
+            QueryRequest queryRequest = new QueryRequest(query);
+            SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest,
+                MCRSolrAuthenticationLevel.SEARCH);
+            response = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
             objidlist = response.getResults().stream().map((document) -> {
                 String id = (String) document.getFieldValue("id");
                 Date modified = (Date) document.getFieldValue("modified");

@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -50,6 +51,8 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -490,7 +493,10 @@ public class MCRRestAPIClassifications {
                 "category:\"" + MCRSolrUtils.escapeSearchValue(classId + ":" + cat.getAttributeValue("ID")) + "\"");
             solrQquery.setRows(0);
             try {
-                QueryResponse response = solrClient.query(solrQquery);
+                QueryRequest queryRequest = new QueryRequest(solrQquery);
+                MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+                    MCRSolrAuthenticationLevel.SEARCH);
+                QueryResponse response = queryRequest.process(solrClient);
                 SolrDocumentList solrResults = response.getResults();
                 if (solrResults.getNumFound() == 0) {
                     cat.detach();

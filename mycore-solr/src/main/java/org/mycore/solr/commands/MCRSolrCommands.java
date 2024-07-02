@@ -20,9 +20,11 @@ package org.mycore.solr.commands;
 
 import static org.mycore.solr.MCRSolrConstants.DEFAULT_SOLR_SERVER_URL;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_PREFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -80,10 +82,35 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                     if (!DEFAULT_SOLR_SERVER_URL.equals(core.getServerURL())) {
                         format += "\n{0}{1}{5}={4}";
                     }
+                    if(core.getConfigSet() != null) {
+                        format += "\n{0}{1}{6}={7}";
+                    }
+                    if(core.getShardCount() > 1){
+                        format += "\n{0}{1}{8}={9}";
+                    }
 
                     return new MessageFormat(format, Locale.ROOT).format(new String[] { SOLR_CORE_PREFIX, coreID,
-                        SOLR_CORE_NAME_SUFFIX, core.getName(), core.getServerURL(), SOLR_CORE_SERVER_SUFFIX, });
+                        SOLR_CORE_NAME_SUFFIX, core.getName(), core.getServerURL(), SOLR_CORE_SERVER_SUFFIX,
+                            SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX, core.getConfigSet(),
+                            SOLR_CORE_SHARD_COUNT_SUFFIX, core.getShardCount() + ""});
                 }).collect(Collectors.joining("\n")));
+    }
+
+    @MCRCommand(
+            syntax = "register solr core with name {0} and configset {1} and shards {2} on server {3} as core {4}",
+            help = "registers a Solr core within MyCoRe",
+            order = 30)
+    public static void registerSolrCore(String coreName, String configSetName, int shards, String server,
+                                        String coreID) {
+        MCRSolrClientFactory.addCore(server, coreName, configSetName, shards, coreID);
+    }
+
+    @MCRCommand(
+            syntax = "register solr core with name {0} and configset {1} on server {2} as core {3}",
+            help = "registers a Solr core within MyCoRe",
+            order = 35)
+    public static void registerSolrCore(String coreName, String configSetName, String server, String coreID) {
+        MCRSolrClientFactory.addCore(server, coreName, configSetName, coreID);
     }
 
     @MCRCommand(

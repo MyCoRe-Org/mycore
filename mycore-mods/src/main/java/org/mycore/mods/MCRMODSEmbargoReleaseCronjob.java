@@ -26,6 +26,8 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.jdom2.Element;
 import org.mycore.common.MCRSystemUserInformation;
@@ -35,6 +37,8 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.cronjob.MCRCronjob;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
 
 /**
@@ -43,6 +47,9 @@ import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
 public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
+            MCRSolrAuthenticationManager.getInstance();
 
     @Override
     public String getDescription() {
@@ -74,7 +81,10 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                 params.set("fl", "id");
                 params.set("q", query);
 
-                solrClient.query(params)
+                QueryRequest queryRequest = new QueryRequest(params);
+                SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
+                QueryResponse solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
+                solrResponse
                     .getResults()
                     .stream()
                     .map(result -> (String) result.get("id"))
