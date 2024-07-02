@@ -53,18 +53,17 @@ public class MCRTikaHttpClient {
         httpPut.setHeader("Accept", "application/json");
         httpPut.setEntity(new InputStreamEntity(is));
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-                if (response.getStatusLine().getStatusCode() != 200) {
-                    throw new IOException("Tika server returned " + response.getStatusLine().getStatusCode());
-                }
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(httpPut)) {
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new IOException("Tika server returned " + response.getStatusLine().getStatusCode());
+            }
 
-                try (InputStream responseStream = response.getEntity().getContent();
-                    InputStreamReader isr = new InputStreamReader(responseStream, StandardCharsets.UTF_8)) {
-                    JsonParser parser = new ObjectMapper().createParser(isr);
-                    TreeNode treeNode = parser.readValueAsTree();
-                    responseConsumer.accept(treeNode);
-                }
+            try (InputStream responseStream = response.getEntity().getContent();
+                InputStreamReader isr = new InputStreamReader(responseStream, StandardCharsets.UTF_8)) {
+                JsonParser parser = new ObjectMapper().createParser(isr);
+                TreeNode treeNode = parser.readValueAsTree();
+                responseConsumer.accept(treeNode);
             }
         }
     }
