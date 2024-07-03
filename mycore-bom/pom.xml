@@ -1067,12 +1067,6 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk16</artifactId>
-        <version>1.46</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>locales</artifactId>
         <version>23.9</version>
