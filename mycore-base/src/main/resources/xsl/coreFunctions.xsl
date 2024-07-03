@@ -419,15 +419,10 @@
     -->
 
   <xsl:template name="getBrowserAddress">
-    <xsl:variable name="RequestURL.sessionRemoved">
-      <xsl:call-template name="UrlDeleteSession">
-        <xsl:with-param name="url" select="$RequestURL" />
-      </xsl:call-template>
-    </xsl:variable>
         <!--remove $lastPage-->
     <xsl:variable name="RequestURL.lastPageDel">
       <xsl:call-template name="UrlDelParam">
-        <xsl:with-param name="url" select="$RequestURL.sessionRemoved" />
+        <xsl:with-param name="url" select="$RequestURL" />
         <xsl:with-param name="par" select="'XSL.lastPage.SESSION'" />
       </xsl:call-template>
     </xsl:variable>
