@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.v3.work;
 
+import java.util.List;
 import java.util.Set;
 
 import org.mycore.common.content.MCRJDOMContent;
@@ -72,5 +73,13 @@ public class MCRORCIDWorkEventHandlerImpl extends MCRORCIDWorkEventHandler<Work>
     @Override
     protected Work transformObject(MCRJDOMContent object) {
         return MCRORCIDWorkTransformerHelper.transformContent(object);
+    }
+
+    @Override
+    protected List<String> listRelatedOrcidIdentifiers(Work work) {
+        return work.getWorkContributors().getContributor().stream().filter(c -> c.getContributorOrcid() != null)
+            .filter(c -> c.getContributorAttributes() != null)
+            .filter(c -> c.getContributorAttributes().getContributorRole() != null)
+            .map(c -> c.getContributorOrcid().getPath()).toList();
     }
 }
