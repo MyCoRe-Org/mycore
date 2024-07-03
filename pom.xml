@@ -263,19 +263,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
-        <version>4.5</version>
-        <dependencies>
-          <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>3.0.1</version>
-          </dependency>
-          <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>${hibernate.version}</version>
-          </dependency>
-        </dependencies>
+        <version>5.1</version>
         <executions>
           <execution>
             <id>generate-jpa-model</id>
@@ -284,6 +272,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
             </goals>
             <phase>generate-sources</phase>
             <configuration>
+              <annotationProcessorPaths>
+                <path>
+                  <groupId>org.hibernate.orm</groupId>
+                  <artifactId>hibernate-jpamodelgen</artifactId>
+                  <version>${hibernate.version}</version>
+                </path>
+              </annotationProcessorPaths>
               <compilerArguments>-implicit:none -AaddGeneratedAnnotation=false</compilerArguments>
               <processors>
                 <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
