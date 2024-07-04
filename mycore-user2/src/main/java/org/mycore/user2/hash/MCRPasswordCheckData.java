@@ -16,25 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.user2;
+package org.mycore.user2.hash;
 
-import jakarta.xml.bind.annotation.XmlEnum;
-
-/**
- * This enum represents different hash type for user passwords.
- * Allows lazy migration of users from different sources.
- * <ul>
- * <li>{@link #crypt} is used in the old MyCoRe user system
- * <li>{@link #md5} is used in the old miless user system
- * <li>{@link #sha1} was the default hash type of mycore-user2
- * <li>{@link #sha256} is the default hash type of mycore-user2
- * </ul>
- * @author Thomas Scheffler (yagee)
- *
- */
-@XmlEnum
-public enum MCRPasswordHashType {
-
-    crypt, md5, sha1, sha256
-
+public record MCRPasswordCheckData(String type, String salt, String hash) {
 }
