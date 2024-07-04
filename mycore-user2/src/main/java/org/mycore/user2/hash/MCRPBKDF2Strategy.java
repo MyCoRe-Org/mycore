@@ -40,7 +40,7 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 @MCRConfigurationProxy(proxyClass = MCRPBKDF2Strategy.Factory.class)
 public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
 
-    public static final HexFormat HEX_FORMAT = HexFormat.of();
+    private static final HexFormat HEX_FORMAT = HexFormat.of();
 
     private final int saltSizeBytes;
 
@@ -79,7 +79,7 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
     private byte[] getHash(byte[] salt, String password) throws Exception {
 
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, hashSizeBytes * 8);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         return factory.generateSecret(spec).getEncoded();
 
     }

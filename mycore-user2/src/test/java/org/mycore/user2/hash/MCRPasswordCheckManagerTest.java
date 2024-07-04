@@ -124,7 +124,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Class", classNameOf = MCRBCryptStrategy.class),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Cost", string = "12"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Cost", string = "13"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "bcrypt")
     })
     public final void testBCrypt() {
@@ -142,7 +142,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Class", classNameOf = MCRArgon2Strategy.class),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.SaltSizeBytes", string = "32"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.HashSizeBytes", string = "64"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Iterations", string = "4"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Iterations", string = "8"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.MemoryLimitKiloBytes", string = "65536"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Parallelism", string = "1"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "argon2")

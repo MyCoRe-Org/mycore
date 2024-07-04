@@ -38,7 +38,7 @@ public class MCRPBKDF2StrategyTest extends MCRTestCase {
     @Test
     public final void test() throws NoSuchAlgorithmException {
 
-        MCRPasswordCheckStrategy strategy = new MCRPBKDF2Strategy(32, 64, 1000);
+        MCRPasswordCheckStrategy strategy = new MCRPBKDF2Strategy(32, 64, 600000);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());

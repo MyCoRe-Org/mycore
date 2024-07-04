@@ -40,11 +40,11 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 @MCRConfigurationProxy(proxyClass = MCRArgon2Strategy.Factory.class)
 public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
 
-    public static final int TYPE = Argon2Parameters.ARGON2_i;
+    private static final int TYPE = Argon2Parameters.ARGON2_id;
 
-    public static final int VERSION = Argon2Parameters.ARGON2_VERSION_13;
+    private static final int VERSION = Argon2Parameters.ARGON2_VERSION_13;
 
-    public static final HexFormat HEX_FORMAT = HexFormat.of();
+    private static final HexFormat HEX_FORMAT = HexFormat.of();
 
     private final int saltSizeBytes;
 
