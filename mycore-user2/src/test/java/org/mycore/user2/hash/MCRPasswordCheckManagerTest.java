@@ -143,7 +143,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.SaltSizeBytes", string = "32"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.HashSizeBytes", string = "64"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Iterations", string = "4"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.MemoryLimitKiloBytes", string = "66536"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.MemoryLimitKiloBytes", string = "65536"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Parallelism", string = "1"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "argon2")
     })

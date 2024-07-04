@@ -38,7 +38,7 @@ public class MCRArgon2StrategyTest extends MCRTestCase {
     @Test
     public final void test() throws NoSuchAlgorithmException {
 
-        MCRPasswordCheckStrategy strategy = new MCRArgon2Strategy(32, 64, 4, 66536, 1);
+        MCRPasswordCheckStrategy strategy = new MCRArgon2Strategy(32, 64, 4, 65536, 1);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
