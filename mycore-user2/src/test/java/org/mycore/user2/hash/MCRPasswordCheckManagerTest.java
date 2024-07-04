@@ -30,7 +30,6 @@ import org.mycore.common.MCRTestProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-
 public class MCRPasswordCheckManagerTest extends MCRTestCase {
 
     public static final String TYPE = "type";

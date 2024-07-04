@@ -18,7 +18,6 @@
 
 package org.mycore.user2.hash;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import org.junit.Test;
@@ -28,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-
 public class MCRPBKDF2StrategyTest extends MCRTestCase {
 
     public static final String TYPE = "type";
@@ -36,7 +34,7 @@ public class MCRPBKDF2StrategyTest extends MCRTestCase {
     public static final String PASSWORD = "passwd123";
 
     @Test
-    public final void test() throws NoSuchAlgorithmException {
+    public final void test() {
 
         MCRPasswordCheckStrategy strategy = new MCRPBKDF2Strategy(32, 64, 600000);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);

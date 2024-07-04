@@ -29,10 +29,10 @@ import org.mycore.common.MCRException;
 public abstract class MCRPasswordCheckStrategyBase implements MCRPasswordCheckStrategy {
 
     @Override
-    public final MCRPasswordCheckData create(SecureRandom random, String typeId, String password) {
+    public final MCRPasswordCheckData create(SecureRandom random, String type, String password) {
         try {
             PasswordCheckData data = doCreate(random, password);
-            return new MCRPasswordCheckData(typeId, data.salt(), data.hash());
+            return new MCRPasswordCheckData(type, data.salt(), data.hash());
         } catch (Exception e) {
             throw new MCRException("Failed to create password hash", e);
         }

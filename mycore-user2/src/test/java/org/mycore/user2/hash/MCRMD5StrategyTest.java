@@ -18,7 +18,6 @@
 
 package org.mycore.user2.hash;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import org.junit.Test;
@@ -27,7 +26,6 @@ import org.mycore.common.MCRTestCase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 
 public class MCRMD5StrategyTest extends MCRTestCase {
 
@@ -38,7 +36,7 @@ public class MCRMD5StrategyTest extends MCRTestCase {
     public static final String MD5_HASH_STRING = "1164f9e5b8cef768396dcd5374e4b6eb";
 
     @Test
-    public final void test() throws NoSuchAlgorithmException {
+    public final void test() {
 
         MCRPasswordCheckStrategy strategy = new MCRMD5Strategy(1);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);

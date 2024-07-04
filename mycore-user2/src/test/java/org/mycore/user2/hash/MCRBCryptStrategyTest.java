@@ -18,7 +18,6 @@
 
 package org.mycore.user2.hash;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import org.junit.Test;
@@ -29,7 +28,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-
 public class MCRBCryptStrategyTest extends MCRTestCase {
 
     public static final String TYPE = "type";
@@ -39,7 +37,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
     public static final int BCRYPT_HASH_STRING_LENGTH = 60;
 
     @Test
-    public final void test() throws NoSuchAlgorithmException {
+    public final void test() {
 
         MCRPasswordCheckStrategy strategy = new MCRBCryptStrategy(13);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
@@ -53,7 +51,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
     }
 
     @Test
-    public final void testCostChange() throws NoSuchAlgorithmException {
+    public final void testCostChange() {
 
         MCRPasswordCheckStrategy strategy12 = new MCRBCryptStrategy(12);
         MCRPasswordCheckStrategy strategy13 = new MCRBCryptStrategy(13);

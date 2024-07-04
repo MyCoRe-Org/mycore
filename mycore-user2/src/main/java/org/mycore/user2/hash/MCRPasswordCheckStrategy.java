@@ -25,9 +25,8 @@ import java.security.SecureRandom;
  */
 public interface MCRPasswordCheckStrategy {
 
-    MCRPasswordCheckData create(SecureRandom random, String typeId, String password);
+    MCRPasswordCheckData create(SecureRandom random, String type, String password);
 
     MCRPasswordCheckResult verify(MCRPasswordCheckData data, String password);
-
 
 }
