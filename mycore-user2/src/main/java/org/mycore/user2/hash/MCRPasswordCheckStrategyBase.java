@@ -21,8 +21,6 @@ package org.mycore.user2.hash;
 import java.security.SecureRandom;
 
 import org.mycore.common.MCRException;
-import org.mycore.resource.provider.MCRResourceProvider;
-import org.mycore.resource.provider.MCRResourceProviderBase;
 
 /**
  * {@link MCRPasswordCheckStrategyBase} is a base implementation of {@link MCRPasswordCheckStrategy} that

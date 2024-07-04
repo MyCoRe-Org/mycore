@@ -379,7 +379,7 @@ public class MCRUserManager {
     }
 
     private static void addEqualsPredicate(CriteriaBuilder cb, Root<MCRUser> root,
-                                           SingularAttribute<MCRUser, String> attribute, String string, ArrayList<Predicate> predicates) {
+        SingularAttribute<MCRUser, String> attribute, String string, ArrayList<Predicate> predicates) {
         if (isValidSearchPattern(string)) {
             predicates.add(cb.equal(root.get(attribute), string));
         }
