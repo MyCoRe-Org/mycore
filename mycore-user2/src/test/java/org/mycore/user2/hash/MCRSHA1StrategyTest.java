@@ -41,7 +41,7 @@ public class MCRSHA1StrategyTest extends MCRTestCase {
     public final void test() throws NoSuchAlgorithmException {
 
         MCRPasswordCheckStrategy strategy = new MCRSHA1Strategy(8, 1000);
-        MCRPasswordCheckData data = strategy.create(SecureRandom.getInstanceStrong(), TYPE, PASSWORD);
+        MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
         assertNotNull(data.salt());

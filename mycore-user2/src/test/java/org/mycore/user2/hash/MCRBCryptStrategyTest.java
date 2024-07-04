@@ -42,7 +42,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
     public final void test() throws NoSuchAlgorithmException {
 
         MCRPasswordCheckStrategy strategy = new MCRBCryptStrategy(12);
-        MCRPasswordCheckData data = strategy.create(SecureRandom.getInstanceStrong(), TYPE, PASSWORD);
+        MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
         assertNull(data.salt());
@@ -57,7 +57,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
 
         MCRPasswordCheckStrategy strategy12 = new MCRBCryptStrategy(12);
         MCRPasswordCheckStrategy strategy13 = new MCRBCryptStrategy(13);
-        MCRPasswordCheckData data12 = strategy12.create(SecureRandom.getInstanceStrong(), TYPE, PASSWORD);
+        MCRPasswordCheckData data12 = strategy12.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult result12 = strategy12.verify(data12, PASSWORD);
         assertTrue(result12.valid());
