@@ -22,6 +22,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,6 +60,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
     public static final String LABEL_LANG_XPATH_MAPPING = "x-mapping-xpath";
+
+    public static final String LABEL_LANG_XPATH_MAPPING_FALLBACK = "x-mapping-xpathfb";
+
     public static final String LABEL_LANG_X_MAPPING = "x-mapping";
 
     /** This configuration lists all eligible classifications for x-path-mapping */
@@ -168,8 +175,11 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     /**
      * For a list of configured classifications
      * (see {@link MCRClassificationMappingEventHandler#X_PATH_MAPPING_CLASSIFICATIONS}),
-     * searches for categories with the label {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}
+     * searches for categories with at least one of the labels
+     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}
+     * or {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}
      * through a given DAO. The XPaths attached to those categories are then evaluated against a given document.
+     * The fallback is evaluated per classification.
      * A list with all {@link MCRCategory MCRCategories} with matching XPaths is returned.
      * @param doc the document to evaluate XPaths against
      * @param dao the {@link MCRCategoryDAO} that gives access to all stored categories
@@ -177,22 +187,48 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      */
     private List<MCRCategory> getXPathMappingCategories(Document doc, MCRCategoryDAO dao) {
         List<MCRCategory> listToAdd = new ArrayList<>();
-        final List<MCRCategory> xPathMappingRelevantCategories = Arrays
-            .stream(X_PATH_MAPPING_CLASSIFICATIONS.trim().split(",")).flatMap(
-                relevantClass -> dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream())
-            .toList();
+        final Map<String, Set<MCRCategory>> xPathMappingRelevantCategories = Arrays
+            .stream(X_PATH_MAPPING_CLASSIFICATIONS.trim().split(",")).collect(Collectors.toMap(
+                relevantClass -> relevantClass,
+                relevantClass -> Stream.concat(
+                    dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream(),
+                    dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING_FALLBACK).stream())
+                    .collect(Collectors.toSet())));
 
-        for (MCRCategory category : xPathMappingRelevantCategories) {
-            if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
+        // check x-mapping-xpath-mappings
+        for (Set<MCRCategory> categoriesPerClass : xPathMappingRelevantCategories.values()) {
+            boolean isXPathMatched = false;
+            for (MCRCategory category : categoriesPerClass) {
+                if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
-                String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
-                MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
+                    String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                    MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
 
-                if (evaluator.test(xPath)) {
-                    String taskMessage = String.format(Locale.ROOT, "adding x-path-mapping from '%s'",
-                        category.getId().toString());
-                    LOGGER.info(taskMessage);
-                    listToAdd.add(category);
+                    if (evaluator.test(xPath)) {
+                        String taskMessage = String.format(Locale.ROOT, "adding x-path-mapping from '%s'",
+                            category.getId().toString());
+                        LOGGER.info(taskMessage);
+                        listToAdd.add(category);
+                        isXPathMatched = true;
+                    }
+                }
+            }
+            if (!isXPathMatched) {
+                //check x-mapping-xpath-fallback-mappings
+                for (MCRCategory category : categoriesPerClass) {
+                    if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
+
+                        String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
+                        MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
+
+                        if (evaluator.test(xPath)) {
+                            String taskMessage = String.format(Locale.ROOT,
+                                "adding x-path-mapping-fallback from '%s'",
+                                category.getId().toString());
+                            LOGGER.info(taskMessage);
+                            listToAdd.add(category);
+                        }
+                    }
                 }
             }
         }
@@ -203,8 +239,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * Searches a given list with {@link MCRCategory MCRCategories} for labels that signal a mapping to a
      * classification. When the relevant labels are found, new mappings are added to the given
      * {@link MCRMetaElement mappings-element}.
-     * The relevant language labels are: {@link MCRClassificationMappingEventHandler#LABEL_LANG_X_MAPPING} and
-     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}.
+     * The relevant language labels are: {@link MCRClassificationMappingEventHandler#LABEL_LANG_X_MAPPING},
+     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING} and
+     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}.
      * @param mappings the element that contains all mappings
      * @param categories the relevant categories that should be searched for specific language labels
      */

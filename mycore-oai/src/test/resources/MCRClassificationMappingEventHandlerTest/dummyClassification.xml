@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<mycoreclass ID="dummyClassification" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+    <label xml:lang="de" text="Dummy Classification"/>
+    <label xml:lang="en" text="dummy classification"/>
+    <categories>
+        <category ID="dummy-article">
+            <label xml:lang="de" text="Dummy Artikel"/>
+            <label xml:lang="en" text="Dummy article"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath"
+                   text="//*[@classid='mir_genres' and @categid='article']" />
+        </category>
+    </categories>
+</mycoreclass>

@@ -28,11 +28,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 @Entity
 @IdClass(MCRObjectIDPK.class)
-@Table(name = "MCRObject")
+@Table(name = "MCRObject",
+    indexes = {
+        @Index(name = "MCRObject_state", columnList = "state"),
+        @Index(name = "MCRObject_createdate", columnList = "createdate"),
+        @Index(name = "MCRObject_modifydate", columnList = "modifydate"),
+        @Index(name = "MCRObject_createdby", columnList = "createdby"),
+        @Index(name = "MCRObject_modifiedby", columnList = "modifiedby"),
+        @Index(name = "MCRObject_deletedby", columnList = "deletedby"),
+        @Index(name = "MCRObject_deletedate", columnList = "deletedate")
+    })
 public class MCRObjectInfoEntity implements MCRObjectInfo {
 
     private MCRObjectID id;

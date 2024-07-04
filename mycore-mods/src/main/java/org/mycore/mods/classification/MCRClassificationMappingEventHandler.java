@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,14 +50,16 @@ import org.mycore.mods.MCRMODSWrapper;
  * Maps classifications in Mods-Documents.
  * <p>You can define a label <b><code>x-mapping</code></b> in a classification with space seperated categoryIds
  * to which the classification will be mapped. You can further define a label <b><code>x-mapping-xpath</code></b> in a
- * classification which creates a classification mapping when the xPath inside the x-mapping-xpath attribute
- * is matched.</p>
+ * classification which creates a classification mapping when the XPath inside the x-mapping-xpath attribute
+ * is matched. You can also define a label <b><code>x-mapping-xpathfb</code></b> which contains a fallback value
+ * in case that no other XPaths inside a classification match.</p>
  * <code>
  * &lt;category ID=&quot;article&quot; counter=&quot;1&quot;&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;en&quot; text=&quot;Article / Chapter&quot; /&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;de&quot; text=&quot;Artikel / Aufsatz&quot; /&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;x-mapping&quot; text=&quot;diniPublType:article&quot; /&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;x-mapping-xpath&quot; text=&quot;mods:genre[text()='article']&quot; /&gt;<br>
+ * &nbsp;&lt;label xml:lang=&quot;x-mapping-xpathfb&quot; text=&quot;mods:genre[text()='other']&quot; /&gt;<br>
  * &lt;/category&gt;
  * </code>
  *
@@ -67,6 +70,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     public static final String GENERATOR_SUFFIX = "-mycore";
 
     public static final String LABEL_LANG_XPATH_MAPPING = "x-mapping-xpath";
+
+    public static final String LABEL_LANG_XPATH_MAPPING_FALLBACK = "x-mapping-xpathfb";
 
     public static final String LABEL_LANG_X_MAPPING = "x-mapping";
 
@@ -104,16 +109,22 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     /**
      * Searches all configured classifications
      * (see {@link MCRClassificationMappingEventHandler#X_PATH_MAPPING_CLASSIFICATIONS}) for categories
-     * with language label {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}.
-     * All categories with said label and present in database are returned in a list.
-     * @return a list of {@link MCRCategory categories} with the XPath-Mapping label
+     * with language labels {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING} or
+     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}.
+     * All categories with said label and present in database are returned in a Map of Sets,
+     * separated by their classification.
+     * @return a Map with classification-IDs as key and Sets of {@link MCRCategory categories}
+     * with the XPath-Mapping label as value
      */
-    private static List<MCRCategory> loadAllXPathMappings() {
+    private static Map<String, Set<MCRCategory>> loadAllXPathMappings() {
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         return Arrays.stream(X_PATH_MAPPING_CLASSIFICATIONS.trim().split(","))
-            .flatMap(
-                relevantClass -> dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream())
-            .collect(Collectors.toList());
+            .collect(Collectors.toMap(
+                relevantClass -> relevantClass,
+                relevantClass -> Stream.concat(
+                    dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream(),
+                    dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING_FALLBACK).stream())
+                    .collect(Collectors.toSet())));
     }
 
     @Override
@@ -173,21 +184,47 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 mappedClassification.setAttribute("generator", generator);
                 MCRClassMapper.assignCategory(mappedClassification, mapping.getValue());
             });
-        // check x-mapping-xpath-mappings
-        for (MCRCategory category : loadAllXPathMappings()) {
-            if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
-                String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
-                MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
+        final Map<String, Set<MCRCategory>> xPathMappings = loadAllXPathMappings();
+        for (Set<MCRCategory> categoriesPerClass : xPathMappings.values()) {
+            boolean isXPathMatched = false;
+            // check x-mapping-xpath-mappings
+            for (MCRCategory category : categoriesPerClass) {
+                if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
-                if (evaluator.test(xPath)) {
-                    String taskMessage = String.format(Locale.ROOT, "add x-path-mapping from '%s'",
-                        category.getId().toString());
-                    LOGGER.info(taskMessage);
-                    Element mappedClassification = mcrmodsWrapper.addElement("classification");
-                    String generator = getXPathMappingGenerator(category.getId());
-                    mappedClassification.setAttribute("generator", generator);
-                    MCRClassMapper.assignCategory(mappedClassification, category.getId());
+                    String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                    MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
+
+                    if (evaluator.test(xPath)) {
+                        String taskMessage = String.format(Locale.ROOT, "add x-path-mapping from '%s'",
+                            category.getId().toString());
+                        LOGGER.info(taskMessage);
+                        Element mappedClassification = mcrmodsWrapper.addElement("classification");
+                        String generator = getXPathMappingGenerator(category.getId());
+                        mappedClassification.setAttribute("generator", generator);
+                        MCRClassMapper.assignCategory(mappedClassification, category.getId());
+                        isXPathMatched = true;
+                    }
+                }
+            }
+            //check x-mapping-xpath-fallback-mappings
+            if (!isXPathMatched) {
+                for (MCRCategory category : categoriesPerClass) {
+                    if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
+
+                        String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
+                        MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
+
+                        if (evaluator.test(xPath)) {
+                            String taskMessage = String.format(Locale.ROOT, "add x-path-mapping-fallback from '%s'",
+                                category.getId().toString());
+                            LOGGER.info(taskMessage);
+                            Element mappedClassification = mcrmodsWrapper.addElement("classification");
+                            String generator = getXPathMappingGenerator(category.getId());
+                            mappedClassification.setAttribute("generator", generator);
+                            MCRClassMapper.assignCategory(mappedClassification, category.getId());
+                        }
+                    }
                 }
             }
         }

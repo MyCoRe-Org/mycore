@@ -159,18 +159,18 @@ public class MCRJPATestCase extends MCRTestCase {
 
     protected static Optional<String> getDefaultSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-            .getEntityManagerFactory()
-            .getProperties()
-            .get("hibernate.default_schema"))
+                .getEntityManagerFactory()
+                .getProperties()
+                .get("hibernate.default_schema"))
             .map(Object::toString)
             .map(schema -> quoteSchema() ? '"' + schema + '"' : schema);
     }
 
     protected static boolean quoteSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-            .getEntityManagerFactory()
-            .getProperties()
-            .get("hibernate.globally_quoted_identifiers"))
+                .getEntityManagerFactory()
+                .getProperties()
+                .get("hibernate.globally_quoted_identifiers"))
             .map(Object::toString)
             .map(Boolean::parseBoolean)
             .orElse(Boolean.FALSE);
@@ -276,5 +276,4 @@ public class MCRJPATestCase extends MCRTestCase {
             }
         });
     }
-
 }

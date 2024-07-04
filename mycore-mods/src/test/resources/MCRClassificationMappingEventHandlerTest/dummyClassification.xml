@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<mycoreclass ID="dummyClassification" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+    <label xml:lang="de" text="Dummy Classification"/>
+    <label xml:lang="en" text="dummy classification"/>
+    <categories>
+        <category ID="dummy-text">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpathfb" text="mods:typeOfResource['text']" />
+        </category>
+        <category ID="dummy-fbonly">
+            <label xml:lang="de" text="Immer Fallback"/>
+            <label xml:lang="en" text="always fallback"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath" text="mods:notInSpec" />
+            <label xml:lang="x-mapping-xpathfb" text="mods:titleInfo" />
+        </category>
+    </categories>
+</mycoreclass>

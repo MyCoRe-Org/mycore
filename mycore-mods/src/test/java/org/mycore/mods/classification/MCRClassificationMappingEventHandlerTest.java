@@ -95,7 +95,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     }
 
     /**
-     * Tests if an XPath-mapping is properly added into a Mods-Document.
+     * Tests if an XPath-mapping is properly added into a Mods-Document. Also tests, if multiple fallbacks per
+     * classification are considered
      * @throws IOException in case of error
      * @throws JDOMException in case of error
      * @throws URISyntaxException in case of error
@@ -109,20 +110,19 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
         loadCategory("genre.xml");
         loadCategory("orcidWorkType.xml");
+        loadCategory("dummyClassification.xml");
 
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods2.xml"));
         MCRObject mcro = new MCRObject();
 
         MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
         mw.setMODS(document.getRootElement().detach());
-        mw.setID("junit", 1);
+        mw.setID("junit", 2);
 
         MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
         mapper.handleObjectUpdated(null, mcro);
 
         Document xml = mcro.createXML();
-
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "
             + "contains(@generator,'xpathmapping2orcidWorkType') and contains(@valueURI, 'journal-article')]";
@@ -132,6 +132,81 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Assert.assertNotNull("The mapped classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-text')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-fbonly')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(xml));
+
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+    }
+
+    /**
+     * Tests if a fallback XPath-mapping is properly added into a Mods-Document if the original mapping doesn't match.
+     * @throws IOException in case of error
+     * @throws JDOMException in case of error
+     * @throws URISyntaxException in case of error
+     */
+    @Test
+    public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.isTransactionActive();
+        ClassLoader classLoader = getClass().getClassLoader();
+        SAXBuilder saxBuilder = new SAXBuilder();
+
+        loadCategory("genre.xml");
+        loadCategory("orcidWorkType.xml");
+        loadCategory("dummyClassification.xml");
+
+        Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods3.xml"));
+        MCRObject mcro = new MCRObject();
+
+        MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 3);
+
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        mapper.handleObjectUpdated(null, mcro);
+
+        Document xml = mcro.createXML();
+
+        String expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2orcidWorkType') and contains(@valueURI, 'online-resource')]";
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-text')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2dummyClassification') and contains(@valueURI, 'dummy-fbonly')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(xml));
+
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
