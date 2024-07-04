@@ -139,6 +139,26 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
 
     @Test
     @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.Class", classNameOf = MCRScryptStrategy.class),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.SaltSizeBytes", string = "32"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.HashSizeBytes", string = "64"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.Cost", string = "17"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.BlockSize", string = "8"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.Parallelism", string = "1"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "scrypt")
+    })
+    public final void testScrypt() {
+
+        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckData data = manager.create(PASSWORD);
+
+        assertEquals("scrypt", data.type());
+        assertTrue(manager.verify(data, PASSWORD).valid());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Class", classNameOf = MCRArgon2Strategy.class),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.SaltSizeBytes", string = "32"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.HashSizeBytes", string = "64"),

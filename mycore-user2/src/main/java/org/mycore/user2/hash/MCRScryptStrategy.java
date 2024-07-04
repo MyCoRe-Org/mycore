@@ -1,0 +1,118 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.mycore.user2.hash;
+
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.HexFormat;
+import java.util.function.Supplier;
+
+import org.bouncycastle.crypto.generators.SCrypt;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
+
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+
+/**
+ * {@link MCRScryptStrategy} is n implementation of {@link MCRPasswordCheckStrategy} that
+ * uses the Scrypt algorithm.
+ * <p>
+ * The salt is stored as a hex encoded String. The verification result will be marked as outdated if the size of
+ * the salt doesn't equal the expected size.
+ */
+@MCRConfigurationProxy(proxyClass = MCRScryptStrategy.Factory.class)
+public class MCRScryptStrategy extends MCRPasswordCheckStrategyBase {
+
+    private static final HexFormat HEX_FORMAT = HexFormat.of();
+
+    private final int saltSizeBytes;
+
+    private final int hashSizeBytes;
+
+    private final int cost;
+
+    private final int blockSize;
+
+    private final int parallelism;
+
+
+    public MCRScryptStrategy(int saltSizeBytes, int hashSizeBytes,
+                             int cost, int blockSize, int parallelism) {
+        this.saltSizeBytes = saltSizeBytes;
+        this.hashSizeBytes = hashSizeBytes;
+        this.cost = cost;
+        this.blockSize = blockSize;
+        this.parallelism = parallelism;
+    }
+
+    @Override
+    protected PasswordCheckData doCreate(SecureRandom random, String password) {
+
+        byte[] salt = random.generateSeed(saltSizeBytes);
+        byte[] hash = getHash(salt, password);
+
+        return new PasswordCheckData(HEX_FORMAT.formatHex(salt), HEX_FORMAT.formatHex(hash));
+    }
+
+    @Override
+    protected PasswordCheckResult<Boolean> doVerify(PasswordCheckData data, String password) {
+
+        byte[] salt = HEX_FORMAT.parseHex(data.salt());
+        byte[] hash = getHash(salt, password);
+
+        boolean verified = fixedEffortEquals(HEX_FORMAT.parseHex(data.hash()), hash);
+        boolean deprecated = data.salt().length() != saltSizeBytes;
+
+        return new PasswordCheckResult<>(verified, deprecated);
+
+    }
+
+    private byte[] getHash(byte[] salt, String password) {
+
+        byte[] bytes = password.getBytes(StandardCharsets.UTF_8);
+        return SCrypt.generate(bytes, salt, 1 << cost, blockSize, parallelism, hashSizeBytes);
+
+    }
+
+    public static class Factory implements Supplier<MCRScryptStrategy> {
+
+        @MCRProperty(name = "SaltSizeBytes")
+        public String saltSizeBytes;
+
+        @MCRProperty(name = "HashSizeBytes")
+        public String hashSizeBytes;
+
+        @MCRProperty(name = "Cost")
+        public String cost;
+
+        @MCRProperty(name = "BlockSize")
+        public String blockSize;
+
+        @MCRProperty(name = "Parallelism")
+        public String parallelism;
+
+        @Override
+        public MCRScryptStrategy get() {
+            return new MCRScryptStrategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes),
+                Integer.parseInt(cost), Integer.parseInt(blockSize), Integer.parseInt(parallelism));
+        }
+
+    }
+
+}
