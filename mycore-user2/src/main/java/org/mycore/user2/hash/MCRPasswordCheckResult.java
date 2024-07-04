@@ -20,3 +20,4 @@ package org.mycore.user2.hash;
 
 public record MCRPasswordCheckResult(boolean valid, boolean deprecated) {
 }
+
