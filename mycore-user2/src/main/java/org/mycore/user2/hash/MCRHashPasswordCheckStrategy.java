@@ -18,7 +18,7 @@
 
 package org.mycore.user2.hash;
 
-import java.util.Objects;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
  * A {@link MCRHashPasswordCheckStrategy} is a base implementation of {@link MCRPasswordCheckStrategy} that
@@ -29,7 +29,7 @@ public abstract class MCRHashPasswordCheckStrategy extends MCRPasswordCheckStrat
     @Override
     protected final PasswordCheckResult<Boolean> doVerify(PasswordCheckData data, String password) throws Exception {
         PasswordCheckResult<String> result = doRecreate(data, password);
-        return new PasswordCheckResult<>(Objects.equals(result.value(), data.hash()), result.deprecated());
+        return new PasswordCheckResult<>(fixedEffortEquals(result.value(), data.hash()), result.deprecated());
     }
 
     protected abstract PasswordCheckResult<String> doRecreate(PasswordCheckData data, String password) throws Exception;

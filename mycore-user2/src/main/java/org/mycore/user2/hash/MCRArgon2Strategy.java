@@ -20,7 +20,6 @@ package org.mycore.user2.hash;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.function.Supplier;
 
@@ -28,6 +27,8 @@ import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
  * {@link MCRArgon2Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
@@ -80,7 +81,7 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
         byte[] salt = HEX_FORMAT.parseHex(data.salt());
         byte[] hash = getHash(salt, password);
 
-        boolean verified = Arrays.equals(HEX_FORMAT.parseHex(data.hash()), hash);
+        boolean verified = fixedEffortEquals(HEX_FORMAT.parseHex(data.hash()), hash);
         boolean deprecated = data.salt().length() != saltSizeBytes;
 
         return new PasswordCheckResult<>(verified, deprecated);
