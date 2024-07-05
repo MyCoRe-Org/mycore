@@ -18,9 +18,9 @@
 
 package org.mycore.solr.auth;
 
+import java.net.http.HttpRequest;
 import java.util.Optional;
 
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.MCRSolrConstants;
@@ -47,7 +47,7 @@ public class MCRSolrPropertyAuthenticationManager implements MCRSolrAuthenticati
         });
     }
 
-    public void applyAuthentication(HttpRequestBase request, MCRSolrAuthenticationLevel level) {
+    public void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level) {
         Optional<MCRSolrAuthentication> optImpl = loadImplementation(level);
         optImpl.ifPresent(instance -> {
             instance.applyAuthentication(request);

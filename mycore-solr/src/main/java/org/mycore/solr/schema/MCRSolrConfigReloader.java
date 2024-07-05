@@ -22,6 +22,10 @@ import static java.util.Map.entry;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
@@ -32,27 +36,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
-import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -224,25 +218,27 @@ public class MCRSolrConfigReloader {
      * @throws UnsupportedEncodingException if command encoding is not supported
      */
     private static void executeSolrCommand(String coreURL, JsonObject command) throws UnsupportedEncodingException {
-        HttpPost post = new HttpPost(coreURL + "/config");
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(post, MCRSolrAuthenticationLevel.ADMIN);
-        post.setHeader("Content-type", "application/json");
-        post.setEntity(new StringEntity(command.toString()));
+        HttpRequest.Builder requestBuilder = MCRHttpUtils.getRequestBuilder()
+            .uri(URI.create(coreURL + "/config"))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(command.toString()));
+
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(requestBuilder,
+            MCRSolrAuthenticationLevel.ADMIN);
         String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
-        HttpResponse response;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            response = httpClient.execute(post);
-            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                StandardCharsets.UTF_8);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                LOGGER.debug(() -> "SOLR config " + commandprefix + " command was successful \n" + respContent);
+        try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
+            HttpResponse<String> response
+                = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                LOGGER.debug(() -> "SOLR config " + commandprefix + " command was successful \n" + response.body());
             } else {
                 LOGGER
-                    .error(() -> "SOLR config " + commandprefix + " error: " + response.getStatusLine().getStatusCode()
-                        + " " + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
+                    .error(() -> "SOLR config " + commandprefix + " error: " + response.statusCode() + " "
+                        + MCRHttpUtils.getReasonPhrase(response.statusCode()) + "\n"
+                        + response.body());
             }
 
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             LOGGER.error(() -> "Could not execute the following Solr config command:\n" + command, e);
         }
     }
@@ -268,9 +264,11 @@ public class MCRSolrConfigReloader {
      * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
-        HttpGet getConfig = new HttpGet(coreURL + "/config");
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
-        return getJSON(getConfig);
+        HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+            .uri(URI.create(coreURL + "/config"));
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
+            MCRSolrAuthenticationLevel.ADMIN);
+        return getJSON(solrRequestBuilder.build());
     }
 
     /**
@@ -279,25 +277,25 @@ public class MCRSolrConfigReloader {
      * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
-        HttpGet getConfig = new HttpGet(coreURL + "/config/overlay");
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(getConfig, MCRSolrAuthenticationLevel.ADMIN);
-        return getJSON(getConfig);
+        HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+            .uri(URI.create(coreURL + "/config/overlay"));
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
+            MCRSolrAuthenticationLevel.ADMIN);
+        return getJSON(solrRequestBuilder.build());
     }
 
-    private static JsonObject getJSON(HttpGet getConfig) {
+    private static JsonObject getJSON(HttpRequest getConfig) {
         JsonObject convertedObject = null;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            CloseableHttpResponse response = httpClient.execute(getConfig);
-            StatusLine statusLine = response.getStatusLine();
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                String configAsString = EntityUtils.toString(response.getEntity(), "UTF-8");
-                convertedObject = new Gson().fromJson(configAsString, JsonObject.class);
+        try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
+            HttpResponse<String> response = httpClient.send(getConfig, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                convertedObject = new Gson().fromJson(response.body(), JsonObject.class);
             } else {
                 LOGGER.error(() -> "Could not retrieve current Solr configuration from solr server. Http Status: "
-                    + statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
+                    + response.statusCode() + " " + MCRHttpUtils.getReasonPhrase(response.statusCode()));
             }
 
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             LOGGER.error("Could not read current Solr configuration", e);
         } catch (JsonSyntaxException e) {
             LOGGER.error("Current json configuration is not a valid json", e);

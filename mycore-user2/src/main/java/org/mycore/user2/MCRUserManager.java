@@ -344,7 +344,8 @@ public class MCRUserManager {
         return em.createQuery(
             query
                 .distinct(true)
-                .where(cb.equal(users.get(MCRUser_.owner), owner)))
+                .where(
+                    owner == null ? cb.isNull(users.get(MCRUser_.owner)) : cb.equal(users.get(MCRUser_.owner), owner)))
             .getResultList();
     }
 
