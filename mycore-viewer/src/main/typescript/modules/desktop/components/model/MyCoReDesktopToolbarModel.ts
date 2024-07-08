@@ -24,6 +24,7 @@ namespace mycore.viewer.model {
             super(name);
         }
 
+        public _languageModel:model.LanguageModel;
         public _viewSelectGroup:widgets.toolbar.ToolbarGroup;
         public viewSelectChilds:Array<widgets.toolbar.ToolbarDropdownButtonChild>;
         public viewSelect:widgets.toolbar.ToolbarDropdownButton;
@@ -69,9 +70,13 @@ namespace mycore.viewer.model {
         }
 
         public addSelectionSwitchButton():void{
-            this.selectionSwitchButton = new widgets.toolbar.ToolbarButton("selectionSwitchButton", "", "");
-            this.selectionSwitchButton.icon = 'text-width';
+            this.selectionSwitchButton = new widgets.toolbar.ToolbarButton("selectionSwitchButton", "", "text-select", "text-width");
+            this.selectionSwitchButton.tooltip = this._languageModel.getTranslation('toolbar.textSelect');
             //this._actionControllGroup.addComponent(this.selectionSwitchButton);
+        }
+
+        public i18n(model: model.LanguageModel) {
+            this._languageModel = model;
         }
 
     }
