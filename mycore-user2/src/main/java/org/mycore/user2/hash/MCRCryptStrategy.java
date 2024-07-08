@@ -32,6 +32,11 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 public class MCRCryptStrategy extends MCRHashPasswordCheckStrategy {
 
     @Override
+    public String invariableConfigurationString() {
+        return "";
+    }
+
+    @Override
     protected final PasswordCheckData doCreate(SecureRandom random, String password) {
         return new PasswordCheckData(null, MCRUtils.asCryptString("", password));
     }

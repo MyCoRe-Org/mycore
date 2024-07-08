@@ -28,6 +28,11 @@ import org.mycore.common.config.annotation.MCRProperty;
 /**
  * {@link MCRMD5Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
  * uses the MD5 algorithm.
+ * <p>
+ * The hash is returned as a hex encoded string.
+ * <p>
+ * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
+ * verification of existing hashes, even if the correct password is supplied.
  */
 @MCRConfigurationProxy(proxyClass = MCRMD5Strategy.Factory.class)
 public class MCRMD5Strategy extends MCRHashPasswordCheckStrategy {
@@ -36,6 +41,11 @@ public class MCRMD5Strategy extends MCRHashPasswordCheckStrategy {
 
     public MCRMD5Strategy(int iterations) {
         this.iterations = iterations;
+    }
+
+    @Override
+    public String invariableConfigurationString() {
+        return "i=" + iterations;
     }
 
     @Override

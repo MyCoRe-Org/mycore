@@ -32,9 +32,9 @@ import at.favre.lib.crypto.bcrypt.LongPasswordStrategy;
  * {@link MCRBCryptStrategy} is n implementation of {@link MCRPasswordCheckStrategy} that
  * uses the BCrypt algorithm.
  * <p>
- * Version, cost and salt are encoded in the hash. The cost parameter may be increased at a later time.
- * After the cost factor has been increased, existing hashed can still be verified, but the verification result
- * will be marked as deprecated.
+ * Version, cost and salt are encoded in the hash.
+ * <p>
+ * The verification result will be marked as outdated if the cost doesn't equal the expected value.
  */
 @MCRConfigurationProxy(proxyClass = MCRBCryptStrategy.Factory.class)
 public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
@@ -47,6 +47,11 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
 
     public MCRBCryptStrategy(int cost) {
         this.cost = cost;
+    }
+
+    @Override
+    public String invariableConfigurationString() {
+        return "";
     }
 
     @Override

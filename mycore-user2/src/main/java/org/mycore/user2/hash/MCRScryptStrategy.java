@@ -33,8 +33,13 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
  * {@link MCRScryptStrategy} is n implementation of {@link MCRPasswordCheckStrategy} that
  * uses the Scrypt algorithm.
  * <p>
- * The salt is stored as a hex encoded String. The verification result will be marked as outdated if the size of
- * the salt doesn't equal the expected size.
+ * The salt and the hash are returned as hex encoded strings.
+ * <p>
+ * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
+ * expected value.
+ * <p>
+ * Changes to the cost, the block size or the parallelism will result in deviating hashes and therefore prevent
+ * the successful verification of existing hashes, even if the correct password is supplied.
  */
 @MCRConfigurationProxy(proxyClass = MCRScryptStrategy.Factory.class)
 public class MCRScryptStrategy extends MCRPasswordCheckStrategyBase {
@@ -62,10 +67,15 @@ public class MCRScryptStrategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
+    public String invariableConfigurationString() {
+        return "c=" + cost + "/bs=" + blockSize + "/p=" + parallelism;
+    }
+
+    @Override
     protected PasswordCheckData doCreate(SecureRandom random, String password) {
 
         byte[] salt = random.generateSeed(saltSizeBytes);
-        byte[] hash = getHash(salt, password);
+        byte[] hash = getHash(salt, hashSizeBytes, password);
 
         return new PasswordCheckData(HEX_FORMAT.formatHex(salt), HEX_FORMAT.formatHex(hash));
     }
@@ -73,17 +83,18 @@ public class MCRScryptStrategy extends MCRPasswordCheckStrategyBase {
     @Override
     protected PasswordCheckResult<Boolean> doVerify(PasswordCheckData data, String password) {
 
-        byte[] salt = HEX_FORMAT.parseHex(data.salt());
-        byte[] hash = getHash(salt, password);
+        byte[] checkSalt = HEX_FORMAT.parseHex(data.salt());
+        byte[] checkHash = HEX_FORMAT.parseHex(data.hash());
+        byte[] hash = getHash(checkSalt, checkHash.length, password);
 
         boolean verified = fixedEffortEquals(HEX_FORMAT.parseHex(data.hash()), hash);
-        boolean deprecated = data.salt().length() != saltSizeBytes;
+        boolean deprecated = checkSalt.length != saltSizeBytes || checkHash.length != hashSizeBytes;
 
         return new PasswordCheckResult<>(verified, deprecated);
 
     }
 
-    private byte[] getHash(byte[] salt, String password) {
+    private byte[] getHash(byte[] salt, int hashSizeBytes, String password) {
 
         byte[] bytes = password.getBytes(StandardCharsets.UTF_8);
         return SCrypt.generate(bytes, salt, 1 << cost, blockSize, parallelism, hashSizeBytes);

@@ -46,24 +46,26 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
         assertNull(data.salt());
         assertEquals(BCRYPT_HASH_STRING_LENGTH, data.hash().length());
 
-        assertTrue(strategy.verify(data, PASSWORD).valid());
+        MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
+        assertTrue(result.valid());
+        assertFalse(result.deprecated());
 
     }
 
     @Test
     public final void testCostChange() {
 
-        MCRPasswordCheckStrategy strategy12 = new MCRBCryptStrategy(12);
-        MCRPasswordCheckStrategy strategy13 = new MCRBCryptStrategy(13);
-        MCRPasswordCheckData data12 = strategy12.create(new SecureRandom(), TYPE, PASSWORD);
+        MCRPasswordCheckStrategy strategyOld = new MCRBCryptStrategy(4);
+        MCRPasswordCheckStrategy strategyNew = new MCRBCryptStrategy(5);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
-        MCRPasswordCheckResult result12 = strategy12.verify(data12, PASSWORD);
-        assertTrue(result12.valid());
-        assertFalse(result12.deprecated());
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
 
-        MCRPasswordCheckResult result13 = strategy13.verify(data12, PASSWORD);
-        assertTrue(result13.valid());
-        assertTrue(result13.deprecated());
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertTrue(resultNew.valid());
+        assertTrue(resultNew.deprecated());
 
     }
 

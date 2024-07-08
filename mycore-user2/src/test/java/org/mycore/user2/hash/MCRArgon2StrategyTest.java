@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -43,7 +44,94 @@ public class MCRArgon2StrategyTest extends MCRTestCase {
         assertNotNull(data.salt());
         assertEquals(128, data.hash().length());
 
-        assertTrue(strategy.verify(data, PASSWORD).valid());
+        MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
+        assertTrue(result.valid());
+        assertFalse(result.deprecated());
+
+    }
+
+    @Test
+    public final void testSaltSizeChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(16, 8, 1, 1024, 1);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertTrue(resultNew.valid());
+        assertTrue(resultNew.deprecated());
+
+    }
+
+    @Test
+    public final void testHashSizeChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 16, 1, 1024, 1);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertTrue(resultNew.valid());
+        assertTrue(resultNew.deprecated());
+
+    }
+
+    @Test
+    public final void testIterationsChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 2, 1024, 1);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertFalse(resultNew.valid());
+        assertFalse(resultNew.deprecated());
+
+    }
+
+    @Test
+    public final void testMemoryLimitChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 1, 2048, 1);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertFalse(resultNew.valid());
+        assertFalse(resultNew.deprecated());
+
+    }
+
+    @Test
+    public final void testParallelismChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 1, 1024, 2);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertFalse(resultNew.valid());
+        assertFalse(resultNew.deprecated());
 
     }
 

@@ -28,8 +28,12 @@ import org.mycore.common.config.annotation.MCRProperty;
  * {@link MCRSHA1Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
  * uses the SHA1 algorithm.
  * <p>
- * The salt is stored as a Base64 encoded String. The verification result will be marked as outdated if the size of
- * the salt doesn't equal the expected size.
+ * The salt is returned as a base 64 encoded string and the hash is returned as a hex encoded string.
+ * <p>
+ * The verification result will be marked as outdated if the salt size doesn't equal the expected value.
+ * <p>
+ * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
+ * verification of existing hashes, even if the correct password is supplied.
  */
 @MCRConfigurationProxy(proxyClass = MCRSHA1Strategy.Factory.class)
 public class MCRSHA1Strategy extends MCRSaltedHashPasswordCheckStrategy {
@@ -39,6 +43,11 @@ public class MCRSHA1Strategy extends MCRSaltedHashPasswordCheckStrategy {
     public MCRSHA1Strategy(int saltSizeBytes, int iterations) {
         super(saltSizeBytes);
         this.iterations = iterations;
+    }
+
+    @Override
+    public String invariableConfigurationString() {
+        return "i=" + iterations;
     }
 
     @Override

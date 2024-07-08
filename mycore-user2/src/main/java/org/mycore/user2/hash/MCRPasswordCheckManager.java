@@ -18,6 +18,14 @@
 
 package org.mycore.user2.hash;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -29,8 +37,12 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.log.MCRListMessage;
+import org.mycore.resource.MCRResourceHelper;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A {@link MCRPasswordCheckManager} can be used to create hashes of passwords and to verify an existing hash
@@ -60,11 +72,12 @@ public final class MCRPasswordCheckManager {
 
     public static final String STRATEGY_KEY = "MCR.User.PasswordCheck.Strategy";
 
-    public static final String RANDOM_ALGORITHM_KEY = "MCR.User.PasswordCheck.Random.Algorithm";
+    public static final String RANDOM_ALGORITHM_KEY = "MCR.User.PasswordCheck.RandomAlgorithm";
 
     private static final Logger LOGGER = StatusLogger.getLogger();
 
-    private static final MCRPasswordCheckManager INSTANCE = new MCRPasswordCheckManager();
+    private static final MCRPasswordCheckManager INSTANCE = new MCRPasswordCheckManager(getConfiguredRandom(),
+        getConfiguredStrategies(), getConfiguredStrategy(), true);
 
     private final SecureRandom random;
 
@@ -74,8 +87,12 @@ public final class MCRPasswordCheckManager {
 
     private final String preferredStrategyType;
 
+    public MCRPasswordCheckManager() {
+        this(getConfiguredRandom(), getConfiguredStrategies(), getConfiguredStrategy(), false);
+    }
+
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
-                                   String preferredStrategyType) {
+                                   String preferredStrategyType, boolean checkIncompatibleConfigurationChange) {
         this.random = Objects.requireNonNull(random);
         this.strategies = new HashMap<>(Objects.requireNonNull(strategies));
         this.strategies.values().forEach(Objects::requireNonNull);
@@ -85,10 +102,90 @@ public final class MCRPasswordCheckManager {
             throw new IllegalArgumentException("Preferred strategy " + preferredStrategyType + " unavailable, got: "
                 + String.join(", ", this.strategies.keySet()));
         }
+        if (checkIncompatibleConfigurationChange) {
+            checkIncompatibleConfigurationChange(strategies);
+        }
     }
 
-    public MCRPasswordCheckManager() {
-        this(getConfiguredRandom(), getConfiguredStrategies(), getConfiguredStrategy());
+    private void checkIncompatibleConfigurationChange(Map<String, MCRPasswordCheckStrategy> strategies) {
+
+        for (Map.Entry<String, MCRPasswordCheckStrategy> entry : strategies.entrySet()) {
+            String name = entry.getKey();
+            String newValue = entry.getValue().invariableConfigurationString();
+            String oldValue = loadInvariableConfigurationString(name);
+
+            System.out.println("--- " + name);
+            System.out.println("-- " + oldValue);
+            System.out.println("- " + newValue);
+
+            if (oldValue != null && !oldValue.equals(newValue)) {
+                throw new MCRConfigurationException("Detected incompatible configuration change for password check " +
+                    "strategy " + name + " that will prevent existing passwords from being successfully verified, " +
+                    "even if the correct password was supplied, got " + newValue + ", expected " + oldValue);
+            }
+            if (oldValue == null) {
+                storeInvariableConfigurationString(name, newValue);
+            }
+        }
+
+
+    }
+
+    private static String loadInvariableConfigurationString(String name) {
+
+        String path = "passwordCheckStrategies/" + name;
+
+        File file = MCRConfigurationDir.getConfigFile(path);
+        if (file != null && file.exists()) {
+
+            System.out.println("READING " + file.getAbsolutePath());
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(file, UTF_8), 128)) {
+                return reader.readLine();
+            } catch (IOException e) {
+                throw new MCRConfigurationException("Unable to read from configuration file " +
+                    file.getAbsolutePath());
+            }
+        }
+
+        InputStream stream = MCRResourceHelper.getResourceAsStream(path);
+        if (stream != null) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, UTF_8), 128)) {
+                return reader.readLine();
+            } catch (IOException e) {
+                throw new MCRException("Unable to read from configuration resource " + path);
+            }
+        }
+
+        return null;
+
+    }
+
+    private static void storeInvariableConfigurationString(String name, String value) {
+
+        String path = "passwordCheckStrategies/" + name;
+
+        File file = MCRConfigurationDir.getConfigFile(path);
+        if (file != null) {
+
+            File parentDir = file.getParentFile();
+            if (!parentDir.exists()) {
+                boolean parentDirCreated = parentDir.mkdirs();
+                if (!parentDirCreated) {
+                    throw new MCRException("Unable to create configuration directory " + parentDir.getAbsolutePath());
+                }
+            }
+
+            System.out.println("WRITING " + file.getAbsolutePath());
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8), 128)) {
+                writer.write(value);
+                writer.newLine();
+            } catch (IOException e) {
+                throw new MCRException("Unable to write to configuration file " + file.getAbsolutePath());
+            }
+        }
+
     }
 
     public static SecureRandom getConfiguredRandom() {
@@ -123,7 +220,7 @@ public final class MCRPasswordCheckManager {
 
     }
 
-    private static String getConfiguredStrategy() {
+    public static String getConfiguredStrategy() {
         return MCRConfiguration2.getStringOrThrow(STRATEGY_KEY);
     }
 

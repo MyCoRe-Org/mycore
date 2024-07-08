@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -45,7 +46,26 @@ public class MCRMD5StrategyTest extends MCRTestCase {
         assertNull(data.salt());
         assertEquals(MD5_HASH_STRING, data.hash());
 
-        assertTrue(strategy.verify(data, PASSWORD).valid());
+        MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
+        assertTrue(result.valid());
+        assertFalse(result.deprecated());
+
+    }
+
+    @Test
+    public final void testIterationsChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRMD5Strategy(1);
+        MCRPasswordCheckStrategy strategyNew = new MCRMD5Strategy(2);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertFalse(resultNew.valid());
+        assertFalse(resultNew.deprecated());
 
     }
 

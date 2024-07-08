@@ -34,8 +34,13 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
  * {@link MCRPBKDF2Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
  * uses the PKKDF2 algorithm.
  * <p>
- * The salt is stored as a hex encoded String. The verification result will be marked as outdated if the size of
- * the salt doesn't equal the expected size.
+ * The salt and the hash are returned as hex encoded strings.
+ * <p>
+ * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
+ * expected value.
+ * <p>
+ * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
+ * verification of existing hashes, even if the correct password is supplied.
  */
 @MCRConfigurationProxy(proxyClass = MCRPBKDF2Strategy.Factory.class)
 public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
@@ -55,10 +60,15 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
+    public String invariableConfigurationString() {
+        return "i=" + iterations;
+    }
+
+    @Override
     protected PasswordCheckData doCreate(SecureRandom random, String password) throws Exception {
 
         byte[] salt = random.generateSeed(saltSizeBytes);
-        byte[] hash = getHash(salt, password);
+        byte[] hash = getHash(salt, hashSizeBytes, password);
 
         return new PasswordCheckData(HEX_FORMAT.formatHex(salt), HEX_FORMAT.formatHex(hash));
     }
@@ -66,17 +76,18 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
     @Override
     protected PasswordCheckResult<Boolean> doVerify(PasswordCheckData data, String password) throws Exception {
 
-        byte[] salt = HEX_FORMAT.parseHex(data.salt());
-        byte[] hash = getHash(salt, password);
+        byte[] checkSalt = HEX_FORMAT.parseHex(data.salt());
+        byte[] checkHash = HEX_FORMAT.parseHex(data.hash());
+        byte[] hash = getHash(checkSalt, checkHash.length, password);
 
         boolean verified = fixedEffortEquals(HEX_FORMAT.parseHex(data.hash()), hash);
-        boolean deprecated = data.salt().length() != saltSizeBytes;
+        boolean deprecated = checkSalt.length != saltSizeBytes || checkHash.length != hashSizeBytes;
 
         return new PasswordCheckResult<>(verified, deprecated);
 
     }
 
-    private byte[] getHash(byte[] salt, String password) throws Exception {
+    private byte[] getHash(byte[] salt, int hashSizeBytes, String password) throws Exception {
 
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, hashSizeBytes * 8);
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");

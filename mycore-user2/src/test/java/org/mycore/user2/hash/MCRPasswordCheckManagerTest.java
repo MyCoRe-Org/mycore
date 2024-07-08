@@ -19,6 +19,7 @@
 package org.mycore.user2.hash;
 
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -177,34 +178,35 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     }
 
     @Test(expected = MCRException.class)
-    @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "md5")
-    })
     public final void testUnknownType() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
-        MCRPasswordCheckData data = manager.create(PASSWORD);
+        SecureRandom random = new SecureRandom();
+        Map<String, MCRPasswordCheckStrategy> strategies = new HashMap<>();
+        strategies.put("foo", new MCRMD5Strategy(1));
 
-        MCRPasswordCheckData data2 = new MCRPasswordCheckData("foo", data.salt(), data.hash());
+        MCRPasswordCheckManager manager = new MCRPasswordCheckManager(random, strategies, "foo", false);
+
+        MCRPasswordCheckData data = manager.create(PASSWORD);
+        MCRPasswordCheckData data2 = new MCRPasswordCheckData("bar", data.salt(), data.hash());
         manager.verify(data2, PASSWORD);
 
     }
 
-
     @Test
     public final void testNotPreferred() {
 
-        SecureRandom random = MCRPasswordCheckManager.getConfiguredRandom();
-        Map<String, MCRPasswordCheckStrategy> strategies = MCRPasswordCheckManager.getConfiguredStrategies();
+        SecureRandom random = new SecureRandom();
+        Map<String, MCRPasswordCheckStrategy> strategies = new HashMap<>();
+        strategies.put("old", new MCRMD5Strategy(1));
+        strategies.put("new", new MCRMD5Strategy(2));
 
-        MCRPasswordCheckManager managerMD5 = new MCRPasswordCheckManager(random, strategies, "md5");
-        MCRPasswordCheckManager managerSHA1 = new MCRPasswordCheckManager(random, strategies, "sha1");
+        MCRPasswordCheckManager managerOld = new MCRPasswordCheckManager(random, strategies, "old", false);
+        MCRPasswordCheckManager managerNew = new MCRPasswordCheckManager(random, strategies, "new", false);
 
-        MCRPasswordCheckData dataMD5 = managerMD5.create(PASSWORD);
-        MCRPasswordCheckResult resultSHA1 = managerSHA1.verify(dataMD5, PASSWORD);
+        MCRPasswordCheckResult result = managerNew.verify(managerOld.create(PASSWORD), PASSWORD);
 
-        assertTrue(resultSHA1.valid());
-        assertTrue(resultSHA1.deprecated());
+        assertTrue(result.valid());
+        assertTrue(result.deprecated());
 
     }
 

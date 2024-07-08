@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -45,7 +46,43 @@ public class MCRSHA1StrategyTest extends MCRTestCase {
         assertNotNull(data.salt());
         assertEquals(SHA1_HASH_STRING_LENGTH, data.hash().length());
 
-        assertTrue(strategy.verify(data, PASSWORD).valid());
+        MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
+        assertTrue(result.valid());
+        assertFalse(result.deprecated());
+
+    }
+
+    @Test
+    public final void testSaltSizeChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRSHA1Strategy(8, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRSHA1Strategy(16, 1);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertTrue(resultNew.valid());
+        assertTrue(resultNew.deprecated());
+
+    }
+
+    @Test
+    public final void testIterationsChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRSHA1Strategy(8, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRSHA1Strategy(8, 2);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertFalse(resultNew.valid());
+        assertFalse(resultNew.deprecated());
 
     }
 
