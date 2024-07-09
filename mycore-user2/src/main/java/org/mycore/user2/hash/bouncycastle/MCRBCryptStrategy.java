@@ -46,14 +46,20 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 @MCRConfigurationProxy(proxyClass = MCRBCryptStrategy.Factory.class)
 public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
 
-    private static final String DELIMITER_REGEX = "\\$";
-    private static final String VERSION_REGEX = "2a";
-    private static final String COST_REGEX = "([0-9]{2})";
-    private static final String SALT_REGEX = "([./a-zA-Z0-9]{22})";
-    private static final String HASH_REGEX = "([./a-zA-Z0-9]{31})";
+    private static final Pattern BCRYPT_MCF_PATTERN;
 
-    private static final Pattern BCRYPT_MCF_PATTERN = Pattern.compile(DELIMITER_REGEX + VERSION_REGEX +
-        DELIMITER_REGEX + COST_REGEX + DELIMITER_REGEX + SALT_REGEX + HASH_REGEX);
+    static {
+
+        String delimiterRegex = "\\$";
+        String versionRegex = "2a";
+        String costRegex = "([0-9]{2})";
+        String saltRegex = "([./a-zA-Z0-9]{22})";
+        String hashRegex = "([./a-zA-Z0-9]{31})";
+
+        BCRYPT_MCF_PATTERN = Pattern.compile(delimiterRegex + versionRegex +
+            delimiterRegex + costRegex + delimiterRegex + saltRegex + hashRegex);
+
+    }
 
     private static final char[] BASE_64_TO_RADIX_64_MAP;
 
