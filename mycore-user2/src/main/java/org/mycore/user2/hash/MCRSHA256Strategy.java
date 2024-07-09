@@ -49,7 +49,7 @@ public class MCRSHA256Strategy extends MCRSaltedHashPasswordCheckStrategy {
     }
 
     @Override
-    public String invariableConfigurationString() {
+    public String invariableConfiguration() {
         return "i=" + iterations;
     }
 

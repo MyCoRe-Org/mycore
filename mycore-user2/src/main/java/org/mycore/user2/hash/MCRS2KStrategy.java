@@ -42,7 +42,7 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
  * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
  * expected value.
  * <p>
- * Changes to the count will result in deviating hashes and therefore prevent the successful
+ * Changes to the hash algorithm or the count will result in deviating hashes and therefore prevent the successful
  * verification of existing hashes, even if the correct password is supplied.
  */
 @MCRConfigurationProxy(proxyClass = MCRS2KStrategy.Factory.class)
@@ -67,7 +67,7 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
-    public String invariableConfigurationString() {
+    public String invariableConfiguration() {
         return "ha=" + hashAlgorithm + "/c=" + count;
     }
 

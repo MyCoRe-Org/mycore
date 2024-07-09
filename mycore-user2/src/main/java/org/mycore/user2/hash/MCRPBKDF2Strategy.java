@@ -40,8 +40,8 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeSecretKeyAlgorith
  * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
  * expected value.
  * <p>
- * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
- * verification of existing hashes, even if the correct password is supplied.
+ * Changes to the hash algorithm or the number of iterations will result in deviating hashes and therefore prevent 
+ * the successful verification of existing hashes, even if the correct password is supplied.
  */
 @MCRConfigurationProxy(proxyClass = MCRPBKDF2Strategy.Factory.class)
 public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
@@ -65,7 +65,7 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
-    public String invariableConfigurationString() {
+    public String invariableConfiguration() {
         return "ha=" + hashAlgorithm + "/i=" + iterations;
     }
 

@@ -111,31 +111,43 @@ public final class MCRPasswordCheckManager {
 
         for (Map.Entry<String, MCRPasswordCheckStrategy> entry : strategies.entrySet()) {
             String name = entry.getKey();
-            String newValue = entry.getValue().invariableConfigurationString();
-            String oldValue = loadInvariableConfigurationString(name);
-            if (oldValue != null && !oldValue.equals(newValue)) {
-                throw new MCRConfigurationException("Detected incompatible configuration change for password check " +
-                    "strategy " + name + " that will prevent existing passwords from being successfully verified, " +
-                    "even if the correct password was supplied, got " + newValue + ", expected " + oldValue);
+            InvariableConfiguration newConfiguration = toInvariableConfiguration(entry.getValue());
+            InvariableConfiguration oldConfiguration = loadInvariableConfigurationString(name);
+            if (oldConfiguration != null) {
+                if (!oldConfiguration.className().equals(newConfiguration.className())) {
+                    throw new MCRConfigurationException("Detected incompatible implementation change for password" +
+                        " check strategy " + name + " that will prevent existing passwords from being successfully " +
+                        "verified, even if the correct password was supplied, got " + newConfiguration.className() +
+                        ", expected " + oldConfiguration.className());
+                }
+                if (!oldConfiguration.value().equals(newConfiguration.value())) {
+                    throw new MCRConfigurationException("Detected incompatible value change for password" +
+                        " check strategy " + name + " that will prevent existing passwords from being successfully " +
+                        "verified, even if the correct password was supplied, got " + newConfiguration.value() +
+                        ", expected " + oldConfiguration.value());
+                }
             }
-            if (oldValue == null) {
-                storeInvariableConfigurationString(name, newValue);
+            if (oldConfiguration == null) {
+                storeInvariableConfiguration(name, newConfiguration);
             }
         }
 
-
     }
 
-    private static String loadInvariableConfigurationString(String name) {
+    private InvariableConfiguration toInvariableConfiguration(MCRPasswordCheckStrategy strategy) {
+        return new InvariableConfiguration(strategy.getClass().getName(), strategy.invariableConfiguration());
+    }
+
+    private static InvariableConfiguration loadInvariableConfigurationString(String name) {
 
         String path = "passwordCheckStrategies/" + name;
 
         File file = MCRConfigurationDir.getConfigFile(path);
         if (file != null && file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file, UTF_8), 128)) {
-                return reader.readLine();
+                return new InvariableConfiguration(reader.readLine(), reader.readLine());
             } catch (IOException e) {
-                throw new MCRConfigurationException("Unable to read from configuration file " +
+                throw new MCRConfigurationException("Unable to read from value file " +
                     file.getAbsolutePath());
             }
         }
@@ -143,9 +155,9 @@ public final class MCRPasswordCheckManager {
         InputStream stream = MCRResourceHelper.getResourceAsStream(path);
         if (stream != null) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, UTF_8), 128)) {
-                return reader.readLine();
+                return new InvariableConfiguration(reader.readLine(), reader.readLine());
             } catch (IOException e) {
-                throw new MCRException("Unable to read from configuration resource " + path);
+                throw new MCRException("Unable to read from value resource " + path);
             }
         }
 
@@ -153,7 +165,7 @@ public final class MCRPasswordCheckManager {
 
     }
 
-    private static void storeInvariableConfigurationString(String name, String value) {
+    private static void storeInvariableConfiguration(String name, InvariableConfiguration configuration) {
 
         String path = "passwordCheckStrategies/" + name;
 
@@ -164,14 +176,16 @@ public final class MCRPasswordCheckManager {
             if (!parentDir.exists()) {
                 boolean parentDirCreated = parentDir.mkdirs();
                 if (!parentDirCreated) {
-                    throw new MCRException("Unable to create configuration directory " + parentDir.getAbsolutePath());
+                    throw new MCRException("Unable to create value directory " + parentDir.getAbsolutePath());
                 }
             }
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8), 128)) {
-                writer.write(value);
+                writer.write(configuration.className());
+                writer.newLine();
+                writer.write(configuration.value());
                 writer.newLine();
             } catch (IOException e) {
-                throw new MCRException("Unable to write to configuration file " + file.getAbsolutePath());
+                throw new MCRException("Unable to write to value file " + file.getAbsolutePath());
             }
         }
 
@@ -237,5 +251,9 @@ public final class MCRPasswordCheckManager {
         }
         return strategy;
     }
+
+    private record InvariableConfiguration(String className, String value) {
+    }
+
 
 }

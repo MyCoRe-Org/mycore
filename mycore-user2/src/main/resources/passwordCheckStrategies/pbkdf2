@@ -1,1 +1,2 @@
+org.mycore.user2.hash.MCRPBKDF2Strategy
 ha=SHA256/i=1000000

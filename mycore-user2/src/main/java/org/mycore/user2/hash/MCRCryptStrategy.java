@@ -32,7 +32,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 public class MCRCryptStrategy extends MCRHashPasswordCheckStrategy {
 
     @Override
-    public String invariableConfigurationString() {
+    public String invariableConfiguration() {
         return "";
     }
 

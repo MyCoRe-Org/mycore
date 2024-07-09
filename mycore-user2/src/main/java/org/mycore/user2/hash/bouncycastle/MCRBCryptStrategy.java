@@ -106,7 +106,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
-    public String invariableConfigurationString() {
+    public String invariableConfiguration() {
         return "";
     }
 

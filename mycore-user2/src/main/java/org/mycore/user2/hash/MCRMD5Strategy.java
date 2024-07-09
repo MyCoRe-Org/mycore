@@ -47,7 +47,7 @@ public class MCRMD5Strategy extends MCRHashPasswordCheckStrategy {
     }
 
     @Override
-    public String invariableConfigurationString() {
+    public String invariableConfiguration() {
         return "i=" + iterations;
     }
 

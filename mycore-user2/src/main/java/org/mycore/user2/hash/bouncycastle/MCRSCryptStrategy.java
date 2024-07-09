@@ -69,7 +69,7 @@ public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
-    public String invariableConfigurationString() {
+    public String invariableConfiguration() {
         return "c=" + cost + "/bs=" + blockSize + "/p=" + parallelism;
     }
 
