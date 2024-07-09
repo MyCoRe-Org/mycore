@@ -109,6 +109,20 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
 
     @Test
     @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "s2k")
+    })
+    public final void testS2K() {
+
+        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckData data = manager.create(PASSWORD);
+
+        assertEquals("s2k", data.type());
+        assertTrue(manager.verify(data, PASSWORD).valid());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "pbkdf2")
     })
     public final void testPBKDF2() {
