@@ -30,15 +30,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.Namespace;
 import org.jdom2.ProcessingInstruction;
-import org.jdom2.filter.ElementFilter;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.output.support.AbstractXMLOutputProcessor;
 import org.jdom2.output.support.FormatStack;
 import org.jdom2.util.NamespaceStack;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -106,7 +105,7 @@ public class MCROAIDataProvider extends MCRServlet {
         Element xmlRespone = oaiResponse.toXML();
 
         if (!(adapter instanceof MCROAIAdapter mcrAdapter) || mcrAdapter.moveNamespaceDeclarationsToRoot()) {
-            moveNamespacesUp(xmlRespone);
+            MCRUtils.moveNamespacesUp(xmlRespone);
         }
 
         // fire
@@ -178,32 +177,7 @@ public class MCROAIDataProvider extends MCRServlet {
         return oaiAdapter;
     }
 
-    /**
-     * Moves all namespace declarations in the children of target to the target.
-     *
-     * @param target the namespace are bundled here
-     */
-    private void moveNamespacesUp(Element target) {
-        Map<String, Namespace> existingNamespaces = getNamespaceMap(target);
-        Map<String, Namespace> newNamespaces = new HashMap<>();
-        target.getDescendants(new ElementFilter()).forEach(child -> {
-            Map<String, Namespace> childNamespaces = getNamespaceMap(child);
-            childNamespaces.forEach((prefix, ns) -> {
-                if (existingNamespaces.containsKey(prefix) || newNamespaces.containsKey(prefix)) {
-                    return;
-                }
-                newNamespaces.put(prefix, ns);
-            });
-        });
-        newNamespaces.forEach((prefix, ns) -> target.addNamespaceDeclaration(ns));
-    }
 
-    private Map<String, Namespace> getNamespaceMap(Element element) {
-        Map<String, Namespace> map = new HashMap<>();
-        map.put(element.getNamespace().getPrefix(), element.getNamespace());
-        element.getAdditionalNamespaces().forEach(ns -> map.put(ns.getPrefix(), ns));
-        return map;
-    }
 
     private static final class OAIXMLOutputProcessor extends AbstractXMLOutputProcessor {
         @Override

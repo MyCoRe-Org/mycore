@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -62,6 +63,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.filter.ElementFilter;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
@@ -598,5 +602,27 @@ public class MCRUtils {
         String[] more = Stream.of(resolve).skip(1).toArray(String[]::new);
         final Path resolvePath = basePath.getFileSystem().getPath(resolve[0], more);
         return safeResolve(basePath, resolvePath);
+    }
+
+    public static void moveNamespacesUp(Element target) {
+        Map<String, Namespace> existingNamespaces = getNamespaceMap(target);
+        Map<String, Namespace> newNamespaces = new HashMap<>();
+        target.getDescendants(new ElementFilter()).forEach(child -> {
+            Map<String, Namespace> childNamespaces = getNamespaceMap(child);
+            childNamespaces.forEach((prefix, ns) -> {
+                if (existingNamespaces.containsKey(prefix) || newNamespaces.containsKey(prefix)) {
+                    return;
+                }
+                newNamespaces.put(prefix, ns);
+            });
+        });
+        newNamespaces.forEach((prefix, ns) -> target.addNamespaceDeclaration(ns));
+    }
+
+    private static Map<String, Namespace> getNamespaceMap(Element element) {
+        Map<String, Namespace> map = new HashMap<>();
+        map.put(element.getNamespace().getPrefix(), element.getNamespace());
+        element.getAdditionalNamespaces().forEach(ns -> map.put(ns.getPrefix(), ns));
+        return map;
     }
 }
