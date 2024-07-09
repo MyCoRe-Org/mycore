@@ -111,7 +111,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "pbkdf2")
     })
-    public final void testPBKDNF2() {
+    public final void testPBKDF2() {
 
         MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
         MCRPasswordCheckData data = manager.create(PASSWORD);

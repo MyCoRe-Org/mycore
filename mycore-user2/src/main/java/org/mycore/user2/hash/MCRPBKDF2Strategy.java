@@ -32,7 +32,7 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
  * {@link MCRPBKDF2Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the PKKDF2 algorithm.
+ * uses the PBKDF2 algorithm.
  * <p>
  * The salt and the hash are returned as hex encoded strings.
  * <p>
