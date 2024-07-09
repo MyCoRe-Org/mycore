@@ -18,9 +18,7 @@
 
 package org.mycore.user2.hash;
 
-import java.security.Provider;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.HexFormat;
 import java.util.function.Supplier;
 
@@ -115,15 +113,6 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
                 Integer.parseInt(iterations));
         }
 
-    }
-
-
-    public static void main(String[] args) {
-        for (Provider provider: Security.getProviders()) {
-            System.out.println(provider.getName());
-            for (String key: provider.stringPropertyNames())
-                System.out.println("\t" + key + "\t" + provider.getProperty(key));
-        }
     }
     
 }
