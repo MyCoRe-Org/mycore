@@ -21,6 +21,7 @@ package org.mycore.user2.hash;
 import java.util.function.Supplier;
 
 import org.mycore.common.MCRUtils;
+import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
@@ -37,6 +38,7 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
  * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
  * verification of existing hashes, even if the correct password is supplied.
  */
+@MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRSHA1Strategy.Factory.class)
 public class MCRSHA1Strategy extends MCRSaltedHashPasswordCheckStrategy {
 

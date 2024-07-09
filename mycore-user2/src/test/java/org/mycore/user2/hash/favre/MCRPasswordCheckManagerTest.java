@@ -24,16 +24,13 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.user2.hash.MCRPasswordCheckData;
 import org.mycore.user2.hash.MCRPasswordCheckManager;
+import org.mycore.user2.hash.MCRPasswordCheckManagerTestBase;
 import org.mycore.user2.hash.bouncycastle.MCRBCryptStrategy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MCRPasswordCheckManagerTest extends MCRTestCase {
-
-    public static final String TYPE = "type";
-
-    public static final String PASSWORD = "passwd123";
+public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase {
 
     @Test
     @MCRTestConfiguration(properties = {

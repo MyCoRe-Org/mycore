@@ -41,6 +41,7 @@ import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.log.MCRListMessage;
 import org.mycore.resource.MCRResourceHelper;
+import org.mycore.common.annotation.MCROutdated;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -92,7 +93,7 @@ public final class MCRPasswordCheckManager {
     }
 
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
-                                   String preferredStrategyType, boolean checkIncompatibleConfigurationChange) {
+                                   String preferredStrategyType, boolean checkConfiguration) {
         this.random = Objects.requireNonNull(random);
         this.strategies = new HashMap<>(Objects.requireNonNull(strategies));
         this.strategies.values().forEach(Objects::requireNonNull);
@@ -102,34 +103,52 @@ public final class MCRPasswordCheckManager {
             throw new IllegalArgumentException("Preferred strategy " + preferredStrategyType + " unavailable, got: "
                 + String.join(", ", this.strategies.keySet()));
         }
-        if (checkIncompatibleConfigurationChange) {
+        if (checkConfiguration) {
+            checkPreferredStrategyIsNotOutdated(preferredStrategyType, preferredStrategy);
             checkIncompatibleConfigurationChange(strategies);
         }
+    }
+
+    private void checkPreferredStrategyIsNotOutdated(String type, MCRPasswordCheckStrategy strategy) {
+
+        Class<? extends MCRPasswordCheckStrategy> preferredStrategyClass = strategy.getClass();
+
+        if (preferredStrategyClass.isAnnotationPresent(MCROutdated.class)) {
+            throw new MCRConfigurationException("Detected outdated password check strategy implementation " +
+                preferredStrategyClass.getName() + " for preferred password check strategy " + type + ", expected " +
+                "an implementation that is not outdated");
+        }
+
     }
 
     private void checkIncompatibleConfigurationChange(Map<String, MCRPasswordCheckStrategy> strategies) {
 
         for (Map.Entry<String, MCRPasswordCheckStrategy> entry : strategies.entrySet()) {
-            String name = entry.getKey();
+
+            String type = entry.getKey();
             InvariableConfiguration newConfiguration = toInvariableConfiguration(entry.getValue());
-            InvariableConfiguration oldConfiguration = loadInvariableConfigurationString(name);
+            InvariableConfiguration oldConfiguration = loadInvariableConfigurationString(type);
+
             if (oldConfiguration != null) {
+
                 if (!oldConfiguration.className().equals(newConfiguration.className())) {
-                    throw new MCRConfigurationException("Detected incompatible implementation change for password" +
-                        " check strategy " + name + " that will prevent existing passwords from being successfully " +
-                        "verified, even if the correct password was supplied, got " + newConfiguration.className() +
+                    throw new MCRConfigurationException("Detected incompatible implementation change for password " +
+                        "check strategy " + type + " that will prevent existing passwords from being successfully " +
+                        "verified, even if the correct password was supplied, got " + newConfiguration.className() + 
                         ", expected " + oldConfiguration.className());
                 }
+
                 if (!oldConfiguration.value().equals(newConfiguration.value())) {
-                    throw new MCRConfigurationException("Detected incompatible value change for password" +
-                        " check strategy " + name + " that will prevent existing passwords from being successfully " +
+                    throw new MCRConfigurationException("Detected incompatible value change for password " +
+                        "check strategy " + type + " that will prevent existing passwords from being successfully " +
                         "verified, even if the correct password was supplied, got " + newConfiguration.value() +
                         ", expected " + oldConfiguration.value());
                 }
+
+            } else {
+                storeInvariableConfiguration(type, newConfiguration);
             }
-            if (oldConfiguration == null) {
-                storeInvariableConfiguration(name, newConfiguration);
-            }
+
         }
 
     }
@@ -179,6 +198,7 @@ public final class MCRPasswordCheckManager {
                     throw new MCRException("Unable to create value directory " + parentDir.getAbsolutePath());
                 }
             }
+
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8), 128)) {
                 writer.write(configuration.className());
                 writer.newLine();
@@ -187,6 +207,7 @@ public final class MCRPasswordCheckManager {
             } catch (IOException e) {
                 throw new MCRException("Unable to write to value file " + file.getAbsolutePath());
             }
+
         }
 
     }
@@ -247,7 +268,7 @@ public final class MCRPasswordCheckManager {
     private MCRPasswordCheckStrategy getStrategy(String type) {
         MCRPasswordCheckStrategy strategy = strategies.get(type);
         if (strategy == null) {
-            throw new MCRException("Unknown type " + type);
+            throw new MCRException("Unknown password check strategy type " + type);
         }
         return strategy;
     }

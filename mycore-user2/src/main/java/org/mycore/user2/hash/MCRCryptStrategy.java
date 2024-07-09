@@ -22,6 +22,7 @@ import java.security.SecureRandom;
 import java.util.function.Supplier;
 
 import org.mycore.common.MCRCrypt;
+import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 
 /**
@@ -30,6 +31,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
  * <p>
  * The salt is prepended to the Radix 64 encoded hash.
  */
+@MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRCryptStrategy.Factory.class)
 public class MCRCryptStrategy extends MCRHashPasswordCheckStrategy {
 
