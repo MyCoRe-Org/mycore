@@ -20,7 +20,6 @@ package org.mycore.user2.hash.favre;
 
 import java.security.SecureRandom;
 
-import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.user2.hash.MCRPasswordCheckData;
@@ -41,7 +40,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
     public static final int BCRYPT_HASH_STRING_LENGTH = 60;
 
     @Test
-    public final void test() throws DecoderException {
+    public final void test() {
 
         MCRPasswordCheckStrategy strategy = new MCRBCryptStrategy(13);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);

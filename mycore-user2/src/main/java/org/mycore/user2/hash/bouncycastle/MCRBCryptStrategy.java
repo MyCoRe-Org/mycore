@@ -31,8 +31,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 
-import com.google.common.primitives.Chars;
-
+import static com.google.common.primitives.Chars.max;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
@@ -81,12 +80,12 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
             '='
         };
 
-        BASE_64_TO_RADIX_64_MAP = new char[Chars.max(base64Alphabet) + 1];
+        BASE_64_TO_RADIX_64_MAP = new char[max(base64Alphabet) + 1];
         for (int i = 0, n = base64Alphabet.length; i < n; i++) {
             BASE_64_TO_RADIX_64_MAP[base64Alphabet[i]] = radix64Alphabet[i];
         }
 
-        RADIX_64_TO_BASE_64_MAP = new char[Chars.max(radix64Alphabet) + 1];
+        RADIX_64_TO_BASE_64_MAP = new char[max(radix64Alphabet) + 1];
         for (int i = 0, n = radix64Alphabet.length; i < n; i++) {
             RADIX_64_TO_BASE_64_MAP[radix64Alphabet[i]] = base64Alphabet[i];
         }
