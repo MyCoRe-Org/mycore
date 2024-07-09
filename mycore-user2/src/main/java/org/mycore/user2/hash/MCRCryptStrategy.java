@@ -22,18 +22,16 @@ import java.security.SecureRandom;
 import java.util.function.Supplier;
 
 import org.mycore.common.MCRCrypt;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 
 /**
- * {@link MCRCryptStrategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the algorithm of the POSIX C library function <code>crypt</code> (a.k.a. crypt(3)) implemented in
- * {@link MCRCrypt}.
+ * {@link MCRCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that
+ * uses traditional DES-based password hashing scheme of the POSIX C crypt(3) command.
+ * <p>
+ * The salt is prepended to the Radix 64 encoded hash.
  */
 @MCRConfigurationProxy(proxyClass = MCRCryptStrategy.Factory.class)
 public class MCRCryptStrategy extends MCRHashPasswordCheckStrategy {
-
-    private static final String ALPHABET = MCRCrypt.ALPHABET;
 
     @Override
     public String invariableConfiguration() {
@@ -42,20 +40,12 @@ public class MCRCryptStrategy extends MCRHashPasswordCheckStrategy {
 
     @Override
     protected final PasswordCheckData doCreate(SecureRandom random, String password) {
-        return new PasswordCheckData(null, MCRUtils.asCryptString(getSalt(random), password));
-    }
-
-    private String getSalt(SecureRandom random) {
-        return new String(new char[]{getRandomCharacter(random), getRandomCharacter(random)});
-    }
-
-    private char getRandomCharacter(SecureRandom random) {
-        return ALPHABET.charAt(random.nextInt(ALPHABET.length()));
+        return new PasswordCheckData(null, MCRCrypt.crypt(random, password));
     }
 
     @Override
     protected final PasswordCheckResult<String> doRecreate(PasswordCheckData data, String password) {
-        return new PasswordCheckResult<>(MCRUtils.asCryptString(data.hash().substring(0, 3), password), false);
+        return new PasswordCheckResult<>(MCRCrypt.crypt(data.hash().substring(0, 2), password), false);
     }
 
     public static class Factory implements Supplier<MCRCryptStrategy> {
