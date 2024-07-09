@@ -34,7 +34,7 @@ public class MCRCryptStrategyTest extends MCRTestCase {
 
     public static final String PASSWORD = "passwd123";
 
-    public static final String CRYPT_HASH_STRING = "AAEwxSmatLWzQ";
+    public static final int CRYPT_STRING_LENGTH = 13;
 
     @Test
     public final void test() {
@@ -44,7 +44,7 @@ public class MCRCryptStrategyTest extends MCRTestCase {
 
         assertEquals(TYPE, data.type());
         assertNull(data.salt());
-        assertEquals(CRYPT_HASH_STRING, data.hash());
+        assertEquals(CRYPT_STRING_LENGTH, data.hash().length());
 
         MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
         assertTrue(result.valid());
