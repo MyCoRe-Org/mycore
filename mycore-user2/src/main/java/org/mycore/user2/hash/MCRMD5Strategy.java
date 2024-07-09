@@ -25,6 +25,8 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
+
 /**
  * {@link MCRMD5Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
  * uses the MD5 algorithm.
@@ -41,6 +43,7 @@ public class MCRMD5Strategy extends MCRHashPasswordCheckStrategy {
 
     public MCRMD5Strategy(int iterations) {
         this.iterations = iterations;
+        probeHashAlgorithm("MD5");
     }
 
     @Override

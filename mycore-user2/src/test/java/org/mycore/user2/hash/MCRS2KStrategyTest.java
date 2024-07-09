@@ -37,7 +37,7 @@ public class MCRS2KStrategyTest extends MCRTestCase {
     @Test
     public final void test() {
 
-        MCRPasswordCheckStrategy strategy = new MCRS2KStrategy(16, 32, 275);
+        MCRPasswordCheckStrategy strategy = new MCRS2KStrategy(16, 32, "SHA256", 275);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
@@ -53,8 +53,8 @@ public class MCRS2KStrategyTest extends MCRTestCase {
     @Test
     public final void testSaltSizeChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRS2KStrategy(8, 8, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRS2KStrategy(16, 8, 1);
+        MCRPasswordCheckStrategy strategyOld = new MCRS2KStrategy(8, 8, "SHA256", 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRS2KStrategy(16, 8, "SHA256", 1);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
@@ -70,8 +70,8 @@ public class MCRS2KStrategyTest extends MCRTestCase {
     @Test
     public final void testHashSizeChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRS2KStrategy(8, 8, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRS2KStrategy(8, 16, 1);
+        MCRPasswordCheckStrategy strategyOld = new MCRS2KStrategy(8, 8, "SHA256", 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRS2KStrategy(8, 16, "SHA256", 1);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
@@ -85,10 +85,27 @@ public class MCRS2KStrategyTest extends MCRTestCase {
     }
 
     @Test
+    public final void testHashAlgorithmChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRS2KStrategy(8, 8, "SHA256", 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRS2KStrategy(8, 8, "SHA512", 1);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertFalse(resultNew.valid());
+        assertFalse(resultNew.deprecated());
+
+    }
+
+    @Test
     public final void testCountChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRS2KStrategy(8, 8, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRS2KStrategy(8, 8, 2);
+        MCRPasswordCheckStrategy strategyOld = new MCRS2KStrategy(8, 8, "SHA256", 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRS2KStrategy(8, 8, "SHA256", 2);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);

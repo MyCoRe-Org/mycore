@@ -37,7 +37,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Class", classNameOf = MCRBCryptStrategy.class),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Cost", string = "13"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Cost", string = "12"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "bcrypt")
     })
     public final void testBCrypt() {

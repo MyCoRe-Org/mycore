@@ -42,7 +42,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
     @Test
     public final void test() {
 
-        MCRPasswordCheckStrategy strategy = new MCRBCryptStrategy(13);
+        MCRPasswordCheckStrategy strategy = new MCRBCryptStrategy(12);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());

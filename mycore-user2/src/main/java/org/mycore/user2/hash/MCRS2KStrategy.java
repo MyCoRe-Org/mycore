@@ -31,6 +31,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import com.google.common.primitives.Bytes;
 
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
 
 /**
  * {@link MCRS2KStrategy} is n implementation of {@link MCRPasswordCheckStrategy} that
@@ -53,17 +54,21 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
 
     private final int hashSizeBytes;
 
+    private final String hashAlgorithm;
+
     private final int count;
 
-    public MCRS2KStrategy(int saltSizeBytes, int hashSizeBytes, int count) {
+    public MCRS2KStrategy(int saltSizeBytes, int hashSizeBytes, String hashAlgorithm, int count) {
         this.saltSizeBytes = saltSizeBytes;
         this.hashSizeBytes = hashSizeBytes;
+        this.hashAlgorithm = hashAlgorithm;
+        probeHashAlgorithm(hashAlgorithm);
         this.count = count;
     }
 
     @Override
     public String invariableConfigurationString() {
-        return "c=" + count;
+        return "ha=" + hashAlgorithm + "/c=" + count;
     }
 
     @Override
@@ -95,7 +100,7 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
         long numberOfBytes = ((long) (16 + (count & 15)) << ((count >> 4) + 6));
         byte[] source = Bytes.concat(salt, password.getBytes(StandardCharsets.UTF_8));
 
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
         int digestLength = digest.getDigestLength();
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -133,13 +138,16 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
         @MCRProperty(name = "HashSizeBytes")
         public String hashSizeBytes;
 
+        @MCRProperty(name = "HashAlgorithm")
+        public String hashAlgorithm;
+
         @MCRProperty(name = "Count")
         public String count;
 
         @Override
         public MCRS2KStrategy get() {
             return new MCRS2KStrategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes),
-                Integer.parseInt(count));
+                hashAlgorithm, Integer.parseInt(count));
         }
 
     }

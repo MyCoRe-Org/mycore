@@ -29,6 +29,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeSecretKeyAlgorithm;
 
 /**
  * {@link MCRPBKDF2Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
@@ -51,17 +52,21 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
 
     private final int hashSizeBytes;
 
+    private final String hashAlgorithm;
+
     private final int iterations;
 
-    public MCRPBKDF2Strategy(int saltSizeBytes, int hashSizeBytes, int iterations) {
+    public MCRPBKDF2Strategy(int saltSizeBytes, int hashSizeBytes, String hashAlgorithm, int iterations) {
         this.saltSizeBytes = saltSizeBytes;
         this.hashSizeBytes = hashSizeBytes;
+        this.hashAlgorithm = hashAlgorithm;
+        probeSecretKeyAlgorithm(pdkdf2Algorithm(hashAlgorithm));
         this.iterations = iterations;
     }
 
     @Override
     public String invariableConfigurationString() {
-        return "i=" + iterations;
+        return "ha=" + hashAlgorithm + "/i=" + iterations;
     }
 
     @Override
@@ -91,9 +96,13 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
     private byte[] getHash(byte[] salt, int hashSizeBytes, String password) throws Exception {
 
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, hashSizeBytes * 8);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        SecretKeyFactory factory = SecretKeyFactory.getInstance(pdkdf2Algorithm(hashAlgorithm));
         return factory.generateSecret(spec).getEncoded();
 
+    }
+
+    private static String pdkdf2Algorithm(String hashAlgorithm) {
+        return "PBKDF2WithHmac" + hashAlgorithm;
     }
 
     public static class Factory implements Supplier<MCRPBKDF2Strategy> {
@@ -104,15 +113,18 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
         @MCRProperty(name = "HashSizeBytes")
         public String hashSizeBytes;
 
+        @MCRProperty(name = "HashAlgorithm")
+        public String hashAlgorithm;
+
         @MCRProperty(name = "Iterations")
         public String iterations;
 
         @Override
         public MCRPBKDF2Strategy get() {
             return new MCRPBKDF2Strategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes),
-                Integer.parseInt(iterations));
+                hashAlgorithm, Integer.parseInt(iterations));
         }
 
     }
-    
+
 }

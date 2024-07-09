@@ -24,6 +24,8 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
+
 /**
  * {@link MCRSHA512Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
  * uses the SHA512 algorithm.
@@ -43,6 +45,7 @@ public class MCRSHA512Strategy extends MCRSaltedHashPasswordCheckStrategy {
     public MCRSHA512Strategy(int saltSizeBytes, int iterations) {
         super(saltSizeBytes);
         this.iterations = iterations;
+        probeHashAlgorithm("SHA-512");
     }
 
     @Override
