@@ -21,6 +21,7 @@ package org.mycore.user2.hash.bouncycastle;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -120,8 +121,12 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
         String hashString = convertBase64ToRadix64(encoder.encodeToString(hash));
         assert saltString.length() == 24 && hashString.length() == 32;
 
-        return "$2a$" + String.format("%02d", cost) + "$" + saltString.substring(0, 22) + hashString.substring(0, 31);
+        return "$2a$" + formatTwoDigitNumber(cost) + "$" + saltString.substring(0, 22) + hashString.substring(0, 31);
 
+    }
+
+    private static String formatTwoDigitNumber(int number) {
+        return String.format(Locale.ENGLISH, "%02d", number);
     }
 
     @Override
