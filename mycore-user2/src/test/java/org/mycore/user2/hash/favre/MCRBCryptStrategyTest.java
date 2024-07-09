@@ -16,12 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.user2.hash;
+package org.mycore.user2.hash.favre;
 
 import java.security.SecureRandom;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.user2.hash.MCRPasswordCheckData;
+import org.mycore.user2.hash.MCRPasswordCheckResult;
+import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -37,7 +41,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
     public static final int BCRYPT_HASH_STRING_LENGTH = 60;
 
     @Test
-    public final void test() {
+    public final void test() throws DecoderException {
 
         MCRPasswordCheckStrategy strategy = new MCRBCryptStrategy(13);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
@@ -66,6 +70,23 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
         MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
         assertTrue(resultNew.valid());
         assertTrue(resultNew.deprecated());
+
+    }
+
+    @Test
+    public final void testCompatibility() {
+
+        MCRPasswordCheckStrategy strategy = new MCRBCryptStrategy(4);
+        MCRPasswordCheckStrategy otherStrategy = new org.mycore.user2.hash.bouncycastle.MCRBCryptStrategy(4);
+        MCRPasswordCheckData data = otherStrategy.create(new SecureRandom(), TYPE, PASSWORD);
+
+        assertEquals(TYPE, data.type());
+        assertNull(data.salt());
+        assertEquals(BCRYPT_HASH_STRING_LENGTH, data.hash().length());
+
+        MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
+        assertTrue(result.valid());
+        assertFalse(result.deprecated());
 
     }
 

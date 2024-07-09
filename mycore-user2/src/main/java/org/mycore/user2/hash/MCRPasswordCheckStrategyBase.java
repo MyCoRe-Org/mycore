@@ -52,10 +52,10 @@ public abstract class MCRPasswordCheckStrategyBase implements MCRPasswordCheckSt
 
     protected abstract PasswordCheckResult<Boolean> doVerify(PasswordCheckData data, String password) throws Exception;
 
-    protected record PasswordCheckData(String salt, String hash) {
+    public record PasswordCheckData(String salt, String hash) {
     }
 
-    protected record PasswordCheckResult<T>(T value, boolean deprecated) {
+    public record PasswordCheckResult<T>(T value, boolean deprecated) {
     }
 
 }

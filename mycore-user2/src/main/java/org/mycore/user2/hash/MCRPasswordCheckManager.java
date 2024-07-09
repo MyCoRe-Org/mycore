@@ -113,11 +113,6 @@ public final class MCRPasswordCheckManager {
             String name = entry.getKey();
             String newValue = entry.getValue().invariableConfigurationString();
             String oldValue = loadInvariableConfigurationString(name);
-
-            System.out.println("--- " + name);
-            System.out.println("-- " + oldValue);
-            System.out.println("- " + newValue);
-
             if (oldValue != null && !oldValue.equals(newValue)) {
                 throw new MCRConfigurationException("Detected incompatible configuration change for password check " +
                     "strategy " + name + " that will prevent existing passwords from being successfully verified, " +
@@ -137,9 +132,6 @@ public final class MCRPasswordCheckManager {
 
         File file = MCRConfigurationDir.getConfigFile(path);
         if (file != null && file.exists()) {
-
-            System.out.println("READING " + file.getAbsolutePath());
-
             try (BufferedReader reader = new BufferedReader(new FileReader(file, UTF_8), 128)) {
                 return reader.readLine();
             } catch (IOException e) {
@@ -175,9 +167,6 @@ public final class MCRPasswordCheckManager {
                     throw new MCRException("Unable to create configuration directory " + parentDir.getAbsolutePath());
                 }
             }
-
-            System.out.println("WRITING " + file.getAbsolutePath());
-
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8), 128)) {
                 writer.write(value);
                 writer.newLine();

@@ -16,19 +16,22 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.user2.hash;
+package org.mycore.user2.hash.bouncycastle;
 
 import java.security.SecureRandom;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.user2.hash.MCRPasswordCheckData;
+import org.mycore.user2.hash.MCRPasswordCheckResult;
+import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class MCRScryptStrategyTest extends MCRTestCase {
+public class MCRArgon2StrategyTest extends MCRTestCase {
 
     public static final String TYPE = "type";
 
@@ -37,7 +40,7 @@ public class MCRScryptStrategyTest extends MCRTestCase {
     @Test
     public final void test() {
 
-        MCRPasswordCheckStrategy strategy = new MCRScryptStrategy(32, 64, 17, 8, 1);
+        MCRPasswordCheckStrategy strategy = new MCRArgon2Strategy(32, 64, 8, 65536, 1);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
@@ -53,8 +56,8 @@ public class MCRScryptStrategyTest extends MCRTestCase {
     @Test
     public final void testSaltSizeChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRScryptStrategy(8, 8, 1, 1, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRScryptStrategy(16, 8, 1, 1, 1);
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(16, 8, 1, 1024, 1);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
@@ -70,8 +73,8 @@ public class MCRScryptStrategyTest extends MCRTestCase {
     @Test
     public final void testHashSizeChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRScryptStrategy(8, 8, 1, 1, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRScryptStrategy(8, 16, 1, 1, 1);
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 16, 1, 1024, 1);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
@@ -85,10 +88,10 @@ public class MCRScryptStrategyTest extends MCRTestCase {
     }
 
     @Test
-    public final void testCostChange() {
+    public final void testIterationsChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRScryptStrategy(8, 8, 1, 1, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRScryptStrategy(8, 8, 2, 1, 1);
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 2, 1024, 1);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
@@ -102,10 +105,10 @@ public class MCRScryptStrategyTest extends MCRTestCase {
     }
 
     @Test
-    public final void testBlockSizeChange() {
+    public final void testMemoryLimitChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRScryptStrategy(8, 8, 1, 1, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRScryptStrategy(8, 8, 1, 2, 1);
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 1, 2048, 1);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
@@ -121,8 +124,8 @@ public class MCRScryptStrategyTest extends MCRTestCase {
     @Test
     public final void testParallelismChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRScryptStrategy(8, 8, 1, 1, 1);
-        MCRPasswordCheckStrategy strategyNew = new MCRScryptStrategy(8, 8, 1, 1, 2);
+        MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 1, 1024, 2);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
