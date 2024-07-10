@@ -26,6 +26,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.services.queuedjob.action.MCRTestJobAction1;
+import org.mycore.services.queuedjob.action.MCRTestJobAction2;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
 
 public class MCRJobQueueTest extends MCRTestCase {
@@ -43,7 +45,7 @@ public class MCRJobQueueTest extends MCRTestCase {
         final List<MCRJob> offeredJobs = new ArrayList<>();
         final List<MCRJob> notifiedJobs = new ArrayList<>();
 
-        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, new MCRConfiguration2JobConfig(), mockDAO);
+        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction1.class, new MCRConfiguration2JobConfig(), mockDAO);
 
         MCRJobQueueEventListener listener = notifiedJobs::add;
 
@@ -81,7 +83,7 @@ public class MCRJobQueueTest extends MCRTestCase {
 
         // the offered jobs should have the right action, the right status and a timestamp
         for (MCRJob j : offeredJobs) {
-            Assert.assertEquals("job action should be MCRTestJobAction", MCRTestJobAction.class, j.getAction());
+            Assert.assertEquals("job action should be MCRTestJobAction", MCRTestJobAction1.class, j.getAction());
             Assert.assertEquals("job status should be new", MCRJobStatus.NEW, j.getStatus());
             Assert.assertTrue("job added timestamp should be set", j.getAdded().getTime() > 0);
         }
@@ -99,14 +101,14 @@ public class MCRJobQueueTest extends MCRTestCase {
 
     @Test
     public void poll() {
-        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, new MCRConfiguration2JobConfig(), mockDAO);
+        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction1.class, new MCRConfiguration2JobConfig(), mockDAO);
         List<MCRJob> offeredJobs = new ArrayList<>();
 
         MCRJob job;
         for (int i = 0; i < 10; i++) {
             job = new MCRJob();
             job.setId((long) i + 1);
-            job.setAction(MCRTestJobAction.class);
+            job.setAction(MCRTestJobAction1.class);
             job.setParameter("count", Integer.toString(i));
             job.setStatus(MCRJobStatus.NEW);
             job.setAdded(new java.util.Date(1000000 - (i * 100000))); // reverse the actual order
@@ -131,13 +133,13 @@ public class MCRJobQueueTest extends MCRTestCase {
 
     @Test
     public void peek() {
-        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, new MCRConfiguration2JobConfig(), mockDAO);
+        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction1.class, new MCRConfiguration2JobConfig(), mockDAO);
         List<MCRJob> offeredJobs = new ArrayList<>();
 
         MCRJob job;
         for (int i = 0; i < 10; i++) {
             job = new MCRJob();
-            job.setAction(MCRTestJobAction.class);
+            job.setAction(MCRTestJobAction1.class);
             job.setParameter("count", Integer.toString(i));
             job.setStatus(MCRJobStatus.NEW);
             job.setAdded(new java.util.Date(1000000 - (i * 100000))); // reverse the actual order

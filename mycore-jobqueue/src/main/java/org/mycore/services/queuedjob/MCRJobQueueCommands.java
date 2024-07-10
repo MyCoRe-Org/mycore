@@ -128,4 +128,22 @@ public class MCRJobQueueCommands {
         LOGGER.info("Reset {} jobs", count);
     }
 
+    @MCRCommand(
+        syntax = "clean job queue",
+        help = "clean job queue",
+        order = 50)
+    public static void cleanJobQueue() {
+        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
+        LOGGER.info("Removed {} jobs", cleaner.clean());
+    }
+
+    @MCRCommand(
+        syntax = "clean job queue with selector {0}",
+        help = "clean job queue with selector {0}",
+        order = 50)
+    public static void cleanJobQueue(String selectorName) {
+        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
+        LOGGER.info("Removed {} jobs", cleaner.clean(selectorName));
+    }
+
 }
