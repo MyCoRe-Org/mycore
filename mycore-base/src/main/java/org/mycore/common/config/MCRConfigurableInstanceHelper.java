@@ -84,7 +84,7 @@ class MCRConfigurableInstanceHelper {
      * Creates a configured instance of a class.
      *
      * @param superClass the intended super class of the instantiated class
-     * @param name the property which contains the class name
+     * @param name       the property which contains the class name
      * @return the configured instance of T
      * @throws MCRConfigurationException if the property is not right configured.
      */
@@ -180,7 +180,7 @@ class MCRConfigurableInstanceHelper {
      * <ul>
      *   <li>
      *     A {@link Supplier} as a factory for creating instances of the target class.
-     *     That factory is 
+     *     That factory is
      *     <ol>
      *       <li>
      *         preferably the target classes parameterless public constructor or
@@ -197,7 +197,7 @@ class MCRConfigurableInstanceHelper {
      *     A list of {@link Injector} that are executed after an instance of the target class has been created.
      *     Each injector binds together a {@link Source} and a {@link Target}.
      *     <br/>
-     *     Sources implement the varying strategies that create values from configuration properties. 
+     *     Sources implement the varying strategies that create values from configuration properties.
      *     Source implementations exist for all supported annotations:
      *     <ol>
      *       <li>{@link MCRProperty}</li>
@@ -206,8 +206,8 @@ class MCRConfigurableInstanceHelper {
      *       <li>{@link MCRInstanceList}</li>
      *       <li>{@link MCRPostConstruction}</li>
      *     </ol>
-     *     Since {@link MCRProperty} produces (based on the value of {@link MCRProperty#name()}) different kinds 
-     *     of values ({@link String} or {@link Map}), two different source implementations ({@link PropertySource}, 
+     *     Since {@link MCRProperty} produces (based on the value of {@link MCRProperty#name()}) different kinds
+     *     of values ({@link String} or {@link Map}), two different source implementations ({@link PropertySource},
      *     {@link AllPropertiesSource}) exists for that annotation.
      *     <br/>
      *     Targets are:
@@ -238,12 +238,12 @@ class MCRConfigurableInstanceHelper {
      *     An exception is thrown if multiple sources are detected for the same target (for example, because a method is
      *     annotated with {@link MCRProperty} and {@link MCRPostConstruction}), if the target is not allowed for the
      *     detected source (for example, {@link MCRPostConstruction} is only allowed on methods) or if the values
-     *     produced by the source are assignment-incompatible with the target (for example, values produced by a 
-     *     {@link InstanceSource} are not assignment-compatible with {@link String}) (as far as type erasure allows it 
+     *     produced by the source are assignment-incompatible with the target (for example, values produced by a
+     *     {@link InstanceSource} are not assignment-compatible with {@link String}) (as far as type erasure allows it
      *     to determine this preemptively).
      *     <br/>
      *     The list is ordered by the type of target (fields first), the source annotation (see list above)
-     *     and lastly the order attribute of the source annotations (i.e. {@link MCRProperty#order()}). 
+     *     and lastly the order attribute of the source annotations (i.e. {@link MCRProperty#order()}).
      *   </li>
      * </ul>
      * <p>
@@ -1097,7 +1097,10 @@ class MCRConfigurableInstanceHelper {
 
         @Override
         public String get(MCRInstanceConfiguration configuration, Target<?> target) {
-            return configuration.name().actual();
+            return switch (annotation.value()) {
+                case ACTUAL -> configuration.name().actual();
+                case CANONICAL -> configuration.name().canonical();
+            };
         }
 
     }

@@ -40,9 +40,22 @@ import java.lang.annotation.Target;
 public @interface MCRPostConstruction {
 
     /**
+     * @return Weather to inject the actual or the canonical property.
+     */
+    Value value() default Value.ACTUAL;
+
+    /**
      * @return the order in which the annotated methods are processed. The higher the value, the later the
      * method is processed.
      */
     int order() default 0;
+
+    enum Value {
+
+        ACTUAL,
+
+        CANONICAL
+
+    }
 
 }
