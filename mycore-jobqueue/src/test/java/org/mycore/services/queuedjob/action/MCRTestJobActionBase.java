@@ -16,52 +16,43 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.services.queuedjob;
-
-import java.util.concurrent.ExecutionException;
+package org.mycore.services.queuedjob.action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.services.queuedjob.MCRJob;
+import org.mycore.services.queuedjob.MCRJobAction;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * @author René Adler (eagle)
  *
  */
-public class MCRTestJobAction2 extends MCRJobAction {
+public abstract class MCRTestJobActionBase extends MCRJobAction {
 
     public static final String ERROR_MESSAGE = "Error parameter was set to true";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRTestJobAction2.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRTestJobActionBase.class);
 
     /**
      * @param job
      */
-    public MCRTestJobAction2(MCRJob job) {
+    public MCRTestJobActionBase(MCRJob job) {
         super(job);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.services.queuedjob.MCRJobAction#isActivated()
-     */
     @Override
     public boolean isActivated() {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.services.queuedjob.MCRJobAction#name()
-     */
     @Override
     public String name() {
         return this.getClass().getSimpleName();
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.services.queuedjob.MCRJobAction#execute()
-     */
     @Override
-    public void execute() throws ExecutionException {
+    public void execute() {
         LOGGER.info("job num: {}", job.getParameter("count"));
         job.setParameter("done", "true");
 
@@ -70,9 +61,6 @@ public class MCRTestJobAction2 extends MCRJobAction {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.services.queuedjob.MCRJobAction#rollback()
-     */
     @Override
     public void rollback() {
         LOGGER.info(job);

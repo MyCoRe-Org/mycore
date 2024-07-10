@@ -27,6 +27,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
+import org.mycore.services.queuedjob.action.MCRTestJobAction1;
+import org.mycore.services.queuedjob.action.MCRTestJobAction2;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
 
 public class MCRJobResetterTest extends MCRJPATestCase {
@@ -44,7 +46,7 @@ public class MCRJobResetterTest extends MCRJPATestCase {
         // create resetter with mockDAO and reset queues
         MCRJobResetter resetter = new MCRJobResetter(mockDAO, (action) -> {
             switch (action.getSimpleName()) {
-                case "MCRTestJobAction" -> {
+                case "MCRTestJobAction1" -> {
                     return reset1;
                 }
                 case "MCRTestJobAction2" -> {
@@ -60,7 +62,7 @@ public class MCRJobResetterTest extends MCRJPATestCase {
         long nineMinutesAgo = new Date().getTime() - 60 * 1000 * 9;
 
         MCRJob job = new MCRJob();
-        job.setAction(MCRTestJobAction.class);
+        job.setAction(MCRTestJobAction1.class);
         job.setParameter("count", "1");
         job.setStatus(MCRJobStatus.ERROR);
         job.setAdded(new Date(elevenMinutesAgo));
@@ -76,7 +78,7 @@ public class MCRJobResetterTest extends MCRJPATestCase {
         mockDAO.daoOfferedJobs.add(job2);
 
         MCRJob job3 = new MCRJob();
-        job3.setAction(MCRTestJobAction.class);
+        job3.setAction(MCRTestJobAction1.class);
         job3.setParameter("count", "3");
         job3.setStatus(MCRJobStatus.ERROR);
         job3.setAdded(new Date(nineMinutesAgo));
@@ -111,7 +113,7 @@ public class MCRJobResetterTest extends MCRJPATestCase {
         Assert.assertEquals("resetted jobs in queue1 should be 0", 0, reset1.size());
         Assert.assertEquals("resetted jobs in queue2 should be 0", 0, reset2.size());
 
-        resetter.resetJobsWithAction(MCRTestJobAction.class);
+        resetter.resetJobsWithAction(MCRTestJobAction1.class);
         Assert.assertEquals("resetted jobs in queue1 should be 1", 1, reset1.size());
         Assert.assertEquals("resetted jobs in queue2 should be 0", 0, reset2.size());
         Assert.assertEquals("reseted job should have count 1", "1",

@@ -36,7 +36,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * Resolves a classification in parent style.
- * Uses the URI <code>classification:metadata:0:parents:{{@link MCRCategoryID#toString()}}</code> to resolve the result.
+ * Uses the URI <code>classification:metadata:0:parents:{@link MCRCategoryID#toString()}</code> to resolve the result.
  * If no matching classification is found an &lt;empty /&gt; element is returned.
  * This URIResolver can used by this URI syntax:<br>
  *     <ul>

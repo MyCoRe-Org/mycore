@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
+import org.mycore.services.queuedjob.action.MCRTestJobAction1;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
 
 import jakarta.persistence.EntityTransaction;
@@ -59,26 +60,26 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
     public void testRun() {
         MCRConfiguration2JobConfig config = new MCRConfiguration2JobConfig();
         MCRJobDAOJPAImpl dao = new MCRJobDAOJPAImpl();
-        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction.class, config, dao);
-        MCRJobThreadStarter starter = new MCRJobThreadStarter(MCRTestJobAction.class, config, queue);
+        MCRJobQueue queue = new MCRJobQueue(MCRTestJobAction1.class, config, dao);
+        MCRJobThreadStarter starter = new MCRJobThreadStarter(MCRTestJobAction1.class, config, queue);
 
         Date baseTime = new Date();
 
-        MCRJob job1 = new MCRJob(MCRTestJobAction.class);
+        MCRJob job1 = new MCRJob(MCRTestJobAction1.class);
         job1.setParameter("count", "1");
         job1.setParameter("error", "false");
         job1.setStatus(MCRJobStatus.NEW);
         job1.setAdded(new Date(baseTime.getTime() + 20));
         queue.offer(job1);
 
-        MCRJob job2 = new MCRJob(MCRTestJobAction.class);
+        MCRJob job2 = new MCRJob(MCRTestJobAction1.class);
         job2.setParameter("count", "2");
         job2.setParameter("error", "false");
         job2.setStatus(MCRJobStatus.NEW);
         job2.setAdded(new Date(baseTime.getTime() + 40));
         queue.offer(job2);
 
-        MCRJob job3 = new MCRJob(MCRTestJobAction.class);
+        MCRJob job3 = new MCRJob(MCRTestJobAction1.class);
         job3.setParameter("count", "3");
         job3.setParameter("error", "true");
         job3.setStatus(MCRJobStatus.NEW);

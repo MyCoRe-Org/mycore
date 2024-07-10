@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.mycore.services.queuedjob.action.MCRTestJobAction1;
+import org.mycore.services.queuedjob.action.MCRTestJobAction2;
+
 public class MCRMockJobDAO implements MCRJobDAO {
 
     public final List<MCRJob> daoOfferedJobs = new ArrayList<>();
@@ -102,6 +105,6 @@ public class MCRMockJobDAO implements MCRJobDAO {
 
     @Override
     public List<? extends Class<? extends MCRJobAction>> getActions() {
-        return List.of(MCRTestJobAction.class, MCRTestJobAction2.class);
+        return List.of(MCRTestJobAction1.class, MCRTestJobAction2.class);
     }
 }

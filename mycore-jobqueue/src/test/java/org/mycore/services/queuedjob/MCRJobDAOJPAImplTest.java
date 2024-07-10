@@ -30,6 +30,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
+import org.mycore.services.queuedjob.action.MCRTestJobAction1;
+import org.mycore.services.queuedjob.action.MCRTestJobAction2;
 
 import jakarta.persistence.EntityManager;
 
@@ -69,19 +71,19 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
 
         Date baseTime = new Date();
 
-        job1 = new MCRJob(MCRTestJobAction.class);
+        job1 = new MCRJob(MCRTestJobAction1.class);
         job1.setParameter("count", "1");
         job1.setParameter("error", "false");
         job1.setStatus(MCRJobStatus.NEW);
         job1.setAdded(new Date(baseTime.getTime() + 20));
 
-        job2 = new MCRJob(MCRTestJobAction.class);
+        job2 = new MCRJob(MCRTestJobAction1.class);
         job2.setParameter("count", "2");
         job2.setParameter("error", "false");
         job2.setStatus(MCRJobStatus.PROCESSING);
         job2.setAdded(new Date(baseTime.getTime() + 40));
 
-        job3 = new MCRJob(MCRTestJobAction.class);
+        job3 = new MCRJob(MCRTestJobAction1.class);
         job3.setParameter("count", "3");
         job3.setParameter("error", "true");
         job3.setStatus(MCRJobStatus.FINISHED);
@@ -99,19 +101,19 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         job5.setStatus(MCRJobStatus.MAX_TRIES);
         job5.setAdded(new Date(baseTime.getTime() + 100));
 
-        xJob6 = new MCRJob(MCRTestJobAction.class);
+        xJob6 = new MCRJob(MCRTestJobAction1.class);
         xJob6.setParameter("count", "6");
         xJob6.setParameter("error", "false");
         xJob6.setStatus(MCRJobStatus.NEW);
         xJob6.setAdded(new Date(baseTime.getTime() + 120));
 
-        xJob7 = new MCRJob(MCRTestJobAction.class);
+        xJob7 = new MCRJob(MCRTestJobAction1.class);
         xJob7.setParameter("count", "7");
         xJob7.setParameter("error", "false");
         xJob7.setStatus(MCRJobStatus.NEW);
         xJob7.setAdded(new Date(baseTime.getTime() + 140));
 
-        xJob8 = new MCRJob(MCRTestJobAction.class);
+        xJob8 = new MCRJob(MCRTestJobAction1.class);
         xJob8.setParameter("count", "8");
         xJob8.setParameter("error", "false");
         xJob8.setStatus(MCRJobStatus.NEW);
@@ -151,30 +153,30 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         jobs = dao.getJobs(null, null, null, 3, null);
         assertAllPresent(allJobs.subList(0, 3), jobs);
 
-        jobs = dao.getJobs(MCRTestJobAction.class, null, null, null, null);
+        jobs = dao.getJobs(MCRTestJobAction1.class, null, null, null, null);
         assertAllPresent(Arrays.asList(job1, job2, job3), jobs);
 
         jobs = dao.getJobs(MCRTestJobAction2.class, null, null, null, null);
         assertAllPresent(Arrays.asList(job4, job5), jobs);
 
-        jobs = dao.getJobs(MCRTestJobAction.class, Collections.emptyMap(),
+        jobs = dao.getJobs(MCRTestJobAction1.class, Collections.emptyMap(),
             Stream.of(MCRJobStatus.NEW, MCRJobStatus.PROCESSING).toList(), null, null);
         assertAllPresent(Arrays.asList(job1, job2), jobs);
 
-        jobs = dao.getJobs(MCRTestJobAction.class, Collections.emptyMap(),
+        jobs = dao.getJobs(MCRTestJobAction1.class, Collections.emptyMap(),
             Stream.of(MCRJobStatus.NEW, MCRJobStatus.PROCESSING).toList(), 1, null);
         assertAllPresent(List.of(job1), jobs);
 
-        jobs = dao.getJobs(MCRTestJobAction.class, job1.getParameters(), null, null, null);
+        jobs = dao.getJobs(MCRTestJobAction1.class, job1.getParameters(), null, null, null);
         assertAllPresent(List.of(job1), jobs);
 
-        jobs = dao.getJobs(MCRTestJobAction.class, job1.getParameters(), List.of(MCRJobStatus.PROCESSING), null, null);
+        jobs = dao.getJobs(MCRTestJobAction1.class, job1.getParameters(), List.of(MCRJobStatus.PROCESSING), null, null);
         assertAllPresent(Collections.emptyList(), jobs);
 
-        jobs = dao.getJobs(MCRTestJobAction.class, errorFalseParam, null, null, null);
+        jobs = dao.getJobs(MCRTestJobAction1.class, errorFalseParam, null, null, null);
         assertAllPresent(List.of(job1, job2), jobs);
 
-        jobs = dao.getJobs(MCRTestJobAction.class, errorTrueParam, null, null, null);
+        jobs = dao.getJobs(MCRTestJobAction1.class, errorTrueParam, null, null, null);
         assertAllPresent(List.of(job3), jobs);
 
         jobs = dao.getJobs(null, errorTrueParam, null, null, null);
@@ -192,7 +194,7 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         EntityManager em = getEntityManager().get();
         allJobs.forEach(em::persist);
 
-        dao.removeJobs(MCRTestJobAction.class, null, null);
+        dao.removeJobs(MCRTestJobAction1.class, null, null);
 
         List<MCRJob> resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(Arrays.asList(job4, job5), resultList);
@@ -235,30 +237,30 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         EntityManager em = getEntityManager().get();
         allJobs.forEach(em::persist);
 
-        MCRJob job = dao.getJob(MCRTestJobAction.class, job1.getParameters(), List.of(MCRJobStatus.NEW));
+        MCRJob job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), List.of(MCRJobStatus.NEW));
         Assert.assertEquals("Job 1 should be equal", job1, job);
 
-        job = dao.getJob(MCRTestJobAction.class, job1.getParameters(), List.of(MCRJobStatus.PROCESSING));
+        job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), List.of(MCRJobStatus.PROCESSING));
         Assert.assertNull("Job 1 should be null", job);
 
-        job = dao.getJob(MCRTestJobAction.class, job1.getParameters(),
+        job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(),
             List.of(MCRJobStatus.NEW, MCRJobStatus.PROCESSING));
         Assert.assertEquals("Job 1 should be equal", job1, job);
 
-        job = dao.getJob(MCRTestJobAction.class, job1.getParameters(), null);
+        job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), null);
         Assert.assertEquals("Job 1 should be equal", job1, job);
 
-        job = dao.getJob(MCRTestJobAction.class, job1.getParameters(), Collections.emptyList());
+        job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), Collections.emptyList());
         Assert.assertEquals("Job 1 should be equal", job1, job);
 
         job = dao.getJob(null, job1.getParameters(), null);
         Assert.assertEquals("Job 1 should be equal", job1, job);
 
-        job = dao.getJob(MCRTestJobAction.class, job2.getParameters(), null);
+        job = dao.getJob(MCRTestJobAction1.class, job2.getParameters(), null);
         Assert.assertEquals("Job 2 should be equal", job2, job);
 
         try {
-            job = dao.getJob(MCRTestJobAction.class, null, null);
+            job = dao.getJob(MCRTestJobAction1.class, null, null);
             Assert.fail("There should be an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // expected
@@ -272,13 +274,13 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         allJobs.forEach(em::persist);
         xJobs.forEach(em::persist);
 
-        List<MCRJob> jobs = dao.getNextJobs(MCRTestJobAction.class, 1);
+        List<MCRJob> jobs = dao.getNextJobs(MCRTestJobAction1.class, 1);
         assertAllPresent(List.of(job1), jobs);
 
         MCRJob j1 = em.merge(job1);
         em.remove(j1);
 
-        jobs = dao.getNextJobs(MCRTestJobAction.class, 2);
+        jobs = dao.getNextJobs(MCRTestJobAction1.class, 2);
         assertAllPresent(List.of(xJob6, xJob7), jobs);
 
         MCRJob j6 = em.merge(xJob6);
@@ -286,7 +288,7 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         em.remove(j6);
         em.remove(j7);
 
-        jobs = dao.getNextJobs(MCRTestJobAction.class, 2);
+        jobs = dao.getNextJobs(MCRTestJobAction1.class, 2);
         assertAllPresent(List.of(xJob8), jobs);
     }
 
@@ -297,13 +299,13 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         allJobs.forEach(em::persist);
         xJobs.forEach(em::persist);
 
-        int jobs = dao.getRemainingJobCount(MCRTestJobAction.class);
+        int jobs = dao.getRemainingJobCount(MCRTestJobAction1.class);
         Assert.assertEquals("There should be 4 remaining jobs", 4, jobs);
 
         MCRJob j1 = em.merge(job1);
         em.remove(j1);
 
-        jobs = dao.getRemainingJobCount(MCRTestJobAction.class);
+        jobs = dao.getRemainingJobCount(MCRTestJobAction1.class);
         Assert.assertEquals("There should be 2 remaining jobs", 3, jobs);
 
         MCRJob j6 = em.merge(xJob6);
@@ -311,7 +313,7 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         em.remove(j6);
         em.remove(j7);
 
-        jobs = dao.getRemainingJobCount(MCRTestJobAction.class);
+        jobs = dao.getRemainingJobCount(MCRTestJobAction1.class);
         Assert.assertEquals("There should be 1 remaining jobs", 1, jobs);
     }
 
@@ -320,17 +322,17 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         EntityManager em = getEntityManager().get();
         allJobs.forEach(em::persist);
 
-        MCRJob job1 = dao.getJob(MCRTestJobAction.class, this.job1.getParameters(), null);
+        MCRJob job1 = dao.getJob(MCRTestJobAction1.class, this.job1.getParameters(), null);
         Assert.assertEquals("Job 1 should be equal", this.job1, job1);
         job1.setStatus(MCRJobStatus.ERROR);
         dao.updateJob(job1);
 
-        job1 = dao.getJob(MCRTestJobAction.class, this.job1.getParameters(), null);
+        job1 = dao.getJob(MCRTestJobAction1.class, this.job1.getParameters(), null);
         Assert.assertEquals("Job 1 Status should be ERROR", MCRJobStatus.ERROR, job1.getStatus());
 
         job1.setParameter("count", NEW_COUNT);
         dao.updateJob(job1);
-        job1 = dao.getJob(MCRTestJobAction.class, this.job1.getParameters(), null);
+        job1 = dao.getJob(MCRTestJobAction1.class, this.job1.getParameters(), null);
         Assert.assertEquals("Job 1 Count should be 13", NEW_COUNT, job1.getParameter("count"));
     }
 
