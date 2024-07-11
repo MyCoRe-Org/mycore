@@ -107,7 +107,8 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
     private void splitDocuments() {
         subHandlerList = new ArrayList<>(documents.size());
         for (SolrInputDocument document : documents) {
-            MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(document, getSolrClient());
+            MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(() -> document, getSolrClient(),
+                String.valueOf(document.getFieldValue("id")));
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }

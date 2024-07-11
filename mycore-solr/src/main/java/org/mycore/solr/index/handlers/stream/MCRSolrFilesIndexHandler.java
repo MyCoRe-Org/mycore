@@ -36,7 +36,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentsHandler;
@@ -98,8 +97,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
                     if (sendContent) {
                         subHandlerList.add(ihf.getIndexHandler(file, attrs, solrClient, true));
                     } else {
-                        SolrInputDocument fileDoc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
-                        docs.add(fileDoc);
+                        subHandlerList.add(ihf.getIndexHandler(file, attrs, solrClient, false));
                     }
                 } catch (Exception ex) {
                     LOGGER.error("Error creating transfer thread", ex);
