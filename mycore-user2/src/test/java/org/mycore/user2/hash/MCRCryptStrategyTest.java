@@ -25,7 +25,6 @@ import org.mycore.common.MCRTestCase;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class MCRCryptStrategyTest extends MCRTestCase {
@@ -46,7 +45,7 @@ public class MCRCryptStrategyTest extends MCRTestCase {
         System.out.println(data);
 
         assertEquals(TYPE, data.type());
-        assertNull(data.salt());
+        assertEquals("", data.salt());
         assertEquals(CRYPT_STRING_LENGTH, data.hash().length());
 
         MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);

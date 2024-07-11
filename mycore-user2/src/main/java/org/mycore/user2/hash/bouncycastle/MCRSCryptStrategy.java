@@ -32,19 +32,52 @@ import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
- * {@link MCRSCryptStrategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the SCrypt algorithm.
+ * {@link MCRSCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the SCrypt algorithm.
  * <p>
- * The salt and the hash are returned as hex encoded strings.
+ * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for SCrypt. No explicit salt
+ * values are generated.
  * <p>
- * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
- * expected value.
+ * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
+ * <ul>
+ * <li> The configuration suffix {@link MCRSCryptStrategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated salt values in bytes.
+ * <li> The configuration suffix {@link MCRSCryptStrategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated hash values in bytes.
+ * <li> The configuration suffix {@link MCRSCryptStrategy#PARALLELISM_KEY} can be used to specify the parallelization
+ * value.
+ * <li> The configuration suffix {@link MCRSCryptStrategy#BLOCK_SIZE_KEY} can be used to influences the amount of
+ * memory to be used.
+ * <li> The configuration suffix {@link MCRSCryptStrategy#COST_KEY} can be used to specify the cost parameter the
+ * CPU/memory cost parameter.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.bouncycastle.MCRSCryptStrategy
+ * [...].SaltSizeBytes=32
+ * [...].HashSizeBytes=64
+ * [...].Parallelism=1
+ * [...].BlockSize=8
+ * [...].Cost=17
+ * </pre>
+ * This will generate salt values of length 32 and hashes of length 64, use 1 as the parallelism value, 8 as the block
+ * size 17 as the cost parameter.
  * <p>
- * Changes to the cost, the block size or the parallelism will result in deviating hashes and therefore prevent
- * the successful verification of existing hashes, even if the correct password is supplied.
+ * Changes to the parallelism value, block size or cost parameter will result in deviating hashes and therefore prevent
+ * the successful verification of existing hashes, even if the correct password is supplied. Changes to the salt size
+ * or the hash size will not prevent verification, but successful verification results will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRSCryptStrategy.Factory.class)
 public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
+
+    public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
+
+    public static final String HASH_SIZE_BYTES_KEY = "HashSizeBytes";
+
+    public static final String PARALLELISM_KEY = "Parallelism";
+
+    public static final String BLOCK_SIZE_KEY = "BlockSize";
+
+    public static final String COST_KEY = "Cost";
 
     private static final HexFormat HEX_FORMAT = HexFormat.of();
 
@@ -52,25 +85,40 @@ public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
 
     private final int hashSizeBytes;
 
-    private final int cost;
+    private final int parallelism;
 
     private final int blockSize;
 
-    private final int parallelism;
+    private final int cost;
 
 
     public MCRSCryptStrategy(int saltSizeBytes, int hashSizeBytes,
-                             int cost, int blockSize, int parallelism) {
+                             int parallelism, int blockSize, int cost) {
+        if (saltSizeBytes < 1) {
+            throw new IllegalArgumentException("Salt size [bytes] must be positive, got " + saltSizeBytes);
+        }
         this.saltSizeBytes = saltSizeBytes;
+        if (hashSizeBytes < 1) {
+            throw new IllegalArgumentException("Hash size [bytes] must be positive, got " + hashSizeBytes);
+        }
         this.hashSizeBytes = hashSizeBytes;
-        this.cost = cost;
-        this.blockSize = blockSize;
+        if (parallelism < 1) {
+            throw new IllegalArgumentException("Parallelism must be positive, got " + parallelism);
+        }
         this.parallelism = parallelism;
+        if (blockSize < 1) {
+            throw new IllegalArgumentException("Block size must be positive, got " + blockSize);
+        }
+        this.blockSize = blockSize;
+        if (cost < 1) {
+            throw new IllegalArgumentException("Cost must be positive, got " + cost);
+        }
+        this.cost = cost;
     }
 
     @Override
     public String invariableConfiguration() {
-        return "c=" + cost + "/bs=" + blockSize + "/p=" + parallelism;
+        return "p=" + parallelism + "/bs=" + blockSize + "/c=" + cost;
     }
 
     @Override
@@ -106,25 +154,25 @@ public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
 
     public static class Factory implements Supplier<MCRSCryptStrategy> {
 
-        @MCRProperty(name = "SaltSizeBytes")
+        @MCRProperty(name = SALT_SIZE_BYTES_KEY)
         public String saltSizeBytes;
 
-        @MCRProperty(name = "HashSizeBytes")
+        @MCRProperty(name = HASH_SIZE_BYTES_KEY)
         public String hashSizeBytes;
 
-        @MCRProperty(name = "Cost")
-        public String cost;
+        @MCRProperty(name = PARALLELISM_KEY)
+        public String parallelism;
 
-        @MCRProperty(name = "BlockSize")
+        @MCRProperty(name = BLOCK_SIZE_KEY)
         public String blockSize;
 
-        @MCRProperty(name = "Parallelism")
-        public String parallelism;
+        @MCRProperty(name = COST_KEY)
+        public String cost;
 
         @Override
         public MCRSCryptStrategy get() {
-            return new MCRSCryptStrategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes),
-                Integer.parseInt(cost), Integer.parseInt(blockSize), Integer.parseInt(parallelism));
+            return new MCRSCryptStrategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes), 
+                Integer.parseInt(parallelism), Integer.parseInt(blockSize), Integer.parseInt(cost));
         }
 
     }

@@ -34,11 +34,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Class", classNameOf = MCRBCryptStrategy.class),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Cost", string = "12"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "bcrypt")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "bcrypt")
     })
     public final void testBCrypt() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("bcrypt", data.type());
@@ -51,14 +51,14 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.Class", classNameOf = MCRSCryptStrategy.class),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.SaltSizeBytes", string = "32"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.HashSizeBytes", string = "64"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.Cost", string = "17"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.BlockSize", string = "8"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.Parallelism", string = "1"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "scrypt")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.BlockSize", string = "8"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.scrypt.Cost", string = "17"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "scrypt")
     })
     public final void testSCrypt() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("scrypt", data.type());
@@ -71,14 +71,14 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Class", classNameOf = MCRArgon2Strategy.class),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.SaltSizeBytes", string = "32"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.HashSizeBytes", string = "64"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Iterations", string = "8"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.MemoryLimitKiloBytes", string = "65536"),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Parallelism", string = "1"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "argon2")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.MemoryLimitKilobytes", string = "65536"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.argon2.Iterations", string = "8"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "argon2")
     })
     public final void testArgon2() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("argon2", data.type());

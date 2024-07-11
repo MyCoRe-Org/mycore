@@ -28,24 +28,44 @@ import org.mycore.common.config.annotation.MCRProperty;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
 
 /**
- * {@link MCRSHA1Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the SHA1 algorithm.
+ * {@link MCRSHA1Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the SHA1 algorithm.
  * <p>
- * The salt is returned as a base 64 encoded string and the hash is returned as a hex encoded string.
+ * The salt is returned as a base 64 encoded string. The hash is returned as a hex encoded string.
  * <p>
- * The verification result will be marked as outdated if the salt size doesn't equal the expected value.
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The configuration suffix {@link MCRSHA1Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated salt values in bytes.
+ * <li> The configuration suffix {@link MCRSHA1Strategy#ITERATIONS_KEY} can be used to specify the number of
+ * iterations to be performed.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.MCRSHA1Strategy
+ * [...].SaltSizeBytes=8
+ * [...].Iterations=1000
+ * </pre>
+ * This will generate salt values of length 8 and perform 1000 iteration.
  * <p>
  * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
- * verification of existing hashes, even if the correct password is supplied.
+ * verification of existing hashes, even if the correct password is supplied. Changes to the salt size will not prevent
+ * verification, but successful verification results will be marked as outdated.
  */
 @MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRSHA1Strategy.Factory.class)
 public class MCRSHA1Strategy extends MCRSaltedHashPasswordCheckStrategy {
 
+    public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
+
+    public static final String ITERATIONS_KEY = "Iterations";
+
     private final int iterations;
 
     public MCRSHA1Strategy(int saltSizeBytes, int iterations) {
         super(saltSizeBytes);
+        if (iterations < 1) {
+            throw new IllegalArgumentException("Iterations must be positive, got " + iterations);
+        }
         this.iterations = iterations;
         probeHashAlgorithm("SHA-1");
     }
@@ -62,10 +82,10 @@ public class MCRSHA1Strategy extends MCRSaltedHashPasswordCheckStrategy {
 
     public static class Factory implements Supplier<MCRSHA1Strategy> {
 
-        @MCRProperty(name = "SaltSizeBytes")
+        @MCRProperty(name = SALT_SIZE_BYTES_KEY)
         public String saltSizeBytes;
 
-        @MCRProperty(name = "Iterations")
+        @MCRProperty(name = ITERATIONS_KEY)
         public String iterations;
 
         @Override

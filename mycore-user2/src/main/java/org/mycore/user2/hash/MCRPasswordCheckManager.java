@@ -31,91 +31,105 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.MCRException;
+import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.log.MCRListMessage;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.resource.MCRResourceHelper;
-import org.mycore.common.annotation.MCROutdated;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * A {@link MCRPasswordCheckManager} can be used to create hashes of passwords and to verify an existing hash
- * against a given password, without knowledge of the underlying algorithm that performs these actions.
+ * A {@link MCRPasswordCheckManager} can be used to create password hashes and to verify an existing hash
+ * against a given password, without knowledge of the underlying algorithm that performs these actions. To do so,
+ * it uses {@link MCRPasswordCheckStrategy} instances that each implement a password hashing and verification strategy.
+ * A single strategy is selected to create new password hashes. Alle strategies are available to verify existing
+ * password hashes.
  * <p>
- * Multiple instances of {@link MCRPasswordCheckStrategy} can be configured using the property prefix
- * {@link MCRPasswordCheckManager#STRATEGIES_KEY} and a freely selectable name. Each user password check strategy
- * implements a strategy to create hashes of passwords and to verify an existing hash against a given password.
+ * The verification result is marked as deprecated, when the strategy used to verify the hash isn't the
+ * selected strategy or if the used strategy already marked it as deprecated.
  * <p>
+ * A singular, globally available and centrally configured instance can be obtained with
+ * {@link MCRPasswordCheckManager#instance()}. This instance is configured using the property prefix
+ * {@link MCRPasswordCheckManager#MANAGER_PROPERTY} and should be used in order to create or verify password hashes,
+ * although custom instances can be created when necessary.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> Strategies are configured as a map using the property suffix {@link MCRPasswordCheckManager#STRATEGIES_KEY}.
+ * <li> The selected strategy is configured using the property suffix
+ * {@link MCRPasswordCheckManager#SELECTED_STRATEGY_KEY}.
+ * <li> The property suffix {@link MCRPasswordCheckManager#CHECK_CONFIGURATION_KEY} can be used to enable or disable
+ * configuration checks during instantiation, specifically: (1) whether the configuration of a selector has been changed
+ * in a way that will prevent existing password hashes from being successfully verified, even if the correct password
+ * was supplied and (2) whether a strategy annotated with {@link MCROutdated} has been selected.
+ * </ul>
  * Example:
  * <pre>
- * MCR.User.PasswordCheck.Strategies.foo.Class=my.package.MCRFooPasswordCheckStrategy
+ * MCR.User.PasswordCheck.Class=org.mycore.user2.hash.MCRPasswordCheckManager
+ * MCR.User.PasswordCheck.Strategies.foo.Class=foo.bar.FooStrategy
+ * MCR.User.PasswordCheck.Strategies.foo.Key1=Value1
+ * MCR.User.PasswordCheck.Strategies.foo.Key2=Value2
+ * MCR.User.PasswordCheck.Strategies.bar.Class=foo.bar.FooStrategy
+ * MCR.User.PasswordCheck.Strategies.bar.Key1=Value1
+ * MCR.User.PasswordCheck.Strategies.bar.Key2=Value2
+ * MCR.User.PasswordCheck.MCR.SelectedStrategy=foo
+ * MCR.User.PasswordCheck.MCR.CheckConfiguration=true
  * </pre>
- * This will create an instance of <code>MCRFooPasswordCheckStrategy</code> and make it available with the schema
- * <code>foo</code>.
- * <p>
- * A single strategy is configured as the preferred strategy using the property
- * {@link MCRPasswordCheckManager#STRATEGY_KEY}.
- * <p>
- * The preferred strategy is used when creating a hash of a password. All configured strategies are available when
- * verifying an existing hash against a given password. The verification result is marked as deprecated, when the
- * strategy used to verify the hash isn't the preferred strategy or if the used strategy marked it as deprecated.
+ * This will add two automatically configured strategies named <code>foo</code> and <code>bar</code> respectively,
+ * select the strategy named <code>foo</code> and perform configuration checks during instantiation.
  */
+@MCRConfigurationProxy(proxyClass = MCRPasswordCheckManager.Factory.class)
 public final class MCRPasswordCheckManager {
 
-    public static final String STRATEGIES_KEY = "MCR.User.PasswordCheck.Strategies";
+    public static final String MANAGER_PROPERTY = "MCR.User.PasswordCheck";
 
-    public static final String STRATEGY_KEY = "MCR.User.PasswordCheck.Strategy";
+    public static final String STRATEGIES_KEY = "Strategies";
 
-    public static final String RANDOM_ALGORITHM_KEY = "MCR.User.PasswordCheck.RandomAlgorithm";
+    public static final String SELECTED_STRATEGY_KEY = "SelectedStrategy";
 
-    private static final Logger LOGGER = StatusLogger.getLogger();
+    public static final String CHECK_CONFIGURATION_KEY = "CheckConfiguration";
 
-    private static final MCRPasswordCheckManager INSTANCE = new MCRPasswordCheckManager(getConfiguredRandom(),
-        getConfiguredStrategies(), getConfiguredStrategy(), true);
+    private static final MCRPasswordCheckManager INSTANCE = instantiate();
 
     private final SecureRandom random;
 
     private final Map<String, MCRPasswordCheckStrategy> strategies;
 
-    private final MCRPasswordCheckStrategy preferredStrategy;
+    private final MCRPasswordCheckStrategy selectedStrategy;
 
-    private final String preferredStrategyType;
-
-    public MCRPasswordCheckManager() {
-        this(getConfiguredRandom(), getConfiguredStrategies(), getConfiguredStrategy(), false);
-    }
+    private final String selectedStrategyType;
 
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
-                                   String preferredStrategyType, boolean checkConfiguration) {
-        this.random = Objects.requireNonNull(random);
-        this.strategies = new HashMap<>(Objects.requireNonNull(strategies));
-        this.strategies.values().forEach(Objects::requireNonNull);
-        this.preferredStrategyType = Objects.requireNonNull(preferredStrategyType);
-        this.preferredStrategy = this.strategies.get(preferredStrategyType);
-        if (this.preferredStrategy == null) {
-            throw new IllegalArgumentException("Preferred strategy " + preferredStrategyType + " unavailable, got: "
+                                   String selectedStrategyType, boolean checkConfiguration) {
+        this.random = Objects.requireNonNull(random, "Random must not be null");
+        this.strategies = new HashMap<>(Objects.requireNonNull(strategies, "Strategies must not be null"));
+        this.strategies.values().forEach(strategy -> Objects.requireNonNull(strategy, "Strategy must not be null"));
+        this.selectedStrategyType = Objects.requireNonNull(selectedStrategyType, "Selected strategy must not be null");
+        this.selectedStrategy = this.strategies.get(selectedStrategyType);
+        if (this.selectedStrategy == null) {
+            throw new IllegalArgumentException("Selected strategy " + selectedStrategyType + " unavailable, got: "
                 + String.join(", ", this.strategies.keySet()));
         }
         if (checkConfiguration) {
-            checkPreferredStrategyIsNotOutdated(preferredStrategyType, preferredStrategy);
+            checkSelectedStrategyIsNotOutdated(selectedStrategyType, selectedStrategy);
             checkIncompatibleConfigurationChange(strategies);
         }
     }
 
-    private void checkPreferredStrategyIsNotOutdated(String type, MCRPasswordCheckStrategy strategy) {
+    private void checkSelectedStrategyIsNotOutdated(String type, MCRPasswordCheckStrategy strategy) {
 
-        Class<? extends MCRPasswordCheckStrategy> preferredStrategyClass = strategy.getClass();
+        Class<? extends MCRPasswordCheckStrategy> selectedStrategyClass = strategy.getClass();
 
-        if (preferredStrategyClass.isAnnotationPresent(MCROutdated.class)) {
+        if (selectedStrategyClass.isAnnotationPresent(MCROutdated.class)) {
             throw new MCRConfigurationException("Detected outdated password check strategy implementation " +
-                preferredStrategyClass.getName() + " for preferred password check strategy " + type + ", expected " +
+                selectedStrategyClass.getName() + " for selected password check strategy " + type + ", expected " +
                 "an implementation that is not outdated");
         }
 
@@ -133,16 +147,16 @@ public final class MCRPasswordCheckManager {
 
                 if (!oldConfiguration.className().equals(newConfiguration.className())) {
                     throw new MCRConfigurationException("Detected incompatible implementation change for password " +
-                        "check strategy " + type + " that will prevent existing passwords from being successfully " +
-                        "verified, even if the correct password was supplied, got " + newConfiguration.className() + 
-                        ", expected " + oldConfiguration.className());
+                        "check strategy " + type + " that will prevent existing password hashes from being " +
+                        "successfully verified, even if the correct password was supplied, got " +
+                        newConfiguration.className() + ", expected " + oldConfiguration.className());
                 }
 
                 if (!oldConfiguration.value().equals(newConfiguration.value())) {
                     throw new MCRConfigurationException("Detected incompatible value change for password " +
-                        "check strategy " + type + " that will prevent existing passwords from being successfully " +
-                        "verified, even if the correct password was supplied, got " + newConfiguration.value() +
-                        ", expected " + oldConfiguration.value());
+                        "check strategy " + type + " that will prevent existing password hashes from being " +
+                        "successfully verified, even if the correct password was supplied, got " +
+                        newConfiguration.value() + ", expected " + oldConfiguration.value());
                 }
 
             } else {
@@ -166,8 +180,7 @@ public final class MCRPasswordCheckManager {
             try (BufferedReader reader = new BufferedReader(new FileReader(file, UTF_8), 128)) {
                 return new InvariableConfiguration(reader.readLine(), reader.readLine());
             } catch (IOException e) {
-                throw new MCRConfigurationException("Unable to read from value file " +
-                    file.getAbsolutePath());
+                throw new MCRException("Unable to read from value file " + file.getAbsolutePath());
             }
         }
 
@@ -212,53 +225,22 @@ public final class MCRPasswordCheckManager {
 
     }
 
-    public static SecureRandom getConfiguredRandom() {
-        try {
-            return SecureRandom.getInstance(MCRConfiguration2.getStringOrThrow(RANDOM_ALGORITHM_KEY));
-        } catch (NoSuchAlgorithmException e) {
-            throw new MCRConfigurationException("Could not initialize secure random number generator", e);
-        }
-    }
-
-    public static Map<String, MCRPasswordCheckStrategy> getConfiguredStrategies() {
-
-        String prefix = STRATEGIES_KEY + ".";
-        Map<String, Callable<MCRPasswordCheckStrategy>> strategyFactoriesByProperty =
-            MCRConfiguration2.getInstances(prefix);
-
-        MCRListMessage description = new MCRListMessage();
-        Map<String, MCRPasswordCheckStrategy> strategiesByType = new HashMap<>();
-        for (String property : strategyFactoriesByProperty.keySet()) {
-            try {
-                String type = property.substring(prefix.length());
-                MCRPasswordCheckStrategy strategy = strategyFactoriesByProperty.get(property).call();
-                description.add(type, strategy.getClass().getName());
-                strategiesByType.put(type, strategy);
-            } catch (Exception e) {
-                throw new MCRConfigurationException("Failed to instantiate strategy configured in: " + property, e);
-            }
-        }
-        LOGGER.info(description.logMessage("Checking password with strategies:"));
-
-        return strategiesByType;
-
-    }
-
-    public static String getConfiguredStrategy() {
-        return MCRConfiguration2.getStringOrThrow(STRATEGY_KEY);
-    }
-
     public static MCRPasswordCheckManager instance() {
         return INSTANCE;
     }
 
+    public static MCRPasswordCheckManager instantiate() {
+        String classProperty = MANAGER_PROPERTY + ".Class";
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, classProperty);
+    }
+
     public MCRPasswordCheckData create(String password) {
-        return preferredStrategy.create(random, preferredStrategyType, password);
+        return selectedStrategy.create(random, selectedStrategyType, password);
     }
 
     public MCRPasswordCheckResult verify(MCRPasswordCheckData data, String password) {
         MCRPasswordCheckResult result = getStrategy(data.type()).verify(data, password);
-        if (preferredStrategyType.equals(data.type())) {
+        if (selectedStrategyType.equals(data.type())) {
             return result;
         } else {
             return new MCRPasswordCheckResult(result.valid(), true);
@@ -276,5 +258,31 @@ public final class MCRPasswordCheckManager {
     private record InvariableConfiguration(String className, String value) {
     }
 
+    public static class Factory implements Supplier<MCRPasswordCheckManager> {
+
+        @MCRInstanceMap(name = STRATEGIES_KEY, valueClass = MCRPasswordCheckStrategy.class)
+        public Map<String, MCRPasswordCheckStrategy> strategies;
+
+        @MCRProperty(name = SELECTED_STRATEGY_KEY)
+        public String selectedStrategy;
+
+        @MCRProperty(name = CHECK_CONFIGURATION_KEY)
+        public String checkConfiguration;
+
+        @Override
+        public MCRPasswordCheckManager get() {
+            return new MCRPasswordCheckManager(getStrongSecureRandom(), strategies, selectedStrategy,
+                Boolean.parseBoolean(checkConfiguration));
+        }
+
+        private static SecureRandom getStrongSecureRandom() {
+            try {
+                return SecureRandom.getInstanceStrong();
+            } catch (NoSuchAlgorithmException e) {
+                throw new MCRException("failed to obtain strong secure random number generator", e);
+            }
+        }
+
+    }
 
 }

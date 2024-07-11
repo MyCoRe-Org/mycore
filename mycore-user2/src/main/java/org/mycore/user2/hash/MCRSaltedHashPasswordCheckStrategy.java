@@ -34,6 +34,9 @@ public abstract class MCRSaltedHashPasswordCheckStrategy extends MCRHashPassword
 
     public MCRSaltedHashPasswordCheckStrategy(int saltSizeBytes) {
         this.saltSizeBytes = saltSizeBytes;
+        if (saltSizeBytes < 0) {
+            throw new IllegalArgumentException("Salt size [bytes] must be non-negative, got " + saltSizeBytes);
+        }
     }
 
     @Override

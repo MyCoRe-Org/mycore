@@ -25,7 +25,6 @@ import org.mycore.common.MCRTestCase;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class MCRMD5StrategyTest extends MCRTestCase {
@@ -39,11 +38,11 @@ public class MCRMD5StrategyTest extends MCRTestCase {
     @Test
     public final void test() {
 
-        MCRPasswordCheckStrategy strategy = new MCRMD5Strategy(1);
+        MCRPasswordCheckStrategy strategy = new MCRMD5Strategy(0, 1);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
-        assertNull(data.salt());
+        assertEquals("", data.salt());
         assertEquals(MD5_HASH_STRING, data.hash());
 
         MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
@@ -53,10 +52,27 @@ public class MCRMD5StrategyTest extends MCRTestCase {
     }
 
     @Test
+    public final void testSaltSizeChange() {
+
+        MCRPasswordCheckStrategy strategyOld = new MCRMD5Strategy(8, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRMD5Strategy(16, 1);
+        MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
+
+        MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);
+        assertTrue(resultOld.valid());
+        assertFalse(resultOld.deprecated());
+
+        MCRPasswordCheckResult resultNew = strategyNew.verify(dataOld, PASSWORD);
+        assertTrue(resultNew.valid());
+        assertTrue(resultNew.deprecated());
+
+    }
+
+    @Test
     public final void testIterationsChange() {
 
-        MCRPasswordCheckStrategy strategyOld = new MCRMD5Strategy(1);
-        MCRPasswordCheckStrategy strategyNew = new MCRMD5Strategy(2);
+        MCRPasswordCheckStrategy strategyOld = new MCRMD5Strategy(8, 1);
+        MCRPasswordCheckStrategy strategyNew = new MCRMD5Strategy(8, 2);
         MCRPasswordCheckData dataOld = strategyOld.create(new SecureRandom(), TYPE, PASSWORD);
 
         MCRPasswordCheckResult resultOld = strategyOld.verify(dataOld, PASSWORD);

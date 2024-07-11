@@ -20,6 +20,7 @@ package org.mycore.user2.hash;
 
 import java.security.SecureRandom;
 import java.util.HexFormat;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import javax.crypto.SecretKeyFactory;
@@ -32,19 +33,46 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeSecretKeyAlgorithm;
 
 /**
- * {@link MCRPBKDF2Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the PBKDF2 algorithm.
+ * {@link MCRPBKDF2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the PBKDF2 algorithm.
  * <p>
- * The salt and the hash are returned as hex encoded strings.
+ * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
  * <p>
- * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
- * expected value.
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The configuration suffix {@link MCRPBKDF2Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated salt values in bytes.
+ * <li> The configuration suffix {@link MCRPBKDF2Strategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated hash values in bytes.
+ * <li> The configuration suffix {@link MCRPBKDF2Strategy#HASH_ALGORITHM_KEY} can be used to specify the hash algorithm
+ * to be used.
+ * <li> The configuration suffix {@link MCRPBKDF2Strategy#ITERATIONS_KEY} can be used to specify the number of
+ * iterations to be performed.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.MCRPBKDF2Strategy
+ * [...].SaltSizeBytes=16
+ * [...].HashSizeBytes=32
+ * [...].HashAlgorithm=SHA256
+ * [...].Iterations=1000000
+ * </pre>
+ * This will generate salt values of length 16 and hashes of length 32, use SHA-256 as the hash algorithm and perform
+ * 1000000 iterations.
  * <p>
- * Changes to the hash algorithm or the number of iterations will result in deviating hashes and therefore prevent 
- * the successful verification of existing hashes, even if the correct password is supplied.
+ * Changes to the hash algorithm or the number of iterations will result in deviating hashes and therefore prevent the
+ * successful verification of existing hashes, even if the correct password is supplied. Changes to the salt size or
+ * the hash size will not prevent verification, but successful verification results will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRPBKDF2Strategy.Factory.class)
 public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
+
+    public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
+
+    public static final String HASH_SIZE_BYTES_KEY = "HashSizeBytes";
+
+    public static final String HASH_ALGORITHM_KEY = "HashAlgorithm";
+
+    public static final String ITERATIONS_KEY = "Iterations";
 
     private static final HexFormat HEX_FORMAT = HexFormat.of();
 
@@ -57,10 +85,19 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
     private final int iterations;
 
     public MCRPBKDF2Strategy(int saltSizeBytes, int hashSizeBytes, String hashAlgorithm, int iterations) {
+        if (saltSizeBytes < 1) {
+            throw new IllegalArgumentException("Salt size [bytes] must be positive, got " + saltSizeBytes);
+        }
         this.saltSizeBytes = saltSizeBytes;
+        if (hashSizeBytes < 1) {
+            throw new IllegalArgumentException("Hash size [bytes] must be positive, got " + hashSizeBytes);
+        }
         this.hashSizeBytes = hashSizeBytes;
-        this.hashAlgorithm = hashAlgorithm;
+        this.hashAlgorithm = Objects.requireNonNull(hashAlgorithm, "Hash algorithm must not be null");
         probeSecretKeyAlgorithm(pdkdf2Algorithm(hashAlgorithm));
+        if (iterations < 1) {
+            throw new IllegalArgumentException("Iterations must be positive, got " + iterations);
+        }
         this.iterations = iterations;
     }
 
@@ -107,16 +144,16 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
 
     public static class Factory implements Supplier<MCRPBKDF2Strategy> {
 
-        @MCRProperty(name = "SaltSizeBytes")
+        @MCRProperty(name = SALT_SIZE_BYTES_KEY)
         public String saltSizeBytes;
 
-        @MCRProperty(name = "HashSizeBytes")
+        @MCRProperty(name = HASH_SIZE_BYTES_KEY)
         public String hashSizeBytes;
 
-        @MCRProperty(name = "HashAlgorithm")
+        @MCRProperty(name = HASH_ALGORITHM_KEY)
         public String hashAlgorithm;
 
-        @MCRProperty(name = "Iterations")
+        @MCRProperty(name = ITERATIONS_KEY)
         public String iterations;
 
         @Override

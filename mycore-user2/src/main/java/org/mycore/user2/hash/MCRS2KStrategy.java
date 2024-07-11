@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.HexFormat;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
@@ -34,19 +35,47 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
 
 /**
- * {@link MCRS2KStrategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the iterated and salted String-to-Key (S2K) algorithm describes in RFC 4880 (OpenPGP Message Format).
+ * {@link MCRS2KStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the iterated and
+ * salted String-to-Key (S2K) algorithm describes in RFC 4880 (OpenPGP Message Format).
  * <p>
- * The salt and the hash are returned as hex encoded strings.
+ * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
  * <p>
- * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
- * expected value.
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The configuration suffix {@link MCRS2KStrategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated salt values in bytes.
+ * <li> The configuration suffix {@link MCRS2KStrategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated hash values in bytes.
+ * <li> The configuration suffix {@link MCRS2KStrategy#HASH_ALGORITHM_KEY} can be used to specify the hash algorithm
+ * to be used.
+ * <li> The configuration suffix {@link MCRS2KStrategy#COUNT_KEY} can be used to specify the count parameter the
+ * determines the number of hashed bytes.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.MCRS2KStrategy
+ * [...].SaltSizeBytes=16
+ * [...].HashSizeBytes=32
+ * [...].HashAlgorithm=SHA256
+ * [...].Count=275
+ * </pre>
+ * This will generate salt values of length 16 and hashes of length 32, use 275 as the count parameter and SHA-256
+ * as the hash algorithm.
  * <p>
- * Changes to the hash algorithm or the count will result in deviating hashes and therefore prevent the successful
- * verification of existing hashes, even if the correct password is supplied.
+ * Changes to the hash algorithm or count parameter will result in deviating hashes and therefore prevent the
+ * successful verification of existing hashes, even if the correct password is supplied. Changes to the salt size or
+ * the hash size will not prevent verification, but successful verification results will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRS2KStrategy.Factory.class)
 public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
+
+    public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
+
+    public static final String HASH_SIZE_BYTES_KEY = "HashSizeBytes";
+
+    public static final String HASH_ALGORITHM_KEY = "HashAlgorithm";
+
+    public static final String COUNT_KEY = "Count";
 
     private static final HexFormat HEX_FORMAT = HexFormat.of();
 
@@ -59,10 +88,19 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
     private final int count;
 
     public MCRS2KStrategy(int saltSizeBytes, int hashSizeBytes, String hashAlgorithm, int count) {
+        if (saltSizeBytes < 1) {
+            throw new IllegalArgumentException("Salt size [bytes] must be positive, got " + saltSizeBytes);
+        }
         this.saltSizeBytes = saltSizeBytes;
+        if (hashSizeBytes < 1) {
+            throw new IllegalArgumentException("Hash size [bytes] must be positive, got " + hashSizeBytes);
+        }
         this.hashSizeBytes = hashSizeBytes;
-        this.hashAlgorithm = hashAlgorithm;
+        this.hashAlgorithm = Objects.requireNonNull(hashAlgorithm, "Hash algorithm must not be null");
         probeHashAlgorithm(hashAlgorithm);
+        if (count < 1) {
+            throw new IllegalArgumentException("Count must be positive, got " + count);
+        }
         this.count = count;
     }
 
@@ -132,16 +170,16 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
 
     public static class Factory implements Supplier<MCRS2KStrategy> {
 
-        @MCRProperty(name = "SaltSizeBytes")
+        @MCRProperty(name = SALT_SIZE_BYTES_KEY)
         public String saltSizeBytes;
 
-        @MCRProperty(name = "HashSizeBytes")
+        @MCRProperty(name = HASH_SIZE_BYTES_KEY)
         public String hashSizeBytes;
 
-        @MCRProperty(name = "HashAlgorithm")
+        @MCRProperty(name = HASH_ALGORITHM_KEY)
         public String hashAlgorithm;
 
-        @MCRProperty(name = "Count")
+        @MCRProperty(name = COUNT_KEY)
         public String count;
 
         @Override

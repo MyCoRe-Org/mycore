@@ -30,15 +30,18 @@ import org.mycore.common.MCRTestProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.User.PasswordCheck.CheckConfiguration", string = "false")
+})
 public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase {
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "crypt")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "crypt")
     })
     public final void testCrypt() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("crypt", data.type());
@@ -48,11 +51,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "md5")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "md5")
     })
     public final void testMD5() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("md5", data.type());
@@ -62,11 +65,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "sha1")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "sha1")
     })
     public final void testSHA1() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("sha1", data.type());
@@ -76,11 +79,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "sha256")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "sha256")
     })
     public final void testSHA256() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("sha256", data.type());
@@ -90,11 +93,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "sha512")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "sha512")
     })
     public final void testSHA512() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("sha512", data.type());
@@ -104,11 +107,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "s2k")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "s2k")
     })
     public final void testS2K() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("s2k", data.type());
@@ -118,11 +121,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
     @Test
     @MCRTestConfiguration(properties = {
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "pbkdf2")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "pbkdf2")
     })
     public final void testPBKDF2() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("pbkdf2", data.type());
@@ -135,7 +138,7 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
         SecureRandom random = new SecureRandom();
         Map<String, MCRPasswordCheckStrategy> strategies = new HashMap<>();
-        strategies.put("foo", new MCRMD5Strategy(1));
+        strategies.put("foo", new MCRMD5Strategy(0, 1));
 
         MCRPasswordCheckManager manager = new MCRPasswordCheckManager(random, strategies, "foo", false);
 
@@ -150,8 +153,8 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
 
         SecureRandom random = new SecureRandom();
         Map<String, MCRPasswordCheckStrategy> strategies = new HashMap<>();
-        strategies.put("old", new MCRMD5Strategy(1));
-        strategies.put("new", new MCRMD5Strategy(2));
+        strategies.put("old", new MCRMD5Strategy(0, 1));
+        strategies.put("new", new MCRMD5Strategy(0, 2));
 
         MCRPasswordCheckManager managerOld = new MCRPasswordCheckManager(random, strategies, "old", false);
         MCRPasswordCheckManager managerNew = new MCRPasswordCheckManager(random, strategies, "new", false);

@@ -28,7 +28,6 @@ import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class MCRBCryptStrategyTest extends MCRTestCase {
@@ -46,7 +45,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
-        assertNull(data.salt());
+        assertEquals("", data.salt());
         assertEquals(BCRYPT_HASH_STRING_LENGTH, data.hash().length());
 
         MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);
@@ -80,7 +79,7 @@ public class MCRBCryptStrategyTest extends MCRTestCase {
         MCRPasswordCheckData data = otherStrategy.create(new SecureRandom(), TYPE, PASSWORD);
 
         assertEquals(TYPE, data.type());
-        assertNull(data.salt());
+        assertEquals("", data.salt());
         assertEquals(BCRYPT_HASH_STRING_LENGTH, data.hash().length());
 
         MCRPasswordCheckResult result = strategy.verify(data, PASSWORD);

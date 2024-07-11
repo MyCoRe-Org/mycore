@@ -37,6 +37,7 @@ public abstract class MCRPasswordCheckUtils {
         }
         return result == 0;
     }
+
     public static void probeHashAlgorithm(String algorithm) {
         try {
             MessageDigest.getInstance(algorithm);

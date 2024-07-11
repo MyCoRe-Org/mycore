@@ -19,7 +19,6 @@
 package org.mycore.user2.hash.favre;
 
 import org.junit.Test;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.user2.hash.MCRPasswordCheckData;
@@ -36,11 +35,11 @@ public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Class", classNameOf = MCRBCryptStrategy.class),
         @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.bcrypt.Cost", string = "12"),
-        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategy", string = "bcrypt")
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "bcrypt")
     })
     public final void testBCrypt() {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("bcrypt", data.type());

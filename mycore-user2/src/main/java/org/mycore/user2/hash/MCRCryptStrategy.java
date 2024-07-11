@@ -26,10 +26,18 @@ import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 
 /**
- * {@link MCRCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that
- * uses traditional DES-based password hashing scheme of the POSIX C crypt(3) command.
+ * {@link MCRCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the traditional
+ * DES-based password hashing scheme of the POSIX C crypt(3) command.
  * <p>
- * The salt is prepended to the Radix 64 encoded hash.
+ * The salt is encoded in the hash using the Modular Crypt Format (MCF) for the traditional DES-based password
+ * hashing scheme. No explicit salt values are generated.
+ * <p>
+ * No configuration options are available, if configured automatically.
+ * <p>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.MCRCryptStrategy
+ * </pre>
  */
 @MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRCryptStrategy.Factory.class)
@@ -42,7 +50,7 @@ public class MCRCryptStrategy extends MCRHashPasswordCheckStrategy {
 
     @Override
     protected final PasswordCheckData doCreate(SecureRandom random, String password) {
-        return new PasswordCheckData(null, MCRCrypt.crypt(random, password));
+        return new PasswordCheckData("", MCRCrypt.crypt(random, password));
     }
 
     @Override

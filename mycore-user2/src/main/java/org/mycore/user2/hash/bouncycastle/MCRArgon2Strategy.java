@@ -33,48 +33,99 @@ import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
- * {@link MCRArgon2Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the Argon2 algorithm.
+ * {@link MCRArgon2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the Argon2 algorithm.
  * <p>
- * The salt and the hash are returned as hex encoded strings.
+ * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for Argon2. No explicit salt
+ * values are generated.
  * <p>
- * The verification result will be marked as outdated if the salt size or the hash size doesn't equal the
- * expected value.
+ * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
+ * <ul>
+ * <li> The configuration suffix {@link MCRArgon2Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated salt values in bytes.
+ * <li> The configuration suffix {@link MCRArgon2Strategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated hash values in bytes.
+ * <li> The configuration suffix {@link MCRArgon2Strategy#PARALLELISM_KEY} can be used to specify the parallelization
+ * value.
+ * <li> The configuration suffix {@link MCRArgon2Strategy#MEMORY_LIMIT_KILOBYTES_KEY} can be used to influences the
+ * amount of memory to be used in kilobytes.
+ * <li> The configuration suffix {@link MCRArgon2Strategy#ITERATIONS_KEY} can be used to specify the number of
+ * iterations to be performed.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.bouncycastle.MCRArgon2Strategy
+ * [...].SaltSizeBytes=32
+ * [...].HashSizeBytes=64
+ * [...].Parallelism=1
+ * [...].MemoryLimitKilobytes=66536
+ * [...].Iterations=8
+ * </pre>
+ * This will generate salt values of length 32 and hashes of length 64, use 1 as the parallelism value, 66536
+ * kilobytes as the memory limit and perform 8 iterations.
  * <p>
- * Changes to the number of iterations, the memory limit or the parallelism will result in deviating hashes
- * and therefore prevent the successful verification of existing hashes, even if the correct password is supplied.
+ * Changes to the parallelism value, memory limit or number of iterations will result in deviating hashes and therefore
+ * prevent the successful verification of existing hashes, even if the correct password is supplied. Changes to the
+ * salt size or the hash size will not prevent verification, but successful verification results will be marked as
+ * outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRArgon2Strategy.Factory.class)
 public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
+
+    public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
+
+    public static final String HASH_SIZE_BYTES_KEY = "HashSizeBytes";
+
+    public static final String PARALLELISM_KEY = "Parallelism";
+
+    public static final String MEMORY_LIMIT_KILOBYTES_KEY = "MemoryLimitKilobytes";
+
+    public static final String ITERATIONS_KEY = "Iterations";
+
+    private static final HexFormat HEX_FORMAT = HexFormat.of();
 
     private static final int TYPE = Argon2Parameters.ARGON2_id;
 
     private static final int VERSION = Argon2Parameters.ARGON2_VERSION_13;
 
-    private static final HexFormat HEX_FORMAT = HexFormat.of();
-
     private final int saltSizeBytes;
 
     private final int hashSizeBytes;
 
-    private final int iterations;
-
-    private final int memoryLimitKiloBytes;
-
     private final int parallelism;
 
+    private final int memoryLimitKilobytes;
+
+    private final int iterations;
+
+
     public MCRArgon2Strategy(int saltSizeBytes, int hashSizeBytes,
-                             int iterations, int memoryLimitKiloBytes, int parallelism) {
+                             int parallelism, int memoryLimitKilobytes, int iterations) {
+        if (saltSizeBytes < 1) {
+            throw new IllegalArgumentException("Salt size [bytes] must be positive, got " + saltSizeBytes);
+        }
         this.saltSizeBytes = saltSizeBytes;
+        if (hashSizeBytes < 1) {
+            throw new IllegalArgumentException("Hash size [bytes] must be positive, got " + hashSizeBytes);
+        }
         this.hashSizeBytes = hashSizeBytes;
-        this.iterations = iterations;
-        this.memoryLimitKiloBytes = memoryLimitKiloBytes;
+        if (parallelism < 1) {
+            throw new IllegalArgumentException("Parallelism must be positive, got " + parallelism);
+        }
         this.parallelism = parallelism;
+        if (memoryLimitKilobytes < 2 * parallelism) {
+            throw new IllegalArgumentException("Memory limit [kilobytes] must be at least " + (2 * parallelism) +
+                ", got " + memoryLimitKilobytes);
+        }
+        this.memoryLimitKilobytes = memoryLimitKilobytes;
+        if (iterations < 1) {
+            throw new IllegalArgumentException("Iterations must be positive, got " + iterations);
+        }
+        this.iterations = iterations;
     }
 
     @Override
     public String invariableConfiguration() {
-        return "i=" + iterations + "/ml=" + memoryLimitKiloBytes + "/p=" + parallelism;
+        return "p=" + parallelism + "/ml=" + memoryLimitKilobytes + "/i=" + iterations;
     }
 
     @Override
@@ -116,7 +167,7 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
         Argon2Parameters.Builder builder = new Argon2Parameters.Builder(TYPE)
             .withVersion(VERSION)
             .withIterations(iterations)
-            .withMemoryAsKB(memoryLimitKiloBytes)
+            .withMemoryAsKB(memoryLimitKilobytes)
             .withParallelism(parallelism)
             .withSalt(salt);
 
@@ -129,25 +180,25 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
 
     public static class Factory implements Supplier<MCRArgon2Strategy> {
 
-        @MCRProperty(name = "SaltSizeBytes")
+        @MCRProperty(name = SALT_SIZE_BYTES_KEY)
         public String saltSizeBytes;
 
-        @MCRProperty(name = "HashSizeBytes")
+        @MCRProperty(name = HASH_SIZE_BYTES_KEY)
         public String hashSizeBytes;
 
-        @MCRProperty(name = "Iterations")
-        public String iterations;
-
-        @MCRProperty(name = "MemoryLimitKiloBytes")
-        public String memoryLimitKiloBytes;
-
-        @MCRProperty(name = "Parallelism")
+        @MCRProperty(name = PARALLELISM_KEY)
         public String parallelism;
+
+        @MCRProperty(name = MEMORY_LIMIT_KILOBYTES_KEY)
+        public String memoryLimitKilobytes;
+
+        @MCRProperty(name = ITERATIONS_KEY)
+        public String iterations;
 
         @Override
         public MCRArgon2Strategy get() {
             return new MCRArgon2Strategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes),
-                Integer.parseInt(iterations), Integer.parseInt(memoryLimitKiloBytes), Integer.parseInt(parallelism));
+                Integer.parseInt(parallelism), Integer.parseInt(memoryLimitKilobytes), Integer.parseInt(iterations));
         }
 
     }

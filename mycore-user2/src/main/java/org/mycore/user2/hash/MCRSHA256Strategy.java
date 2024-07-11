@@ -27,23 +27,43 @@ import org.mycore.common.config.annotation.MCRProperty;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
 
 /**
- * {@link MCRSHA256Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the SHA256 algorithm.
+ * {@link MCRSHA256Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the SHA-256 algorithm.
  * <p>
- * The salt is returned as a base 64 encoded string and the hash is returned as a hex encoded string.
+ * The salt is returned as a base 64 encoded string. The hash is returned as a hex encoded string.
  * <p>
- * The verification result will be marked as outdated if the salt size doesn't equal the expected value.
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The configuration suffix {@link MCRSHA256Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated salt values in bytes.
+ * <li> The configuration suffix {@link MCRSHA256Strategy#ITERATIONS_KEY} can be used to specify the number of
+ * iterations to be performed.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.MCRSHA256Strategy
+ * [...].SaltSizeBytes=8
+ * [...].Iterations=1000
+ * </pre>
+ * This will generate salt values of length 8 and perform 1000 iteration.
  * <p>
  * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
- * verification of existing hashes, even if the correct password is supplied.
+ * verification of existing hashes, even if the correct password is supplied. Changes to the salt size will not prevent
+ * verification, but successful verification results will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRSHA256Strategy.Factory.class)
 public class MCRSHA256Strategy extends MCRSaltedHashPasswordCheckStrategy {
+
+    public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
+
+    public static final String ITERATIONS_KEY = "Iterations";
 
     private final int iterations;
 
     public MCRSHA256Strategy(int saltSizeBytes, int iterations) {
         super(saltSizeBytes);
+        if (iterations < 1) {
+            throw new IllegalArgumentException("Iterations must be positive, got " + iterations);
+        }
         this.iterations = iterations;
         probeHashAlgorithm("SHA-256");
     }
@@ -60,15 +80,15 @@ public class MCRSHA256Strategy extends MCRSaltedHashPasswordCheckStrategy {
 
     public static class Factory implements Supplier<MCRSHA256Strategy> {
 
-        @MCRProperty(name = "SaltSizeBytes")
-        public String saltSize;
+        @MCRProperty(name = SALT_SIZE_BYTES_KEY)
+        public String saltSizeBytes;
 
-        @MCRProperty(name = "Iterations")
+        @MCRProperty(name = ITERATIONS_KEY)
         public String iterations;
 
         @Override
         public MCRSHA256Strategy get() {
-            return new MCRSHA256Strategy(Integer.parseInt(saltSize), Integer.parseInt(iterations));
+            return new MCRSHA256Strategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(iterations));
         }
 
     }

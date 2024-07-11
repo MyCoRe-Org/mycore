@@ -18,7 +18,6 @@
 
 package org.mycore.user2.hash;
 
-import java.security.SecureRandom;
 import java.util.function.Supplier;
 
 import org.mycore.common.MCRUtils;
@@ -29,23 +28,46 @@ import org.mycore.common.config.annotation.MCRProperty;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
 
 /**
- * {@link MCRMD5Strategy} is n implementation of {@link MCRPasswordCheckStrategy} that
- * uses the MD5 algorithm.
+ * {@link MCRMD5Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the MD5 algorithm.
  * <p>
- * The hash is returned as a hex encoded string.
+ * The salt is returned as a base 64 encoded string. The hash is returned as a hex encoded string.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The configuration suffix {@link MCRMD5Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
+ * generated salt values in bytes.
+ * <li> The configuration suffix {@link MCRMD5Strategy#ITERATIONS_KEY} can be used to specify the number of 
+ * iterations to be performed.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.hash.MCRMD5Strategy
+ * [...].SaltSizeBytes=0
+ * [...].Iterations=1
+ * </pre>
+ * This will generate salt values of length zero and perform one iteration.
  * <p>
  * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
- * verification of existing hashes, even if the correct password is supplied.
+ * verification of existing hashes, even if the correct password is supplied. Changes to the salt size will not prevent 
+ * verification, but successful verification results will be marked as outdated.
  */
 @MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRMD5Strategy.Factory.class)
-public class MCRMD5Strategy extends MCRHashPasswordCheckStrategy {
+public class MCRMD5Strategy extends MCRSaltedHashPasswordCheckStrategy {
+
+    public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
+
+    public static final String ITERATIONS_KEY = "Iterations";
 
     private final int iterations;
 
-    public MCRMD5Strategy(int iterations) {
+    public MCRMD5Strategy(int saltSizeBytes, int iterations) {
+        super(saltSizeBytes);
+        if (iterations < 1) {
+            throw new IllegalArgumentException("Iterations must be positive, got " + iterations);
+        }
         this.iterations = iterations;
-        probeHashAlgorithm("MD5");
+        probeHashAlgorithm("SHA-1");
     }
 
     @Override
@@ -54,23 +76,21 @@ public class MCRMD5Strategy extends MCRHashPasswordCheckStrategy {
     }
 
     @Override
-    protected final PasswordCheckData doCreate(SecureRandom random, String password) throws Exception {
-        return new PasswordCheckData(null, MCRUtils.asMD5String(iterations, null, password));
-    }
-
-    @Override
-    protected final PasswordCheckResult<String> doRecreate(PasswordCheckData data, String password) throws Exception {
-        return new PasswordCheckResult<>(MCRUtils.asMD5String(iterations, null, password), false);
+    protected String doCreateSaltedHash(byte[] salt, String password) throws Exception {
+        return MCRUtils.asMD5String(iterations, salt, password);
     }
 
     public static class Factory implements Supplier<MCRMD5Strategy> {
 
-        @MCRProperty(name = "Iterations")
+        @MCRProperty(name = SALT_SIZE_BYTES_KEY)
+        public String saltSizeBytes;
+
+        @MCRProperty(name = ITERATIONS_KEY)
         public String iterations;
 
         @Override
         public MCRMD5Strategy get() {
-            return new MCRMD5Strategy(Integer.parseInt(iterations));
+            return new MCRMD5Strategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(iterations));
         }
 
     }
