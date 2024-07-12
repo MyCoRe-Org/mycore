@@ -28,9 +28,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -80,6 +83,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     /** This configuration lists all eligible classifications for x-path-mapping */
     private static final String X_PATH_MAPPING_CLASSIFICATIONS
         = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
+
+    private static final Map<String, String> mappingPatterns = MCRConfiguration2.getSubPropertiesMap(
+        "MCR.Category.XPathMapping.Pattern.");
 
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
@@ -152,6 +158,44 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     }
 
     /**
+     * Replaces a specific pattern in an XPath with the value of a matching property. Placeholders in the
+     * property value are substituted with the specific values given in an XPath.<p>
+     * Syntax:<p>
+     * {pattern:&lt;name of property&gt;=&lt;comma-separated list of values&gt;}<p>
+     * (when there are no values, the "=" is optional)<p>
+     * Ex.:<p>
+     * <b>Input XPath:</b> {pattern:Genre=article} and not(mods:relatedItem[@type='host'])<p>
+     * <b>Property:</b> MCR.Category.XPathMapping.Pattern.Genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
+     * <b>Substituted XPath:</b> mods:genre[substring-after(@valueURI,'#')='article'] and not(mods:relatedItem[@type='host'])
+     * @param xPath the XPath containing a pattern to substitute
+     * @return the resolved xPath
+     */
+    private static String replacePattern(String xPath) {
+        final Pattern pattern = Pattern.compile("\\{pattern:([^}]*)}");
+        Matcher matcher = pattern.matcher(xPath);
+        if (matcher.find()) {
+            String patternContent = matcher.group(1);
+            String[] parts = patternContent.split("=");
+            String placeholderText = mappingPatterns.get(parts[0]);
+            if (placeholderText != null) {
+                if (parts.length > 1) { // if there are values to substitute
+                    String[] placeholderValues = parts[1].split(",");
+                    Map<String, String> placeholderValuesMap = new HashMap<>();
+                    for (int i = 0; i < placeholderValues.length; i++) {
+                        placeholderValuesMap.put(String.valueOf(i), placeholderValues[i]);
+                    }
+                    StringSubstitutor sub = new StringSubstitutor(placeholderValuesMap, "{", "}");
+                    String substitute = sub.replace(placeholderText);
+                    return xPath.replace("{pattern:" + patternContent + "}", substitute);
+                } else {
+                    return xPath.replace("{pattern:" + patternContent + "}", placeholderText);
+                }
+            }
+        }
+        return xPath;
+    }
+
+    /**
      * Creates x-mappings and XPath-mappings for a given object.
      * @param obj the {@link MCRObject} to add mappings to
      */
@@ -193,6 +237,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
                     String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                    xPath = replacePattern(xPath);
                     MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                     if (evaluator.test(xPath)) {
@@ -213,6 +258,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
 
                         String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
+                        xPath = replacePattern(xPath);
                         MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                         if (evaluator.test(xPath)) {
