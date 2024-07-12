@@ -173,8 +173,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * @return the resolved xPath
      */
     private static String replacePattern(String xPath) {
+        String updatedXPath = xPath;
         final Pattern pattern = Pattern.compile("\\{pattern:([^=}]*)=?([^}]*)\\}");
-        Matcher matcher = pattern.matcher(xPath);
+        Matcher matcher = pattern.matcher(updatedXPath);
         while (matcher.find()) {
             String patternName = matcher.group(1);
             String placeholderText = MAPPING_PATTERNS.get(patternName);
@@ -187,14 +188,16 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     }
                     StringSubstitutor sub = new StringSubstitutor(placeholderValuesMap, "{", "}");
                     String substitute = sub.replace(placeholderText);
-                    xPath = xPath.substring(0, matcher.start()) + substitute + xPath.substring(matcher.end());
+                    updatedXPath = updatedXPath.substring(0, matcher.start()) + substitute +
+                        updatedXPath.substring(matcher.end());
                 } else {
-                    xPath = xPath.substring(0, matcher.start()) + placeholderText + xPath.substring(matcher.end());
+                    updatedXPath = updatedXPath.substring(0, matcher.start()) + placeholderText +
+                        updatedXPath.substring(matcher.end());
                 }
             }
-            matcher = pattern.matcher(xPath);
+            matcher = pattern.matcher(updatedXPath);
         }
-        return xPath;
+        return updatedXPath;
     }
 
     /**
