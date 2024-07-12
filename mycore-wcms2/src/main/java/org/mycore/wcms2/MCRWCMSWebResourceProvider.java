@@ -30,15 +30,28 @@ import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProviderMode;
 
 /**
- * A {@link MCRFileSystemResourceProvider} is a {@link MCRResourceProvider} that looks up web resources
+ * {@link MCRWCMSWebResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up web resources
  * in the file system. It uses the directory configured in as {@link MCRWCMSUtil#getWCMSDataDir()} (which is the
  * directory that the WCMS writes into) as a base directory for the lookup.
  * <p>
  * This provider replaces the previously used <code>MCRWebPagesSynchronizer</code> that copied the content
  * of the above-mentioned directory in the webapp directory used by the web container.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The property suffix {@link MCRWCMSWebResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.wcms2.MCRWCMSWebResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWCMSWebResourceProvider.Factory.class)
 public class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvider {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRWCMSWebResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.WEB_RESOURCES, getBaseDirs());
@@ -55,7 +68,7 @@ public class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvider {
 
     public static class Factory implements Supplier<MCRWCMSWebResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.WCMS.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.WCMS.Coverage")
         public String coverage;
 
         @Override

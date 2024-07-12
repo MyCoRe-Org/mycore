@@ -26,11 +26,24 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 
 /**
- * A {@link MCRLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource
- * candidate is a resource from a JAR file.
+ * {@link MCRLibraryResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
+ * candidate is a resource from a JAR file. To decide weather such resources are retained or ignored, a
+ * {@link MCRResourceFilterMode} value is used.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The mode is configured using the property suffix {@link MCRLibraryResourceFilter#MODE_KEY}.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.filter.MCRLibraryResourceFilter
+ * [...].Mode=MUST_MATCH
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRLibraryResourceFilter.Factory.class)
 public class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
+
+    public static final String MODE_KEY = "Mode";
 
     public MCRLibraryResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
@@ -43,7 +56,7 @@ public class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
 
     public static class Factory implements Supplier<MCRLibraryResourceFilter> {
 
-        @MCRProperty(name = "Mode", defaultName = "MCR.Resource.Filter.Default.Library.Mode")
+        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Filter.Default.Library.Mode")
         public String mode;
 
         @Override

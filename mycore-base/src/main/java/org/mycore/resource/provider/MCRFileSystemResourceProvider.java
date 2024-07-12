@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
@@ -34,12 +33,31 @@ import org.mycore.common.log.MCRTreeMessage;
 import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 /**
- * A {@link MCRFileSystemResourceProvider} is a {@link MCRResourceProvider} that looks up,
- * depending on the given {@link MCRResourceProviderMode}, resources or web resources in the file system.
+ * {@link MCRFileSystemResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up,
+ * depending on the given {@link MCRResourceProviderMode} value, resources or web resources in the file system.
  * It uses a fixed list of base directories for the lookup.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The mode is configures using the property suffix {@link MCRFileSystemResourceProvider#MODE_KEY}.
+ * <li> The property suffix {@link MCRFileSystemResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRFileSystemResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * [...].MODE=RESOURCES
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRFileSystemResourceProvider.Factory.class)
 public class MCRFileSystemResourceProvider extends MCRFileSystemResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
+
+    public static final String MODE_KEY = "Mode";
+
+    public static final String BASE_DIRS_KEY = "BaseDirs";
 
     private final List<File> baseDirs;
 
@@ -62,19 +80,19 @@ public class MCRFileSystemResourceProvider extends MCRFileSystemResourceProvider
 
     public static class Factory implements Supplier<MCRFileSystemResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.FileSystem.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.FileSystem.Coverage")
         public String coverage;
 
-        @MCRProperty(name = "Mode")
+        @MCRProperty(name = MODE_KEY)
         public String mode;
 
-        @MCRProperty(name = "BaseDirs")
+        @MCRProperty(name = BASE_DIRS_KEY)
         public String baseDirs;
 
         @Override
         public MCRFileSystemResourceProvider get() {
             MCRResourceProviderMode mode = MCRResourceProviderMode.valueOf(this.mode);
-            List<File> baseDirs = splitValue(this.baseDirs).map(File::new).collect(Collectors.toList());
+            List<File> baseDirs = splitValue(this.baseDirs).map(File::new).toList();
             return new MCRFileSystemResourceProvider(coverage, mode, baseDirs);
         }
 

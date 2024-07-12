@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRStreamUtils;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.hint.MCRResourceHintKeys;
@@ -34,11 +36,19 @@ import org.mycore.resource.provider.MCRResourceProvider.JarUrlPrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 
 /**
- * A {@link MCRClassLoaderResourceLocator} is a {@link MCRResourceLocator} that uses
+ * {@link MCRClassLoaderResourceLocator} is an implementation of {@link MCRResourceLocator} that uses
  * {@link ClassLoader#getResources(String)} to locate resources.
  * <p>
  * It uses the {@link ClassLoader} hinted at by {@link MCRResourceHintKeys#CLASS_LOADER}, if present.
+ * <p>
+ * No configuration options are available, if configured automatically.
+ * <p>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.locator.MCRClassLoaderResourceLocator
+ * </pre>
  */
+@MCRConfigurationProxy(proxyClass = MCRClassLoaderResourceLocator.Factory.class)
 public class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
 
     @Override
@@ -67,6 +77,15 @@ public class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
             Stream.of(JarUrlPrefixStripper.INSTANCE),
             hints.get(MCRResourceHintKeys.CLASS_LOADER).map(ClassLoaderPrefixStripper::new).stream()
         );
+    }
+
+    public static class Factory implements Supplier<MCRClassLoaderResourceLocator> {
+
+        @Override
+        public MCRClassLoaderResourceLocator get() {
+            return new MCRClassLoaderResourceLocator();
+        }
+
     }
 
 }

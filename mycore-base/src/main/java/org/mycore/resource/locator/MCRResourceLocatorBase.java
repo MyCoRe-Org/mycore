@@ -20,7 +20,6 @@ package org.mycore.resource.locator;
 
 import java.net.URL;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
@@ -43,7 +42,7 @@ public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
         logger.debug("Locating resource URLs for path {}", path);
         Stream<URL> locatedResourceUrls = doLocate(path, hints);
         if (logger.isDebugEnabled()) {
-            return logResourceUrls(locatedResourceUrls.collect(Collectors.toList())).stream();
+            return logResourceUrls(locatedResourceUrls.toList()).stream();
         } else {
             return locatedResourceUrls;
         }

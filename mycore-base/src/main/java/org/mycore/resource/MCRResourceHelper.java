@@ -120,7 +120,7 @@ public final class MCRResourceHelper {
     }
 
     private static MCRHints modifyHints(ClassLoader classLoader) {
-        MCRHintsBuilder builder = MCRResourceResolver.defaultHints().builder();
+        MCRHintsBuilder builder = MCRResourceResolver.instance().defaultHints().builder();
         builder.add(MCRResourceHintKeys.CLASS_LOADER, classLoader);
         return builder.build();
     }

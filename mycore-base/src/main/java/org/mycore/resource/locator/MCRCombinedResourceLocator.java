@@ -34,12 +34,28 @@ import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 
 /**
- * A {@link MCRCombinedResourceLocator} is a {@link MCRResourceLocator} that delegates to multiple other
- * {@link MCRResourceLocator}, one after another.
+ * {@link MCRCombinedResourceLocator} is an implementation of {@link MCRResourceLocator} that delegates to multiple
+ * other {@link MCRResourceLocator} instances, one after another.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> Locators are configured as a list using the property suffix {@link MCRCombinedResourceLocator#LOCATORS_KEY}.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.locator.MCRCombinedResourceLocator
+ * [...].Locators.10.Class=foo.bar.FooLocator
+ * [...].Locators.10.Key1=Value1
+ * [...].Locators.10.Key2=Value2
+ * [...].Locators.20.Class=foo.bar.BarLocator
+ * [...].Locators.20.Key1=Value1
+ * [...].Locators.20.Key2=Value2
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceLocator.Factory.class)
 public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
 
+    public static final String LOCATORS_KEY = "Locators";
     private final List<MCRResourceLocator> locators;
 
     public MCRCombinedResourceLocator(MCRResourceLocator... locators) {
@@ -68,7 +84,7 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceLocator> {
 
-        @MCRInstanceList(name = "Locators", valueClass = MCRResourceLocator.class)
+        @MCRInstanceList(name = LOCATORS_KEY, valueClass = MCRResourceLocator.class)
         public List<MCRResourceLocator> locators;
 
         @Override

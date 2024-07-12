@@ -35,12 +35,30 @@ import org.mycore.resource.selector.MCRFirstLibraryJarResourceSelector;
 import org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector;
 
 /**
- * A {@link MCRLibraryResourceProvider} is a {@link MCRResourceProvider} that looks up resources
- * in JAR files placed in the WAR file, prioritized by {@link MCRComponent#getPriority()} and the order
- * in which the libraries are present in the classpath.
+ * {@link MCRWebappLibraryResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up,
+ * depending on the given {@link MCRResourceProviderMode} value, resources or web resources in JAR files placed
+ * in the WAR file, prioritized by {@link MCRComponent#getPriority()} and the order in which the libraries are
+ * present in the classpath.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The mode is configures using the property suffix {@link MCRWebappLibraryResourceProvider#MODE_KEY}.
+ * <li> The property suffix {@link MCRWebappLibraryResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRWebappLibraryResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * [...].MODE=RESOURCES
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappLibraryResourceProvider.Factory.class)
 public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvider {
+
+    public static final String COVERAGE_KEY = "Coverage";
+
+    public static final String MODE_KEY = "Mode";
 
     private final MCRResourceFilterMode mode;
 
@@ -74,10 +92,10 @@ public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvid
 
     public static class Factory implements Supplier<MCRWebappLibraryResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.WebappLibrary.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.WebappLibrary.Coverage")
         public String coverage;
 
-        @MCRProperty(name = "Mode", defaultName = "MCR.Resource.Provider.Default.WebappLibrary.Mode")
+        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Provider.Default.WebappLibrary.Mode")
         public String mode;
 
         @Override

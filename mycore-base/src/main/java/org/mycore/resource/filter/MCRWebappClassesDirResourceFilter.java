@@ -28,19 +28,30 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * A {@link MCRConfigDirLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource
- * candidate is a resource from the <code>/WEB-INF/classes</code> directory inside the webapp directory.
+ * {@link MCRWebappClassesDirResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
+ * candidate is a resource from the <code>/WEB-INF/classes</code> directory inside the webapp directory. To decide
+ * weather such resources are retained or ignored, a {@link MCRResourceFilterMode} value is used.
  * <p>
- * Unless placed there manually, such resources originate from the <code>/WEB-INF/classes</code> directory
- * inside the WAR file.
- * <p>
- * In a usual build, such resources originate from the <code>/src/main/resources</code> directory
- * inside the Maven project that creates the WAR file.
+ * Unless placed there manually, such resources originate from the <code>/WEB-INF/classes</code> directory inside the
+ * WAR file. In a usual build, such resources originate from the <code>/src/main/resources</code> directory inside the
+ * Maven project that creates the WAR file.
  * <p>
  * It uses the webapp directory hinted at by {@link MCRResourceHintKeys#WEBAPP_DIR}, if present.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The mode is configured using the property suffix {@link MCRWebappClassesDirResourceFilter#MODE_KEY}.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.filter.MCRWebappClassesDirResourceFilter
+ * [...].Mode=MUST_MATCH
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappClassesDirResourceFilter.Factory.class)
 public class MCRWebappClassesDirResourceFilter extends MCRUrlPrefixResourceFilterBase {
+
+    public static final String MODE_KEY = "Mode";
 
     public MCRWebappClassesDirResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
@@ -59,7 +70,7 @@ public class MCRWebappClassesDirResourceFilter extends MCRUrlPrefixResourceFilte
 
     public static class Factory implements Supplier<MCRWebappClassesDirResourceFilter> {
 
-        @MCRProperty(name = "Mode", defaultName = "MCR.Resource.Filter.Default.WebappClassesDir.Mode")
+        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Filter.Default.WebappClassesDir.Mode")
         public String mode;
 
         @Override

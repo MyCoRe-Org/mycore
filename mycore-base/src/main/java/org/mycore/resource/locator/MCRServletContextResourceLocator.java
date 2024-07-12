@@ -22,9 +22,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.hint.MCRResourceHintKeys;
@@ -34,11 +36,19 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import jakarta.servlet.ServletContext;
 
 /**
- * A {@link MCRServletContextResourceLocator} is a {@link MCRResourceLocator} that uses
- * {@link ServletContext#getResource(String)}} to locate a resources.
+ * {@link MCRClassLoaderResourceLocator} is an implementation of {@link MCRResourceLocator} that uses
+ * {@link ServletContext#getResource(String)} to locate a resources.
  * <p>
  * It uses the {@link ServletContext} hinted at by {@link MCRResourceHintKeys#SERVLET_CONTEXT}, if present.
+ * <p>
+ * No configuration options are available, if configured automatically.
+ * <p>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.locator.MCRServletContextResourceLocator
+ * </pre>
  */
+@MCRConfigurationProxy(proxyClass = MCRServletContextResourceLocator.Factory.class)
 public class MCRServletContextResourceLocator extends MCRResourceLocatorBase {
 
     @Override
@@ -69,6 +79,15 @@ public class MCRServletContextResourceLocator extends MCRResourceLocatorBase {
     @Override
     public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
         return Stream.of(JarUrlPrefixStripper.INSTANCE);
+    }
+
+    public static class Factory implements Supplier<MCRServletContextResourceLocator> {
+
+        @Override
+        public MCRServletContextResourceLocator get() {
+            return new MCRServletContextResourceLocator();
+        }
+
     }
 
 }

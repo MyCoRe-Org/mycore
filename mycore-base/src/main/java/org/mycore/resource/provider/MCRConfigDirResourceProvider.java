@@ -28,14 +28,27 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * A {@link MCRConfigDirResourceProvider} is a {@link MCRResourceProvider} that searches resources
- * in the file system. It uses the <code>/resources</code> directory in the config directory as a base
- * directory for the lookup.
+ * {@link MCRConfigDirResourceProvider} is an implementation of {@link MCRResourceProvider} that searches resources
+ * in the file system. It uses the <code>/resources</code> directory in the config directory as a base directory
+ * for the lookup.
  * <p>
  * It uses the config directory hinted at by {@link MCRResourceHintKeys#CONFIG_DIR}, if present.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The property suffix {@link MCRConfigDirResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRConfigDirResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRConfigDirResourceProvider.Factory.class)
 public class MCRConfigDirResourceProvider extends MCRFileSystemResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRConfigDirResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.RESOURCES);
@@ -57,7 +70,7 @@ public class MCRConfigDirResourceProvider extends MCRFileSystemResourceProviderB
 
     public static class Factory implements Supplier<MCRConfigDirResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.ConfigDir.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ConfigDir.Coverage")
         public String coverage;
 
         @Override

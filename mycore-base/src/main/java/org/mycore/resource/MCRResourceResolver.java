@@ -24,120 +24,88 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.common.log.MCRListMessage;
 import org.mycore.common.log.MCRTreeMessage;
-import org.mycore.resource.provider.MCRCombinedResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 
 /**
- * A {@link MCRResourceResolver} is a component that uses a {@link MCRResourceProvider} to lookup resources.
+ * A {@link MCRResourceResolver} is a component that uses a {@link MCRResourceProvider} instance to lookup resources.
+ * To inject variable values into the resolving mechanism, several {@link MCRHint} instances can be provided as a
+ * {@link MCRHints} instance. A default set of hints can be provided.
  * <p>
- * A singular, globally available and centrally configured instance is made available by
- * {{@link MCRResourceResolver#instance()}}. This instance should be used wherever resources need to be resolved.
- * This ensures an application-wide consistent behaviour.
+ * A singular, globally available and centrally configured instance can be obtained with
+ * {@link MCRResourceResolver#instance()}. This instance is configured using the property prefix
+ * {@link MCRResourceResolver#RESOLVER_PROPERTY} and should be used wherever resources need to be resolved.
+ * This ensures an application-wide consistent behaviour, although custom instances can be created when necessary.
  * <p>
- * The globally available instance is configured through the configuration properties provided by
- * {@link MCRConfiguration2}. Multiple configurations may be configured. The name of the configuration
- * that is actually used is retrieved from the configuration property <code>MCR.Resource.Resolver</code>.
- * <p>
- * Specific configuration values begin with <code>MCR.Resource.Resolver.${configurationName}</code>.
- * <p>
- * There are the following configuration values:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- *     <li><code>Provider.Class</code> - The configured instance of {@link MCRResourceProvider} to be used, configured
- *     by {@link MCRConfiguration2#getInstanceOfOrThrow(Class, String)},
- *     typically a {@link MCRCombinedResourceProvider}.</li>
+ * <li> Hints are configured as a map using the property suffix {@link MCRResourceResolver#HINTS_KEY}.
+ * <li> Providers are configured as a map using the property suffix {@link MCRResourceResolver#PROVIDERS_KEY}.
+ * <li> The selected provider is configured using the property suffix {@link MCRResourceResolver#SELECTED_PROVIDER_KEY}.
  * </ul>
- * <p>
  * Example:
  * <pre>
- * MCR.Resource.Resolver=foo
- * MCR.Resource.Resolver.foo.Provider.Class=org.mycore.resource.provider.MCRCombinedResourceProvider
- * MCR.Resource.Resolver.foo.Provider.Providers.1.Class=org.mycore.resource.provider.MCRConfigDirResourceProvider
- * MCR.Resource.Resolver.foo.Provider.Providers.2.Class=org.mycore.resource.provider.MCRClassLoaderResourceProvider
+ * MCR.Resource.Resolver.Class=org.mycore.resource.MCRResourceResolver
+ * MCR.Resource.Resolver.Hints.foo.Class=foo.bar.FooHint
+ * MCR.Resource.Resolver.Hints.foo.Key1=Value1
+ * MCR.Resource.Resolver.Hints.foo.Key2=Value2
+ * MCR.Resource.Resolver.Hints.bar.Class=foo.bar.BarHint
+ * MCR.Resource.Resolver.Hints.bar.Key1=Value1
+ * MCR.Resource.Resolver.Hints.bar.Key2=Value2
+ * MCR.Resource.Resolver.Providers.foo.Class=foo.bar.FooProvider
+ * MCR.Resource.Resolver.Providers.foo.Key1=Value1
+ * MCR.Resource.Resolver.Providers.foo.Key2=Value2
+ * MCR.Resource.Resolver.SelectedProvider=foo
  * </pre>
- * <p>
- * Additionally, there are the following global configuration values for the provider:
- * <ul>
- *     <li><code>MCR.Resource.Resolver.Hints.${hintName}</code> - Configured instances of {@link MCRHint} to be used
- *     for {@link MCRResourceResolver#defaultHints()} and as default hints for methods that optionally take hints.</li>
- * </ul>
- * <p>
- * Example:
- * <pre>
- * MCR.Resource.Resolver.Hints.classLoader.Class=org.mycore.resource.hint.MCRClassLoaderResourceHint
- * MCR.Resource.Resolver.Hints.servletContext.Class=org.mycore.resource.hint.MCRServletContextResourceHint
- * </pre>
+ * Although only one provider is ever in use, multiple providers can be prepared. This configuration mechanism greatly
+ * simplifies the configuration changes necessary in order to switch to another provider. It also ensures that all
+ * prepared providers are properly configured.
  */
+@MCRConfigurationProxy(proxyClass = MCRResourceResolver.Factory.class)
 public final class MCRResourceResolver {
-
-    public static final String RESOLVER_KEY = "MCR.Resource.Resolver";
-
-    public static final String HINTS_KEY = "MCR.Resource.Resolver.Hints";
 
     private static final Logger LOGGER = StatusLogger.getLogger();
 
-    private static final MCRResourceResolver INSTANCE = new MCRResourceResolver(getProvider());
+    private static final MCRResourceResolver INSTANCE = instantiate();
 
-    private static final MCRHints DEFAULT_HINTS = getDefaultHints();
+    public static final String RESOLVER_PROPERTY = "MCR.Resource.Resolver";
+
+    public static final String HINTS_KEY = "Hints";
+
+    public static final String PROVIDERS_KEY = "Providers";
+
+    public static final String SELECTED_PROVIDER_KEY = "SelectedProvider";
+
+    private final MCRHints hints;
 
     private final MCRResourceProvider provider;
 
-    public MCRResourceResolver(MCRResourceProvider provider) {
-        this.provider = Objects.requireNonNull(provider);
-    }
-
-    private static MCRResourceProvider getProvider() {
-
-        String name = MCRConfiguration2.getStringOrThrow(RESOLVER_KEY);
-        LOGGER.info("Using resolver: {}", name);
-
-        String providerKey = RESOLVER_KEY + "." + name + ".Provider.Class";
-        MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(MCRResourceProvider.class, providerKey);
-
-        MCRTreeMessage description = provider.compileDescription(LOGGER.getLevel());
-        LOGGER.info(description.logMessage("Resolving resources with provider:"));
-
-        return provider;
-
-    }
-
-    private static MCRHints getDefaultHints() {
-
-        String prefix = HINTS_KEY + ".";
-        Map<String, Callable<MCRHint<?>>> hintFactoriesByProperty = MCRConfiguration2.getInstances(prefix);
-
-        MCRListMessage description = new MCRListMessage();
-        MCRHintsBuilder builder = new MCRHintsBuilder();
-        for (String property : hintFactoriesByProperty.keySet()) {
-            try {
-                String schema = property.substring(prefix.length());
-                MCRHint<?> hint = hintFactoriesByProperty.get(property).call();
-                description.add(schema, hint.getClass().getName());
-                builder.add(hint);
-            } catch (Exception e) {
-                throw new MCRException("Failed to instantiate hint configured in: " + property);
-            }
-        }
-        LOGGER.info(description.logMessage("Resolving resources with default hints:"));
-
-        return builder.build();
-
+    public MCRResourceResolver(MCRHints hints, MCRResourceProvider provider) {
+        this.hints = Objects.requireNonNull(hints, "Hints must not be null");
+        this.provider = Objects.requireNonNull(provider, "Provider must not be null");
     }
 
     public static MCRResourceResolver instance() {
         return INSTANCE;
+    }
+
+    public static MCRResourceResolver instantiate() {
+        String classProperty = RESOLVER_PROPERTY + ".Class";
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, classProperty);
     }
 
     /**
@@ -347,8 +315,56 @@ public final class MCRResourceResolver {
      * The default {@link MCRHints} used by {@link MCRResourceResolver}, when no custom hints are given.
      * Intended to be a basis for customized hints, if customization or extension is required.
      */
-    public static MCRHints defaultHints() {
-        return DEFAULT_HINTS;
+    public MCRHints defaultHints() {
+        return hints;
+    }
+
+    public static class Factory implements Supplier<MCRResourceResolver> {
+
+        @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class)
+        public Map<String, MCRHint<?>> hints;
+
+        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class)
+        public Map<String, MCRResourceProvider> providers;
+
+        @MCRProperty(name = SELECTED_PROVIDER_KEY)
+        public String selectedProvider;
+
+        @Override
+        public MCRResourceResolver get() {
+            return new MCRResourceResolver(getHints(), getProvider(selectedProvider));
+        }
+
+        private MCRHints getHints() {
+
+            MCRListMessage description = new MCRListMessage();
+            MCRHintsBuilder builder = new MCRHintsBuilder();
+            for (Map.Entry<String, MCRHint<?>> entry : hints.entrySet()) {
+                MCRHint<?> hint = entry.getValue();
+                description.add(entry.getKey(), hint.getClass().getName());
+                builder.add(hint);
+            }
+            LOGGER.info(description.logMessage("Resolving resources with default hints:"));
+
+            return builder.build();
+
+        }
+
+        private MCRResourceProvider getProvider(String selectedProviderName) {
+
+            MCRResourceProvider selectedProvider = providers.get(selectedProviderName);
+            if (selectedProvider == null) {
+                throw new IllegalArgumentException("Selected provider " + selectedProviderName + " unavailable, got: "
+                    + String.join(", ", providers.keySet()));
+            }
+
+            MCRTreeMessage description = selectedProvider.compileDescription(LOGGER.getLevel());
+            LOGGER.info(description.logMessage("Resolving resources with provider " + selectedProviderName + ":"));
+
+            return selectedProvider;
+
+        }
+
     }
 
 }

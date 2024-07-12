@@ -28,13 +28,26 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * A {@link MCRConfigDirLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource
+ * {@link MCRConfigDirLibraryResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
  * candidate is a resource from a JAR file placed in the <code>/lib</code> directory in the config directory.
+ * To decide weather such resources are retained or ignored, a {@link MCRResourceFilterMode} value is used.
  * <p>
  * It uses the config directory hinted at by {@link MCRResourceHintKeys#CONFIG_DIR}, if present.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The mode is configured using the property suffix {@link MCRConfigDirLibraryResourceFilter#MODE_KEY}.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.filter.MCRConfigDirLibraryResourceFilter
+ * [...].Mode=MUST_MATCH
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRConfigDirLibraryResourceFilter.Factory.class)
 public class MCRConfigDirLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
+
+    public static final String MODE_KEY = "Mode";
 
     public MCRConfigDirLibraryResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
@@ -53,7 +66,7 @@ public class MCRConfigDirLibraryResourceFilter extends MCRUrlPrefixResourceFilte
 
     public static class Factory implements Supplier<MCRConfigDirLibraryResourceFilter> {
 
-        @MCRProperty(name = "Mode", defaultName = "MCR.Resource.Filter.Default.ConfigDirLibrary.Mode")
+        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Filter.Default.ConfigDirLibrary.Mode")
         public String mode;
 
         @Override
