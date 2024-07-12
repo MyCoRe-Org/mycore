@@ -84,7 +84,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private static final String X_PATH_MAPPING_CLASSIFICATIONS
         = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
 
-    private static final Map<String, String> mappingPatterns = MCRConfiguration2.getSubPropertiesMap(
+    private static final Map<String, String> MAPPING_PATTERNS = MCRConfiguration2.getSubPropertiesMap(
         "MCR.Category.XPathMapping.Pattern.");
 
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
@@ -177,7 +177,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         if (matcher.find()) {
             String patternContent = matcher.group(1);
             String[] parts = patternContent.split("=");
-            String placeholderText = mappingPatterns.get(parts[0]);
+            String placeholderText = MAPPING_PATTERNS.get(parts[0]);
             if (placeholderText != null) {
                 if (parts.length > 1) { // if there are values to substitute
                     String[] placeholderValues = parts[1].split(",");
