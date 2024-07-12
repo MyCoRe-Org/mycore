@@ -166,7 +166,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * Ex.:<p>
      * <b>Input XPath:</b> {pattern:Genre=article} and not(mods:relatedItem[@type='host'])<p>
      * <b>Property:</b> MCR.Category.XPathMapping.Pattern.Genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
-     * <b>Substituted XPath:</b> mods:genre[substring-after(@valueURI,'#')='article'] and not(mods:relatedItem[@type='host'])
+     * <b>Substituted XPath:</b> mods:genre[substring-after(@valueURI,'#')='article']
+     * and not(mods:relatedItem[@type='host'])
      * @param xPath the XPath containing a pattern to substitute
      * @return the resolved xPath
      */

@@ -241,7 +241,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "
-            + "contains(@generator,'xpathmapping2placeholderClassification') and contains(@valueURI, 'dummy-placeholder-language')]";
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-language')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
@@ -262,7 +263,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
-            + "contains(@generator,'xpathmapping2placeholderClassification') and contains(@valueURI, 'dummy-placeholder-genre')]";
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-genre')]";
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
@@ -282,7 +284,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
-            + "contains(@generator,'xpathmapping2placeholderClassification') and contains(@valueURI, 'dummy-placeholder-fb')]";
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-fb')]";
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
