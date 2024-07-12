@@ -245,7 +245,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assert.assertNotNull("The mapped classification 'dummy-placeholder-language' should be in the MyCoReObject now!",
+        Assert.assertNotNull(
+            "The mapped classification 'dummy-placeholder-language' should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
