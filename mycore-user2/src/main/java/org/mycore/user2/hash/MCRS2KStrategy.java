@@ -59,15 +59,14 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
  * [...].HashAlgorithm=SHA256
  * [...].Count=275
  * </pre>
- * This will generate salt values of length 16 and hashes of length 32, use 275 as the count parameter and SHA-256
- * as the hash algorithm.
- * <p>
  * Changes to the hash algorithm or count parameter will result in deviating hashes and therefore prevent the
  * successful verification of existing hashes, even if the correct password is supplied. Changes to the salt size or
  * the hash size will not prevent verification, but successful verification results will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRS2KStrategy.Factory.class)
 public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
+
+    private static final HexFormat HEX_FORMAT = HexFormat.of();
 
     public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
 
@@ -76,8 +75,6 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
     public static final String HASH_ALGORITHM_KEY = "HashAlgorithm";
 
     public static final String COUNT_KEY = "Count";
-
-    private static final HexFormat HEX_FORMAT = HexFormat.of();
 
     private final int saltSizeBytes;
 

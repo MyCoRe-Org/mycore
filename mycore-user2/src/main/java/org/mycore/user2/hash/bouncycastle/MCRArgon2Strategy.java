@@ -60,9 +60,6 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
  * [...].MemoryLimitKilobytes=66536
  * [...].Iterations=8
  * </pre>
- * This will generate salt values of length 32 and hashes of length 64, use 1 as the parallelism value, 66536
- * kilobytes as the memory limit and perform 8 iterations.
- * <p>
  * Changes to the parallelism value, memory limit or number of iterations will result in deviating hashes and therefore
  * prevent the successful verification of existing hashes, even if the correct password is supplied. Changes to the
  * salt size or the hash size will not prevent verification, but successful verification results will be marked as
@@ -70,6 +67,12 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
  */
 @MCRConfigurationProxy(proxyClass = MCRArgon2Strategy.Factory.class)
 public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
+
+    private static final int TYPE = Argon2Parameters.ARGON2_id;
+
+    private static final int VERSION = Argon2Parameters.ARGON2_VERSION_13;
+
+    private static final HexFormat HEX_FORMAT = HexFormat.of();
 
     public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
 
@@ -80,12 +83,6 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
     public static final String MEMORY_LIMIT_KILOBYTES_KEY = "MemoryLimitKilobytes";
 
     public static final String ITERATIONS_KEY = "Iterations";
-
-    private static final HexFormat HEX_FORMAT = HexFormat.of();
-
-    private static final int TYPE = Argon2Parameters.ARGON2_id;
-
-    private static final int VERSION = Argon2Parameters.ARGON2_VERSION_13;
 
     private final int saltSizeBytes;
 

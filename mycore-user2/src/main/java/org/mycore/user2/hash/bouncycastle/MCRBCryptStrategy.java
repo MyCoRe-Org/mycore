@@ -51,17 +51,15 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
  * [...].Class=org.mycore.user2.hash.bouncycastle.MCRBCryptStrategy
  * [...].Cost=12
  * </pre>
- * This will use 12 as the cost parameter.
- * <p>
  * Changes to the cost parameter will not prevent verification, but successful verification results will be marked as
  * outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRBCryptStrategy.Factory.class)
 public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
 
-    public static final String COST_KEY = "Cost";
-
     private static final Pattern BCRYPT_MCF_PATTERN;
+
+    public static final String COST_KEY = "Cost";
 
     static {
 

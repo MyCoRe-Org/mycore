@@ -44,8 +44,6 @@ import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
  * [...].SaltSizeBytes=16
  * [...].Iterations=1000000
  * </pre>
- * This will generate salt values of length 16 and perform 1000000 iteration.
- * <p>
  * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
  * verification of existing hashes, even if the correct password is supplied. Changes to the salt size will not prevent
  * verification, but successful verification results will be marked as outdated.

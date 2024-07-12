@@ -65,10 +65,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <li> Strategies are configured as a map using the property suffix {@link MCRPasswordCheckManager#STRATEGIES_KEY}.
  * <li> The selected strategy is configured using the property suffix
  * {@link MCRPasswordCheckManager#SELECTED_STRATEGY_KEY}.
- * <li> The property suffix {@link MCRPasswordCheckManager#CHECK_CONFIGURATION_KEY} can be used to enable or disable
- * configuration checks during instantiation, specifically: (1) whether the configuration of a selector has been changed
- * in a way that will prevent existing password hashes from being successfully verified, even if the correct password
- * was supplied and (2) whether a strategy annotated with {@link MCROutdated} has been selected.
+ * <li> The property suffix {@link MCRPasswordCheckManager#CHECK_CONFIGURATION_LONGEVITY_KEY} can be used to enable or
+ * disable configuration checks during instantiation, specifically: (1) whether the configuration of a selector has
+ * been changed in a way that will prevent existing password hashes from being successfully verified, even if the
+ * correct password was supplied and (2) whether a strategy annotated with {@link MCROutdated} has been selected.
  * </ul>
  * Example:
  * <pre>
@@ -80,13 +80,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * MCR.User.PasswordCheck.Strategies.bar.Key1=Value1
  * MCR.User.PasswordCheck.Strategies.bar.Key2=Value2
  * MCR.User.PasswordCheck.MCR.SelectedStrategy=foo
- * MCR.User.PasswordCheck.MCR.CheckConfiguration=true
+ * MCR.User.PasswordCheck.MCR.CheckConfigurationLongevity=true
  * </pre>
- * This will add two automatically configured strategies named <code>foo</code> and <code>bar</code> respectively,
- * select the strategy named <code>foo</code> and perform configuration checks during instantiation.
  */
 @MCRConfigurationProxy(proxyClass = MCRPasswordCheckManager.Factory.class)
 public final class MCRPasswordCheckManager {
+
+    private static final MCRPasswordCheckManager INSTANCE = instantiate();
 
     public static final String MANAGER_PROPERTY = "MCR.User.PasswordCheck";
 
@@ -94,9 +94,7 @@ public final class MCRPasswordCheckManager {
 
     public static final String SELECTED_STRATEGY_KEY = "SelectedStrategy";
 
-    public static final String CHECK_CONFIGURATION_KEY = "CheckConfiguration";
-
-    private static final MCRPasswordCheckManager INSTANCE = instantiate();
+    public static final String CHECK_CONFIGURATION_LONGEVITY_KEY = "CheckConfigurationLongevity";
 
     private final SecureRandom random;
 
@@ -107,7 +105,7 @@ public final class MCRPasswordCheckManager {
     private final String selectedStrategyType;
 
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
-                                   String selectedStrategyType, boolean checkConfiguration) {
+                                   String selectedStrategyType, boolean checkConfigurationLongevity) {
         this.random = Objects.requireNonNull(random, "Random must not be null");
         this.strategies = new HashMap<>(Objects.requireNonNull(strategies, "Strategies must not be null"));
         this.strategies.values().forEach(strategy -> Objects.requireNonNull(strategy, "Strategy must not be null"));
@@ -117,7 +115,7 @@ public final class MCRPasswordCheckManager {
             throw new IllegalArgumentException("Selected strategy " + selectedStrategyType + " unavailable, got: "
                 + String.join(", ", this.strategies.keySet()));
         }
-        if (checkConfiguration) {
+        if (checkConfigurationLongevity) {
             checkSelectedStrategyIsNotOutdated(selectedStrategyType, selectedStrategy);
             checkIncompatibleConfigurationChange(strategies);
         }
@@ -266,20 +264,20 @@ public final class MCRPasswordCheckManager {
         @MCRProperty(name = SELECTED_STRATEGY_KEY)
         public String selectedStrategy;
 
-        @MCRProperty(name = CHECK_CONFIGURATION_KEY)
-        public String checkConfiguration;
+        @MCRProperty(name = CHECK_CONFIGURATION_LONGEVITY_KEY)
+        public String checkConfigurationLongevity;
 
         @Override
         public MCRPasswordCheckManager get() {
             return new MCRPasswordCheckManager(getStrongSecureRandom(), strategies, selectedStrategy,
-                Boolean.parseBoolean(checkConfiguration));
+                Boolean.parseBoolean(checkConfigurationLongevity));
         }
 
         private static SecureRandom getStrongSecureRandom() {
             try {
                 return SecureRandom.getInstanceStrong();
             } catch (NoSuchAlgorithmException e) {
-                throw new MCRException("failed to obtain strong secure random number generator", e);
+                throw new MCRException("Failed to obtain strong secure random number generator", e);
             }
         }
 

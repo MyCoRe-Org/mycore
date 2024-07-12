@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 
@@ -31,9 +32,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.User.PasswordCheck.CheckConfiguration", string = "false")
+    @MCRTestProperty(key = "MCR.User.PasswordCheck.CheckConfigurationLongevity", string = "false")
 })
-public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase {
+public class MCRPasswordCheckManagerTest extends MCRTestCase {
+
+    protected static final String TYPE = "type";
+
+    protected static final String PASSWORD = "passwd123";
 
     @Test
     @MCRTestConfiguration(properties = {

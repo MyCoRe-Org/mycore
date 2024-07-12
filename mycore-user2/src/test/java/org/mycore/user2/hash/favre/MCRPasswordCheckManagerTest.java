@@ -19,17 +19,24 @@
 package org.mycore.user2.hash.favre;
 
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.user2.hash.MCRPasswordCheckData;
 import org.mycore.user2.hash.MCRPasswordCheckManager;
-import org.mycore.user2.hash.MCRPasswordCheckManagerTestBase;
 import org.mycore.user2.hash.bouncycastle.MCRBCryptStrategy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MCRPasswordCheckManagerTest extends MCRPasswordCheckManagerTestBase {
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.User.PasswordCheck.CheckConfigurationLongevity", string = "false")
+})
+public class MCRPasswordCheckManagerTest extends MCRTestCase {
+
+    protected static final String TYPE = "type";
+
+    protected static final String PASSWORD = "passwd123";
 
     @Test
     @MCRTestConfiguration(properties = {

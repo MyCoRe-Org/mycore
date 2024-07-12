@@ -46,8 +46,6 @@ import at.favre.lib.crypto.bcrypt.LongPasswordStrategy;
  * [...].Class=org.mycore.user2.hash.favre.MCRBCryptStrategy
  * [...].Cost=12
  * </pre>
- * This will use 12 as the cost parameter.
- * <p>
  * Changes to the cost parameter will not prevent verification, but successful verification results will be marked as
  * outdated.
  */
