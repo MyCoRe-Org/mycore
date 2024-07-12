@@ -22,5 +22,11 @@
                    description="Dummy category for a test."/>
             <label xml:lang="x-mapping-xpathfb" text="{pattern:Title}" />
         </category>
+        <category ID="dummy-placeholder-multiple">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath" text="{pattern:Title} and {pattern:Genre=article} and {pattern:LanguageTerm=rfc5646,code,de}" />
+        </category>
     </categories>
 </mycoreclass>

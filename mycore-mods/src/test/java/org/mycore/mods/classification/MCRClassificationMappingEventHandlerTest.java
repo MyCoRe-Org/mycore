@@ -215,10 +215,11 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
      *     <li>A pattern with 3 values to substitute</li>
      *     <li>A pattern that tests for a specific genre</li>
      *     <li>A pattern without values to substitute</li>
+     *     <li>Multiple patterns in one XPath</li>
      * </ol>
      */
     @Test
-    public void testPlaceholders() throws URISyntaxException, IOException, JDOMException {
+    public void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionHelper.isTransactionActive();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -292,6 +293,29 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Assert.assertNotNull("The mapped classification 'dummy-placeholder-fb' should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
+
+        // test multiple placeholders in one XPath
+        document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods2.xml"));
+        mcro = new MCRObject();
+        mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 7);
+
+        mapper.handleObjectUpdated(null, mcro);
+        xml = mcro.createXML();
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-multiple')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped classification 'dummy-placeholder-multiple' "
+            + "should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
     }
 
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {

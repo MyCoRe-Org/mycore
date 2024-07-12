@@ -159,7 +159,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     /**
      * Replaces a specific pattern in an XPath with the value of a matching property. Placeholders in the
-     * property value are substituted with the specific values given in an XPath.<p>
+     * property value are substituted with the specific values given in an XPath. It is possible to use
+     * multiple patterns per XPath.<p>
      * Syntax:<p>
      * {pattern:&lt;name of property&gt;=&lt;comma-separated list of values&gt;}<p>
      * (when there are no values, the "=" is optional)<p>
@@ -172,26 +173,26 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * @return the resolved xPath
      */
     private static String replacePattern(String xPath) {
-        final Pattern pattern = Pattern.compile("\\{pattern:([^}]*)}");
+        final Pattern pattern = Pattern.compile("\\{pattern:([^=}]*)=?([^}]*)\\}");
         Matcher matcher = pattern.matcher(xPath);
-        if (matcher.find()) {
-            String patternContent = matcher.group(1);
-            String[] parts = patternContent.split("=");
-            String placeholderText = MAPPING_PATTERNS.get(parts[0]);
+        while (matcher.find()) {
+            String patternName = matcher.group(1);
+            String placeholderText = MAPPING_PATTERNS.get(patternName);
             if (placeholderText != null) {
-                if (parts.length > 1) { // if there are values to substitute
-                    String[] placeholderValues = parts[1].split(",");
+                if (!matcher.group(2).isEmpty()) { // if there are values to substitute
+                    String[] placeholderValues = matcher.group(2).split(",");
                     Map<String, String> placeholderValuesMap = new HashMap<>();
                     for (int i = 0; i < placeholderValues.length; i++) {
                         placeholderValuesMap.put(String.valueOf(i), placeholderValues[i]);
                     }
                     StringSubstitutor sub = new StringSubstitutor(placeholderValuesMap, "{", "}");
                     String substitute = sub.replace(placeholderText);
-                    return xPath.replace("{pattern:" + patternContent + "}", substitute);
+                    xPath = xPath.substring(0, matcher.start()) + substitute + xPath.substring(matcher.end());
                 } else {
-                    return xPath.replace("{pattern:" + patternContent + "}", placeholderText);
+                    xPath = xPath.substring(0, matcher.start()) + placeholderText + xPath.substring(matcher.end());
                 }
             }
+            matcher = pattern.matcher(xPath);
         }
         return xPath;
     }
