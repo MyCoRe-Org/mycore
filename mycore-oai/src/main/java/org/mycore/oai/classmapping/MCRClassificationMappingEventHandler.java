@@ -24,9 +24,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -68,6 +71,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     /** This configuration lists all eligible classifications for x-path-mapping */
     private static final String X_PATH_MAPPING_CLASSIFICATIONS
         = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
+
+    private static final Map<String, String> MAPPING_PATTERNS = MCRConfiguration2.getSubPropertiesMap(
+        "MCR.Category.XPathMapping.Pattern.");
 
     private MCRMetaElement oldMappings = null;
 
@@ -202,6 +208,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
                     String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                    xPath = replacePattern(xPath);
                     MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
 
                     if (evaluator.test(xPath)) {
@@ -219,6 +226,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
 
                         String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
+                        xPath = replacePattern(xPath);
                         MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
 
                         if (evaluator.test(xPath)) {
@@ -266,6 +274,49 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 mappings.addMetaObject(metaClass);
             });
         }
+    }
+
+    /**
+     * Replaces a specific pattern in an XPath with the value of a matching property. Placeholders in the
+     * property value are substituted with the specific values given in an XPath. It is possible to use
+     * multiple patterns per XPath.<p>
+     * Syntax:<p>
+     * {pattern:&lt;name of property&gt;=&lt;comma-separated list of values&gt;}<p>
+     * (when there are no values, the "=" is optional)<p>
+     * Ex.:<p>
+     * <b>Input XPath:</b> {pattern:Genre=article} and not(mods:relatedItem[@type='host'])<p>
+     * <b>Property:</b> MCR.Category.XPathMapping.Pattern.Genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
+     * <b>Substituted XPath:</b> mods:genre[substring-after(@valueURI,'#')='article']
+     * and not(mods:relatedItem[@type='host'])
+     * @param xPath the XPath containing a pattern to substitute
+     * @return the resolved xPath
+     */
+    private static String replacePattern(String xPath) {
+        String updatedXPath = xPath;
+        final Pattern pattern = Pattern.compile("\\{pattern:([^=}]*)=?([^}]*)\\}");
+        Matcher matcher = pattern.matcher(updatedXPath);
+        while (matcher.find()) {
+            String patternName = matcher.group(1);
+            String placeholderText = MAPPING_PATTERNS.get(patternName);
+            if (placeholderText != null) {
+                if (!matcher.group(2).isEmpty()) { // if there are values to substitute
+                    String[] placeholderValues = matcher.group(2).split(",");
+                    Map<String, String> placeholderValuesMap = new HashMap<>();
+                    for (int i = 0; i < placeholderValues.length; i++) {
+                        placeholderValuesMap.put(String.valueOf(i), placeholderValues[i]);
+                    }
+                    StringSubstitutor sub = new StringSubstitutor(placeholderValuesMap, "{", "}");
+                    String substitute = sub.replace(placeholderText);
+                    updatedXPath = updatedXPath.substring(0, matcher.start()) + substitute +
+                        updatedXPath.substring(matcher.end());
+                } else {
+                    updatedXPath = updatedXPath.substring(0, matcher.start()) + placeholderText +
+                        updatedXPath.substring(matcher.end());
+                }
+            }
+            matcher = pattern.matcher(updatedXPath);
+        }
+        return updatedXPath;
     }
 
     /**
