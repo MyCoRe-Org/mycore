@@ -35,7 +35,12 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRScopedSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
+import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -141,10 +146,44 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
+        syntax = "check permission {0} on {1} as {2}",
+        help = "Check permission {0} on {1} as {2}",
+        order = 69)
+    public static void checkPermission(String permission, String id, String user) throws InterruptedException {
+
+        MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(user);
+
+        MCRScopedSession session = (MCRScopedSession) MCRSessionMgr.getCurrentSession();
+        MCRScopedSession.ScopedValues values = new MCRScopedSession.ScopedValues(userInformation);
+
+        LOGGER.info(session.doAs(values, () -> MCRAccessManager.checkPermission(id, permission)));
+
+    }
+
+    @MCRCommand(
+        syntax = "resolve uri {0} as {1}",
+        help = "Resolve uri {0} as {1}",
+        order = 70)
+    public static void resolveUri(String uri, String user) throws InterruptedException {
+
+        MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(user);
+
+        MCRScopedSession session = (MCRScopedSession) MCRSessionMgr.getCurrentSession();
+        MCRScopedSession.ScopedValues values = new MCRScopedSession.ScopedValues(userInformation);
+
+        session.doAs(values, () -> doResolveUri(uri));
+
+    }
+
+    @MCRCommand(
         syntax = "resolve uri {0}",
         help = "Resolve uri {0}",
-        order = 70)
+        order = 71)
     public static void resolveUri(String uri) {
+        doResolveUri(uri);
+    }
+
+    private static void doResolveUri(String uri) {
         try {
             Element resource = MCRURIResolver.instance().resolve(uri);
             if (null != resource) {
