@@ -49,7 +49,26 @@ public final class MCRScopedSession extends MCRSession {
      * <p>
      * The scoped values are set for the duration of the action and then removed.
      * This allows to execute actions that require a specific context or access to certain resources.
-     * The base MCRSession is left untouched in all other running threads. Bassically this
+     * The base MCRSession is left untouched in all other running threads. Basically this
+     * allows to overwrite most of the base MCRSession information while performing {@code action}
+     * and using the same database transaction.
+     *
+     * @param scopeValues the scoped values to use during the execution of the action
+     * @param action the action to be executed within the restricted scope
+     */
+    public void doAs(ScopedValues scopeValues, Runnable action) {
+        doAs(scopeValues, () -> {
+            action.run();
+            return null;
+        });
+    }
+
+    /**
+     * Executes an action within a restricted scope.
+     * <p>
+     * The scoped values are set for the duration of the action and then removed.
+     * This allows to execute actions that require a specific context or access to certain resources.
+     * The base MCRSession is left untouched in all other running threads. Basically this
      * allows to overwrite most of the base MCRSession information while performing {@code action}
      * and using the same database transaction.
      *
