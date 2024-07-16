@@ -8,19 +8,19 @@
             <label xml:lang="de" text="Zeitschriftenartikel"/>
             <label xml:lang="en" text="Journal article"
                    description="Articles in peer-reviewed publications that disseminate the results of original research and scholarship."/>
-            <label xml:lang="x-mapping-xpath" text="{pattern:Genre=article} and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='journal']" />
+            <label xml:lang="x-mapping-xpath" text="{pattern:Genre=article} and {pattern:HostGenre=journal}" />
         </category>
         <category ID="newspaper-article">
             <label xml:lang="de" text="Zeitungsartikel"/>
             <label xml:lang="en" text="Newspaper article"
                    description="Articles in a daily, weekly or monthly publication reporting on news and social issues aimed at the public."/>
-            <label xml:lang="x-mapping-xpath" text="{pattern:Genre=article} and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='newspaper']" />
+            <label xml:lang="x-mapping-xpath" text="{pattern:Genre=article} and {pattern:HostGenre=newspaper}" />
         </category>
         <category ID="online-resource">
             <label xml:lang="de" text="Online Ressource"/>
             <label xml:lang="en" text="Online resource"
                    description="Information accessible only on the web via traditional technical methods"/>
-            <label xml:lang="x-mapping-xpath" text="{pattern:Genre=article} and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='blog']" />
+            <label xml:lang="x-mapping-xpath" text="{pattern:Genre=article} and {pattern:HostGenre=blog}" />
             <label xml:lang="x-mapping-xpathfb" text="{pattern:Genre=article}" />
         </category>
         <category ID="no-xpath-mapping">
