@@ -19,8 +19,10 @@
 package org.mycore.user2.hash;
 
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.mycore.common.MCRException;
@@ -32,9 +34,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.User.PasswordCheck.CheckConfigurationLongevity", string = "false")
+    @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", empty = true)
 })
 public class MCRPasswordCheckManagerTest extends MCRTestCase {
+
+    protected static final Set<MCRPasswordCheckManager.ConfigurationCheck> NO_CHECKS = Collections.emptySet();
 
     protected static final String TYPE = "type";
 
@@ -145,7 +149,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
         Map<String, MCRPasswordCheckStrategy> strategies = new HashMap<>();
         strategies.put("foo", new MCRMD5Strategy(0, 1));
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager(random, strategies, "foo", false);
+        MCRPasswordCheckManager manager = new MCRPasswordCheckManager(random, strategies, "foo", NO_CHECKS);
 
         MCRPasswordCheckData data = manager.create(PASSWORD);
         MCRPasswordCheckData data2 = new MCRPasswordCheckData("bar", data.salt(), data.hash());
@@ -161,8 +165,8 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
         strategies.put("old", new MCRMD5Strategy(0, 1));
         strategies.put("new", new MCRMD5Strategy(0, 2));
 
-        MCRPasswordCheckManager managerOld = new MCRPasswordCheckManager(random, strategies, "old", false);
-        MCRPasswordCheckManager managerNew = new MCRPasswordCheckManager(random, strategies, "new", false);
+        MCRPasswordCheckManager managerOld = new MCRPasswordCheckManager(random, strategies, "old", NO_CHECKS);
+        MCRPasswordCheckManager managerNew = new MCRPasswordCheckManager(random, strategies, "new", NO_CHECKS);
 
         MCRPasswordCheckResult result = managerNew.verify(managerOld.create(PASSWORD), PASSWORD);
 

@@ -31,7 +31,9 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.annotation.MCROutdated;
@@ -44,6 +46,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.resource.MCRResourceHelper;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 /**
  * A {@link MCRPasswordCheckManager} can be used to create password hashes and to verify an existing hash
@@ -65,7 +68,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <li> Strategies are configured as a map using the property suffix {@link MCRPasswordCheckManager#STRATEGIES_KEY}.
  * <li> The selected strategy is configured using the property suffix
  * {@link MCRPasswordCheckManager#SELECTED_STRATEGY_KEY}.
- * <li> The property suffix {@link MCRPasswordCheckManager#CHECK_CONFIGURATION_LONGEVITY_KEY} can be used to enable or
+ * <li> The property suffix {@link MCRPasswordCheckManager#CONFIGURATION_CHECKS_KEY} can be used to enable or
  * disable configuration checks during instantiation, specifically: (1) whether the configuration of a selector has
  * been changed in a way that will prevent existing password hashes from being successfully verified, even if the
  * correct password was supplied and (2) whether a strategy annotated with {@link MCROutdated} has been selected.
@@ -79,8 +82,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * MCR.User.PasswordCheck.Strategies.bar.Class=foo.bar.FooStrategy
  * MCR.User.PasswordCheck.Strategies.bar.Key1=Value1
  * MCR.User.PasswordCheck.Strategies.bar.Key2=Value2
- * MCR.User.PasswordCheck.MCR.SelectedStrategy=foo
- * MCR.User.PasswordCheck.MCR.CheckConfigurationLongevity=true
+ * MCR.User.PasswordCheck.SelectedStrategy=foo
+ * MCR.User.PasswordCheck.ConfigurationChecks=OUTDATED_STRATEGY,INCOMPATIBLE_CHANGE
  * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRPasswordCheckManager.Factory.class)
@@ -94,7 +97,7 @@ public final class MCRPasswordCheckManager {
 
     public static final String SELECTED_STRATEGY_KEY = "SelectedStrategy";
 
-    public static final String CHECK_CONFIGURATION_LONGEVITY_KEY = "CheckConfigurationLongevity";
+    public static final String CONFIGURATION_CHECKS_KEY = "ConfigurationChecks";
 
     private final SecureRandom random;
 
@@ -105,7 +108,7 @@ public final class MCRPasswordCheckManager {
     private final String selectedStrategyType;
 
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
-                                   String selectedStrategyType, boolean checkConfigurationLongevity) {
+                                   String selectedStrategyType, Set<ConfigurationCheck> configurationChecks) {
         this.random = Objects.requireNonNull(random, "Random must not be null");
         this.strategies = new HashMap<>(Objects.requireNonNull(strategies, "Strategies must not be null"));
         this.strategies.values().forEach(strategy -> Objects.requireNonNull(strategy, "Strategy must not be null"));
@@ -115,8 +118,10 @@ public final class MCRPasswordCheckManager {
             throw new IllegalArgumentException("Selected strategy " + selectedStrategyType + " unavailable, got: "
                 + String.join(", ", this.strategies.keySet()));
         }
-        if (checkConfigurationLongevity) {
+        if (configurationChecks.contains(ConfigurationCheck.OUTDATED_STRATEGY)) {
             checkSelectedStrategyIsNotOutdated(selectedStrategyType, selectedStrategy);
+        }
+        if (configurationChecks.contains(ConfigurationCheck.INCOMPATIBLE_CHANGE)) {
             checkIncompatibleConfigurationChange(strategies);
         }
     }
@@ -256,6 +261,14 @@ public final class MCRPasswordCheckManager {
     private record InvariableConfiguration(String className, String value) {
     }
 
+    public enum ConfigurationCheck {
+
+        OUTDATED_STRATEGY,
+
+        INCOMPATIBLE_CHANGE;
+
+    }
+
     public static class Factory implements Supplier<MCRPasswordCheckManager> {
 
         @MCRInstanceMap(name = STRATEGIES_KEY, valueClass = MCRPasswordCheckStrategy.class)
@@ -264,13 +277,18 @@ public final class MCRPasswordCheckManager {
         @MCRProperty(name = SELECTED_STRATEGY_KEY)
         public String selectedStrategy;
 
-        @MCRProperty(name = CHECK_CONFIGURATION_LONGEVITY_KEY)
-        public String checkConfigurationLongevity;
+        @MCRProperty(name = CONFIGURATION_CHECKS_KEY)
+        public String configurationChecks;
 
         @Override
         public MCRPasswordCheckManager get() {
+
+            Set<ConfigurationCheck> configurationChecks = splitValue(this.configurationChecks)
+                .map(ConfigurationCheck::valueOf).collect(Collectors.toSet());
+
             return new MCRPasswordCheckManager(getStrongSecureRandom(), strategies, selectedStrategy,
-                Boolean.parseBoolean(checkConfigurationLongevity));
+                configurationChecks);
+
         }
 
         private static SecureRandom getStrongSecureRandom() {

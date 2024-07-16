@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.User.PasswordCheck.CheckConfigurationLongevity", string = "false")
+    @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", empty = true)
 })
 public class MCRPasswordCheckManagerTest extends MCRTestCase {
 
