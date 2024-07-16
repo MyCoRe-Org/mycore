@@ -16,7 +16,7 @@
             <label xml:lang="en" text="Dummy article"
                    description="Dummy category for a test."/>
             <label xml:lang="x-mapping-xpath"
-                   text="{pattern:Genre=mir_genres,article} and {pattern:Host=journal}" />
+                   text="{pattern:genre(mir_genres,article)} and {pattern:host(journal)}" />
         </category>
     </categories>
 </mycoreclass>

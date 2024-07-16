@@ -41,9 +41,9 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCRConfiguration2.set("MCR.Category.XPathMapping.ClassIDs", "orcidWorkType,dummyClassification");
-        MCRConfiguration2.set("MCR.Category.XPathMapping.Pattern.Genre",
+        MCRConfiguration2.set("MCR.Category.XPathMapping.Pattern.genre",
             "//*[@classid='{0}' and @categid='{1}']");
-        MCRConfiguration2.set("MCR.Category.XPathMapping.Pattern.Host", "//element/publishedin[@type='{0}']");
+        MCRConfiguration2.set("MCR.Category.XPathMapping.Pattern.host", "//element/publishedin[@type='{0}']");
 
     }
 

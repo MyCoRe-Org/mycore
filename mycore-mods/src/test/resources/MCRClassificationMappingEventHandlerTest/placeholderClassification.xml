@@ -8,25 +8,25 @@
             <label xml:lang="de" text="Text"/>
             <label xml:lang="en" text="text"
                    description="Dummy category for a test."/>
-            <label xml:lang="x-mapping-xpath" text="{pattern:LanguageTerm=rfc5646,code,de}" />
+            <label xml:lang="x-mapping-xpath" text="{pattern:language-term(rfc5646,code,de)}" />
         </category>
         <category ID="dummy-placeholder-genre">
             <label xml:lang="de" text="Text"/>
             <label xml:lang="en" text="text"
                    description="Dummy category for a test."/>
-            <label xml:lang="x-mapping-xpath" text="{pattern:Genre=article} and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='journal']" />
+            <label xml:lang="x-mapping-xpath" text="{pattern:genre(article)} and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='journal']" />
         </category>
         <category ID="dummy-placeholder-fb">
             <label xml:lang="de" text="Text"/>
             <label xml:lang="en" text="text"
                    description="Dummy category for a test."/>
-            <label xml:lang="x-mapping-xpathfb" text="{pattern:Title}" />
+            <label xml:lang="x-mapping-xpathfb" text="{pattern:title}" />
         </category>
         <category ID="dummy-placeholder-multiple">
             <label xml:lang="de" text="Text"/>
             <label xml:lang="en" text="text"
                    description="Dummy category for a test."/>
-            <label xml:lang="x-mapping-xpath" text="{pattern:Title} and {pattern:Genre=article} and {pattern:LanguageTerm=rfc5646,code,de}" />
+            <label xml:lang="x-mapping-xpath" text="{pattern:title()} and {pattern:genre(article)} and {pattern:language-term(rfc5646,code,de)}" />
         </category>
     </categories>
 </mycoreclass>

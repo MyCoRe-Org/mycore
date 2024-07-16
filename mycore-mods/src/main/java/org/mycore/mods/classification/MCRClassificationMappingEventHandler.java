@@ -162,11 +162,11 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * property value are substituted with the specific values given in an XPath. It is possible to use
      * multiple patterns per XPath.<p>
      * Syntax:<p>
-     * {pattern:&lt;name of property&gt;=&lt;comma-separated list of values&gt;}<p>
-     * (when there are no values, the "=" is optional)<p>
+     * {pattern:&lt;name of property&gt;(&lt;comma-separated list of values&gt;)}<p>
+     * (when there are no values, use empty parenthesis)<p>
      * Ex.:<p>
-     * <b>Input XPath:</b> {pattern:Genre=article} and not(mods:relatedItem[@type='host'])<p>
-     * <b>Property:</b> MCR.Category.XPathMapping.Pattern.Genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
+     * <b>Input XPath:</b> {pattern:genre(article)} and not(mods:relatedItem[@type='host'])<p>
+     * <b>Property:</b> MCR.Category.XPathMapping.Pattern.genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
      * <b>Substituted XPath:</b> mods:genre[substring-after(@valueURI,'#')='article']
      * and not(mods:relatedItem[@type='host'])
      * @param xPath the XPath containing a pattern to substitute
@@ -174,7 +174,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      */
     private static String replacePattern(String xPath) {
         String updatedXPath = xPath;
-        final Pattern pattern = Pattern.compile("\\{pattern:([^=}]*)=?([^}]*)\\}");
+        final Pattern pattern = Pattern.compile("\\{pattern:([^(}]*)\\(?([^)]*)\\)?}");
         Matcher matcher = pattern.matcher(updatedXPath);
         while (matcher.find()) {
             String patternName = matcher.group(1);
@@ -194,6 +194,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     updatedXPath = updatedXPath.substring(0, matcher.start()) + placeholderText +
                         updatedXPath.substring(matcher.end());
                 }
+            } else {
+                break; // break while-loop for unconfigured patterns
             }
             matcher = pattern.matcher(updatedXPath);
         }
