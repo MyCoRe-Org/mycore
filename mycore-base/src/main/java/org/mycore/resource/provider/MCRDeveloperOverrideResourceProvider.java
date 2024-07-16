@@ -21,23 +21,37 @@ package org.mycore.resource.provider;
 import java.io.File;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
+
 /**
- * A {@link MCRFileSystemResourceProvider} is a {@link MCRResourceProvider} that looks up resources
- * in the file system. It uses a fixed list of base directories configured as a comma-separated-list
- * in <code>MCR.Developer.Resource.Override</code> as base directories for the lookup.
+ * {@link MCRDeveloperOverrideResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up
+ * resources in the file system. It uses a fixed list of base directories configured as a comma-separated-list in
+ * {@link MCRDeveloperOverrideResourceProvider#DEVELOPER_RESOURCE_OVERRIDE_PROPERTY} as base directories for the lookup.
  * <p>
  * This provider replaces the previously used <code>MCRDeveloperTools</code>.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The property suffix {@link MCRDeveloperOverrideResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRDeveloperOverrideResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDeveloperOverrideResourceProvider.Factory.class)
 public class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceProvider {
 
     public static final String DEVELOPER_RESOURCE_OVERRIDE_PROPERTY = "MCR.Developer.Resource.Override";
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRDeveloperOverrideResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.RESOURCES, getBaseDirs());
@@ -45,7 +59,7 @@ public class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceP
 
     private static List<File> getBaseDirs() {
         String paths = MCRConfiguration2.getString(DEVELOPER_RESOURCE_OVERRIDE_PROPERTY).orElse("");
-        return MCRConfiguration2.splitValue(paths).map(File::new).collect(Collectors.toList());
+        return splitValue(paths).map(File::new).toList();
     }
 
     @Override
@@ -55,7 +69,7 @@ public class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceP
 
     public static class Factory implements Supplier<MCRDeveloperOverrideResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.DeveloperOverride.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.DeveloperOverride.Coverage")
         public String coverage;
 
         @Override

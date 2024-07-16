@@ -35,11 +35,35 @@ import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
 
 /**
- * A {@link MCRCachingResourceProvider} is a {@link MCRResourceProvider} that delegates to another
+ * {@link MCRCachingResourceProvider} is an implementation of {@link MCRResourceProvider} that delegates to another
  * {@link MCRResourceProvider} and uses a {@link MCRCache} to cache the results.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The provider is configured using the property suffix {@link MCRCachingResourceProvider#PROVIDER_KEY}.
+ * <li> The property suffix {@link MCRCachingResourceProvider#CAPACITY_KEY} can be used to configure tha capacity
+ * of the underlying cache.
+ * <li> The property suffix {@link MCRCachingResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRCachingResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * [...].Capacity=1000
+ * [...].Provider.Class=foo.bar.FooProvider
+ * [...].Provider.Key1=Value1
+ * [...].Provider.Key2=Value2
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCachingResourceProvider.Factory.class)
 public class MCRCachingResourceProvider extends MCRResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
+
+    public static final String CAPACITY_KEY = "Capacity";
+
+    public static final String PROVIDER_KEY = "Provider";
 
     private final int capacity;
 
@@ -55,6 +79,7 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
+    @SuppressWarnings("OptionalAssignedToNull")
     protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
         Optional<URL> resourceUrl = cache.get(path);
         if (resourceUrl == null) {
@@ -87,13 +112,13 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
 
     public static class Factory implements Supplier<MCRCachingResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.Caching.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Caching.Coverage")
         public String coverage;
 
-        @MCRProperty(name = "Capacity", defaultName = "MCR.Resource.Provider.Default.Caching.Capacity")
+        @MCRProperty(name = CAPACITY_KEY, defaultName = "MCR.Resource.Provider.Default.Caching.Capacity")
         public String capacity;
 
-        @MCRInstance(name = "Provider", valueClass = MCRResourceProvider.class)
+        @MCRInstance(name = PROVIDER_KEY, valueClass = MCRResourceProvider.class)
         public MCRResourceProvider provider;
 
         @Override

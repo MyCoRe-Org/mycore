@@ -20,7 +20,6 @@ package org.mycore.resource.filter;
 
 import java.net.URL;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
@@ -43,7 +42,7 @@ public abstract class MCRResourceFilterBase implements MCRResourceFilter {
         logger.debug("Filtering resource URLs");
         Stream<URL> filteredResourceUrls = doFilter(resourceUrls, hints);
         if (logger.isDebugEnabled()) {
-            return logResourceUrls(filteredResourceUrls.collect(Collectors.toList())).stream();
+            return logResourceUrls(filteredResourceUrls.toList()).stream();
         } else {
             return filteredResourceUrls;
         }

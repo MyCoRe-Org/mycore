@@ -18,80 +18,65 @@
 
 package org.mycore.common;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.log.MCRListMessage;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstanceMap;
 
 /**
  * A {@link MCRUserInformationResolver} can be used to obtain {@link MCRUserInformation}, without knowledge
  * of the underlying mechanism that creates or looks up that user information, by providing a string specification.
  * The specification can be created from a schema and a user ID with
- * {@link MCRUserInformationResolver#getSpecification(String, String)}.
+ * {@link MCRUserInformationResolver#getSpecification(String, String)}. To do so, it uses
+ * {@link MCRUserInformationProvider} instances that each implement a strategy to create or look up user information.
  * <p>
- * Multiple instances of {@link MCRUserInformationProvider} can be configured as a comma separated list of fully
- * qualified class names with the configuration property prefix {@link MCRUserInformationResolver#PROVIDERS_KEY}.
- * Each user information provider implements a strategy to create or look up user information for a given user ID
- * and uses the configured name as its scheme.
+ * A singular, globally available and centrally configured instance can be obtained with
+ * {@link MCRUserInformationResolver#instance()}. This instance is configured using the property prefix
+ * {@link MCRUserInformationResolver#RESOLVER_PROPERTY} and should be used in order obtain user information with
+ * consistently applied strategies, although custom instances can be created when necessary.
  * <p>
- * Example: 
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> Providers are configured as a map using the property suffix {@link MCRUserInformationResolver#PROVIDERS_KEY}.
+ * </ul>
+ * Example:
  * <pre>
- * MCR.UserInformation.Resolver.Providers.foo.Class=my.package.FooUserInformationProvider
+ * MCR.UserInformation.Resolver.Class=org.mycore.common.MCRUserInformationResolver
+ * MCR.UserInformation.Resolver.Providers.foo.Class=foo.bar.FooProvider
+ * MCR.UserInformation.Resolver.Providers.foo.Key1=Value1
+ * MCR.UserInformation.Resolver.Providers.foo.Key2=Value2
+ * MCR.UserInformation.Resolver.Providers.bar.Class=foo.bar.BarProvider
+ * MCR.UserInformation.Resolver.Providers.bar.Key1=Value1
+ * MCR.UserInformation.Resolver.Providers.bar.Key2=Value2
  * </pre>
- * This will create an instance of <code>FooUserInformationProvider</code> and make it available with the schema 
- * <code>foo</code>.
- * <p>
- * A possible use case is to have the ability of storing the user information required for e.g.
- * {@link org.mycore.util.concurrent.MCRFixedUserCallable} as a string in a configuration property.
  */
+@MCRConfigurationProxy(proxyClass = MCRUserInformationResolver.Factory.class)
 public final class MCRUserInformationResolver {
 
-    public static final String PROVIDERS_KEY = "MCR.UserInformation.Resolver.Providers";
+    private static final MCRUserInformationResolver INSTANCE = instantiate();
 
-    private static final Logger LOGGER = StatusLogger.getLogger();
+    public static final String RESOLVER_PROPERTY = "MCR.UserInformation.Resolver";
 
-    private static final MCRUserInformationResolver INSTANCE = new MCRUserInformationResolver(getProviders());
+    public static final String PROVIDERS_KEY = "Providers";
 
     private final Map<String, MCRUserInformationProvider> providers;
 
     public MCRUserInformationResolver(Map<String, MCRUserInformationProvider> providers) {
-        this.providers = Objects.requireNonNull(providers);
-    }
-
-    private static Map<String, MCRUserInformationProvider> getProviders() {
-
-        String prefix = PROVIDERS_KEY + ".";
-        Map<String, Callable<MCRUserInformationProvider>> providerFactoriesByProperty =
-            MCRConfiguration2.getInstances(prefix);
-
-        MCRListMessage description = new MCRListMessage();
-        Map<String, MCRUserInformationProvider> providersBySchema = new HashMap<>();
-        for (String property : providerFactoriesByProperty.keySet()) {
-            try {
-                String schema = property.substring(prefix.length());
-                MCRUserInformationProvider provider = providerFactoriesByProperty.get(property).call();
-                description.add(schema, provider.getClass().getName());
-                providersBySchema.put(schema, provider);
-            } catch (Exception e) {
-                throw new MCRException("Failed to instantiate provider configured in: " + property);
-            }
-        }
-
-        LOGGER.info(description.logMessage("Resolving user information with providers:"));
-
-        return Collections.unmodifiableMap(providersBySchema);
-
+        this.providers = Objects.requireNonNull(providers, "Providers must not be null");
+        this.providers.values().forEach(provider -> Objects.requireNonNull(provider, "Provider must not be null"));
     }
 
     public static MCRUserInformationResolver instance() {
         return INSTANCE;
+    }
+
+    public static MCRUserInformationResolver instantiate() {
+        String classProperty = RESOLVER_PROPERTY + ".Class";
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, classProperty);
     }
 
     public MCRUserInformation getOrThrow(String schema, String userId) {
@@ -135,6 +120,18 @@ public final class MCRUserInformationResolver {
 
     public static String getSpecification(String schema, String userId) {
         return schema + ":" + userId;
+    }
+
+    public static class Factory implements Supplier<MCRUserInformationResolver> {
+
+        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRUserInformationProvider.class)
+        public Map<String, MCRUserInformationProvider> providers;
+
+        @Override
+        public MCRUserInformationResolver get() {
+            return new MCRUserInformationResolver(providers);
+        }
+
     }
 
 }

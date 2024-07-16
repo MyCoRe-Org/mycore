@@ -28,13 +28,26 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * A {@link MCRConfigDirLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource
- * candidate is a resource from a JAR file placed in the WAR file.
+ * {@link MCRWebappLibraryResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
+ * candidate is a resource from a JAR file placed in the WAR file. To decide weather such resources are retained or
+ * ignored, a {@link MCRResourceFilterMode} value is used.
  * <p>
  * It uses the webapp directory hinted at by {@link MCRResourceHintKeys#WEBAPP_DIR}, if present.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The mode is configured using the property suffix {@link MCRWebappLibraryResourceFilter#MODE_KEY}.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.filter.MCRWebappLibraryResourceFilter
+ * [...].Mode=MUST_MATCH
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappLibraryResourceFilter.Factory.class)
 public class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
+
+    public static final String MODE_KEY = "Mode";
 
     public MCRWebappLibraryResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
@@ -53,7 +66,7 @@ public class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFilterBa
 
     public static class Factory implements Supplier<MCRWebappLibraryResourceFilter> {
 
-        @MCRProperty(name = "Mode", defaultName = "MCR.Resource.Filter.Default.WebappLibrary.Mode")
+        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Filter.Default.WebappLibrary.Mode")
         public String mode;
 
         @Override

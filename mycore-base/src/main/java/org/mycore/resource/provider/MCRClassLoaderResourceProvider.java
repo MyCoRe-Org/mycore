@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
@@ -32,13 +31,26 @@ import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * A {@link MCRClassLoaderResourceProvider} is a {@link MCRResourceProvider} that uses
- * {@link ClassLoader#getResource(String)} to lookup a resource.
+ * {@link MCRClassLoaderResourceProvider} is an implementation of {@link MCRResourceProvider} hat uses
+ * {@link ClassLoader#getResource(String)} to look up a resource.
  * <p>
  * It uses the {@link ClassLoader} hinted at by {@link MCRResourceHintKeys#CLASS_LOADER}, if present.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The property suffix {@link MCRClassLoaderResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRClassLoaderResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRClassLoaderResourceProvider.Factory.class)
 public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRClassLoaderResourceProvider(String coverage) {
         super(coverage);
@@ -51,7 +63,7 @@ public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
 
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return doProvide(path, hints).stream().map(this::providedURL).collect(Collectors.toList());
+        return doProvide(path, hints).stream().map(this::providedURL).toList();
     }
 
     private Optional<ClassLoader> getClassloader(MCRHints hints) {
@@ -68,7 +80,7 @@ public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
 
     public static class Factory implements Supplier<MCRClassLoaderResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.ClassLoader.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ClassLoader.Coverage")
         public String coverage;
 
         @Override

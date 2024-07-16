@@ -26,7 +26,7 @@ import org.mycore.resource.MCRResourceResolver;
 import jakarta.servlet.ServletContext;
 
 /**
- * A utility class that provides {{@link MCRHintKey}} used by {@link MCRResourceResolver#defaultHints()}.
+ * A utility class that provides {@link MCRHintKey} used by {@link MCRResourceResolver#defaultHints()}.
  */
 public final class MCRResourceHintKeys {
 

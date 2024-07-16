@@ -33,12 +33,23 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 
 /**
- * A {@link MCRCombinedResourceFilter} is a {@link MCRResourceFilter} that delegates to multiple other
- * {@link MCRResourceFilter}, one after another.
+ * {@link MCRCombinedResourceFilter} is an implementation of {@link MCRResourceFilter} that delegates to multiple
+ * other {@link MCRResourceFilter} instances, one after another.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> Filters are configured as a list using the property suffix {@link MCRCombinedResourceFilter#FILTERS_KEY}.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.filter.MCRCombinedResourceFilter
+ * [...].Filters.10.Class=MUST_MATCH
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceFilter.Factory.class)
 public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
+    public static final String FILTERS_KEY = "Filters";
     private final List<MCRResourceFilter> filters;
 
     public MCRCombinedResourceFilter(MCRResourceFilter... filters) {
@@ -68,7 +79,7 @@ public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceFilter> {
 
-        @MCRInstanceList(name = "Filters", valueClass = MCRResourceFilter.class)
+        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRResourceFilter.class)
         public List<MCRResourceFilter> filters;
 
         @Override

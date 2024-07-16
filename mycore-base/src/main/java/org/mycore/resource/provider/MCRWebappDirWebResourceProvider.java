@@ -40,8 +40,33 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
  * <p>
  * It uses the webapp directory hinted at by {@link MCRResourceHintKeys#WEBAPP_DIR}, if present.
  */
+
+/**
+ * {@link MCRWebappDirWebResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up web
+ * resources in the file system. It uses the webapp directory used by the web container as the base directory
+ * for the lookup.
+ * <p>
+ * Unless placed there manually, such resources originate from the root directory inside the WAR file. In a usual
+ * build, such resources originate from the <code>/src/main/webapp</code> directory inside the Maven project that
+ * creates the WAR file.
+ * <p>
+ * It uses the webapp directory hinted at by {@link MCRResourceHintKeys#WEBAPP_DIR}, if present.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The property suffix {@link MCRWebappDirWebResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRWebappDirWebResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * </pre>
+ */
 @MCRConfigurationProxy(proxyClass = MCRWebappDirWebResourceProvider.Factory.class)
 public class MCRWebappDirWebResourceProvider extends MCRFileSystemResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRWebappDirWebResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.WEB_RESOURCES);
@@ -63,7 +88,7 @@ public class MCRWebappDirWebResourceProvider extends MCRFileSystemResourceProvid
 
     public static class Factory implements Supplier<MCRWebappDirWebResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.WebappDir.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.WebappDir.Coverage")
         public String coverage;
 
         @Override

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
@@ -48,8 +47,52 @@ import org.mycore.resource.selector.MCRResourceSelector;
  * the result of the <em>filter</em>-phase. If, after the <em>select</em>-phase, multiple candidates are
  * till available, the first candidate is chosen.
  */
+
+
+/**
+ * {@link MCRLFSResourceProvider} is an implementation of {@link MCRResourceProvider} that splits the lookup
+ * strategy in three phases: <em>locate</em>, <em>filter</em>, <em>select</em> (LFS).
+ * <p>
+ * In the <em>locate</em>-phase, a {@link MCRResourceLocator} instance is used to locate a set of possible candidates.
+ * In the <em>filter</em>-phase, a {@link MCRResourceFilter} instance is used to reduce the result of the
+ * <em>locate</em>-phase to the set of allowed resources.
+ * In the <em>select</em>-phase, a {@link MCRResourceSelector} instance is used to select prioritized resources from
+ * the result of the <em>filter</em>-phase. If, after the <em>select</em>-phase, multiple candidates are
+ * till available, the first candidate is chosen.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> The locator is configures using the property suffix {@link MCRLFSResourceProvider#LOCATOR_KEY}.
+ * <li> The filter is configures using the property suffix {@link MCRLFSResourceProvider#FILTER_KEY}.
+ * <li> The selector is configures using the property suffix {@link MCRLFSResourceProvider#SELECTOR_KEY}.
+ * <li> The property suffix {@link MCRLFSResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.provider.MCRFileSystemResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * [...].Locator.Class=foo.bar.FooLocator
+ * [...].Locator.Key1=Value1
+ * [...].Locator.Key2=Value2
+ * [...].Filter.Class=foo.bar.FooFilter
+ * [...].Filter.Key1=Value1
+ * [...].Filter.Key2=Value2
+ * [...].Selector.Class=foo.bar.FooSelector
+ * [...].Selector.Key1=Value1
+ * [...].Selector.Key2=Value2
+ * </pre>
+ */
 @MCRConfigurationProxy(proxyClass = MCRLFSResourceProvider.Factory.class)
 public class MCRLFSResourceProvider extends MCRResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
+
+    public static final String LOCATOR_KEY = "Locator";
+
+    public static final String FILTER_KEY = "Filter";
+
+    public static final String SELECTOR_KEY = "Selector";
 
     private final MCRResourceLocator locator;
 
@@ -72,11 +115,11 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
 
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return filter.filter(locator.locate(path, hints), hints).map(this::providedURL).collect(Collectors.toList());
+        return filter.filter(locator.locate(path, hints), hints).map(this::providedURL).toList();
     }
 
     private Optional<URL> doProvide(Stream<URL> resourceUrls, MCRHints hints) {
-        return doProvide(resourceUrls.collect(Collectors.toList()), hints);
+        return doProvide(resourceUrls.toList(), hints);
     }
 
     private Optional<URL> doProvide(List<URL> resourceUrls, MCRHints hints) {
@@ -109,16 +152,16 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
 
     public static class Factory implements Supplier<MCRLFSResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.LFS.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.LFS.Coverage")
         public String coverage;
 
-        @MCRInstance(name = "Locator", valueClass = MCRResourceLocator.class)
+        @MCRInstance(name = LOCATOR_KEY, valueClass = MCRResourceLocator.class)
         public MCRResourceLocator locator;
 
-        @MCRInstance(name = "Filter", valueClass = MCRResourceFilter.class)
+        @MCRInstance(name = FILTER_KEY, valueClass = MCRResourceFilter.class)
         public MCRResourceFilter filter;
 
-        @MCRInstance(name = "Selector", valueClass = MCRResourceSelector.class)
+        @MCRInstance(name = SELECTOR_KEY, valueClass = MCRResourceSelector.class)
         public MCRResourceSelector selector;
 
         @Override

@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
@@ -107,7 +106,7 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
 
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return getResourceUrls(path, hints).map(this::providedURL).collect(Collectors.toList());
+        return getResourceUrls(path, hints).map(this::providedURL).toList();
     }
 
     private Stream<URL> getResourceUrls(MCRResourcePath path, MCRHints hints) {

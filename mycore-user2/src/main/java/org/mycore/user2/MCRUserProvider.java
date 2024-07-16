@@ -24,8 +24,15 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationProvider;
 
 /**
- * A {@link MCRUserProvider} is a {@link MCRUserInformationProvider} that looks up user information of type
- * {@link MCRUser} with {@link MCRUserManager#getUser(String)}.
+ * {@link MCRUserProvider} is an implementation of {@link MCRUserInformationProvider} that looks up user information
+ * of type {@link MCRUser} with {@link MCRUserManager#getUser(String)}.
+ * <p>
+ * No configuration options are available, if configured automatically.
+ * <p>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.user2.MCRUserProvider
+ * </pre>
  */
 public final class MCRUserProvider implements MCRUserInformationProvider {
 
