@@ -132,6 +132,7 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
 
     private byte[] getHash(byte[] salt, int hashSizeBytes, String password) throws Exception {
 
+        // see definition of EXPBIAS in section 3.7.1.3. of RFC 4880 for original formula
         long numberOfBytes = ((long) (16 + (count & 15)) << ((count >> 4) + 6));
         byte[] source = Bytes.concat(salt, password.getBytes(StandardCharsets.UTF_8));
 
