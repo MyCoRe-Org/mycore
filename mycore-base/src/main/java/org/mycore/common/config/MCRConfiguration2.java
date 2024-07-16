@@ -352,9 +352,10 @@ public class MCRConfiguration2 {
     public static <T> Map<String, Callable<T>> getInstances(String prefix) {
         return getInstantiatablePropertyKeys(prefix)
             .collect(Collectors.toMap(
-                k -> MCRInstanceName.of(k).canonical(),
+                k -> MCRInstanceName.of(k).canonical().substring(prefix.length()),
                 v -> () -> (T) getInstanceOf(v).orElse(null)));
     }
+
 
     /**
      * Returns the configuration property with the specified name as an <CODE>

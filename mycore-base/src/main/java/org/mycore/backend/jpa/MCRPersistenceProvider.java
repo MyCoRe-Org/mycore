@@ -109,14 +109,11 @@ public class MCRPersistenceProvider implements PersistenceProvider {
 
     @Override
     public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
-        // TODO: this is a workarround for MCRConfiguration2.getInstances returning full property keys
-        if (persistenceUnitInitializer
-            .containsKey(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME + emName)) {
+        if (persistenceUnitInitializer.containsKey(emName)) {
             LOGGER.info("Creating EntityManagerFactory for persistence unit {}", emName);
             try {
 
-                MCRPersistenceUnitDescriptor puDescriptor = persistenceUnitInitializer
-                    .get(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME + emName).call();
+                MCRPersistenceUnitDescriptor puDescriptor = persistenceUnitInitializer.get(emName).call();
 
                 EntityManagerFactoryBuilderImpl builder = new EntityManagerFactoryBuilderImpl(puDescriptor, map,
                     MCRClassTools.getClassLoader());
@@ -144,13 +141,10 @@ public class MCRPersistenceProvider implements PersistenceProvider {
 
     @Override
     public boolean generateSchema(String persistenceUnitName, Map map) {
-        // TODO: this is a workarround for MCRConfiguration2.getInstances returning full property keys
-        if (persistenceUnitInitializer.containsKey(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME +
-            persistenceUnitName)) {
+        if (persistenceUnitInitializer.containsKey(persistenceUnitName)) {
             try {
 
-                MCRPersistenceUnitDescriptor puDescriptor = persistenceUnitInitializer
-                    .get(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME + persistenceUnitName).call();
+                MCRPersistenceUnitDescriptor puDescriptor = persistenceUnitInitializer.get(persistenceUnitName).call();
 
                 EntityManagerFactoryBuilderImpl builder = new EntityManagerFactoryBuilderImpl(puDescriptor, map,
                     MCRClassTools.getClassLoader());
