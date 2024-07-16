@@ -16,16 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.solr.index.handlers.stream;
+package org.mycore.solr;
 
-import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
-import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
+public record MCRSolrCoreType(String name) {
 
-/**
- * Base class for solr indexing using content streams.
- */
-public abstract class MCRSolrAbstractStreamIndexHandler extends MCRSolrAbstractIndexHandler {
+    public static final MCRSolrCoreType MAIN = new MCRSolrCoreType("main");
 
-    protected abstract MCRSolrAbstractContentStream<?> getStream();
+    public static final MCRSolrCoreType CLASSIFICATION = new MCRSolrCoreType("classification");
 
 }

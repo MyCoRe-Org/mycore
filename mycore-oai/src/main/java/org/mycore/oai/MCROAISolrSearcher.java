@@ -50,7 +50,7 @@ import org.mycore.oai.set.MCROAISetHandler;
 import org.mycore.oai.set.MCROAISetResolver;
 import org.mycore.oai.set.MCROAISolrSetHandler;
 import org.mycore.oai.set.MCRSet;
-import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
@@ -87,7 +87,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.Q, "id:" + MCRSolrUtils.escapeSearchValue(mcrId));
         query.setRows(1);
         // do the query
-        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
+        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
         try {
             QueryRequest queryRequest = new QueryRequest(query);
             MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
@@ -157,7 +157,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.SORT, "id asc");
 
         // do the query
-        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
+        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
         QueryRequest queryRequest = new QueryRequest(query);
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
@@ -263,7 +263,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         params.add(CommonParams.FQ, fieldName + ":[* TO *]");
         params.add(CommonParams.FL, fieldName);
         params.add(CommonParams.ROWS, "1");
-        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
+        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
         try {
             QueryRequest queryRequest = new QueryRequest(params);
             MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,

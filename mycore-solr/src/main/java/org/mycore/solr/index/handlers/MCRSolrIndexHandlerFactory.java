@@ -26,12 +26,12 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
@@ -86,12 +86,11 @@ public abstract class MCRSolrIndexHandlerFactory {
         return MCRSolrIndexStrategyManager.checkFile(file, attrs);
     }
 
-    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient) {
-        return this.getIndexHandler(file, attrs, solrClient, checkFile(file, attrs));
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs) {
+        return this.getIndexHandler(file, attrs, checkFile(file, attrs));
     }
 
-    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient,
-        boolean sendContent) {
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, boolean sendContent) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: submitting file \"{} for indexing", file);
         }
@@ -99,10 +98,12 @@ public abstract class MCRSolrIndexHandlerFactory {
         long start = System.currentTimeMillis();
         if (sendContent) {
             /* extract metadata with tika */
-            indexHandler = new MCRSolrFileIndexHandler(file, attrs, solrClient);
+            indexHandler = new MCRSolrFileIndexHandler(file, attrs);
         } else {
             indexHandler = new MCRSolrInputDocumentHandler(() ->
-                    MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs), solrClient, file.toString());
+                    MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs), file.toString(),
+                    MCRSolrCoreType.MAIN);
+            indexHandler.setCoreType(MCRSolrCoreType.MAIN);
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);

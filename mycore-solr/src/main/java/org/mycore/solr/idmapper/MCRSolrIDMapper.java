@@ -35,8 +35,8 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
 import org.mycore.frontend.idmapper.MCRIDMapper;
-import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 
 /**
@@ -102,7 +102,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     QueryRequest queryRequest = new QueryRequest(params);
                     MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
-                    solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
+                    solrResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
                 } catch (Exception e) {
                     LOGGER.error("Error retrieving object id from SOLR", e);
                 }
@@ -147,7 +147,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     QueryRequest queryRequest = new QueryRequest(params);
                     MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
-                    solrResponse = queryRequest.process(MCRSolrClientFactory.getMainSolrClient());
+                    solrResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
                 } catch (Exception e) {
                     LOGGER.error("Error retrieving derivate id from SOLR", e);
                 }

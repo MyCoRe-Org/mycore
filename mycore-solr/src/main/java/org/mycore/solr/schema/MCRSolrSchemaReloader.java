@@ -42,8 +42,8 @@ import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -85,7 +85,7 @@ public class MCRSolrSchemaReloader {
 
         LOGGER.info("Resetting SOLR schema for core " + coreID + " using configuration " + configType);
         try {
-            SolrClient solrClient = MCRSolrClientFactory.get(coreID).map(MCRSolrCore::getClient)
+            SolrClient solrClient = MCRSolrCoreManager.get(coreID).map(MCRSolrCore::getClient)
                 .orElseThrow(() -> new MCRConfigurationException("The core " + coreID + " is not configured!"));
 
             deleteCopyFields(solrClient);
@@ -179,7 +179,7 @@ public class MCRSolrSchemaReloader {
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processSchemaFiles(String configType, String coreID) {
-        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID)
+        MCRSolrCore solrCore = MCRSolrCoreManager.get(coreID)
             .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
         LOGGER.info("Load schema definitions for core " + coreID + " using configuration " + configType);
