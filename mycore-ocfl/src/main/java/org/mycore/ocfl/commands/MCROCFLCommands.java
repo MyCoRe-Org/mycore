@@ -88,7 +88,7 @@ public class MCROCFLCommands {
             String[] prunerIds = prunersStringList.split(",");
             Map<String, Callable<Object>> pruners = MCRConfiguration2.getInstances(PRUNERS_CONFIG_PREFIX);
             for (String prunerId : prunerIds) {
-                prunerList.add((MCROCFLRevisionPruner) pruners.get(PRUNERS_CONFIG_PREFIX + prunerId).call());
+                prunerList.add((MCROCFLRevisionPruner) pruners.get(prunerId).call());
             }
         }
 

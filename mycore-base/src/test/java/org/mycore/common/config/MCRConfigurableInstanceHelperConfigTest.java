@@ -39,9 +39,13 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
 
     public static final String INSTANCE_NAME_PREFIX = "MCR.CIH.";
 
-    private static final String INSTANCE_1_NAME = INSTANCE_NAME_PREFIX + "Test1";
+    public static final String INSTANCE_1_KEY = "Test1";
 
-    private static final String INSTANCE_2_NAME = INSTANCE_NAME_PREFIX + "Test2";
+    public static final String INSTANCE_2_KEY = "Test2";
+
+    private static final String INSTANCE_1_NAME = INSTANCE_NAME_PREFIX + INSTANCE_1_KEY;
+
+    private static final String INSTANCE_2_NAME = INSTANCE_NAME_PREFIX + INSTANCE_2_KEY;
 
     private static final String DEFAULT_KEY = "DefaultKey";
 
@@ -137,7 +141,9 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     public void test() {
 
         Map<String, ?> instances = MCRConfiguration2.getInstances(INSTANCE_NAME_PREFIX);
-        assertEquals("Except two instances!", 2, instances.size());
+        assertEquals("Except two instances", 2, instances.size());
+        assertTrue("Expected key " + INSTANCE_1_KEY + " to be present", instances.containsKey(INSTANCE_1_KEY));
+        assertTrue("Expected key " + INSTANCE_2_KEY + " to be present", instances.containsKey(INSTANCE_2_KEY));
 
         testInstance(INSTANCE_1_NAME, false);
         testInstance(INSTANCE_2_NAME, true);
