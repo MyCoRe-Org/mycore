@@ -19,6 +19,7 @@
 package org.mycore.resource.selector;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
@@ -43,7 +44,7 @@ public class MCRHighestComponentPriorityResourceSelector extends MCRResourceSele
     @Override
     protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
         int highestPriority = -1;
-        List<URL> unmatchedResourceUrls = resourceUrls;
+        List<URL> unmatchedResourceUrls = new ArrayList<>(resourceUrls);
         List<URL> highestPriorityModuleResourceUrls = new LinkedList<>();
         for (MCRComponent component : componentsByComponentPriority()) {
             int priority = component.getPriority();
