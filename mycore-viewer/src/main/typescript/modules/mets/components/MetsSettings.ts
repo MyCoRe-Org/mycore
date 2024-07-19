@@ -16,22 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../widgets/alto/AltoChange.ts" />
+import {AltoChangeSet} from "../widgets/alto/AltoChange";
+import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
 
-namespace mycore.viewer.components {
-    import AltoChangeSet = mycore.viewer.widgets.alto.AltoChangeSet;
-
-    export interface MetsSettings extends MyCoReViewerSettings {
-        altoChangePID: string;
-        metsURL: string;
-        imageXmlPath: string;
-        pageRange: number;
-        pdfCreatorURI: string;
-        pdfCreatorStyle: string;
-        pdfCreatorFormatString?:string;
-        pdfCreatorRestrictionFormatString?:string;
-        altoChanges?:AltoChangeSet;
-        altoEditorPostURL?:string;
-        altoReviewer?:boolean;
-    }
+export interface MetsSettings extends MyCoReViewerSettings {
+    altoChangePID: string;
+    metsURL: string;
+    imageXmlPath: string;
+    pageRange: number;
+    pdfCreatorURI: string;
+    pdfCreatorStyle: string;
+    pdfCreatorFormatString?: string;
+    pdfCreatorRestrictionFormatString?: string;
+    altoChanges?: AltoChangeSet;
+    altoEditorPostURL?: string;
+    altoReviewer?: boolean;
 }
+

@@ -16,56 +16,64 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="model/MyCoReFrameToolbarModel.ts" />
 
-namespace mycore.viewer.components {
+import {LanguageModelLoadedEvent} from "../../base/components/events/LanguageModelLoadedEvent";
+import {RequestPermalinkEvent} from "../../base/components/events/RequestPermalinkEvent";
+import {ButtonPressedEvent} from "../../base/widgets/toolbar/events/ButtonPressedEvent";
+import {ViewerEvent} from "../../base/widgets/events/ViewerEvent";
+import {WaitForEvent} from "../../base/components/events/WaitForEvent";
+import {ProvideToolbarModelEvent} from "../../base/components/events/ProvideToolbarModelEvent";
+import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+import {ViewerComponent} from "../../base/components/ViewerComponent";
+import {ToolbarButton} from "../../base/widgets/toolbar/model/ToolbarButton";
+import {MyCoReFrameToolbarModel} from "./model/MyCoReFrameToolbarModel";
 
-    export class MyCoReFrameToolbarProviderComponent extends ViewerComponent {
+export class MyCoReFrameToolbarProviderComponent extends ViewerComponent {
 
-        constructor(private _settings:MyCoReViewerSettings) {
-            super();
+    constructor(private _settings: MyCoReViewerSettings) {
+        super();
+    }
+
+    private btn: ToolbarButton = null;
+    private translation: string = null;
+
+    public get handlesEvents(): string[] {
+        return [ButtonPressedEvent.TYPE,
+            LanguageModelLoadedEvent.TYPE];
+    }
+
+    public init() {
+        var frameToolbarModel = new MyCoReFrameToolbarModel();
+
+        if (this._settings.mobile) {
+            frameToolbarModel.shrink();
         }
 
-        private btn: mycore.viewer.widgets.toolbar.ToolbarButton = null;
-        private translation: string = null;
+        this.trigger(new ProvideToolbarModelEvent(
+            this, frameToolbarModel));
+        this.btn = frameToolbarModel.maximizeViewerToolbarButton;
+        this.trigger(new WaitForEvent(this, LanguageModelLoadedEvent.TYPE));
+    }
 
-        public get handlesEvents():string[] {
-            return [mycore.viewer.widgets.toolbar.events.ButtonPressedEvent.TYPE,
-                mycore.viewer.components.events.LanguageModelLoadedEvent.TYPE];
-        }
-        public init() {
-            var frameToolbarModel = new mycore.viewer.model.MyCoReFrameToolbarModel();
-
-            if(this._settings.mobile){
-                frameToolbarModel.shrink();
+    public handle(e: ViewerEvent): void {
+        if (e.type == ButtonPressedEvent.TYPE) {
+            var bpe = e as ButtonPressedEvent;
+            if (bpe.button.id == "MaximizeButton") {
+                this.trigger(new RequestPermalinkEvent(this, (permalink) => {
+                    window.top.location.assign(permalink);
+                }));
             }
-
-            this.trigger(new events.ProvideToolbarModelEvent(
-                this, frameToolbarModel));
-            this.btn = frameToolbarModel.maximizeViewerToolbarButton;
-            this.trigger(new events.WaitForEvent(this, mycore.viewer.components.events.LanguageModelLoadedEvent.TYPE));
         }
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
-            if (e.type == mycore.viewer.widgets.toolbar.events.ButtonPressedEvent.TYPE) {
-                var bpe = <mycore.viewer.widgets.toolbar.events.ButtonPressedEvent>e;
-                if (bpe.button.id == "MaximizeButton") {
-                    this.trigger(new events.RequestPermalinkEvent(this, (permalink)=> {
-                        window.top.location.assign(permalink);
-                    }));
-                }
-            }
-
-            if (e.type === mycore.viewer.components.events.LanguageModelLoadedEvent.TYPE) {
-                const lmle = <events.LanguageModelLoadedEvent>e;
-                this.translation = lmle.languageModel.getTranslation('toolbar.maximize');
-                if (this.translation != null && this.btn != null) {
-                    this.btn.tooltip = this.translation;
-                }
+        if (e.type === LanguageModelLoadedEvent.TYPE) {
+            const lmle = e as LanguageModelLoadedEvent;
+            this.translation = lmle.languageModel.getTranslation('toolbar.maximize');
+            if (this.translation != null && this.btn != null) {
+                this.btn.tooltip = this.translation;
             }
         }
     }
-
 }
 
-addViewerComponent(mycore.viewer.components.MyCoReFrameToolbarProviderComponent);
+
+

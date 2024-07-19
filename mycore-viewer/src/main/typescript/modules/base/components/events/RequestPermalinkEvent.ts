@@ -16,17 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
 
-namespace mycore.viewer.components.events {
-    export class RequestPermalinkEvent extends MyCoReImageViewerEvent {
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {ViewerComponent} from "../ViewerComponent";
 
-        constructor(component:ViewerComponent, public callback:(permalink:string) => void) {
-            super(component, RequestPermalinkEvent.TYPE);
-        }
+export class RequestPermalinkEvent extends MyCoReImageViewerEvent {
 
-        public static TYPE:string = "RequestPermalinkEvent";
-
+    constructor(component: ViewerComponent, public callback: (permalink: string) => void) {
+        super(component, RequestPermalinkEvent.TYPE);
     }
+
+    public static TYPE: string = "RequestPermalinkEvent";
+
 }
+

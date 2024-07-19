@@ -16,15 +16,13 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="ChapterTreeModel.ts" />
-/// <reference path="ChapterTreeView.ts" />
-/// <reference path="ChapterTreeSettings.ts" />
-/// <reference path="ChapterTreeInputHandler.ts" />
-/// <reference path="ChapterTreeChapter.ts" />
 
-namespace mycore.viewer.widgets.chaptertree {
+    import {ChapterTreeSettings} from "./ChapterTreeSettings";
+import {ChapterTreeModel} from "./ChapterTreeModel";
+import {ChapterTreeView} from "./ChapterTreeView";
+import {ChapterTreeChapter} from "./ChapterTreeChapter";
 
-    export class IviewChapterTree {
+export class IviewChapterTree {
 
         constructor(private _settings: ChapterTreeSettings) {
             this._model = new ChapterTreeModel(_settings.chapter, this._settings.chapterLabelMap);
@@ -88,4 +86,3 @@ namespace mycore.viewer.widgets.chaptertree {
 
     }
 
-}

@@ -16,12 +16,28 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/events/MyCoReImageViewerEvent.ts" />
-/// <reference path="widgets/canvas/PageController.ts" />
-/// <reference path="widgets/toolbar/IviewToolbar.ts" />
-/// <reference path="components/model/MyCoReBasicToolbarModel.ts" />
-/// <reference path="MyCoReViewer.ts" />
-/// <reference path="widgets/modal/ViewerErrorModal.ts" />
-/// <reference path="widgets/modal/ViewerInfoModal.ts" />
-/// <reference path="widgets/modal/ViewerConfirmModal.ts" />
-/// <reference path="components/events/PageLoadedEvent.ts" />
+import {MyCoReViewer} from "./MyCoReViewer";
+import {addViewerComponent} from "./Utils";
+import {MyCoReViewerContainerComponent} from "./components/MyCoReViewerContainerComponent";
+import {MyCoReI18NComponent} from "./components/MyCoReI18NComponent";
+import {MyCoReImageOverviewComponent} from "./components/MyCoReImageOverviewComponent";
+import {MyCoReToolbarComponent} from "./components/MyCoReToolbarComponent";
+import {MyCoReImageScrollComponent} from "./components/MyCoReImageScrollComponent";
+import {MyCoReChapterComponent} from "./components/MyCoReChapterComponent";
+import {MyCoRePermalinkComponent} from "./components/MyCoRePermalinkComponent";
+import {MyCoReLayerComponent} from "./components/MyCoReLayerComponent";
+import {MyCoReButtonChangeComponent} from "./components/MyCoReButtonChangeComponent";
+
+addViewerComponent(MyCoReViewerContainerComponent);
+addViewerComponent(MyCoReI18NComponent);
+addViewerComponent(MyCoReImageOverviewComponent);
+addViewerComponent(MyCoReToolbarComponent);
+addViewerComponent(MyCoReImageScrollComponent);
+addViewerComponent(MyCoReChapterComponent);
+addViewerComponent(MyCoRePermalinkComponent);
+
+
+addViewerComponent(MyCoReLayerComponent);
+addViewerComponent(MyCoReButtonChangeComponent);
+
+export {MyCoReViewer}

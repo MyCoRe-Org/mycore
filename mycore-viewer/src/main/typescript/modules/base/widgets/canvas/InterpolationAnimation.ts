@@ -16,11 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="StatefulAnimation.ts" />
 
-namespace mycore.viewer.widgets.canvas {
+    import {StatefulAnimation} from "./StatefulAnimation";
 
-    export class InterpolationAnimation extends StatefulAnimation {
+export class InterpolationAnimation extends StatefulAnimation {
 
         public value:number;
 
@@ -50,4 +49,3 @@ namespace mycore.viewer.widgets.canvas {
         return from + ((to - from) * progress);
     }
 
-}

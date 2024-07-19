@@ -16,17 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
-/// <reference path="../model/StructureImage.ts" />
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {ViewerComponent} from "../ViewerComponent";
 
-namespace mycore.viewer.components.events {
-    export class TextEditEvent extends MyCoReImageViewerEvent {
-        constructor(component:ViewerComponent, public edit:boolean = true) {
-            super(component, TextEditEvent.TYPE);
-        }
-
-        public static TYPE:string = "TextEditEvent";
-
+export class TextEditEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent, public edit: boolean = true) {
+        super(component, TextEditEvent.TYPE);
     }
+
+    public static TYPE: string = "TextEditEvent";
+
 }

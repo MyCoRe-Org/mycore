@@ -16,13 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../Utils.ts" />
 
-namespace mycore.viewer.widgets.canvas {
-    export interface CanvasPageLayer {
+import {Size2D} from "../../Utils";
 
-        draw(ctx:CanvasRenderingContext2D, id:string, pageSize:Size2D, drawOnHtml:boolean):void;
-
-    }
-
+export interface CanvasPageLayer {
+    draw(ctx: CanvasRenderingContext2D, id: string, pageSize: Size2D, drawOnHtml: boolean): void;
 }
+
+

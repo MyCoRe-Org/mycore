@@ -16,12 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../definitions/jquery.d.ts" />
-/// <reference path="IviewChapterTree.ts" />
 
-namespace mycore.viewer.widgets.chaptertree {
 
-    export interface ChapterTreeInputHandler {
+    import {IviewChapterTree} from "./IviewChapterTree";
+
+export interface ChapterTreeInputHandler {
         // called from ctrl
         register(ctrl: IviewChapterTree): void;
 
@@ -74,4 +73,4 @@ namespace mycore.viewer.widgets.chaptertree {
         }
     }
 
-}
+

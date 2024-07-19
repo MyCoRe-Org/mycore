@@ -16,33 +16,36 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.tei {
-    export class TEILayer implements model.Layer {
 
-        constructor(private _id: string, private _label: string, private mapping: MyCoReMap<string,string>, private contentLocation: string, private teiStylesheet: string) {
-        }
+import {Layer} from "../../base/components/model/Layer";
+import {MyCoReMap} from "../../base/Utils";
 
-        getId():string {
-            return this._id;
-        }
+export class TEILayer implements Layer {
 
-        getLabel():string {
-            return this._label;
-        }
+    constructor(private _id: string, private _label: string, private mapping: MyCoReMap<string, string>, private contentLocation: string, private teiStylesheet: string) {
+    }
 
-        resolveLayer(pageHref:string, callback:(success:boolean, content?:JQuery)=>void):void {
-            if (this.mapping.has(pageHref)) {
-                var settings:JQueryAjaxSettings = {};
+    getId(): string {
+        return this._id;
+    }
 
-                settings.async = true;
-                settings.success = function (data:any, textStatus:string, jqXHR:JQueryXHR) {
-                    callback(true,jQuery(data));
-                };
+    getLabel(): string {
+        return this._label;
+    }
 
-                jQuery.ajax(this.contentLocation + this.mapping.get(pageHref) + "?XSL.Style=" + this.teiStylesheet, settings);
-            } else {
-                callback(false);
-            }
+    resolveLayer(pageHref: string, callback: (success: boolean, content?: JQuery) => void): void {
+        if (this.mapping.has(pageHref)) {
+            var settings: JQueryAjaxSettings = {};
+
+            settings.async = true;
+            settings.success = function (data: any, textStatus: string, jqXHR: JQueryXHR) {
+                callback(true, jQuery(data));
+            };
+
+            jQuery.ajax(this.contentLocation + this.mapping.get(pageHref) + "?XSL.Style=" + this.teiStylesheet, settings);
+        } else {
+            callback(false);
         }
     }
 }
+

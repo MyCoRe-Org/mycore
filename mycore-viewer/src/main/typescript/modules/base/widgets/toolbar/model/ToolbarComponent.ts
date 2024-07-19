@@ -16,39 +16,37 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../Utils.ts" />
 
-namespace mycore.viewer.widgets.toolbar {
+import {MyCoReMap, ViewerProperty} from "../../../Utils";
 
-    export class ToolbarComponent {
-        constructor(id: string) {
-            this._properties = new MyCoReMap<string, ViewerProperty<any>>();
-            this.addProperty(new ViewerProperty(this, "id", id))
-        }
+export class ToolbarComponent {
+    constructor(id: string) {
+        this._properties = new MyCoReMap<string, ViewerProperty<any>>();
+        this.addProperty(new ViewerProperty(this, "id", id))
+    }
 
-        private _properties: MyCoReMap<string, ViewerProperty<any>>;
+    private _properties: MyCoReMap<string, ViewerProperty<any>>;
 
-        public get id() {
-            return this.getProperty("id").value;
-        }
+    public get id() {
+        return this.getProperty("id").value;
+    }
 
-        public get PropertyNames() {
-            return this._properties.keys;
-        }
+    public get PropertyNames() {
+        return this._properties.keys;
+    }
 
-        public addProperty(property: ViewerProperty<any>) {
-            this._properties.set(property.name, property);
-        }
+    public addProperty(property: ViewerProperty<any>) {
+        this._properties.set(property.name, property);
+    }
 
-        public getProperty(name: string) {
-            return this._properties.get(name);
-        }
+    public getProperty(name: string) {
+        return this._properties.get(name);
+    }
 
-        public hasProperty(name: string) {
-            return this._properties.has(name);
-        }
-
-
+    public hasProperty(name: string) {
+        return this._properties.has(name);
     }
 
 }
+
+

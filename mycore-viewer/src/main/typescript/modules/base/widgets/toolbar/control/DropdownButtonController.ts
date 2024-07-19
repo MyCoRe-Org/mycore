@@ -16,85 +16,86 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../Utils.ts" />
-/// <reference path="ButtonController.ts" />
-/// <reference path="../events/DropdownButtonPressedEvent.ts" />
-/// <reference path="../model/ToolbarDropdownButton.ts" />
-/// <reference path="../view/group/GroupView.ts" />
-/// <reference path="../view/dropdown/DropdownView.ts" />
-/// <reference path="../view/ToolbarViewFactory.ts" />
 
-namespace mycore.viewer.widgets.toolbar {
-    export class DropdownButtonController extends ButtonController {
+import {ButtonController} from "./ButtonController";
+import {MyCoReMap, ViewerProperty} from "../../../Utils";
+import {GroupView} from "../view/group/GroupView";
+import {DropdownView} from "../view/dropdown/DropdownView";
+import {ToolbarDropdownButton, ToolbarDropdownButtonChild} from "../model/ToolbarDropdownButton";
+import {DropdownButtonPressedEvent} from "../events/DropdownButtonPressedEvent";
+import {ToolbarViewFactory} from "../view/ToolbarViewFactory";
 
-        constructor(_groupMap:MyCoReMap<string, GroupView>, private _dropdownButtonViewMap:MyCoReMap<string, DropdownView>, private __mobile = false) {
-            super(_groupMap, _dropdownButtonViewMap, __mobile);
-        }
 
-        public childAdded(parent:any, component:any):void {
-            super.childAdded(parent, component);
-            var button = <ToolbarDropdownButton>component;
-            var componentId = component.getProperty("id").value;
-            var childrenProperty = button.getProperty("children");
+export class DropdownButtonController extends ButtonController {
 
-            childrenProperty.addObserver(this);
+    constructor(_groupMap: MyCoReMap<string, GroupView>, private _dropdownButtonViewMap: MyCoReMap<string, DropdownView>, private __mobile = false) {
+        super(_groupMap, _dropdownButtonViewMap, __mobile);
+    }
 
-            var dropdownView = this._dropdownButtonViewMap.get(componentId);
-            dropdownView.updateChilds(childrenProperty.value);
+    public childAdded(parent: any, component: any): void {
+        super.childAdded(parent, component);
+        const button = component as ToolbarDropdownButton;
+        const componentId = component.getProperty("id").value;
+        const childrenProperty = button.getProperty("children");
 
-            this.updateChildEvents(button, childrenProperty.value);
-        }
+        childrenProperty.addObserver(this);
 
-        public updateChildEvents(button:ToolbarDropdownButton, childs:Array<ToolbarDropdownButtonChild>):void {
-            var dropdownView = this._dropdownButtonViewMap.get(button.id);
-            var that = this;
-            if (button.largeContent || this.__mobile) {
-                dropdownView.getElement().bind("change", function (modelElement:ToolbarDropdownButton) {
-                    return function (e) {
-                        var jqTarget = jQuery(e.target);
-                        var select = jqTarget.find(":selected");
-                        if (that.__mobile) {
-                            jqTarget.val([]);
-                        }
-                        that.eventManager.trigger(new events.DropdownButtonPressedEvent(button, select.attr("data-id")));
+        const dropdownView = this._dropdownButtonViewMap.get(componentId);
+        dropdownView.updateChilds(childrenProperty.value);
+
+        this.updateChildEvents(button, childrenProperty.value);
+    }
+
+    public updateChildEvents(button: ToolbarDropdownButton, childs: Array<ToolbarDropdownButtonChild>): void {
+        const dropdownView = this._dropdownButtonViewMap.get(button.id);
+        const that = this;
+        if (button.largeContent || this.__mobile) {
+            dropdownView.getElement().bind("change", function (modelElement: ToolbarDropdownButton) {
+                return function (e) {
+                    const jqTarget = jQuery(e.target);
+                    const select = jqTarget.find(":selected");
+                    if (that.__mobile) {
+                        jqTarget.val([]);
+                    }
+                    that.eventManager.trigger(new DropdownButtonPressedEvent(button, select.attr("data-id")));
+                };
+            }(button));
+        } else {
+            const childArray: Array<ToolbarDropdownButtonChild> = childs;
+            for (var childIndex in childArray) {
+                const view = dropdownView.getChildElement(childArray[childIndex].id);
+                view.bind("click", function (modelElement: ToolbarDropdownButtonChild) {
+                    return function () {
+                        that.eventManager.trigger(new DropdownButtonPressedEvent(button, modelElement.id))
                     };
-                }(button));
-            } else {
-                var childArray:Array<ToolbarDropdownButtonChild> = childs;
-                for (var childIndex in childArray) {
-                    var view = dropdownView.getChildElement(childArray[childIndex].id);
-                    view.bind("click", function (modelElement:ToolbarDropdownButtonChild) {
-                        return function () {
-                            that.eventManager.trigger(new events.DropdownButtonPressedEvent(button, modelElement.id))
-                        };
-                    }(childArray[childIndex]));
+                }(childArray[childIndex]));
 
-                }
-            }
-
-        }
-
-        public childRemoved(parent:any, component:any):void {
-            super.childRemoved(parent, component);
-        }
-
-
-        public propertyChanged(_old:ViewerProperty<any>, _new:ViewerProperty<any>) {
-            if (_new.name == "children") {
-                this._dropdownButtonViewMap.get(_new.from.getProperty("id").value).updateChilds(_new.value);
-                this.updateChildEvents(_new.from, _new.value);
-            } else {
-                super.propertyChanged(_old, _new);
-            }
-        }
-
-        public createButtonView(dropdown:ToolbarDropdownButton):DropdownView {
-            if (!this.__mobile && dropdown.largeContent) {
-                return ToolbarViewFactoryImpl.createLargeDropdownView(dropdown.id);
-            } else {
-                return ToolbarViewFactoryImpl.createDropdownView(dropdown.id);
             }
         }
 
     }
+
+    public childRemoved(parent: any, component: any): void {
+        super.childRemoved(parent, component);
+    }
+
+
+    public propertyChanged(_old: ViewerProperty<any>, _new: ViewerProperty<any>) {
+        if (_new.name == "children") {
+            this._dropdownButtonViewMap.get(_new.from.getProperty("id").value).updateChilds(_new.value);
+            this.updateChildEvents(_new.from, _new.value);
+        } else {
+            super.propertyChanged(_old, _new);
+        }
+    }
+
+    public createButtonView(dropdown: ToolbarDropdownButton): DropdownView {
+        if (!this.__mobile && dropdown.largeContent) {
+            return ((window as any).ToolbarViewFactoryImpl as ToolbarViewFactory).createLargeDropdownView(dropdown.id);
+        } else {
+            return ((window as any).ToolbarViewFactoryImpl as ToolbarViewFactory).createDropdownView(dropdown.id);
+        }
+    }
+
 }
+

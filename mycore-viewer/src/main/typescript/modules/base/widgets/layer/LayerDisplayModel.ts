@@ -16,48 +16,46 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../components/model/Layer.ts" />
-/// <reference path="../../definitions/jquery.d.ts" />
+import {Layer} from "../../components/model/Layer";
 
-namespace mycore.viewer.widgets.layer {
 
-    export class LayerDisplayModel {
+export class LayerDisplayModel {
 
-        constructor() {
-        }
-
-        public onLayerAdd = Array<LayerCallback>();
-        public onLayerRemove = Array<LayerCallback>();
-        public currentPage:string = null;
-
-        public addLayer(layer:model.Layer) {
-            if (this.layerList.indexOf(layer) != -1) {
-                throw `the layer ${layer.getId()} is already in model!`;
-            }
-
-            this.layerList.push(layer);
-            this.onLayerAdd.forEach((callback)=>callback(layer));
-        }
-
-        public removeLayer(layer:model.Layer) {
-            var layerIndex = this.layerList.indexOf(layer);
-
-            if (layerIndex == -1) {
-                throw `the layer ${layer.getId()} is not present in model!`;
-            }
-
-            this.layerList.splice(layerIndex, 1);
-            this.onLayerRemove.forEach((callback)=>callback(layer));
-        }
-
-        public getLayerList() {
-            return this.layerList.slice(0);
-        }
-
-        private layerList = new Array<model.Layer>();
+    constructor() {
     }
 
-    export interface LayerCallback {
-        (layer:model.Layer):void;
+    public onLayerAdd = Array<LayerCallback>();
+    public onLayerRemove = Array<LayerCallback>();
+    public currentPage: string = null;
+
+    public addLayer(layer: Layer) {
+        if (this.layerList.indexOf(layer) != -1) {
+            throw `the layer ${layer.getId()} is already in model!`;
+        }
+
+        this.layerList.push(layer);
+        this.onLayerAdd.forEach((callback) => callback(layer));
     }
+
+    public removeLayer(layer: Layer) {
+        var layerIndex = this.layerList.indexOf(layer);
+
+        if (layerIndex == -1) {
+            throw `the layer ${layer.getId()} is not present in model!`;
+        }
+
+        this.layerList.splice(layerIndex, 1);
+        this.onLayerRemove.forEach((callback) => callback(layer));
+    }
+
+    public getLayerList() {
+        return this.layerList.slice(0);
+    }
+
+    private layerList = new Array<Layer>();
 }
+
+export interface LayerCallback {
+    (layer: Layer): void;
+}
+

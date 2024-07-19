@@ -16,5 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoReLogoComponent.ts" />
-console.log("LOGO MODULE");
+
+import {addViewerComponent} from "../base/Utils";
+import {MyCoReLogoComponent} from "./components/MyCoReLogoComponent";
+
+addViewerComponent(MyCoReLogoComponent);

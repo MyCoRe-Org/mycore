@@ -16,8 +16,6 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../Utils.ts" />
-/// <reference path="../../definitions/jquery.d.ts" />
 
 namespace mycore.viewer.widgets.layout {
     export class IviewPageLayout {

@@ -16,16 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
+import {ViewerComponent} from "../ViewerComponent";
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
 
-namespace mycore.viewer.components.events {
-    export class RedrawEvent extends MyCoReImageViewerEvent {
-        constructor(component: ViewerComponent) {
-            super(component, RedrawEvent.TYPE);
-        }
-
-        public static TYPE:string = "RedrawEvent";
-
+export class RedrawEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent) {
+        super(component, RedrawEvent.TYPE);
     }
+
+    public static TYPE: string = "RedrawEvent";
+
 }
+

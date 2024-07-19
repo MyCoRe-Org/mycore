@@ -16,9 +16,6 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.thumbnail {
-    export interface ThumbnailOverviewInputHandler {
-        addedThumbnail(id: string, element: JQuery): void;
-    }
-
+export interface ThumbnailOverviewInputHandler {
+    addedThumbnail(id: string, element: JQuery): void;
 }

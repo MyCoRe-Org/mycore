@@ -16,161 +16,163 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../definitions/jquery.d.ts" />
-/// <reference path="../Utils.ts" />
-/// <reference path="ViewerComponent.ts" />
-/// <reference path="events/StructureModelLoadedEvent.ts" />
-/// <reference path="events/ComponentInitializedEvent.ts" />
-/// <reference path="events/WaitForEvent.ts" />
-/// <reference path="events/ImageSelectedEvent.ts" />
-/// <reference path="events/ImageChangedEvent.ts" />
-/// <reference path="events/ShowContentEvent.ts" />
-/// <reference path="model/StructureImage.ts" />
-/// <reference path="../MyCoReViewerSettings.ts" />
-/// <reference path="../widgets/events/ViewerEvent.ts" />
-/// <reference path="../widgets/thumbnail/IviewThumbnailOverview.ts" />
-/// <reference path="../widgets/thumbnail/ThumbnailOverviewSettings.ts" />
-/// <reference path="../widgets/thumbnail/ThumbnailOverviewThumbnail.ts" />
-/// <reference path="../widgets/thumbnail/ThumbnailOverviewInputHandler.ts" />
-/// <reference path="../widgets/toolbar/events/DropdownButtonPressedEvent.ts" />
 
-namespace mycore.viewer.components {
+import {ViewerComponent} from "./ViewerComponent";
+import {ThumbnailOverviewInputHandler} from "../widgets/thumbnail/ThumbnailOverviewInputHandler";
+import {MyCoReViewerSettings} from "../MyCoReViewerSettings";
+import {MyCoReMap, Utils} from "../Utils";
+import {IviewThumbnailOverview} from "../widgets/thumbnail/IviewThumbnailOverview";
+import {DefaultThumbnailOverviewSettings} from "../widgets/thumbnail/ThumbnailOverviewSettings";
+import {StructureImage} from "./model/StructureImage";
+import {LanguageModelLoadedEvent} from "./events/LanguageModelLoadedEvent";
+import {StructureModelLoadedEvent} from "./events/StructureModelLoadedEvent";
+import {WaitForEvent} from "./events/WaitForEvent";
+import {ShowContentEvent} from "./events/ShowContentEvent";
 
-    /**
-     * imageOverview.enabled: boolean   should the image overview be enabled in toolbar dropwdown menu
-     */
-    export class MyCoReImageOverviewComponent extends ViewerComponent implements widgets.thumbnail.ThumbnailOverviewInputHandler {
+import {DropdownButtonPressedEvent} from "../widgets/toolbar/events/DropdownButtonPressedEvent";
+import {ViewerEvent} from "../widgets/events/ViewerEvent";
+import {ComponentInitializedEvent} from "./events/ComponentInitializedEvent";
+import {ProvideToolbarModelEvent} from "./events/ProvideToolbarModelEvent";
+import {ImageChangedEvent} from "./events/ImageChangedEvent";
+import {ThumbnailOverviewThumbnail} from "../widgets/thumbnail/ThumbnailOverviewThumbnail";
+import {ImageSelectedEvent} from "./events/ImageSelectedEvent";
 
-        constructor(private _settings: MyCoReViewerSettings) {
-            super();
-            this._enabled = Utils.getVar<boolean>(this._settings, "imageOverview.enabled", true);
-        }
 
-        private _enabled:boolean;
-        private _container: JQuery;
-        private _overview: widgets.thumbnail.IviewThumbnailOverview;
-        private _overviewSettings: widgets.thumbnail.DefaultThumbnailOverviewSettings;
-        private _sidebarLabel = jQuery("<span>Bildübersicht</span>");
-        private _currentImageId:string = null;
-        private _idMetsImageMap: MyCoReMap<string, model.StructureImage>;
-        private _spinner: JQuery = null;
+/**
+ * imageOverview.enabled: boolean   should the image overview be enabled in toolbar dropwdown menu
+ */
+export class MyCoReImageOverviewComponent extends ViewerComponent implements ThumbnailOverviewInputHandler {
 
-        public init() {
-            if (this._enabled) {
-                this._container = jQuery("<div></div>");
-                this._idMetsImageMap = new MyCoReMap<string, model.StructureImage>();
-                this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
-                this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
+    constructor(private _settings: MyCoReViewerSettings) {
+        super();
+        this._enabled = Utils.getVar<boolean>(this._settings, "imageOverview.enabled", true);
+    }
 
-                let showImageOverViewOnStart = Utils.getVar<string>(this._settings, "leftShowOnStart", "chapterOverview")
-                    == "imageOverview";
-                if (this._settings.mobile == false && showImageOverViewOnStart) {
-                    this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
-                        `/modules/iview2/img/spinner.gif'></div>`);
-                    this._container.append(this._spinner);
+    private _enabled: boolean;
+    private _container: JQuery;
+    private _overview: IviewThumbnailOverview;
+    private _overviewSettings: DefaultThumbnailOverviewSettings;
+    private _sidebarLabel = jQuery("<span>Bildübersicht</span>");
+    private _currentImageId: string = null;
+    private _idMetsImageMap: MyCoReMap<string, StructureImage>;
+    private _spinner: JQuery = null;
 
-                    let direction = (this._settings.mobile)
-                        ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_WEST;
-                    this.trigger(new events.ShowContentEvent(this, this._container, direction, 300, this._sidebarLabel));
-                }
-            } else {
-                this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
+    public init() {
+        if (this._enabled) {
+            this._container = jQuery("<div></div>");
+            this._idMetsImageMap = new MyCoReMap<string, StructureImage>();
+            this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
+            this.trigger(new WaitForEvent(this, LanguageModelLoadedEvent.TYPE));
+
+            let showImageOverViewOnStart = Utils.getVar<string>(this._settings, "leftShowOnStart", "chapterOverview")
+                == "imageOverview";
+            if (this._settings.mobile == false && showImageOverViewOnStart) {
+                this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
+                    `/modules/iview2/img/spinner.gif'></div>`);
+                this._container.append(this._spinner);
+
+                let direction = (this._settings.mobile)
+                    ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_WEST;
+                this.trigger(new ShowContentEvent(this, this._container, direction, 300, this._sidebarLabel));
             }
-        }
-
-        public get content() {
-            return this._container;
-        }
-
-        public get handlesEvents(): string[] {
-            let handles = new Array<string>();
-
-            if (this._enabled) {
-                handles.push(events.StructureModelLoadedEvent.TYPE);
-                handles.push(events.ImageChangedEvent.TYPE);
-                handles.push(mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE);
-                handles.push(events.ShowContentEvent.TYPE);
-                handles.push(events.LanguageModelLoadedEvent.TYPE);
-            } else {
-                handles.push(events.ProvideToolbarModelEvent.TYPE);
-            }
-
-            return handles;
-        }
-
-        /// TODO: jump to the right image
-        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
-            if (e.type == events.ProvideToolbarModelEvent.TYPE) {
-                var ptme = <events.ProvideToolbarModelEvent>e;
-                ptme.model._sidebarControllDropdownButton.children = ptme.model._sidebarControllDropdownButton.children.filter((my)=>my.id != "imageOverview");
-            }
-
-
-            if (e.type == mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE) {
-                var dropdownButtonPressedEvent = <mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent> e;
-
-                if (dropdownButtonPressedEvent.childId == "imageOverview") {
-                    var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_WEST;
-                    this.trigger(new events.ShowContentEvent(this, this._container, direction, -1, this._sidebarLabel));
-                    this._overview.update(true);
-                    this._overview.jumpToThumbnail(this._currentImageId);
-                }
-            }
-
-            if (e.type == events.StructureModelLoadedEvent.TYPE) {
-                var imageList = (<events.StructureModelLoadedEvent>e).structureModel._imageList;
-                var basePath = this._settings.tileProviderPath + this._settings.derivate + "/";
-                this._overviewSettings = new mycore.viewer.widgets.thumbnail.DefaultThumbnailOverviewSettings(this.prepareModel(imageList, basePath), this._container, this);
-                this._overview = new mycore.viewer.widgets.thumbnail.IviewThumbnailOverview(this._overviewSettings);
-                var startImage = (this._settings.filePath.indexOf("/") == 0) ? this._settings.filePath.substr(1) : this._settings.filePath;
-                this._overview.jumpToThumbnail(startImage);
-                this._overview.setThumbnailSelected(startImage);
-                this._currentImageId = startImage;
-                if (this._spinner != null) {
-                    this._spinner.detach();
-                }
-                this.trigger(new events.ComponentInitializedEvent(this));
-            }
-
-            if (e.type == events.ImageChangedEvent.TYPE) {
-                var imageChangedEvent = <events.ImageChangedEvent>e;
-                if (typeof this._overview != "undefined") {
-                    this._overview.jumpToThumbnail(imageChangedEvent.image.id);
-                    this._overview.setThumbnailSelected(imageChangedEvent.image.id);
-                    this._currentImageId = imageChangedEvent.image.id;
-                }
-            }
-
-            if (e.type == events.LanguageModelLoadedEvent.TYPE) {
-                var lmle = <events.LanguageModelLoadedEvent>e;
-                this._sidebarLabel.text(lmle.languageModel.getTranslation("sidebar.imageOverview"));
-            }
-
-            return;
-        }
-
-        public prepareModel(images: Array<model.StructureImage>, basePath: string): Array<mycore.viewer.widgets.thumbnail.ThumbnailOverviewThumbnail> {
-            var result = new Array<mycore.viewer.widgets.thumbnail.ThumbnailOverviewThumbnail>();
-
-            for (var imageIndex in images) {
-                var image = images[imageIndex];
-                var label = "" + (image.orderLabel || image.order);
-                var id = image.id;
-
-                this._idMetsImageMap.set(id, image);
-                result.push({ id: id, label: label, requestImgdataUrl: image.requestImgdataUrl });
-            }
-
-
-            return result;
-        }
-
-
-        public addedThumbnail(id: string, element: JQuery): void {
-            var that = this;
-            jQuery(element).bind("click", function() {
-                that.trigger(new events.ImageSelectedEvent(that, that._idMetsImageMap.get(id)));
-            });
+        } else {
+            this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
         }
     }
+
+    public get content() {
+        return this._container;
+    }
+
+    public get handlesEvents(): string[] {
+        let handles = new Array<string>();
+
+        if (this._enabled) {
+            handles.push(StructureModelLoadedEvent.TYPE);
+            handles.push(ImageChangedEvent.TYPE);
+            handles.push(DropdownButtonPressedEvent.TYPE);
+            handles.push(ShowContentEvent.TYPE);
+            handles.push(LanguageModelLoadedEvent.TYPE);
+        } else {
+            handles.push(ProvideToolbarModelEvent.TYPE);
+        }
+
+        return handles;
+    }
+
+    /// TODO: jump to the right image
+    public handle(e: ViewerEvent): void {
+        if (e.type == ProvideToolbarModelEvent.TYPE) {
+            const ptme = e as ProvideToolbarModelEvent;
+            ptme.model._sidebarControllDropdownButton.children = ptme.model._sidebarControllDropdownButton.children.filter((my) => my.id != "imageOverview");
+        }
+
+
+        if (e.type == DropdownButtonPressedEvent.TYPE) {
+            const dropdownButtonPressedEvent = e as DropdownButtonPressedEvent;
+
+            if (dropdownButtonPressedEvent.childId == "imageOverview") {
+                const direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_WEST;
+                this.trigger(new ShowContentEvent(this, this._container, direction, -1, this._sidebarLabel));
+                this._overview.update(true);
+                this._overview.jumpToThumbnail(this._currentImageId);
+            }
+        }
+
+        if (e.type == StructureModelLoadedEvent.TYPE) {
+            const imageList = (e as StructureModelLoadedEvent).structureModel._imageList;
+            const basePath = this._settings.tileProviderPath + this._settings.derivate + "/";
+            this._overviewSettings = new DefaultThumbnailOverviewSettings(this.prepareModel(imageList, basePath), this._container, this);
+            this._overview = new IviewThumbnailOverview(this._overviewSettings);
+            const startImage = (this._settings.filePath.indexOf("/") == 0) ? this._settings.filePath.substr(1) : this._settings.filePath;
+            this._overview.jumpToThumbnail(startImage);
+            this._overview.setThumbnailSelected(startImage);
+            this._currentImageId = startImage;
+            if (this._spinner != null) {
+                this._spinner.detach();
+            }
+            this.trigger(new ComponentInitializedEvent(this));
+        }
+
+        if (e.type == ImageChangedEvent.TYPE) {
+            const imageChangedEvent = e as ImageChangedEvent;
+            if (typeof this._overview != "undefined") {
+                this._overview.jumpToThumbnail(imageChangedEvent.image.id);
+                this._overview.setThumbnailSelected(imageChangedEvent.image.id);
+                this._currentImageId = imageChangedEvent.image.id;
+            }
+        }
+
+        if (e.type == LanguageModelLoadedEvent.TYPE) {
+            const lmle = <LanguageModelLoadedEvent>e;
+            this._sidebarLabel.text(lmle.languageModel.getTranslation("sidebar.imageOverview"));
+        }
+
+        return;
+    }
+
+    public prepareModel(images: Array<StructureImage>, basePath: string): Array<ThumbnailOverviewThumbnail> {
+        const result = new Array<ThumbnailOverviewThumbnail>();
+
+        for (let imageIndex in images) {
+            const image = images[imageIndex];
+            const label = "" + (image.orderLabel || image.order);
+            const id = image.id;
+
+            this._idMetsImageMap.set(id, image);
+            result.push({id: id, label: label, requestImgdataUrl: image.requestImgdataUrl});
+        }
+
+
+        return result;
+    }
+
+
+    public addedThumbnail(id: string, element: JQuery): void {
+        var that = this;
+        jQuery(element).bind("click", function () {
+            that.trigger(new ImageSelectedEvent(that, that._idMetsImageMap.get(id)));
+        });
+    }
 }
+

@@ -16,36 +16,38 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../definitions/jquery.d.ts" />
-/// <reference path="../Utils.ts" />
-/// <reference path="../MyCoReViewerSettings.ts" />
-/// <reference path="../widgets/events/ViewerEvent.ts" />
-/// <reference path="../widgets/chapter/IviewChapterTree.ts" />
-/// <reference path="../widgets/chapter/ChapterTreeSettings.ts" />
-/// <reference path="../widgets/chapter/ChapterTreeInputHandler.ts" />
-/// <reference path="../widgets/toolbar/events/DropdownButtonPressedEvent.ts" />
-/// <reference path="ViewerComponent.ts" />
-/// <reference path="model/StructureChapter.ts" />
-/// <reference path="model/StructureImage.ts" />
-/// <reference path="events/StructureModelLoadedEvent.ts" />
-/// <reference path="events/ComponentInitializedEvent.ts" />
-/// <reference path="events/WaitForEvent.ts" />
-/// <reference path="events/ImageSelectedEvent.ts" />
-/// <reference path="events/ImageChangedEvent.ts" />
-/// <reference path="events/ChapterChangedEvent.ts" />
-/// <reference path="events/ShowContentEvent.ts" />
-/// <reference path="events/RequestStateEvent.ts" />
 
-namespace mycore.viewer.components {
 
-    import StructureImage = mycore.viewer.model.StructureImage;
 
-    /**
+    import {ViewerComponent} from "./ViewerComponent";
+import {ChapterTreeInputHandler} from "../widgets/chapter/ChapterTreeInputHandler";
+import {MyCoReMap, Utils} from "../Utils";
+import {MyCoReViewerSettings} from "../MyCoReViewerSettings";
+import {IviewChapterTree} from "../widgets/chapter/IviewChapterTree";
+import {ChapterTreeSettings, DefaultChapterTreeSettings} from "../widgets/chapter/ChapterTreeSettings";
+import {StructureModel} from "./model/StructureModel";
+import {StructureImage} from "./model/StructureImage";
+import {WaitForEvent} from "./events/WaitForEvent";
+import {StructureModelLoadedEvent} from "./events/StructureModelLoadedEvent";
+import {LanguageModelLoadedEvent} from "./events/LanguageModelLoadedEvent";
+import {ShowContentEvent} from "./events/ShowContentEvent";
+import {ProvideToolbarModelEvent} from "./events/ProvideToolbarModelEvent";
+import {ImageChangedEvent} from "./events/ImageChangedEvent";
+import {DropdownButtonPressedEvent} from "../widgets/toolbar/events/DropdownButtonPressedEvent";
+import {RequestStateEvent} from "./events/RequestStateEvent";
+import {RestoreStateEvent} from "./events/RestoreStateEvent";
+import {ViewerEvent} from "../widgets/events/ViewerEvent";
+import {ComponentInitializedEvent} from "./events/ComponentInitializedEvent";
+import {StructureChapter} from "./model/StructureChapter";
+import {ImageSelectedEvent} from "./events/ImageSelectedEvent";
+import {ChapterChangedEvent} from "./events/ChapterChangedEvent";
+
+/**
      * Settings
      * chapter.enabled: boolean // enables the chapter in toolbar dropdown menu
      * chapter.showOnStart: boolean // should the chapter be opened on start (only desktop viewer)
      */
-    export class MyCoReChapterComponent extends ViewerComponent implements widgets.chaptertree.ChapterTreeInputHandler {
+    export class MyCoReChapterComponent extends ViewerComponent implements ChapterTreeInputHandler {
 
         constructor(private _settings: MyCoReViewerSettings) {
             super();
@@ -54,12 +56,12 @@ namespace mycore.viewer.components {
 
 
         private _enabled:boolean;
-        private _chapterWidgetSettings: widgets.chaptertree.ChapterTreeSettings;
-        private _chapterWidget: widgets.chaptertree.IviewChapterTree;
+        private _chapterWidgetSettings: ChapterTreeSettings;
+        private _chapterWidget: IviewChapterTree;
         private _spinner:JQuery = null;
-        private _currentChapter:model.StructureChapter = null;
+        private _currentChapter:StructureChapter = null;
 
-        private _structureModel: model.StructureModel;
+        private _structureModel: StructureModel;
         private _initialized: boolean = false;
         private _sidebarLabel = jQuery("<span>strukturübersicht</span>");
         private _chapterToActivate:string = null;
@@ -73,8 +75,8 @@ namespace mycore.viewer.components {
                 this._container.bind("iviewResize", ()=> {
                     this.updateContainerSize();
                 });
-                this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
-                this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
+                this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
+                this.trigger(new WaitForEvent(this, LanguageModelLoadedEvent.TYPE));
 
                 let oldProperty = Utils.getVar<boolean>(this._settings, "chapter.showOnStart",
                     window.innerWidth >= 1200);
@@ -85,12 +87,12 @@ namespace mycore.viewer.components {
                     this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
                         `/modules/iview2/img/spinner.gif'></div>`);
                     this._container.append(this._spinner);
-                    let direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER :
-                        events.ShowContentEvent.DIRECTION_WEST;
-                    this.trigger(new events.ShowContentEvent(this, this._container, direction, 300, this._sidebarLabel));
+                    let direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER :
+                        ShowContentEvent.DIRECTION_WEST;
+                    this.trigger(new ShowContentEvent(this, this._container, direction, 300, this._sidebarLabel));
                 }
             } else {
-                this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
+                this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
             }
         }
 
@@ -104,42 +106,42 @@ namespace mycore.viewer.components {
             let handles = new Array<string>();
 
             if (this._enabled) {
-                handles.push(events.StructureModelLoadedEvent.TYPE);
-                handles.push(events.ImageChangedEvent.TYPE);
-                handles.push(events.ShowContentEvent.TYPE);
-                handles.push(mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE);
-                handles.push(events.LanguageModelLoadedEvent.TYPE);
-                handles.push(events.RequestStateEvent.TYPE);
-                handles.push(events.RestoreStateEvent.TYPE);
-                handles.push(events.ChapterChangedEvent.TYPE);
+                handles.push(StructureModelLoadedEvent.TYPE);
+                handles.push(ImageChangedEvent.TYPE);
+                handles.push(ShowContentEvent.TYPE);
+                handles.push(DropdownButtonPressedEvent.TYPE);
+                handles.push(LanguageModelLoadedEvent.TYPE);
+                handles.push(RequestStateEvent.TYPE);
+                handles.push(RestoreStateEvent.TYPE);
+                handles.push(ChapterChangedEvent.TYPE);
             } else {
-                handles.push(events.ProvideToolbarModelEvent.TYPE);
+                handles.push(ProvideToolbarModelEvent.TYPE);
             }
 
             return handles;
         }
 
-        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
-            if (e.type === events.ProvideToolbarModelEvent.TYPE) {
-                let ptme = <events.ProvideToolbarModelEvent>e;
+        public handle(e: ViewerEvent): void {
+            if (e.type === ProvideToolbarModelEvent.TYPE) {
+                const ptme = e as ProvideToolbarModelEvent;
                 ptme.model._sidebarControllDropdownButton.children = ptme.model._sidebarControllDropdownButton
                     .children
                     .filter((my) => my.id !== 'chapterOverview');
             }
 
-            if (e.type === mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE) {
-                const dropdownButtonPressedEvent = <mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent>e;
+            if (e.type === DropdownButtonPressedEvent.TYPE) {
+                const dropdownButtonPressedEvent = e as DropdownButtonPressedEvent;
 
                 if (dropdownButtonPressedEvent.childId == "chapterOverview") {
-                    var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_WEST;
-                    this.trigger(new events.ShowContentEvent(this, this._container, direction, -1, this._sidebarLabel));
+                    var direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_WEST;
+                    this.trigger(new ShowContentEvent(this, this._container, direction, -1, this._sidebarLabel));
                     this.updateContainerSize();
                 }
             }
 
 
-            if (e.type === events.StructureModelLoadedEvent.TYPE) {
-                let structureModelLoadedEvent = <events.StructureModelLoadedEvent>e;
+            if (e.type === StructureModelLoadedEvent.TYPE) {
+                let structureModelLoadedEvent = e as StructureModelLoadedEvent;
                 let model = structureModelLoadedEvent.structureModel._rootChapter;
 
                 this._structureModel = structureModelLoadedEvent.structureModel;
@@ -152,10 +154,10 @@ namespace mycore.viewer.components {
                 });
 
                 let chapterLabelMap = this.createChapterLabelMap(this._structureModel);
-                this._chapterWidgetSettings = new mycore.viewer.widgets.chaptertree.DefaultChapterTreeSettings(this._container, chapterLabelMap, model, this._settings.mobile, this);
-                this._chapterWidget = new mycore.viewer.widgets.chaptertree.IviewChapterTree(this._chapterWidgetSettings);
+                this._chapterWidgetSettings = new DefaultChapterTreeSettings(this._container, chapterLabelMap, model, this._settings.mobile, this);
+                this._chapterWidget = new IviewChapterTree(this._chapterWidgetSettings);
                 this._initialized = true;
-                this.trigger(new events.ComponentInitializedEvent(this));
+                this.trigger(new ComponentInitializedEvent(this));
                 if (this._spinner != null) {
                     this._spinner.detach();
                 }
@@ -165,37 +167,37 @@ namespace mycore.viewer.components {
             }
 
 
-            if (e.type === events.ImageChangedEvent.TYPE) {
+            if (e.type === ImageChangedEvent.TYPE) {
                 if (typeof this._structureModel === "undefined" || this._structureModel._imageToChapterMap.isEmpty()) {
                     return;
                 }
-                const imageChangedEvent = <events.ImageChangedEvent>e;
+                const imageChangedEvent = e as ImageChangedEvent;
                 if (imageChangedEvent.image != null && this._initialized) {
                     if (this._chapterWidget.getSelectedChapter() == null ||
                         this._structureModel.chapterToImageMap.get(this._chapterWidget.getSelectedChapter().id) != imageChangedEvent.image) {
                         let newChapter = this._structureModel._imageToChapterMap.get(imageChangedEvent.image.id);
                         if (newChapter != null) {
-                            this._chapterWidget.setChapterExpanded(<model.StructureChapter>newChapter, true);
-                            this._chapterWidget.jumpToChapter(<model.StructureChapter>newChapter);
+                            this._chapterWidget.setChapterExpanded(newChapter as StructureChapter, true);
+                            this._chapterWidget.jumpToChapter(newChapter as StructureChapter);
                         }
                     }
                 }
             }
 
-            if (e.type === events.LanguageModelLoadedEvent.TYPE) {
-                let lmle = <events.LanguageModelLoadedEvent>e;
+            if (e.type === LanguageModelLoadedEvent.TYPE) {
+                const lmle = e as LanguageModelLoadedEvent;
                 this._sidebarLabel.text(lmle.languageModel.getTranslation("sidebar.chapterOverview"));
             }
 
-            if (e.type === events.RequestStateEvent.TYPE) {
-                let rse = <events.RequestStateEvent>e;
+            if (e.type === RequestStateEvent.TYPE) {
+                const rse = e as RequestStateEvent;
                 if (this._currentChapter != null) {
                     rse.stateMap.set("logicalDiv", this.persistChapterToString(this._currentChapter));
                 }
             }
 
-            if (e.type === events.RestoreStateEvent.TYPE) {
-                let rse = <events.RestoreStateEvent>e;
+            if (e.type === RestoreStateEvent.TYPE) {
+                const rse = e as RestoreStateEvent;
                 let activateChapter = (div) => {
                     if (this._initialized) {
                         this.setChapter(div);
@@ -208,23 +210,23 @@ namespace mycore.viewer.components {
 
             }
 
-            if (e.type === events.ChapterChangedEvent.TYPE) {
-                let cce = <events.ChapterChangedEvent>e;
+            if (e.type === ChapterChangedEvent.TYPE) {
+                let cce = e as ChapterChangedEvent;
                 if (cce == null || cce.chapter == null) {
                     return;
                 }
-                this._chapterWidget.setChapterExpanded(<model.StructureChapter>cce.chapter, true);
-                this._chapterWidget.jumpToChapter(<model.StructureChapter>cce.chapter);
+                this._chapterWidget.setChapterExpanded(cce.chapter as StructureChapter, true);
+                this._chapterWidget.jumpToChapter(cce.chapter as StructureChapter);
             }
         }
 
-        private persistChapterToString(chapter:model.StructureChapter):string{
+        private persistChapterToString(chapter:StructureChapter):string{
             return chapter.id;
         }
 
-        private createChapterLabelMap(model: model.StructureModel): MyCoReMap<string, string> {
-            var chapterLabelMap = new MyCoReMap<string, string>();
-            model.chapterToImageMap.forEach((k: string, v: model.StructureImage) => {
+        private createChapterLabelMap(model: StructureModel): MyCoReMap<string, string> {
+            const chapterLabelMap = new MyCoReMap<string, string>();
+            model.chapterToImageMap.forEach((k: string, v: StructureImage) => {
                 chapterLabelMap.set(k, v.orderLabel || (this._autoPagination ? v.order.toString(10) : ""));
             });
             return chapterLabelMap;
@@ -248,17 +250,17 @@ namespace mycore.viewer.components {
                 return;
             }
             let changeChapter = (firstImageOfChapter) => {
-                this._currentChapter = <model.StructureChapter>newSelectedChapter;
+                this._currentChapter =newSelectedChapter as StructureChapter;
 
-                this._chapterWidget.setChapterExpanded(<model.StructureChapter>newSelectedChapter, true);
-                this._chapterWidget.setChapterSelected(<model.StructureChapter>newSelectedChapter);
-                this._chapterWidget.jumpToChapter(<model.StructureChapter>newSelectedChapter);
+                this._chapterWidget.setChapterExpanded(newSelectedChapter as StructureChapter, true);
+                this._chapterWidget.setChapterSelected(newSelectedChapter as StructureChapter);
+                this._chapterWidget.jumpToChapter(newSelectedChapter as StructureChapter);
 
                 if(trigger){
-                    this.trigger(new events.ChapterChangedEvent(this, <model.StructureChapter>newSelectedChapter));
+                    this.trigger(new ChapterChangedEvent(this, newSelectedChapter as StructureChapter));
                 }
                 if (typeof firstImageOfChapter !== "undefined" && firstImageOfChapter !== null && jumpToFirstImageOfChapter) {
-                    this.trigger(new events.ImageSelectedEvent(this, firstImageOfChapter));
+                    this.trigger(new ImageSelectedEvent(this, firstImageOfChapter));
                 }
             };
 
@@ -293,4 +295,4 @@ namespace mycore.viewer.components {
             return this._container;
         }
     }
-}
+

@@ -16,83 +16,81 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="ViewerComponent.ts" />
-/// <reference path="../MyCoReViewerSettings.ts" />
-/// <reference path="events/LanguageModelLoadedEvent.ts" />
-/// <reference path="model/LanguageModel.ts" />
-/// <reference path="../widgets/i18n/XMLI18NProvider.ts" />
+import {LanguageModel} from "./model/LanguageModel";
+import {MyCoReMap, ViewerError, ViewerFormatString} from "../Utils";
+import {ViewerComponent} from "./ViewerComponent";
+import {MyCoReViewerSettings} from "../MyCoReViewerSettings";
+import {LanguageModelLoadedEvent} from "./events/LanguageModelLoadedEvent";
+import {I18NProvider} from "../widgets/i18n/XMLI18NProvider";
 
-namespace mycore.viewer.components {
+/**
+ * Overwrite the default implementation of the I18NProvider.
+ */
+export class MyCoReI18NProvider implements I18NProvider {
 
+    private static DEFAULT_ERROR_CALLBACK = (err) => {
+        console.log(err);
+        return;
+    };
 
-    /**
-     * Overwrite the the default implementation of the I18NProvider.
-     */
-    export class MyCoReI18NProvider implements mycore.viewer.widgets.i18n.I18NProvider {
+    private static VIEWER_PREFIX = "component.viewer.";
+    private static METS_PREFIX = "component.mets.";
 
-        private static DEFAULT_ERROR_CALLBACK = (err)=> {
-            console.log(err);
-            return;
-        };
-
-        private static VIEWER_PREFIX = "component.viewer.";
-        private static METS_PREFIX = "component.mets.";
-
-        public getLanguage(href:string, callback:(model:model.LanguageModel)=>void, errorCallback:(err) => void = MyCoReI18NProvider.DEFAULT_ERROR_CALLBACK) {
-            var settings = {
-                url: href,
-                dataType: 'json',
-                success: function (response) {
-                    var newResponse = [];
-                    for(var keyIndex in response){
-                        var prefixEnd = 0;
-                        if (keyIndex.indexOf(MyCoReI18NProvider.VIEWER_PREFIX) == 0) {
-                            prefixEnd = MyCoReI18NProvider.VIEWER_PREFIX.length;
-                        } else if (keyIndex.indexOf(MyCoReI18NProvider.METS_PREFIX) == 0) {
-                            prefixEnd = MyCoReI18NProvider.METS_PREFIX.length;
-                        }
-
-                        var newKeyIndex = keyIndex.substr(prefixEnd);
-                        newResponse[newKeyIndex] = response[keyIndex];
+    public getLanguage(href: string, callback: (model: LanguageModel) => void, errorCallback: (err) => void = MyCoReI18NProvider.DEFAULT_ERROR_CALLBACK) {
+        const settings = {
+            url: href,
+            dataType: 'json',
+            success: function (response) {
+                const newResponse = [];
+                for (let keyIndex in response) {
+                    let prefixEnd = 0;
+                    if (keyIndex.indexOf(MyCoReI18NProvider.VIEWER_PREFIX) == 0) {
+                        prefixEnd = MyCoReI18NProvider.VIEWER_PREFIX.length;
+                    } else if (keyIndex.indexOf(MyCoReI18NProvider.METS_PREFIX) == 0) {
+                        prefixEnd = MyCoReI18NProvider.METS_PREFIX.length;
                     }
 
-                    callback(new model.LanguageModel(new MyCoReMap<string, string>(newResponse)));
-                },
-                error: function (request, status, exception) {
-                    errorCallback(exception);
-                    callback(new model.LanguageModel(new MyCoReMap<string, string>()));
+                    let newKeyIndex = keyIndex.substr(prefixEnd);
+                    newResponse[newKeyIndex] = response[keyIndex];
                 }
-            };
 
-            jQuery.ajax(settings);
-        }
-
-    }
-
-    {
-        mycore.viewer.widgets.i18n.I18NPROVIDER = new MyCoReI18NProvider();
-    }
-
-    export class MyCoReI18NComponent extends ViewerComponent {
-
-        constructor(private _settings:MyCoReViewerSettings) {
-            super();
-            this._loadI18N();
-        }
-
-        private _language = ("lang" in this._settings) ? this._settings.lang : "en";
-
-        private _loadI18N() {
-            var that = this;
-
-            if (typeof this._settings.i18nURL == "undefined" || this._settings.i18nURL == null) {
-                throw new ViewerError("i18nURL is not specified in settings!");
+                callback(new LanguageModel(new MyCoReMap<string, string>(newResponse)));
+            },
+            error: function (request, status, exception) {
+                errorCallback(exception);
+                callback(new LanguageModel(new MyCoReMap<string, string>()));
             }
-            widgets.i18n.I18NPROVIDER.getLanguage(ViewerFormatString(this._settings.i18nURL, {"lang": this._language}), (languageModel:model.LanguageModel)=> {
-                var loadedEvent = new events.LanguageModelLoadedEvent(that,languageModel);
-                that.trigger(loadedEvent);
-            });
+        };
+
+        jQuery.ajax(settings);
+    }
+
+}
+
+export class MyCoReI18NComponent extends ViewerComponent {
+
+    constructor(private _settings: MyCoReViewerSettings) {
+        super();
+        this._loadI18N();
+    }
+
+    private get _language() {
+        return ("lang" in this._settings) ? this._settings.lang : "en";
+    }
+
+    private static I18N_PROVIDER = new MyCoReI18NProvider();
+
+    private _loadI18N() {
+
+        if (typeof this._settings.i18nURL == "undefined" || this._settings.i18nURL == null) {
+            throw new ViewerError("i18nURL is not specified in settings!");
         }
 
+        MyCoReI18NComponent.I18N_PROVIDER.getLanguage(ViewerFormatString(this._settings.i18nURL, {"lang": this._language}), (languageModel: LanguageModel) => {
+            const loadedEvent = new LanguageModelLoadedEvent(this, languageModel);
+            this.trigger(loadedEvent);
+        });
     }
+
 }
+

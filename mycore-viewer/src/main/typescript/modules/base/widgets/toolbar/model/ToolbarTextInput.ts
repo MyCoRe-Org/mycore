@@ -16,34 +16,31 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../Utils.ts" />
-/// <reference path="ToolbarComponent.ts" />
+import {ToolbarComponent} from "./ToolbarComponent";
+import {ViewerProperty} from "../../../Utils";
 
-namespace mycore.viewer.widgets.toolbar {
+export class ToolbarTextInput extends ToolbarComponent {
+    constructor(id: string, value: string, placeHolder: string) {
+        super(id);
+        this.addProperty(new ViewerProperty<string>(this, "value", value));
+        this.addProperty(new ViewerProperty<string>(this, "placeHolder", placeHolder))
+    }
 
-    export class ToolbarTextInput extends ToolbarComponent {
-        constructor(id: string, value:string, placeHolder: string) {
-            super(id);
-            this.addProperty(new ViewerProperty<string>(this, "value", value));
-            this.addProperty(new ViewerProperty<string>(this, "placeHolder", placeHolder))
-        }
+    public get value(): string {
+        return this.getProperty("value").value;
+    }
 
-        public get value(): string {
-            return this.getProperty("value").value;
-        }
+    public set value(value: string) {
+        this.getProperty("value").value = value;
+    }
 
-        public set value(value: string) {
-            this.getProperty("value").value = value;
-        }
+    public get placeHolder(): string {
+        return this.getProperty("placeHolder").value;
+    }
 
-        public get placeHolder():string{
-            return this.getProperty("placeHolder").value;
-        }
-
-        public set placeHolder(prefillText:string) {
-            this.getProperty("placeHolder").value = prefillText;
-        }
-
+    public set placeHolder(prefillText: string) {
+        this.getProperty("placeHolder").value = prefillText;
     }
 
 }
+

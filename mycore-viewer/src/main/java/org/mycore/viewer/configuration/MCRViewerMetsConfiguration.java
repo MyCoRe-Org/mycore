@@ -59,11 +59,11 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
 
         // script
         final boolean debugParameterSet = isDebugMode(request);
-        addLocalScript("iview-client-mets.js", true, debugParameterSet);
+        addLocalScript("iview-client-mets.es.js", false, true, debugParameterSet);
 
         final MCRPath teiDirectoryPath = MCRPath.getPath(derivate, "/tei");
         if (Files.exists(teiDirectoryPath) && Files.isDirectory(teiDirectoryPath)) {
-            addLocalScript("iview-client-tei.js", true, debugParameterSet);
+            addLocalScript("iview-client-tei.es.js", false, true, debugParameterSet);
             addLocalCSS("tei.css");
             MCRConfiguration2.getString("MCR.Viewer.TeiStyle")
                 .ifPresent((style) -> setProperty("teiStylesheet", style));

@@ -16,11 +16,6 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../Utils.ts" />
-/// <reference path="Viewport.ts" />
-/// <reference path="../model/PageArea.ts" />
-/// <reference path="../../../components/model/AbstractPage.ts" />
-
 namespace mycore.viewer.widgets.canvas {
     export class ViewportTools {
 

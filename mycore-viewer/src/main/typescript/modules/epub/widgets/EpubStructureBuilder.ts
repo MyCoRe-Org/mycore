@@ -16,32 +16,34 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.epub {
 
-    export class EpubStructureBuilder {
+import {EpubStructureChapter} from "./EpubStructureChapter";
+import {StructureChapter} from "../../base/components/model/StructureChapter";
 
-        public convertToChapter(item: any, parent?: EpubStructureChapter): EpubStructureChapter {
-            const chapters: mycore.viewer.model.StructureChapter[] = [];
-            const chapter = new EpubStructureChapter(
-                parent,
-                typeof parent === 'undefined' ? 'root' : '',
-                item.label,
-                chapters,
-                item);
+export class EpubStructureBuilder {
 
-            if (item.subitems != null) {
-                item.subitems
-                    .map((childItem) => {
-                        return this.convertToChapter(childItem, chapter);
-                    })
-                    .forEach((childChapter) => {
-                        chapters.push(childChapter);
-                    });
-            }
+    public convertToChapter(item: any, parent?: EpubStructureChapter): EpubStructureChapter {
+        const chapters: StructureChapter[] = [];
+        const chapter = new EpubStructureChapter(
+            parent,
+            typeof parent === 'undefined' ? 'root' : '',
+            item.label,
+            chapters,
+            item);
 
-            return chapter;
+        if (item.subitems != null) {
+            item.subitems
+                .map((childItem) => {
+                    return this.convertToChapter(childItem, chapter);
+                })
+                .forEach((childChapter) => {
+                    chapters.push(childChapter);
+                });
         }
 
+        return chapter;
     }
 
 }
+
+

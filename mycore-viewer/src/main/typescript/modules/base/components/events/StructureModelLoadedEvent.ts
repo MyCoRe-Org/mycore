@@ -16,24 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../Utils.ts" />
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
-/// <reference path="../model/StructureModel.ts" />
 
-namespace mycore.viewer.components.events {
-    export class StructureModelLoadedEvent extends MyCoReImageViewerEvent {
-        constructor(component:ViewerComponent, private _structureModel:model.StructureModel) {
-            super(component, StructureModelLoadedEvent.TYPE);
-        }
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {ViewerComponent} from "../ViewerComponent";
+import {StructureModel} from "../model/StructureModel";
 
-        public get structureModel() {
-            return this._structureModel;
-        }
-
-        public static TYPE:string = "StructureModelLoadedEvent";
-
-
+export class StructureModelLoadedEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent, private _structureModel: StructureModel) {
+        super(component, StructureModelLoadedEvent.TYPE);
     }
 
+    public get structureModel() {
+        return this._structureModel;
+    }
+
+    public static TYPE: string = "StructureModelLoadedEvent";
+
 }
+

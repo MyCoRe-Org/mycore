@@ -16,22 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="ButtonPressedEvent.ts" />
-/// <reference path="../model/ToolbarDropdownButton.ts" />
+import {ButtonPressedEvent} from "./ButtonPressedEvent";
+import {ToolbarDropdownButton} from "../model/ToolbarDropdownButton";
 
-namespace mycore.viewer.widgets.toolbar.events {
-    export class DropdownButtonPressedEvent extends ButtonPressedEvent {
-        constructor(button:ToolbarDropdownButton, private _childId:string) {
-            super(button, DropdownButtonPressedEvent.TYPE);
-        }
-
-        public get childId() {
-            return this._childId;
-        }
-
-        public static TYPE:string = "DropdownButtonPressedEvent";
-
-
+export class DropdownButtonPressedEvent extends ButtonPressedEvent {
+    constructor(button: ToolbarDropdownButton, private _childId: string) {
+        super(button, DropdownButtonPressedEvent.TYPE);
     }
 
+    public get childId() {
+        return this._childId;
+    }
+
+    public static TYPE: string = "DropdownButtonPressedEvent";
+
 }
+

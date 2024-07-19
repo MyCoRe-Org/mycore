@@ -16,7 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoReIIIFComponent.ts" />
-/// <reference path="components/MyCoReIIIFPageProviderComponent.ts" />
 
-console.log('IIIF MODULE');
+
+import {addViewerComponent} from "../base/Utils";
+import {MyCoReIIIFComponent} from "./components/MyCoReIIIFComponent";
+import {MyCoReIIIFPageProviderComponent} from "./components/MyCoReIIIFPageProviderComponent";
+
+addViewerComponent(MyCoReIIIFComponent);
+addViewerComponent(MyCoReIIIFPageProviderComponent);

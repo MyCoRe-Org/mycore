@@ -16,11 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../Utils.ts" />
 
-namespace mycore.viewer.model {
+import {Rect, Size2D} from "../../Utils";
 
-    export interface AbstractPage {
+export interface AbstractPage {
         id:string;
         size: Size2D;
         draw(ctx:CanvasRenderingContext2D, rect:Rect, sourceScale, preview?:boolean, infoScale?:number): void;
@@ -29,4 +28,4 @@ namespace mycore.viewer.model {
         toString(): string;
     }
 
-}
+

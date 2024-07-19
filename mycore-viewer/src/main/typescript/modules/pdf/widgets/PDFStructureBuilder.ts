@@ -16,211 +16,219 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../definitions/pdf.d.ts" />
-/// <reference path="PDFStructureModel.ts" />
+
+import {GivenViewerPromise, MyCoReMap, Size2D, Utils, ViewerPromise} from "../../base/Utils";
+import {StructureImage} from "../../base/components/model/StructureImage";
+import {StructureChapter} from "../../base/components/model/StructureChapter";
+import {PDFStructureModel} from "./PDFStructureModel";
+import {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist";
+import {RefProxy} from "pdfjs-dist/types/src/display/api";
+
+export class PDFStructureBuilder {
+    private _startPage: number = -1;
+
+    constructor(private _document: PDFDocumentProxy, private _name: string) {
+        this._pageCount = <any>(this._document.numPages);
+    }
+
+    private _structureModel: PDFStructureModel = null;
+    private _chapterPageMap: MyCoReMap<string, StructureImage> = new MyCoReMap<string, StructureImage>();
+    private _pages: Array<StructureImage> = new Array<StructureImage>();
+    private _pageCount: number = 0;
+    private _refPageMap: MyCoReMap<string, PDFPageProxy> = new MyCoReMap<string, PDFPageProxy>();
+    private _idPageMap: MyCoReMap<number, StructureImage> = new MyCoReMap<number, StructureImage>();
+    private _loadedPageCount: number;
+    private _outline: Array<PDFTreeNode>;
+    private _rootChapter: StructureChapter;
+    private _promise: ViewerPromise<PDFStructureModel, any> = new ViewerPromise<PDFStructureModel, any>();
+    private _outlineTodoCount = 0;
+    private static PDF_TEXT_HREF = "pdfText";
 
 
-namespace mycore.viewer.widgets.pdf {
-    import StructureChapter = mycore.viewer.model.StructureChapter;
+    public resolve() {
+        this._resolvePages();
+        this._resolveOutline();
+        this._resolveStartPage();
+        return this._promise as GivenViewerPromise<PDFStructureModel, any>;
+    }
 
-    export class PDFStructureBuilder {
-        private _startPage: number = -1;
+    private _resolveStartPage() {
+        try {
+            (this._document as any).getOpenAction().then((openAction: { dest: Array<{ num?: number, gen: number }> }) => {
 
-        constructor(private _document:PDFDocumentProxy, private _name:string) {
-            this._pageCount = <any>(this._document.numPages);
-        }
-
-        private _structureModel: PDFStructureModel = null;
-        private _chapterPageMap:MyCoReMap<string, model.StructureImage> = new MyCoReMap<string, mycore.viewer.model.StructureImage>();
-        private _pages:Array<model.StructureImage> = new Array<model.StructureImage>();
-        private _pageCount:number = 0;
-        private _refPageMap:MyCoReMap<string, PDFPageProxy> = new MyCoReMap<string, PDFPageProxy>();
-        private _idPageMap:MyCoReMap<number, model.StructureImage> = new MyCoReMap<number, mycore.viewer.model.StructureImage>();
-        private _loadedPageCount:number;
-        private _outline:Array<PDFTreeNode>;
-        private _rootChapter:model.StructureChapter;
-        private _promise:ViewerPromise<PDFStructureModel, any> = new ViewerPromise<PDFStructureModel, any>();
-        private _outlineTodoCount = 0;
-        private static PDF_TEXT_HREF = "pdfText";
-
-
-        public resolve() {
-            this._resolvePages();
-            this._resolveOutline();
-            this._resolveStartPage();
-            return <GivenViewerPromise<PDFStructureModel, any>>this._promise;
-        }
-
-        private _resolveStartPage() {
-            try {
-                (<any>this._document).getOpenAction().then((openAction:{dest: Array<{ num?: number, gen: number }>}) => {
-
-                    if(openAction=== null || openAction.dest===null){
-                        this._startPage = 1;
-                        this.checkResolvable();
-                        return;
-                    }
-                    this._document.getPageIndex(openAction.dest[0]).then((page) => {
-                        this._startPage = page + 1;
-                        this.checkResolvable();
-                    }, () => {
-                        this._startPage = 1;
-                        this.checkResolvable();
-                    });
-                });
-            } catch (e) {
-                this._startPage = 1;
-                this.checkResolvable();
-            }
-        }
-
-        private _resolvePages() {
-            var that = this;
-            this._loadedPageCount = 0;
-
-            for (var i = 1; i <= that._pageCount; i++) {
-                var callback = this._createThumbnailDrawer(i);
-                var additionalHref = new MyCoReMap<string, string>();
-                additionalHref.set(PDFStructureBuilder.PDF_TEXT_HREF, i + "");
-                var structureImage = new model.StructureImage("pdfPage", i + "", i, null, i + "", "pdfPage", callback, additionalHref);
-                that._pages.push(structureImage);
-                that._idPageMap.set(i, structureImage);
-            }
-        }
-
-        private _createThumbnailDrawer(i) {
-            var that = this;
-            var imgData = null;
-            var collectedCallbacks = new Array<(string)=>void>();
-            return (callback:(string)=>void)=> {
-                if (imgData == null) {
-                    collectedCallbacks.push((url)=>{
-                        if (imgData == null) {
-                            imgData = url;
-                        }
-                        callback(url);
-                    });
-                    if (collectedCallbacks.length == 1) {
-                        that._document.getPage(i).then((page) => {
-                            that._renderPage(collectedCallbacks, page);
-                        });
-                    }
-                } else {
-                    callback(imgData);
-                }
-            }
-        }
-
-        private _renderPage(callbacks:Array<(string)=>void>, page) {
-            var originalSize =  new Size2D(page.view[2] - page.view[0], page.view[3] - page.view[1]);//IviewPDFCanvas.getPageSize(page);
-            var largest = Math.max(originalSize.width, originalSize.height);
-            var vpScale = 256 / largest;
-            var vp = page.getViewport({scale: vpScale});
-            var thumbnailDrawCanvas = document.createElement("canvas");
-            var thumbnailCanvasCtx = thumbnailDrawCanvas.getContext("2d");
-            thumbnailDrawCanvas.width = (originalSize.width) * vpScale;
-            thumbnailDrawCanvas.height = (originalSize.height) * vpScale;
-
-            var task = <any> page.render({canvasContext: thumbnailCanvasCtx, viewport: vp})
-            task.promise.then((onErr)=>{
-                this._loadedPageCount++;
-                let imgUrl = thumbnailDrawCanvas.toDataURL();
-                thumbnailDrawCanvas = null;
-                thumbnailCanvasCtx = null;
-                for (var callbackIndex in callbacks) {
-                    let callback = callbacks[callbackIndex];
-                    callback(imgUrl);
-                }
-            });
-
-        }
-
-        private _resolveOutline() {
-            var that = this;
-            this._document.getOutline().then(function (nodes:Array<PDFTreeNode>) {
-                that._outline = nodes;
-                that.resolveStructure();
-            });
-        }
-
-        public getPageNumberFromDestination(dest:String, callback:(number:number)=>void){
-            let promise;
-
-            if (typeof dest === 'string') {
-                promise = this._document.getDestination(dest);
-            } else {
-                promise = (<any>window).Promise.resolve(dest);
-            }
-
-            promise.then((destination) => {
-                if (!(destination instanceof Array)) {
-                    console.error("Invalid destination " + destination);
+                if (openAction === null || openAction.dest === null) {
+                    this._startPage = 1;
+                    this.checkResolvable();
                     return;
-                } else {
-                    this._document.getPageIndex(destination[ 0 ]).then((pageNumber) => {
-                        if (typeof pageNumber != "undefined" && pageNumber != null) {
-                            if (pageNumber > this._pageCount) {
-                                console.error("Destination outside of Document! (" + pageNumber + ")");
-                            } else {
-                                callback(pageNumber + 1);
-                            }
-                        }
+                }
+                this._document.getPageIndex(openAction.dest[0] as RefProxy).then((page) => {
+                    this._startPage = page + 1;
+                    this.checkResolvable();
+                }, () => {
+                    this._startPage = 1;
+                    this.checkResolvable();
+                });
+            });
+        } catch (e) {
+            this._startPage = 1;
+            this.checkResolvable();
+        }
+    }
+
+    private _resolvePages() {
+        var that = this;
+        this._loadedPageCount = 0;
+
+        for (var i = 1; i <= that._pageCount; i++) {
+            var callback = this._createThumbnailDrawer(i);
+            var additionalHref = new MyCoReMap<string, string>();
+            additionalHref.set(PDFStructureBuilder.PDF_TEXT_HREF, i + "");
+            var structureImage = new StructureImage("pdfPage", i + "", i, null, i + "", "pdfPage", callback, additionalHref);
+            that._pages.push(structureImage);
+            that._idPageMap.set(i, structureImage);
+        }
+    }
+
+    private _createThumbnailDrawer(i) {
+        var that = this;
+        var imgData = null;
+        var collectedCallbacks = new Array<(string) => void>();
+        return (callback: (string) => void) => {
+            if (imgData == null) {
+                collectedCallbacks.push((url) => {
+                    if (imgData == null) {
+                        imgData = url;
+                    }
+                    callback(url);
+                });
+                if (collectedCallbacks.length == 1) {
+                    that._document.getPage(i).then((page) => {
+                        that._renderPage(collectedCallbacks, page);
                     });
                 }
-            });
-        }
-
-        private getChapterFromOutline(parent:model.StructureChapter, nodes:Array<PDFTreeNode>, currentCount:number):Array<model.StructureChapter> {
-            let chapterArr = new Array<model.StructureChapter>();
-            for (let nodeIndex in nodes) {
-                let currentNode = nodes[nodeIndex];
-                let destResolver = ((copyChapter) => (callback) => {
-                    this.getPageNumberFromDestination(copyChapter.dest, callback);
-                })(currentNode);
-                let chapter = new model.StructureChapter(parent, "pdfChapter", Utils.hash(currentNode.title+currentCount++).toString(), currentNode.title, null, null,destResolver);
-                let children = this.getChapterFromOutline(chapter, currentNode.items, currentCount++);
-                chapter.chapter = children;
-                chapterArr.push(chapter);
-            }
-
-            return chapterArr;
-        }
-
-        private checkResolvable() {
-            if (this._structureModel !== null && this._outlineTodoCount === 0 && this._startPage !== -1) {
-                this._structureModel.startPage = this._startPage;
-                this._promise.resolve(this._structureModel);
+            } else {
+                callback(imgData);
             }
         }
+    }
 
-        /**
-         * Checks if all needed data is resolved and the structure model can be build.
-         * Executes the Callback.
-         */
-        private resolveStructure() {
-            if (typeof this._outline != "undefined") {
-                var that = this;
-                this._rootChapter = new model.StructureChapter(null, "pdf", "0", this._name, null, null, () => 1);
-                this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline,1);
-                this._structureModel = new PDFStructureModel(this._rootChapter,
-                        this._pages,
-                        this._chapterPageMap,
-                        new MyCoReMap<string, model.StructureChapter>(),
-                        new MyCoReMap<string, model.StructureImage>(),
-                        this._refPageMap);
-                this.checkResolvable();
+    private _renderPage(callbacks: Array<(string) => void>, page) {
+        var originalSize = new Size2D(page.view[2] - page.view[0], page.view[3] - page.view[1]);//IviewPDFCanvas.getPageSize(page);
+        var largest = Math.max(originalSize.width, originalSize.height);
+        var vpScale = 256 / largest;
+        var vp = page.getViewport({scale: vpScale});
+        var thumbnailDrawCanvas = document.createElement("canvas");
+        var thumbnailCanvasCtx = thumbnailDrawCanvas.getContext("2d");
+        thumbnailDrawCanvas.width = (originalSize.width) * vpScale;
+        thumbnailDrawCanvas.height = (originalSize.height) * vpScale;
+
+        var task = <any>page.render({canvasContext: thumbnailCanvasCtx, viewport: vp})
+        task.promise.then((onErr) => {
+            this._loadedPageCount++;
+            let imgUrl = thumbnailDrawCanvas.toDataURL();
+            thumbnailDrawCanvas = null;
+            thumbnailCanvasCtx = null;
+            for (var callbackIndex in callbacks) {
+                let callback = callbacks[callbackIndex];
+                callback(imgUrl);
             }
-        }
+        });
 
-        /**
-         * Converts a destination to a String.
-         * @param ref the PDFRef wich should be converted.
-         * @returns {string}
-         */
-        private static destToString(ref:PDFRef):string {
-            return   ref.gen + " " + ref.num;
-
-        }
 
     }
+
+    private _resolveOutline() {
+        var that = this;
+        this._document.getOutline().then(function (nodes: Array<PDFTreeNode>) {
+            that._outline = nodes;
+            that.resolveStructure();
+        });
+    }
+
+    public getPageNumberFromDestination(dest: String, callback: (number: number) => void) {
+        let promise;
+
+        if (typeof dest === 'string') {
+            promise = this._document.getDestination(dest);
+        } else {
+            promise = (<any>window).Promise.resolve(dest);
+        }
+
+        promise.then((destination) => {
+            if (!(destination instanceof Array)) {
+                console.error("Invalid destination " + destination);
+                return;
+            } else {
+                this._document.getPageIndex(destination[0]).then((pageNumber) => {
+                    if (typeof pageNumber != "undefined" && pageNumber != null) {
+                        if (pageNumber > this._pageCount) {
+                            console.error("Destination outside of Document! (" + pageNumber + ")");
+                        } else {
+                            callback(pageNumber + 1);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    private getChapterFromOutline(parent: StructureChapter, nodes: Array<PDFTreeNode>, currentCount: number): Array<StructureChapter> {
+        let chapterArr = new Array<StructureChapter>();
+        for (let nodeIndex in nodes) {
+            let currentNode = nodes[nodeIndex];
+            let destResolver = ((copyChapter) => (callback) => {
+                this.getPageNumberFromDestination(copyChapter.dest as string, callback);
+            })(currentNode);
+            let chapter = new StructureChapter(parent, "pdfChapter", Utils.hash(currentNode.title + currentCount++).toString(), currentNode.title, null, null, destResolver);
+            let children = this.getChapterFromOutline(chapter, currentNode.items, currentCount++);
+            chapter.chapter = children;
+            chapterArr.push(chapter);
+        }
+
+        return chapterArr;
+    }
+
+    private checkResolvable() {
+        if (this._structureModel !== null && this._outlineTodoCount === 0 && this._startPage !== -1) {
+            this._structureModel.startPage = this._startPage;
+            this._promise.resolve(this._structureModel);
+        }
+    }
+
+    /**
+     * Checks if all needed data is resolved and the structure model can be build.
+     * Executes the Callback.
+     */
+    private resolveStructure() {
+        if (typeof this._outline != "undefined") {
+            var that = this;
+            this._rootChapter = new StructureChapter(null, "pdf", "0", this._name, null, null, () => 1);
+            this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline, 1);
+            this._structureModel = new PDFStructureModel(this._rootChapter,
+                this._pages,
+                this._chapterPageMap,
+                new MyCoReMap<string, StructureChapter>(),
+                new MyCoReMap<string, StructureImage>(),
+                this._refPageMap);
+            this.checkResolvable();
+        }
+    }
+
+}
+
+interface PDFTreeNode{
+    title: string;
+    bold: boolean;
+    italic: boolean;
+    /**
+     * - The color in RGB format to use for
+     * display purposes.
+     */
+    color: Uint8ClampedArray;
+    dest: string | Array<any> | null;
+    url: string | null;
+    unsafeUrl: string | undefined;
+    newWindow: boolean | undefined;
+    count: number | undefined;
+    items: any[];
 }

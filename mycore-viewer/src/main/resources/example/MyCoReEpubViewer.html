@@ -8,15 +8,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-base.js"></script>
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-desktop.js"></script>
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-epub.js"></script>
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js"></script>
+    <script type="module" src="../META-INF/resources/modules/iview2/js/iview-client-base.es.js"></script>
+    <script type="module" src="../META-INF/resources/modules/iview2/js/iview-client-desktop.es.js"></script>
+    <script type="module" src="../META-INF/resources/modules/iview2/js/iview-client-epub.es.js"></script>
+    <script type="module" src="../META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.es.js"></script>
     <script src="../META-INF/resources/modules/iview2/js/lib/epubjs/epub.js"></script>
     <link href="../META-INF/resources/modules/iview2/css/default.css" type="text/css" rel="stylesheet">
 
     <!-- <link rel="stylesheet" href="../META-INF/resources/components/iview/templates/mobile/jquery.mobile-1.3.2.min.css" />     -->
-    <script>
+    <script type="module">
+        import {MyCoReViewer} from "../META-INF/resources/modules/iview2/js/iview-client-base.es.js";
+
         window.onload = function () {
             /**
              *         location: string;
@@ -25,7 +27,7 @@
              startImage: string;
              * @type {mycore.iview.imageviewer.MyCoReViewer}
              */
-            window["viewer"] = new mycore.viewer.MyCoReViewer(jQuery("body"), {
+            window["viewer"] = new MyCoReViewer(jQuery("body"), {
                 "mobile": false,
                 filePath: "epub/Beethovens_neunte_Symphonie.epub",
                 derivateURL:".",

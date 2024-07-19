@@ -71,7 +71,7 @@ public class MCRViewerConfiguration {
     private static Logger LOGGER = LogManager.getLogger(MCRViewerConfiguration.class);
 
     public enum ResourceType {
-        script, css
+        script, module, css
     }
 
     private Multimap<ResourceType, String> resources;
@@ -193,8 +193,8 @@ public class MCRViewerConfiguration {
     /**
      * Adds a new javascript file which should be included by the image viewer.
      */
-    public void addScript(final String url) {
-        this.resources.put(ResourceType.script, url);
+    public void addScript(final String url, boolean isModule) {
+        this.resources.put(isModule ? ResourceType.module: ResourceType.script, url);
     }
 
     /**
@@ -203,7 +203,7 @@ public class MCRViewerConfiguration {
      * @param file the local javascript file to include
      */
     public void addLocalScript(final String file) {
-        this.addLocalScript(file, true, false);
+        this.addLocalScript(file, true, false, false);
     }
 
     /**
@@ -213,7 +213,18 @@ public class MCRViewerConfiguration {
      * @param hasMinified is a minified version available
      */
     public void addLocalScript(final String file, boolean hasMinified) {
-        this.addLocalScript(file, hasMinified, false);
+        this.addLocalScript(file, hasMinified, false, false);
+    }
+
+    /**
+     * Shorthand MCRViewerConfiguration#addLocalScript(file, hasMinified, false)
+     *
+     * @param file the local javascript file to include
+     * @param hasMinified is a minified version available
+     * @param debugMode if the debug mode is active or not
+     */
+    public void addLocalScript(final String file, boolean hasMinified, boolean debugMode) {
+        this.addLocalScript(file, hasMinified, false, debugMode);
     }
 
     /**
@@ -223,11 +234,13 @@ public class MCRViewerConfiguration {
      *
      * <p>This method uses the minified (adds a .min) version only if hasMinified is true and debugMode is false.</p>.
      *
-     * @param file the local javascript file to include
+     * @param file        the local javascript file to include
      * @param hasMinified is a minified version available
-     * @param debugMode if the debug mode is active or not
+     * @param isModule    if the script is an esm module or not
+     * @param debugMode   if the debug mode is active or not
      */
-    public void addLocalScript(final String file, final boolean hasMinified, final boolean debugMode) {
+    public void addLocalScript(final String file, final boolean hasMinified, final boolean isModule,
+                               final boolean debugMode) {
         String baseURL = MCRFrontendUtil.getBaseURL();
         StringBuilder scriptURL = new StringBuilder(baseURL);
         scriptURL.append("modules/iview2/js/");
@@ -237,7 +250,7 @@ public class MCRViewerConfiguration {
         } else {
             scriptURL.append(file);
         }
-        addScript(scriptURL.toString());
+        addScript(scriptURL.toString(), isModule);
     }
 
     /**
