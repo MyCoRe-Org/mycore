@@ -289,7 +289,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * @param xPath the XPath containing a pattern to substitute
      * @return the resolved xPath
      */
-    private static String replacePattern(String xPath) {
+    public static String replacePattern(String xPath) {
         String updatedXPath = xPath;
         final Pattern pattern = Pattern.compile("\\{pattern:([^(}]*)\\(?([^)]*)\\)?}");
         Matcher matcher = pattern.matcher(updatedXPath);
