@@ -127,10 +127,10 @@
           </execution>
           <execution>
             <id>typecheck-viewer</id>
-            <phase>generate-resources</phase>
             <goals>
               <goal>yarn</goal>
             </goals>
+            <phase>generate-resources</phase>
             <configuration>
               <arguments>typecheck</arguments>
             </configuration>
