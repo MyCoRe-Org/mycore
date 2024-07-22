@@ -16,8 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {defineConfig} from 'vite'
-import {viteStaticCopy} from 'vite-plugin-static-copy'
+import {defineConfig} from 'vite';
+import {viteStaticCopy} from 'vite-plugin-static-copy';
 
 const inputs = {
     base: 'src/main/typescript/modules/base/module.ts',

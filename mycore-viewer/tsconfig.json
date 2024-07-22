@@ -18,6 +18,6 @@
     "src/main/typescript/modules/tei/module.ts",
     "src/main/typescript/modules/toolbar-extender/module.ts",
     "src/main/typescript/modules/epub/module.ts",
-    "src/main/typescript/modules/iiif/module.ts",
+    "src/main/typescript/modules/iiif/module.ts"
   ]
 }
