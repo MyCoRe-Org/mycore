@@ -23,7 +23,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URL;
 
-import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -77,7 +77,7 @@ public final class MCREpicurLite {
             Element login = newEpicureElement("login");
             Element password = newEpicureElement("password");
             login.setText(credentials.getUserName());
-            password.setText(credentials.getPassword());
+            password.setText(String.copyValueOf(credentials.getPassword()));
             epicurLite.addContent(login);
             epicurLite.addContent(password);
         }

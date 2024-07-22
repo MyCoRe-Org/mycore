@@ -20,18 +20,18 @@ package org.mycore.pi.doi.client.crossref;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -39,6 +39,9 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.util.MCRResultOrException;
+import org.mycore.services.http.MCRHttpUtils;
+import org.mycore.services.http.MCRQueryParameter;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -93,18 +96,17 @@ public class MCRCrossrefClient {
     }
 
     private static CloseableHttpClient getHttpClient() {
-        return HttpClientBuilder.create().build();
+        return HttpClientBuilder.create()
+            .setUserAgent(MCRHttpUtils.getHttpUserAgent())
+            .build();
     }
 
     public void doMDUpload(Document metadata) throws MCRPersistentIdentifierException {
         final HttpPost postRequest;
 
         try {
-            final URIBuilder uriBuilder;
-            uriBuilder = new URIBuilder("https://" + this.host + "/" + DEPOSIT_PATH);
-            addAuthParameters(uriBuilder);
-            uriBuilder.addParameter(OPERATION_PARAM, OPERATION_DOMDUPLOAD);
-            postRequest = new HttpPost(uriBuilder.build());
+            URI uri = getUploadURI();
+            postRequest = new HttpPost(uri);
         } catch (URISyntaxException e) {
             throw new MCRPersistentIdentifierException(
                 String.format(Locale.ROOT, "Can not build a valid URL with  host: %s", this.host));
@@ -119,41 +121,49 @@ public class MCRCrossrefClient {
         postRequest.setEntity(reqEntity);
 
         try (CloseableHttpClient client = getHttpClient()) {
-            try (CloseableHttpResponse response = client.execute(postRequest)) {
-                final int statusCode = response.getStatusLine().getStatusCode();
+            client.<MCRResultOrException<Object, MCRPersistentIdentifierException>>execute(postRequest, response -> {
+                final int statusCode = response.getCode();
                 final HttpEntity entity = response.getEntity();
                 String message = "";
 
-                switch (statusCode) {
+                return switch (statusCode) {
                     case 200:
-                        if (entity != null) {
+                        if (entity != null && LOGGER.isDebugEnabled()) {
                             try (InputStream inputStream = entity.getContent()) {
                                 message = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                                 LOGGER.debug(message);
                             }
                         }
-                        return; // everything OK!
+                        yield MCRResultOrException.ofResult(null); // everything OK!
                     case 503:
                         LOGGER.error("Seems like the quota of 10000 Entries is exceeded!");
+                        yield MCRResultOrException.ofResult(null);
                     default:
                         if (entity != null) {
                             try (InputStream inputStream = entity.getContent()) {
                                 message = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                             }
                         }
-                        throw new MCRDatacenterException(
-                            String.format(Locale.ROOT, "Error while doMDUpload: (%d)%s%s%s", statusCode,
-                                response.getStatusLine().getReasonPhrase(), System.lineSeparator(), message));
-                }
-            }
+                        yield MCRResultOrException.ofException(
+                            new MCRDatacenterException(
+                                String.format(Locale.ROOT, "Error while doMDUpload: (%d)%s%s%s", statusCode,
+                                    response.getReasonPhrase(), System.lineSeparator(), message)));
+                };
+            }).getResultOrThrow();
         } catch (IOException e) {
             throw new MCRDatacenterException(String.format(Locale.ROOT, "Error while sending request to %s", host), e);
         }
     }
 
-    private void addAuthParameters(URIBuilder uriBuilder) {
-        uriBuilder.addParameter(USER_PARAM, this.username);
-        uriBuilder.addParameter(PASSWORD_PARAM, this.password);
+    private URI getUploadURI() throws URISyntaxException {
+        List<MCRQueryParameter> parameters = List.of(
+            new MCRQueryParameter(USER_PARAM, this.username),
+            new MCRQueryParameter(PASSWORD_PARAM, this.password),
+            new MCRQueryParameter(OPERATION_PARAM, OPERATION_DOMDUPLOAD));
+        return new URI(String.format(Locale.ROOT, "https://%s/%s%s",
+            this.host,
+            DEPOSIT_PATH,
+            MCRQueryParameter.toQueryString(parameters)));
     }
 
 }

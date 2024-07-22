@@ -57,15 +57,13 @@ public class MCRURLConfigSetProvider extends MCRSolrConfigSetProvider {
     @Override
     protected Supplier<InputStream> getStreamSupplier() {
         return () -> {
-            HttpRequest httpGet = MCRHttpUtils.getRequestBuilder().uri(getUrl()).build();
-            byte[] bytes;
             try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-                HttpResponse<byte[]> response = httpClient.send(httpGet, HttpResponse.BodyHandlers.ofByteArray());
-                bytes = response.body();
-            } catch (IOException | InterruptedException e) {
+                HttpRequest request = MCRHttpUtils.getRequestBuilder().uri(uri).build();
+                HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+                return new ByteArrayInputStream(response.body());
+            } catch (InterruptedException | IOException e) {
                 throw new MCRException(e);
             }
-            return new ByteArrayInputStream(bytes);
         };
     }
 }

@@ -29,19 +29,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.mycore.pi.util.MCRHttpUtils;
+import org.mycore.pi.util.MCRResultOrException;
 
 import com.google.gson.Gson;
 
@@ -49,6 +49,7 @@ import com.google.gson.Gson;
  * Implementation for this api <a href="https://doc.pidconsortium.eu/docs/">https://doc.pidconsortium.eu/docs/</a>
  */
 public class MCREpicClient {
+    private static final AuthScope ANY_AUTHSCOPE = new AuthScope(null, -1);
 
     private final String userName;
 
@@ -64,24 +65,20 @@ public class MCREpicClient {
 
     public void delete(MCRHandle handle) throws MCREpicException, IOException {
         final HttpDelete httpDelete = new HttpDelete(baseURL + "handles/" + handle.toString());
-        try (CloseableHttpClient httpClient = getHttpClient();
-            CloseableHttpResponse response = httpClient.execute(httpDelete)) {
-
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_NO_CONTENT -> {
-                    return;
-                }
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
-                    "Error while create:" + statusLine.getReasonPhrase());
-                default -> {
-                    final String content = new String(entity.getContent().readAllBytes(), StandardCharsets.UTF_8);
-                    throw new MCREpicException("Unknown error: " + statusLine.getStatusCode() + " - "
-                        + statusLine.getReasonPhrase() + " - " + content);
-                }
-            }
+        try (CloseableHttpClient httpClient = getHttpClient()) {
+            httpClient.<MCRResultOrException<Object, MCREpicException>>execute(httpDelete,
+                response -> switch (response.getCode()) {
+                    case HttpStatus.SC_NO_CONTENT -> MCRResultOrException.ofResult(null);
+                    case HttpStatus.SC_UNAUTHORIZED
+                        -> MCRResultOrException.ofException(new MCREpicUnauthorizedException(
+                            "Error while create:" + response.getReasonPhrase()));
+                    default -> {
+                        final String content = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+                        yield MCRResultOrException
+                            .ofException(new MCREpicException("Unknown error: " + response.getCode() + " - "
+                                + response.getReasonPhrase() + " - " + content));
+                    }
+                }).getResultOrThrow();
         }
     }
 
@@ -100,91 +97,89 @@ public class MCREpicClient {
         httpPut.setEntity(new StringEntity(handleInfoStr));
         httpPut.setHeader("Content-Type", "application/json");
 
-        try (CloseableHttpClient httpClient = getHttpClient();
-            CloseableHttpResponse response = httpClient.execute(httpPut)) {
+        try (CloseableHttpClient httpClient = getHttpClient()) {
 
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_CREATED, HttpStatus.SC_NO_CONTENT -> {
-                    return;
-                }
-                case HttpStatus.SC_PRECONDITION_FAILED -> throw new MCREpicException(
-                    "The Precondition failed, which means the handle already exist!");
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
-                    "Error while create:" + statusLine.getReasonPhrase());
-                default -> {
-                    final String content = new String(entity.getContent().readAllBytes(), StandardCharsets.UTF_8);
-                    throw new MCREpicException("Unknown error: " + statusLine.getStatusCode() + " - "
-                        + statusLine.getReasonPhrase() + " - " + content);
-                }
-            }
+            httpClient.<MCRResultOrException<Object, MCREpicException>>execute(httpPut,
+                response -> switch (response.getCode()) {
+                    case HttpStatus.SC_CREATED, HttpStatus.SC_NO_CONTENT -> MCRResultOrException.ofResult(null);
+                    case HttpStatus.SC_PRECONDITION_FAILED -> MCRResultOrException.ofException(
+                        new MCREpicException("The Precondition failed, which means the handle already exist!"));
+                    case HttpStatus.SC_UNAUTHORIZED
+                        -> MCRResultOrException.ofException(
+                            new MCREpicUnauthorizedException("Error while create:" + response.getReasonPhrase()));
+                    default -> {
+                        final String content = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+                        yield MCRResultOrException.ofException(
+                            new MCREpicException("Unknown error: " + response.getCode() + " - "
+                                + response.getReasonPhrase() + " - " + content));
+                    }
+                }).getResultOrThrow();
         }
     }
 
     public List<MCRHandleInfo> get(MCRHandle hdl) throws IOException, MCREpicException {
-        try (CloseableHttpClient httpClient = getHttpClient();
-            CloseableHttpResponse response = httpClient
-                .execute(new HttpGet(baseURL + "handles/" + hdl.toString()))) {
+        try (CloseableHttpClient httpClient = getHttpClient()) {
 
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
+            return httpClient.<MCRResultOrException<List<MCRHandleInfo>, MCREpicException>>execute(
+                new HttpGet(baseURL + "handles/" + hdl.toString()),
+                response -> switch (response.getCode()) {
+                    case HttpStatus.SC_OK -> {
+                        try (InputStream content = response.getEntity().getContent();
+                            Reader reader = new InputStreamReader(content, StandardCharsets.UTF_8)) {
+                            final Gson gson = new Gson();
 
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    try (InputStream content = entity.getContent();
-                        Reader reader = new InputStreamReader(content, StandardCharsets.UTF_8)) {
-                        final Gson gson = new Gson();
-
-                        final MCRHandleInfo[] handleInfos = gson.fromJson(reader, MCRHandleInfo[].class);
-                        return Arrays.asList(handleInfos);
+                            final MCRHandleInfo[] handleInfos = gson.fromJson(reader, MCRHandleInfo[].class);
+                            yield MCRResultOrException.ofResult(Arrays.asList(handleInfos));
+                        }
                     }
-                }
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
-                    "Error while listIds:" + statusLine.getReasonPhrase());
-                default -> throw new MCREpicException("Error while listIds" + statusLine.getReasonPhrase());
-            }
+                    case HttpStatus.SC_UNAUTHORIZED -> MCRResultOrException.ofException(
+                        new MCREpicUnauthorizedException("Error while listIds:" + response.getReasonPhrase()));
+                    default -> MCRResultOrException.ofException(
+                        new MCREpicException("Error while listIds" + response.getReasonPhrase()));
+                }).getResultOrThrow();
         }
     }
 
     public List<MCRHandle> listIds(String prefix) throws IOException, MCREpicException {
-        try (CloseableHttpClient httpClient = getHttpClient();
-            CloseableHttpResponse response = httpClient
-                .execute(new HttpGet(baseURL + "handles/" + prefix + "/"))) {
-            final String prefix2 = prefix + "/";
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    try (InputStream content = entity.getContent();
-                        InputStreamReader inputStreamReader = new InputStreamReader(content, StandardCharsets.UTF_8);
-                        BufferedReader br = new BufferedReader(inputStreamReader)) {
-                        return br.lines().map(prefix2::concat).map(MCRHandle::new).collect(Collectors.toList());
-                    }
-                }
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCREpicUnauthorizedException(
-                    "Error while listIds:" + statusLine.getReasonPhrase());
-                default -> throw new MCREpicException("Error while listIds" + statusLine.getReasonPhrase());
-            }
+        try (CloseableHttpClient httpClient = getHttpClient()) {
+            return httpClient.<MCRResultOrException<List<MCRHandle>, MCREpicException>>execute(
+                new HttpGet(baseURL + "handles/" + prefix + "/"), response -> {
+                    final String prefix2 = prefix + "/";
+                    HttpEntity entity = response.getEntity();
+                    return switch (response.getCode()) {
+                        case HttpStatus.SC_OK -> {
+                            try (InputStream content = entity.getContent();
+                                InputStreamReader inputStreamReader
+                                    = new InputStreamReader(content, StandardCharsets.UTF_8);
+                                BufferedReader br = new BufferedReader(inputStreamReader)) {
+                                yield MCRResultOrException.ofResult(
+                                    br.lines().map(prefix2::concat).map(MCRHandle::new).collect(Collectors.toList()));
+                            }
+                        }
+                        case HttpStatus.SC_UNAUTHORIZED -> MCRResultOrException.ofException(
+                            new MCREpicUnauthorizedException("Error while listIds:" + response.getReasonPhrase()));
+                        default -> MCRResultOrException.ofException(
+                            new MCREpicException("Error while listIds" + response.getReasonPhrase()));
+                    };
+                }).getResultOrThrow();
         }
     }
 
     private CloseableHttpClient getHttpClient() {
-        return HttpClientBuilder.create().setDefaultCredentialsProvider(getCredentialsProvider()).build();
+        return MCRHttpUtils.getHttpClient().setDefaultCredentialsProvider(getCredentialsProvider()).build();
     }
 
     private BasicCredentialsProvider getCredentialsProvider() {
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
         if (userName != null && !userName.isEmpty() && password != null && !password.isEmpty()) {
-            credentialsProvider.setCredentials(AuthScope.ANY, getCredentials());
+            credentialsProvider.setCredentials(ANY_AUTHSCOPE, getCredentials());
         }
 
         return credentialsProvider;
     }
 
     private UsernamePasswordCredentials getCredentials() {
-        return new UsernamePasswordCredentials(this.userName, this.password);
+        return new UsernamePasswordCredentials(this.userName, this.password.toCharArray());
     }
 }

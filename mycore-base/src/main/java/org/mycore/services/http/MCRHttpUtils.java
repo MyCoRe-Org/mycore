@@ -52,21 +52,6 @@ public class MCRHttpUtils {
 
     // Utility method to map status codes to reason phrases
     public static Optional<String> getReasonPhrase(int statusCode) {
-        return switch (statusCode) {
-            case 200 -> Optional.of("OK");
-            case 201 -> Optional.of("Created");
-            case 202 -> Optional.of("Accepted");
-            case 204 -> Optional.of("No Content");
-            case 301 -> Optional.of("Moved Permanently");
-            case 302 -> Optional.of("Found");
-            case 400 -> Optional.of("Bad Request");
-            case 401 -> Optional.of("Unauthorized");
-            case 403 -> Optional.of("Forbidden");
-            case 404 -> Optional.of("Not Found");
-            case 500 -> Optional.of("Internal Server Error");
-            case 502 -> Optional.of("Bad Gateway");
-            case 503 -> Optional.of("Service Unavailable");
-            default -> Optional.empty();
-        };
+        return MCRHttpStatus.resolve(statusCode).map(MCRHttpStatus::getReasonPhrase);
     }
 }

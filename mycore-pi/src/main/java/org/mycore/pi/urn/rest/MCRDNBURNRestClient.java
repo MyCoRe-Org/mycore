@@ -18,7 +18,6 @@
 
 package org.mycore.pi.urn.rest;
 
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,13 +30,14 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -136,34 +136,28 @@ public class MCRDNBURNRestClient {
     public Optional<Date> register(MCRPIRegistrationInfo urn) {
         MCRURNJsonBundle bundle = this.jsonProvider.apply(urn);
         String url = getBaseServiceCheckExistsURL(urn);
-        CloseableHttpResponse response = MCRHttpsClient.get(url, credentials);
-        StatusLine statusLine = response.getStatusLine();
+        return MCRHttpsClient.get(url, credentials, response -> {
+            int status = response.getCode();
 
-        if (statusLine == null) {
-            LOGGER.warn("GET request for {} returns no status line.", url);
+            String identifier = urn.getIdentifier();
+            switch (status) {
+                case HttpStatus.SC_OK -> {
+                    LOGGER.info("URN {} is in database. No further information asked", identifier);
+                    LOGGER.info("Performing update of url");
+                    return update(urn);
+                }
+                case HttpStatus.SC_NOT_FOUND -> {
+                    LOGGER.info("URN {} is not registered", identifier);
+                    return registerNew(urn);
+                }
+                default -> {
+                    LOGGER.error("Error while check if URN {} exists using url {}.", identifier, url);
+                    logFailure("", response, status, urn.getIdentifier(), bundle.getUrl());
+                }
+            }
+
             return Optional.empty();
-        }
-
-        int status = statusLine.getStatusCode();
-
-        String identifier = urn.getIdentifier();
-        switch (status) {
-            case HttpStatus.SC_OK -> {
-                LOGGER.info("URN {} is in database. No further information asked", identifier);
-                LOGGER.info("Performing update of url");
-                return update(urn);
-            }
-            case HttpStatus.SC_NOT_FOUND -> {
-                LOGGER.info("URN {} is not registered", identifier);
-                return registerNew(urn);
-            }
-            default -> {
-                LOGGER.error("Error while check if URN {} exists using url {}.", identifier, url);
-                logFailure("", response, status, urn.getIdentifier(), bundle.getUrl());
-            }
-        }
-
-        return Optional.empty();
+        });
     }
 
     public Optional<JsonObject> getRegistrationInfo(MCRPIRegistrationInfo urn) {
@@ -173,26 +167,27 @@ public class MCRDNBURNRestClient {
 
     public static Optional<JsonObject> getRegistrationInfo(String identifier) {
         String url = MCRDNBURNRestClient.getBaseServiceURL() + "/urn/" + identifier;
-        CloseableHttpResponse response = MCRHttpsClient.get(url, Optional.empty());
-
-        int statusCode = response.getStatusLine().getStatusCode();
-        switch (statusCode) {
-            case HttpStatus.SC_OK -> {
-                HttpEntity entity = response.getEntity();
-                try {
-                    Reader reader = new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8);
-                    JsonElement jsonElement = JsonParser.parseReader(reader);
-                    return Optional.of(jsonElement.getAsJsonObject());
-                } catch (Exception e) {
-                    LOGGER.error("Could not read Response from " + url);
+        return MCRHttpsClient.get(url, Optional.empty(), response -> {
+            int statusCode = response.getCode();
+            switch (statusCode) {
+                case HttpStatus.SC_OK -> {
+                    HttpEntity entity = response.getEntity();
+                    try {
+                        Reader reader = new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8);
+                        JsonElement jsonElement = JsonParser.parseReader(reader);
+                        return Optional.of(jsonElement.getAsJsonObject());
+                    } catch (Exception e) {
+                        LOGGER.error("Could not read Response from " + url);
+                    }
+                }
+                default -> {
+                    LOGGER.error("Error while get registration info for URN {} using url {}.", identifier, url);
+                    MCRDNBURNRestClient.logFailure("", response, statusCode, identifier, url);
                 }
             }
-            default -> {
-                LOGGER.error("Error while get registration info for URN {} using url {}.", identifier, url);
-                MCRDNBURNRestClient.logFailure("", response, statusCode, identifier, url);
-            }
-        }
-        return Optional.empty();
+            return Optional.empty();
+        });
+
     }
 
     /**
@@ -209,35 +204,29 @@ public class MCRDNBURNRestClient {
         MCRURNJsonBundle bundle = jsonProvider.apply(urn);
         String json = bundle.toJSON(MCRURNJsonBundle.Format.register);
         String baseServiceURL = getBaseServiceURL();
-        CloseableHttpResponse response = MCRHttpsClient.post(baseServiceURL, APPLICATION_JSON.toString(), json,
-            credentials);
+        return MCRHttpsClient.post(baseServiceURL, ContentType.APPLICATION_JSON.toString(), json, credentials,
+            response -> {
+                int postStatus = response.getCode();
 
-        StatusLine statusLine = response.getStatusLine();
+                String identifier = urn.getIdentifier();
+                URL url = bundle.getUrl();
+                switch (postStatus) {
+                    case HttpStatus.SC_CREATED -> {
+                        LOGGER.info("URN {} registered to {}", identifier, url);
+                        return Optional.ofNullable(response.getFirstHeader("date"))
+                            .map(Header::getValue)
+                            .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                            .map(Instant::from)
+                            .map(Date::from);
+                    }
+                    default -> {
+                        LOGGER.error("Error while register new URN {} using url {}.", identifier, url);
+                        logFailure(json, response, postStatus, identifier, url);
+                    }
+                }
+                return Optional.empty();
+            });
 
-        if (statusLine == null) {
-            LOGGER.warn("POST request for {} returns no status line", baseServiceURL);
-            return Optional.empty();
-        }
-
-        int postStatus = statusLine.getStatusCode();
-
-        String identifier = urn.getIdentifier();
-        URL url = bundle.getUrl();
-        switch (postStatus) {
-            case HttpStatus.SC_CREATED -> {
-                LOGGER.info("URN {} registered to {}", identifier, url);
-                return Optional.ofNullable(response.getFirstHeader("date"))
-                    .map(Header::getValue)
-                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-                    .map(Instant::from)
-                    .map(Date::from);
-            }
-            default -> {
-                LOGGER.error("Error while register new URN {} using url {}.", identifier, url);
-                logFailure(json, response, postStatus, identifier, url);
-            }
-        }
-        return Optional.empty();
     }
 
     /**
@@ -254,42 +243,35 @@ public class MCRDNBURNRestClient {
         MCRURNJsonBundle bundle = jsonProvider.apply(urn);
         String json = bundle.toJSON(MCRURNJsonBundle.Format.update);
         String updateURL = getUpdateURL(urn);
-        CloseableHttpResponse response = MCRHttpsClient.patch(updateURL, APPLICATION_JSON.toString(), json,
-            credentials);
-        StatusLine statusLine = response.getStatusLine();
+        return MCRHttpsClient.patch(updateURL, ContentType.APPLICATION_JSON.toString(), json, credentials, response -> {
+            int patchStatus = response.getCode();
 
-        if (statusLine == null) {
-            LOGGER.warn("PATCH request for {} returns no status line", updateURL);
+            String identifier = urn.getIdentifier();
+            switch (patchStatus) {
+                case HttpStatus.SC_NO_CONTENT -> {
+                    LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
+                    return Optional.ofNullable(response.getFirstHeader("date"))
+                        .map(Header::getValue)
+                        .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                        .map(Instant::from)
+                        .map(Date::from);
+                }
+                default -> {
+                    LOGGER.error("Error while update URN {} using url {}.", identifier, updateURL);
+                    logFailure(json, response, patchStatus, identifier, bundle.getUrl());
+                }
+            }
+
             return Optional.empty();
-        }
-
-        int patchStatus = statusLine.getStatusCode();
-
-        String identifier = urn.getIdentifier();
-        switch (patchStatus) {
-            case HttpStatus.SC_NO_CONTENT -> {
-                LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
-                return Optional.ofNullable(response.getFirstHeader("date"))
-                    .map(Header::getValue)
-                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-                    .map(Instant::from)
-                    .map(Date::from);
-            }
-            default -> {
-                LOGGER.error("Error while update URN {} using url {}.", identifier, updateURL);
-                logFailure(json, response, patchStatus, identifier, bundle.getUrl());
-            }
-        }
-
-        return Optional.empty();
+        });
     }
 
-    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier,
+    public static void logFailure(String json, ClassicHttpResponse response, int postStatus, String identifier,
         URL url) {
         logFailure(json, response, postStatus, identifier, url.toString());
     }
 
-    public static void logFailure(String json, CloseableHttpResponse response, int status, String identifier,
+    public static void logFailure(String json, ClassicHttpResponse response, int status, String identifier,
         String url) {
         HttpEntity entity = response.getEntity();
         LOGGER.error(
@@ -297,9 +279,9 @@ public class MCRDNBURNRestClient {
                 "urn={}, url={} json={}",
             status, identifier, url, json);
         try {
-            String errBody = EntityUtils.toString(entity, "UTF-8");
+            String errBody = EntityUtils.toString(entity, StandardCharsets.UTF_8);
             LOGGER.error("Server error message: {}", errBody);
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             LOGGER.error("Could not get error body from http request", e);
         }
     }
