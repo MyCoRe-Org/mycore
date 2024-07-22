@@ -24,27 +24,26 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequest;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.pi.util.MCRHttpUtils;
 
 /**
  * Convinience class for sending http requests to the DNB urn service api.
@@ -63,24 +62,17 @@ public class MCRHttpsClient {
             .build();
     }
 
-    public static CloseableHttpClient getHttpsClient() {
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        int timeout = 5;
-        RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
-            .setSocketTimeout(timeout * 1000).build();
-
-        return clientBuilder.setDefaultRequestConfig(config).setSSLContext(SSLContexts.createSystemDefault()).build();
+    public static <R> R head(String url, HttpClientResponseHandler<R> responseHandler) {
+        return MCRHttpsClient.head(url, Optional.empty(), responseHandler);
     }
 
-    public static CloseableHttpResponse head(String url) {
-        return MCRHttpsClient.head(url, Optional.empty());
-    }
-
-    public static CloseableHttpResponse head(String url, Optional<UsernamePasswordCredentials> credentials) {
+    public static <R> R head(String url, Optional<UsernamePasswordCredentials> credentials,
+        HttpClientResponseHandler<R> responseHandler) {
         HttpHead httpHead = new HttpHead(url);
-        try (CloseableHttpClient httpClient = getHttpsClient()) {
-            return httpClient.execute(httpHead);
+        try {
+            try (CloseableHttpClient httpClient = MCRHttpUtils.getHttpClient().build()) {
+                return httpClient.execute(httpHead, responseHandler);
+            }
         } catch (IOException e) {
             LOGGER.error("There is a problem or the connection was aborted for URL: {}", url, e);
         }
@@ -88,14 +80,17 @@ public class MCRHttpsClient {
         return null;
     }
 
-    public static CloseableHttpResponse get(String url, Optional<UsernamePasswordCredentials> credentials) {
+    public static <R> R get(String url, Optional<UsernamePasswordCredentials> credentials,
+        HttpClientResponseHandler<R> responseHandler) {
         HttpGet get = new HttpGet(url);
 
         if (credentials.isPresent()) {
             setAuthorizationHeader(get, credentials);
         }
-        try (CloseableHttpClient httpsClient = getHttpsClient()) {
-            return httpsClient.execute(get);
+        try {
+            try (CloseableHttpClient httpsClient = MCRHttpUtils.getHttpClient().build()) {
+                return httpsClient.execute(get, responseHandler);
+            }
         } catch (IOException e) {
             LOGGER.error(e);
         }
@@ -103,36 +98,41 @@ public class MCRHttpsClient {
         return null;
     }
 
-    public static CloseableHttpResponse put(String url, String contentType, String data) {
-        return MCRHttpsClient.put(url, contentType, data, Optional.empty());
+    public static <R> R put(String url, String contentType, String data, HttpClientResponseHandler<R> responseHandler) {
+        return MCRHttpsClient.put(url, contentType, data, Optional.empty(), responseHandler);
     }
 
-    public static CloseableHttpResponse put(String url, String contentType, String data,
-        Optional<UsernamePasswordCredentials> credentials) {
-        return request(HttpPut::new, url, contentType, new StringEntity(data, "UTF-8"), credentials);
+    public static <R> R put(String url, String contentType, String data,
+        Optional<UsernamePasswordCredentials> credentials, HttpClientResponseHandler<R> responseHandler) {
+        return request(HttpPut::new, url, contentType, new StringEntity(data, StandardCharsets.UTF_8), credentials,
+            responseHandler);
     }
 
-    public static CloseableHttpResponse post(String url, String contentType, String data) {
-        return MCRHttpsClient.post(url, contentType, data, Optional.empty());
+    public static <R> R post(String url, String contentType, String data,
+        HttpClientResponseHandler<R> responseHandler) {
+        return MCRHttpsClient.post(url, contentType, data, Optional.empty(), responseHandler);
     }
 
-    public static CloseableHttpResponse post(String url, String contentType, String data,
-        Optional<UsernamePasswordCredentials> credentials) {
-        return request(HttpPost::new, url, contentType, new StringEntity(data, "UTF-8"), credentials);
+    public static <R> R post(String url, String contentType, String data,
+        Optional<UsernamePasswordCredentials> credentials, HttpClientResponseHandler<R> responseHandler) {
+        return request(HttpPost::new, url, contentType, new StringEntity(data, StandardCharsets.UTF_8), credentials,
+            responseHandler);
     }
 
-    public static CloseableHttpResponse patch(String url, String contentType, String data) {
-        return MCRHttpsClient.patch(url, contentType, data, Optional.empty());
+    public static <R> R patch(String url, String contentType, String data,
+        HttpClientResponseHandler<R> responseHandler) {
+        return MCRHttpsClient.patch(url, contentType, data, Optional.empty(), responseHandler);
     }
 
-    public static CloseableHttpResponse patch(String url, String contentType, String data,
-        Optional<UsernamePasswordCredentials> credentials) {
-        return request(HttpPatch::new, url, contentType, new StringEntity(data, "UTF-8"), credentials);
+    public static <R> R patch(String url, String contentType, String data,
+        Optional<UsernamePasswordCredentials> credentials, HttpClientResponseHandler<R> responseHandler) {
+        return request(HttpPatch::new, url, contentType, new StringEntity(data, StandardCharsets.UTF_8), credentials,
+            responseHandler);
     }
 
-    public static <R extends HttpEntityEnclosingRequestBase> CloseableHttpResponse request(Supplier<R> requestSupp,
-        String url, String contentType, HttpEntity entity) {
-        return MCRHttpsClient.request(requestSupp, url, contentType, entity, Optional.empty());
+    public static <R, T extends HttpUriRequestBase> R request(Function<URI, T> requestSupp,
+        String url, String contentType, HttpEntity entity, HttpClientResponseHandler<R> responseHandler) {
+        return request(requestSupp, url, contentType, entity, Optional.empty(), responseHandler);
     }
 
     /**
@@ -144,28 +144,30 @@ public class MCRHttpsClient {
     private static HttpRequest setAuthorizationHeader(HttpRequest request,
         Optional<UsernamePasswordCredentials> credentials) {
 
-        String auth = credentials.get().getUserName() + ":" + credentials.get().getPassword();
+        String auth = credentials.get().getUserName() + ":" + String.copyValueOf(credentials.get().getUserPassword());
         byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
         String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.UTF_8);
         request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         return request;
     }
 
-    public static <R extends HttpEntityEnclosingRequestBase> CloseableHttpResponse request(Supplier<R> requestSupp,
-        String url, String contentType, HttpEntity entity, Optional<UsernamePasswordCredentials> credentials) {
+    public static <R, T extends HttpUriRequestBase> R request(Function<URI, T> requestSupp,
+        String url, String contentType, HttpEntity entity, Optional<UsernamePasswordCredentials> credentials,
+        HttpClientResponseHandler<R> responseHandler) {
 
-        try (CloseableHttpClient httpClient = getHttpsClient()) {
-            R request = requestSupp.get();
+        try {
+            try (CloseableHttpClient httpClient = MCRHttpUtils.getHttpClient().build()) {
+                T request = requestSupp.apply(new URI(url));
 
-            if (credentials.isPresent()) {
-                setAuthorizationHeader(request, credentials);
+                if (credentials.isPresent()) {
+                    setAuthorizationHeader(request, credentials);
+                }
+                request.setHeader("content-type", contentType);
+                request.setConfig(noRedirect());
+                request.setEntity(entity);
+
+                return httpClient.execute(request, responseHandler);
             }
-            request.setURI(new URI(url));
-            request.setHeader("content-type", contentType);
-            request.setConfig(noRedirect());
-            request.setEntity(entity);
-
-            return httpClient.execute(request);
         } catch (URISyntaxException e) {
             LOGGER.error("Wrong format for URL: {}", url, e);
         } catch (ClientProtocolException e) {

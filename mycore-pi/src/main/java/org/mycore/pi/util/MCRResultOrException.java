@@ -16,22 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.urn;
+package org.mycore.pi.util;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContexts;
+public record MCRResultOrException<T, E extends Exception>(T result, E exception) {
+    public static <T, E extends Exception> MCRResultOrException<T, E> ofResult(T result) {
+        return new MCRResultOrException<>(result, null);
+    }
 
-/**
- * Created by chi on 31.01.17.
- *
- * @author Huu Chi Vu
- */
-public class MCRHttpUtils {
-    public static CloseableHttpClient getHttpClient() {
-        return HttpClientBuilder
-            .create()
-            .setSSLContext(SSLContexts.createSystemDefault())
-            .build();
+    public static <T, E extends Exception> MCRResultOrException<T, E> ofException(E exception) {
+        return new MCRResultOrException<>(null, exception);
+    }
+
+    public T getResultOrThrow() throws E {
+        if (exception != null) {
+            throw exception();
+        }
+        return result;
     }
 }
