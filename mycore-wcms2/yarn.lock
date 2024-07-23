@@ -91,10 +91,6 @@ chalk@~4.1.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-"ckeditor@https://github.com/MyCoRe-Org/ckeditor-releases.git#full/4.3.x":
-  version "4.3.5"
-  resolved "git+ssh://git@github.com/MyCoRe-Org/ckeditor-releases.git#dc3b44ffb3c30691dd97ebbc273ac6bca43b227c"
-
 color-convert@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz"
@@ -546,7 +542,7 @@ micromatch@^4.0.2:
     braces "^3.0.2"
     picomatch "^2.3.1"
 
-"minimatch@2 || 3", minimatch@^3.0.4, minimatch@~3.0.4:
+minimatch@^3.0.4, minimatch@~3.0.4, "minimatch@2 || 3":
   version "3.0.4"
   resolved "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz"
   integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
@@ -736,7 +732,7 @@ supports-preserve-symlinks-flag@^1.0.0:
 
 tinymce-i18n@^24.7.15:
   version "24.7.15"
-  resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-24.7.15.tgz#0eeee2ad8441017364c5da0a45b942ecd729792d"
+  resolved "https://registry.npmjs.org/tinymce-i18n/-/tinymce-i18n-24.7.15.tgz"
   integrity sha512-capZBGG8q5hSMb3C5SeVfr5SZmo7jv3mdLZPJdV8mNpe/DNCYcIzWQSFW7/CW1o9rpQ2xZz9DVSfLPLV8xCoNQ==
 
 tinymce@^7.2.1:

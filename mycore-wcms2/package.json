@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "mycore-wcms2",
   "devDependencies": {
-    "ckeditor": "https://github.com/MyCoRe-Org/ckeditor-releases.git#full/4.3.x",
     "tinymce": "^7.2.1",
     "tinymce-i18n": "^24.7.15",
     "dijit": "1.6.5",

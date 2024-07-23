@@ -28,14 +28,6 @@ module.exports = function (grunt) {
                     files: [
                         {
                             expand: true,
-                            cwd: './node_modules/ckeditor',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/ckeditor',
-                            src: [
-                                '**'
-                            ]
-                        },
-                        {
-                            expand: true,
                             cwd: './node_modules/tinymce',
                             dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/tinymce',
                             src: [
