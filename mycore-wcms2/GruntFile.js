@@ -36,6 +36,22 @@ module.exports = function (grunt) {
                         },
                         {
                             expand: true,
+                            cwd: './node_modules/tinymce',
+                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/tinymce',
+                            src: [
+                                '**'
+                            ]
+                        },
+                        {
+                            expand: true,
+                            cwd: './node_modules/tinymce-i18n/langs7',
+                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/tinymce/langs',
+                            src: [
+                                '**'
+                            ]
+                        },
+                        {
+                            expand: true,
                             cwd: './node_modules/dojo',
                             dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/dojo',
                             src: [
