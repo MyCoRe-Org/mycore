@@ -250,21 +250,26 @@ ul{
 	margin: 20px 0;
 	padding: 20px;
 }
+
 #drop-area.highlight {
 	border-color: purple;
 }
+
 #drop-area p {
 	margin-top: 0;
 }
+
 #gallery {
 	margin-top: 10px;
 }
+
 #gallery img {
 	width: 150px;
 	margin-bottom: 10px;
 	margin-right: 10px;
 	vertical-align: middle;
 }
+
 #drop-area .button {
 	display: inline-block;
 	padding: 10px;
@@ -273,9 +278,11 @@ ul{
 	border-radius: 5px;
 	border: 1px solid #ccc;
 }
+
 #drop-area .button:hover {
 	background: #ddd;
 }
+
 #upload-file-input {
 	display: none;
 }

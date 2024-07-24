@@ -26,169 +26,6 @@ var WCMS2FileBrowser = function () {
   const dropArea = document.getElementById("drop-area");
   const progressBar = document.getElementById("upload-progress-bar");
 
-  return {
-    init: function () {
-      $("body").on("click", ".button-expand", function () {
-        expandFolder($(this).closest(".folder"));
-      });
-
-      $("body").on("click", ".button-contract", function () {
-        $(this).siblings("ul.children").addClass("hide-folder");
-        $(this).siblings(".icon").removeClass("glyphicon-folder-open");
-        $(this).siblings(".icon").addClass("glyphicon-folder-close");
-        $(this).removeClass("button-contract glyphicon-minus");
-        $(this).addClass("button-expand glyphicon-plus");
-
-      });
-
-      $("body").on("click", ".folder-name, .folder > span.icon", function () {
-        if (!$(this).parent().hasClass("edit")) {
-          changeFolder($(this).parent().data("path"));
-        }
-      });
-
-      $("body").on("click", ".file-image-cotainer", function (e) {
-        if (type === "images") {
-          window.callback(getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());
-        } else {
-          window.callback(baseHref + getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());
-        }
-        window.close();
-      });
-
-      ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
-        dropArea.addEventListener(eventName, (e) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }, false)
-      });
-      ["dragenter", "dragover"].forEach(eventName => {
-        dropArea.addEventListener(eventName, () => {
-          dropArea.classList.add("highlight")
-        }, false)
-      });
-      ["dragleave", "drop"].forEach(eventName => {
-        dropArea.addEventListener(eventName, () => {
-          dropArea.classList.remove("highlight")
-        }, false)
-      });
-      dropArea.addEventListener("drop", (e) => {
-        let dt = e.dataTransfer;
-        let files = dt.files;
-        this.uploadFiles(files);
-      }, false)
-
-      /*
-            $("body").on("dragover", "#file-view", function(event) {
-              event.preventDefault();
-            });
-            $("body").on("drop", "#file-view", function(event) {
-              event.preventDefault();
-              event.stopPropagation();
-              if($(".aktiv").data("allowed")) {
-                const files = event.originalEvent.dataTransfer.files;
-                $.each(files, function(i, file) {
-                  if (file.type !== "" && file.type !== "text/xml"){
-                    const data = new FormData();
-                    data.append('path', currentPath);
-                    data.append('file', file);
-                    uploadFile(data, createStatusBar($("#uploadbar"), file));
-                  } else {
-                    alert(geti18n("component.wcms.navigation.fileBrowser.invalidFileType"))
-                  }
-                });
-              } else {
-                alert(geti18n("component.wcms.navigation.fileBrowser.invalidUploadFolder"));
-              }
-            });
-       */
-
-      $("body").on("mouseenter", ".file", function () {
-        $(this).find(".wcms2-image-button").removeClass("hidden");
-      });
-
-      $("body").on("mouseleave", ".file", function () {
-        $(this).find(".wcms2-image-button").addClass("hidden");
-      });
-
-      $("body").on("click", ".button-remove", function () {
-        var parent = $(this).parent();
-        if (confirm(geti18n("component.wcms.navigation.fileBrowser.confirmDeleteFile", parent.find("h5").html()))) {
-          deleteFile(currentPath + "/" + parent.find(".file-title").html());
-        }
-      });
-
-      $("body").on("click", "#add-folder", function () {
-        if ($(".aktiv").data("allowed")) {
-          expandFolder($(".aktiv"));
-          if (!$(".aktiv").children("ul.children").length) {
-            $(".aktiv").append("<ul class='children'></ul>");
-            $(".aktiv").children(".no-button").remove();
-            $(".aktiv").prepend("<span class='glyphicon glyphicon-minus button button-contract'></span>");
-            $(".aktiv").children(".icon").addClass("glyphicon-folder-open");
-            $(".aktiv").children(".icon").removeClass("glyphicon-folder-close");
-          }
-          var li = $("<li class='folder edit'><div class='folder-name'><input class='add-folder-input' type='text'></div></li>");
-          $(li).prepend("<span class='glyphicon glyphicon-folder-close icon'></span>");
-          $(li).prepend("<div class='no-button'>&nbsp;</div>");
-          $(li).data("allowed", true);
-          $(".aktiv").children("ul.children").append(li);
-          $(li).find("input.add-folder-input").focus();
-        } else {
-          alert(geti18n("component.wcms.navigation.fileBrowser.invalidCreateFolder"))
-        }
-      });
-
-      $("body").on("keydown", ".add-folder-input", function (key) {
-        if (key.which == 13 && $(this).val() != "") {
-          addFolder(currentPath + "/" + $(this).val(), $(this).parents(".folder")[0]);
-        }
-        if (key.which == 27) {
-          removeFolder($(this).closest(".folder"));
-        }
-      });
-
-      $("body").on("click", "#delete-folder", function () {
-        if ($(".aktiv").data("allowed")) {
-          if (confirm(geti18n("component.wcms.navigation.fileBrowser.confirmDeleteFolder", $(".aktiv").find(".folder-name").html()))) {
-            deleteFolder(currentPath, $(".aktiv"));
-          }
-        } else {
-          alert(geti18n("component.wcms.navigation.fileBrowser.invalidDeleteFolder"));
-        }
-      });
-
-      $("body").on("click", ".wcms2-lightbox", function (evt) {
-        evt.preventDefault();
-        showLightbox($(this));
-      });
-
-      $("body").on("click", "#wcms2-lightbox-close", function () {
-        hideLightbox();
-      });
-
-      readQueryParameter();
-      currentPath = qpara["href"] != undefined ? qpara["href"] : "";
-      type = qpara["type"] != undefined ? qpara["type"] : "files";
-      baseHref = qpara["basehref"] != undefined ? qpara["basehref"] : "";
-      jQuery.getJSON("../../rsc/locale/translate/" + qpara["langCode"] + "/component.wcms.navigation.fileBrowser.*", function (data) {
-        i18nKeys = data;
-        $("#folder-label").html(geti18n("component.wcms.navigation.fileBrowser.folder"));
-        $("#drag-and-drop-info").append(geti18n("component.wcms.navigation.fileBrowser.dragDropInfo"));
-        $("#add-folder").append(geti18n("component.wcms.navigation.fileBrowser.addFolder"));
-        $("#delete-folder").append(geti18n("component.wcms.navigation.fileBrowser.deleteFolder"));
-        getFolders();
-      });
-    },
-
-    uploadFiles: function (files) {
-      files = [...files];
-      initializeProgress(files.length);
-      files.forEach(uploadFile);
-    }
-
-  }
-
   function showLightbox(elm) {
     loadImage($(elm).attr("data-url"));
   }
@@ -330,7 +167,7 @@ var WCMS2FileBrowser = function () {
   }
 
   function createFolder(parent, data, parentPath) {
-    var li = $("<li class='folder'><div class='folder-name'>" + data.name + "</div></li>");
+    const li = $("<li class='folder'><div class='folder-name'>" + data.name + "</div></li>");
     if (data.type == "folder") {
       $(li).prepend("<span class='glyphicon glyphicon-folder-close icon'></span>");
     }
@@ -348,7 +185,7 @@ var WCMS2FileBrowser = function () {
     }
     if (data.children != undefined && data.children.length > 0) {
       $(li).prepend("<span class='glyphicon glyphicon-plus button button-expand'></span>");
-      var ul = $("<ul class='hide-folder children'></ul>");
+      const ul = $("<ul class='hide-folder children'></ul>");
       $(li).append(ul);
       $.each(data.children, function (i, node) {
         if (node.type == "folder") {
@@ -402,7 +239,7 @@ var WCMS2FileBrowser = function () {
   }
 
   function expandFolder(node) {
-    var button = $(node).children(".button");
+    const button = $(node).children(".button");
     if (button.hasClass("button-expand")) {
       button.siblings("ul.children").removeClass("hide-folder");
       button.siblings(".icon").removeClass("glyphicon-folder-close");
@@ -425,7 +262,7 @@ var WCMS2FileBrowser = function () {
   }
 
   function changeFolder(folderPath) {
-    var folder = $("li").filter(function () {
+    const folder = $("li").filter(function () {
       return $(this).data("path") == folderPath;
     });
     $(folder).parents(".folder").each(function () {
@@ -438,23 +275,22 @@ var WCMS2FileBrowser = function () {
   }
 
   function geti18n(key) {
-    var string = i18nKeys[key];
+    let string = i18nKeys[key];
     if (string != undefined) {
-      for (i = 0; i < arguments.length - 1; i++) {
+      for (let i = 0; i < arguments.length - 1; i++) {
         string = string.replace(new RegExp('\\{' + i + '\\}', "g"), arguments[i + 1]);
       }
       return string;
-    } else {
-      return "";
     }
+    return "";
   }
 
   function getRelativePath(path) {
-    var pathArray = path.split("/");
-    var basePathArray = qpara["href"].split("/");
-    var relativePath = "";
-    var i = -1;
-    while ((basePathArray.length + i) > 0 && pathArray.indexOf(basePathArray[basePathArray.length + i]) == -1) {
+    const pathArray = path.split("/");
+    const basePathArray = qpara["href"].split("/");
+    let relativePath = "";
+    let i = -1;
+    while ((basePathArray.length + i) > 0 && pathArray.indexOf(basePathArray[basePathArray.length + i]) === -1) {
       console.log(basePathArray[basePathArray.length + i]);
       relativePath = relativePath + "../";
       i--;
@@ -466,6 +302,148 @@ var WCMS2FileBrowser = function () {
     }
     return relativePath;
   }
+
+  return {
+    init: function () {
+      const $body = $("body");
+      const $aktiv = $(".aktiv");
+
+      $body.on("click", ".button-expand", function () {
+        expandFolder($(this).closest(".folder"));
+      });
+
+      $body.on("click", ".button-contract", function () {
+        $(this).siblings("ul.children").addClass("hide-folder");
+        $(this).siblings(".icon").removeClass("glyphicon-folder-open");
+        $(this).siblings(".icon").addClass("glyphicon-folder-close");
+        $(this).removeClass("button-contract glyphicon-minus");
+        $(this).addClass("button-expand glyphicon-plus");
+
+      });
+
+      $body.on("click", ".folder-name, .folder > span.icon", function () {
+        if (!$(this).parent().hasClass("edit")) {
+          changeFolder($(this).parent().data("path"));
+        }
+      });
+
+      $body.on("click", ".file-image-cotainer", function () {
+        if (type === "images") {
+          window.callback(getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());
+        } else {
+          window.callback(baseHref + getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());
+        }
+        window.close();
+      });
+
+      ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+        dropArea.addEventListener(eventName, (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }, false)
+      });
+      ["dragenter", "dragover"].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+          dropArea.classList.add("highlight")
+        }, false)
+      });
+      ["dragleave", "drop"].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+          dropArea.classList.remove("highlight")
+        }, false)
+      });
+      dropArea.addEventListener("drop", (e) => {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        this.uploadFiles(files);
+      }, false)
+
+      $body.on("mouseenter", ".file", function () {
+        $(this).find(".wcms2-image-button").removeClass("hidden");
+      });
+
+      $body.on("mouseleave", ".file", function () {
+        $(this).find(".wcms2-image-button").addClass("hidden");
+      });
+
+      $body.on("click", ".button-remove", function () {
+        const parent = $(this).parent();
+        if (confirm(geti18n("component.wcms.navigation.fileBrowser.confirmDeleteFile", parent.find("h5").html()))) {
+          deleteFile(currentPath + "/" + parent.find(".file-title").html());
+        }
+      });
+
+      $body.on("click", "#add-folder", function () {
+        if ($aktiv.data("allowed")) {
+          expandFolder($aktiv);
+          if (!$aktiv.children("ul.children").length) {
+            $aktiv.append("<ul class='children'></ul>");
+            $aktiv.children(".no-button").remove();
+            $aktiv.prepend("<span class='glyphicon glyphicon-minus button button-contract'></span>");
+            $aktiv.children(".icon").addClass("glyphicon-folder-open");
+            $aktiv.children(".icon").removeClass("glyphicon-folder-close");
+          }
+          const li = $("<li class='folder edit'><div class='folder-name'><input class='add-folder-input' type='text'></div></li>");
+          $(li).prepend("<span class='glyphicon glyphicon-folder-close icon'></span>");
+          $(li).prepend("<div class='no-button'>&nbsp;</div>");
+          $(li).data("allowed", true);
+          $aktiv.children("ul.children").append(li);
+          $(li).find("input.add-folder-input").focus();
+        } else {
+          alert(geti18n("component.wcms.navigation.fileBrowser.invalidCreateFolder"))
+        }
+      });
+
+      $body.on("keydown", ".add-folder-input", function (key) {
+        if (key.which === 13 && $(this).val() !== "") {
+          addFolder(currentPath + "/" + $(this).val(), $(this).parents(".folder")[0]);
+        }
+        if (key.which === 27) {
+          removeFolder($(this).closest(".folder"));
+        }
+      });
+
+      $body.on("click", "#delete-folder", function () {
+        if ($aktiv.data("allowed")) {
+          if (confirm(geti18n("component.wcms.navigation.fileBrowser.confirmDeleteFolder", $aktiv.find(".folder-name").html()))) {
+            deleteFolder(currentPath, $aktiv);
+          }
+        } else {
+          alert(geti18n("component.wcms.navigation.fileBrowser.invalidDeleteFolder"));
+        }
+      });
+
+      $body.on("click", ".wcms2-lightbox", function (evt) {
+        evt.preventDefault();
+        showLightbox($(this));
+      });
+
+      $body.on("click", "#wcms2-lightbox-close", function () {
+        hideLightbox();
+      });
+
+      readQueryParameter();
+      currentPath = qpara["href"] != undefined ? qpara["href"] : "";
+      type = qpara["type"] != undefined ? qpara["type"] : "files";
+      baseHref = qpara["basehref"] != undefined ? qpara["basehref"] : "";
+      jQuery.getJSON("../../rsc/locale/translate/" + qpara["langCode"] + "/component.wcms.navigation.fileBrowser.*", function (data) {
+        i18nKeys = data;
+        $("#folder-label").html(geti18n("component.wcms.navigation.fileBrowser.folder"));
+        $("#drag-and-drop-info").append(geti18n("component.wcms.navigation.fileBrowser.dragDropInfo"));
+        $("#add-folder").append(geti18n("component.wcms.navigation.fileBrowser.addFolder"));
+        $("#delete-folder").append(geti18n("component.wcms.navigation.fileBrowser.deleteFolder"));
+        getFolders();
+      });
+    },
+
+    uploadFiles: function (files) {
+      files = [...files];
+      initializeProgress(files.length);
+      files.forEach(uploadFile);
+    }
+
+  }
+
 }
 
 $(document).ready(function () {
