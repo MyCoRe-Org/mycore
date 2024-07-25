@@ -21,7 +21,6 @@ package org.mycore.restapi.v1;
 import java.util.Properties;
 
 import org.mycore.common.MCRCoreVersion;
-import org.mycore.frontend.jersey.MCRStaticContent;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -29,7 +28,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/mycore")
-@MCRStaticContent
 public class MCRInfo {
 
     @GET
