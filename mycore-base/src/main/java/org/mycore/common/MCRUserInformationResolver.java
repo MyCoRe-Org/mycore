@@ -18,14 +18,17 @@
 
 package org.mycore.common;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRSentinel;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRInstanceMap;
 
 /**
  * A {@link MCRUserInformationResolver} can be used to obtain {@link MCRUserInformation}, without knowledge
@@ -42,20 +45,25 @@ import org.mycore.common.config.annotation.MCRInstanceMap;
  * The following configuration options are available, if configured automatically:
  * <ul>
  * <li> Providers are configured as a map using the property suffix {@link MCRUserInformationResolver#PROVIDERS_KEY}.
+ * <li> Each resolver can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
  * </ul>
  * Example:
  * <pre>
  * MCR.UserInformation.Resolver.Class=org.mycore.common.MCRUserInformationResolver
  * MCR.UserInformation.Resolver.Providers.foo.Class=foo.bar.FooProvider
+ * MCR.UserInformation.Resolver.Providers.foo.Enabled=true
  * MCR.UserInformation.Resolver.Providers.foo.Key1=Value1
  * MCR.UserInformation.Resolver.Providers.foo.Key2=Value2
  * MCR.UserInformation.Resolver.Providers.bar.Class=foo.bar.BarProvider
+ * MCR.UserInformation.Resolver.Providers.bar.Enabled=false
  * MCR.UserInformation.Resolver.Providers.bar.Key1=Value1
  * MCR.UserInformation.Resolver.Providers.bar.Key2=Value2
  * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRUserInformationResolver.Factory.class)
 public final class MCRUserInformationResolver {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRUserInformationResolver INSTANCE = instantiate();
 
@@ -66,8 +74,12 @@ public final class MCRUserInformationResolver {
     private final Map<String, MCRUserInformationProvider> providers;
 
     public MCRUserInformationResolver(Map<String, MCRUserInformationProvider> providers) {
+
         this.providers = Objects.requireNonNull(providers, "Providers must not be null");
         this.providers.values().forEach(provider -> Objects.requireNonNull(provider, "Provider must not be null"));
+
+        LOGGER.info("Working with providers: " + String.join(", ", providers.keySet()));
+
     }
 
     public static MCRUserInformationResolver instance() {
@@ -124,7 +136,7 @@ public final class MCRUserInformationResolver {
 
     public static class Factory implements Supplier<MCRUserInformationResolver> {
 
-        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRUserInformationProvider.class)
+        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRUserInformationProvider.class, sentinel = @MCRSentinel)
         public Map<String, MCRUserInformationProvider> providers;
 
         @Override
