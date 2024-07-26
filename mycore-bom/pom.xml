@@ -32,22 +32,29 @@
   <name>MyCoRe Bill of Materials (BOM)</name>
 
   <properties>
-    <grizzly.version>4.0.0</grizzly.version>
+    <grizzly.version>4.0.2</grizzly.version>
     <hamcrest.version>2.2</hamcrest.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
-    <hk2.version>3.0.4</hk2.version>
-    <jakarta.activation.version>2.1.2</jakarta.activation.version>
-    <jakarta.mail.version>2.1.2</jakarta.mail.version>
-    <jaxb.version>4.0.3</jaxb.version>
+    <hk2.version>3.1.1</hk2.version>
+    <httpclient.version>5.3.1</httpclient.version>
+    <httpclient4.version>4.5.14</httpclient4.version>
+    <httpcore.version>5.2.5</httpcore.version>
+    <jackson.version>2.17.2</jackson.version>
+    <jakarta.activation.version>2.1.3</jakarta.activation.version>
+    <jakarta.mail.version>2.1.3</jakarta.mail.version>
+    <jaxb.version>4.0.5</jaxb.version>
     <jersey.version>3.1.7</jersey.version>
+    <!-- jetty 11.x is required for SOLR -->
+    <jetty.version>11.0.22</jetty.version>
+    <junit.version>5.10.3</junit.version>
     <!-- defined in parent POM: -->
     <!-- <log4j.version>2.19.0</log4j.version> -->
-    <neo4j.version>5.6.0</neo4j.version>
+    <neo4j.version>5.22.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
-    <ocfl-java.version>2.1.0</ocfl-java.version>
-    <rdf4j.version>4.3.6</rdf4j.version>
+    <ocfl-java.version>2.2.1</ocfl-java.version>
+    <rdf4j.version>5.0.1</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
-    <verapdf.version>1.24.2</verapdf.version>
+    <verapdf.version>1.26.1</verapdf.version>
     <vis-network.version>9.1.2</vis-network.version>
     <xalan.version>2.7.3</xalan.version>
     <xsonify.version>1.0</xsonify.version>
@@ -56,37 +63,9 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
-        <artifactId>jackson-bom</artifactId>
-        <version>2.17.1</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents.client5</groupId>
-        <artifactId>httpclient5-parent</artifactId>
-        <version>5.3.1</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
         <version>${log4j.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-bom</artifactId>
-        <version>11.0.22</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.rdf4j</groupId>
-        <artifactId>rdf4j-bom</artifactId>
-        <version>${rdf4j.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -100,7 +79,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.10.0</version>
+        <version>5.10.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -120,6 +99,36 @@
         <version>9.2.1</version>
       </dependency>
       <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+        <artifactId>jackson-jakarta-rs-base</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+        <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.closure-stylesheets</groupId>
         <artifactId>closure-stylesheets</artifactId>
         <version>1.5.0</version>
@@ -133,32 +142,32 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.10.1</version>
+        <version>2.11.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>32.1.2-jre</version>
+        <version>33.2.1-jre</version>
       </dependency>
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.24.3</version>
+        <version>3.25.3</version>
       </dependency>
       <dependency>
         <groupId>com.google.zxing</groupId>
         <artifactId>core</artifactId>
-        <version>3.5.2</version>
+        <version>3.5.3</version>
       </dependency>
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>73.2</version>
+        <version>75.1</version>
       </dependency>
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>html2pdf</artifactId>
-        <version>5.0.1</version>
+        <version>5.0.5</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -173,7 +182,7 @@
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>kernel</artifactId>
-        <version>8.0.1</version>
+        <version>8.0.5</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -188,7 +197,7 @@
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>layout</artifactId>
-        <version>8.0.1</version>
+        <version>8.0.5</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -224,17 +233,17 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.13.0</version>
+        <version>2.16.1</version>
       </dependency>
       <dependency>
         <groupId>de.larsgrefer.sass</groupId>
         <artifactId>sass-embedded-host</artifactId>
-        <version>3.2.0</version>
+        <version>3.6.0</version>
       </dependency>
       <dependency>
         <groupId>de.larsgrefer.sass</groupId>
         <artifactId>sass-embedded-protocol</artifactId>
-        <version>3.2.0</version>
+        <version>3.6.0</version>
       </dependency>
       <dependency>
         <groupId>de.undercouch</groupId>
@@ -244,12 +253,12 @@
       <dependency>
         <groupId>io.bit3</groupId>
         <artifactId>jsass</artifactId>
-        <version>5.10.5</version>
+        <version>5.11.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.classgraph</groupId>
         <artifactId>classgraph</artifactId>
-        <version>4.8.165</version>
+        <version>4.8.174</version>
       </dependency>
       <dependency>
         <groupId>io.ocfl</groupId>
@@ -296,7 +305,7 @@
       <dependency>
         <groupId>jakarta.annotation</groupId>
         <artifactId>jakarta.annotation-api</artifactId>
-        <version>2.1.1</version>
+        <version>3.0.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.inject</groupId>
@@ -316,27 +325,27 @@
       <dependency>
         <groupId>jakarta.validation</groupId>
         <artifactId>jakarta.validation-api</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.websocket</groupId>
         <artifactId>jakarta.websocket-api</artifactId>
-        <version>2.1.1</version>
+        <version>2.2.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.websocket</groupId>
         <artifactId>jakarta.websocket-client-api</artifactId>
-        <version>2.1.1</version>
+        <version>2.2.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.ws.rs</groupId>
         <artifactId>jakarta.ws.rs-api</artifactId>
-        <version>3.1.0</version>
+        <version>4.0.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.2</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
@@ -386,17 +395,47 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.26.0</version>
+        <version>1.26.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.13.0</version>
+        <version>3.15.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-text</artifactId>
-        <version>1.10.0</version>
+        <version>1.12.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5</artifactId>
+        <version>${httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5-cache</artifactId>
+        <version>${httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5-fluent</artifactId>
+        <version>${httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents.core5</groupId>
+        <artifactId>httpcore5</artifactId>
+        <version>${httpcore.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents.core5</groupId>
+        <artifactId>httpcore5-h2</artifactId>
+        <version>${httpcore.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents.core5</groupId>
+        <artifactId>httpcore5-reactive</artifactId>
+        <version>${httpcore.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
@@ -433,15 +472,6 @@
           <exclusion>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>stax2-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <!-- if required use https://github.com/FasterXML/woodstox -->
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
           <exclusion>
             <groupId>io.netty</groupId>
@@ -527,6 +557,57 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>http2-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>http2-http-client-transport</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-rio-api</artifactId>
+        <version>${rdf4j.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-rio-jsonld</artifactId>
+        <version>${rdf4j.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-rio-rdfxml</artifactId>
+        <version>${rdf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-rio-turtle</artifactId>
+        <version>${rdf4j.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.glassfish.hk2</groupId>
         <artifactId>hk2-api</artifactId>
         <version>${hk2.version}</version>
@@ -588,7 +669,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.16.1</version>
+        <version>1.18.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -864,7 +945,7 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.7.2</version>
+        <version>42.7.3</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
@@ -942,7 +1023,7 @@
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>4.7.3</version>
+        <version>4.8.6</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -972,7 +1053,7 @@
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.5.1</version>
+        <version>7.0.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -983,17 +1064,16 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <!-- jna 5.7.0 - 5.11.0 do not work with M1 macs and SVNKit -->
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.13.0</version>
+        <version>5.14.0</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
-        <version>12.3</version>
+        <version>12.5</version>
         <scope>runtime</scope>
         <exclusions>
           <exclusion>
@@ -1031,9 +1111,28 @@
         </exclusions>
       </dependency>
       <dependency>
+        <!-- required due to import in class of solrj:
+        org.apache.solr.common.util.Utils 🤦
+        -->
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${httpclient4.version}</version>
+        <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>fontbox</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
         <scope>runtime</scope>
         <exclusions>
           <exclusion>
@@ -1063,19 +1162,19 @@
       <dependency>
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>stax2-api</artifactId>
-        <version>4.2.1</version>
+        <version>4.2.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.angus</groupId>
         <artifactId>angus-activation</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.angus</groupId>
         <artifactId>angus-mail</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.3</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1087,7 +1186,7 @@
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.29.2-GA</version>
+        <version>3.30.2-GA</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1105,7 +1204,7 @@
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>2.2.224</version>
+        <version>2.3.230</version>
         <scope>test</scope>
       </dependency>
       <dependency>
