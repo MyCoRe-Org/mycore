@@ -60,11 +60,6 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-classifications</artifactId>
-        <version>1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
         <artifactId>mycore-coma</artifactId>
         <version>${project.version}</version>
       </dependency>
