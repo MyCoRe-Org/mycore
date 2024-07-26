@@ -268,7 +268,7 @@ public class MCRDNBURNRestClient {
 
     public static void logFailure(String json, ClassicHttpResponse response, int postStatus, String identifier,
         URL url) {
-        logFailure(json, response, postStatus, identifier, url.toString());
+        logFailure(json, response, postStatus, identifier, url == null ? null : url.toString());
     }
 
     public static void logFailure(String json, ClassicHttpResponse response, int status, String identifier,

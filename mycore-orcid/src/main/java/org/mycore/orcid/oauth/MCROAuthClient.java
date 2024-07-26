@@ -19,17 +19,19 @@
 package org.mycore.orcid.oauth;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.digest.MCRMD5Digest;
+import org.mycore.services.http.MCRQueryParameter;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -107,28 +109,27 @@ public class MCROAuthClient {
      * @param scopes the scope(s) to request permission for, if multiple separate by blanks
      */
     String getCodeRequestURL(String redirectURL, String scopes) throws URISyntaxException, MalformedURLException {
-        URIBuilder builder = new URIBuilder(baseURL + "/authorize");
-        builder.addParameter("client_id", clientID);
-        builder.addParameter("response_type", "code");
-        builder.addParameter("redirect_uri", redirectURL);
-        builder.addParameter("scope", scopes.trim());
-        builder.addParameter("state", buildStateParam());
-        builder.addParameter("prompt", "login");
+        List<MCRQueryParameter> parameters = new ArrayList<>();
+        parameters.add(new MCRQueryParameter("client_id", clientID));
+        parameters.add(new MCRQueryParameter("response_type", "code"));
+        parameters.add(new MCRQueryParameter("redirect_uri", redirectURL));
+        parameters.add(new MCRQueryParameter("scope", scopes.trim()));
+        parameters.add(new MCRQueryParameter("state", buildStateParam()));
+        parameters.add(new MCRQueryParameter("prompt", "login"));
 
         // check if current lang is supported
         List<String> supportedLanguages = Arrays
             .asList(MCRConfiguration2.getStringOrThrow("MCR.ORCID.SupportedLanguages").split(",", 0));
         if (supportedLanguages.contains(MCRSessionMgr.getCurrentSession().getCurrentLanguage())) {
-            builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+            parameters.add(new MCRQueryParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage()));
         } else {
-            builder.addParameter("lang", "en");
+            parameters.add(new MCRQueryParameter("lang", "en"));
         }
 
         if (MCRConfiguration2.getOrThrow("MCR.ORCID.PreFillRegistrationForm", Boolean::parseBoolean)) {
-            preFillRegistrationForm(builder);
+            preFillRegistrationForm(parameters);
         }
-
-        return builder.build().toURL().toExternalForm();
+        return new URI(baseURL + "/authorize" + MCRQueryParameter.toQueryString(parameters)).toString();
     }
 
     /**
@@ -141,11 +142,11 @@ public class MCROAuthClient {
      *
      * See https://members.orcid.org/api/resources/customize
      */
-    private void preFillRegistrationForm(URIBuilder builder) {
+    private void preFillRegistrationForm(List<MCRQueryParameter> parameters) {
         MCRUser user = MCRUserManager.getCurrentUser();
         String eMail = user.getEMailAddress();
         if (eMail != null) {
-            builder.addParameter("email", eMail);
+            parameters.add(new MCRQueryParameter("email", eMail));
         }
 
         String name = user.getRealName();
@@ -167,10 +168,10 @@ public class MCROAuthClient {
         }
 
         if (firstName != null) {
-            builder.addParameter("given_names", firstName);
+            parameters.add(new MCRQueryParameter("given_names", firstName));
         }
         if (lastName != null) {
-            builder.addParameter("family_names", lastName);
+            parameters.add(new MCRQueryParameter("family_names", lastName));
         }
     }
 

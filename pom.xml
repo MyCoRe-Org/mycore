@@ -70,7 +70,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>7.3.0</pmd.version>
     <site.suffix />
-    <swagger.version>2.2.16</swagger.version>
+    <swagger.version>2.2.22</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <yarn.install.args>--mutex network</yarn.install.args>
   </properties>
