@@ -54,9 +54,9 @@ public class MCRSolrCore {
     public static final int DEFAULT_SHARD_COUNT = 1;
 
     private static boolean USE_CONCURRENT_SERVER = MCRConfiguration2
-        .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled", Boolean::parseBoolean);;
+        .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled", Boolean::parseBoolean);
     private static boolean USE_JETTY_HTTP_CLIENT = MCRConfiguration2
-        .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.JettyHttpClient.Enabled", Boolean::parseBoolean);;
+        .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.JettyHttpClient.Enabled", Boolean::parseBoolean);
 
     protected String serverURL;
 
