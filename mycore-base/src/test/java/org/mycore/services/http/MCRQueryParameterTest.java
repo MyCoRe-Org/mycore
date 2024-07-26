@@ -41,7 +41,6 @@ class MCRQueryParameterTest {
     @Test
     public void testToEncodedString() {
         assertEquals("name=value", new MCRQueryParameter("name", "value").toEncodedString());
-        String expected2 = "name=%3D%26";
         assertEquals("name=%3D%26", new MCRQueryParameter("name", "=&").toEncodedString());
         //UTF-8 encoding test:
         assertEquals("name=%C3%BC", new MCRQueryParameter("name", "ü").toEncodedString());
