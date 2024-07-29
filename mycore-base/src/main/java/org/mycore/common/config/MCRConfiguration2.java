@@ -182,7 +182,7 @@ public class MCRConfiguration2 {
         return MCRConfiguration2.<T>getSingleInstanceOf(name)
             .or(() -> Optional.ofNullable(alternative)
                 .map(className -> new ConfigSingletonKey(name, className.getName()))
-                .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
+                .map(key -> (T) instanceHolder.computeIfAbsent(key,
                     (k) -> MCRConfigurableInstanceHelper.getInstance(MCRInstanceConfiguration.ofClass(alternative)))));
     }
 
@@ -331,13 +331,15 @@ public class MCRConfiguration2 {
         return getSubPropertiesMap(prefix).entrySet()
             .stream()
             .filter(es -> {
+                boolean result;
                 String s = es.getKey();
                 if (!s.contains(".")) {
-                    return true;
+                    result= true;
+                }else{
+                    result= (s.endsWith(".class") || s.endsWith(".Class")) &&
+                        !s.substring(0, s.length() - ".class".length()).contains(".");
                 }
-
-                return (s.endsWith(".class") || s.endsWith(".Class")) &&
-                    !s.substring(0, s.length() - ".class".length()).contains(".");
+                return result;
             })
             .filter(es -> es.getValue() != null)
             .filter(es -> !es.getValue().isBlank())

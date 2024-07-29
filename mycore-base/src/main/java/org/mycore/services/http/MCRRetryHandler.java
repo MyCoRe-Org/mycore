@@ -42,23 +42,17 @@ class MCRRetryHandler implements HttpRequestRetryHandler {
 
     @Override
     public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-        if (executionCount >= maxExecutionCount) {
-            // Do not retry if over max retry count
-            return false;
+        boolean result;
+       // Do not retry if over max retry count,Unknown host
+        if (executionCount >= maxExecutionCount||exception instanceof UnknownHostException) {
+            result= false;
+       // Timeout, Connection refused
+        } else if(exception instanceof InterruptedIOException||exception instanceof ConnectException){
+            result= true;
+        }else{
+            result= !(exception instanceof SSLException);
         }
-        if (exception instanceof InterruptedIOException) {
-            // Timeout
-            return true;
-        }
-        if (exception instanceof UnknownHostException) {
-            // Unknown host
-            return false;
-        }
-        if (exception instanceof ConnectException) {
-            // Connection refused
-            return true;
-        }
-        return !(exception instanceof SSLException);
+        return result;
     }
 
 }

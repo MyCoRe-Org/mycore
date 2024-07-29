@@ -403,10 +403,13 @@ public class MCRServlet extends HttpServlet {
 
     private static boolean isBrokenPipe(Throwable throwable) {
         String message = throwable.getMessage();
+        boolean result;
         if (message != null && throwable instanceof IOException && message.contains("Broken pipe")) {
-            return true;
+            result= true;
+        }else {
+            result = throwable.getCause() != null && isBrokenPipe(throwable.getCause());
         }
-        return throwable.getCause() != null && isBrokenPipe(throwable.getCause());
+        return result;
     }
 
     private void configureSession(MCRServletJob job) {

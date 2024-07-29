@@ -30,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 
 import com.google.common.cache.CacheBuilder;
@@ -175,11 +174,14 @@ public class MCRJPARuleStore extends MCRRuleStore {
      * @return boolean value
      */
     @Override
-    public boolean existsRule(String ruleid) throws MCRException {
+    public boolean existsRule(String ruleid) {
+        boolean result;
         if (ruleCache.getIfPresent(ruleid) != null) {
-            return true;
+            result = true;
+        } else {
+            result = MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESSRULE.class, ruleid) != null;
         }
-        return MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESSRULE.class, ruleid) != null;
+        return result;
     }
 
     @Override

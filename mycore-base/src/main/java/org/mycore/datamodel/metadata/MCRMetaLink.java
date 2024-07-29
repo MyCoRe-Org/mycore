@@ -251,27 +251,25 @@ public class MCRMetaLink extends MCRMetaDefault {
         return Objects.hash(super.hashCode(), from, href, label, linktype, role, title, to);
     }
 
+
     @Override
     public boolean equals(Object obj) {
-        if (!super.equals(obj)) {
-            return false;
-        }
+        boolean result;
+        if (this == obj) {
+            result= true;
+        }else if (!super.equals(obj) || getClass() != obj.getClass()) {
+            result= false;
+        }else{
         MCRMetaLink other = (MCRMetaLink) obj;
-        if (!Objects.equals(from, other.from)) {
-            return false;
-        } else if (!Objects.equals(href, other.href)) {
-            return false;
-        } else if (!Objects.equals(label, other.label)) {
-            return false;
-        } else if (!Objects.equals(linktype, other.linktype)) {
-            return false;
-        } else if (!Objects.equals(role, other.role)) {
-            return false;
-        } else if (!Objects.equals(title, other.title)) {
-            return false;
-        } else {
-            return Objects.equals(to, other.to);
+        result= Objects.equals(from, other.from) &&
+                Objects.equals(href, other.href) &&
+                Objects.equals(label, other.label) &&
+                Objects.equals(linktype, other.linktype) &&
+                Objects.equals(role, other.role) &&
+                Objects.equals(title, other.title) &&
+                Objects.equals(to, other.to);
         }
+        return result;
     }
 
     /**

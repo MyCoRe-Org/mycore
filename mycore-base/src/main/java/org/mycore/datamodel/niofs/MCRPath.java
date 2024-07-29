@@ -262,16 +262,13 @@ public abstract class MCRPath implements Path {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
+        boolean result;
+        if (!(obj instanceof MCRPath that) || !getFileSystem().equals(that.getFileSystem())) {
+            result= false;
+        } else {
+            result= stringValue.equals(that.stringValue);
         }
-        if (!(obj instanceof MCRPath that)) {
-            return false;
-        }
-        if (!getFileSystem().equals(that.getFileSystem())) {
-            return false;
-        }
-        return stringValue.equals(that.stringValue);
+        return result;
     }
 
     /* (non-Javadoc)

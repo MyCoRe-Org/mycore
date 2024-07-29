@@ -70,13 +70,15 @@ public class MCRIPAddress {
     }
 
     public boolean contains(MCRIPAddress other) {
-        if (address.length != other.address.length) {
-            return false;
+        boolean result=false;
+        if (address.length == other.address.length) {
+            result = IntStream.range(0, address.length)
+                    .noneMatch(t -> (address[t] & mask[t]) != (other.address[t] & mask[t]));
         }
 
-        return IntStream.range(0, address.length)
-            .noneMatch(t -> (address[t] & mask[t]) != (other.address[t] & mask[t]));
+        return result;
     }
+
 
     public byte[] getAddress() {
         return address;
