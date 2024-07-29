@@ -485,7 +485,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             categoryDAO.repairLeftRightValue(classID);
         } else {
             LOGGER.error("Command not compatible with {}", DAO.getClass().getName());
-            return;
         }
     }
 
