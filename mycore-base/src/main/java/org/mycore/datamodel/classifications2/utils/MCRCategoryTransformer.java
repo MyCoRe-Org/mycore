@@ -261,11 +261,20 @@ public class MCRCategoryTransformer {
         void addLabel(Element item, MCRLabel label, MCRCategory cat) {
             Element le = new Element("label");
             item.addContent(le);
+            boolean format = true;
             if (label.getLang() != null && label.getLang().length() > 0) {
                 le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
+                if(label.getLang().startsWith("x-")) {
+                    format = false;
+                }
             }
 
             String labtext = label.getText() != null ? label.getText() : "";
+
+            if (!format) {
+                le.setText(labtext);
+                return;
+            }
 
             String text;
             try {
@@ -290,7 +299,9 @@ public class MCRCategoryTransformer {
             }
 
             Element desc = new Element("description");
-            desc.setAttribute("lang", label.getLang(), XML_NAMESPACE);
+            if (label.getLang() != null && label.getLang().length() > 0) {
+                desc.setAttribute("lang", label.getLang(), XML_NAMESPACE);
+            }
             desc.setText(label.getDescription());
             item.addContent(desc);
         }
