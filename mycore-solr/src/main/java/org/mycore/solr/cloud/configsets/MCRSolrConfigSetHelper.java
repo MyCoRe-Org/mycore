@@ -37,8 +37,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Provides helper methods for working with Solr configuration sets.
@@ -81,7 +81,7 @@ public class MCRSolrConfigSetHelper {
             try {
                 Object cs = supplier.call();
                 if (cs instanceof MCRSolrConfigSetProvider configSet) {
-                    configSets.put(name.substring(CONFIG_SET_PROPERTY_PREFIX.length()), configSet);
+                    configSets.put(name, configSet);
                 } else {
                     throw new MCRConfigurationException("Invalid config set instance " + name);
                 }
