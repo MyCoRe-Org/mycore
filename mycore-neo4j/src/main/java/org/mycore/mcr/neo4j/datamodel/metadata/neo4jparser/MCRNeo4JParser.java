@@ -187,7 +187,8 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
                     MCRNeo4JAbstractDataModelParser clazz = parserMap.get(classAttribute.getValue());
                     if (null == clazz) {
-                        LOGGER.error("Could not find Neo4J parser for metadata of type {}. Skipping", classAttribute.getValue());
+                        LOGGER.error("Could not find Neo4J parser for metadata of type {}. Skipping",
+                            classAttribute.getValue());
                         continue;
                     }
 
