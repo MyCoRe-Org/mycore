@@ -96,7 +96,7 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
 
 
     public MCRArgon2Strategy(int saltSizeBytes, int hashSizeBytes,
-                             int parallelism, int memoryLimitKilobytes, int iterations) {
+        int parallelism, int memoryLimitKilobytes, int iterations) {
         if (saltSizeBytes < 1) {
             throw new IllegalArgumentException("Salt size [bytes] must be positive, got " + saltSizeBytes);
         }

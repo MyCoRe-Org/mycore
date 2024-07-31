@@ -89,8 +89,7 @@ public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
     private final int cost;
 
 
-    public MCRSCryptStrategy(int saltSizeBytes, int hashSizeBytes,
-                             int parallelism, int blockSize, int cost) {
+    public MCRSCryptStrategy(int saltSizeBytes, int hashSizeBytes, int parallelism, int blockSize, int cost) {
         if (saltSizeBytes < 1) {
             throw new IllegalArgumentException("Salt size [bytes] must be positive, got " + saltSizeBytes);
         }
