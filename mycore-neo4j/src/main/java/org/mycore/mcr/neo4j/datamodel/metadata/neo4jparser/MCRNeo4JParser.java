@@ -186,6 +186,11 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
                     LOGGER.info("parse: {}", classAttribute.getValue());
 
                     MCRNeo4JAbstractDataModelParser clazz = parserMap.get(classAttribute.getValue());
+                    if (null == clazz) {
+                        LOGGER.error("Could not find Neo4J parser for metadata of type {}. Skipping", classAttribute.getValue());
+                        continue;
+                    }
+
                     for (Element elm : elms) {
                         // should only one elm in elms
                         List<Neo4JRelation> relations = clazz.parse(elm, id);
