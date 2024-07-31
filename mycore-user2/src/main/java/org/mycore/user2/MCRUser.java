@@ -331,6 +331,14 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
+     * @param hashType the hashType to set
+     */
+    @Deprecated
+    public void setHashType(MCRPasswordHashType hashType) {
+        setPassword(hashType.name());
+    }
+
+    /**
      * Returns the user that owns this user, or null
      * if the user is independent and has no owner.
      *

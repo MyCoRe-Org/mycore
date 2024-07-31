@@ -626,7 +626,7 @@ public class MCRUserManager {
      * Returns a {@link MCRUser} instance if the login succeeds.
      * This method will return <code>null</code> if the user does not exist, no password was given or
      * the login is disabled.
-     * If the {@link MCRUser#getHashType()} is nt the currently preferred hash type, the stored password hash is
+     * If the {@link MCRUser#getHashType()} is not the currently preferred hash type, the stored password hash is
      * automatically updated.
      * @param userName Name of the user to login.
      * @param password clear text password.
