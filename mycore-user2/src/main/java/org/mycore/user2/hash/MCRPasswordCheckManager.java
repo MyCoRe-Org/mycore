@@ -31,6 +31,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -91,6 +92,8 @@ public final class MCRPasswordCheckManager {
 
     private static final MCRPasswordCheckManager INSTANCE = instantiate();
 
+    private static final String DATA_DIRECTORY_NAME = "passwordCheckStrategies";
+
     public static final String MANAGER_PROPERTY = "MCR.User.PasswordCheck";
 
     public static final String STRATEGIES_KEY = "Strategies";
@@ -122,7 +125,7 @@ public final class MCRPasswordCheckManager {
             checkSelectedStrategyIsNotOutdated(selectedStrategyType, selectedStrategy);
         }
         if (configurationChecks.contains(ConfigurationCheck.INCOMPATIBLE_CHANGE)) {
-            checkIncompatibleConfigurationChange(strategies);
+            checkConfigurationHasNoIncompatibleChange(strategies);
         }
     }
 
@@ -138,71 +141,88 @@ public final class MCRPasswordCheckManager {
 
     }
 
-    private void checkIncompatibleConfigurationChange(Map<String, MCRPasswordCheckStrategy> strategies) {
+    private void checkConfigurationHasNoIncompatibleChange(Map<String, MCRPasswordCheckStrategy> strategies) {
 
         for (Map.Entry<String, MCRPasswordCheckStrategy> entry : strategies.entrySet()) {
 
             String type = entry.getKey();
-            InvariableConfiguration newConfiguration = toInvariableConfiguration(entry.getValue());
-            InvariableConfiguration oldConfiguration = loadInvariableConfigurationString(type);
+            Optional<UnmodifiableConfiguration> oldConfiguration = loadUnmodifiableConfiguration(type);
+            UnmodifiableConfiguration newConfiguration = toUnmodifiableConfiguration(entry.getValue());
 
-            if (oldConfiguration != null) {
-
-                if (!oldConfiguration.className().equals(newConfiguration.className())) {
-                    throw new MCRConfigurationException("Detected incompatible implementation change for password " +
-                        "check strategy " + type + " that will prevent existing password hashes from being " +
-                        "successfully verified, even if the correct password was supplied, got " +
-                        newConfiguration.className() + ", expected " + oldConfiguration.className());
-                }
-
-                if (!oldConfiguration.value().equals(newConfiguration.value())) {
-                    throw new MCRConfigurationException("Detected incompatible value change for password " +
-                        "check strategy " + type + " that will prevent existing password hashes from being " +
-                        "successfully verified, even if the correct password was supplied, got " +
-                        newConfiguration.value() + ", expected " + oldConfiguration.value());
-                }
-
+            if (oldConfiguration.isPresent()) {
+                checkConfigurationHasNoIncompatibleChange(type, oldConfiguration.get(), newConfiguration);
             } else {
-                storeInvariableConfiguration(type, newConfiguration);
+                storeUnmodifiableConfiguration(type, newConfiguration);
             }
 
         }
 
     }
 
-    private InvariableConfiguration toInvariableConfiguration(MCRPasswordCheckStrategy strategy) {
-        return new InvariableConfiguration(strategy.getClass().getName(), strategy.invariableConfiguration());
-    }
+    private static Optional<UnmodifiableConfiguration> loadUnmodifiableConfiguration(String type) {
 
-    private static InvariableConfiguration loadInvariableConfigurationString(String name) {
+        String path = DATA_DIRECTORY_NAME + "/" + type;
 
-        String path = "passwordCheckStrategies/" + name;
-
+        // previously seen configuration values (those, that must not change)
+        // might have been stored for comparison as a file when a custom provider was first encountered, ...
         File file = MCRConfigurationDir.getConfigFile(path);
         if (file != null && file.exists()) {
+            if (!file.isFile() || !file.canRead()) {
+                throw new MCRException("Expected " + file.getAbsolutePath() + " to be a readable file");
+            }
             try (BufferedReader reader = new BufferedReader(new FileReader(file, UTF_8), 128)) {
-                return new InvariableConfiguration(reader.readLine(), reader.readLine());
+                return Optional.of(readUnmodifiableConfiguration(reader));
             } catch (IOException e) {
-                throw new MCRException("Unable to read from value file " + file.getAbsolutePath());
+                throw new MCRException("Unable to read file " + file.getAbsolutePath());
             }
         }
 
+        // ... or are provided as a resource in case of a built-in provider
         InputStream stream = MCRResourceHelper.getResourceAsStream(path);
         if (stream != null) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, UTF_8), 128)) {
-                return new InvariableConfiguration(reader.readLine(), reader.readLine());
+                return Optional.of(readUnmodifiableConfiguration(reader));
             } catch (IOException e) {
-                throw new MCRException("Unable to read from value resource " + path);
+                throw new MCRException("Unable to read resource " + path);
             }
         }
 
-        return null;
+        return Optional.empty();
 
     }
 
-    private static void storeInvariableConfiguration(String name, InvariableConfiguration configuration) {
+    private static UnmodifiableConfiguration readUnmodifiableConfiguration(BufferedReader reader) throws IOException {
+        String className = reader.readLine();
+        String hint = reader.readLine();
+        return new UnmodifiableConfiguration(className, hint);
+    }
 
-        String path = "passwordCheckStrategies/" + name;
+    private UnmodifiableConfiguration toUnmodifiableConfiguration(MCRPasswordCheckStrategy strategy) {
+        return new UnmodifiableConfiguration(strategy.getClass().getName(), strategy.unmodifiableConfigurationHint());
+    }
+
+    private void checkConfigurationHasNoIncompatibleChange(String type, UnmodifiableConfiguration oldConfiguration,
+                                                           UnmodifiableConfiguration newConfiguration) {
+
+        if (!oldConfiguration.className().equals(newConfiguration.className())) {
+            throw new MCRConfigurationException("Detected incompatible implementation change for password " +
+                "check strategy " + type + " that will prevent existing password hashes from being " +
+                "successfully verified, even if the correct password was supplied, got " +
+                newConfiguration.className() + ", expected " + oldConfiguration.className());
+        }
+
+        if (!oldConfiguration.hint().equals(newConfiguration.hint())) {
+            throw new MCRConfigurationException("Detected incompatible value change for password " +
+                "check strategy " + type + " that will prevent existing password hashes from being " +
+                "successfully verified, even if the correct password was supplied, got " +
+                newConfiguration.hint() + ", expected " + oldConfiguration.hint());
+        }
+
+    }
+
+    private static void storeUnmodifiableConfiguration(String name, UnmodifiableConfiguration configuration) {
+
+        String path = DATA_DIRECTORY_NAME + "/" + name;
 
         File file = MCRConfigurationDir.getConfigFile(path);
         if (file != null) {
@@ -218,7 +238,7 @@ public final class MCRPasswordCheckManager {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8), 128)) {
                 writer.write(configuration.className());
                 writer.newLine();
-                writer.write(configuration.value());
+                writer.write(configuration.hint());
                 writer.newLine();
             } catch (IOException e) {
                 throw new MCRException("Unable to write to value file " + file.getAbsolutePath());
@@ -258,7 +278,7 @@ public final class MCRPasswordCheckManager {
         return strategy;
     }
 
-    private record InvariableConfiguration(String className, String value) {
+    private record UnmodifiableConfiguration(String className, String hint) {
     }
 
     public enum ConfigurationCheck {

@@ -121,7 +121,7 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
-    public String invariableConfiguration() {
+    public String unmodifiableConfigurationHint() {
         return "p=" + parallelism + "/ml=" + memoryLimitKilobytes + "/i=" + iterations;
     }
 

@@ -67,7 +67,7 @@ public class MCRSHA512Strategy extends MCRSaltedHashPasswordCheckStrategy {
     }
 
     @Override
-    public String invariableConfiguration() {
+    public String unmodifiableConfigurationHint() {
         return "i=" + iterations;
     }
 

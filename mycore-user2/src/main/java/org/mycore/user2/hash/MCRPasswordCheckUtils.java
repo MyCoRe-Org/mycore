@@ -26,6 +26,9 @@ import javax.crypto.SecretKeyFactory;
 import org.mycore.common.config.MCRConfigurationException;
 
 public abstract class MCRPasswordCheckUtils {
+    
+    private MCRPasswordCheckUtils() {
+    }
 
     public static boolean fixedEffortEquals(String a, String b) {
         if (a == null || b == null) {

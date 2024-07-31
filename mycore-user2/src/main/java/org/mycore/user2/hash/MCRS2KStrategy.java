@@ -102,7 +102,7 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
     }
 
     @Override
-    public String invariableConfiguration() {
+    public String unmodifiableConfigurationHint() {
         return "ha=" + hashAlgorithm + "/c=" + count;
     }
 

@@ -25,7 +25,7 @@ import java.security.SecureRandom;
  */
 public interface MCRPasswordCheckStrategy {
 
-    String invariableConfiguration();
+    String unmodifiableConfigurationHint();
 
     MCRPasswordCheckData create(SecureRandom random, String type, String password);
 
