@@ -19,49 +19,62 @@
 package org.mycore.mcr.acl.accesskey.model;
 
 import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
-import jakarta.persistence.Basic;
-import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @NamedQueries({
     @NamedQuery(name = "MCRAccessKey.getWithObjectId",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.objectId = :objectId"
+            + "  WHERE k.reference = :reference"
             + "  ORDER BY k.lastModified ASC"),
+    @NamedQuery(name = "MCRAccessKey.getWithUuid",
+        query = "SELECT k"
+            + "  FROM MCRAccessKey k"
+            + "  WHERE k.uuid = :uuid"),
     @NamedQuery(name = "MCRAccessKey.getWithSecret",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.secret = :secret AND k.objectId = :objectId"),
+            + "  WHERE k.secret = :secret AND k.reference = :reference"),
     @NamedQuery(name = "MCRAccessKey.getWithType",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.type = :type AND k.objectId = :objectId"),
+            + "  WHERE k.type = :type AND k.reference = :reference"),
+    @NamedQuery(name = "MCRAccessKey.clearWithReferenceAndPermission",
+        query = "DELETE"
+            + "  FROM MCRAccessKey k"
+            + "  WHERE k.reference = :reference AND k.type = :permission"),
     @NamedQuery(name = "MCRAccessKey.clearWithObjectId",
         query = "DELETE"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.objectId = :objectId"),
+            + "  WHERE k.reference = :reference"),
     @NamedQuery(name = "MCRAccessKey.clear",
         query = "DELETE"
+            + "  FROM MCRAccessKey k"),
+    @NamedQuery(name = "MCRAccessKey.findAll",
+        query = "SELECT k"
             + "  FROM MCRAccessKey k"),
 })
 
 /**
- * Access keys for a {@link MCRObject}.
+ * Access keys for a reference.
  * An access keys contains a secret and a type.
  * Value is the key secret of the key and type the permission.
  */
@@ -70,13 +83,11 @@ import jakarta.persistence.Table;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MCRAccessKey {
 
-    private static final long serialVersionUID = 1L;
-
     /** The unique and internal information id */
-    private int id;
+    private Long id;
 
     /** The access key information */
-    private MCRObjectID objectId;
+    private String reference;
 
     /** The secret */
     private String secret;
@@ -105,7 +116,9 @@ public class MCRAccessKey {
     /** The name of the last modifier */
     private String lastModifiedBy;
 
-    protected MCRAccessKey() {
+    private UUID uuid;
+
+    public MCRAccessKey() {
     }
 
     /**
@@ -121,23 +134,85 @@ public class MCRAccessKey {
     }
 
     /**
+     * Constructs an access key with reference, permission and value.
+     *
+     * @param reference the reference
+     * @param permission the permission
+     * @param value the value
+     */
+    public MCRAccessKey(String reference, String permission, String value) {
+        setReference(reference);
+        setPermission(permission);
+        setSecret(value);
+    }
+
+    /**
      * @return the linked objectId
      */
     @JsonIgnore
-    @Column(name = "object_id",
-        length = MCRObjectID.MAX_LENGTH,
-        nullable = false)
-    @Convert(converter = MCRObjectIDConverter.class)
-    @Basic
+    @Transient
     public MCRObjectID getObjectId() {
-        return objectId;
+        if (reference != null) {
+            return MCRObjectID.getInstance(reference);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the UUID.
+     *
+     * @return the UUID or null
+     */
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    /**
+     * Sets the UUID.
+     *
+     * @param uuid the uuid to set
+     */
+    @Column(name = "uuid", nullable = false)
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    /**
+     * Sets UUID if null.
+     */
+    @PrePersist
+    @PreUpdate
+    public void autofill() {
+        if (getUuid() == null) {
+            setUuid(UUID.randomUUID());
+        }
     }
 
     /**
      * @param objectId the {@link MCRObjectID} to set
      */
     public void setObjectId(final MCRObjectID objectId) {
-        this.objectId = objectId;
+        this.reference = objectId.toString();
+    }
+
+    /**
+     * Returns the reference.
+     *
+     * @return the reference
+     */
+    @JsonIgnore
+    @Column(name = "objectId", nullable = false)
+    public String getReference() {
+        return reference;
+    }
+
+    /**
+     * Sets the reference.
+     *
+     * @param reference the reference
+     */
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
     /**
@@ -148,14 +223,14 @@ public class MCRAccessKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "accesskey_id",
         nullable = false)
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
     /**
      * @param id internal id
      */
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -176,7 +251,7 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return permission type 
+     * @return permission type
      */
     @Column(name = "type",
         nullable = false)
@@ -189,6 +264,26 @@ public class MCRAccessKey {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * Returns the permission.
+     *
+     * @return the permission
+     */
+    @JsonIgnore
+    @Transient
+    public String getPermission() {
+        return type;
+    }
+
+    /**
+     * Sets the permission.
+     *
+     * @param permission the permission
+     */
+    public void setPermission(String permission) {
+        this.type = permission;
     }
 
     /**
@@ -300,6 +395,11 @@ public class MCRAccessKey {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(id, secret, reference);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -307,7 +407,8 @@ public class MCRAccessKey {
         if (!(o instanceof MCRAccessKey other)) {
             return false;
         }
-        return this.id == other.getId() && this.type.equals(other.getType())
+        return this.id == other.getId() && this.reference.equals(other.getReference())
             && this.secret.equals(other.getSecret());
     }
+
 }
