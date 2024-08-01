@@ -37,7 +37,8 @@ public class MCRFunctionResolver implements URIResolver {
         String className = parts[1];
         String methodName = parts[2];
 
-        Object[] params = Arrays.stream(Arrays.stream(parts).skip(3).toArray(String[]::new))
+        Object[] params = Arrays.stream(parts)
+            .skip(3)
             .map(p -> URLDecoder.decode(p, StandardCharsets.UTF_8))
             .toArray(String[]::new);
 
