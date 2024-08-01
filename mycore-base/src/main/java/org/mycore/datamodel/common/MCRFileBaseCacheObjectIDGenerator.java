@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -150,8 +149,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
             writeLock.lock();
             try (
                 FileChannel channel = FileChannel.open(cacheFile, StandardOpenOption.READ, StandardOpenOption.WRITE,
-                    StandardOpenOption.SYNC);
-                FileLock fileLock = channel.lock()) {
+                    StandardOpenOption.SYNC)) {
 
                 int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
                 ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);

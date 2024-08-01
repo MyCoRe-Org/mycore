@@ -27,8 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -220,7 +218,6 @@ public class MCRLanguageFactory {
      * Reads in the language classification and builds language objects from its categories
      */
     private void readLanguageClassification() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
         if (!MCRTransactionHelper.isTransactionActive()) {
             MCRTransactionHelper.beginTransaction();
             buildLanguagesFromClassification();

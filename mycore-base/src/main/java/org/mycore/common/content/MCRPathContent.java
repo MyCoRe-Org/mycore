@@ -32,9 +32,6 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 /**
@@ -44,13 +41,10 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
  */
 public class MCRPathContent extends MCRContent implements MCRSeekableChannelContent {
 
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private Path path;
 
     private BasicFileAttributes attrs;
-
-    private static int BUFFER_SIZE = 8192;
 
     public MCRPathContent(Path path) {
         this(path, null);

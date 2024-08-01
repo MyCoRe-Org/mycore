@@ -61,6 +61,7 @@ public class MCRCommandManager {
     protected void handleInitException(Exception ex) {
         MCRCLIExceptionHandler.handleException(ex);
         System.exit(1);
+
     }
 
     public static TreeMap<String, List<MCRCommand>> getKnownCommands() {

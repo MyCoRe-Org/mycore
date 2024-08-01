@@ -52,8 +52,6 @@ public class MCRXMLParserImpl implements MCRXMLParser {
     private static final String FEATURE_FULL_SCHEMA_SUPPORT
         = "http://apache.org/xml/features/validation/schema-full-checking";
 
-    private static final String MSG = "Error while parsing XML document: ";
-
     private boolean validate;
 
     private SAXBuilder builder;

@@ -28,8 +28,6 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -93,8 +91,6 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         int numFiles = (int) files.stream().map(Part::getSubmittedFileName).filter(Objects::nonNull).count();
         LOGGER.info("UploadHandler uploading {} file(s)", numFiles);
         handler.startUpload(numFiles);
-
-        MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRTransactionHelper.commitTransaction();
 
         for (Part file : files) {

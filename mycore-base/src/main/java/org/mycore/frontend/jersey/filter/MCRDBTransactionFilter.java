@@ -18,7 +18,7 @@
 
 package org.mycore.frontend.jersey.filter;
 
-import org.mycore.common.MCRSession;
+
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 
@@ -31,7 +31,6 @@ public class MCRDBTransactionFilter implements ContainerRequestFilter, Container
 
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
         if (MCRTransactionHelper.transactionRequiresRollback()) {
             MCRTransactionHelper.rollbackTransaction();
         } else {
