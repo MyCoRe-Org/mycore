@@ -25,7 +25,6 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
 
 public class MCRRestCheckAPIAccessResolver implements URIResolver {
@@ -34,26 +33,22 @@ public class MCRRestCheckAPIAccessResolver implements URIResolver {
      * Checks permission for a given rest api path.
      *
      * Syntax: <code>checkRestAPIAccess:{path}:{permission}</code>
-     * 
+     *
      * @param href
      *            URI in the syntax above
      * @param base
      *            not used
-     * 
+     *
      * @return the root element "boolean" of the XML document with content string "true" or "false"
      * @see javax.xml.transform.URIResolver
      */
     @Override
-    public Source resolve(final String href, final String base) throws IllegalArgumentException {
+    public Source resolve(String href, String base) throws IllegalArgumentException {
         final String[] hrefParts = href.split(":");
         if (hrefParts.length == 3) {
             final String permission = hrefParts[2];
-            final MCRRestAPIACLPermission apiPermission = MCRRestAPIACLPermission.resolve(permission);
-            if (apiPermission == null) {
-                throw new IllegalArgumentException("Unknown permission: " + permission);
-            }
             final MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
-            final boolean isPermitted = MCRRestAccessManager.checkRestAPIAccess(acl, apiPermission, hrefParts[1]);
+            final boolean isPermitted = MCRRestAccessManager.checkRestAPIAccess(acl, permission, hrefParts[1]);
             final Element resultElement = new Element("boolean");
             resultElement.setText(Boolean.toString(isPermitted));
             return new JDOMSource(resultElement);

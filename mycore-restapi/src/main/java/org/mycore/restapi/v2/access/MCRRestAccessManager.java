@@ -26,19 +26,18 @@ public class MCRRestAccessManager {
 
     private static final String REST_API_OBJECT_ID = "restapi:/";
 
-    public static boolean checkRestAPIAccess(final MCRAccessInterface aclProvider,
-        final MCRRestAPIACLPermission permission, final String path) {
+    public static boolean checkRestAPIAccess(MCRAccessInterface aclProvider, String permission, String path) {
         final MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
-        final String permStr = permission.toString();
-        if (aclProvider.checkPermission(REST_API_OBJECT_ID, permStr)) {
+        if (aclProvider.checkPermission(REST_API_OBJECT_ID, permission)) {
             final String objectId = path.startsWith("/") ? REST_API_OBJECT_ID + path.substring(1)
                 : REST_API_OBJECT_ID + path;
-            if (!(acl instanceof MCRRuleAccessInterface ruleAccess) || ruleAccess.hasRule(objectId, permStr)) {
-                return aclProvider.checkPermission(objectId, permStr);
+            if (!(acl instanceof MCRRuleAccessInterface ruleAccess) || ruleAccess.hasRule(objectId, permission)) {
+                return aclProvider.checkPermission(objectId, permission);
             } else {
                 return true;
             }
         }
         return false;
     }
+
 }

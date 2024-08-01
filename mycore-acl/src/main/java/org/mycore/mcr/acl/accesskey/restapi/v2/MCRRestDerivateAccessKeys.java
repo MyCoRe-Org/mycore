@@ -24,13 +24,13 @@ import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.v2.MCRRestUtils.TAG_MYCORE_DERIVATE;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.mycore.restapi.v2.MCRRestDerivates;
-import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,7 +89,7 @@ public class MCRRestDerivateAccessKeys {
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
+    @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_WRITE)
     public Response listAccessKeysForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @DefaultValue("0") @QueryParam("offset") final int offset,
         @DefaultValue("128") @QueryParam("limit") final int limit) {
@@ -117,7 +117,7 @@ public class MCRRestDerivateAccessKeys {
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
+    @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_WRITE)
     public Response getAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @PathParam(PARAM_SECRET) final String secret,
         @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
@@ -149,7 +149,7 @@ public class MCRRestDerivateAccessKeys {
             schema = @Schema(implementation = MCRAccessKey.class)))
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
+    @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_WRITE)
     @MCRRequireTransaction
     public Response createAccessKeyForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         final String accessKeyJson) {
@@ -178,7 +178,7 @@ public class MCRRestDerivateAccessKeys {
             schema = @Schema(implementation = MCRAccessKey.class)))
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
+    @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_WRITE)
     @MCRRequireTransaction
     public Response updateAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @PathParam(PARAM_SECRET) final String encodedSecret, final String accessKeyJson,
@@ -204,7 +204,7 @@ public class MCRRestDerivateAccessKeys {
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
+    @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_WRITE)
     @MCRRequireTransaction
     public Response removeAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
         @PathParam(PARAM_SECRET) final String secret,
