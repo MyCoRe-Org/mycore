@@ -104,7 +104,8 @@ public record MCRQueryParameter(String name, String value) {
     }
 
     /**
-     * Encodes a list of parameters as a query String.
+     * Encodes a list of parameters as a query component.
+     * The returned query component String is encoded as required but does not start with the question mark ('?').
      *
      * @param parameters list of parameters
      * @return The encoded string, empty if parameters are empty
@@ -116,6 +117,6 @@ public record MCRQueryParameter(String name, String value) {
         }
         return parameters.stream()
             .map(MCRQueryParameter::toEncodedString)
-            .collect(Collectors.joining("&", "?", ""));
+            .collect(Collectors.joining("&"));
     }
 }

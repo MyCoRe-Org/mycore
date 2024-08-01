@@ -33,6 +33,7 @@ class MCRQueryParameterTest {
         parameter = MCRQueryParameter.ofEncodedString("name");
         assertEquals("name", parameter.name());
         assertEquals("", parameter.value());
+        assertEquals(parameter, MCRQueryParameter.ofEncodedString("name="));
         parameter = MCRQueryParameter.ofEncodedString("=value");
         assertEquals("", parameter.name());
         assertEquals("value", parameter.value());
@@ -71,10 +72,10 @@ class MCRQueryParameterTest {
     @Test
     public void testToQueryString() {
         List<MCRQueryParameter> parameters = List.of(
-            new MCRQueryParameter("name1", "value1"),
-            new MCRQueryParameter("name2", "value2"));
+            new MCRQueryParameter("name", "value"),
+            new MCRQueryParameter("name", "value²"));
 
-        String expected = "?name1=value1&name2=value2";
+        String expected = "name=value&name=value%C2%B2";
         assertEquals(expected, MCRQueryParameter.toQueryString(parameters));
     }
 

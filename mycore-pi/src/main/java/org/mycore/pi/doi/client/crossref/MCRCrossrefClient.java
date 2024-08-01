@@ -121,7 +121,7 @@ public class MCRCrossrefClient {
         postRequest.setEntity(reqEntity);
 
         try (CloseableHttpClient client = getHttpClient()) {
-            client.<MCRResultOrException<Object, MCRPersistentIdentifierException>>execute(postRequest, response -> {
+            client.<MCRResultOrException<Void, MCRPersistentIdentifierException>>execute(postRequest, response -> {
                 final int statusCode = response.getCode();
                 final HttpEntity entity = response.getEntity();
                 String message = "";
