@@ -62,7 +62,7 @@ public class MCRAccessKeyMapper {
     public static MCRAccessKeyDto toDto(MCRAccessKey accessKey) {
         final MCRAccessKeyDto accessKeyDto = new MCRAccessKeyDto();
         accessKeyDto.setId(accessKey.getUuid());
-        accessKeyDto.setValue(accessKey.getSecret());
+        accessKeyDto.setValue(accessKey.getValue());
         accessKeyDto.setPermission(accessKey.getPermission());
         accessKeyDto.setComment(accessKey.getComment());
         accessKeyDto.setCreated(accessKey.getCreated());

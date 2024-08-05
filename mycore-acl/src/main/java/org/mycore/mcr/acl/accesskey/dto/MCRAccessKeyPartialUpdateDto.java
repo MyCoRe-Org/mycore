@@ -49,7 +49,7 @@ public class MCRAccessKeyPartialUpdateDto {
      *
      * @return a Nullable containing the value of the access key, or an empty Nullable if not set
      */
-    @JsonProperty("value")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_VALUE)
     public MCRNullable<String> getValue() {
         return value;
     }
@@ -68,7 +68,7 @@ public class MCRAccessKeyPartialUpdateDto {
      *
      * @return a Nullable containing the permission type of the access key
      */
-    @JsonProperty("permission")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_PERMISSION)
     public MCRNullable<String> getPermission() {
         return permission;
     }
@@ -87,7 +87,7 @@ public class MCRAccessKeyPartialUpdateDto {
      *
      * @return a Nullable containing the reference associated with the access key
      */
-    @JsonProperty("reference")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_REFERENCE)
     public MCRNullable<String> getReference() {
         return reference;
     }
@@ -95,7 +95,7 @@ public class MCRAccessKeyPartialUpdateDto {
     /**
      * Sets the reference associated with the access key.
      *
-     * @param reference a Nullable containing the new object ID associated with the access key
+     * @param reference a Nullable containing the new reference associated with the access key
      */
     public void setReference(MCRNullable<String> reference) {
         this.reference = reference;
@@ -106,7 +106,7 @@ public class MCRAccessKeyPartialUpdateDto {
      *
      * @return a Nullable containing the active status of the access key
      */
-    @JsonProperty("active")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_ACTIVE)
     public MCRNullable<Boolean> getActive() {
         return active;
     }
@@ -125,7 +125,7 @@ public class MCRAccessKeyPartialUpdateDto {
      *
      * @return a Nullable containing the comment associated with the access key
      */
-    @JsonProperty("comment")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_COMMENT)
     public MCRNullable<String> getComment() {
         return comment;
     }
@@ -144,7 +144,7 @@ public class MCRAccessKeyPartialUpdateDto {
      *
      * @return a Nullable containing the expiration date of the access key
      */
-    @JsonProperty("expiration")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_EXPIRATION)
     public MCRNullable<Date> getExpiration() {
         return expiration;
     }

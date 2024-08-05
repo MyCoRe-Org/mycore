@@ -53,10 +53,21 @@ public class MCRAccessKeyDto {
 
     private String lastModifiedBy;
 
+    /**
+     * Returns the id.
+     *
+     * @return the id
+     */
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_ID)
     public UUID getId() {
         return id;
     }
 
+    /**
+     * Sets the id.
+     *
+     * @param id the id
+     */
     public void setId(UUID id) {
         this.id = id;
     }
@@ -66,7 +77,7 @@ public class MCRAccessKeyDto {
      *
      * @return the value of the access key
      */
-    @JsonProperty(value = "value")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_VALUE)
     public String getValue() {
         return value;
     }
@@ -83,9 +94,9 @@ public class MCRAccessKeyDto {
     /**
      * Gets the reference associated with the access key.
      *
-     * @return the object ID
+     * @return the reference
      */
-    @JsonProperty(value = "reference")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_REFERENCE)
     public String getReference() {
         return reference;
     }
@@ -93,7 +104,7 @@ public class MCRAccessKeyDto {
     /**
      * Sets the reference associated with the access key.
      *
-     * @param objectId the reference to set
+     * @param reference the reference to set
      */
     public void setReference(String reference) {
         this.reference = reference;
@@ -104,7 +115,7 @@ public class MCRAccessKeyDto {
      *
      * @return the permission of the access key
      */
-    @JsonProperty(value = "permission")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_PERMISSION)
     public String getPermission() {
         return permission;
     }
@@ -123,7 +134,7 @@ public class MCRAccessKeyDto {
      *
      * @return the comment
      */
-    @JsonProperty(value = "comment")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_COMMENT)
     public String getComment() {
         return comment;
     }
@@ -142,7 +153,7 @@ public class MCRAccessKeyDto {
      *
      * @return the active status
      */
-    @JsonProperty(value = "active")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_ACTIVE)
     public Boolean getActive() {
         return active;
     }
@@ -161,7 +172,7 @@ public class MCRAccessKeyDto {
      *
      * @return the expiration date
      */
-    @JsonProperty(value = "expiration")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_EXPIRATION)
     public Date getExpiration() {
         return expiration;
     }
@@ -180,7 +191,7 @@ public class MCRAccessKeyDto {
      *
      * @return the creation date
      */
-    @JsonProperty(value = "created")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_CREATED)
     public Date getCreated() {
         return created;
     }
@@ -199,7 +210,7 @@ public class MCRAccessKeyDto {
      *
      * @return the creator's user ID
      */
-    @JsonProperty(value = "createdBy")
+    @JsonProperty(MCRAccessKeyJsonConstants.NAME_CREATED_BY)
     public String getCreatedBy() {
         return createdBy;
     }
@@ -218,7 +229,7 @@ public class MCRAccessKeyDto {
      *
      * @return the last modification date
      */
-    @JsonProperty(value = "lastModified")
+    @JsonProperty(MCRAccessKeyJsonConstants.LAST_MODIFIED)
     public Date getLastModified() {
         return lastModified;
     }
@@ -237,7 +248,7 @@ public class MCRAccessKeyDto {
      *
      * @return the last modifier's user ID
      */
-    @JsonProperty(value = "lastModifiedBy")
+    @JsonProperty(MCRAccessKeyJsonConstants.LAST_MODIFIED_BY)
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }

@@ -16,21 +16,23 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mcr.acl.accesskey;
+package org.mycore.mcr.acl.accesskey.access;
 
 /**
- * The {@code AccessKeyConstants} class holds constant values for access keys like permissions.
+ * This class provides access and permission constants for access key context.
  */
-public class MCRAccessKeyConstants {
+public class MCRAccessKeyAccessConstants {
 
     /**
-     * Permission to manage read access keys.
+     * Required permission to manage read access key(s).
      */
-    public static final String PERMISSION_MANAGE_READ_ACCESS_KEYS = "manage-read-access-keys";
-
+    public static String PERMISSION_MANAGE_READ_ACCESS_KEYS = "manage-read-access-keys";
     /**
-     * Permission to manage write access keys.
+     * Required permission to manage write access key(s).
      */
-    public static final String PERMISSION_MANAGE_WRITE_ACCESS_KEYS = "manage-write-access-keys";
+    public static String PERMISSION_MANAGE_WRITE_ACCESS_KEYS = "manage-write-access-keys";
 
+    private MCRAccessKeyAccessConstants() {
+
+    }
 }

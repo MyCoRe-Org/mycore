@@ -16,20 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mcr.acl.accesskey.service;
+package org.mycore.mcr.acl.accesskey;
 
 import java.util.List;
 import java.util.UUID;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyManagementPermissionsDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyValidationException;
 
 /**
- * Service interface for managing AccessKeys.
+ * Service interface for managing access keys.
  */
 public interface MCRAccessKeyService {
 
@@ -49,6 +50,14 @@ public interface MCRAccessKeyService {
     List<MCRAccessKeyDto> getAccessKeysByReference(String reference);
 
     /**
+     * Retrieves a list of access keys associated with the specified permission.
+     *
+     * @param permission the permission for which access keys are to be retrieved
+     * @return a list of access key DTO associated with the specified permission
+     */
+    List<MCRAccessKeyDto> getAccessKeysByPermission(String permission);
+
+    /**
      * Retrieves a list of access keys of a specific permission associated with the specified reference.
      *
      * @param reference the reference for which access keys are to be retrieved
@@ -58,23 +67,23 @@ public interface MCRAccessKeyService {
     List<MCRAccessKeyDto> getAccessKeysByReferenceAndPermission(String reference, String permission);
 
     /**
-     * Retrieves an access key by its id.
+     * Retrieves an access key by id.
      *
      * @param id reference the id of the access key
      * @return the access key DTO corresponding to the specified reference and value
      * @throws MCRAccessKeyNotFoundException if the access key does not exist
+     * @throws MCRAccessException if current user is not allowed to get access key
      */
-    MCRAccessKeyDto getAccessKeyById(UUID id);
+    MCRAccessKeyDto getAccessKeyById(UUID id) throws MCRAccessException;
 
     /**
      * Retrieves an access key by its reference associated with the value.
      *
      * @param reference the reference for which access keys are to be retrieved
      * @param value the value of the access key to be retrieved
-     * @return the access key DTO corresponding to the specified reference and value
-     * @throws MCRAccessKeyNotFoundException if the access key does not exist
+     * @return the access key DTO corresponding to the specified reference and value or null
      */
-    MCRAccessKeyDto getAccessKeyByReferenceAndValue(String reference, String value) throws MCRAccessException;
+    MCRAccessKeyDto getAccessKeyByReferenceAndValue(String reference, String value);
 
     /**
      * Creates a new access key.
@@ -83,21 +92,23 @@ public interface MCRAccessKeyService {
      * @return the created access key DTO
      * @throws MCRAccessKeyValidationException if the DTO is invalid
      * @throws MCRAccessKeyCollisionException if there is already and access key with the value
+     * @throws MCRAccessException if current user is not allowed to create access key
      */
     MCRAccessKeyDto createAccessKey(MCRAccessKeyDto accessKeyDto) throws MCRAccessException;
 
     /**
-     * Import existing access key.
+     * Imports existing access key.
      *
      * @param accessKeyDto the access keys to be imported
      * @return the imported access key DTO
      * @throws MCRAccessKeyValidationException if the DTO is invalid
      * @throws MCRAccessKeyCollisionException if there is already and access key with the value
+     * @throws MCRAccessException if current user is not allowed to import access key
      */
     MCRAccessKeyDto importAccessKey(MCRAccessKeyDto accessKeyDto) throws MCRAccessException;
 
     /**
-     * Updates an access key based on the provided reference and value.
+     * Updates an access key by id.
      *
      * @param id reference the id of the access key to be updated
      * @param accessKeyDto the DTO containing the updated details of the access key
@@ -105,6 +116,7 @@ public interface MCRAccessKeyService {
      * @throws MCRAccessKeyValidationException if the DTO is invalid
      * @throws MCRAccessKeyNotFoundException if the access key does not exist
      * @throws MCRAccessKeyCollisionException if the access key already exists
+     * @throws MCRAccessException if current user is not allowed to update access key
      */
     MCRAccessKeyDto updateAccessKeyById(UUID id, MCRAccessKeyDto accessKeyDto) throws MCRAccessException;
 
@@ -117,6 +129,7 @@ public interface MCRAccessKeyService {
      * @throws MCRAccessKeyValidationException if the DTO is invalid
      * @throws MCRAccessKeyNotFoundException if the access key does not exist
      * @throws MCRAccessKeyCollisionException if the access key already exists
+     * @throws MCRAccessException if current user is not allowed to update access key
      */
     MCRAccessKeyDto partialUpdateAccessKeyById(UUID id, MCRAccessKeyPartialUpdateDto accessKeyDto)
         throws MCRAccessException;
@@ -124,13 +137,14 @@ public interface MCRAccessKeyService {
     /**
      * Deletes an access key by id.
      *
-     * @param id reference the id of the access key to be deleted
+     * @param id the id of the access key to be deleted
      * @throws MCRAccessKeyNotFoundException if the access key does not exist
+     * @throws MCRAccessException if current user is not allowed to delete access key
      */
     void deleteAccessKeyById(UUID id) throws MCRAccessException;
 
     /**
-     * Deletes all access keys that match the specified reference.
+     * Deletes all access keys that match the specified reference and current user is allowed to.
      *
      * @param reference the reference for which all matching access keys should be deleted
      * @return true if at least one access key was deleted
@@ -138,7 +152,7 @@ public interface MCRAccessKeyService {
     boolean deleteAccessKeysByReference(String reference);
 
     /**
-     * Deletes all access keys that match the specified reference and permission type.
+     * Deletes all access keys that match the specified reference and permission type and current user is allowed to.
      *
      * @param reference the reference for which all matching access keys should be deleted
      * @param permission the permission type to filter by
@@ -147,17 +161,35 @@ public interface MCRAccessKeyService {
     boolean deleteAccessKeysByReferenceAndPermission(String reference, String permission);
 
     /**
-     * Deletes all AccessKeys.
+     * Deletes all access keys current user is allowed to.
      */
     void deleteAllAccessKeys();
 
     /**
-     * Checks if an access key with the specified reference and encoded value exists.
+     * Checks if current user has given permission by access key defined by reference and value.
      *
      * @param reference the reference to search for
-     * @param value the encoded value to search for
-     * @return true if an access key with the specified reference and value exists
+     * @param rawValue the value to search for
+     * @param permission the permission
+     * @return true if current user has permission to reference via access key
      */
-    boolean existsAccessKeyWithReferenceAndEncodedValue(String reference, String encodedValue);
+    boolean checkAccess(String reference, String rawValue, String permission);
+
+    /**
+     * Returns the value processed value.
+     *
+     * @param reference the reference
+     * @param rawValue the raw value
+     * @return the processed value
+     */
+    String getValue(String reference, String rawValue);
+
+    /**
+     * Returns {@link MCRAccessKeyManagementPermissionsDto} by specified reference.
+     *
+     * @param reference the reference
+     * @return permission context
+     */
+    MCRAccessKeyManagementPermissionsDto getManagementPermissionsByReference(String reference);
 
 }

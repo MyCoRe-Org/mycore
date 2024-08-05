@@ -53,7 +53,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindAll() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.endTransaction();
+        endTransaction();
         final Collection<MCRAccessKey> accessKeys = new MCRAccessKeyRepositoryImpl().findAll();
         assertEquals(2, accessKeys.size());
     }
@@ -69,9 +69,9 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByReference() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.endTransaction();
-        final Collection<MCRAccessKey> accessKeys
-            = new MCRAccessKeyRepositoryImpl().findByReference(TEST_REFERENCE_READ);
+        endTransaction();
+        final Collection<MCRAccessKey> accessKeys = new MCRAccessKeyRepositoryImpl()
+            .findByReference(TEST_REFERENCE_READ);
         assertEquals(1, accessKeys.size());
         final MCRAccessKey accessKey = accessKeys.iterator().next();
         assertEquals(TEST_ID_READ, accessKey.getUuid());
@@ -82,8 +82,8 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
 
     @Test
     public void testFindByReference_empty() {
-        final Collection<MCRAccessKey> accessKeys
-            = new MCRAccessKeyRepositoryImpl().findByReference(TEST_REFERENCE_READ);
+        final Collection<MCRAccessKey> accessKeys = new MCRAccessKeyRepositoryImpl()
+            .findByReference(TEST_REFERENCE_READ);
         assertNotNull(accessKeys);
         assertEquals(0, accessKeys.size());
     }
@@ -92,9 +92,9 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByReferenceAndPermission() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.endTransaction();
-        final Collection<MCRAccessKey> accessKeys
-            = new MCRAccessKeyRepositoryImpl().findByReferenceAndPermission(TEST_REFERENCE_READ, TEST_PERMISSION_READ);
+        endTransaction();
+        final Collection<MCRAccessKey> accessKeys = new MCRAccessKeyRepositoryImpl()
+            .findByReferenceAndPermission(TEST_REFERENCE_READ, TEST_PERMISSION_READ);
         assertEquals(1, accessKeys.size());
         final MCRAccessKey accessKey = accessKeys.iterator().next();
         assertEquals(TEST_ID_READ, accessKey.getUuid());
@@ -105,8 +105,8 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
 
     @Test
     public void testFindByReferenceAndPermission_empty() {
-        final Collection<MCRAccessKey> accessKeys
-            = new MCRAccessKeyRepositoryImpl().findByReferenceAndPermission(TEST_REFERENCE_READ, TEST_PERMISSION_READ);
+        final Collection<MCRAccessKey> accessKeys = new MCRAccessKeyRepositoryImpl()
+            .findByReferenceAndPermission(TEST_REFERENCE_READ, TEST_PERMISSION_READ);
         assertNotNull(accessKeys);
         assertEquals(0, accessKeys.size());
     }
@@ -115,7 +115,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByUuid() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.endTransaction();
+        endTransaction();
         final Optional<MCRAccessKey> optAccessKey = new MCRAccessKeyRepositoryImpl().findByUuid(TEST_ID_READ);
         assertNotNull(optAccessKey);
         assertTrue(optAccessKey.isPresent());
@@ -128,7 +128,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     @Test
     public void testFindByUuid_noMatch() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        this.endTransaction();
+        endTransaction();
         final Optional<MCRAccessKey> optAccessKey = new MCRAccessKeyRepositoryImpl().findByUuid(TEST_ID_WRITE);
         assertNotNull(optAccessKey);
         assertTrue(optAccessKey.isEmpty());
@@ -138,9 +138,9 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByReferenceAndValue() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.endTransaction();
-        final Optional<MCRAccessKey> optAccessKey
-            = new MCRAccessKeyRepositoryImpl().findByReferenceAndValue(TEST_REFERENCE_READ, TEST_VALUE_READ);
+        endTransaction();
+        final Optional<MCRAccessKey> optAccessKey = new MCRAccessKeyRepositoryImpl()
+            .findByReferenceAndValue(TEST_REFERENCE_READ, TEST_VALUE_READ);
         assertNotNull(optAccessKey);
         assertTrue(optAccessKey.isPresent());
         assertEquals(TEST_ID_READ, optAccessKey.get().getUuid());
@@ -151,8 +151,8 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
 
     @Test
     public void testFindByReferenceAndValue_noMatch() {
-        final Optional<MCRAccessKey> optAccessKey
-            = new MCRAccessKeyRepositoryImpl().findByReferenceAndValue(TEST_REFERENCE_READ, TEST_VALUE_READ);
+        final Optional<MCRAccessKey> optAccessKey = new MCRAccessKeyRepositoryImpl()
+            .findByReferenceAndValue(TEST_REFERENCE_READ, TEST_VALUE_READ);
         assertNotNull(optAccessKey);
         assertTrue(optAccessKey.isEmpty());
     }
@@ -165,7 +165,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         accessKey.setSecret(TEST_VALUE_READ);
         accessKey.setIsActive(true);
         final MCRAccessKey createdAccessKey = new MCRAccessKeyRepositoryImpl().save(accessKey);
-        this.endTransaction();
+        endTransaction();
         assertNotNull(createdAccessKey);
         assertNotNull(createdAccessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, createdAccessKey.getReference());
@@ -176,7 +176,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     @Test
     public void testSave_update() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        this.startNewTransaction();
+        startNewTransaction();
         final MCRAccessKey accessKey = new MCRAccessKey();
         accessKey.setUuid(TEST_ID_READ);
         accessKey.setReference(TEST_REFERENCE_READ);
@@ -184,7 +184,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         accessKey.setSecret(TEST_VALUE_READ);
         accessKey.setIsActive(true);
         final MCRAccessKey createdAccessKey = new MCRAccessKeyRepositoryImpl().save(accessKey);
-        this.endTransaction();
+        endTransaction();
         assertNotNull(createdAccessKey);
         assertEquals(TEST_ID_READ, createdAccessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, createdAccessKey.getReference());
@@ -193,63 +193,18 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void testDeleteAll() {
-        insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.startNewTransaction();
-        new MCRAccessKeyRepositoryImpl().deleteAll();
-    }
-
-    @Test
-    public void testDeleteAll_empty() {
-        new MCRAccessKeyRepositoryImpl().deleteByReference(TEST_REFERENCE_READ);
-    }
-
-    @Test
-    public void testDeleteByReference() {
-        insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.startNewTransaction();
-        final long deleted = new MCRAccessKeyRepositoryImpl().deleteByReference(TEST_REFERENCE_READ);
-        assertEquals(1, deleted);
-    }
-
-    @Test
-    public void testDeleteByReference_noMatch() {
-        final long deleted = new MCRAccessKeyRepositoryImpl().deleteByReference(TEST_REFERENCE_READ);
-        assertEquals(0, deleted);
-    }
-
-    @Test
-    public void testDeleteByReferenceAndPermission() {
-        insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        this.startNewTransaction();
-        final long deleted = new MCRAccessKeyRepositoryImpl().deleteByReferenceAndPermission(TEST_REFERENCE_READ,
-            TEST_PERMISSION_READ);
-        assertEquals(1, deleted);
-    }
-
-    @Test
-    public void testDeleteByReferenceAndPermission_noMatch() {
-        final long deleted = new MCRAccessKeyRepositoryImpl().deleteByReferenceAndPermission(TEST_REFERENCE_READ,
-            TEST_PERMISSION_READ);
-        assertEquals(0, deleted);
-    }
-
-    @Test
     public void testExistsByReferenceAndValue() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        final boolean check
-            = new MCRAccessKeyRepositoryImpl().existsByReferenceAndValue(TEST_REFERENCE_READ, TEST_VALUE_READ);
+        final boolean check = new MCRAccessKeyRepositoryImpl().existsByReferenceAndValue(TEST_REFERENCE_READ,
+            TEST_VALUE_READ);
         assertTrue(check);
     }
 
     @Test
     public void testExistsByReferenceAndValue_noMatch() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        final boolean check
-            = new MCRAccessKeyRepositoryImpl().existsByReferenceAndValue(TEST_REFERENCE_READ + "1", TEST_VALUE_READ);
+        final boolean check = new MCRAccessKeyRepositoryImpl().existsByReferenceAndValue(TEST_REFERENCE_READ + "1",
+            TEST_VALUE_READ);
         assertFalse(check);
     }
 

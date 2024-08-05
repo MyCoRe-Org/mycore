@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKeyNamedQueries;
 
 import jakarta.persistence.EntityManager;
 
@@ -32,39 +33,46 @@ import jakarta.persistence.EntityManager;
  */
 public class MCRAccessKeyRepositoryImpl implements MCRAccessKeyRepository {
 
-    private static final String PARAM_REFERENCE = "reference";
-
-    private static final String PARAM_PERMISSION = "permission";
-
-    private static final String PARAM_UUID = "uuid";
-
     @Override
     public Collection<MCRAccessKey> findAll() {
-        return getEntityManager().createNamedQuery("MCRAccessKey.findAll", MCRAccessKey.class).getResultList();
+        return getEntityManager().createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_ALL, MCRAccessKey.class)
+            .getResultList();
     }
 
     @Override
     public Collection<MCRAccessKey> findByReference(String reference) {
-        return getEntityManager().createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
-            .setParameter(PARAM_REFERENCE, reference).getResultList();
+        return getEntityManager()
+            .createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE, MCRAccessKey.class)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_REFERENCE, reference).getResultList();
+    }
+
+    @Override
+    public Collection<MCRAccessKey> findByPermission(String permission) {
+        return getEntityManager()
+            .createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_PERMISSION, MCRAccessKey.class)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_PERMISSION, permission).getResultList();
     }
 
     @Override
     public Collection<MCRAccessKey> findByReferenceAndPermission(String reference, String permission) {
-        return getEntityManager().createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
-            .setParameter(PARAM_REFERENCE, reference).setParameter("type", permission).getResultList();
+        return getEntityManager()
+            .createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE_AND_PERMISSION, MCRAccessKey.class)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_REFERENCE, reference)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_PERMISSION, permission).getResultList();
     }
 
     @Override
     public Optional<MCRAccessKey> findByUuid(UUID uuid) {
-        return getEntityManager().createNamedQuery("MCRAccessKey.getWithUuid", MCRAccessKey.class)
-            .setParameter(PARAM_UUID, uuid).getResultStream().findFirst();
+        return getEntityManager().createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_UUID, MCRAccessKey.class)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_UUID, uuid).getResultStream().findFirst();
     }
 
     @Override
     public Optional<MCRAccessKey> findByReferenceAndValue(String reference, String value) {
-        return getEntityManager().createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
-            .setParameter(PARAM_REFERENCE, reference).setParameter("secret", value).getResultStream().findFirst();
+        return getEntityManager()
+            .createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE_AND_VALUE, MCRAccessKey.class)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_REFERENCE, reference)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_VALUE, value).getResultStream().findFirst();
     }
 
     @Override
@@ -81,23 +89,6 @@ public class MCRAccessKeyRepositoryImpl implements MCRAccessKeyRepository {
     public void delete(MCRAccessKey accessKey) {
         final EntityManager entityManager = getEntityManager();
         entityManager.remove(entityManager.merge(accessKey));
-    }
-
-    @Override
-    public void deleteAll() {
-        getEntityManager().createNamedQuery("MCRAccessKey.clear").executeUpdate();
-    }
-
-    @Override
-    public long deleteByReference(String reference) {
-        return getEntityManager().createNamedQuery("MCRAccessKey.clearWithObjectId")
-            .setParameter(PARAM_REFERENCE, reference).executeUpdate();
-    }
-
-    @Override
-    public long deleteByReferenceAndPermission(String reference, String permission) {
-        return getEntityManager().createNamedQuery("MCRAccessKey.clearWithReferenceAndPermission")
-            .setParameter(PARAM_REFERENCE, reference).setParameter(PARAM_PERMISSION, permission).executeUpdate();
     }
 
     @Override

@@ -45,6 +45,14 @@ public interface MCRAccessKeyRepository {
     Collection<MCRAccessKey> findByReference(String reference);
 
     /**
+     * Finds and returns all {@link MCRAccessKey} entities that match the specified permission.
+     *
+     * @param permission the permission to filter by
+     * @return a collection of access keys that match the specified permission
+     */
+    Collection<MCRAccessKey> findByPermission(String permission);
+
+    /**
      * Finds and returns all {@link MCRAccessKey} entities that match the specified reference and permission.
      *
      * @param reference the reference to filter by
@@ -85,26 +93,6 @@ public interface MCRAccessKeyRepository {
      * @param accessKey The access key object to be deleted
      */
     void delete(MCRAccessKey accessKey);
-
-    /**
-     * Deletes all {@link MCRAccessKey} entities.
-     */
-    void deleteAll();
-
-    /**
-     * Deletes all {@link MCRAccessKey} entities that match the specified reference.
-     *
-     * @param reference the reference of the access keys to be deleted
-     */
-    long deleteByReference(String reference);
-
-    /**
-     * Deletes all {@link MCRAccessKey} entities that match the specified reference and permission.
-     *
-     * @param reference the reference of the access key to be deleted
-     * @param permission the permission of the access key to be deleted
-     */
-    long deleteByReferenceAndPermission(String reference, String permission);
 
     /**
      * Checks if an {@link MCRAccessKey} with the specified reference and value exists.
