@@ -183,7 +183,7 @@ public class MCREventManager {
 
     /** Same as handleEvent( evt, MCREventManager.FORWARD ) */
     public void handleEvent(MCREvent evt) throws MCRException {
-        handleEvent(evt, MCREventManager.FORWARD);
+        handleEvent(evt, FORWARD);
     }
 
     /**

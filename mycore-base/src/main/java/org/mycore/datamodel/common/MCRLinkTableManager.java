@@ -465,10 +465,10 @@ public class MCRLinkTableManager {
                 categories.add(new MCRCategoryID(classId, categId));
             } else if (inf instanceof MCRMetaLinkID linkID) {
                 addReferenceLink(mcrId.toString(), linkID.getXLinkHref(),
-                    MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
+                    ENTRY_TYPE_REFERENCE, "");
             } else if (inf instanceof MCRMetaDerivateLink derLink) {
                 addReferenceLink(mcrId.toString(), derLink.getXLinkHref(),
-                    MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK, "");
+                    ENTRY_TYPE_DERIVATE_LINK, "");
             }
         });
         MCRCategoryID state = obj.getService().getState();
@@ -484,11 +484,11 @@ public class MCRLinkTableManager {
         MCRObjectStructure structure = obj.getStructure();
         for (int i = 0; i < structure.getDerivates().size(); i++) {
             MCRMetaLinkID lid = structure.getDerivates().get(i);
-            addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE, "");
+            addReferenceLink(obj.getId(), lid.getXLinkHrefID(), ENTRY_TYPE_DERIVATE, "");
         }
         // add parent reference
         if (structure.getParentID() != null) {
-            addReferenceLink(mcrId, structure.getParentID(), MCRLinkTableManager.ENTRY_TYPE_PARENT, "");
+            addReferenceLink(mcrId, structure.getParentID(), ENTRY_TYPE_PARENT, "");
         }
     }
 

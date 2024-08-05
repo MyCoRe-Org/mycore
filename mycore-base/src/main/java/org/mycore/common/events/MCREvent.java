@@ -65,7 +65,7 @@ public class MCREvent {
         }
 
         public static ObjectType fromClassName(String className) {
-            for (ObjectType b : ObjectType.values()) {
+            for (ObjectType b : values()) {
                 if (b.className.equalsIgnoreCase(className)) {
                     return b;
                 }

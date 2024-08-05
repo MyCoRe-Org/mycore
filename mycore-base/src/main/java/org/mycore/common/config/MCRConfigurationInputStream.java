@@ -185,7 +185,7 @@ public class MCRConfigurationInputStream extends InputStream {
             }
         }
         // load config file from classpath
-        try (InputStream configStream = MCRConfigurationInputStream.getConfigFileStream(filename)) {
+        try (InputStream configStream = getConfigFileStream(filename)) {
             if (configStream != null) {
                 LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
                 map.put("classpath_" + filename, configStream.readAllBytes());

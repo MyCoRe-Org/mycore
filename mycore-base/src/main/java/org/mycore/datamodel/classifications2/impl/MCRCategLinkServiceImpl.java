@@ -154,7 +154,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             objectIds.add(ref.getObjectID());
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        jakarta.persistence.Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
+        Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
         int deleted = 0;
         for (Map.Entry<String, Collection<String>> entry : typeMap.entrySet()) {
             q.setParameter("ids", entry.getValue());

@@ -168,7 +168,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             .map(MCRObjectID::toString)
             .collect(Collectors.toList());
 
-        MCRObjectCommands.setSelectedObjectIDs(selectedObjectIds);
+        setSelectedObjectIDs(selectedObjectIds);
 
     }
 
@@ -181,7 +181,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
             fillWithDescendants(id, descendants);
         }
-        MCRObjectCommands.setSelectedObjectIDs(descendants);
+        setSelectedObjectIDs(descendants);
     }
 
     private static void fillWithDescendants(String mcrObjID, List<String> descendants) {

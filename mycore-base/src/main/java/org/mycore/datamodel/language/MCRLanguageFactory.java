@@ -49,9 +49,9 @@ public class MCRLanguageFactory {
 
     private static final MCRLanguageFactory SINGLETON = new MCRLanguageFactory();
 
-    public static final MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
+    public static final MCRLanguage GERMAN = instance().getLanguage("de");
 
-    public static final MCRLanguage ENGLISH = MCRLanguageFactory.instance().getLanguage("en");
+    public static final MCRLanguage ENGLISH = instance().getLanguage("en");
 
     /**
      * Map of languages by ISO 639-1 or -2 code

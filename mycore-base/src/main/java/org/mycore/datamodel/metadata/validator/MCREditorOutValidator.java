@@ -230,20 +230,20 @@ public class MCREditorOutValidator {
     }
 
     static MCREditorMetadataValidator getObjectCheckInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObject(datasubtag, clazz, false);
+        return datasubtag -> checkMetaObject(datasubtag, clazz, false);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLangInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLang(datasubtag, clazz);
+        return datasubtag -> checkMetaObjectWithLang(datasubtag, clazz);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLangNotEmptyInstance(
         final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLangNotEmpty(datasubtag, clazz);
+        return datasubtag -> checkMetaObjectWithLangNotEmpty(datasubtag, clazz);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLinksInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLinks(datasubtag, clazz);
+        return datasubtag -> checkMetaObjectWithLinks(datasubtag, clazz);
     }
 
     /**

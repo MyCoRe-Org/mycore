@@ -41,7 +41,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         long time;
         try {
             time = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(s).getTime();
-        } catch (java.text.ParseException e) {
+        } catch (ParseException e) {
             try {
                 time = new SimpleDateFormat("dd.MM.yyyy", Locale.ROOT).parse(s).getTime();
             } catch (ParseException e1) {

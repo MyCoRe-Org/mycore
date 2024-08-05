@@ -173,7 +173,7 @@ public final class MCRWebsiteWriteProtection {
 
     public static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response,
         String baseURL) throws IOException {
-        if (MCRWebsiteWriteProtection.isActive()) {
+        if (isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             String pageURL = baseURL + MCRConfiguration2.getStringOrThrow("MCR.WriteProtectionWebsite.ErrorPage");
             response.sendRedirect(response.encodeRedirectURL(pageURL));

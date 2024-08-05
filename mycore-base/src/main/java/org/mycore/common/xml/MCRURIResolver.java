@@ -486,7 +486,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            URI hrefURI = MCRURIResolver.resolveURI(href, base);
+            URI hrefURI = resolveURI(href, base);
             if (!hrefURI.getScheme().equals("file")) {
                 throw new TransformerException("Unsupport file uri scheme: " + hrefURI.getScheme());
             }
@@ -510,7 +510,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            URI hrefURI = MCRURIResolver.resolveURI(href, base);
+            URI hrefURI = resolveURI(href, base);
             try {
                 final Source source = client.get(hrefURI).getSource();
                 source.setSystemId(hrefURI.toASCIIString());
@@ -607,7 +607,7 @@ public final class MCRURIResolver implements URIResolver {
                     LOGGER.debug("include stylesheet: {}", saxSource.getSystemId());
                     return saxSource;
                 } else {
-                    return MCRURIResolver.instance().resolve(resource.toString(), base);
+                    return instance().resolve(resource.toString(), base);
                 }
             }
             return null;
@@ -946,7 +946,7 @@ public final class MCRURIResolver implements URIResolver {
             String target = href.substring(href.indexOf(":") + 1);
 
             try {
-                return MCRURIResolver.instance().resolve(target, base);
+                return instance().resolve(target, base);
             } catch (Exception ex) {
                 LOGGER.debug("Caught {}. Put it into XML to process in XSL!", ex.getClass().getName());
                 Element exception = new Element("exception");
@@ -989,7 +989,7 @@ public final class MCRURIResolver implements URIResolver {
             // end fix
             LOGGER.debug("Ensuring xml is not null: {}", target);
             try {
-                Source result = MCRURIResolver.instance().resolve(target, base);
+                Source result = instance().resolve(target, base);
                 if (result != null) {
                     // perform actual construction of xml document, as in MCRURIResolver#resolve(String),
                     // by performing the same actions as MCRSourceContent#asXml(),
@@ -1108,7 +1108,7 @@ public final class MCRURIResolver implements URIResolver {
             String stylesheetPaths = help.substring(0, configurationEnd);
 
             // resolve target URI
-            Source resolved = MCRURIResolver.instance().resolve(targetUri, base);
+            Source resolved = instance().resolve(targetUri, base);
             assert resolved != null;
 
             try {
@@ -1181,7 +1181,7 @@ public final class MCRURIResolver implements URIResolver {
             } else {
                 params = Collections.emptyMap();
             }
-            Source resolved = MCRURIResolver.instance().resolve(target, base);
+            Source resolved = instance().resolve(target, base);
 
             try {
                 if (resolved != null) {
@@ -1785,7 +1785,7 @@ public final class MCRURIResolver implements URIResolver {
                 throw new TransformerException("No Access to " + uri + " (" + href + " )");
             }
 
-            return MCRURIResolver.instance().resolve(uri, base);
+            return instance().resolve(uri, base);
         }
     }
 
@@ -1856,7 +1856,7 @@ public final class MCRURIResolver implements URIResolver {
 
             if (resolvedXML == null) {
                 LOGGER.debug(hrefToCache + " not in cache, must resolve");
-                resolvedXML = MCRURIResolver.instance().resolve(hrefToCache);
+                resolvedXML = instance().resolve(hrefToCache);
                 cache.put(hrefToCache, resolvedXML);
             } else {
                 LOGGER.debug(hrefToCache + " already in cache");

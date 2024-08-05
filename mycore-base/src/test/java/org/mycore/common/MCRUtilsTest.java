@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -84,6 +83,6 @@ public class MCRUtilsTest extends MCRTestCase {
     public final void testResolve() {
         Path path = baseDir.getRoot().toPath();
         Path resolve = MCRUtils.safeResolve(path, "foo", "bar");
-        Assert.assertEquals(path.resolve("foo").resolve("bar"), resolve);
+        assertEquals(path.resolve("foo").resolve("bar"), resolve);
     }
 }

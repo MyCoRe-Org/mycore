@@ -180,7 +180,7 @@ public class MCRTranslation {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
                     result = message.getString(newLabel);
-                } catch (java.util.MissingResourceException e) {
+                } catch (MissingResourceException e) {
                 }
                 if (result != null) {
                     LOGGER.warn("Usage of deprected I18N key '{}'. Please use '{}' instead.", label, newLabel);
@@ -305,7 +305,7 @@ public class MCRTranslation {
      * @see #translate(String, Object[])
      */
     public static String translateToLocale(String label, String argument, String locale) {
-        return translateToLocale(label, argument, MCRTranslation.getLocale(locale));
+        return translateToLocale(label, argument, getLocale(locale));
     }
 
     public static Locale getCurrentLocale() {
@@ -453,8 +453,8 @@ public class MCRTranslation {
      * output the current message properties to configuration directory
      */
     private static void debug() {
-        for (String lang : MCRTranslation.getAvailableLanguages()) {
-            ResourceBundle rb = MCRTranslation.getResourceBundle("messages", MCRTranslation.getLocale(lang));
+        for (String lang : getAvailableLanguages()) {
+            ResourceBundle rb = getResourceBundle("messages", getLocale(lang));
             Properties props = new MCRProperties();
             rb.keySet().forEach(key -> props.put(key, rb.getString(key)));
             File resolvedMsgFile = MCRConfigurationDir.getConfigFile("messages_" + lang + ".resolved.properties");

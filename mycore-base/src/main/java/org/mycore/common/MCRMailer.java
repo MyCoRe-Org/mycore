@@ -103,7 +103,7 @@ public class MCRMailer extends MCRServlet {
         String xsl = job.getRequest().getParameter("xsl");
 
         Document input = (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
-        MCRMailer.sendMail(input, xsl);
+        sendMail(input, xsl);
 
         job.getResponse().sendRedirect(goTo);
     }
@@ -485,7 +485,7 @@ public class MCRMailer extends MCRServlet {
             LOGGER.warn("Will not send e-mail, no 'to' address specified");
         } else {
             LOGGER.info("Sending e-mail to {}: {}", eMail.getChildText("to"), eMail.getChildText("subject"));
-            MCRMailer.send(eMail);
+            send(eMail);
         }
 
         return eMail;
@@ -763,7 +763,7 @@ public class MCRMailer extends MCRServlet {
             }
 
             public static MessageType fromValue(String v) {
-                for (MessageType t : MessageType.values()) {
+                for (MessageType t : values()) {
                     if (t.value.equals(v)) {
                         return t;
                     }
@@ -773,7 +773,7 @@ public class MCRMailer extends MCRServlet {
         }
     }
 
-    private static class SMTPAuthenticator extends jakarta.mail.Authenticator {
+    private static class SMTPAuthenticator extends Authenticator {
 
         public PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(MCRConfiguration2.getStringOrThrow("MCR.Mail.User"),
