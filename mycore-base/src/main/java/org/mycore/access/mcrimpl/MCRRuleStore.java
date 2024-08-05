@@ -19,9 +19,6 @@
 package org.mycore.access.mcrimpl;
 
 import java.util.Collection;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**

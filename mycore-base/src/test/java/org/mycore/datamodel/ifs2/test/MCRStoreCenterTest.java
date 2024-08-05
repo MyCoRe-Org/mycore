@@ -28,9 +28,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.text.MessageFormat;
-import java.util.Locale;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRStore;
