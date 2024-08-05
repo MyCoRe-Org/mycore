@@ -50,9 +50,9 @@ import jakarta.persistence.criteria.Root;
 public class MCRJPARuleStore extends MCRRuleStore {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static int CACHE_SIZE = MCRConfiguration2.getInt("MCR.AccessPool.CacheSize").orElse(2048);
-
-    private static LoadingCache<String, MCRAccessRule> ruleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE)
+    private static LoadingCache<String, MCRAccessRule> ruleCache = CacheBuilder
+            .newBuilder()
+            .maximumSize(MCRConfiguration2.getInt("MCR.AccessPool.CacheSize").orElse(2048))
         .build(new CacheLoader<>() {
             @Override
             public MCRAccessRule load(String ruleid) {
