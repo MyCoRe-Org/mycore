@@ -273,7 +273,7 @@ public class MCRDataURL implements Serializable {
                     .map(s -> s.split(PARAM_SEPARATOR, 2)).collect(Collectors.toMap(sl -> sl[0], sl -> {
                         try {
                             return decode(sl[1], StandardCharsets.UTF_8);
-                        } catch (UnsupportedCharsetException e) {
+                        } catch (Exception e) {
                             throw new UnsupportedCharsetException("Error encoding the parameter value \"" + sl[1]
                                 + "\". Error: " + e.getMessage());
                         }
