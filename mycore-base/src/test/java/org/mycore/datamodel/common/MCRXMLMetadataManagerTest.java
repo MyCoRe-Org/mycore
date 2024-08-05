@@ -56,7 +56,9 @@ import org.xml.sax.SAXException;
  */
 public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
-    private XMLInfo MyCoRe_document_00000001, MyCoRe_document_00000001_new, MCR_document_00000001;
+    private XMLInfo MyCoRe_document_00000001;
+    private XMLInfo MyCoRe_document_00000001_new;
+    private XMLInfo MCR_document_00000001;
 
     private static final SAXBuilder SAX_BUILDER = new SAXBuilder();
 

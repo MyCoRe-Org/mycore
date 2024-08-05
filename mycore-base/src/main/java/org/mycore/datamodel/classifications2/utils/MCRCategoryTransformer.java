@@ -193,7 +193,8 @@ public class MCRCategoryTransformer {
 
         private String labelFormat;
 
-        private boolean emptyLeaves, completeId;
+        private boolean emptyLeaves;
+        private boolean completeId;
 
         private Map<MCRCategoryID, Number> countMap = null;
 

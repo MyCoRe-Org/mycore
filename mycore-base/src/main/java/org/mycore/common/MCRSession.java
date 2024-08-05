@@ -100,7 +100,10 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private String ip;
 
-    private long loginTime, lastAccessTime, thisAccessTime, createTime;
+    private long loginTime;
+    private long lastAccessTime;
+    private long thisAccessTime;
+    private long createTime;
 
     private StackTraceElement[] constructingStackTrace;
 

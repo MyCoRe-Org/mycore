@@ -1203,7 +1203,8 @@ public class MCRCalendarTest extends MCRTestCase {
      */
     @Test
     public void getHistoryDateAsCalendar() {
-        String cstring, dstring;
+        String cstring;
+        String dstring;
         cstring = MCRCalendar.getCalendarDateToFormattedString(new GregorianCalendar());
         Calendar cal;
 

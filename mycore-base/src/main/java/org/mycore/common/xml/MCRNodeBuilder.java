@@ -95,7 +95,8 @@ public class MCRNodeBuilder {
         Object existingNode = null;
         Parent currentParent = parent;
         List<Step> steps = locationPath.getSteps();
-        int i, indexOfLastStep = steps.size() - 1;
+        int i;
+        int indexOfLastStep = steps.size() - 1;
 
         for (i = indexOfLastStep; i >= 0; i--) {
             String xPath = buildXPath(steps.subList(0, i + 1));

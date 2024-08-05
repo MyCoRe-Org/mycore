@@ -89,7 +89,8 @@ public class MCRContentInputStream extends FilterInputStream {
 
     public int consume() throws IOException {
         byte[] buffer = new byte[4096];
-        int numRead, totalRead = 0;
+        int numRead;
+        int totalRead = 0;
         do {
             numRead = read(buffer);
             if (numRead > 0) {

@@ -75,7 +75,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
     static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
-    private MCRCategory category, category2;
+    private MCRCategory category;
+    private MCRCategory category2;
 
     @Override
     @Before
