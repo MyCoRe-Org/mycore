@@ -31,11 +31,8 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Arne Seifert
  */
 public abstract class MCRRuleStore {
-    private static final Logger LOGGER = LogManager.getLogger(MCRRuleStore.class);
 
     protected static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-    protected static final String RULETABLENAME = "MCRACCESSRULE";
 
     private static MCRRuleStore implementation;
 

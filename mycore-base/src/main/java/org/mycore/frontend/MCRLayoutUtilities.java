@@ -67,7 +67,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.resource.MCRResourceHelper;
-import org.mycore.common.xml.MCRURIResolver;
+
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
@@ -80,7 +80,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
-import jakarta.servlet.ServletContext;
+
 
 /**
  *
@@ -106,7 +106,6 @@ public class MCRLayoutUtilities {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
 
-    private static final ServletContext SERVLET_CONTEXT = MCRURIResolver.getServletContext();
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
         .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);
