@@ -35,7 +35,8 @@
          that you fully re-index after changing this setting as it can
          affect both how text is indexed and queried.
     -->
-    <luceneMatchVersion>8.11.2</luceneMatchVersion>
+    <luceneMatchVersion>9.11</luceneMatchVersion>
+
 
     <!-- <lib/> directives can be used to instruct Solr to load any Jars
          identified and use them to resolve any "plugins" specified in
@@ -75,21 +76,17 @@
     <!-- <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-ltr-\d.*\.jar" /> -->
 
     <!--Required for alto fields -->
-    <lib dir="${solr.install.dir:../../../..}/contrib/analysis-extras/lucene-libs"
+    <lib dir="${solr.install.dir:../../../..}/module/analysis-extras/lib/"
          regex="lucene-analyzers-icu-\d.*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/module/analysis-extras/lib/" regex="solr-analysis-extras-\d.*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/contrib/extraction/lib" regex=".*\.jar"/>
-    <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-cell-\d.*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/module/extraction/lib/" regex=".*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/contrib/clustering/lib/" regex=".*\.jar"/>
-    <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-clustering-\d.*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/module/clustering/lib/" regex=".*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/contrib/langid/lib/" regex=".*\.jar"/>
-    <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-langid-\d.*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/module/langid/lib/" regex=".*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar"/>
-    <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar"/>
-    <!-- an exact 'path' can be used instead of a 'dir' to specify a
+    <lib dir="${solr.install.dir:../../../..}/module/velocity/lib/" regex=".*\.jar"/>
          specific jar file.  This will cause a serious error to be logged
          if it can't be loaded.
       -->
@@ -393,6 +390,24 @@
              of user specified boolean queries.
           -->
         <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
+
+
+
+        <!-- Minimum acceptable prefix-size for prefix-based queries.
+
+             Prefix-based queries consume memory in proportion to the number of terms in the index
+             that start with that prefix.  Short prefixes tend to match many many more indexed-terms
+             and consume more memory as a result, sometimes causing stability issues on the node.
+
+             This setting allows administrators to require that prefixes meet or exceed a specified
+             minimum length requirement.  Prefix queries that don't meet this requirement return an
+             error to users.  The limit may be overridden on a per-query basis by specifying a
+             'minPrefixQueryTermLength' local-param value.
+
+             The flag value of '-1' can be used to disable enforcement of this limit.
+        -->
+        <minPrefixQueryTermLength>${solr.query.minPrefixLength:-1}</minPrefixQueryTermLength>
+
 
         <!-- Solr Internal Query Caches
 
@@ -1331,13 +1346,6 @@
         <str name="params.resource.loader.enabled">${velocity.params.resource.loader.enabled:false}</str>
     </queryResponseWriter>
 
-    <!-- XSLT response writer transforms the XML output by any xslt file found
-         in Solr's conf/xslt directory.  Changes to xslt files are checked for
-         every xsltCacheLifetimeSeconds.
-      -->
-    <queryResponseWriter name="xslt" class="solr.XSLTResponseWriter">
-        <int name="xsltCacheLifetimeSeconds">5</int>
-    </queryResponseWriter>
 
     <!-- Query Parsers
 
