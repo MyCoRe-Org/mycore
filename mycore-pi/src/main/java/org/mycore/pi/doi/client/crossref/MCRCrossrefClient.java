@@ -41,7 +41,7 @@ import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.util.MCRResultOrException;
 import org.mycore.services.http.MCRHttpUtils;
-import org.mycore.services.http.MCRQueryParameter;
+import org.mycore.services.http.MCRURLQueryParameter;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -156,14 +156,14 @@ public class MCRCrossrefClient {
     }
 
     private URI getUploadURI() throws URISyntaxException {
-        List<MCRQueryParameter> parameters = List.of(
-            new MCRQueryParameter(USER_PARAM, this.username),
-            new MCRQueryParameter(PASSWORD_PARAM, this.password),
-            new MCRQueryParameter(OPERATION_PARAM, OPERATION_DOMDUPLOAD));
+        List<MCRURLQueryParameter> parameters = List.of(
+            new MCRURLQueryParameter(USER_PARAM, this.username),
+            new MCRURLQueryParameter(PASSWORD_PARAM, this.password),
+            new MCRURLQueryParameter(OPERATION_PARAM, OPERATION_DOMDUPLOAD));
         return new URI(String.format(Locale.ROOT, "https://%s/%s%s",
             this.host,
             DEPOSIT_PATH,
-            MCRQueryParameter.toQueryString(parameters)));
+            MCRURLQueryParameter.toQueryString(parameters)));
     }
 
 }

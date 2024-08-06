@@ -32,9 +32,9 @@ import java.util.stream.Stream;
  * @param name query parameter name, null is allowed but transformed to empty String
  * @param value query parameter name, null is allowed but transformed to empty String
  */
-public record MCRQueryParameter(String name, String value) {
+public record MCRURLQueryParameter(String name, String value) {
 
-    public MCRQueryParameter {
+    public MCRURLQueryParameter {
         name = (name == null ? "" : name);
         value = (value == null ? "" : value);
     }
@@ -54,13 +54,13 @@ public record MCRQueryParameter(String name, String value) {
      * @param encodedString encoded string as stated above
      * @return a record with name and value as determined by above algorithm
      */
-    public static MCRQueryParameter ofEncodedString(String encodedString) {
+    public static MCRURLQueryParameter ofEncodedString(String encodedString) {
         String[] parts = encodedString.split("=");
         switch (parts.length) {
             case 1:
-                return new MCRQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8), "");
+                return new MCRURLQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8), "");
             case 2:
-                return new MCRQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8),
+                return new MCRURLQueryParameter(URLDecoder.decode(parts[0], StandardCharsets.UTF_8),
                     URLDecoder.decode(parts[1], StandardCharsets.UTF_8));
             default:
                 throw new IllegalArgumentException("Could not parse parameter: " + encodedString);
@@ -71,11 +71,11 @@ public record MCRQueryParameter(String name, String value) {
      * Returnes an encoded String as described in {@link #ofEncodedString(String)}.
      * <p>
      * {@snippet :
-     * MCRQueryParameter inst1 = new MCRQueryParameter(name, value);
+     * MCRURLQueryParameter inst1 = new MCRURLQueryParameter(name, value);
      * String encodedString = inst1.toEncodedString();
-     * MCRQueryParameter inst2 = MCRQueryParameter.ofEncodedString(encodedString);
+     * MCRURLQueryParameter inst2 = MCRURLQueryParameter.ofEncodedString(encodedString);
      * boolean allwaysTrue = inst1.equals(inst2);
-     * }
+     *}
      * @return encoded String as definied for <code>application/x-www-form-urlencoded</code>
      */
     public String toEncodedString() {
@@ -92,10 +92,10 @@ public record MCRQueryParameter(String name, String value) {
      * @param queryString The encoded string, may start with a '?'
      * @return A list of parameters
      */
-    public static List<MCRQueryParameter> parse(String queryString) {
+    public static List<MCRURLQueryParameter> parse(String queryString) {
         String[] parts = removeQuestionMark(queryString).split("&");
         return Stream.of(parts)
-            .map(MCRQueryParameter::ofEncodedString)
+            .map(MCRURLQueryParameter::ofEncodedString)
             .collect(Collectors.toUnmodifiableList());
     }
 
@@ -111,12 +111,12 @@ public record MCRQueryParameter(String name, String value) {
      * @return The encoded string, empty if parameters are empty
      * @throws NullPointerException if parameters are empty or contains null values
      */
-    public static String toQueryString(List<MCRQueryParameter> parameters) {
+    public static String toQueryString(List<MCRURLQueryParameter> parameters) {
         if (parameters.isEmpty()) {
             return "";
         }
         return parameters.stream()
-            .map(MCRQueryParameter::toEncodedString)
+            .map(MCRURLQueryParameter::toEncodedString)
             .collect(Collectors.joining("&"));
     }
 }

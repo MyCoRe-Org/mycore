@@ -31,7 +31,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.digest.MCRMD5Digest;
-import org.mycore.services.http.MCRQueryParameter;
+import org.mycore.services.http.MCRURLQueryParameter;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -109,27 +109,27 @@ public class MCROAuthClient {
      * @param scopes the scope(s) to request permission for, if multiple separate by blanks
      */
     String getCodeRequestURL(String redirectURL, String scopes) throws URISyntaxException, MalformedURLException {
-        List<MCRQueryParameter> parameters = new ArrayList<>();
-        parameters.add(new MCRQueryParameter("client_id", clientID));
-        parameters.add(new MCRQueryParameter("response_type", "code"));
-        parameters.add(new MCRQueryParameter("redirect_uri", redirectURL));
-        parameters.add(new MCRQueryParameter("scope", scopes.trim()));
-        parameters.add(new MCRQueryParameter("state", buildStateParam()));
-        parameters.add(new MCRQueryParameter("prompt", "login"));
+        List<MCRURLQueryParameter> parameters = new ArrayList<>();
+        parameters.add(new MCRURLQueryParameter("client_id", clientID));
+        parameters.add(new MCRURLQueryParameter("response_type", "code"));
+        parameters.add(new MCRURLQueryParameter("redirect_uri", redirectURL));
+        parameters.add(new MCRURLQueryParameter("scope", scopes.trim()));
+        parameters.add(new MCRURLQueryParameter("state", buildStateParam()));
+        parameters.add(new MCRURLQueryParameter("prompt", "login"));
 
         // check if current lang is supported
         List<String> supportedLanguages = Arrays
             .asList(MCRConfiguration2.getStringOrThrow("MCR.ORCID.SupportedLanguages").split(",", 0));
         if (supportedLanguages.contains(MCRSessionMgr.getCurrentSession().getCurrentLanguage())) {
-            parameters.add(new MCRQueryParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage()));
+            parameters.add(new MCRURLQueryParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage()));
         } else {
-            parameters.add(new MCRQueryParameter("lang", "en"));
+            parameters.add(new MCRURLQueryParameter("lang", "en"));
         }
 
         if (MCRConfiguration2.getOrThrow("MCR.ORCID.PreFillRegistrationForm", Boolean::parseBoolean)) {
             preFillRegistrationForm(parameters);
         }
-        return new URI(baseURL + "/authorize" + MCRQueryParameter.toQueryString(parameters)).toString();
+        return new URI(baseURL + "/authorize" + MCRURLQueryParameter.toQueryString(parameters)).toString();
     }
 
     /**
@@ -142,11 +142,11 @@ public class MCROAuthClient {
      *
      * See https://members.orcid.org/api/resources/customize
      */
-    private void preFillRegistrationForm(List<MCRQueryParameter> parameters) {
+    private void preFillRegistrationForm(List<MCRURLQueryParameter> parameters) {
         MCRUser user = MCRUserManager.getCurrentUser();
         String eMail = user.getEMailAddress();
         if (eMail != null) {
-            parameters.add(new MCRQueryParameter("email", eMail));
+            parameters.add(new MCRURLQueryParameter("email", eMail));
         }
 
         String name = user.getRealName();
@@ -168,10 +168,10 @@ public class MCROAuthClient {
         }
 
         if (firstName != null) {
-            parameters.add(new MCRQueryParameter("given_names", firstName));
+            parameters.add(new MCRURLQueryParameter("given_names", firstName));
         }
         if (lastName != null) {
-            parameters.add(new MCRQueryParameter("family_names", lastName));
+            parameters.add(new MCRURLQueryParameter("family_names", lastName));
         }
     }
 

@@ -24,59 +24,59 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-class MCRQueryParameterTest {
+class MCRURLQueryParameterTest {
     @Test
     public void testOfEncodedString() {
-        MCRQueryParameter parameter = MCRQueryParameter.ofEncodedString("name=value");
+        MCRURLQueryParameter parameter = MCRURLQueryParameter.ofEncodedString("name=value");
         assertEquals("name", parameter.name());
         assertEquals("value", parameter.value());
-        parameter = MCRQueryParameter.ofEncodedString("name");
+        parameter = MCRURLQueryParameter.ofEncodedString("name");
         assertEquals("name", parameter.name());
         assertEquals("", parameter.value());
-        assertEquals(parameter, MCRQueryParameter.ofEncodedString("name="));
-        parameter = MCRQueryParameter.ofEncodedString("=value");
+        assertEquals(parameter, MCRURLQueryParameter.ofEncodedString("name="));
+        parameter = MCRURLQueryParameter.ofEncodedString("=value");
         assertEquals("", parameter.name());
         assertEquals("value", parameter.value());
     }
 
     @Test
     public void testToEncodedString() {
-        assertEquals("name=value", new MCRQueryParameter("name", "value").toEncodedString());
-        assertEquals("name=%3D%26", new MCRQueryParameter("name", "=&").toEncodedString());
+        assertEquals("name=value", new MCRURLQueryParameter("name", "value").toEncodedString());
+        assertEquals("name=%3D%26", new MCRURLQueryParameter("name", "=&").toEncodedString());
         //UTF-8 encoding test:
-        assertEquals("name=%C3%BC", new MCRQueryParameter("name", "ü").toEncodedString());
-        assertEquals("name", new MCRQueryParameter("name", null).toEncodedString());
-        assertEquals("name", new MCRQueryParameter("name", "").toEncodedString());
-        assertEquals("=value", new MCRQueryParameter(null, "value").toEncodedString());
-        assertEquals("=value", new MCRQueryParameter("", "value").toEncodedString());
+        assertEquals("name=%C3%BC", new MCRURLQueryParameter("name", "ü").toEncodedString());
+        assertEquals("name", new MCRURLQueryParameter("name", null).toEncodedString());
+        assertEquals("name", new MCRURLQueryParameter("name", "").toEncodedString());
+        assertEquals("=value", new MCRURLQueryParameter(null, "value").toEncodedString());
+        assertEquals("=value", new MCRURLQueryParameter("", "value").toEncodedString());
     }
 
     @Test
     public void testParse() {
         String encodedString = "?name1=value1&name2=value2";
-        List<MCRQueryParameter> parameters = MCRQueryParameter.parse(encodedString);
+        List<MCRURLQueryParameter> parameters = MCRURLQueryParameter.parse(encodedString);
         assertEquals(2, parameters.size());
 
-        MCRQueryParameter parameter1 = parameters.getFirst();
+        MCRURLQueryParameter parameter1 = parameters.getFirst();
         assertEquals("name1", parameter1.name());
         assertEquals("value1", parameter1.value());
 
-        MCRQueryParameter parameter2 = parameters.get(1);
+        MCRURLQueryParameter parameter2 = parameters.get(1);
         assertEquals("name2", parameter2.name());
         assertEquals("value2", parameter2.value());
 
-        assertEquals(MCRQueryParameter.parse(encodedString),
-            MCRQueryParameter.parse(encodedString.substring(1)));
+        assertEquals(MCRURLQueryParameter.parse(encodedString),
+            MCRURLQueryParameter.parse(encodedString.substring(1)));
     }
 
     @Test
     public void testToQueryString() {
-        List<MCRQueryParameter> parameters = List.of(
-            new MCRQueryParameter("name", "value"),
-            new MCRQueryParameter("name", "value²"));
+        List<MCRURLQueryParameter> parameters = List.of(
+            new MCRURLQueryParameter("name", "value"),
+            new MCRURLQueryParameter("name", "value²"));
 
         String expected = "name=value&name=value%C2%B2";
-        assertEquals(expected, MCRQueryParameter.toQueryString(parameters));
+        assertEquals(expected, MCRURLQueryParameter.toQueryString(parameters));
     }
 
 }

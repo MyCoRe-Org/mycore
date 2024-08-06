@@ -105,7 +105,7 @@ import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.resource.MCRResourceHelper;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.services.http.MCRQueryParameter;
+import org.mycore.services.http.MCRURLQueryParameter;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
@@ -1434,7 +1434,7 @@ public final class MCRURIResolver implements URIResolver {
 
             if (split.length == 2) {
                 String req = split[1];
-                MCRQueryParameter.parse(req).forEach(nv -> {
+                MCRURLQueryParameter.parse(req).forEach(nv -> {
                     if (nv.name().equals("attribute")) {
                         if (suppliedAttributes.contains(nv.value())) {
                             LOGGER.warn("Duplicate attribute {} in user info request", nv.value());
