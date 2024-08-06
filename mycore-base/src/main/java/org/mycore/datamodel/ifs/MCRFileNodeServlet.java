@@ -85,15 +85,8 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         String path = getPath(request);
         MCRPath mcrPath = MCRPath.getPath(ownerID, path);
-        BasicFileAttributes attr;
-        try {
-            attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
-        } catch (NoSuchFileException e) {
-            String msg = e.getMessage();
-            if (msg == null) {
-                msg = "File or directory not found: " + mcrPath;
-            }
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+        BasicFileAttributes attr = getBasicFileAttributes(response, mcrPath);
+        if (attr == null) {
             return null;
         }
         if (attr.isDirectory()) {
@@ -108,6 +101,22 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not a file or directory: " + mcrPath);
         return null;
+    }
+
+    private static BasicFileAttributes getBasicFileAttributes(HttpServletResponse response, MCRPath mcrPath)
+        throws IOException {
+        BasicFileAttributes attr;
+        try {
+            attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
+        } catch (NoSuchFileException e) {
+            String msg = e.getMessage();
+            if (msg == null) {
+                msg = "File or directory not found: " + mcrPath;
+            }
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+            return null;
+        }
+        return attr;
     }
 
     private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {

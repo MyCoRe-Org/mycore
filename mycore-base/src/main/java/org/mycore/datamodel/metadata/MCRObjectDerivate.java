@@ -86,60 +86,25 @@ public class MCRObjectDerivate {
      */
     private void setFromDOM(Element derivate) {
         // Link to Metadata part
-        Element linkmetaElement = derivate.getChild("linkmetas").getChild("linkmeta");
-        MCRMetaLinkID link = new MCRMetaLinkID();
-        link.setFromDOM(linkmetaElement);
-        linkmeta = link;
+        setMetadataFromDOM(derivate);
 
         // External part
-        Element externalsElement = derivate.getChild("externals");
-        externals.clear();
-        if (externalsElement != null) {
-            List<Element> externalList = externalsElement.getChildren();
-            for (Element externalElement : externalList) {
-                MCRMetaLink eLink = new MCRMetaLink();
-                eLink.setFromDOM(externalElement);
-                externals.add(eLink);
-            }
-        }
+        setExternalFromDOM(derivate);
 
         // Internal part
-        Element internalsElement = derivate.getChild("internals");
-        if (internalsElement != null) {
-            Element internalElement = internalsElement.getChild("internal");
-            if (internalElement != null) {
-                internals = new MCRMetaIFS();
-                internals.setFromDOM(internalElement);
-            }
-        }
+        setInternalFromDOM(derivate);
 
         // Title part
-        Element titlesElement = derivate.getChild("titles");
-        titles.clear();
-        if (titlesElement != null) {
-            List<Element> titleList = titlesElement.getChildren();
-            for (Element titleElement : titleList) {
-                MCRMetaLangText text = new MCRMetaLangText();
-                text.setFromDOM(titleElement);
-                if (text.isValid()) {
-                    titles.add(text);
-                }
-            }
-        }
+        setTitleFromDOM(derivate);
 
         // Classification part
-        Element classificationElement = derivate.getChild("classifications");
-        classifications.clear();
-        if (classificationElement != null) {
-            final List<Element> classificationList = classificationElement.getChildren();
-            classificationList.stream().map((classElement) -> {
-                MCRMetaClassification clazzObject = new MCRMetaClassification();
-                clazzObject.setFromDOM(classElement);
-                return clazzObject;
-            }).forEach(classifications::add);
-        }
+        setClassificationsFromDOM(derivate);
 
         // fileset part
+        setFilesetFromDOM(derivate);
+    }
+
+    private void setFilesetFromDOM(Element derivate) {
         Element filesetElements = derivate.getChild("fileset");
         if (filesetElements != null) {
             String mainURN = filesetElements.getAttributeValue("urn");
@@ -155,6 +120,67 @@ public class MCRObjectDerivate {
             }
         }
     }
+
+    private void setClassificationsFromDOM(Element derivate) {
+        Element classificationElement = derivate.getChild("classifications");
+        classifications.clear();
+        if (classificationElement != null) {
+            final List<Element> classificationList = classificationElement.getChildren();
+            classificationList.stream().map((classElement) -> {
+                MCRMetaClassification clazzObject = new MCRMetaClassification();
+                clazzObject.setFromDOM(classElement);
+                return clazzObject;
+            }).forEach(classifications::add);
+        }
+    }
+
+
+    private void setTitleFromDOM(Element derivate) {
+        Element titlesElement = derivate.getChild("titles");
+        titles.clear();
+        if (titlesElement != null) {
+            List<Element> titleList = titlesElement.getChildren();
+            for (Element titleElement : titleList) {
+                MCRMetaLangText text = new MCRMetaLangText();
+                text.setFromDOM(titleElement);
+                if (text.isValid()) {
+                    titles.add(text);
+                }
+            }
+        }
+    }
+
+    private void setInternalFromDOM(Element derivate) {
+        Element internalsElement = derivate.getChild("internals");
+        if (internalsElement != null) {
+            Element internalElement = internalsElement.getChild("internal");
+            if (internalElement != null) {
+                internals = new MCRMetaIFS();
+                internals.setFromDOM(internalElement);
+            }
+        }
+    }
+
+    private void setExternalFromDOM(Element derivate) {
+        Element externalsElement = derivate.getChild("externals");
+        externals.clear();
+        if (externalsElement != null) {
+            List<Element> externalList = externalsElement.getChildren();
+            for (Element externalElement : externalList) {
+                MCRMetaLink eLink = new MCRMetaLink();
+                eLink.setFromDOM(externalElement);
+                externals.add(eLink);
+            }
+        }
+    }
+
+    private void setMetadataFromDOM(Element derivate) {
+        Element linkmetaElement = derivate.getChild("linkmetas").getChild("linkmeta");
+        MCRMetaLinkID link = new MCRMetaLinkID();
+        link.setFromDOM(linkmetaElement);
+        linkmeta = link;
+    }
+
 
     /**
      * returns link to the MCRObject.
@@ -342,66 +368,83 @@ public class MCRObjectDerivate {
             throw new MCRException("The content is not valid.", exc);
         }
         Element elm = new Element("derivate");
-
         Element linkmetas = new Element("linkmetas");
         linkmetas.setAttribute("class", "MCRMetaLinkID");
         linkmetas.setAttribute("heritable", "false");
         linkmetas.addContent(linkmeta.createXML());
         elm.addContent(linkmetas);
-
         if (externals.size() != 0) {
-            Element extEl = new Element("externals");
-            extEl.setAttribute("class", "MCRMetaLink");
-            extEl.setAttribute("heritable", "false");
-            for (MCRMetaLink external : externals) {
-                extEl.addContent(external.createXML());
-            }
+            Element extEl = createExternalsElement();
             elm.addContent(extEl);
         }
-
         if (internals != null) {
-            Element intEl = new Element("internals");
-            intEl.setAttribute("class", "MCRMetaIFS");
-            intEl.setAttribute("heritable", "false");
-            intEl.addContent(internals.createXML());
+            Element intEl = createInternalsElement();
             elm.addContent(intEl);
         }
-
         if (titles.size() != 0) {
-            Element titEl = new Element("titles");
-            titEl.setAttribute("class", "MCRMetaLangText");
-            titEl.setAttribute("heritable", "false");
-            titles.stream()
-                .map(MCRMetaLangText::createXML)
-                .forEach(titEl::addContent);
+            Element titEl = createTitleElement();
             elm.addContent(titEl);
         }
-
         if (classifications.size() > 0) {
-            Element clazzElement = new Element("classifications");
-            clazzElement.setAttribute("class", "MCRMetaClassification");
-            clazzElement.setAttribute("heritable", "false");
-
-            classifications.stream()
-                .map(MCRMetaClassification::createXML)
-                .forEach(clazzElement::addContent);
+            Element clazzElement = createClassificationElement();
             elm.addContent(clazzElement);
         }
-
         if (this.derivateURN != null || !files.isEmpty()) {
-            Element fileset = new Element("fileset");
-
-            if (this.derivateURN != null) {
-                fileset.setAttribute("urn", this.derivateURN);
-            }
-            Collections.sort(files);
-            for (MCRFileMetadata file : files) {
-                fileset.addContent(file.createXML());
-            }
+            Element fileset = createFilesetElement();
             elm.addContent(fileset);
         }
-
         return elm;
+    }
+
+    private Element createExternalsElement() {
+        Element extEl = new Element("externals");
+        extEl.setAttribute("class", "MCRMetaLink");
+        extEl.setAttribute("heritable", "false");
+        for (MCRMetaLink external : externals) {
+            extEl.addContent(external.createXML());
+        }
+        return extEl;
+    }
+
+    private Element createInternalsElement() {
+        Element intEl = new Element("internals");
+        intEl.setAttribute("class", "MCRMetaIFS");
+        intEl.setAttribute("heritable", "false");
+        intEl.addContent(internals.createXML());
+        return intEl;
+    }
+
+    private Element createTitleElement() {
+        Element titEl = new Element("titles");
+        titEl.setAttribute("class", "MCRMetaLangText");
+        titEl.setAttribute("heritable", "false");
+        titles.stream()
+                .map(MCRMetaLangText::createXML)
+                .forEach(titEl::addContent);
+        return titEl;
+    }
+
+    private Element createClassificationElement() {
+        Element clazzElement = new Element("classifications");
+        clazzElement.setAttribute("class", "MCRMetaClassification");
+        clazzElement.setAttribute("heritable", "false");
+
+        classifications.stream()
+                .map(MCRMetaClassification::createXML)
+                .forEach(clazzElement::addContent);
+        return clazzElement;
+    }
+
+    private Element createFilesetElement() {
+        Element fileset = new Element("fileset");
+        if (this.derivateURN != null) {
+            fileset.setAttribute("urn", this.derivateURN);
+        }
+        Collections.sort(files);
+        for (MCRFileMetadata file : files) {
+            fileset.addContent(file.createXML());
+        }
+        return fileset;
     }
 
     /**

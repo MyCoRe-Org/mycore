@@ -19,7 +19,9 @@
 package org.mycore.common;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,6 +56,7 @@ import jakarta.activation.DataSource;
 import jakarta.activation.URLDataSource;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
@@ -382,71 +385,25 @@ public class MCRMailer extends MCRServlet {
         MimeMessage msg = new MimeMessage(mailSession);
         msg.setFrom(EMail.buildAddress(mail.from));
 
-        Optional<List<InternetAddress>> toList = EMail.buildAddressList(mail.to);
-        if (toList.isPresent()) {
-            msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(InternetAddress[]::new));
-        }
-
-        Optional<List<InternetAddress>> replyToList = EMail.buildAddressList(mail.replyTo);
-        if (replyToList.isPresent()) {
-            msg.setReplyTo((replyToList.get().toArray(InternetAddress[]::new)));
-        }
-
-        Optional<List<InternetAddress>> bccList = EMail.buildAddressList(mail.bcc);
-        if (bccList.isPresent()) {
-            msg.addRecipients(Message.RecipientType.BCC,
-                bccList.get().toArray(InternetAddress[]::new));
-        }
+        addRecipientOptionals(msg, mail.to, Message.RecipientType.TO);
+        addRecipientOptionals(msg, mail.replyTo, null);
+        addRecipientOptionals(msg, mail.bcc, Message.RecipientType.BCC);
 
         msg.setSentDate(new Date());
         msg.setSubject(mail.subject, ENCODING);
 
         if (mail.parts != null && !mail.parts.isEmpty() || mail.msgParts != null && mail.msgParts.size() > 1) {
-            Multipart multipart = new MimeMultipart();
+            Multipart multipart = new MimeMultipart("mixed");
             // Create the message part
-            MimeBodyPart messagePart = new MimeBodyPart();
-
-            if (mail.msgParts.size() > 1) {
-                multipart = new MimeMultipart("mixed");
-                MimeMultipart alternative = new MimeMultipart("alternative");
-
-                for (MessagePart m : mail.msgParts) {
-                    messagePart = new MimeBodyPart();
-                    messagePart.setText(m.message, ENCODING, m.type.value());
-                    alternative.addBodyPart(messagePart);
-                }
-
-                messagePart = new MimeBodyPart();
-                messagePart.setContent(alternative);
-                multipart.addBodyPart(messagePart);
-            } else {
-                Optional<MessagePart> plainMsg = mail.getTextMessage();
-                if (plainMsg.isPresent()) {
-                    messagePart.setText(plainMsg.get().message, ENCODING);
-                    multipart.addBodyPart(messagePart);
-                }
-            }
+            MimeBodyPart messagePart= new MimeBodyPart();
+            MimeMultipart alternative = new MimeMultipart("alternative");
+            buildMessageBodyParts(mail, alternative);
+            messagePart.setContent(alternative);
+            multipart.addBodyPart(messagePart);
 
             if (mail.parts != null && !mail.parts.isEmpty()) {
-                for (String part : mail.parts) {
-                    messagePart = new MimeBodyPart();
-
-                    URL url = new URI(part).toURL();
-                    DataSource source = new URLDataSource(url);
-                    messagePart.setDataHandler(new DataHandler(source));
-
-                    String fileName = url.getPath();
-                    if (fileName.contains("\\")) {
-                        fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
-                    } else if (fileName.contains("/")) {
-                        fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
-                    }
-                    messagePart.setFileName(fileName);
-
-                    multipart.addBodyPart(messagePart);
-                }
+                setMessageContent(mail, multipart);
             }
-
             msg.setContent(multipart);
         } else {
             Optional<MessagePart> plainMsg = mail.getTextMessage();
@@ -454,10 +411,49 @@ public class MCRMailer extends MCRServlet {
                 msg.setText(plainMsg.get().message, ENCODING);
             }
         }
-
         LOGGER.info("Sending e-mail to {}", mail.to);
         Transport.send(msg);
     }
+
+    private static void addRecipientOptionals(MimeMessage msg, List<String> foo, Message.RecipientType bar)
+            throws MessagingException {
+        Optional<List<InternetAddress>> list = EMail.buildAddressList(foo);
+        if (list.isPresent()) {
+            if (bar == null) {
+                msg.setReplyTo((list.get().toArray(InternetAddress[]::new)));
+            } else {
+                msg.addRecipients(bar, list.get().toArray(InternetAddress[]::new));
+            }
+        }
+    }
+
+    private static void buildMessageBodyParts(EMail mail, MimeMultipart alternative)
+            throws MessagingException {
+        MimeBodyPart messagePart = new MimeBodyPart();
+        for (MessagePart m : mail.msgParts) {
+            messagePart.setText(m.message, ENCODING, m.type.value());
+            alternative.addBodyPart(messagePart);
+        }
+    }
+
+    private static void setMessageContent(EMail mail, Multipart multipart)
+            throws MessagingException, URISyntaxException, MalformedURLException {
+        for (String part : mail.parts) {
+            MimeBodyPart messagePart = new MimeBodyPart();
+            URL url = new URI(part).toURL();
+            DataSource source = new URLDataSource(url);
+            messagePart.setDataHandler(new DataHandler(source));
+            String fileName = url.getPath();
+            if (fileName.contains("\\")) {
+                fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+            } else if (fileName.contains("/")) {
+                fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+            }
+            messagePart.setFileName(fileName);
+            multipart.addBodyPart(messagePart);
+        }
+    }
+
 
     /**
      * Generates e-mail from the given input document by transforming it with an xsl stylesheet,

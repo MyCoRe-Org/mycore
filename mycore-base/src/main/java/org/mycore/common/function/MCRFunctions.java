@@ -83,6 +83,65 @@ public class MCRFunctions {
     }
 
     private static int addCharacterClass(final StringBuilder regex, final String globPattern, int nextPos) {
+        int currentIndex = getCurrentIndex(regex, globPattern, nextPos);
+        boolean inRange = false;
+        char rangeStartChar = 0;
+        char curChar = '[';
+        while (currentIndex < globPattern.length()) {
+            curChar = globPattern.charAt(currentIndex++);
+
+            switch (curChar) {
+                case ']':
+                    break;
+
+                case MCRAbstractFileSystem.SEPARATOR:
+                    throw new PatternSyntaxException("Character classes cannot cross directory boundaries.",
+                        globPattern, currentIndex - 1);
+
+                case '\\':
+                case '[':
+                    regex.append('\\');
+                    regex.append(curChar);
+                    break;
+
+                case '&':
+                    if (nextCharAt(globPattern, currentIndex) == '&') {
+                        regex.append('\\');
+                    }
+                    regex.append(curChar);
+                    break;
+
+                case '-':
+                    if (!inRange) {
+                        throw new PatternSyntaxException("Invalid range.", globPattern, currentIndex - 1);
+                    }
+                    curChar = nextCharAt(globPattern, currentIndex++);
+                    if (curChar == END_OF_PATTERN || curChar == ']') {
+                        break;
+                    }
+                    if (curChar < rangeStartChar) {
+                        throw new PatternSyntaxException("Invalid range.", globPattern, currentIndex - 3);
+                    }
+                    regex.append(curChar);
+                    inRange = false;
+                    break;
+
+                default:
+                    regex.append(curChar);
+                    inRange = true;
+                    rangeStartChar = curChar;
+                    break;
+            }
+        }
+
+        if (curChar != ']') {
+            throw new PatternSyntaxException("Missing ']'.", globPattern, currentIndex - 1);
+        }
+        regex.append("]]");
+        return currentIndex;
+    }
+
+    private static int getCurrentIndex(StringBuilder regex, String globPattern, int nextPos) {
         int currentIndex = nextPos;
         regex.append("[[^/]&&[");
         if (nextCharAt(globPattern, currentIndex) == '^') {
@@ -101,48 +160,6 @@ public class MCRFunctions {
                 currentIndex++;
             }
         }
-
-
-        boolean inRange = false;
-        char rangeStartChar = 0;
-        char curChar = '[';
-        while (currentIndex < globPattern.length()) {
-            curChar = globPattern.charAt(currentIndex++);
-            if (curChar == ']') {
-                break;
-            }
-            if (curChar == MCRAbstractFileSystem.SEPARATOR) {
-                throw new PatternSyntaxException("Chracter classes cannot cross directory boundaries.", globPattern,
-                    currentIndex - 1);
-            }
-            if (curChar == '\\' || curChar == '[' || curChar == '&' && nextCharAt(globPattern, currentIndex) == '&') {
-                // escape '\', '[' or "&&"
-                regex.append('\\');
-            }
-            regex.append(curChar);
-
-            if (curChar == '-') {
-                if (!inRange) {
-                    throw new PatternSyntaxException("Invalid range.", globPattern, currentIndex - 1);
-                }
-                curChar = nextCharAt(globPattern, currentIndex++);
-                if (curChar == END_OF_PATTERN || curChar == ']') {
-                    break;
-                }
-                if (curChar < rangeStartChar) {
-                    throw new PatternSyntaxException("Invalid range.", globPattern, currentIndex - 3);
-                }
-                regex.append(curChar);
-                inRange = false;
-            } else {
-                inRange = true;
-                rangeStartChar = curChar;
-            }
-        }
-        if (curChar != ']') {
-            throw new PatternSyntaxException("Missing ']'.", globPattern, currentIndex - 1);
-        }
-        regex.append("]]");
         return currentIndex;
     }
 

@@ -399,24 +399,7 @@ public class MCREditorOutValidator {
             LOGGER.info("Adding object default acl rule is disabled.");
             return;
         }
-        String resourcetype = "/editor_default_acls_" + id.getTypeId() + ".xml";
-        String resourcebase = "/editor_default_acls_" + id.getBase() + ".xml";
-        // Read stylesheet and add user
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcebase);
-        if (aclxml == null) {
-            aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
-            if (aclxml == null) {
-                LOGGER.warn("Can't find default object ACL file {} or {}", resourcebase.substring(1),
-                    resourcetype.substring(1));
-                String resource = "/editor_default_acls.xml"; // fallback
-                aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
-                if (aclxml == null) {
-                    return;
-                }
-            }
-        }
-        Document xml = SAX_BUILDER.build(aclxml);
-        Element acls = xml.getRootElement().getChild("servacls");
+        Element acls = loadDefaultAclDocument().getRootElement().getChild("servacls");
         if (acls == null) {
             return;
         }
@@ -429,36 +412,60 @@ public class MCREditorOutValidator {
             if (rootbool == null) {
                 continue;
             }
-            for (Element orbool : rootbool.getChildren("boolean")) {
-                for (Element firstcond : orbool.getChildren("condition")) {
-                    if (firstcond == null) {
-                        continue;
-                    }
-                    String value = firstcond.getAttributeValue("value");
-                    if (value == null) {
-                        continue;
-                    }
-                    if (value.equals("$CurrentUser")) {
-                        String thisuser = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-                        firstcond.setAttribute("value", thisuser);
-                        continue;
-                    }
-                    if (value.equals("$CurrentGroup")) {
-                        throw new MCRException(
-                            "The parameter $CurrentGroup in default ACLs is not supported as of MyCoRe 2014.06"
-                                + " because it is not supported in Servlet API 3.0");
-                    }
-                    int i = value.indexOf("$CurrentIP");
-                    if (i != -1) {
-                        String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-                        firstcond.setAttribute("value",
-                            value.substring(0, i) + thisip + value.substring(i + 10));
-                    }
-                }
-            }
+            updateConditionsValueAttribute(rootbool);
         }
         service.addContent(acls.detach());
     }
+
+    private void updateConditionsValueAttribute(Element rootbool) {
+        for (Element orbool : rootbool.getChildren("boolean")) {
+            for (Element firstcond : orbool.getChildren("condition")) {
+                if (firstcond == null) {
+                    continue;
+                }
+                String value = firstcond.getAttributeValue("value");
+                if (value == null) {
+                    continue;
+                }
+                if (value.equals("$CurrentUser")) {
+                    String thisuser = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
+                    firstcond.setAttribute("value", thisuser);
+                    continue;
+                }
+                if (value.equals("$CurrentGroup")) {
+                    throw new MCRException(
+                            "The parameter $CurrentGroup in default ACLs is not supported as of MyCoRe 2014.06"
+                                    + " because it is not supported in Servlet API 3.0");
+                }
+                int i = value.indexOf("$CurrentIP");
+                if (i != -1) {
+                    String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
+                    firstcond.setAttribute("value",
+                            value.substring(0, i) + thisip + value.substring(i + 10));
+                }
+            }
+        }
+    }
+
+    private Document loadDefaultAclDocument() throws IOException, JDOMException {
+        String resourcetype = "/editor_default_acls_" + id.getTypeId() + ".xml";
+        String resourcebase = "/editor_default_acls_" + id.getBase() + ".xml";
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcebase);
+        if (aclxml == null) {
+            aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
+            if (aclxml == null) {
+                LOGGER.warn("Can't find default object ACL file {} or {}", resourcebase.substring(1),
+                        resourcetype.substring(1));
+                String resource = "/editor_default_acls.xml"; // fallback
+                aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
+                if (aclxml == null) {
+                    return null;
+                }
+            }
+        }
+        return SAX_BUILDER.build(aclxml);
+    }
+
 
     private void checkObjectMetadata(Element metadata) {
         if (metadata.getAttribute("lang") != null) {

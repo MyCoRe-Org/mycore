@@ -95,12 +95,9 @@ public abstract class MCRServletContentHelper {
      * This method handles both GET and HEAD requests.
      */
     public static void serveContent(final MCRContent content, final HttpServletRequest request,
-        final HttpServletResponse response, final ServletContext context, final Config config,
-        final boolean withContent)
-        throws IOException {
-
+        HttpServletResponse httpServletResponse, final ServletContext context, final Config config,
+        final boolean withContent) throws IOException {
         boolean serveContent = withContent;
-
         final String path = getRequestPath(request);
         if (LOGGER.isDebugEnabled()) {
             if (serveContent) {
@@ -109,25 +106,114 @@ public abstract class MCRServletContentHelper {
                 LOGGER.debug("Serving '{}' headers only", path);
             }
         }
-
-        if (response.isCommitted()) {
+        //Check if all conditional header validate
+        final boolean isError = httpServletResponse.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
+        if (httpServletResponse.isCommitted() || (!isError && !checkIfHeaders(request, httpServletResponse, content))) {
             //getContent has access to response
             return;
         }
-
-        final boolean isError = response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
-
         if (content == null && !isError) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+            httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
             return;
         }
-
-        //Check if all conditional header validate
-        if (!isError && !checkIfHeaders(request, response, content)) {
-            return;
-        }
-
         // Find content type.
+        final String contentType = resolveMimeType(content, request, context);
+        final long contentLength = content.length();
+        //No Content to serve?
+        if (contentLength == 0) {
+            serveContent = false;
+        }
+        prepareAndSetupResponse(content, request, httpServletResponse, config, serveContent, isError, contentType,
+            contentLength);
+    }
+
+    private static void prepareAndSetupResponse(MCRContent content, HttpServletRequest request,
+        HttpServletResponse httpServletResponse, Config config, boolean serveContent, boolean isError,
+        String contentType, long contentLength) throws IOException {
+        HttpServletResponse response
+            = configureResponseHeaders(content, serveContent, request, httpServletResponse, config);
+        try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {
+            if (serveContent) {
+                try {
+                    response.setBufferSize(config.outputBufferSize);
+                } catch (final IllegalStateException e) {
+                    //does not matter if we fail
+                }
+            }
+            List<Range> ranges = parseRange(request, response, content);
+            if (response instanceof ServletResponseWrapper) {
+                if (request.getHeader("Range") != null) {
+                    LOGGER.warn("Response is wrapped by ServletResponseWrapper, no 'Range' requests supported.");
+                }
+                ranges = ContentUtils.FULL;
+            }
+            deliverContent(content, request, response, config, isError, ranges, contentType, contentLength,
+                serveContent,
+                out);
+        }
+    }
+
+    private static void deliverContent(MCRContent content, HttpServletRequest request,
+        HttpServletResponse response,
+        Config config, boolean isError, List<Range> ranges, String contentType, long contentLength,
+        boolean serveContent, ServletOutputStream out) throws IOException {
+        if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null
+            || ranges.equals(ContentUtils.FULL)) {
+            //No ranges
+            if (contentType != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("contentType='{}'", contentType);
+                }
+                response.setContentType(contentType);
+            }
+            if (contentLength >= 0) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("contentLength={}", contentLength);
+                }
+                setContentLengthLong(response, contentLength);
+            }
+            if (serveContent) {
+                ContentUtils.copy(content, out, config.inputBufferSize, config.outputBufferSize);
+            }
+        } else {
+            handlePartialContent(content, response, config, ranges, contentType, serveContent, out);
+        }
+    }
+
+    private static void handlePartialContent(MCRContent content, HttpServletResponse response, Config config,
+        List<Range> ranges,
+        String contentType, boolean serveContent, ServletOutputStream out) throws IOException {
+        if (ranges == null || ranges.isEmpty()) {
+            return;
+        }
+        // Partial content response.
+        response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        if (ranges.size() == 1) {
+            final Range range = ranges.getFirst();
+            response.addHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
+            final long length = range.end - range.start + 1;
+            setContentLengthLong(response, length);
+            if (contentType != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("contentType='{}'", contentType);
+                }
+                response.setContentType(contentType);
+            }
+            if (serveContent) {
+                ContentUtils.copy(content, out, range, config.inputBufferSize, config.outputBufferSize);
+            }
+        } else {
+            response.setContentType("multipart/byteranges; boundary=" + ContentUtils.MIME_BOUNDARY);
+            if (serveContent) {
+                ContentUtils.copy(content, out, ranges.iterator(), contentType, config.inputBufferSize,
+                    config.outputBufferSize);
+            }
+        }
+    }
+
+    private static String resolveMimeType(MCRContent content, HttpServletRequest request,
+        final ServletContext context)
+        throws IOException {
         String contentType = content.getMimeType();
         final String filename = getFileName(request, content);
         if (contentType == null) {
@@ -138,122 +224,40 @@ public abstract class MCRServletContentHelper {
         if (enc != null) {
             contentType = String.format(Locale.ROOT, "%s; charset=%s", contentType, enc);
         }
+        return contentType;
+    }
 
-        String eTag = null;
-        List<Range> ranges = null;
+    private static HttpServletResponse configureResponseHeaders(MCRContent content, boolean serveContent,
+        HttpServletRequest request,
+        final HttpServletResponse response, final Config config) throws IOException {
+        final boolean isError = response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
+        final String filename = getFileName(request, content);
+        String eTag;
         if (!isError) {
             eTag = content.getETag();
             if (config.useAcceptRanges) {
                 response.setHeader("Accept-Ranges", "bytes");
             }
-
-            ranges = parseRange(request, response, content);
-
             response.setHeader("ETag", eTag);
-
             long lastModified = content.lastModified();
             if (lastModified >= 0) {
                 response.setDateHeader("Last-Modified", lastModified);
             }
-
             if (config.expiresMinutes != 0) {
                 long expires = System.currentTimeMillis() + (config.expiresMinutes * 60L * 1000L);
                 response.setDateHeader("Expires", expires);
             }
-
             if (serveContent) {
                 String dispositionType = request.getParameter("dl") == null ? "inline" : "attachment";
                 response.setHeader("Content-Disposition", dispositionType + ";filename=\"" + filename + "\"");
             }
         }
-
-        final long contentLength = content.length();
-        //No Content to serve?
-        if (contentLength == 0) {
-            serveContent = false;
-        }
-
         if (content.isUsingSession()) {
             response.addHeader("Cache-Control", "private, max-age=0, must-revalidate");
             response.addHeader("Vary", "*");
         }
-
-        try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {
-            if (serveContent) {
-                try {
-                    response.setBufferSize(config.outputBufferSize);
-                } catch (final IllegalStateException e) {
-                    //does not matter if we fail
-                }
-            }
-            if (response instanceof ServletResponseWrapper) {
-                if (request.getHeader("Range") != null) {
-                    LOGGER.warn("Response is wrapped by ServletResponseWrapper, no 'Range' requests supported.");
-                }
-                ranges = ContentUtils.FULL;
-            }
-
-            if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null
-                || ranges.equals(ContentUtils.FULL)) {
-                //No ranges
-                if (contentType != null) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("contentType='{}'", contentType);
-                    }
-                    response.setContentType(contentType);
-                }
-                if (contentLength >= 0) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("contentLength={}", contentLength);
-                    }
-                    setContentLengthLong(response, contentLength);
-                }
-
-                if (serveContent) {
-                    ContentUtils.copy(content, out, config.inputBufferSize, config.outputBufferSize);
-                }
-
-            } else {
-
-                if (ranges == null || ranges.isEmpty()) {
-                    return;
-                }
-
-                // Partial content response.
-
-                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-
-                if (ranges.size() == 1) {
-
-                    final Range range = ranges.getFirst();
-                    response.addHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
-                    final long length = range.end - range.start + 1;
-                    setContentLengthLong(response, length);
-
-                    if (contentType != null) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("contentType='{}'", contentType);
-                        }
-                        response.setContentType(contentType);
-                    }
-
-                    if (serveContent) {
-                        ContentUtils.copy(content, out, range, config.inputBufferSize, config.outputBufferSize);
-                    }
-
-                } else {
-
-                    response.setContentType("multipart/byteranges; boundary=" + ContentUtils.MIME_BOUNDARY);
-
-                    if (serveContent) {
-                        ContentUtils.copy(content, out, ranges.iterator(), contentType, config.inputBufferSize,
-                            config.outputBufferSize);
-                    }
-                }
-            }
-        }
+        return response;
     }
-
     /**
      * Check if all conditions specified in the If headers are
      * satisfied.

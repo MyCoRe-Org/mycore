@@ -114,6 +114,8 @@ import org.xml.sax.XMLReader;
 
 import jakarta.servlet.ServletContext;
 
+import static org.mycore.common.xml.MCRURIResolver.MCRLayoutTransformerResolver.findAndThrowTransformerException;
+
 /**
  * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
  * usages, xsl:include usages and MyCoRe Editor include declarations. DTDs and Schema files are read from the CLASSPATH
@@ -893,6 +895,14 @@ public final class MCRURIResolver implements URIResolver {
             } catch (URISyntaxException e) {
                 categ = categID.toString();
             }
+            MCRCategory cl = getMcrCategory(uri, axis, categ, classID, levels);
+            if (cl == null) {
+                return null;
+            }
+            return getElement(uri, format, classID, cl, emptyLeaves);
+        }
+
+        private static MCRCategory getMcrCategory(String uri, String axis, String categ, String classID, int levels) {
             MCRCategory cl = null;
             LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
             if (axis.equals("children")) {
@@ -914,7 +924,11 @@ public final class MCRURIResolver implements URIResolver {
             if (cl == null) {
                 return null;
             }
+            return cl;
+        }
 
+        private static Element getElement(String uri, String format, String classID, MCRCategory cl,
+            boolean emptyLeaves) {
             Element returns;
             LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
@@ -1130,13 +1144,7 @@ public final class MCRURIResolver implements URIResolver {
                 return transformer.transform(content, parameterCollector).getSource();
 
             } catch (IOException e) {
-                Throwable cause = e.getCause();
-                while (cause != null) {
-                    if (cause instanceof TransformerException te) {
-                        throw te;
-                    }
-                    cause = cause.getCause();
-                }
+                findAndThrowTransformerException( e);
                 throw new TransformerException(e);
             }
 
@@ -1148,16 +1156,14 @@ public final class MCRURIResolver implements URIResolver {
             }
             return stylesheets;
         }
-
         private record Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {}
-
     }
 
     /**
      * Transform result of other resolver with stylesheet. Usage: xslTransform:<transformer><?param1=value1
      * <&param2=value2>>:<anyMyCoReURI>
      */
-    private static class MCRLayoutTransformerResolver implements URIResolver {
+    static class MCRLayoutTransformerResolver implements URIResolver {
 
         private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
 
@@ -1203,14 +1209,18 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(new Element("null"));
                 }
             } catch (Exception e) {
-                Throwable cause = e.getCause();
-                while (cause != null) {
-                    if (cause instanceof TransformerException te) {
-                        throw te;
-                    }
-                    cause = cause.getCause();
-                }
+                findAndThrowTransformerException(e);
                 throw new TransformerException(e);
+            }
+        }
+
+        static void findAndThrowTransformerException(Exception e) throws TransformerException {
+            Throwable cause = e.getCause();
+            while (cause != null) {
+                if (cause instanceof TransformerException te) {
+                    throw te;
+                }
+                cause = cause.getCause();
             }
         }
 

@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -269,17 +270,8 @@ public class MCRDataURL implements Serializable {
                 String[] tokens = parts[0].split(TOKEN_SEPARATOR);
                 List<String> token = Arrays.stream(tokens).filter(s -> !s.contains(PARAM_SEPARATOR))
                     .collect(Collectors.toList());
-                Map<String, String> params = Arrays.stream(tokens).filter(s -> s.contains(PARAM_SEPARATOR))
-                    .map(s -> s.split(PARAM_SEPARATOR, 2)).collect(Collectors.toMap(sl -> sl[0], sl -> {
-                        try {
-                            return decode(sl[1], StandardCharsets.UTF_8);
-                        } catch (Exception e) {
-                            throw new UnsupportedCharsetException("Error encoding the parameter value \"" + sl[1]
-                                + "\". Error: " + e.getMessage());
-                        }
-                    }));
-
-                final String mimeType = !token.isEmpty() ? token.getFirst() : null;
+                Map<String, String> params = parseTokenizedParameters(parts);
+                final String mimeType = !token.isEmpty() ? token.get(0) : null;
 
                 if (mimeType != null && !mimeType.isEmpty() && !PATTERN_MIMETYPE.matcher(mimeType).matches()) {
                     throw new MalformedURLException("Unknown mime type.");
@@ -295,7 +287,6 @@ public class MCRDataURL implements Serializable {
 
                 Charset charset = params.containsKey(CHARSET_PARAM) ? Charset.forName(params.get(CHARSET_PARAM))
                     : StandardCharsets.US_ASCII;
-
                 byte[] data;
                 try {
                     data = encoding == MCRDataURLEncoding.BASE64 ? Base64.getDecoder().decode(parts[1])
@@ -303,7 +294,6 @@ public class MCRDataURL implements Serializable {
                 } catch (IllegalArgumentException e) {
                     throw new MalformedURLException("Error decoding the data. " + e.getMessage());
                 }
-
                 return new MCRDataURL(data, encoding, mimeType, params);
             } else {
                 throw new MalformedURLException("Error parse data url: " + url);
@@ -314,6 +304,19 @@ public class MCRDataURL implements Serializable {
 
     }
 
+    private static Map<String, String> parseTokenizedParameters(String[] parts) {
+        String[] tokens = parts[0].split(TOKEN_SEPARATOR);
+        Map<String, String> params = Arrays.stream(tokens).filter(s -> s.contains(PARAM_SEPARATOR))
+            .map(s -> s.split(PARAM_SEPARATOR, 2)).collect(Collectors.toMap(sl -> sl[0], sl -> {
+                try {
+                    return decode(sl[1], StandardCharsets.UTF_8);
+                } catch (Exception e) {
+                    throw new UnsupportedCharsetException("Error encoding the parameter value \"" + sl[1]
+                        + "\". Error: " + e.getMessage());
+                }
+            }));
+        return params;
+    }
     /**
      * Constructs a new {@link MCRDataURL}.
      *
@@ -505,44 +508,22 @@ public class MCRDataURL implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
-            return true;
+            return true; //true
         }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof MCRDataURL other)) {
-            return false;
-        }
-        if (charset == null) {
-            if (other.charset != null) {
+        if ((!(obj instanceof MCRDataURL other)) ||
+                ((charset == null && other.charset != null) || !Objects.equals(charset, other.charset)) ||
+                ((data == null && other.data != null) || !MessageDigest.isEqual(data, other.data)) ||
+                (encoding != other.encoding) ||
+                ((mimeType == null && other.mimeType != null) || !Objects.equals(mimeType, other.mimeType))) {
                 return false;
             }
-        } else if (!charset.equals(other.charset)) {
-            return false;
-        }
-        if (data == null) {
-            if (other.data != null) {
-                return false;
-            }
-        } else if (!MessageDigest.isEqual(data, other.data)) {
-            return false;
-        }
-        if (encoding != other.encoding) {
-            return false;
-        }
-        if (mimeType == null) {
-            if (other.mimeType != null) {
-                return false;
-            }
-        } else if (!mimeType.equals(other.mimeType)) {
-            return false;
-        }
         if (parameters == null) {
             return other.parameters == null;
         } else {
             return parameters.equals(other.parameters);
         }
     }
+
 
     private static String encode(final String str, final Charset charset) {
         return URLEncoder.encode(str, charset).replace("+", "%20");

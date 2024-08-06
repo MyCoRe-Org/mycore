@@ -235,6 +235,10 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             }
         }
 
+        return getMcrCondition(qc, values);
+    }
+
+    private static MCRCondition<Void> getMcrCondition(MCRQueryCondition qc, List<String> values) {
         MCRAndCondition<Void> ac = new MCRAndCondition<>();
         for (String value : values) {
             if (value.startsWith("'")) {
@@ -257,7 +261,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
         }
 
         if (values.size() == 1) {
-            return ac.getChildren().get(0);
+            return ac.getChildren().getFirst();
         } else {
             return ac;
         }

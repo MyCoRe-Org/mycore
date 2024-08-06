@@ -410,21 +410,20 @@ public class MCRMetaLink extends MCRMetaDefault {
             throw new MCRException(getSubTag() + ": linktype is unsupported: " + linktype);
         }
         if (linktype.equals("arc")) {
-            if (from == null || from.length() == 0) {
-                throw new MCRException(getSubTag() + ": from is null or empty");
-            } else if (!XMLChar.isValidNCName(from)) {
-                throw new MCRException(getSubTag() + ": from is no valid NCName:" + from);
-            }
-
-            if (to == null || to.length() == 0) {
-                throw new MCRException(getSubTag() + ": to is null or empty");
-            } else if (!XMLChar.isValidNCName(to)) {
-                throw new MCRException(getSubTag() + ": to is no valid NCName:" + to);
-            }
+            throwMCRExceptionIfNullOrInvalid(from);
+            throwMCRExceptionIfNullOrInvalid(to);
         }
         if (linktype.equals("locator")&&(href == null || href.length() == 0)) {
                 throw new MCRException(getSubTag() + ": href is null or empty");
         }
+    }
+
+    private void throwMCRExceptionIfNullOrInvalid(String string){
+            if (string == null || string.length() == 0) {
+                throw new MCRException(getSubTag() + ": is null or empty");
+            } else if (!XMLChar.isValidNCName(string)) {
+                throw new MCRException(getSubTag() + ": is no valid NCName:" + string);
+            }
     }
 
     /**

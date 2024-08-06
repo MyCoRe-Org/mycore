@@ -111,55 +111,48 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     protected MCRCondition<?> parseString(String s) {
-        /* handle specific rules */
+        // handle specific rules
         if (s.equalsIgnoreCase("false")) {
             return new MCRFalseCondition<>();
-        }
-
-        if (s.equalsIgnoreCase("true")) {
+        } else if (s.equalsIgnoreCase("true")) {
             return new MCRTrueCondition<>();
-        }
-
-        if (s.startsWith("group")) {
-            String sTrimmed = s.substring(5).trim();
-            if (sTrimmed.startsWith("!=")) {
-                return new MCRGroupClause(sTrimmed.substring(2).trim(), true);
-            } else if (sTrimmed.startsWith("=")) {
-                return new MCRGroupClause(sTrimmed.substring(1).trim(), false);
-            } else {
-                throw new MCRParseException("syntax error: " + sTrimmed);
-            }
-        }
-
-        if (s.startsWith("user")) {
-            String sTrimmed = s.substring(4).trim();
-            if (sTrimmed.startsWith("!=")) {
-                return new MCRUserClause(sTrimmed.substring(2).trim(), true);
-            } else if (sTrimmed.startsWith("=")) {
-                return new MCRUserClause(sTrimmed.substring(1).trim(), false);
-            } else {
-                throw new MCRParseException("syntax error: " + sTrimmed);
-            }
-        }
-
-        if (s.startsWith("ip ")) {
+        } else if (s.startsWith("group")) {
+            return handleUserGroupCondition(s.substring(5).trim());
+        } else if (s.startsWith("user")) {
+            return handleUserGroupCondition(s.substring(4).trim());
+        } else if (s.startsWith("ip ")) {
             return getIPClause(s.substring(3).trim());
+        } else if (s.startsWith("date ")) {
+            return handleDateCondition(s.substring(5).trim());
+        } else {
+            return null;
         }
-
-        if (s.startsWith("date ")) {
-            String sTrimmed  = s.substring(5).trim();
-            if (sTrimmed.startsWith(">=")) {
-                return new MCRDateAfterClause(parseDate(sTrimmed.substring(2).trim(), false));
-            } else if (sTrimmed.startsWith("<=")) {
-                return new MCRDateBeforeClause(parseDate(sTrimmed.substring(2).trim(), true));
-            } else if (sTrimmed.startsWith(">")) {
-                return new MCRDateAfterClause(parseDate(sTrimmed.substring(1).trim(), true));
-            } else if (sTrimmed.startsWith("<")) {
-                return new MCRDateBeforeClause(parseDate(sTrimmed.substring(1).trim(), false));
-            } else {
-                throw new MCRParseException("syntax error: " + sTrimmed);
-            }
-        }
-        return null;
     }
+
+
+    private MCRCondition<?> handleUserGroupCondition(String s) {
+        if (s.startsWith("!=")) {
+            return new MCRUserClause(s.substring(2).trim(), true);
+        } else if (s.startsWith("=")) {
+            return new MCRUserClause(s.substring(1).trim(), false);
+        } else {
+            throw new MCRParseException("syntax error: " + s);
+        }
+    }
+
+    private MCRCondition<?> handleDateCondition(String s) {
+
+        if (s.startsWith(">=")) {
+            return new MCRDateAfterClause(parseDate(s.substring(2).trim(), false));
+        } else if (s.startsWith("<=")) {
+            return new MCRDateBeforeClause(parseDate(s.substring(2).trim(), true));
+        } else if (s.startsWith(">")) {
+            return new MCRDateAfterClause(parseDate(s.substring(1).trim(), true));
+        } else if (s.startsWith("<")) {
+            return new MCRDateBeforeClause(parseDate(s.substring(1).trim(), false));
+        } else {
+            throw new MCRParseException("syntax error: " + s);
+        }
+    }
+
 }
