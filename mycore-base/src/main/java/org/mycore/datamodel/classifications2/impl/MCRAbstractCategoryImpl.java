@@ -90,7 +90,9 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         setChildrenUnlocked(MCRCategoryDAOFactory.getInstance().getChildren(id));
     }
 
-    protected abstract void setChildrenUnlocked(List<MCRCategory> children);
+    protected void setChildrenUnlocked(List<MCRCategory> children){
+        //Does nothing. Please override
+    }
 
     public MCRCategoryID getId() {
         return id;

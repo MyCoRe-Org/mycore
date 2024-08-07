@@ -40,7 +40,6 @@ import org.mycore.common.MCRStreamUtils;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -60,10 +59,7 @@ public class MCRRequestDebugFilter implements Filter {
     /* (non-Javadoc)
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
-    @Override
-    public void init(FilterConfig filterConfig) {
 
-    }
 
     /* (non-Javadoc)
      * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)
@@ -202,12 +198,4 @@ public class MCRRequestDebugFilter implements Filter {
             });
         sb.append("REQUEST PARAMETERS END \n\n");
     }
-
-    /* (non-Javadoc)
-     * @see jakarta.servlet.Filter#destroy()
-     */
-    @Override
-    public void destroy() {
-    }
-
 }

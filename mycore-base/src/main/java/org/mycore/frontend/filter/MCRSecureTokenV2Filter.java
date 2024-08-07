@@ -130,9 +130,4 @@ public class MCRSecureTokenV2Filter implements Filter {
             System.arraycopy(src, i + 1, dest, i, src.length - 1 - i);
         }
     }
-
-    @Override
-    public void destroy() {
-    }
-
 }
