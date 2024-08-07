@@ -964,16 +964,21 @@ namespace mycore.viewer.components {
             vp.startAnimation(new widgets.canvas.ZoomAnimation(vp, 2, position));
         }
 
-        public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D): void {
-            if (!this.component.isAltoSelectable()) {
-                var xMove = currentPosition.x - startPosition.x;
-                var yMove = currentPosition.y - startPosition.y;
-                var move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
-                this.component.getPageController().viewport.position = startViewport
-                    .scale(this.component.getPageController().viewport.scale)
-                    .move(move)
-                    .scale(1 / this.component.getPageController().viewport.scale);
+        public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
+                         event: JQueryMouseEventObject): void {
+            const isAltoSelectable = this.component.isAltoSelectable();
+            const isImageCanvas = event.target === this.component._imageView.drawCanvas ||
+                event.target === this.component._imageView.markCanvas;
+            if(!isImageCanvas && isAltoSelectable) {
+                return;
             }
+            const xMove = currentPosition.x - startPosition.x;
+            const yMove = currentPosition.y - startPosition.y;
+            const move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
+            this.component.getPageController().viewport.position = startViewport
+                .scale(this.component.getPageController().viewport.scale)
+                .move(move)
+                .scale(1 / this.component.getPageController().viewport.scale);
         }
 
         public scroll(e: { deltaX: number; deltaY: number; orig: any; pos: Position2D; altKey?: boolean, ctrlKey?: boolean }) {
