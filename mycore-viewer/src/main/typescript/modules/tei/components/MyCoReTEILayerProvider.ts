@@ -57,12 +57,12 @@ export class MyCoReTEILayerProvider extends ViewerComponent {
                 const additionalHrefs = image.additionalHrefs;
                 additionalHrefs.forEach((name, href) => {
                     if (name.indexOf("TEI.") == 0) {
-                        var language = name.substr("TEI.".length).toLocaleLowerCase();
+                        const language = name.substr("TEI.".length).toLocaleLowerCase();
                         if (!translations.has(language)) {
                             translations.set(language, new MyCoReMap<string, string>());
                         }
 
-                        var idHrefTranslationMap = translations.get(language);
+                        const idHrefTranslationMap = translations.get(language);
                         idHrefTranslationMap.set(image.href, href);
 
                         if (languages.indexOf(language) == -1) {
@@ -82,13 +82,13 @@ export class MyCoReTEILayerProvider extends ViewerComponent {
             if (languages.length != 0) {
                 languages
                     .sort((l1, l2) => {
-                        var l1Order = order.indexOf(l1);
-                        var l2Order = order.indexOf(l2);
+                        const l1Order = order.indexOf(l1);
+                        const l2Order = order.indexOf(l2);
 
                         return l1Order - l2Order;
                     })
                     .forEach((language) => {
-                        var translationMap = translations.get(language);
+                        const translationMap = translations.get(language);
                         this.trigger(new ProvideLayerEvent(this, new TEILayer(language, "layer." + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
                     });
             }

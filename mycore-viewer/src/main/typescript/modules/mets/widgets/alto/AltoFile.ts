@@ -49,8 +49,8 @@ export class AltoFile {
         }
 
         // set width/height
-        var pages: HTMLCollectionOf<Element> = layout.getElementsByTagName("Page");
-        var page: Element = pages.item(0);
+        const pages: HTMLCollectionOf<Element> = layout.getElementsByTagName("Page");
+        const page: Element = pages.item(0);
         if (page == null) {
             return;
         }
@@ -58,8 +58,8 @@ export class AltoFile {
         this._pageHeight = parseInt(page.getAttribute("HEIGHT"));
 
         // extract content
-        var printSpaces: HTMLCollectionOf<Element> = page.getElementsByTagName("PrintSpace");
-        var printSpace: Element = printSpaces.item(0);
+        const printSpaces: HTMLCollectionOf<Element> = page.getElementsByTagName("PrintSpace");
+        const printSpace: Element = printSpaces.item(0);
         if (printSpace == null) {
             return;
         }
@@ -68,10 +68,10 @@ export class AltoFile {
     }
 
     private createAltoStyle(src: Element): AltoStyle {
-        var id: string = src.getAttribute("ID");
-        var fontFamily: string = src.getAttribute("FONTFAMILY");
-        var fontSize: number = parseFloat(src.getAttribute("FONTSIZE"));
-        var fontStyle: string = src.getAttribute("FONTSTYLE");
+        const id: string = src.getAttribute("ID");
+        const fontFamily: string = src.getAttribute("FONTFAMILY");
+        const fontSize: number = parseFloat(src.getAttribute("FONTSIZE"));
+        const fontStyle: string = src.getAttribute("FONTSTYLE");
         return new AltoStyle(id, fontFamily, fontSize, fontStyle);
     }
 
@@ -96,22 +96,22 @@ export class AltoFile {
 
     //Aufruf: PrintSpace->ermittle alle Kinder des Typs Textblock -> ermittle davon alle Kinder (TextLines) -> hole die Kinder der Textlines
     private extractElements(elem: Element, parent: AltoElement = null): Array<AltoElement> {
-        var childrenOfElement: Array<AltoElement> = new Array<AltoElement>();
+        const childrenOfElement: Array<AltoElement> = new Array<AltoElement>();
         //da enums mit reverse mapping erstellt werden kann zu der passende Nummer der entsprechende String ausgegeben werden
-        var childList: NodeList = elem.childNodes;
+        const childList: NodeList = elem.childNodes;
 
         //durchlaufe die Kinder
-        for (var index = 0; index < childList.length; index++) {
-            var currentElement = <Element>childList.item(index);
+        for (let index = 0; index < childList.length; index++) {
+            const currentElement = <Element>childList.item(index);
             if (currentElement instanceof Element) {
-                var elementType = this.detectElementType(currentElement);
+                const elementType = this.detectElementType(currentElement);
                 if (elementType != null) {
-                    var currentAltoElement = this.createAltoElement(currentElement, elementType, parent);
+                    const currentAltoElement = this.createAltoElement(currentElement, elementType, parent);
 
                     switch (elementType) {
                         case AltoElementType.ComposedBlock:
                         case AltoElementType.TextBlock:
-                            var blockChildren = this.extractElements(currentElement, currentAltoElement);
+                            const blockChildren = this.extractElements(currentElement, currentAltoElement);
                             currentAltoElement.setChildren(blockChildren);
                             childrenOfElement.push(currentAltoElement);
                             if (elementType == AltoElementType.TextBlock) {
@@ -132,7 +132,7 @@ export class AltoFile {
                             }
                             break;
                         case AltoElementType.TextLine:
-                            var listChildrens = this.extractElements(currentElement, currentAltoElement);
+                            const listChildrens = this.extractElements(currentElement, currentAltoElement);
                             currentAltoElement.setChildren(listChildrens);
                             childrenOfElement.push(currentAltoElement);
                             this._allLines.push(currentAltoElement);
@@ -155,11 +155,11 @@ export class AltoFile {
     }
 
     public getBlockContent(id: string): string {
-        var content: string = "";
-        for (var index = 0; index < this._allTextBlocks.length; index++) {
+        let content: string = "";
+        for (let index = 0; index < this._allTextBlocks.length; index++) {
             if (this._allTextBlocks[index].getId() == id) {
-                var lines: Array<AltoElement> = this._allTextBlocks[index].getChildren();
-                for (var i = 0; i < lines.length; i++) {
+                const lines: Array<AltoElement> = this._allTextBlocks[index].getChildren();
+                for (let i = 0; i < lines.length; i++) {
                     content += this.getContainerContent(lines[i].getId(), this._allLines);
                 }
                 break;
@@ -169,15 +169,15 @@ export class AltoFile {
     }
 
     public getContainerContent(id: string, container: Array<AltoElement>): string {
-        var content: string = "";
+        let content: string = "";
 
-        for (var index = 0; index < container.length; index++) {
+        for (let index = 0; index < container.length; index++) {
             if (container[index].getId() == id) {
-                var elements: Array<AltoElement> = container[index].getChildren();
-                for (var i = 0; i < elements.length; i++) {
-                    var childs: Array<AltoElement> = elements[i].getChildren();
+                const elements: Array<AltoElement> = container[index].getChildren();
+                for (let i = 0; i < elements.length; i++) {
+                    const childs: Array<AltoElement> = elements[i].getChildren();
                     content += "<span data-id=" + elements[i].getId() + ">";
-                    for (var j = 0; j < childs.length; j++) {
+                    for (let j = 0; j < childs.length; j++) {
                         content += childs[j].getContent() + " ";
                     }
                     content += "</span>";

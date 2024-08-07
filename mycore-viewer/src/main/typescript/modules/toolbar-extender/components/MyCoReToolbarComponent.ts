@@ -91,7 +91,7 @@ export class MyCoReToolbarExtenderComponent extends ViewerComponent {
             });
 
             this.idButtonMapping.forEach((k, v) => {
-                var inGroup = this.idEntryMapping.get(k).inGroup;
+                const inGroup = this.idEntryMapping.get(k).inGroup;
                 let group: ToolbarGroup = ptme.model.getGroups().filter(g => inGroup == g.name)[0];
 
                 if (typeof group == "undefined") {

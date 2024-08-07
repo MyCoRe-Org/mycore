@@ -93,7 +93,7 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
             Utils.selectElementText(this._scaleEdit.get(0));
 
             this._scaleEdit.keyup((ev) => {
-                var isValid = this.validateScaleEdit();
+                const isValid = this.validateScaleEdit();
 
                 if (ev.keyCode == 13) {
                     if (isValid) {
@@ -127,7 +127,7 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
             return false;
         }
 
-        var zoomNumber = (zoom * 1);
+        const zoomNumber = (zoom * 1);
         if (zoomNumber < 50 || zoomNumber > 400) {
             this._scaleEdit.addClass("error");
             return false;
@@ -138,7 +138,7 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
     }
 
     public get handlesEvents(): string[] {
-        var handles = new Array<any>();
+        const handles = new Array<any>();
         handles.push(ImageChangedEvent.TYPE);
         handles.push(StructureModelLoadedEvent.TYPE);
         handles.push(ViewportInitializedEvent.TYPE);
@@ -190,7 +190,7 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
         if (e.type == ImageChangedEvent.TYPE) {
             const imageChangedEvent = e as ImageChangedEvent;
             if (typeof imageChangedEvent.image != "undefined" && imageChangedEvent.image != null) {
-                var text = imageChangedEvent.image.orderLabel || imageChangedEvent.image.order;
+                let text = imageChangedEvent.image.orderLabel || imageChangedEvent.image.order;
                 if (imageChangedEvent.image.uniqueIdentifier != null) {
                     text += " - " + imageChangedEvent.image.uniqueIdentifier;
                 }
@@ -203,13 +203,13 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
 
     public updateLayoutInformation() {
         if (typeof this._pageLayout != "undefined") {
-            var currentPageZoom = this._pageLayout.getCurrentPageZoom();
+            const currentPageZoom = this._pageLayout.getCurrentPageZoom();
             if (this._currentZoom != currentPageZoom) {
                 this._scale.text(Math.round(currentPageZoom * 100) + "%");
                 this._currentZoom = currentPageZoom;
             }
 
-            var currentPageRotation = this._pageLayout.getCurrentPageRotation();
+            const currentPageRotation = this._pageLayout.getCurrentPageRotation();
             if (this._currentRotation != currentPageRotation) {
                 this._rotation.text(currentPageRotation + " °");
                 this._currentRotation = currentPageRotation;

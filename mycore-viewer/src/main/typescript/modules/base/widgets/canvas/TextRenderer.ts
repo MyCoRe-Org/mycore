@@ -32,7 +32,7 @@ export class TextRenderer {
 
 
         this.textContainer.setAttribute("class", "textContainer");
-        var htmlElement = <HTMLElement>this._view.container[0];
+        const htmlElement = this._view.container[0] as HTMLElement;
         htmlElement.appendChild(this.textContainer);
     }
 
@@ -100,7 +100,7 @@ export class TextRenderer {
             "transform : " + "scale(" + (pai.scale * this._vp.scale / dpr) + ");" +
             "z-index: 5;";
 
-        var childrenElement = <HTMLElement>pe.children[0];
+        const childrenElement = pe.children[0] as HTMLElement;
         childrenElement.style.cssText = "transform : rotate(" + pai.rotation + "deg);" +
             "width: " + realSize.width + "px;" +
             "height: " + realSize.height + "px;"
@@ -113,14 +113,14 @@ export class TextRenderer {
             this.createPageElement(page);
         }
 
-        var pageElement = this._pageElementCache.get(page);
+        const pageElement = this._pageElementCache.get(page);
         this._addedPages.push(page);
         this.textContainer.appendChild(pageElement);
     }
 
     createPageElement(page) {
-        var pageElement = document.createElement("div");
-        var childPageElement = <HTMLDivElement>(pageElement.cloneNode());
+        const pageElement = document.createElement("div");
+        const childPageElement = <HTMLDivElement>(pageElement.cloneNode());
         pageElement.appendChild(childPageElement);
         this._pageElementCache.set(page, pageElement);
         pageElement.style.display = "none";
@@ -128,21 +128,21 @@ export class TextRenderer {
 
     private removePage(page: AbstractPage) {
         this._addedPages.splice(this._addedPages.indexOf(page), 1);
-        var textContent = this._pageElementCache.get(page);
+        const textContent = this._pageElementCache.get(page);
         textContent.parentElement.removeChild(textContent);
     }
 
     private addPageParts(page: AbstractPage, textContent: TextContentModel) {
-        var pageHtml = document.createDocumentFragment();
+        const pageHtml = document.createDocumentFragment();
         textContent.content.forEach((e) => {
-            var cacheKey = e.pos.toString() + e.text;
+            const cacheKey = e.pos.toString() + e.text;
             if (!this._elementCache.has(cacheKey)) {
-                var contentPart = this.createContentPart(page, e);
+                const contentPart = this.createContentPart(page, e);
                 pageHtml.appendChild(contentPart);
             }
         });
         textContent.links.forEach((link) => {
-            var cacheKey = link.rect.toString() + link.url;
+            const cacheKey = link.rect.toString() + link.url;
             if (!this._elementCache.has(cacheKey)) {
                 const linkElement = document.createElement("a");
                 linkElement.setAttribute("href", link.url);
@@ -160,7 +160,7 @@ export class TextRenderer {
         });
 
         textContent.internLinks.forEach((link) => {
-            var cacheKey = link.rect.toString() + "DEST";
+            const cacheKey = link.rect.toString() + "DEST";
             if (!this._elementCache.has(cacheKey)) {
                 const linkElement = document.createElement("a");
                 linkElement.style.left = link.rect.getX() + "px";
@@ -182,7 +182,7 @@ export class TextRenderer {
 
         });
 
-        var pageElement = <HTMLElement>this._pageElementCache.get(page).children[0];
+        const pageElement = <HTMLElement>this._pageElementCache.get(page).children[0];
         pageElement.appendChild(pageHtml);
         if (pageElement.style.display == "none") {
             pageElement.style.display = "block";
@@ -190,21 +190,21 @@ export class TextRenderer {
     }
 
     private removeContentPart(cp: TextElement) {
-        var cpElement = this._lineElementMap.get(cp);
-        var parent = cpElement.parentElement;
+        const cpElement = this._lineElementMap.get(cp);
+        const parent = cpElement.parentElement;
 
         parent.removeChild(cpElement);
         this._lineElementMap.remove(cp);
     }
 
     private createContentPart(page: AbstractPage, cp: TextElement): HTMLElement {
-        var htmlElement = window.document.createElement("div");
+        const htmlElement = window.document.createElement("div");
         htmlElement.textContent = cp.text;
         htmlElement.setAttribute("class", "line");
 
         // need to stop propagation, because the text should be selectable and one parent calls preventDefault
         // (which prevents the selection)
-        var stopPropagation = (e) => {
+        const stopPropagation = (e) => {
             e.stopPropagation();
         };
 
@@ -224,21 +224,21 @@ export class TextRenderer {
             }
         });
 
-        var size = page.size;
-        var cacheKey = cp.pos.toString() + cp.text;
+        const size = page.size;
+        const cacheKey = cp.pos.toString() + cp.text;
 
         this._elementCache.set(cacheKey, htmlElement);
 
         this._mesureCanvas.save();
         this._mesureCanvas.font = cp.fontSize + 'px ' + cp.fontFamily;
 
-        var drawnWidth = this._mesureCanvas.measureText(cp.text).width;
+        const drawnWidth = this._mesureCanvas.measureText(cp.text).width;
         this._mesureCanvas.restore();
 
-        var xScaling = cp.size.width / drawnWidth;
+        const xScaling = cp.size.width / drawnWidth;
         this._lineElementMap.set(cp, htmlElement);
 
-        var topPosition = ("fromBottomLeft" in cp && !cp.fromBottomLeft) ? cp.pos.y : size.height - cp.pos.y;
+        const topPosition = ("fromBottomLeft" in cp && !cp.fromBottomLeft) ? cp.pos.y : size.height - cp.pos.y;
 
         htmlElement.style.cssText = "left : " + cp.pos.x + "px;" +
             "top : " + topPosition + "px;" +

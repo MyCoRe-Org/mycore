@@ -57,7 +57,7 @@ export class PDFPage implements AbstractPage {
 
     public resolveTextContent(callback: (content: TextContentModel) => void): void {
         if (this._textData == null) {
-            var textContent: TextContentModel = {
+            const textContent: TextContentModel = {
                 content: [],
                 links: [],
                 internLinks: []
@@ -69,8 +69,8 @@ export class PDFPage implements AbstractPage {
             this.pdfPage.getAnnotations().then((anotations) => {
                 linksReady = true;
                 if (anotations.length > 0) {
-                    for (var annotation of anotations) {
-                        if ((<any>annotation).annotationType == 2 && (<any>annotation).subtype == 'Link') {
+                    for (let annotation of anotations) {
+                        if ((annotation as any).annotationType == 2 && (annotation as any).subtype == 'Link') {
                             if ("url" in annotation) {
                                 textContent.links.push({
                                     rect: this.getRectFromAnnotation(annotation),
@@ -102,14 +102,14 @@ export class PDFPage implements AbstractPage {
                 contentReady = true;
                 textData.items.forEach((e) => {
 
-                    var vp = (<any>this.pdfPage.getViewport({scale: 1}));
+                    const vp = (this.pdfPage.getViewport({scale: 1}));
                     const textItem = e as TextItem;
-                    var transform = Util.transform(vp.transform, textItem.transform);
+                    const transform = Util.transform(vp.transform, textItem.transform);
 
-                    var style = textData.styles[textItem.fontName];
-                    var angle = Math.atan2(transform[1], transform[0]) + ((style.vertical == true) ? Math.PI / 2 : 0);
-                    var fontHeight = Math.sqrt((transform[2] * transform[2]) + (transform[3] * transform[3]));
-                    var fontAscent = fontHeight;
+                    const style = textData.styles[textItem.fontName];
+                    const angle = Math.atan2(transform[1], transform[0]) + ((style.vertical == true) ? Math.PI / 2 : 0);
+                    const fontHeight = Math.sqrt((transform[2] * transform[2]) + (transform[3] * transform[3]));
+                    let fontAscent = fontHeight;
 
                     if (style.ascent) {
                         fontAscent = style.ascent * fontAscent;
@@ -117,14 +117,14 @@ export class PDFPage implements AbstractPage {
                         fontAscent = (1 + style.descent) * fontAscent;
                     }
 
-                    var x;
-                    var y;
+                    let x;
+                    let y;
 
                     x = transform[4] * PDFPage.CSS_UNITS;
                     y = transform[5] * PDFPage.CSS_UNITS;
 
 
-                    var textElement = new PDFTextElement(angle, new Size2D(textItem.width, textItem.height).scale(PDFPage.CSS_UNITS).roundDown(), fontHeight, textItem.str, new Position2D(x, y), style.fontFamily, this.id);
+                    const textElement = new PDFTextElement(angle, new Size2D(textItem.width, textItem.height).scale(PDFPage.CSS_UNITS).roundDown(), fontHeight, textItem.str, new Position2D(x, y), style.fontFamily, this.id);
                     textContent.content.push(textElement);
                 });
 
@@ -162,11 +162,11 @@ export class PDFPage implements AbstractPage {
             return;
         }
 
-        var scaledRect = rect.scale(this._fbScale);
-        var sourceScaleRect = rect.scale(sourceScale);
+        const scaledRect = rect.scale(this._fbScale);
+        const sourceScaleRect = rect.scale(sourceScale);
 
-        var sw = scaledRect.size.width;
-        var sh = scaledRect.size.height;
+        const sw = scaledRect.size.width;
+        const sh = scaledRect.size.height;
 
         if (sw > 0 && sh > 0) {
             ctx.save();
@@ -179,8 +179,8 @@ export class PDFPage implements AbstractPage {
     }
 
     private _updateBackBuffer(newScale) {
-        var vp = this.pdfPage.getViewport({scale: newScale * PDFPage.CSS_UNITS, rotation: this._rotation});
-        var task = <any>this.pdfPage.render({
+        const vp = this.pdfPage.getViewport({scale: newScale * PDFPage.CSS_UNITS, rotation: this._rotation});
+        const task = this.pdfPage.render({
             canvasContext: <CanvasRenderingContext2D>this._backBuffer.getContext('2d'),
             viewport: vp
         });
@@ -191,13 +191,13 @@ export class PDFPage implements AbstractPage {
         this._backBuffer.width = this.size.width * newScale;
         this._backBuffer.height = this.size.height * newScale;
 
-        var resolve = (page: PDFPageProxy) => {
+        const resolve = () => {
             this._promiseRunning = false;
             this._swapBuffers();
             this.refreshCallback();
         };
 
-        var error = (err) => {
+        const error = (err) => {
             console.log("Render Error", err);
         };
 
@@ -206,7 +206,7 @@ export class PDFPage implements AbstractPage {
 
 
     private _swapBuffers() {
-        var swap: any = null;
+        let swap: any = null;
 
         swap = this._backBuffer;
         this._backBuffer = this._frontBuffer;

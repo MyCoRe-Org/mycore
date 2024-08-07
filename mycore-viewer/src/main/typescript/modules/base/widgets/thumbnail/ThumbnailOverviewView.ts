@@ -29,7 +29,7 @@ export class ThumbnailOverviewView {
         this._spacer.appendTo(this._container);
 
 
-        var cssObj = {"position": "relative"};
+        const cssObj = {"position": "relative"};
 
         cssObj["overflow-y"] = "scroll";
         cssObj["overflow-x"] = "hidden";
@@ -37,21 +37,20 @@ export class ThumbnailOverviewView {
 
         this._container.css(cssObj);
         this._lastViewPortSize = this.getViewportSize();
-        var that = this;
-        const scrollHandler = function () {
-            var newPos = new Position2D(that._container.scrollLeft(), that._container.scrollTop());
-            that._scrollHandler.scrolled(newPos);
+        const scrollHandler = () => {
+            const newPos = new Position2D(this._container.scrollLeft(), this._container.scrollTop());
+            this._scrollHandler.scrolled(newPos);
         };
 
         // TODO: Use touch
         this._container.bind("scroll", scrollHandler);
 
 
-        var resizeHandler = function () {
-            var newVp = that.getViewportSize();
-            if (that._lastViewPortSize != newVp) {
-                that._resizeHandler.resized(newVp);
-                that._lastViewPortSize = that.getViewportSize();
+        const resizeHandler = () => {
+            const newVp = this.getViewportSize();
+            if (this._lastViewPortSize != newVp) {
+                this._resizeHandler.resized(newVp);
+                this._lastViewPortSize = this.getViewportSize();
                 scrollHandler();
             }
         }
@@ -85,7 +84,7 @@ export class ThumbnailOverviewView {
     }
 
     public setThumnailSelected(id: string, selected: boolean) {
-        var thumb = this._container.find("[data-id='" + CSS.escape(id) + "']");
+        const thumb = this._container.find("[data-id='" + CSS.escape(id) + "']");
 
         if (selected) {
             thumb.addClass("selected");
@@ -132,7 +131,7 @@ export class ThumbnailOverviewView {
     }
 
     public updateTilePosition(id: string, position: Position2D) {
-        var thumbnailDiv = this._container.find("div[data-id='" + id + "']");
+        const thumbnailDiv = this._container.find("div[data-id='" + id + "']");
         thumbnailDiv.css({
             /* "display": "block" ,*/
             /*"position": "relative",*/

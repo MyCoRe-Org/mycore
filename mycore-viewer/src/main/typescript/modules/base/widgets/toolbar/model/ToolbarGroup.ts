@@ -41,7 +41,7 @@ export class ToolbarGroup {
      * Adds a IviewComponent to this Group and notify all registered observers.
      */
     public addComponent(component: ToolbarComponent) {
-        var componentId = component.getProperty("id").value;
+        const componentId = component.getProperty("id").value;
         if (this._idComponentMap.has(componentId)) {
             throw new Error(componentId + " already exist in " + this.name);
         }
@@ -54,7 +54,7 @@ export class ToolbarGroup {
      * Removes a IviewComponent from this Group and notify all registered observers.
      */
     public removeComponent(component: ToolbarComponent) {
-        var componentId = component.getProperty("id").value;
+        const componentId = component.getProperty("id").value;
         if (!this._idComponentMap.has(componentId)) {
             throw new Error(componentId + " doesnt exist in " + this.name);
         }
@@ -85,7 +85,7 @@ export class ToolbarGroup {
      * Removes a previous added Observer.
      */
     public removeObserver(observer: ContainerObserver<ToolbarGroup, ToolbarComponent>) {
-        var index = this._observerArray.indexOf(observer);
+        const index = this._observerArray.indexOf(observer);
         this._observerArray.splice(index, 1);
     }
 

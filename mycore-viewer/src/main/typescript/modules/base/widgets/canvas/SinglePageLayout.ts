@@ -112,8 +112,8 @@ export class SinglePageLayout extends PageLayout {
 
         let correctedY = middle.y;
         if (attop) {
-            var vp = this._pageController.viewport;
-            var scaledViewport = vp.size.scale(1 / vp.scale);
+            const vp = this._pageController.viewport;
+            const scaledViewport = vp.size.scale(1 / vp.scale);
             correctedY = (correctedY - realPageDimension.height / 2) + scaledViewport.height / 2;
         }
 

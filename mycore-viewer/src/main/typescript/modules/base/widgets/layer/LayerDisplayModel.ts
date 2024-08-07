@@ -38,7 +38,7 @@ export class LayerDisplayModel {
     }
 
     public removeLayer(layer: Layer) {
-        var layerIndex = this.layerList.indexOf(layer);
+        const layerIndex = this.layerList.indexOf(layer);
 
         if (layerIndex == -1) {
             throw `the layer ${layer.getId()} is not present in model!`;

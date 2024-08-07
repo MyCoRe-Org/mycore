@@ -31,18 +31,18 @@ export class TextInputController implements ContainerObserver<ToolbarGroup, Tool
     }
 
     public childAdded(parent: any, component: any): void {
-        var group = parent as ToolbarGroup;
-        var groupView = this._groupMap.get(group.name);
-        var componentId = component.getProperty("id").value;
-        var text = component as ToolbarTextInput;
+        const group = parent as ToolbarGroup;
+        const groupView = this._groupMap.get(group.name);
+        const componentId = component.getProperty("id").value;
+        const text = component as ToolbarTextInput;
 
-        var textView = this.createTextInputView(componentId);
+        const textView = this.createTextInputView(componentId);
 
-        var valueProperty = text.getProperty("value");
+        const valueProperty = text.getProperty("value");
         valueProperty.addObserver(this);
         textView.updateValue(valueProperty.value);
 
-        var placeHolderProperty = text.getProperty("placeHolder");
+        const placeHolderProperty = text.getProperty("placeHolder");
         placeHolderProperty.addObserver(this);
         textView.updatePlaceholder(placeHolderProperty.value);
 
@@ -58,7 +58,7 @@ export class TextInputController implements ContainerObserver<ToolbarGroup, Tool
     }
 
     public childRemoved(parent: any, component: any): void {
-        var componentId = component.getProperty("id").value;
+        const componentId = component.getProperty("id").value;
         this._textInputViewMap.get(componentId).getElement().remove();
 
         component.getProperty("value").removeObserver(this);
@@ -66,8 +66,8 @@ export class TextInputController implements ContainerObserver<ToolbarGroup, Tool
     }
 
     public propertyChanged(_old: ViewerProperty<any>, _new: ViewerProperty<any>) {
-        var textId = _new.from.getProperty("id").value;
-        var textInputView = this._textInputViewMap.get(textId);
+        const textId = _new.from.getProperty("id").value;
+        const textInputView = this._textInputViewMap.get(textId);
         if (_old.name == "value" && _new.name == "value") {
             if (textInputView.getValue() != _new.value) {
                 textInputView.updateValue(_new.value);

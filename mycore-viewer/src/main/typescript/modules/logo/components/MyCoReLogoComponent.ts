@@ -43,12 +43,12 @@ export class MyCoReLogoComponent extends ViewerComponent {
     public handle(e: ViewerEvent): void {
         if (e.type == ProvideToolbarModelEvent.TYPE && !this._settings.mobile) {
             if (this._settings.logoURL) {
-                var logoUrl = this._settings.logoURL;
+                const logoUrl = this._settings.logoURL;
 
-                var ptme = e as ProvideToolbarModelEvent;
+                const ptme = e as ProvideToolbarModelEvent;
 
                 const logoGroup = new ToolbarGroup('LogoGroup', 90, true);
-                var logo = new ToolbarImage('ToolbarImage', logoUrl);
+                const logo = new ToolbarImage('ToolbarImage', logoUrl);
 
                 logoGroup.addComponent(logo);
 
@@ -58,7 +58,7 @@ export class MyCoReLogoComponent extends ViewerComponent {
     }
 
     public get handlesEvents(): string[] {
-        var handleEvents: Array<string> = new Array<string>();
+        const handleEvents: Array<string> = new Array<string>();
         handleEvents.push(ProvideToolbarModelEvent.TYPE);
         return handleEvents;
     }

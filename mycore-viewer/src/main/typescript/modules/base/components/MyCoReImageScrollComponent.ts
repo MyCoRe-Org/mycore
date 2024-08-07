@@ -99,7 +99,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
         this.trigger(new WaitForEvent(this, ShowContentEvent.TYPE));
         this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
         this.trigger(new ViewportInitializedEvent(this, this._pageController.viewport));
-        var componentContent = this._componentContent;
+        const componentContent = this._componentContent;
         componentContent.css({
             position: "absolute",
             top: "0px",
@@ -109,15 +109,15 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
         });
         this.initMainView();
 
-        var overviewEnabled = Utils.getVar(this._settings, "canvas.overview.enabled", true);
+        const overviewEnabled = Utils.getVar(this._settings, "canvas.overview.enabled", true);
         if (!this._settings.mobile) {
             if (overviewEnabled) {
                 componentContent.append(this._pageController._overview.container);
             }
             this._pageController._overview.initEventHandler();
-            componentContent = componentContent.add(this._horizontalScrollbar.scrollbarElement);
-            componentContent = componentContent.add(this._verticalScrollbar.scrollbarElement);
-            componentContent = componentContent.add(this._toggleButton);
+            componentContent.add(this._horizontalScrollbar.scrollbarElement);
+            componentContent.add(this._verticalScrollbar.scrollbarElement);
+            componentContent.add(this._toggleButton);
             this.initOverview(overviewEnabled);
         }
 
@@ -150,12 +150,12 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
 
     private initOverview(overviewEnabled: any | boolean) {
         if (overviewEnabled) {
-            var overviewContainer = this._pageController._overview.container;
-            var minVisibleSize = parseInt(Utils.getVar(this._settings, "canvas.overview.minVisibleSize", MyCoReImageScrollComponent.DEFAULT_CANVAS_OVERVIEW_MIN_VISIBLE_SIZE, (value) => {
+            const overviewContainer = this._pageController._overview.container;
+            const minVisibleSize = parseInt(Utils.getVar(this._settings, "canvas.overview.minVisibleSize", MyCoReImageScrollComponent.DEFAULT_CANVAS_OVERVIEW_MIN_VISIBLE_SIZE, (value) => {
                 return !isNaN((<any>value) * 1) && parseInt(value, 10) > 1;
             }), 10);
 
-            var iconChild = this._toggleButton.children('.fas');
+            const iconChild = this._toggleButton.children('.fas');
             if (this._container.width() < minVisibleSize) {
                 jQuery(overviewContainer).hide();
                 iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
@@ -357,7 +357,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     }
 
     public get handlesEvents(): string[] {
-        var handleEvents = [];
+        const handleEvents = [];
 
         if (!this.isImageDoctype()) {
             return handleEvents;
@@ -409,14 +409,15 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     }
 
     private changePageLayout(pageLayout: PageLayout) {
+        let page: number = NaN;
         if (this._pageLayout != null) {
             this._pageLayout.clear();
-            var page = this._pageLayout.getCurrentPage();
+            page = this._pageLayout.getCurrentPage();
         }
         this._pageLayout = pageLayout;
 
         if (isNaN(page)) {
-            var page = 1;
+            page = 1;
             this._layoutModel.pageCount = 1;
         }
         this._pageLayout.jumpToPage(page);
@@ -431,9 +432,9 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
             (!this._hrefPageLoadingMap.has(imageHref) || !this._hrefPageLoadingMap.get(imageHref))) {
             this._hrefPageLoadingMap.set(imageHref, true);
 
-            var textHref: string = null;
+            let textHref: string = null;
             if (this._hrefImageMap.has(imageHref)) {
-                var additionalHrefs = this._imageByHref(imageHref).additionalHrefs;
+                const additionalHrefs = this._imageByHref(imageHref).additionalHrefs;
                 if (additionalHrefs.has(MyCoReImageScrollComponent.ALTO_TEXT_HREF)) {
                     textHref = additionalHrefs.get(MyCoReImageScrollComponent.ALTO_TEXT_HREF);
                 } else if (additionalHrefs.has(MyCoReImageScrollComponent.PDF_TEXT_HREF)) {
@@ -457,11 +458,11 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     }
 
     private restorePermalink() {
-        var state = this._permalinkState;
+        const state = this._permalinkState;
 
         if (state.has("layout")) {
-            var layout = state.get("layout");
-            var layoutObjects = this._layouts.filter(l => l.getLabelKey() == layout);
+            const layout = state.get("layout");
+            const layoutObjects = this._layouts.filter(l => l.getLabelKey() == layout);
             if (layoutObjects.length != 1) {
                 console.log("no matching layout found!");
             } else {
@@ -471,13 +472,13 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
         }
 
         if (state.has("page")) {
-            var page = <number>+state.get("page");
+            const page = <number>+state.get("page");
             this._pageLayout.jumpToPage(page);
             this._startPage = page;
         }
 
         if (state.has("rotation")) {
-            var rot = <number>+state.get("rotation");
+            const rot = <number>+state.get("rotation");
             this._rotation = rot;
             this._pageLayout.rotate(rot);
         }
@@ -727,10 +728,10 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     }
 
     private synchronizeLayoutToolbarButton() {
-        var changed = false;
+        let changed = false;
         this._layouts.forEach((layout) => {
-            var id = layout.getLabelKey();
-            var childrenWithId = this._layoutToolbarButton.children.filter((c) => c.id == id);
+            const id = layout.getLabelKey();
+            const childrenWithId = this._layoutToolbarButton.children.filter((c) => c.id == id);
 
             if (childrenWithId.length == 0) {
                 this._layoutToolbarButton.children.push({
@@ -778,7 +779,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
             return;
         }
 
-        var newImageOrder = this._pageLayout.getCurrentPage();
+        const newImageOrder = this._pageLayout.getCurrentPage();
         this._pageLayout.syncronizePages();
         if (!this._settings.mobile) {
             this._pageController._overview.overviewRect = this._pageLayout.getCurrentOverview();
@@ -793,8 +794,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
 
     private _structureModelLoaded() {
         let altoPresent = false;
-        for (var imageIndex in this._structureImages) {
-            var image = this._structureImages[imageIndex];
+        for (const image of this._structureImages) {
             this._hrefImageMap.set(image.href, image);
             this._orderImageMap.set(image.order, image);
             altoPresent = altoPresent || image.additionalHrefs.has("AltoHref");
@@ -802,9 +802,9 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
 
 
         if (this._orderPageMap.has(1)) {
-            var firstPage = this._orderPageMap.get(1);
+            const firstPage = this._orderPageMap.get(1);
             this._orderPageMap.remove(1);
-            var img = this._hrefImageMap.get(this._settings.filePath);
+            const img = this._hrefImageMap.get(this._settings.filePath);
             this._orderPageMap.set(img.order, firstPage);
         }
 
@@ -832,11 +832,11 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
         this._pageLayout.clear();
         this._layoutModel.pageCount = this._structureImages.length;
 
-        var order;
+        let order;
         if (this._hrefImageMap.has(key)) {
             order = this._hrefImageMap.get(key).order;
         } else {
-            var url = ViewerParameterMap.fromCurrentUrl();
+            const url = ViewerParameterMap.fromCurrentUrl();
             if (url.has("page")) {
                 order = parseInt(url.get("page"));
             } else {
@@ -863,7 +863,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
         if (this._permalinkState != null) {
             this.restorePermalink();
         }
-        var image = this._orderImageMap.get(this._pageLayout.getCurrentPage());
+        const image = this._orderImageMap.get(this._pageLayout.getCurrentPage());
         this.trigger(new ImageChangedEvent(this, image));
     }
 
@@ -930,15 +930,15 @@ class TouchInputHandler extends TouchInputAdapter {
                 viewPort.scale *= relativeScale;
             }
 
-            var move = new MoveVector(-(session.currentMove.middle.x - session.startMiddle.x), -(session.currentMove.middle.y - session.startMiddle.y));
-            var rotation = viewPort.rotation;
-            var scale = viewPort.scale;
+            const move = new MoveVector(-(session.currentMove.middle.x - session.startMiddle.x), -(session.currentMove.middle.y - session.startMiddle.y));
+            const rotation = viewPort.rotation;
+            const scale = viewPort.scale;
             viewPort.position = session.canvasStartPosition.copy().scale(scale).move(move.rotate(rotation)).scale(1 / scale).move(this._touchAdditionalScaleMove);
         }
     }
 
     public touchEnd(session: TouchSession): void {
-        var viewPort = this.component.getPageController().viewport;
+        const viewPort = this.component.getPageController().viewport;
 
         if (session.currentMove != null) {
             if (session.currentMove.velocity.x != 0 || session.currentMove.velocity.y != 0) {
@@ -1006,12 +1006,12 @@ class DesktopInputHandler extends DesktopInputAdapter {
         altKey?: boolean,
         ctrlKey?: boolean
     }) {
-        var zoomParameter = (ViewerParameterMap.fromCurrentUrl().get("iview2.scroll") == "zoom");
-        var zoom = (zoomParameter) ? !e.altKey || e.ctrlKey : e.altKey || e.ctrlKey;
-        var vp = this.component.getPageController().viewport;
+        const zoomParameter = (ViewerParameterMap.fromCurrentUrl().get("iview2.scroll") == "zoom");
+        const zoom = (zoomParameter) ? !e.altKey || e.ctrlKey : e.altKey || e.ctrlKey;
+        const vp = this.component.getPageController().viewport;
 
         if (zoom) {
-            var relative = Math.pow(0.95, (e.deltaY / 10));
+            const relative = Math.pow(0.95, (e.deltaY / 10));
             if (typeof vp.currentAnimation != "undefined" && vp.currentAnimation != null) {
                 if (vp.currentAnimation instanceof ZoomAnimation) {
                     (vp.currentAnimation as ZoomAnimation).merge(relative);
@@ -1020,7 +1020,7 @@ class DesktopInputHandler extends DesktopInputAdapter {
                 }
 
             } else {
-                var position = vp.getAbsolutePosition(e.pos);
+                const position = vp.getAbsolutePosition(e.pos);
                 vp.startAnimation(new ZoomAnimation(vp, relative, position));
             }
         } else {

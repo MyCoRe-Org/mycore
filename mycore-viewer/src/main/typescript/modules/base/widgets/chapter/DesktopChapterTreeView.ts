@@ -35,13 +35,13 @@ export class DesktopChapterTreeView implements ChapterTreeView {
 
     public addNode(parentId: string, id: string, label: string, childLabel: string, expandable: boolean) {
         // Resolves the Parent
-        var parentElement = this.getParent(parentId);
+        const parentElement = this.getParent(parentId);
 
         // Creates the Node
         if (label === childLabel) {
             childLabel = '';
         }
-        var nodeToAdd = this.createNode(id, label, childLabel, expandable);
+        const nodeToAdd = this.createNode(id, label, childLabel, expandable);
 
         parentElement.append(nodeToAdd);
     }
@@ -50,13 +50,13 @@ export class DesktopChapterTreeView implements ChapterTreeView {
      * Resolves the List of a Parent or creates it.
      */
     public getParent(parentId: string): JQuery {
-        var parentElement: JQuery;
+        let parentElement: JQuery;
         if (parentId != null) {
             parentElement = this.list.find("ol[data-id='" + CSS.escape(parentId) + "']");
             // Creates ol for children if not exist
             if (parentElement.length == 0) {
                 parentElement = this.list.find("li[data-id='" + CSS.escape(parentId) + "']");
-                var childrenList = jQuery("<ol></ol>");
+                const childrenList = jQuery("<ol></ol>");
                 childrenList.attr("data-id", parentId);
                 childrenList.attr("data-opened", "true");
                 childrenList.insertAfter(parentElement);
@@ -82,7 +82,7 @@ export class DesktopChapterTreeView implements ChapterTreeView {
         this._inputHandler.registerNode(labelElement, id);
 
         if (expandable) {
-            var expander = jQuery("<span class=\"expander fas " + DesktopChapterTreeView.OPEN_ICON_CLASS + "\"></span>");
+            const expander = jQuery("<span class=\"expander fas " + DesktopChapterTreeView.OPEN_ICON_CLASS + "\"></span>");
             insertedNode.prepend(expander);
             this._inputHandler.registerExpander(expander, id);
         }
@@ -107,11 +107,11 @@ export class DesktopChapterTreeView implements ChapterTreeView {
     }
 
     public setSelected(id: string, selected: boolean) {
-        var elem = this.list.find("li[data-id='" + CSS.escape(id) + "']").attr("data-selected", selected.toString());
+        const elem = this.list.find("li[data-id='" + CSS.escape(id) + "']").attr("data-selected", selected.toString());
     }
 
     public jumpTo(id: string) {
-        var elem = this.list.find("li[data-id='" + CSS.escape(id) + "']");
+        const elem = this.list.find("li[data-id='" + CSS.escape(id) + "']");
 
         elem.addClass("blink");
         setTimeout(() => {
@@ -119,13 +119,13 @@ export class DesktopChapterTreeView implements ChapterTreeView {
             }, 500
         );
 
-        var realElementPosition = elem.position().top - this._container.position().top;
-        var move = 0;
+        const realElementPosition = elem.position().top - this._container.position().top;
+        let move = 0;
         if (realElementPosition < 0) {
             move = realElementPosition - 10;
         } else {
-            var containerHeight = this._container.height();
-            var elementHeight = elem.height();
+            const containerHeight = this._container.height();
+            const elementHeight = elem.height();
             if ((realElementPosition + elementHeight + 10) > containerHeight) {
                 move = (realElementPosition - containerHeight) + elementHeight + 10;
             } else {

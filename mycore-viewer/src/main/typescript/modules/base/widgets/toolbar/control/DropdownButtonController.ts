@@ -62,15 +62,12 @@ export class DropdownButtonController extends ButtonController {
             }(button));
         } else {
             const childArray: Array<ToolbarDropdownButtonChild> = childs;
-            for (var childIndex in childArray) {
-                const view = dropdownView.getChildElement(childArray[childIndex].id);
-                view.bind("click", function (modelElement: ToolbarDropdownButtonChild) {
-                    return function () {
-                        that.eventManager.trigger(new DropdownButtonPressedEvent(button, modelElement.id))
-                    };
-                }(childArray[childIndex]));
-
-            }
+            childArray.forEach((child) => {
+                const view = dropdownView.getChildElement(child.id);
+                view.bind("click", () => {
+                    that.eventManager.trigger(new DropdownButtonPressedEvent(button, child.id))
+                });
+            });
         }
 
     }

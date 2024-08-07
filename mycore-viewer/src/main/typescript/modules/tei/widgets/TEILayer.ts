@@ -35,7 +35,7 @@ export class TEILayer implements Layer {
 
     resolveLayer(pageHref: string, callback: (success: boolean, content?: JQuery) => void): void {
         if (this.mapping.has(pageHref)) {
-            var settings: JQueryAjaxSettings = {};
+            const settings: JQueryAjaxSettings = {};
 
             settings.async = true;
             settings.success = function (data: any, textStatus: string, jqXHR: JQueryXHR) {

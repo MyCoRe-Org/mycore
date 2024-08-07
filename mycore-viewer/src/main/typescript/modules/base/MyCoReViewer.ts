@@ -45,18 +45,17 @@ export class MyCoReViewer {
     }
 
     public addComponent(ic: ViewerComponent) {
-        var that = this;
-        ic.bind(function (event: ViewerEvent) {
-            that.eventTriggered(event);
+        ic.bind((event: ViewerEvent) => {
+            this.eventTriggered(event);
         });
 
-        var events = ic.handlesEvents;
+        const events = ic.handlesEvents;
 
         if (typeof events != "undefined" && events != null && events instanceof Array) {
             events.push(WaitForEvent.TYPE)
 
-            for (var eIndex in events) {
-                var e = events[eIndex];
+            for (const eIndex in events) {
+                const e = events[eIndex];
                 // initialize the array for the event first
                 if (!this._eventHandlerMap.has(e)) {
                     this._eventHandlerMap.set(e, new Array<ViewerComponent>());
@@ -74,9 +73,8 @@ export class MyCoReViewer {
 
     private eventTriggered(e: ViewerEvent) {
         if (this._eventHandlerMap.has(e.type)) {
-            var handlers = this._eventHandlerMap.get(e.type);
-            for (var componentIndex in handlers) {
-                var component = handlers[componentIndex];
+            const handlers = this._eventHandlerMap.get(e.type);
+            for (const component of handlers) {
                 component._handle(e);
             }
         }
@@ -88,8 +86,7 @@ export class MyCoReViewer {
             this._container.addClass("mycoreViewer");
         }
 
-        for (var i in VIEWER_COMPONENTS) {
-            var ic = VIEWER_COMPONENTS[i];
+        for (const ic of VIEWER_COMPONENTS) {
             try {
                 this.addComponent(new ic(this._settings, this._container));
             } catch (e) {

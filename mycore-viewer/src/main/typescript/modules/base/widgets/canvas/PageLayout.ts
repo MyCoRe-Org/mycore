@@ -59,8 +59,8 @@ export class PageLayout {
      * @param order the order number of the page.
      */
     public updatePage(order) {
-        var shouldBeInserted = this.checkShouldBeInserted(order);
-        var isInserted = this.isImageInserted(order);
+        const shouldBeInserted = this.checkShouldBeInserted(order);
+        const isInserted = this.isImageInserted(order);
 
         if (shouldBeInserted && !isInserted && this._model.children.has(order)) {
             const page = this._model.children.get(order);
@@ -78,9 +78,9 @@ export class PageLayout {
 
     public getRealPageDimension(pageNumber: number): Size2D {
         if (pageNumber != -1 && this._model.children.has(pageNumber)) {
-            var page = this._model.children.get(pageNumber);
+            const page = this._model.children.get(pageNumber);
 
-            var pageArea = this._pageController.getPageAreaInformation(page);
+            const pageArea = this._pageController.getPageAreaInformation(page);
             if (typeof pageArea != "undefined") {
                 return page.size.scale(pageArea.scale).getRotated(this.getCurrentPageRotation());
             }

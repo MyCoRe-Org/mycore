@@ -85,8 +85,8 @@ export class DesktopInputDelegator {
 
 
         this._mouseUpHandler = (e) => {
-            let target = jQuery(e.target);
-            var mousePosition: Position2D = this.getMousePosition(inputElement, e);
+            const target = jQuery(e.target);
+            const mousePosition: Position2D = this.getMousePosition(inputElement, e);
             this._handler.mouseUp(mousePosition, e);
 
             // end mouse session for drag and double click support
@@ -119,7 +119,7 @@ export class DesktopInputDelegator {
         inputElement.bind("mousedown", this._mouseDownHandler);
         inputElement.bind("mouseup", this._mouseUpHandler);
 
-        let body = jQuery(document.body);
+        const body = jQuery(document.body);
         body.keydown((e) => {
             this._handler.keydown(e);
         });
@@ -139,7 +139,7 @@ export class DesktopInputDelegator {
     }
 
     private getTarget(e: JQuery.MouseEventBase) {
-        let target = jQuery(e.target);
+        const target = jQuery(e.target);
         if (target.hasClass("overview")) {
             return null;
         }
@@ -147,14 +147,14 @@ export class DesktopInputDelegator {
     }
 
     private getMousePosition(inputElement: any, e: JQuery.MouseEventBase): Position2D {
-        let x = ((e.clientX + window.pageXOffset) - inputElement.offset().left) * window.devicePixelRatio;
-        let y = ((e.clientY + window.pageYOffset) - inputElement.offset().top) * window.devicePixelRatio;
+        const x = ((e.clientX + window.pageXOffset) - inputElement.offset().left) * window.devicePixelRatio;
+        const y = ((e.clientY + window.pageYOffset) - inputElement.offset().top) * window.devicePixelRatio;
         return new Position2D(x, y);
     }
 
     public clearRunning() {
         if (this._currentMouseSession != null) {
-            let inputElement = jQuery(this._inputElement[0]);
+            const inputElement = jQuery(this._inputElement[0]);
             inputElement.unbind("mousemove", this._mouseDragHandler);
             inputElement.bind("mousemove", this._mouseMoveHandler);
             this._lastMouseSession = this._currentMouseSession;

@@ -45,7 +45,7 @@ export class MyCoReMetadataComponent extends ViewerComponent {
         this._container = jQuery("<div></div>");
         this._container.addClass("card-body");
         if (typeof this._settings.metadataURL != "undefined" && this._settings.metadataURL != null) {
-            var metadataUrl = ViewerFormatString(this._settings.metadataURL, {
+            const metadataUrl = ViewerFormatString(this._settings.metadataURL, {
                 derivateId: this._settings.derivate,
                 objId: this._settings.objId
             });

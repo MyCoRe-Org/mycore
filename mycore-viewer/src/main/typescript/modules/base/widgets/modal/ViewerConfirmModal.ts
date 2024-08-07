@@ -39,12 +39,11 @@ export class ViewerConfirmModal extends ViewerModalWindow {
         button.addClass("btn btn-secondary");
         button.appendTo(this.modalFooter);
 
-        var that = this;
         button.click(() => {
             if (callback) {
                 callback(confirm);
             }
-            that.hide();
+            this.hide();
         });
     }
 }

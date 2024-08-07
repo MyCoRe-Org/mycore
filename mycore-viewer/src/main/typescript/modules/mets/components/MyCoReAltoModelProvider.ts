@@ -71,8 +71,7 @@ export class MyCoReAltoModelProvider extends ViewerComponent {
             this.structureModel = smle.structureModel;
             if (smle.structureModel._textContentPresent) {
                 this.fillAltoHrefMap();
-                for (var rtceIndex in this.altoModelRequestTempStore) {
-                    const rtce = this.altoModelRequestTempStore[rtceIndex];
+                for (const rtce of this.altoModelRequestTempStore) {
                     const {altoHref, imgHref} = this.detectHrefs(rtce._href);
                     ((altoHref, imgHref, cb) => {
                         if (this.pageHrefAltoHrefMap.has(imgHref)) {
@@ -109,7 +108,7 @@ export class MyCoReAltoModelProvider extends ViewerComponent {
         this.structureModel.imageList.forEach((image) => {
             const hasTextHref = image.additionalHrefs.has(MyCoReAltoModelProvider.TEXT_HREF);
             if (hasTextHref) {
-                var altoHref = image.additionalHrefs.get(MyCoReAltoModelProvider.TEXT_HREF);
+                const altoHref = image.additionalHrefs.get(MyCoReAltoModelProvider.TEXT_HREF);
                 this.pageHrefAltoHrefMap.set(image.href, altoHref);
                 this.altoHrefPageHrefMap.set(altoHref, image.href);
             }
@@ -155,14 +154,14 @@ export class MyCoReAltoModelProvider extends ViewerComponent {
                            xml: any,
                            callback: (altoContainer: AltoFile) => void): void {
 
-        var pageStyles: NodeListOf<HTMLAreaElement> = xml.getElementsByTagName("Styles");
-        var styles: Element = pageStyles.item(0);
+        const pageStyles: NodeListOf<HTMLAreaElement> = xml.getElementsByTagName("Styles");
+        const styles: Element = pageStyles.item(0);
 
-        var layouts: NodeListOf<HTMLAreaElement> = xml.getElementsByTagName("Layout");
-        var layout: Element = layouts.item(0);
+        const layouts: NodeListOf<HTMLAreaElement> = xml.getElementsByTagName("Layout");
+        const layout: Element = layouts.item(0);
 
         if (layout != null) {
-            var altoContainer = new AltoFile(styles, layout);
+            const altoContainer = new AltoFile(styles, layout);
             MyCoReAltoModelProvider.altoHrefModelMap.set(altoHref, altoContainer);
             callback(altoContainer);
         }

@@ -86,9 +86,8 @@ export class MyCoReMetsComponent extends MyCoReStructFileComponent {
     }
 
     public handle(e: ViewerEvent): void {
-
         if (e.type === LanguageModelLoadedEvent.TYPE) {
-            var languageModelLoadedEvent = e as LanguageModelLoadedEvent;
+            const languageModelLoadedEvent = e as LanguageModelLoadedEvent;
             this.lm = languageModelLoadedEvent.languageModel;
             this.errorSync(this);
             this.structFileAndLanguageSync(this);

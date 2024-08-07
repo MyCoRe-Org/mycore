@@ -28,7 +28,7 @@ namespace mycore.viewer.widgets.layout {
 
         private _initContainer() {
             this._container1 = jQuery("<div></div>");
-            var cssObject = <any>{};
+            const cssObject = <any>{};
             cssObject.position = "fixed";
             cssObject.left = "0px";
             cssObject.top = "0px";
@@ -55,7 +55,7 @@ namespace mycore.viewer.widgets.layout {
             this._container2.append(newPage);
             this._container1.fadeOut("slow");
             this._container2.fadeIn("slow");
-            var b = this._container1;
+            const b = this._container1;
             this._container1 = this._container2;
             this._container2 = b;
         }

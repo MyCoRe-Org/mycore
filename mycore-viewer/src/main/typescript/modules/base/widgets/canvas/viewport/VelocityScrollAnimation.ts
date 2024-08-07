@@ -31,14 +31,14 @@ export class VelocityScrollAnimation implements Animation {
 
     updateAnimation(elapsedTime: number): boolean {
         this._currentVelocity = this._currentVelocity.scale(1 / (1 + (0.01 * (elapsedTime / 3))));
-        var isComplete = this._currentVelocity.x < VelocityScrollAnimation.MINIMUM_VELOCITY &&
+        const isComplete = this._currentVelocity.x < VelocityScrollAnimation.MINIMUM_VELOCITY &&
             this._currentVelocity.x > -VelocityScrollAnimation.MINIMUM_VELOCITY &&
             this._currentVelocity.y < VelocityScrollAnimation.MINIMUM_VELOCITY &&
             this._currentVelocity.y > -VelocityScrollAnimation.MINIMUM_VELOCITY;
 
         if (!isComplete) {
-            var oldPos = this._viewport.position;
-            var newPosition = new Position2D(oldPos.x + (this._currentVelocity.x * elapsedTime), oldPos.y + (this._currentVelocity.y * elapsedTime));
+            const oldPos = this._viewport.position;
+            const newPosition = new Position2D(oldPos.x + (this._currentVelocity.x * elapsedTime), oldPos.y + (this._currentVelocity.y * elapsedTime));
             this._viewport.position = newPosition;
         }
 

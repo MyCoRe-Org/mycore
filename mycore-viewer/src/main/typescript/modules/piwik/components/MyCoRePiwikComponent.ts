@@ -78,19 +78,18 @@ export class MyCoRePiwikComponent extends ViewerComponent {
 
     public init() {
         window["_paq"] = [];
-        var piwikURL = this._settings["MCR.Piwik.baseurl"];
+        const piwikURL = this._settings["MCR.Piwik.baseurl"];
         if (piwikURL == null) {
             console.log("Error: unable to get piwik base url (MCR.Piwik.baseurl)");
         }
-        var pageID = this._settings["MCR.Piwik.id"];
+        const pageID = this._settings["MCR.Piwik.id"];
         if (pageID == null) {
             console.log("Error: unable to get piwik id (MCR.Piwik.id)");
         }
         window["_paq"].push(["setTrackerUrl", piwikURL + "piwik.php"]);
         window["_paq"].push(["setSiteId", pageID]);
-        var that = this;
-        jQuery.getScript(piwikURL + 'piwik.js', function () {
-            that.trigger(new ComponentInitializedEvent(that));
+        jQuery.getScript(piwikURL + 'piwik.js', () => {
+            this.trigger(new ComponentInitializedEvent(this));
         });
     }
 

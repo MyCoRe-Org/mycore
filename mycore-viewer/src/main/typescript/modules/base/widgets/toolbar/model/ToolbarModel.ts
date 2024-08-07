@@ -107,7 +107,7 @@ export class ToolbarModel extends ToolbarGroup implements ContainerObserver<Tool
      * removes a previous added Observer.
      */
     public removeGroupObserver(observer: ContainerObserver<ToolbarModel, ToolbarGroup>) {
-        var index = this._groupObserverArray.indexOf(observer);
+        const index = this._groupObserverArray.indexOf(observer);
         this._groupObserverArray.splice(index, 1);
     }
 

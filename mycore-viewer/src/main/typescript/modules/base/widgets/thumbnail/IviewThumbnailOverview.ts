@@ -52,19 +52,18 @@ export class IviewThumbnailOverview implements ThumbnailOverviewScrollHandler, T
     }
 
     public jumpToThumbnail(id: string) {
-        var vpSize = this._view.getViewportSize();
-        var maxTileSize = this._settings.maxThumbnailSize;
-        var scrollPos = this._model.currentPosition;
-        var tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
-        var thumb = this._model.getThumbnailById(id);
-        var pos = (<Array<ThumbnailOverviewThumbnail>>this._model.thumbnails).indexOf(thumb);
-        var verticalLinePos = Math.floor(pos / tilesHorizontal);
-        var verticalPos = verticalLinePos * this._settings.maxThumbnailSize.height;
+        const vpSize = this._view.getViewportSize();
+        const maxTileSize = this._settings.maxThumbnailSize;
+        const scrollPos = this._model.currentPosition;
+        const tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
+        const thumb = this._model.getThumbnailById(id);
+        const pos = (<Array<ThumbnailOverviewThumbnail>>this._model.thumbnails).indexOf(thumb);
+        const verticalLinePos = Math.floor(pos / tilesHorizontal);
+        let verticalPos = verticalLinePos * this._settings.maxThumbnailSize.height;
 
-        var isOver = this._model.currentPosition.y > verticalPos;
-        var isUnder = this._model.currentPosition.y + this._view.getViewportSize().height < verticalPos + this._settings.maxThumbnailSize.height;
+        const isOver = this._model.currentPosition.y > verticalPos;
+        const isUnder = this._model.currentPosition.y + this._view.getViewportSize().height < verticalPos + this._settings.maxThumbnailSize.height;
         if (isOver) {
-
         } else if (isUnder) {
             verticalPos = verticalPos - this._view.getViewportSize().height + this._settings.maxThumbnailSize.height;
         } else {

@@ -43,8 +43,6 @@ import {getDocument, GlobalWorkerOptions, PDFDocumentProxy, PDFPageProxy} from "
 export class MyCoRePDFViewerComponent extends ViewerComponent {
     constructor(private _settings: PDFSettings, private container: JQuery) {
         super();
-        var that = this;
-
     }
 
     private _structureBuilder: PDFStructureBuilder;
@@ -57,9 +55,9 @@ export class MyCoRePDFViewerComponent extends ViewerComponent {
     private _errorModalSynchronize = Utils.synchronize<MyCoRePDFViewerComponent>([(context: MyCoRePDFViewerComponent) => {
         return context._languageModel != null && context.error;
     }], (context: MyCoRePDFViewerComponent) => {
-        var errorText = context._languageModel.getFormatedTranslation("noPDF", "<a href='mailto:"
+        const errorText = context._languageModel.getFormatedTranslation("noPDF", "<a href='mailto:"
             + this._settings.adminMail + "'>" + this._settings.adminMail + "</a>");
-        var messageBoxTitle = context._languageModel.getTranslation("noPDFShort");
+        let messageBoxTitle = context._languageModel.getTranslation("noPDFShort");
         new ViewerErrorModal(
             this._settings.mobile,
             messageBoxTitle, errorText, this._settings.webApplicationBaseURL + "/modules/iview2/img/sad-emotion-egg.jpg", this.container[0]).show();
@@ -82,8 +80,7 @@ export class MyCoRePDFViewerComponent extends ViewerComponent {
                 derivate: this._settings.derivate
             });
             GlobalWorkerOptions.workerSrc = this._settings.pdfWorkerURL;
-            var that = this;
-            var pdfLocation = this._pdfUrl;
+            const pdfLocation = this._pdfUrl;
             getDocument({
                 url: pdfLocation,
                 disableAutoFetch: true,
@@ -91,14 +88,14 @@ export class MyCoRePDFViewerComponent extends ViewerComponent {
                 cMapPacked: true
             }).promise.then((pdfDoc: PDFDocumentProxy) => {
                 this._pdfDocument = pdfDoc;
-                that._structureBuilder = new PDFStructureBuilder(that._pdfDocument, this._settings.filePath);
-                var promise = that._structureBuilder.resolve();
+                this._structureBuilder = new PDFStructureBuilder(this._pdfDocument, this._settings.filePath);
+                const promise = this._structureBuilder.resolve();
                 promise.then((structure: PDFStructureModel) => {
-                    that._structure = structure;
-                    var smle = new StructureModelLoadedEvent(that, that._structure);
-                    that._structureModelLoadedEvent = smle;
-                    that._pageCount = structure._imageList.length;
-                    that.trigger(smle);
+                    this._structure = structure;
+                    const smle = new StructureModelLoadedEvent(this, this._structure);
+                    this._structureModelLoadedEvent = smle;
+                    this._pageCount = structure._imageList.length;
+                    this.trigger(smle);
                 });
 
                 promise.onreject((err: any) => {
@@ -124,9 +121,9 @@ export class MyCoRePDFViewerComponent extends ViewerComponent {
 
             let pageID = rpe._pageId;
             if (!this._pageCache.has(Number(pageID))) {
-                var promise = this._pdfDocument.getPage(Number(pageID));
+                const promise = this._pdfDocument.getPage(Number(pageID));
                 promise.then((page: PDFPageProxy) => {
-                        var pdfPage = new PDFPage(rpe._pageId, page, this._structureBuilder);
+                        const pdfPage = new PDFPage(rpe._pageId, page, this._structureBuilder);
                         this._pageCache.set(Number(rpe._pageId), pdfPage);
                         rpe._onResolve(rpe._pageId, pdfPage);
                     },
@@ -159,14 +156,14 @@ export class MyCoRePDFViewerComponent extends ViewerComponent {
         }
 
         if (e.type == LanguageModelLoadedEvent.TYPE) {
-            var lmle = e as LanguageModelLoadedEvent;
+            const lmle = e as LanguageModelLoadedEvent;
             this._languageModel = lmle.languageModel;
             this.toolbarLanguageSync(this);
             this._errorModalSynchronize(this);
         }
 
         if (e.type == ButtonPressedEvent.TYPE) {
-            var bpe = e as ButtonPressedEvent;
+            const bpe = e as ButtonPressedEvent;
             if (bpe.button.id == "PdfDownloadButton") {
                 window.location.assign(this._pdfUrl + "?dl");
             }

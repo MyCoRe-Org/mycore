@@ -35,7 +35,7 @@ export class MyCoReViewerSettings {
     maximalPageScale: string;
 
     static normalize(settings: MyCoReViewerSettings): MyCoReViewerSettings {
-        var parameter = ViewerParameterMap.fromCurrentUrl();
+        const parameter = ViewerParameterMap.fromCurrentUrl();
 
         if (typeof settings.filePath != "undefined" && settings.filePath != null && settings.filePath.charAt(0) == '/') {
             settings.filePath = settings.filePath.substring(1);

@@ -16,9 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-    import {IviewChapterTree} from "./IviewChapterTree";
+import {IviewChapterTree} from "./IviewChapterTree";
 
 export interface ChapterTreeInputHandler {
         // called from ctrl
@@ -57,18 +55,16 @@ export interface ChapterTreeInputHandler {
         }
 
         registerNode(node: JQuery, id: string): void {
-            var that = this;
-            node.click(function() {
-                var newSelectedChapter = that._ctrl.getChapterById(id);
-                that._ctrl.setChapterSelected(newSelectedChapter);
+            node.click(() => {
+                const newSelectedChapter = this._ctrl.getChapterById(id);
+                this._ctrl.setChapterSelected(newSelectedChapter);
             });
         }
 
         registerExpander(expander: JQuery, id: string): void {
-            var that = this;
-            expander.click(function() {
-                var chapterToChange = that._ctrl.getChapterById(id);
-                that._ctrl.setChapterExpanded(chapterToChange, !that._ctrl.getChapterExpanded(chapterToChange));
+            expander.click(() => {
+                const chapterToChange = this._ctrl.getChapterById(id);
+                this._ctrl.setChapterExpanded(chapterToChange, !this._ctrl.getChapterExpanded(chapterToChange));
             });
         }
     }

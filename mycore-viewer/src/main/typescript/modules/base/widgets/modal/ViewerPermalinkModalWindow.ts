@@ -22,13 +22,12 @@ import {ViewerModalWindow} from "./ViewerModalWindow";
 export class ViewerPermalinkModalWindow extends ViewerModalWindow {
     constructor(_mobile: boolean) {
         super(_mobile, "Permalink");
-        var that = this;
 
         this._textArea = jQuery("<textarea></textarea>");
         this._textArea.addClass("form-control");
         this._textArea.appendTo(this.modalBody);
-        this._textArea.on("click", function () {
-            that._textArea.select();
+        this._textArea.on("click", () => {
+            this._textArea.select();
         });
 
     }

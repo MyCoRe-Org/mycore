@@ -64,7 +64,7 @@ export class MyCoReImageOverviewComponent extends ViewerComponent implements Thu
             this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
             this.trigger(new WaitForEvent(this, LanguageModelLoadedEvent.TYPE));
 
-            let showImageOverViewOnStart = Utils.getVar<string>(this._settings, "leftShowOnStart", "chapterOverview")
+            const showImageOverViewOnStart = Utils.getVar<string>(this._settings, "leftShowOnStart", "chapterOverview")
                 == "imageOverview";
             if (this._settings.mobile == false && showImageOverViewOnStart) {
                 this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
@@ -169,9 +169,8 @@ export class MyCoReImageOverviewComponent extends ViewerComponent implements Thu
 
 
     public addedThumbnail(id: string, element: JQuery): void {
-        var that = this;
-        jQuery(element).bind("click", function () {
-            that.trigger(new ImageSelectedEvent(that, that._idMetsImageMap.get(id)));
+        jQuery(element).bind("click",  () => {
+            this.trigger(new ImageSelectedEvent(this, this._idMetsImageMap.get(id)));
         });
     }
 }

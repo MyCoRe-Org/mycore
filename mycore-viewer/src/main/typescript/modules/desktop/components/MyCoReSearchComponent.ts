@@ -324,7 +324,7 @@ export class MyCoReSearchComponent extends ViewerComponent {
     }
 
     private openSearch() {
-        var direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_EAST;
+        const direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_EAST;
         this.trigger(new ShowContentEvent(this, this._container, direction, -1, this._sidebarLabel));
         this.updateContainerSize();
 

@@ -50,14 +50,14 @@ export class TextController implements ContainerObserver<ToolbarGroup, ToolbarCo
         }
 
         public childRemoved(parent:any, component:any):void {
-            var componentId = component.getProperty("id").value;
+            const componentId = component.getProperty("id").value;
             this._textViewMap.get(componentId).getElement().remove();
 
             component.getProperty("text").removeObserver(this);
         }
 
         public propertyChanged(_old:ViewerProperty<any>, _new:ViewerProperty<any>) {
-            var textId = _new.from.getProperty("id").value;
+            const textId = _new.from.getProperty("id").value;
             if (_old.name == "text" && _new.name == "text") {
                 this._textViewMap.get(textId).updateText(_new.value);
             }

@@ -41,8 +41,8 @@ export class LayerDisplayController {
     private _layerIdCallbackMap = new MyCoReMap<string, (success: boolean, content: JQuery) => void>();
 
     private addLayerView(layer: Layer): void {
-        var id = layer.getId();
-        var layerView;
+        const id = layer.getId();
+        let layerView;
 
         if (!this._layerIdViewMap.has(id)) {
             layerView = this.createLayerView(layer);
@@ -128,20 +128,20 @@ export class LayerDisplayController {
 
     private synchronizeView() {
         this.model.getLayerList().forEach((currentDisplayedLayer: Layer) => {
-            var layerId = currentDisplayedLayer.getId();
+            const layerId = currentDisplayedLayer.getId();
             this.cleanLayerView(currentDisplayedLayer.getId()); // don not show old content while loading!
 
-            var onResolve = (success: boolean, content?: JQuery) => {
+            const onResolve = (success: boolean, content?: JQuery) => {
                 if (success && /* check if the last registered callback matches the current*/
                     this._layerIdCallbackMap.has(layerId) &&
                     this._layerIdCallbackMap.get(layerId) == onResolve) {
 
                     content.find(".popupTrigger").each(function (i, popupTrigger) {
-                        var popup = <any>jQuery(popupTrigger);
+                        const popup = (jQuery as any)(popupTrigger);
                         popup.attr("data-placement", "bottom");
                         popup.popover({
                             html: true,
-                            content: function () {
+                            content: () => {
                                 return popup.find(".popupBox").html();
                             }
                         });

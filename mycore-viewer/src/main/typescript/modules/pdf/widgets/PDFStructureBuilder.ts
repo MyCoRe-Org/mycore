@@ -76,23 +76,21 @@ export class PDFStructureBuilder {
     }
 
     private _resolvePages() {
-        var that = this;
         this._loadedPageCount = 0;
 
-        for (var i = 1; i <= that._pageCount; i++) {
-            var callback = this._createThumbnailDrawer(i);
-            var additionalHref = new MyCoReMap<string, string>();
+        for (let i = 1; i <= this._pageCount; i++) {
+            const callback = this._createThumbnailDrawer(i);
+            const additionalHref = new MyCoReMap<string, string>();
             additionalHref.set(PDFStructureBuilder.PDF_TEXT_HREF, i + "");
-            var structureImage = new StructureImage("pdfPage", i + "", i, null, i + "", "pdfPage", callback, additionalHref);
-            that._pages.push(structureImage);
-            that._idPageMap.set(i, structureImage);
+            const structureImage = new StructureImage("pdfPage", i + "", i, null, i + "", "pdfPage", callback, additionalHref);
+            this._pages.push(structureImage);
+            this._idPageMap.set(i, structureImage);
         }
     }
 
     private _createThumbnailDrawer(i) {
-        var that = this;
-        var imgData = null;
-        var collectedCallbacks = new Array<(string) => void>();
+        let imgData = null;
+        const collectedCallbacks = new Array<(string) => void>();
         return (callback: (string) => void) => {
             if (imgData == null) {
                 collectedCallbacks.push((url) => {
@@ -102,8 +100,8 @@ export class PDFStructureBuilder {
                     callback(url);
                 });
                 if (collectedCallbacks.length == 1) {
-                    that._document.getPage(i).then((page) => {
-                        that._renderPage(collectedCallbacks, page);
+                    this._document.getPage(i).then((page) => {
+                        this._renderPage(collectedCallbacks, page);
                     });
                 }
             } else {
@@ -113,23 +111,22 @@ export class PDFStructureBuilder {
     }
 
     private _renderPage(callbacks: Array<(string) => void>, page) {
-        var originalSize = new Size2D(page.view[2] - page.view[0], page.view[3] - page.view[1]);//IviewPDFCanvas.getPageSize(page);
-        var largest = Math.max(originalSize.width, originalSize.height);
-        var vpScale = 256 / largest;
-        var vp = page.getViewport({scale: vpScale});
-        var thumbnailDrawCanvas = document.createElement("canvas");
-        var thumbnailCanvasCtx = thumbnailDrawCanvas.getContext("2d");
+        const originalSize = new Size2D(page.view[2] - page.view[0], page.view[3] - page.view[1]);//IviewPDFCanvas.getPageSize(page);
+        const largest = Math.max(originalSize.width, originalSize.height);
+        const vpScale = 256 / largest;
+        const vp = page.getViewport({scale: vpScale});
+        let thumbnailDrawCanvas = document.createElement("canvas");
+        let thumbnailCanvasCtx = thumbnailDrawCanvas.getContext("2d");
         thumbnailDrawCanvas.width = (originalSize.width) * vpScale;
         thumbnailDrawCanvas.height = (originalSize.height) * vpScale;
 
-        var task = <any>page.render({canvasContext: thumbnailCanvasCtx, viewport: vp})
-        task.promise.then((onErr) => {
+        const task = page.render({canvasContext: thumbnailCanvasCtx, viewport: vp})
+        task.promise.then(() => {
             this._loadedPageCount++;
             let imgUrl = thumbnailDrawCanvas.toDataURL();
             thumbnailDrawCanvas = null;
             thumbnailCanvasCtx = null;
-            for (var callbackIndex in callbacks) {
-                let callback = callbacks[callbackIndex];
+            for (const callback of callbacks) {
                 callback(imgUrl);
             }
         });
@@ -138,10 +135,9 @@ export class PDFStructureBuilder {
     }
 
     private _resolveOutline() {
-        var that = this;
-        this._document.getOutline().then(function (nodes: Array<PDFTreeNode>) {
-            that._outline = nodes;
-            that.resolveStructure();
+        this._document.getOutline().then((nodes: Array<PDFTreeNode>) => {
+            this._outline = nodes;
+            this.resolveStructure();
         });
     }
 
@@ -151,7 +147,7 @@ export class PDFStructureBuilder {
         if (typeof dest === 'string') {
             promise = this._document.getDestination(dest);
         } else {
-            promise = (<any>window).Promise.resolve(dest);
+            promise = (window as any).Promise.resolve(dest);
         }
 
         promise.then((destination) => {
@@ -201,7 +197,6 @@ export class PDFStructureBuilder {
      */
     private resolveStructure() {
         if (typeof this._outline != "undefined") {
-            var that = this;
             this._rootChapter = new StructureChapter(null, "pdf", "0", this._name, null, null, () => 1);
             this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline, 1);
             this._structureModel = new PDFStructureModel(this._rootChapter,

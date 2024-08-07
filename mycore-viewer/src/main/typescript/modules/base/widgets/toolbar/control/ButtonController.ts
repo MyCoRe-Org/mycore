@@ -101,7 +101,7 @@ export class ButtonController implements ContainerObserver<ToolbarGroup, Toolbar
 
     public propertyChanged(_old: ViewerProperty<any>, _new: ViewerProperty<any>) {
         // Change button
-        var buttonId = _new.from.getProperty("id").value;
+        const buttonId = _new.from.getProperty("id").value;
         if (_old.name == "label" && _new.name == "label") {
             this._buttonViewMap.get(buttonId).updateButtonLabel(_new.value);
             return;

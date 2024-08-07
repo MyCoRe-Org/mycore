@@ -43,7 +43,7 @@ export class MyCoReFrameToolbarProviderComponent extends ViewerComponent {
     }
 
     public init() {
-        var frameToolbarModel = new MyCoReFrameToolbarModel();
+        const frameToolbarModel = new MyCoReFrameToolbarModel();
 
         if (this._settings.mobile) {
             frameToolbarModel.shrink();
@@ -57,7 +57,7 @@ export class MyCoReFrameToolbarProviderComponent extends ViewerComponent {
 
     public handle(e: ViewerEvent): void {
         if (e.type == ButtonPressedEvent.TYPE) {
-            var bpe = e as ButtonPressedEvent;
+            const bpe = e as ButtonPressedEvent;
             if (bpe.button.id == "MaximizeButton") {
                 this.trigger(new RequestPermalinkEvent(this, (permalink) => {
                     window.top.location.assign(permalink);

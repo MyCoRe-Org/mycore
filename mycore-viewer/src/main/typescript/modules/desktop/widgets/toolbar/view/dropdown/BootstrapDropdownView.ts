@@ -59,7 +59,7 @@ export class BootstrapDropdownView extends BootstrapButtonView implements Dropdo
                 }
                 newChild = newChild.add("<li class='disabled' value='divider-" + current.id + "' data-id=\"divider-" + current.id + "\"><a class='dropdown-item'>" + current.label + "</a></li>");
             } else {
-                var anchor = jQuery("<a class='dropdown-item'>" + current.label + "</a>");
+                const anchor = jQuery("<a class='dropdown-item'>" + current.label + "</a>");
                 newChild = jQuery(jQuery("<li value='" + current.id + "' data-id=\"" + current.id + "\"></li>"));
 
 

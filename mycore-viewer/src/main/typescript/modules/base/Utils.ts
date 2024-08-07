@@ -28,7 +28,7 @@ export interface iterator<T> {
     current(): T;
 }
 
-export var VIEWER_COMPONENTS: Array<any> = window["IVIEW_COMPONENTS"] || (window["IVIEW_COMPONENTS"] = []);
+export const VIEWER_COMPONENTS: Array<any> = window["IVIEW_COMPONENTS"] || (window["IVIEW_COMPONENTS"] = []);
 
 export function addViewerComponent(component: any) {
     VIEWER_COMPONENTS.push(component);
@@ -111,8 +111,8 @@ export class Position2D {
     }
 
     public static fromString(str: string): Position2D {
-        var values = str.split(':');
-        return new Position2D(parseInt(values[0], 10), parseInt(values[1], 10));
+        const [first, second] = str.split(':');
+        return new Position2D(parseInt(first, 10), parseInt(second, 10));
     }
 
     public get x() {
@@ -132,19 +132,20 @@ export class Position2D {
     }
 
     public rotate(rotation: number): Position2D {
-        var x = this._x;
-        var y = this._y;
+        let x = this._x;
+        let y = this._y;
+        let s: number;
         switch (rotation) {
             case 90:
-                var s = x;
+                s = x;
                 x = -y;
                 y = s;
             case 180:
-                var s = x;
+                s = x;
                 x = -y;
                 y = s;
             case 270:
-                var s = x;
+                s = x;
                 x = -1 * y;
                 y = s;
             case 0:
@@ -153,11 +154,11 @@ export class Position2D {
     }
 
     public rotateAround(center: Position2D, rotation: number): Position2D {
-        rotation = rotation * -1; // invert for clockwise rotation
-        var diffX = (this.x - center.x);
-        var diffY = (this.y - center.y);
-        var x = center.x + diffX * Math.cos(rotation) - diffY * Math.sin(rotation);
-        var y = center.y + diffX * Math.sin(rotation) + diffY * Math.cos(rotation);
+        const invertedRotation = rotation * -1; // invert for clockwise rotation
+        const diffX = (this.x - center.x);
+        const diffY = (this.y - center.y);
+        const x = center.x + diffX * Math.cos(invertedRotation) - diffY * Math.sin(invertedRotation);
+        const y = center.y + diffX * Math.sin(invertedRotation) + diffY * Math.cos(invertedRotation);
         return new Position2D(x, y);
     }
 
@@ -225,8 +226,7 @@ export class Size2D {
         if (deg == 0 || deg == 180) {
             return this.copy();
         } else {
-            var rotatedSize = new Size2D(this.height, this.width);
-            return rotatedSize;
+            return new Size2D(this.height, this.width);
         }
     }
 
@@ -493,7 +493,7 @@ export class Utils {
     public static LOG_HALF = Math.log(1 / 2);
 
     public static canvasToImage(canvas: HTMLCanvasElement): HTMLImageElement {
-        let image = document.createElement("img");
+        const image = document.createElement("img");
         image.src = canvas.toDataURL();
         return image;
     }
@@ -507,12 +507,12 @@ export class Utils {
         }
 
         // check child objects
-        var pathPartEnd = path.indexOf(".");
+        let pathPartEnd = path.indexOf(".");
         if (pathPartEnd == -1) {
             pathPartEnd = path.length;
         }
 
-        var part = path.substring(0, pathPartEnd);
+        let part = path.substring(0, pathPartEnd);
         if (part in obj && obj[part] != null && typeof obj[part] != "undefined") {
             if (pathPartEnd != path.length) {
                 return Utils.getVar(obj[part], path.substring(part.length + 1), defaultReturn, check);
@@ -529,7 +529,7 @@ export class Utils {
 
     public static synchronize<T>(conditions: Array<(synchronizeObj: T) => boolean>, then: (synchronizeObj: T) => void) {
         return (synchronizeObj: any) => {
-            var matchingConditions = conditions.filter((condition: (synchronizeObj: any) => boolean) => {
+            const matchingConditions = conditions.filter((condition: (synchronizeObj: any) => boolean) => {
                 return condition(synchronizeObj);
             });
             if (matchingConditions.length == conditions.length) {
@@ -545,8 +545,8 @@ export class Utils {
     }
 
     public static hash(str: string) {
-        var hash = 0;
-        for (var i = 0; i < str.length; i++) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
             hash = ((hash << 5) - hash) + str.charCodeAt(i);
             hash = hash & hash;
         }
@@ -722,7 +722,7 @@ export class ViewerProperty<T> {
     }
 
     public set value(value: T) {
-        var old = this.clone();
+        const old = this.clone();
         this._value = value;
         this.notifyPropertyChanged(old, this);
     }
@@ -736,11 +736,13 @@ export class ViewerProperty<T> {
     }
 
     public removeAllObserver(): void {
-        while (this.observerArray.pop()) ;
+        while (this.observerArray.length > 0) {
+            this.observerArray.pop()
+        }
     }
 
     public removeObserver(observer: ViewerPropertyObserver<T>): void {
-        var index = this.observerArray.indexOf(observer);
+        const index = this.observerArray.indexOf(observer);
         this.observerArray.splice(index, 1);
     }
 
@@ -866,8 +868,7 @@ export class ViewerUserSettingStore {
 
 //TODO: extends this
 export function isFullscreen() {
-    var d = (<any>document);
-    return d.fullscreenElement != null || d.webkitFullscreenElement != null;
+    return document.fullscreenElement != null;
 }
 
 
@@ -887,7 +888,7 @@ export function viewerCrossBrowserWheel(element: HTMLElement, handler: (e: {
             return;
         }
 
-        var horizontal: boolean = e.shiftKey;
+        let horizontal: boolean = e.shiftKey;
         if ("axis" in e) {
             horizontal = (e.axis == 1);
 
@@ -986,11 +987,11 @@ export class ViewerParameterMap extends MyCoReMap<string, string> {
     }
 
     public toParameterString() {
-        var stringBuilder = new Array<string>()
+        const stringBuilder = new Array<string>()
         this.forEach((key, value) => {
             stringBuilder.push(key + "=" + value);
         });
-        var s = stringBuilder.join("&");
+        const s = stringBuilder.join("&");
         return s.length > 0 ? "?" + s : "";
     }
 
@@ -999,15 +1000,13 @@ export class ViewerParameterMap extends MyCoReMap<string, string> {
     }
 
     public static fromUrl(url): ViewerParameterMap {
-        var map = new ViewerParameterMap();
-        var parameter = url.split("?")[1];
+        const map = new ViewerParameterMap();
+        const parameter = url.split("?")[1];
         if (typeof parameter != "undefined") {
-            var parameterWithoutHash = parameter.split("#")[0];
-            var mapElements = parameter.split("&");
+            const mapElements = parameter.split("&");
 
-            for (var currentElementIndex in mapElements) {
-                var currentElement = mapElements[currentElementIndex];
-                var keyValueArray = currentElement.split("=");
+            for (const currentElement of mapElements) {
+                const keyValueArray = currentElement.split("=");
                 map.set(keyValueArray[0], decodeURIComponent(keyValueArray[1]));
             }
         }
@@ -1047,15 +1046,15 @@ export function getNodesShim(xml: Document, xpathExpression: string, contextNode
 export class XMLUtil {
 
     public static iterateChildNodes(element: Node, iter: (node: Node) => void) {
-        var childNodes = element.childNodes;
-        for (var i = 0; i < childNodes.length; i++) {
+        const childNodes = element.childNodes;
+        for (let i = 0; i < childNodes.length; i++) {
             iter(childNodes.item(i));
         }
     }
 
     public static nodeListToNodeArray(nodeList: NodeList): Array<Node> {
-        var array = [];
-        for (var i = 0; i < nodeList.length; i++) {
+        const array = [];
+        for (let i = 0; i < nodeList.length; i++) {
             array.push(nodeList.item(i));
         }
 
@@ -1063,14 +1062,16 @@ export class XMLUtil {
     }
 
     public static getOneChild(element: Node, isTheOne: (node: Node) => boolean): Node {
-        var childNodes = element.childNodes;
+        const childNodes = element.childNodes;
         return XMLUtil.getOneOf(childNodes, isTheOne);
     }
 
     public static getOneOf(childNodes: NodeList, isTheOne: (node: Node) => boolean): Node {
-        for (var i = 0; i < childNodes.length; i++) {
-            var currentChild = childNodes.item(i);
-            if (isTheOne(currentChild)) return currentChild;
+        for (let i = 0; i < childNodes.length; i++) {
+            const currentChild = childNodes.item(i);
+            if (isTheOne(currentChild)) {
+                return currentChild;
+            }
         }
         return null;
     }

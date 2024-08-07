@@ -32,8 +32,7 @@ export class ChapterTreeModel {
     private initChapter(chapter: ChapterTreeChapter): void {
         this.idElementMap.set(chapter.id, chapter);
         this.chapterVisible.set(chapter.id, true);
-        for (var index in chapter.chapter) {
-            var current = chapter.chapter[index];
+        for (const current of chapter.chapter) {
             this.initChapter(current);
         }
     }

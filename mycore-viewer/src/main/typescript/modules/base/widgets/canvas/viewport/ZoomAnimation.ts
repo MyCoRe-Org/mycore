@@ -46,11 +46,11 @@ export class ZoomAnimation implements Animation {
 
     updateAnimation(elapsedTime: number): boolean {
         this._totalElapsedTime += elapsedTime;
-        var currentScale = (this._targetScale - this._startScale) * this._totalElapsedTime / this._duration + this._startScale;
+        const currentScale = (this._targetScale - this._startScale) * this._totalElapsedTime / this._duration + this._startScale;
         this._viewport.scale = currentScale;
         this._viewport.position = this._position.move(this._diff.scale(1 / currentScale));
 
-        var complete = this._totalElapsedTime >= (this._duration - elapsedTime);
+        const complete = this._totalElapsedTime >= (this._duration - elapsedTime);
         if (complete) {
             this._viewport.position = this._position.move(this._diff.scale(1 / this._targetScale));
             this._viewport.scale = this._targetScale;

@@ -126,7 +126,7 @@ export class MyCoReViewerContainerComponent extends ViewerComponent {
             }
 
             if (sce.containerDirection != MyCoReViewerContainerComponent.CONTENT_DIRECTION) {
-                var containerDescription = this._layout.getContainerDescription(sce.containerDirection);
+                const containerDescription = this._layout.getContainerDescription(sce.containerDirection);
                 if (sce.size != -1) {
                     if (sce.size == 0) {
                         container.css({display: "none"});

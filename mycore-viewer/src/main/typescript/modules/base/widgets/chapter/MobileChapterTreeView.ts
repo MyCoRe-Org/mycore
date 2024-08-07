@@ -38,15 +38,15 @@ export class MobileChapterTreeView implements ChapterTreeView {
         if (label === childLabel) {
             childLabel = '';
         }
-        var newElement = jQuery("<li></li>");
-        var labelElement = jQuery("<a></a>");
+        const newElement = jQuery("<li></li>");
+        const labelElement = jQuery("<a></a>");
 
         labelElement.addClass("label");
         labelElement.text(label);
         labelElement.attr("data-id", id);
         labelElement.appendTo(newElement);
 
-        var childlabelElement = jQuery("<a></a>");
+        const childlabelElement = jQuery("<a></a>");
 
         childlabelElement.text(childLabel);
         childlabelElement.addClass("childLabel");
@@ -54,7 +54,7 @@ export class MobileChapterTreeView implements ChapterTreeView {
 
         newElement.attr("data-id", id);
 
-        var level = 0;
+        let level = 0;
         if (parentId != null && this.levelMap.has(parentId)) {
             level = this.levelMap.get(parentId) + 1;
         }

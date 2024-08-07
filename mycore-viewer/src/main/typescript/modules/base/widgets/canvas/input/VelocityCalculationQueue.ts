@@ -33,14 +33,14 @@ export class VelocityCalculationQueue {
 
     public add(move: TouchMove) {
         if (this._values.length > 0) {
-            var last = this._values.pop();
+            const last = this._values.pop();
             this._values.push(last);
 
             if (move.time - last.time >= 5) {
                 this._values.push(move);
             }
 
-            var arr = this._values.reverse();
+            const arr = this._values.reverse();
             arr.length = Math.min(arr.length, this._maxElements);
             this._values = arr.reverse();
         } else {
@@ -49,26 +49,25 @@ export class VelocityCalculationQueue {
     }
 
     public getVelocity(): MoveVector {
-        var newest: TouchMove = this._values.pop();
+        const newest: TouchMove = this._values.pop();
         this._values.push(newest);
 
         if (this._values.length == 0) {
             return new MoveVector(0, 0);
         }
 
-        var oldest: TouchMove = null;
+        let oldest: TouchMove = null;
 
-        for (var i in this._values) {
-            var current = this._values[i];
-            var isOlderThenMaxTime = Math.abs(current.time - newest.time) > this._maxTime;
+        for (const current of this._values) {
+            const isOlderThenMaxTime = Math.abs(current.time - newest.time) > this._maxTime;
             if (!isOlderThenMaxTime) {
                 oldest = current;
                 break;
             }
         }
 
-        var deltaTime = newest.time - oldest.time;
-        var delta = new MoveVector(oldest.middle.x - newest.middle.x, oldest.middle.y - newest.middle.y);
+        const deltaTime = newest.time - oldest.time;
+        const delta = new MoveVector(oldest.middle.x - newest.middle.x, oldest.middle.y - newest.middle.y);
 
         return new MoveVector((delta.x / deltaTime) || 0, (delta.y / deltaTime) || 0);
     }

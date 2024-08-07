@@ -93,15 +93,15 @@ export class MyCoReLayerComponent extends ViewerComponent {
 
     private updateContainerSize() {
         this.container.css({"height": this.container.parent().height() - this.sidebarLabel.parent().outerHeight() + "px"});
-        var containerSize = this.container.width();
-        var settingStore = ViewerUserSettingStore.getInstance();
+        const containerSize = this.container.width();
+        const settingStore = ViewerUserSettingStore.getInstance();
         if (containerSize > 50) {
             settingStore.setValue(MyCoReLayerComponent.SIDEBAR_LAYER_SIZE, containerSize.toString());
         }
     }
 
     public get handlesEvents(): string[] {
-        var handles = new Array<string>();
+        const handles = new Array<string>();
 
         if (this.enabled) {
             handles.push(StructureModelLoadedEvent.TYPE);
@@ -118,10 +118,10 @@ export class MyCoReLayerComponent extends ViewerComponent {
 
     public handle(e: ViewerEvent): void {
         if (e.type == DropdownButtonPressedEvent.TYPE) {
-            var dropdownButtonPressedEvent = e as DropdownButtonPressedEvent;
+            const dropdownButtonPressedEvent = e as DropdownButtonPressedEvent;
             if (dropdownButtonPressedEvent.button.id == MyCoReLayerComponent.LAYER_DROPDOWN_ID) {
                 if (this.layerIdLayerMap.has(dropdownButtonPressedEvent.childId)) {
-                    var transcriptionType = dropdownButtonPressedEvent.childId;
+                    const transcriptionType = dropdownButtonPressedEvent.childId;
                     this.toggleTranscriptionContainer(transcriptionType);
                 } else {
                     throw new ViewerError("Invalid button child pressed!");

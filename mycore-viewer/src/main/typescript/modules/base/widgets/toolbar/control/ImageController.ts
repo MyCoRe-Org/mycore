@@ -32,14 +32,14 @@ export class ImageController implements ContainerObserver<ToolbarGroup, ToolbarC
     }
 
     public childAdded(parent: any, component: any): void {
-        var group = <ToolbarGroup>parent;
-        var groupView = this._groupMap.get(group.name);
-        var componentId = component.getProperty("id").value;
-        var text = component as ToolbarImage;
+        const group = parent as ToolbarGroup;
+        const groupView = this._groupMap.get(group.name);
+        const componentId = component.getProperty("id").value;
+        const text = component as ToolbarImage;
 
-        var imageView = this.createImageView(componentId);
+        const imageView = this.createImageView(componentId);
 
-        var hrefProperty = text.getProperty("href");
+        const hrefProperty = text.getProperty("href");
         hrefProperty.addObserver(this);
         imageView.updateHref(hrefProperty.value);
 
@@ -49,14 +49,14 @@ export class ImageController implements ContainerObserver<ToolbarGroup, ToolbarC
     }
 
     public childRemoved(parent: any, component: any): void {
-        var componentId = component.getProperty("id").value;
+        const componentId = component.getProperty("id").value;
         this._textViewMap.get(componentId).getElement().remove();
 
         component.getProperty("href").removeObserver(this);
     }
 
     public propertyChanged(_old: ViewerProperty<any>, _new: ViewerProperty<any>) {
-        var textId = _new.from.getProperty("id").value;
+        const textId = _new.from.getProperty("id").value;
         if (_old.name == "href" && _new.name == "href") {
             this._textViewMap.get(textId).updateHref(_new.value);
         }

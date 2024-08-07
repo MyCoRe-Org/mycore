@@ -82,7 +82,7 @@ export class Viewport {
     }
 
     asRectInArea(): Rect {
-        var realSize = this.size.getRotated(this.rotation).scale(1 / this.scale);
+        const realSize = this.size.getRotated(this.rotation).scale(1 / this.scale);
         return new Rect(new Position2D(this.position.x - (realSize.width / 2), this.position.y - (realSize.height / 2)), realSize);
     }
 
@@ -93,8 +93,8 @@ export class Viewport {
     }
 
     public getAbsolutePosition(positionInViewport: Position2D): Position2D {
-        var rectPoints = this.asRectInArea().getPoints();
-        var upperLeftPosition: Position2D = rectPoints.upperLeft;
+        const rectPoints = this.asRectInArea().getPoints();
+        let upperLeftPosition: Position2D = rectPoints.upperLeft;
         switch (this.rotation) {
             case 90:
                 upperLeftPosition = rectPoints.lowerLeft;
@@ -107,7 +107,7 @@ export class Viewport {
                 break;
         }
 
-        var scaledPositionInViewport = positionInViewport.scale(1 / this.scale).rotate(this.rotation);
+        const scaledPositionInViewport = positionInViewport.scale(1 / this.scale).rotate(this.rotation);
 
         return new Position2D(upperLeftPosition.x + scaledPositionInViewport.x, upperLeftPosition.y + scaledPositionInViewport.y);
     }
@@ -118,7 +118,7 @@ export class Viewport {
 
     public updateAnimation(): void {
         if (this._currentAnimation != null) {
-            var currentAnimTime = new Date().valueOf();
+            const currentAnimTime = new Date().valueOf();
 
             if (this._currentAnimation.updateAnimation(currentAnimTime - this._lastAnimTime)) {
                 this._currentAnimation = null;

@@ -106,7 +106,7 @@ export class PageController {
                     this.updateAnimations();
                     this._views.forEach(view => {
                         if (view.drawHTML) {
-                            var htmlRenderer: HtmlRenderer;
+                            let htmlRenderer: HtmlRenderer;
                             if (this._viewHTMLRendererMap.has(view)) {
                                 htmlRenderer = this._viewHTMLRendererMap.get(view);
                             } else {
@@ -319,7 +319,7 @@ export class PageController {
         if (this._canvasPageLayers == null || this._canvasPageLayers.isEmpty()) {
             return [];
         }
-        var sortedArray: Array<CanvasPageLayer> = [];
+        const sortedArray: Array<CanvasPageLayer> = [];
         this._canvasPageLayers.keys.sort().forEach(k => {
             sortedArray.push(this._canvasPageLayers.get(k));
         });

@@ -32,15 +32,14 @@ export class ViewerEventManager {
     }
 
     public trigger(e: ViewerEvent) {
-        for (var i in this._callBackArray) {
-            var callback = this._callBackArray[i];
+        for (const callback of this._callBackArray) {
             // if one handler throws a error it will be catched
             callback(e);
         }
     }
 
     public unbind(callback: (e: ViewerEvent) => void) {
-        var index = this._callBackArray.lastIndexOf(callback);
+        const index = this._callBackArray.lastIndexOf(callback);
         this._callBackArray.splice(index, 1);
     }
 

@@ -77,8 +77,8 @@ export class TouchPolyfill {
 
     private _fireEvent(eventName: string) {
         if (this._handlerMap.has(eventName)) {
-            var handler = this._handlerMap.get(eventName);
-            (<any>handler)(this._createTouchEvent());
+            const handler = this._handlerMap.get(eventName);
+            (handler as any)(this._createTouchEvent());
         }
     }
 
@@ -91,7 +91,7 @@ export class TouchPolyfill {
     }
 
     private _createTouchesArray() {
-        var arr = new Array<{ clientX: number; clientY: number, pageX: number, pageY: number }>();
+        const arr = new Array<{ clientX: number; clientY: number, pageX: number, pageY: number }>();
         this._idPointerMap.values.forEach((pos: Position2D) => arr.push({
             clientX: pos.x,
             clientY: pos.y,

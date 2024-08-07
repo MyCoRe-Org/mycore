@@ -57,10 +57,9 @@ export class MyCoRePermalinkComponent extends ViewerComponent {
         if (this._enabled) {
             this._modalWindow = new ViewerPermalinkModalWindow(this._settings.mobile);
             this.trigger(new WaitForEvent(this, LanguageModelLoadedEvent.TYPE));
-            var that = this;
-            var parameter = ViewerParameterMap.fromCurrentUrl();
+            const parameter = ViewerParameterMap.fromCurrentUrl();
             if (!parameter.isEmpty()) {
-                that.trigger(new RestoreStateEvent(that, parameter));
+                this.trigger(new RestoreStateEvent(this, parameter));
             }
         } else {
             this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
@@ -116,8 +115,8 @@ export class MyCoRePermalinkComponent extends ViewerComponent {
     }
 
     private updateHistory() {
-        let updateHistory = Utils.getVar(this._settings, "permalink.updateHistory", true);
-        let state = new ViewerParameterMap();
+        const updateHistory = Utils.getVar(this._settings, "permalink.updateHistory", true);
+        const state = new ViewerParameterMap();
         this.trigger(new RequestStateEvent(this, state, false));
         if (updateHistory) {
             window.history.replaceState({}, "", this.buildPermalink(state));
@@ -125,21 +124,21 @@ export class MyCoRePermalinkComponent extends ViewerComponent {
     }
 
     private buildPermalink(state: ViewerParameterMap) {
-        var file;
+        let file: string;
         if (this._settings.doctype === 'mets' || this._settings.doctype === 'manifest') {
             file = state.get('page');
             state.remove('page');
         } else {
             file = this._settings.filePath;
         }
-        var baseURL = this.getBaseURL(file);
+        const baseURL = this.getBaseURL(file);
         state.remove('derivate');
         return baseURL + state.toParameterString();
     }
 
     private getBaseURL(file) {
-        let iiif = (location.href.indexOf("/iiif/") > 0) ? "iiif/" : "";
-        var pattern = Utils.getVar<string>(this._settings, 'permalink.viewerLocationPattern', '{baseURL}/rsc/viewer/' + iiif + '{derivate}{file}', (p) => p != null);
+        const iiif = (location.href.indexOf("/iiif/") > 0) ? "iiif/" : "";
+        const pattern = Utils.getVar<string>(this._settings, 'permalink.viewerLocationPattern', '{baseURL}/rsc/viewer/' + iiif + '{derivate}{file}', (p) => p != null);
         return ViewerFormatString(pattern, {
             baseURL: this._settings.webApplicationBaseURL,
             derivate: (file.indexOf('_derivate_') > 0) ? '' : this._settings.derivate + '/',
@@ -148,7 +147,7 @@ export class MyCoRePermalinkComponent extends ViewerComponent {
     }
 
     public get handlesEvents(): string[] {
-        var handles = new Array<string>();
+        const handles = new Array<string>();
 
         if (this._enabled) {
             handles.push(ButtonPressedEvent.TYPE);

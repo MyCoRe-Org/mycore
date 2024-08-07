@@ -30,7 +30,7 @@ export class XMLI18NProvider implements I18NProvider {
     public getLanguage(href: string,
                        callback: (model: LanguageModel) => void,
                        errorCallback: (err) => void = XMLI18NProvider.DEFAULT_ERROR_CALLBACK) {
-        var settings = {
+        const settings = {
             url: href,
             success: function (response) {
                 callback(new LanguageModel(new MyCoReMap<string, string>(response)));

@@ -51,15 +51,15 @@ export class Overview extends PageView {
 
     public set overviewRect(rect: Rect) {
         this.overviewViewport.position = rect.getMiddlePoint();
-        var scale = this.overviewViewport.scale = Math.min(this._maxOverviewSize.width / rect.size.width,
+        const scale = this.overviewViewport.scale = Math.min(this._maxOverviewSize.width / rect.size.width,
             this._maxOverviewSize.height / rect.size.height);
-        var toWidth = this._maxOverviewSize.width / rect.size.width == scale;
-        var realSize;
+        const toWidth = this._maxOverviewSize.width / rect.size.width == scale;
+        let realSize;
         if (toWidth) {
-            var relation = rect.size.width / rect.size.height;
+            const relation = rect.size.width / rect.size.height;
             realSize = new Size2D(this._maxOverviewSize.width, this._maxOverviewSize.height / relation);
         } else {
-            var relation = rect.size.height / rect.size.width;
+            const relation = rect.size.height / rect.size.width;
             realSize = new Size2D(this._maxOverviewSize.width / relation, this._maxOverviewSize.height);
         }
         this.updateOverviewSize(realSize);

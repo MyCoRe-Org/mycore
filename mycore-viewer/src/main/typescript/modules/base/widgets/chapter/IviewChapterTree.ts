@@ -77,8 +77,7 @@ export class IviewChapterTree {
 
         private insertChapterView(chapter: ChapterTreeChapter) {
             this._view.addNode((chapter.parent || (<any>{ id: null })).id, chapter.id, chapter.label, this._model.chapterLabelMap.get(chapter.id) || "", chapter.chapter.length > 0);
-            for (var i in chapter.chapter) {
-                var currentChapter = chapter.chapter[i];
+            for (const currentChapter of chapter.chapter) {
                 this.insertChapterView(currentChapter);
             }
         }

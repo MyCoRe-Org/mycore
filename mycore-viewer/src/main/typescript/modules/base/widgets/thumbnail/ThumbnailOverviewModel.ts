@@ -36,16 +36,13 @@ export class ThumbnailOverviewModel {
 
 
     private fillTilesInsertedMap(): void {
-        for (var index in this.thumbnails) {
-            var current: ThumbnailOverviewThumbnail = <any>this.thumbnails[index];
-
+        for (const current of this.thumbnails) {
             this.tilesInsertedMap.set(current.id, false);
         }
     }
 
     private fillIdThumbnailMap(): void {
-        for (var index in this.thumbnails) {
-            var current: ThumbnailOverviewThumbnail = <any>this.thumbnails[index];
+        for (const current of this.thumbnails) {
             this._idThumbnailMap.set(current.id, current);
         }
     }

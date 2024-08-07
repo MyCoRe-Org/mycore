@@ -49,7 +49,7 @@ export class PageArea implements ViewerPropertyObserver<any> {
 
         public removePage(page:AbstractPage):void {
             this._pages.splice(this._pages.indexOf(page), 1);
-            var pageInformation = this._pageAreaInformationMap.get(page);
+            const pageInformation = this._pageAreaInformationMap.get(page);
             this._pageAreaInformationMap.remove(page);
             this.unregisterPageAreaInformationEvents(pageInformation);
             this.updateCallback();

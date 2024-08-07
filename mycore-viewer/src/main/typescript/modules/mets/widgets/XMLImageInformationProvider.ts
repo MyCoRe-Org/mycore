@@ -21,11 +21,11 @@ export class XMLImageInformationProvider {
         return;
     }) {
 
-        var settings = {
+        const settings = {
             url: basePath + href + "/imageinfo.xml",
             async: true,
             success: function (response) {
-                var imageInformation = XMLImageInformationProvider.proccessXML(response, href);
+                const imageInformation = XMLImageInformationProvider.proccessXML(response, href);
                 callback(imageInformation);
             },
             error: function (request, status, exception) {
@@ -38,7 +38,7 @@ export class XMLImageInformationProvider {
     }
 
     private static proccessXML(imageInfo, path: string): XMLImageInformation {
-        var node = jQuery(imageInfo.childNodes[0]);
+        const node = jQuery(imageInfo.childNodes[0]);
         return new XMLImageInformation(node.attr("derivate"), path, parseInt(node.attr("tiles")), parseInt(node.attr("width")), parseInt(node.attr("height")), parseInt(node.attr("zoomLevel")));
     }
 

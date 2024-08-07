@@ -133,7 +133,7 @@ import {ChapterChangedEvent} from "./events/ChapterChangedEvent";
                 const dropdownButtonPressedEvent = e as DropdownButtonPressedEvent;
 
                 if (dropdownButtonPressedEvent.childId == "chapterOverview") {
-                    var direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_WEST;
+                    const direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_WEST;
                     this.trigger(new ShowContentEvent(this, this._container, direction, -1, this._sidebarLabel));
                     this.updateContainerSize();
                 }
@@ -268,12 +268,13 @@ import {ChapterChangedEvent} from "./events/ChapterChangedEvent";
                 let firstImageOfChapter = this._structureModel._chapterToImageMap.get(id);
                 changeChapter(firstImageOfChapter);
             } else {
+                let oldVal: null|string = null;
                 if (typeof node != "undefined") {
-                    var oldVal = node.css("cursor");
+                    oldVal = node.css("cursor");
                     node.css("cursor", "wait");
                 }
                 newSelectedChapter.resolveDestination((targetId) => {
-                    if (typeof node != "undefined") {
+                    if (typeof node != "undefined" && oldVal != null) {
                         node.css("cursor", oldVal);
                     }
                     changeChapter(targetId !== null ? this._idImageMap.get(targetId) : null);
@@ -282,10 +283,9 @@ import {ChapterChangedEvent} from "./events/ChapterChangedEvent";
         }
 
         registerExpander(expander: JQuery, id: string): void {
-            var that = this;
-            expander.click(function() {
-                var chapterToChange = that._chapterWidget.getChapterById(id);
-                that._chapterWidget.setChapterExpanded(chapterToChange, !that._chapterWidget.getChapterExpanded(chapterToChange));
+            expander.click(()=> {
+                const chapterToChange = this._chapterWidget.getChapterById(id);
+                this._chapterWidget.setChapterExpanded(chapterToChange, !this._chapterWidget.getChapterExpanded(chapterToChange));
             });
         }
 

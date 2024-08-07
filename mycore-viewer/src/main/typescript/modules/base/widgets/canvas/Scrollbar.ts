@@ -184,14 +184,14 @@ export class Scrollbar {
         if (this._areaSize == null || this._viewSize == null || this._position == null) {
             return;
         }
-        var ret = this.getScrollbarElementSize.call(this);
-        var realSize = (this._horizontal ? ret.width : ret.height) - 30;
-        var relation = realSize / this._areaSize;
+        const ret = this.getScrollbarElementSize();
+        const realSize = (this._horizontal ? ret.width : ret.height) - 30;
+        let relation = realSize / this._areaSize;
 
         // calculate and set slider style
-        var sliderSize = Math.min(Math.max(20, this._viewSize * relation), realSize);
-        var sliderSizeStyleKey = this._horizontal ? "width" : "height";
-        var sliderSizeStyle = {};
+        const sliderSize = Math.min(Math.max(20, this._viewSize * relation), realSize);
+        const sliderSizeStyleKey = this._horizontal ? "width" : "height";
+        const sliderSizeStyle = {};
         sliderSizeStyle[sliderSizeStyleKey] = sliderSize + "px";
         this._slider.css(sliderSizeStyle);
 
@@ -199,8 +199,8 @@ export class Scrollbar {
 
         //calculate and set slider position
         const sliderPos = Math.min(Math.max(this._position * relation + 15, 15), (this.areaSize * relation) - sliderSize) + 15;
-        var sliderPosStyleKey = this._horizontal ? "left" : "top";
-        var sliderPosStyle = {};
+        const sliderPosStyleKey = this._horizontal ? "left" : "top";
+        const sliderPosStyle = {};
         sliderPosStyle[sliderPosStyleKey] = sliderPos + "px";
         this._slider.css(sliderPosStyle);
 
@@ -213,8 +213,8 @@ export class Scrollbar {
     private getScrollbarElementSize() {
         const currentTime = new Date().getTime();
         if (this._cachedScrollbarElementSize == null || (currentTime - 1000 > this._cacheTime)) {
-            var elementHeight = this._scrollbarElement.height();
-            var elementWidth = this._scrollbarElement.width();
+            const elementHeight = this._scrollbarElement.height();
+            const elementWidth = this._scrollbarElement.width();
             this._cachedScrollbarElementSize = new Size2D(elementWidth, elementHeight);
             this._cacheTime = new Date().getTime();
         }

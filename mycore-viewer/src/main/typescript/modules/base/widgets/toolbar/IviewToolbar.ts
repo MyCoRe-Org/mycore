@@ -53,13 +53,12 @@ export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComp
         this._imageController = new ImageController(this._idGroupViewMap, this._idViewMap);
         this._textInputController = new TextInputController(this._idGroupViewMap, this._idViewMap);
 
-        var that = this;
-        this._buttonController.eventManager.bind(function ToolbarCallback(e: ViewerEvent) {
-            that.eventManager.trigger(e);
+        this._buttonController.eventManager.bind((e: ViewerEvent) => {
+            this.eventManager.trigger(e);
         });
 
-        this._dropdownController.eventManager.bind(function ToolbarCallback(e: ViewerEvent) {
-            that.eventManager.trigger(e);
+        this._dropdownController.eventManager.bind((e: ViewerEvent) => {
+            this.eventManager.trigger(e);
         });
 
         this._createView();
@@ -89,9 +88,8 @@ export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComp
         this._toolbarView = this.createToolbarView();
         this._toolbarElement = this._toolbarView.getElement();
         this._toolbarElement.appendTo(this._container);
-        var groups = this._model.getGroups();
-        for (var groupIndex in groups) {
-            var group = groups[groupIndex];
+        const groups = this._model.getGroups();
+        for (const group of groups) {
             this.childAdded(this._model, group);
         }
         if (this._mobile) {
@@ -102,14 +100,13 @@ export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComp
     public childAdded(parent: any, component: any): void {
         if (parent instanceof ToolbarModel) {
             // add a Group to the Model
-            var parentModel = <ToolbarModel>parent;
-            var childGroup = <ToolbarGroup>component;
+            const childGroup = component as ToolbarGroup;
 
-            var gv = this.createGroupView(childGroup.name, childGroup.order, childGroup.align);
+            const gv = this.createGroupView(childGroup.name, childGroup.order, childGroup.align);
             this._idGroupViewMap.set(childGroup.name, gv);
             this._toolbarView.addChild(gv.getElement());
 
-            var children = childGroup.getComponents();
+            const children = childGroup.getComponents();
             children.forEach((child: ToolbarComponent) => {
                 childGroup.notifyObserverChildAdded(childGroup, child);
             });
@@ -196,11 +193,12 @@ export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComp
     public getView(component: ToolbarComponent): ToolbarView;
 
     public getView(component: any): ToolbarView {
+        let componentId: string;
         if (component instanceof ToolbarComponent) {
             const toolbarComponent: ToolbarComponent = component;
-            const componentId: string = toolbarComponent.getProperty("id").value;
+            componentId = toolbarComponent.getProperty("id").value;
         } else if (typeof component == "string") {
-            var componentId: string = component;
+            componentId = component;
         } else {
             return this._toolbarView;
         }

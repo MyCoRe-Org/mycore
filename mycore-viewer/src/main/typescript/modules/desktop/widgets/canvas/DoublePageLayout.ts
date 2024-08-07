@@ -48,7 +48,7 @@ export class DoublePageLayout extends PageLayout {
 
         this._horizontalScrollbar.position = vp.position.x - (vp.size.width / vp.scale / 2) + (this._pageDimension.width / widthDivisor);
         this._verticalScrollbar.position = vp.position.y - (vp.size.height / vp.scale / 2);
-        var pagesPerLine = 2;
+        const pagesPerLine = 2;
 
         const vpSizeInArea = vp.size.height / vp.scale;
         const yStart = vp.position.y - (vpSizeInArea / 2);
@@ -58,7 +58,7 @@ export class DoublePageLayout extends PageLayout {
 
         const pagesToCheck = this._insertedPages.slice(0);
 
-        for (var y = yStartOrder; y <= yEndOrder; y++) {
+        for (let y = yStartOrder; y <= yEndOrder; y++) {
             if (this._model.children.has(y) && pagesToCheck.indexOf(y) == -1) {
                 pagesToCheck.push(y);
             } else if (0 < y && y <= this._model.pageCount) {
@@ -82,7 +82,7 @@ export class DoublePageLayout extends PageLayout {
     public fitToScreen(): void {
         const vp = this._pageController.viewport;
         if (vp.size.width != 0 && vp.size.height != 0) {
-            var dpRect = this.getDoublePageRect(this.getCurrentPage());
+            const dpRect = this.getDoublePageRect(this.getCurrentPage());
             vp.setRect(dpRect);
         }
     }

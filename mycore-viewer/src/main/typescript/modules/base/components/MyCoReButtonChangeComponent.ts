@@ -39,7 +39,7 @@ export class MyCoReButtonChangeComponent extends ViewerComponent {
     }
 
     public get handlesEvents(): string[] {
-        var handles = new Array<string>();
+        const handles = new Array<string>();
 
         handles.push(StructureModelLoadedEvent.TYPE);
         handles.push(ImageChangedEvent.TYPE);
@@ -59,7 +59,7 @@ export class MyCoReButtonChangeComponent extends ViewerComponent {
         (context: MyCoReButtonChangeComponent) => context._structureModel != null,
         (context: MyCoReButtonChangeComponent) => context._currentImage != null
     ], (context) => {
-        var positionOfImage = this._structureModel._imageList.indexOf(this._currentImage);
+        const positionOfImage = this._structureModel._imageList.indexOf(this._currentImage);
         if (positionOfImage == 0) {
             this._previousImageButton.disabled = true;
         } else {

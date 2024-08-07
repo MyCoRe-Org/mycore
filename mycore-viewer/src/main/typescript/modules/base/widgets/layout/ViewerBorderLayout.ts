@@ -60,16 +60,16 @@ export class ViewerBorderLayout {
 
 
     private _initCenter() {
-        var centerContainerDiv = jQuery("<div></div>");
+        const centerContainerDiv = jQuery("<div></div>");
         centerContainerDiv.addClass(this.getDirectionDescription(ViewerBorderLayout.DIRECTION_CENTER));
-        var cssDescription = this._updateCenterCss();
+        const cssDescription = this._updateCenterCss();
         this._parent.append(centerContainerDiv);
         centerContainerDiv.css(cssDescription);
         this._containerMap.set(ViewerBorderLayout.DIRECTION_CENTER, centerContainerDiv);
     }
 
     private _updateCenterCss(): any {
-        var cssDescription = <any>{};
+        const cssDescription = {} as any;
         cssDescription.position = "absolute";
         cssDescription.left = this.getContainerSize(ViewerBorderLayout.DIRECTION_WEST) + "px";
         cssDescription.top = this.getContainerSize(ViewerBorderLayout.DIRECTION_NORTH) + "px";
@@ -79,7 +79,7 @@ export class ViewerBorderLayout {
     }
 
     private _initContainer(description: ContainerDescription) {
-        var containerDiv = jQuery("<div></div>");
+        const containerDiv = jQuery("<div></div>");
 
         containerDiv.addClass(this.getDirectionDescription(description.direction));
 
@@ -92,7 +92,7 @@ export class ViewerBorderLayout {
         }
 
         this._correctDescription(description);
-        var cssDescription = this._updateCssDescription(description);
+        const cssDescription = this._updateCssDescription(description);
 
         containerDiv.css(cssDescription);
         this._parent.append(containerDiv);
@@ -101,14 +101,14 @@ export class ViewerBorderLayout {
 
     private _correctDescription(description: ContainerDescription) {
         if ("minSize" in description && !isNaN(description.minSize)) {
-            var minimumSize = description.minSize;
+            const minimumSize = description.minSize;
 
             description.size = Math.max(description.minSize, description.size);
         }
     }
 
     private _updateCssDescription(description: ContainerDescription): any {
-        var cssDescription = <any>{};
+        const cssDescription = {} as any;
         cssDescription.position = "absolute";
 
         cssDescription.right = "0px";
@@ -155,53 +155,51 @@ export class ViewerBorderLayout {
     }
 
     public updateSizes() {
-        var descriptions = this._descriptionMap.values;
-        for (var i in descriptions) {
-            var description: ContainerDescription = descriptions[i];
-            var container = this._containerMap.get(description.direction);
+        const descriptions = this._descriptionMap.values;
+        for (const description of descriptions) {
+            const container = this._containerMap.get(description.direction);
             this._correctDescription(description);
             container.css(this._updateCssDescription(description));
             container.delay(10).children().trigger("iviewResize");
         }
 
-        var container = this._containerMap.get(ViewerBorderLayout.DIRECTION_CENTER);
+        const container = this._containerMap.get(ViewerBorderLayout.DIRECTION_CENTER);
         container.css(this._updateCenterCss());
         container.delay(10).children().trigger("iviewResize")
     }
 
     private _initContainerResizeable(containerDiv: JQuery, description: ContainerDescription) {
-        var resizerElement = jQuery("<span></span>");
+        const resizerElement = jQuery("<span></span>");
 
         resizerElement.addClass("resizer");
-        var that = this;
-        resizerElement.bind("mousedown", function resizerMouseDown(e: JQuery.MouseDownEvent) {
-            var startPos = new Position2D(e.clientX, e.clientY);
-            var startSize = description.size;
+        resizerElement.bind("mousedown",  (e: JQuery.MouseDownEvent)=> {
+            const startPos = new Position2D(e.clientX, e.clientY);
+            const startSize = description.size;
 
-            var MOUSE_MOVE = function (e: JQuery.MouseEventBase) {
-                var curPos = new Position2D(e.clientX, e.clientY);
+            const MOUSE_MOVE =  (e: JQuery.MouseEventBase) => {
+                const curPos = new Position2D(e.clientX, e.clientY);
 
-                description.size = that._getNewSize(startPos, curPos, startSize, description.direction);
+                description.size = this._getNewSize(startPos, curPos, startSize, description.direction);
                 e.preventDefault();
-                that.updateSizes();
+                this.updateSizes();
             };
 
-            var MOUSE_UP = function (e: JQuery.MouseEventBase) {
-                var curPos = new Position2D(e.clientX, e.clientY);
-                that._parent.unbind("mousemove");
-                that._parent.unbind("mouseup");
+            const MOUSE_UP = (e: JQuery.MouseEventBase) => {
+                const curPos = new Position2D(e.clientX, e.clientY);
+                this._parent.unbind("mousemove");
+                this._parent.unbind("mouseup");
                 // trigger resize in this and center
             };
 
             e.preventDefault();
-            jQuery(that._parent).bind("mousemove", MOUSE_MOVE);
-            jQuery(that._parent).bind("mouseup", MOUSE_UP);
+            jQuery(this._parent).bind("mousemove", MOUSE_MOVE);
+            jQuery(this._parent).bind("mouseup", MOUSE_UP);
         });
 
 
-        var cssElem = <any>{};
+        const cssElem = {} as any;
         cssElem.position = "absolute";
-        var resizeWidth = 6;
+        const resizeWidth = 6;
 
         if (description.direction == ViewerBorderLayout.DIRECTION_NORTH || ViewerBorderLayout.DIRECTION_SOUTH == description.direction) {
             cssElem.cursor = "row-resize";
@@ -237,9 +235,9 @@ export class ViewerBorderLayout {
     private _containerMap: MyCoReMap<number, JQuery>;
 
     private _getNewSize(startPosition: Position2D, currentPosition: Position2D, startSize: number, direction: number): number {
-        var newSize;
+        let newSize;
         if (direction == ViewerBorderLayout.DIRECTION_EAST || direction == ViewerBorderLayout.DIRECTION_WEST) {
-            var diff = startPosition.x - currentPosition.x;
+            const diff = startPosition.x - currentPosition.x;
             if (direction == ViewerBorderLayout.DIRECTION_EAST) {
                 newSize = startSize + diff;
             } else {
@@ -247,7 +245,7 @@ export class ViewerBorderLayout {
             }
         }
         if (direction == ViewerBorderLayout.DIRECTION_NORTH || direction == ViewerBorderLayout.DIRECTION_SOUTH) {
-            var diff = startPosition.y - currentPosition.y;
+            const diff = startPosition.y - currentPosition.y;
             if (direction == ViewerBorderLayout.DIRECTION_SOUTH) {
                 newSize = startSize + diff;
             } else {
@@ -287,7 +285,7 @@ export class ViewerBorderLayout {
 
     public getContainerSize(direction: number) {
         if (this.hasContainer(direction)) {
-            var container: JQuery = this.getContainer(direction);
+            const container: JQuery = this.getContainer(direction);
             if (direction == ViewerBorderLayout.DIRECTION_EAST || direction == ViewerBorderLayout.DIRECTION_WEST) {
                 return container.width();
 

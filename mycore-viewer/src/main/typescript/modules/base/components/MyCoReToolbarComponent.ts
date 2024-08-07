@@ -57,9 +57,8 @@ export class MyCoReToolbarComponent extends ViewerComponent {
             this._toolbarModel = (e as ProvideToolbarModelEvent).model;
             this._toolbarController = new IviewToolbar(this._container, this._settings.mobile, this._toolbarModel);
 
-            var that = this;
-            this._toolbarController.eventManager.bind(function (e: ViewerEvent) {
-                that.trigger(e);
+            this._toolbarController.eventManager.bind((e: ViewerEvent) => {
+                this.trigger(e);
             });
 
             this.trigger(new WaitForEvent(this, LanguageModelLoadedEvent.TYPE));
@@ -68,15 +67,15 @@ export class MyCoReToolbarComponent extends ViewerComponent {
 
         if (this._toolbarModel != null) {
             if (e.type == LanguageModelLoadedEvent.TYPE) {
-                var languageModelLoadedEvent = e as LanguageModelLoadedEvent;
+                const languageModelLoadedEvent = e as LanguageModelLoadedEvent;
                 this._toolbarModel.i18n(languageModelLoadedEvent.languageModel);
                 this._sync(this);
             }
 
             if (e.type == StructureModelLoadedEvent.TYPE) {
                 if (!this._settings.mobile) {
-                    let smlEvent = e as StructureModelLoadedEvent;
-                    let imgList = smlEvent.structureModel._imageList;
+                    const smlEvent = e as StructureModelLoadedEvent;
+                    const imgList = smlEvent.structureModel._imageList;
                     const group = this._toolbarModel.getGroup('ImageChangeControllGroup');
                     if (group != null || typeof group !== 'undefined') {
                         const pageSelect: ToolbarDropdownButton =
@@ -102,11 +101,11 @@ export class MyCoReToolbarComponent extends ViewerComponent {
             }
 
             if (e.type == DropdownButtonPressedEvent.TYPE) {
-                var dropdownButtonPressedEvent = e as DropdownButtonPressedEvent;
+                const dropdownButtonPressedEvent = e as DropdownButtonPressedEvent;
 
                 if (dropdownButtonPressedEvent.button.id == "PageSelect") {
-                    var id = dropdownButtonPressedEvent.childId;
-                    var img = this._imageIdMap.get(id);
+                    const id = dropdownButtonPressedEvent.childId;
+                    const img = this._imageIdMap.get(id);
                     this.trigger(new ImageSelectedEvent(this, img));
                 }
 
@@ -114,10 +113,10 @@ export class MyCoReToolbarComponent extends ViewerComponent {
             }
 
             if (e.type == ImageChangedEvent.TYPE) {
-                var icEvent: ImageChangedEvent = e as ImageChangedEvent;
+                const icEvent: ImageChangedEvent = e as ImageChangedEvent;
                 if (icEvent.image != null) {
                     if (!this._settings.mobile) {
-                        var select = this._toolbarController.getView("PageSelect").getElement();
+                        const select = this._toolbarController.getView("PageSelect").getElement();
                         //select.find("option[selected]").removeAttr("selected");
                         select.val(icEvent.image.id);
                     }
@@ -133,7 +132,7 @@ export class MyCoReToolbarComponent extends ViewerComponent {
     }
 
     public get handlesEvents(): string[] {
-        var handleEvents: Array<string> = new Array<string>();
+        const handleEvents: Array<string> = new Array<string>();
         handleEvents.push(StructureModelLoadedEvent.TYPE);
         handleEvents.push(ProvideToolbarModelEvent.TYPE);
         handleEvents.push(DropdownButtonPressedEvent.TYPE);
