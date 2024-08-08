@@ -33,6 +33,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+@Deprecated
 /**
  * Strategy for {@link MCRAccessKey}.
  */
