@@ -76,17 +76,15 @@
     <!-- <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-ltr-\d.*\.jar" /> -->
 
     <!--Required for alto fields -->
-    <lib dir="${solr.install.dir:../../../..}/module/analysis-extras/lib/"
-         regex="lucene-analyzers-icu-\d.*\.jar"/>
-    <lib dir="${solr.install.dir:../../../..}/module/analysis-extras/lib/" regex="solr-analysis-extras-\d.*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/modules/analysis-extras/lib/" regex=".*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/module/extraction/lib/" regex=".*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/modules/extraction/lib/" regex=".*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/module/clustering/lib/" regex=".*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/modules/clustering/lib/" regex=".*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/module/langid/lib/" regex=".*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/modules/langid/lib/" regex=".*\.jar"/>
 
-    <lib dir="${solr.install.dir:../../../..}/module/velocity/lib/" regex=".*\.jar"/>
+    <lib dir="${solr.install.dir:../../../..}/modules/velocity/lib/" regex=".*\.jar"/>
          specific jar file.  This will cause a serious error to be logged
          if it can't be loaded.
       -->
