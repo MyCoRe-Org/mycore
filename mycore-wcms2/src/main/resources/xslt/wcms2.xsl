@@ -100,7 +100,8 @@
         <script type="text/javascript" src="{$jsPath}/navigation/undo/EditUndo.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/undo/RestoreUndo.js"></script>
 
-        <script type="text/javascript" src="{$wcmsBasePath}/node_modules/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" src="{$wcmsBasePath}/node_modules/tinymce/tinymce.js"></script>
+        <script type="text/javascript" src="{$wcmsBasePath}/node_modules/tinymce/langs/de.js"></script>
         <!-- main -->
         <script type="text/javascript" src="{$jsPath}/Header.js"></script>
         <script type="text/javascript" src="{$jsPath}/WCMS2.js"></script>

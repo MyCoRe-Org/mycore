@@ -129,15 +129,15 @@ wcms.navigation.TypeEditor = function() {
 		});
 		dojo.connect(this.typeSelect, "onChange", this, this.updateType);
 
-		this.editContentDialog.eventHandler.attach(dojo.hitch(this, function(/* EditContentDialog */source, /* Json */args) {
-			if (args.type == "okButtonClicked" && !deepEquals(source.oldWebpageContent, source.webpageContent)) {
+		this.editContentDialog.eventHandler.attach((/* EditContentDialog */source, /* Json */args) => {
+			if (args.type === "okButtonClicked" && !deepEquals(source.oldWebpageContent, source.webpageContent)) {
 				this.eventHandler.notify({
 					"type" : "contentChanged",
 					"webpageContent" : source.webpageContent
 				});
 			}
-		}));
-		this.moveContentDialog.eventHandler.attach(dojo.hitch(this, function(/* MoveContentDialog */source, /* Json */args) {
+		});
+		this.moveContentDialog.eventHandler.attach((/* MoveContentDialog */source, /* Json */args) => {
 			var from = this.hrefTextBox.get("value");
 			var to = args.href;
 			if (args.type == "moveButtonClicked" && to != from) {
@@ -157,7 +157,7 @@ wcms.navigation.TypeEditor = function() {
 				};
 				dojo.xhrPost(xhrArgs);
 			}
-		}));
+		});
 	}
 
 	function update(/* JSON */item) {

@@ -68,9 +68,9 @@ import jakarta.ws.rs.core.Response.Status;
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSFileBrowserResource {
 
-    private ArrayList<String> folderList = new ArrayList<>();
+    private final ArrayList<String> folderList = new ArrayList<>();
 
-    private String wcmsDataPath = MCRWebPagesSynchronizer.getWCMSDataDir().getPath();
+    private final String wcmsDataPath = MCRWebPagesSynchronizer.getWCMSDataDir().getPath();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRWCMSFileBrowserResource.class);
 
@@ -221,28 +221,7 @@ public class MCRWCMSFileBrowserResource {
         return Response.status(Status.CONFLICT).build();
     }
 
-    @POST
-    @Path("/upload")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String getUpload(@FormDataParam("upload") InputStream inputStream,
-        @FormDataParam("upload") FormDataContentDisposition header, @QueryParam("CKEditorFuncNum") int funcNum,
-        @QueryParam("href") String href, @QueryParam("type") String type, @QueryParam("basehref") String basehref) {
-        String path = "";
-        try {
-            path = saveFile(inputStream, href + "/" + header.getFileName());
-        } catch (IOException e) {
-            LOGGER.error("Error while saving {}", href + "/" + header.getFileName(), e);
-            return "";
-        }
-        if (Objects.equals(type, "images")) {
-            return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'"
-                + path.substring(path.lastIndexOf("/") + 1) + "', '');</script>";
-        }
-        return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + basehref
-            + path.substring(path.lastIndexOf("/") + 1) + "', '');</script>";
-    }
-
-    protected String saveFile(InputStream inputStream, String path) throws IOException {
+    protected void saveFile(InputStream inputStream, String path) throws IOException {
         String newPath = testIfFileExists(path);
         OutputStream outputStream = MCRWebPagesSynchronizer.getOutputStream(newPath);
         int read = 0;
@@ -253,7 +232,6 @@ public class MCRWCMSFileBrowserResource {
         }
         outputStream.flush();
         outputStream.close();
-        return newPath;
     }
 
     protected String testIfFileExists(String path) {

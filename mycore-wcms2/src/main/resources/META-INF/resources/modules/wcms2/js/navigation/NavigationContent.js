@@ -253,26 +253,27 @@ wcms.navigation.NavigationContent = function() {
 	// this class shouldn't use xhrget/post methods or error dialogs
 	function save(/*JSON*/ treeHierarchy) {
 		// delete all undefined and null properties
-		for(var i = 0; i < this.itemList.length; i++) {
+		for(let i = 0; i < this.itemList.length; i++) {
 			deleteUndefinedProperties(this.itemList[i]);
 		}
 		// save navigation
-		var saveObject = {
+		const saveObject = {
 			items: this.itemList,
 			hierarchy: treeHierarchy
 		};
-		var navXhrArgs = {
+		const navXhrArgs = {
 			url :  wcms.settings.wcmsURL + "/navigation/save",
 			postData : dojo.toJson(saveObject),
 			handleAs : "json",
 			headers: { "Content-Type": "application/json; charset=utf-8"},
-			error : dojo.hitch(this, function(error, xhr) {
+			error : (error, xhr) => {
+				console.log(error);
 				wcms.util.ErrorUtils.show("couldNotSave");
-			}),
-			load : dojo.hitch(this, function(data) {
+			},
+			load : (data) => {
 				this.reset();
 				this.eventHandler.notify({type : "saved", data : data});					
-			})
+			}
 		};
 		dojo.xhrPost(navXhrArgs);
 	}
