@@ -23,8 +23,12 @@ import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.QUE
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.v2.MCRRestUtils.TAG_MYCORE_OBJECT;
 
+import org.mycore.access.MCRAccessException;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
@@ -83,9 +87,8 @@ public class MCRRestObjectAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
-    public Response listAccessKeysForObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @DefaultValue("0") @QueryParam("offset") final int offset,
-        @DefaultValue("128") @QueryParam("limit") final int limit) {
+    public MCRAccessKeyInformation listAccessKeysForObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @DefaultValue("0") @QueryParam("offset") int offset, @DefaultValue("128") @QueryParam("limit") int limit) {
         return MCRRestAccessKeyHelper.doListAccessKeys(objectId, offset, limit);
     }
 
@@ -110,9 +113,9 @@ public class MCRRestObjectAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
-    public Response getAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public MCRAccessKeyDto getAccessKeyFromObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @PathParam(PARAM_SECRET) String secret, @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding)
+        throws MCRAccessException {
         return MCRRestAccessKeyHelper.doGetAccessKey(objectId, secret, secretEncoding);
     }
 
@@ -142,9 +145,9 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response createAccessKeyForObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        final String accessKeyJson) {
-        return MCRRestAccessKeyHelper.doCreateAccessKey(objectId, accessKeyJson, uriInfo);
+    public Response createAccessKeyForObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        MCRAccessKeyDto accessKeyDto) throws MCRAccessException {
+        return MCRRestAccessKeyHelper.doCreateAccessKey(objectId, accessKeyDto, uriInfo);
     }
 
     @PUT
@@ -170,10 +173,10 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response updateAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String secret, final String accessKeyJson,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
-        return MCRRestAccessKeyHelper.doUpdateAccessKey(objectId, secret, accessKeyJson, secretEncoding);
+    public Response updateAccessKeyFromObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @PathParam(PARAM_SECRET) String secret, MCRAccessKeyPartialUpdateDto accessKeyDto,
+        @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding) throws MCRAccessException {
+        return MCRRestAccessKeyHelper.doUpdateAccessKey(objectId, secret, accessKeyDto, secretEncoding);
     }
 
     @DELETE
@@ -195,9 +198,9 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
-    public Response removeAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+    public Response removeAccessKeyFromObject(@PathParam(PARAM_MCRID) MCRObjectID objectId,
+        @PathParam(PARAM_SECRET) String secret, @QueryParam(QUERY_PARAM_SECRET_ENCODING) String secretEncoding)
+        throws MCRAccessException {
         return MCRRestAccessKeyHelper.doRemoveAccessKey(objectId, secret, secretEncoding);
     }
 }

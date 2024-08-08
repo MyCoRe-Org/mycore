@@ -18,6 +18,7 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mcr.acl.accesskey.access.MCRAccessKeyAccessService;
 import org.mycore.mcr.acl.accesskey.access.MCRAccessKeyAccessServiceImpl;
@@ -31,6 +32,8 @@ import org.mycore.mcr.acl.accesskey.value.MCRAccessKeyValueProcessor;
 public class MCRAccessKeyServiceFactory {
 
     private static volatile MCRAccessKeyService service;
+
+    private static volatile MCRAccessKeyService noAccessService;
 
     private static final Object lock = new Object();
 
@@ -51,6 +54,25 @@ public class MCRAccessKeyServiceFactory {
         return service;
     }
 
+    /**
+     * Returns single access key service instance.
+     * This service allows all accesses and is temporary because of the outdatet resources.
+     * The use requires that the access authorization part has already been made.
+     *
+     * @return the instance
+     */
+    public static MCRAccessKeyService getServiceWithoutAccessCheck() {
+        if (noAccessService == null) {
+            synchronized (lock) {
+                if (noAccessService == null) {
+                    noAccessService = createAndConfigureService(createRepository(),
+                        new MCRAccessKeyAccessAlwaysAllowedService(), createValueProcessor());
+                }
+            }
+        }
+        return noAccessService;
+    }
+
     private static MCRAccessKeyService createAndConfigureService(MCRAccessKeyRepository accessKeyRepository,
         MCRAccessKeyAccessService accessService, MCRAccessKeyValueProcessor valueProcessor) {
         final MCRAccessKeyServiceImpl service = new MCRAccessKeyServiceImpl(accessKeyRepository, accessService);
@@ -69,5 +91,21 @@ public class MCRAccessKeyServiceFactory {
 
     private static MCRAccessKeyAccessService createAccessService() {
         return new MCRAccessKeyAccessServiceImpl();
+    }
+
+    /**
+     * This service is temporary for the outdated resources.
+     */
+    private static class MCRAccessKeyAccessAlwaysAllowedService implements MCRAccessKeyAccessService {
+
+        @Override
+        public void validateManagePermission(String reference, String permission) throws MCRAccessException {
+            // nothing to validate
+        }
+
+        @Override
+        public boolean checkManagePermission(String reference, String permission) {
+            return true;
+        }
     }
 }
