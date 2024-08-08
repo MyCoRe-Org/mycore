@@ -81,6 +81,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private static final String X_PATH_MAPPING_CLASSIFICATIONS
         = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
 
+    private static final Map<String, String> MAPPING_PATTERNS = MCRConfiguration2.getSubPropertiesMap(
+        "MCR.Category.XPathMapping.Pattern.");
+
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
     /**
@@ -193,6 +196,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
                     String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                    xPath = org.mycore.common.events.MCRClassificationMappingEventHandler.replacePattern(xPath);
                     MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                     if (evaluator.test(xPath)) {
@@ -213,6 +217,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
 
                         String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
+                        xPath = org.mycore.common.events.MCRClassificationMappingEventHandler.replacePattern(xPath);
                         MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                         if (evaluator.test(xPath)) {

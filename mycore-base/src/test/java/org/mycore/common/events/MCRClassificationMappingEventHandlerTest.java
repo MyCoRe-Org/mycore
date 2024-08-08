@@ -1,4 +1,4 @@
-package org.mycore.oai.classmapping;
+package org.mycore.common.events;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +18,7 @@ import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.events.MCRClassificationMappingEventHandler;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -41,6 +42,10 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCRConfiguration2.set("MCR.Category.XPathMapping.ClassIDs", "orcidWorkType,dummyClassification");
+        MCRConfiguration2.set("MCR.Category.XPathMapping.Pattern.genre",
+            "//*[@classid='{0}' and @categid='{1}']");
+        MCRConfiguration2.set("MCR.Category.XPathMapping.Pattern.host", "//element/publishedin[@type='{0}']");
+
     }
 
     /**
@@ -102,6 +107,15 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
             expressionObject.evaluateFirst(
                 xml));
 
+        String expression5
+            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+                + "and @categid='dummy-placeholder']";
+        expressionObject = XPathFactory.instance()
+            .compile(expression5, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+        Assert.assertNotNull("The mapped placeholder classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
@@ -129,20 +143,20 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 
-        String expression3
+        String expression1
             = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
                 + "and @categid='journal-article']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
-            .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+            .compile(expression1, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression4
+        String expression2
             = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
                 + "and @categid='dummy-article']";
         expressionObject = XPathFactory.instance()
-            .compile(expression4, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+            .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
