@@ -164,14 +164,21 @@ public class MCRComponent implements Comparable<MCRComponent> {
     }
 
     /**
-     * Returns true, if this component is part of MyCoRe
+     * Returns true, if this component is a MyCore base component
+     */
+    public boolean isMyCoReBaseComponent() {
+        return type == Type.base;
+    }
+    
+    /**
+     * Returns true, if this component is a MyCoRe component
      */
     public boolean isMyCoReComponent() {
         return type == Type.base || type == Type.component;
     }
 
     /**
-     * Returns true, if this component is application module 
+     * Returns true, if this component is an application module 
      */
     public boolean isAppModule() {
         return type == Type.module;
@@ -183,6 +190,13 @@ public class MCRComponent implements Comparable<MCRComponent> {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * The unshortened name for this component.
+     */
+    public String getFullName() {
+        return artifactId;
     }
 
     /**
