@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<mycoreclass ID="placeholderClassification" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+    <label xml:lang="de" text="Dummy Placeholder Classification"/>
+    <label xml:lang="en" text="dummy placeholder classification"/>
+    <categories>
+        <category ID="dummy-placeholder-language">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath" text="{pattern:language-term(rfc5646,code,de)}" />
+        </category>
+        <category ID="dummy-placeholder-genre">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath" text="{pattern:genre(article)} and mods:relatedItem[@type='host']/mods:genre[substring-after(@valueURI,'#')='journal']" />
+        </category>
+        <category ID="dummy-placeholder-fb">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpathfb" text="{pattern:title}" />
+        </category>
+        <category ID="dummy-placeholder-multiple">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath" text="{pattern:title()} and {pattern:genre(article)} and {pattern:language-term(rfc5646,code,de)}" />
+        </category>
+    </categories>
+</mycoreclass>
