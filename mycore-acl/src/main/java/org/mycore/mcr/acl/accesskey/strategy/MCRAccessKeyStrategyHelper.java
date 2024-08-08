@@ -54,6 +54,7 @@ public class MCRAccessKeyStrategyHelper {
      * @param accessKey the {@link MCRAccessKey}
      * @return true if valid, otherwise false
      */
+    @Deprecated
     public static boolean verifyAccessKey(final String permission, final MCRAccessKey accessKey) {
         final String sanitizedPermission = sanitizePermission(permission);
         if (PERMISSION_READ.equals(sanitizedPermission) || PERMISSION_WRITE.equals(sanitizedPermission)) {

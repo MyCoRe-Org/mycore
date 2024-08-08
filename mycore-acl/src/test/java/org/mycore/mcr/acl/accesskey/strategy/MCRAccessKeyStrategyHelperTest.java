@@ -54,6 +54,7 @@ public class MCRAccessKeyStrategyHelperTest extends MCRTestCase {
         assertEquals(PERMISSION_WRITE, MCRAccessKeyStrategyHelper.sanitizePermission(PERMISSION_WRITE));
     }
 
+    @Deprecated
     @Test
     public void testVerifyAccessKey() {
         assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
@@ -64,6 +65,7 @@ public class MCRAccessKeyStrategyHelperTest extends MCRTestCase {
         assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_DELETE, accessKey));
     }
 
+    @Deprecated
     public void testVerifyAccessKeyIsActive() {
         assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
         accessKey.setIsActive(false);
@@ -72,6 +74,7 @@ public class MCRAccessKeyStrategyHelperTest extends MCRTestCase {
         assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
     }
 
+    @Deprecated
     public void testVerifyAccessKeyExpiration() {
         assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
         accessKey.setExpiration(new Date());
