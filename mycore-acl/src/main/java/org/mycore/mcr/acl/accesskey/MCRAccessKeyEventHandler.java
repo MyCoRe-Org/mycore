@@ -18,113 +18,75 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
+import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
 
 /**
- * This class contains EventHandler methods to manage access keys of
- * MCRObjects and MCRDerivates.
- * 
+ * Event handler for managing access keys in the context of MyCoRe objects and derivates.
  */
 public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+    /**
+     * Service flags name for access keys.
      */
+    public static final String ACCESS_KEY_FLAG_TYPE = "accesskeys";
+
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         handleBaseCreated(obj);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
-     */
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         handleBaseUpdated(obj);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
-     */
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         handleBaseDeleted(obj);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleDerivateCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRDerivate)
-     */
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         handleBaseCreated(der);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleDerivateUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRDerivate)
-     */
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         handleBaseUpdated(der);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleDerivateDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRDerivate)
-     */
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         handleBaseDeleted(der);
     }
 
-    /**
-     * Add all {@link MCRAccessKey} from servflags to object.
-     *
-     * Then the servlag will be deleted.
-     * @param obj the {@link MCRBase}
-     */
     private void handleBaseCreated(final MCRBase obj) {
         final MCRObjectService service = obj.getService();
-        try {
-            final List<MCRAccessKey> accessKeys = MCRAccessKeyTransformer
-                .accessKeysFromElement(obj.getId(), service.createXML());
-            if (accessKeys.size() > 0) {
-                MCRAccessKeyManager.addAccessKeys(obj.getId(), accessKeys);
-            }
-        } catch (MCRAccessKeyTransformationException e) {
-            LOGGER.warn("Access keys can not be handled.");
+        final List<MCRAccessKeyDto> accessKeyDtos = service.getFlags(ACCESS_KEY_FLAG_TYPE).stream()
+            .map(MCRAccessKeyJsonMapper::jsonToAccessKeyDtos).flatMap(Collection::stream).toList();
+        for (MCRAccessKeyDto accessKeyDto : accessKeyDtos) {
+            accessKeyDto.setReference(obj.getId().toString());
+            MCRAccessKeyServiceFactory.getAccessKeyService().importAccessKey(accessKeyDto);
         }
-        service.removeFlags(MCRAccessKeyTransformer.ACCESS_KEY_TYPE);
+        service.removeFlags(ACCESS_KEY_FLAG_TYPE);
     }
 
-    /**
-     * Removes {@link MCRAccessKey} string for servflags.
-     *
-     * {@link MCRAccessKey} string will not handled
-     * @param obj the {@link MCRBase}
-     */
-    private void handleBaseUpdated(final MCRBase obj) {
-        final MCRObjectService service = obj.getService();
-        service.removeFlags(MCRAccessKeyTransformer.ACCESS_KEY_TYPE);
+    private void handleBaseUpdated(MCRBase obj) {
+        obj.getService().removeFlags(ACCESS_KEY_FLAG_TYPE);
     }
 
-    /**
-     * Deletes all {@link MCRAccessKey} for given {@link MCRBase}
-     *
-     * @param obj the {@link MCRBase}
-     */
-    private void handleBaseDeleted(final MCRBase obj) {
-        MCRAccessKeyManager.clearAccessKeys(obj.getId());
+    private void handleBaseDeleted(MCRBase obj) {
+        MCRAccessKeyServiceFactory.getAccessKeyService().removeAccessKeysByReference(obj.getId().toString());
     }
 }
