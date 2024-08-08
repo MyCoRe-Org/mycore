@@ -70,7 +70,7 @@ public class MCRAccessKeyMapperTest {
         final MCRAccessKey accessKey = MCRAccessKeyMapper.toEntity(accessKeyDto);
         assertEquals(TEST_ID, accessKey.getUuid());
         assertEquals(TEST_REFERENCE, accessKey.getReference());
-        assertEquals(TEST_VALUE, accessKey.getSecret());
+        assertEquals(TEST_VALUE, accessKey.getValue());
         assertEquals(TEST_PERMISSION, accessKey.getPermission());
         assertEquals(TEST_EXPIRATION, accessKey.getExpiration());
         assertEquals(TEST_ACTIVE, accessKey.getIsActive());
@@ -87,7 +87,7 @@ public class MCRAccessKeyMapperTest {
         final MCRAccessKey accessKey = MCRAccessKeyMapper.toEntity(accessKeyDto);
         assertNull(accessKey.getId());
         assertNull(accessKey.getReference());
-        assertNull(accessKey.getSecret());
+        assertNull(accessKey.getValue());
         assertNull(accessKey.getPermission());
         assertNull(accessKey.getExpiration());
         assertNull(accessKey.getIsActive());
@@ -103,7 +103,7 @@ public class MCRAccessKeyMapperTest {
         final MCRAccessKey accessKey = new MCRAccessKey();
         accessKey.setUuid(TEST_ID);
         accessKey.setReference(TEST_REFERENCE);
-        accessKey.setSecret(TEST_VALUE);
+        accessKey.setValue(TEST_VALUE);
         accessKey.setPermission(TEST_PERMISSION);
         accessKey.setExpiration(TEST_EXPIRATION);
         accessKey.setComment(TEST_COMMENT);

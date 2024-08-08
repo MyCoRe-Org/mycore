@@ -231,7 +231,7 @@ public class MCRAccessKeyServiceImplTest extends MCRJPATestCase {
     public void testCreateAccessKey() throws MCRAccessException {
         final MCRAccessKey accessKey = new MCRAccessKey(TEST_REFERENCE_READ, TEST_PERMISSION_READ, TEST_VALUE_READ);
         final MCRAccessKeyDto createAccessKeyDto = MCRAccessKeyMapper.toDto(accessKey);
-        accessKey.setSecret(testEncodedValueRead);
+        accessKey.setValue(testEncodedValueRead);
         accessKey.setUuid(TEST_ID_READ);
         Mockito.when(accessKeyRepositoryMock.save(accessKey)).thenReturn(accessKey);
         Mockito.when(accessKeyRepositoryMock.existsByReferenceAndValue(TEST_REFERENCE_READ, testEncodedValueRead))
@@ -289,7 +289,7 @@ public class MCRAccessKeyServiceImplTest extends MCRJPATestCase {
         final MCRAccessKeyDto updateAccessKeyDto = MCRAccessKeyMapper.toDto(outdatedAccessKey);
         updateAccessKeyDto.setValue(newValue);
         final MCRAccessKey updateAccessKey = MCRAccessKeyMapper.toEntity(updateAccessKeyDto);
-        updateAccessKey.setSecret(encodedNewValue);
+        updateAccessKey.setValue(encodedNewValue);
         Mockito.when(accessKeyRepositoryMock.findByUuid(TEST_ID_READ)).thenReturn(Optional.of(getReadAccessKey()));
         Mockito.when(accessKeyRepositoryMock.existsByReferenceAndValue(TEST_REFERENCE_READ, encodedNewValue))
             .thenReturn(false);
@@ -342,7 +342,7 @@ public class MCRAccessKeyServiceImplTest extends MCRJPATestCase {
         final MCRAccessKey outdatedAccessKey = getReadAccessKey();
         outdatedAccessKey.setExpiration(new Date());
         final MCRAccessKey updatedAccessKey = getReadAccessKey();
-        updatedAccessKey.setSecret(encodedNewValue);
+        updatedAccessKey.setValue(encodedNewValue);
         updatedAccessKey.setExpiration(null);
         Mockito.when(accessKeyRepositoryMock.findByUuid(TEST_ID_READ)).thenReturn(Optional.of(outdatedAccessKey));
         Mockito.when(accessKeyRepositoryMock.existsByReferenceAndValue(TEST_REFERENCE_READ, encodedNewValue))

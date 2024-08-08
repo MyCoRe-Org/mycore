@@ -77,7 +77,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         assertEquals(TEST_ID_READ, accessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, accessKey.getReference());
         assertEquals(TEST_PERMISSION_READ, accessKey.getPermission());
-        assertEquals(TEST_VALUE_READ, accessKey.getSecret());
+        assertEquals(TEST_VALUE_READ, accessKey.getValue());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         assertEquals(TEST_ID_READ, accessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, accessKey.getReference());
         assertEquals(TEST_PERMISSION_READ, accessKey.getPermission());
-        assertEquals(TEST_VALUE_READ, accessKey.getSecret());
+        assertEquals(TEST_VALUE_READ, accessKey.getValue());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         assertEquals(TEST_ID_READ, optAccessKey.get().getUuid());
         assertEquals(TEST_REFERENCE_READ, optAccessKey.get().getReference());
         assertEquals(TEST_PERMISSION_READ, optAccessKey.get().getPermission());
-        assertEquals(TEST_VALUE_READ, optAccessKey.get().getSecret());
+        assertEquals(TEST_VALUE_READ, optAccessKey.get().getValue());
     }
 
     @Test
@@ -146,7 +146,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         assertEquals(TEST_ID_READ, optAccessKey.get().getUuid());
         assertEquals(TEST_REFERENCE_READ, optAccessKey.get().getReference());
         assertEquals(TEST_PERMISSION_READ, optAccessKey.get().getPermission());
-        assertEquals(TEST_VALUE_READ, optAccessKey.get().getSecret());
+        assertEquals(TEST_VALUE_READ, optAccessKey.get().getValue());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         final MCRAccessKey accessKey = new MCRAccessKey();
         accessKey.setReference(TEST_REFERENCE_READ);
         accessKey.setPermission(TEST_PERMISSION_READ);
-        accessKey.setSecret(TEST_VALUE_READ);
+        accessKey.setValue(TEST_VALUE_READ);
         accessKey.setIsActive(true);
         final MCRAccessKey createdAccessKey = new MCRAccessKeyRepositoryImpl().save(accessKey);
         endTransaction();
@@ -170,7 +170,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         assertNotNull(createdAccessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, createdAccessKey.getReference());
         assertEquals(TEST_PERMISSION_READ, createdAccessKey.getPermission());
-        assertEquals(TEST_VALUE_READ, createdAccessKey.getSecret());
+        assertEquals(TEST_VALUE_READ, createdAccessKey.getValue());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         accessKey.setUuid(TEST_ID_READ);
         accessKey.setReference(TEST_REFERENCE_READ);
         accessKey.setPermission(TEST_PERMISSION_WRITE);
-        accessKey.setSecret(TEST_VALUE_READ);
+        accessKey.setValue(TEST_VALUE_READ);
         accessKey.setIsActive(true);
         final MCRAccessKey createdAccessKey = new MCRAccessKeyRepositoryImpl().save(accessKey);
         endTransaction();
@@ -189,7 +189,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         assertEquals(TEST_ID_READ, createdAccessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, createdAccessKey.getReference());
         assertEquals(TEST_PERMISSION_WRITE, createdAccessKey.getPermission());
-        assertEquals(TEST_VALUE_READ, createdAccessKey.getSecret());
+        assertEquals(TEST_VALUE_READ, createdAccessKey.getValue());
     }
 
     @Test
@@ -220,6 +220,6 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         MCRJPATestCase.executeUpdate(
             "INSERT INTO \"junit\".\"MCRAccessKey\" (\"uuid\",\"type\",\"objectId\","
                 + "\"secret\",\"isActive\") VALUES ('" + id + "','" + accessKey.getPermission() + "','"
-                + accessKey.getReference() + "','" + accessKey.getSecret() + "',true)");
+                + accessKey.getReference() + "','" + accessKey.getValue() + "',true)");
     }
 }
