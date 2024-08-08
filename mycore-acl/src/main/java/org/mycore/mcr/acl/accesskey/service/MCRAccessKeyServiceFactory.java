@@ -38,7 +38,15 @@ public final class MCRAccessKeyServiceFactory {
 
     private static volatile MCRAccessKeyService service;
 
+    private static volatile MCRAccessKeyUserService userService;
+
+    private static volatile MCRAccessKeySessionService sessionService;
+
     private static final Lock SERVICE_LOCK = new ReentrantLock();
+
+    private static final Lock USER_SERVICE_LOCK = new ReentrantLock();
+
+    private static final Lock SESSION_SERVICE_LOCK = new ReentrantLock();
 
     private MCRAccessKeyServiceFactory() {
 
@@ -62,6 +70,52 @@ public final class MCRAccessKeyServiceFactory {
             }
         }
         return service;
+    }
+
+    /**
+     * Returns single access key user service instance.
+     *
+     * @return the instance
+     */
+    public static MCRAccessKeyUserService getAccessKeyUserService() {
+        if (userService == null) {
+            try {
+                USER_SERVICE_LOCK.lock();
+                if (userService == null) {
+                    userService = createUserService(getAccessKeyService());
+                }
+            } finally {
+                USER_SERVICE_LOCK.unlock();
+            }
+        }
+        return userService;
+    }
+
+    /**
+     * Returns single access key session service instance.
+     *
+     * @return the instance
+     */
+    public static MCRAccessKeySessionService getAccessKeySessionService() {
+        if (sessionService == null) {
+            try {
+                SESSION_SERVICE_LOCK.lock();
+                if (sessionService == null) {
+                    sessionService = createSessionService(getAccessKeyService());
+                }
+            } finally {
+                SESSION_SERVICE_LOCK.unlock();
+            }
+        }
+        return sessionService;
+    }
+
+    private static MCRAccessKeyUserService createUserService(MCRAccessKeyService service) {
+        return new MCRAccessKeyUserService(service);
+    }
+
+    private static MCRAccessKeySessionService createSessionService(MCRAccessKeyService service) {
+        return new MCRAccessKeySessionService(service);
     }
 
     private static MCRAccessKeyService createAndConfigureService(MCRAccessKeyRepository accessKeyRepository,
