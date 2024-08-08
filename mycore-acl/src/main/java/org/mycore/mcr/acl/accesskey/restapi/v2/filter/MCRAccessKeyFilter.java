@@ -23,7 +23,8 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyConfig;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceFactory;
 import org.mycore.restapi.v2.MCRRestAuthorizationFilter;
 
 import jakarta.annotation.Priority;
@@ -33,6 +34,9 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.Provider;
 
+/**
+ * Sets access key to session by request header.
+ */
 @Provider
 @Priority(Priorities.AUTHENTICATION + 1)
 public class MCRAccessKeyFilter implements ContainerRequestFilter {
@@ -42,7 +46,7 @@ public class MCRAccessKeyFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
         LOGGER.debug("Access key filter started.");
-        if (!MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
+        if (MCRAccessKeyConfig.getAllowedSessionPermissionTypes().isEmpty()) {
             LOGGER.debug("Access keys are not allowed for session. Skipping filter...");
             return;
         }
@@ -50,16 +54,17 @@ public class MCRAccessKeyFilter implements ContainerRequestFilter {
             LOGGER.debug("Session is not initialised. Skipping filter...");
             return;
         }
-        final String secret = requestContext.getHeaderString("X-Access-Key");
-        if (secret != null) {
-            LOGGER.debug("Found X-Access-Key with value {}.", secret);
+        final String rawValue = requestContext.getHeaderString("X-Access-Key");
+        if (rawValue != null) {
+            LOGGER.debug("Found X-Access-Key with value {}.", rawValue);
             final MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
             final String objectIdString = pathParameters.getFirst(MCRRestAuthorizationFilter.PARAM_MCRID);
             if (objectIdString != null) {
                 try {
                     final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
                     if (objectId != null) {
-                        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, secret);
+                        MCRAccessKeyServiceFactory.getAccessKeySessionService()
+                            .activateAccessKey(objectId.toString(), rawValue);
                     }
                 } catch (MCRException e) {
                     LOGGER.debug("The access key could not be added to the current session: ", e);
