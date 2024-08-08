@@ -45,6 +45,7 @@ import org.mycore.user2.MCRUserManager;
 /**
  * Methods for setting and removing {@link MCRAccessKey} for users.
  */
+@Deprecated
 public class MCRAccessKeyUtils {
     /**
      * Prefix for user attribute name for value

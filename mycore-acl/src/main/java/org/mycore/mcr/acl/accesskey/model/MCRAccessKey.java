@@ -135,6 +135,7 @@ public class MCRAccessKey {
      * @param secret the secret the user must know to acquire permission.
      * @param type the type of permission.
      */
+    @Deprecated
     public MCRAccessKey(final String secret, final String type) {
         this();
         setValue(secret);
@@ -159,6 +160,7 @@ public class MCRAccessKey {
      */
     @JsonIgnore
     @Transient
+    @Deprecated
     public MCRObjectID getObjectId() {
         if (reference != null) {
             return MCRObjectID.getInstance(reference);
@@ -200,6 +202,7 @@ public class MCRAccessKey {
     /**
      * @param objectId the {@link MCRObjectID} to set
      */
+    @Deprecated
     public void setObjectId(final MCRObjectID objectId) {
         reference = objectId.toString();
     }
@@ -245,6 +248,7 @@ public class MCRAccessKey {
     /**
      * @return the key secret
      */
+    @Deprecated
     @Transient
     public String getSecret() {
         return value;
@@ -253,6 +257,7 @@ public class MCRAccessKey {
     /**
      * @param secret key secret
      */
+    @Deprecated
     public void setSecret(String secret) {
         value = secret;
     }
@@ -280,8 +285,8 @@ public class MCRAccessKey {
     /**
      * @return permission type
      */
-
     @Transient
+    @Deprecated
     public String getType() {
         return permission;
     }
@@ -289,6 +294,7 @@ public class MCRAccessKey {
     /**
      * @param type permission type
      */
+    @Deprecated
     public void setType(String type) {
         permission = type;
     }

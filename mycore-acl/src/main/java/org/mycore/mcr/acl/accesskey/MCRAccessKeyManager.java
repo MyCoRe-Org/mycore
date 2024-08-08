@@ -50,6 +50,7 @@ import jakarta.persistence.EntityManager;
 /**
  * Methods to manage {@link MCRAccessKey}.
  */
+@Deprecated
 public final class MCRAccessKeyManager {
 
     private static final Logger LOGGER = LogManager.getLogger();

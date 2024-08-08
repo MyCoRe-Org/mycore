@@ -26,6 +26,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
+@Deprecated
 public class MCRAccessKeyTest extends MCRTestCase {
 
     private static final String READ_KEY = "blah";
