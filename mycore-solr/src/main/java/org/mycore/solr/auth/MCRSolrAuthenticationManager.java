@@ -18,7 +18,8 @@
 
 package org.mycore.solr.auth;
 
-import org.apache.http.client.methods.HttpRequestBase;
+import java.net.http.HttpRequest;
+
 import org.apache.solr.client.solrj.SolrRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.MCRSolrConstants;
@@ -42,7 +43,7 @@ public interface MCRSolrAuthenticationManager {
      * @param request the request to add the authentication to
      * @param level the level of authentication to add
      */
-     void applyAuthentication(HttpRequestBase request, MCRSolrAuthenticationLevel level);
+    void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level);
 
 
      static MCRSolrAuthenticationManager getInstance() {

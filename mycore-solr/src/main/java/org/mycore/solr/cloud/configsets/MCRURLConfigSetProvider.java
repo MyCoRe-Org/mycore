@@ -22,13 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.function.Supplier;
 
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.services.http.MCRHttpUtils;
 
 /**
  * A zipped Solr config set file that is fetched from a web-based resource.
@@ -56,15 +57,13 @@ public class MCRURLConfigSetProvider extends MCRSolrConfigSetProvider {
     @Override
     protected Supplier<InputStream> getStreamSupplier() {
         return () -> {
-            HttpGet httpGet = new HttpGet(uri);
-            byte[] bytes;
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                InputStream content = httpClient.execute(httpGet).getEntity().getContent();
-                bytes = content.readAllBytes();
-            } catch (IOException e) {
+            try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
+                HttpRequest request = MCRHttpUtils.getRequestBuilder().uri(uri).build();
+                HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+                return new ByteArrayInputStream(response.body());
+            } catch (InterruptedException | IOException e) {
                 throw new MCRException(e);
             }
-            return new ByteArrayInputStream(bytes);
         };
     }
 }

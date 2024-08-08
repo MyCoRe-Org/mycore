@@ -84,12 +84,9 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
+      <!-- required until org.apache.solr.common.util.Utils does not import classes from this artifact -->
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -122,20 +119,22 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpmime</artifactId>
+      <!-- required until HttpJdkSolrClient works with mir-it -->
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- required until HttpJdkSolrClient works with mir-it -->
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-client</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- required until HttpJdkSolrClient works with mir-it -->
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-http-client-transport</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>mycore-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

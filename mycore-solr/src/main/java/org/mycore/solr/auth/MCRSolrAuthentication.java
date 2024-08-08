@@ -16,7 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.solr.auth;import org.apache.http.client.methods.HttpRequestBase;
+package org.mycore.solr.auth;
+
+import java.net.http.HttpRequest;
+
 import org.apache.solr.client.solrj.SolrRequest;
 
 /**
@@ -40,6 +43,6 @@ public interface MCRSolrAuthentication {
      * Add authentication to an HTTP request.
      * @param request the request to add authentication to
      */
-    void applyAuthentication(HttpRequestBase request);
+    void applyAuthentication(HttpRequest.Builder request);
 
 }

@@ -27,6 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,13 +45,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HTTP;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -63,9 +60,8 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
-import org.mycore.services.http.MCRIdleConnectionMonitorThread;
-import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrConstants;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.xml.sax.SAXException;
@@ -117,13 +113,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static Map<String, String> NEW_HTTP_RESPONSE_HEADER = MCRConfiguration2
         .getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader.");
 
-    private CloseableHttpClient httpClient;
-
-    private MCRIdleConnectionMonitorThread idleConnectionMonitorThread;
+    private HttpClient httpClient;
 
     private Set<String> queryHandlerWhitelist;
-
-    private PoolingHttpClientConnectionManager httpClientConnectionManager;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -231,56 +223,53 @@ public class MCRSolrProxyServlet extends MCRServlet {
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         filterParams(solrParameter);
-        HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
+        HttpRequest.Builder solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
             Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
 
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(solrHttpMethod, MCRSolrAuthenticationLevel.SEARCH);
 
+        HttpRequest solrRequest;
         try {
-            LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());
-            HttpResponse response = httpClient.execute(solrHttpMethod);
-            int statusCode = response.getStatusLine().getStatusCode();
+            solrRequest = solrHttpMethod.build();
+            LOGGER.info("Sending Request: {}", solrRequest.uri());
+            HttpResponse<InputStream> response
+                = httpClient.send(solrRequest, HttpResponse.BodyHandlers.ofInputStream());
+            int statusCode = response.statusCode();
 
             // set status code
             resp.setStatus(statusCode);
 
-            boolean isXML = response.getFirstHeader(HTTP.CONTENT_TYPE).getValue().contains("/xml");
+            boolean isXML = response.headers().firstValue("Content-Type").orElse("").contains("/xml");
             boolean justCopyInput = !isXML;
 
             // set all headers
-            for (Header header : response.getAllHeaders()) {
-                LOGGER.debug("SOLR response header: {} - {}", header.getName(), header.getValue());
-                String headerName = header.getName();
+            response.headers().map().forEach((headerName, headerValues) -> {
+                LOGGER.debug("SOLR response header: {} - {}", headerName, headerValues);
                 if (NEW_HTTP_RESPONSE_HEADER.containsKey(headerName)) {
                     String headerValue = NEW_HTTP_RESPONSE_HEADER.get(headerName);
-                    if (headerValue != null && headerValue.length() > 0) {
+                    if (headerValue != null && !headerValue.isEmpty()) {
                         resp.setHeader(headerName, headerValue);
                     }
                 } else {
-                    resp.setHeader(header.getName(), header.getValue());
+                    headerValues.forEach(headerValue -> resp.setHeader(headerName, headerValue));
                 }
-            }
+            });
 
-            HttpEntity solrResponseEntity = response.getEntity();
-            if (solrResponseEntity != null) {
-                try (InputStream solrResponseStream = solrResponseEntity.getContent()) {
-                    if (justCopyInput) {
-                        // copy solr response to servlet outputstream
-                        OutputStream servletOutput = resp.getOutputStream();
-                        solrResponseStream.transferTo(servletOutput);
-                    } else {
-                        MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream,
-                            solrHttpMethod.getURI().toString(),
-                            "response");
-                        MCRLayoutService.instance().doLayout(request, resp, solrResponse);
-                    }
+            try (InputStream solrResponseStream = response.body()) {
+                if (justCopyInput) {
+                    // copy solr response to servlet outputstream
+                    OutputStream servletOutput = resp.getOutputStream();
+                    solrResponseStream.transferTo(servletOutput);
+                } else {
+                    MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream,
+                        solrRequest.uri().toString(),
+                        "response");
+                    MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                 }
             }
-        } catch (IOException ex) {
-            solrHttpMethod.abort();
-            throw ex;
+        } catch (InterruptedException ex) {
+            throw new IOException(ex);
         }
-        solrHttpMethod.releaseConnection();
     }
 
     private void filterParams(ModifiableSolrParams solrParameter) {
@@ -312,11 +301,12 @@ public class MCRSolrProxyServlet extends MCRServlet {
      *            Parameters to use with the Request
      * @return a method to make the request
      */
-    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String type) {
+    private static HttpRequest.Builder getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params,
+        String type) {
         String serverURL = MCRSolrCoreManager.get(type).get().getV1CoreURL();
 
-        return new HttpGet(new MessageFormat("{0}{1}{2}", Locale.ROOT)
-            .format(new Object[] { serverURL, queryHandlerPath, params.toQueryString() }));
+        return MCRHttpUtils.getRequestBuilder()
+            .uri(URI.create(serverURL + queryHandlerPath + params.toQueryString()));
     }
 
     private static ModifiableSolrParams getSolrQueryParameter(HttpServletRequest request) {
@@ -336,26 +326,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-
         this.updateQueryHandlerMap();
-
-        httpClientConnectionManager = MCRHttpUtils.getConnectionManager(MAX_CONNECTIONS);
-        httpClient = MCRHttpUtils.getHttpClient(httpClientConnectionManager, MAX_CONNECTIONS);
-
-        // start thread to monitor stalled connections
-        idleConnectionMonitorThread = new MCRIdleConnectionMonitorThread(httpClientConnectionManager);
-        idleConnectionMonitorThread.start();
+        httpClient = MCRHttpUtils.getHttpClient();
     }
 
     @Override
     public void destroy() {
-        idleConnectionMonitorThread.shutdown();
-        try {
-            httpClient.close();
-        } catch (IOException e) {
-            log("Could not close HTTP client to SOLR server.", e);
-        }
-        httpClientConnectionManager.shutdown();
+        httpClient.close();
         super.destroy();
     }
 

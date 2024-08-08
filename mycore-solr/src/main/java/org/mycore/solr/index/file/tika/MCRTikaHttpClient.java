@@ -21,13 +21,13 @@ package org.mycore.solr.index.file.tika;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.mycore.services.http.MCRHttpUtils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
@@ -49,22 +49,26 @@ public class MCRTikaHttpClient {
 
     public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<TreeNode, T> responseConsumer)
         throws IOException, T {
-        HttpPut httpPut = new HttpPut(url + "tika/text");
-        httpPut.setHeader("Accept", "application/json");
-        httpPut.setEntity(new InputStreamEntity(is));
+        HttpRequest httpPut = MCRHttpUtils.getRequestBuilder()
+            .uri(URI.create(url + "tika/text"))
+            .setHeader("Accept", "application/json")
+            .PUT(HttpRequest.BodyPublishers.ofInputStream(() -> is))
+            .build();
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(httpPut)) {
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw new IOException("Tika server returned " + response.getStatusLine().getStatusCode());
+        try (HttpClient client = MCRHttpUtils.getHttpClient()) {
+            HttpResponse<InputStream> response = client.send(httpPut, HttpResponse.BodyHandlers.ofInputStream());
+            if (response.statusCode() != 200) {
+                throw new IOException("Tika server returned " + response.statusCode());
             }
 
-            try (InputStream responseStream = response.getEntity().getContent();
+            try (InputStream responseStream = response.body();
                 InputStreamReader isr = new InputStreamReader(responseStream, StandardCharsets.UTF_8)) {
                 JsonParser parser = new ObjectMapper().createParser(isr);
                 TreeNode treeNode = parser.readValueAsTree();
                 responseConsumer.accept(treeNode);
             }
+        } catch (InterruptedException e) {
+            throw new IOException("Tika response did not arrive in time.", e);
         }
     }
 

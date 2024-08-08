@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Supplier;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.util.MCRServletContentHelper;
 

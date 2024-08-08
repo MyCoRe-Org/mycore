@@ -57,7 +57,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -106,6 +105,7 @@ import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.resource.MCRResourceHelper;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.services.http.MCRURLQueryParameter;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
@@ -1434,26 +1434,26 @@ public final class MCRURIResolver implements URIResolver {
 
             if (split.length == 2) {
                 String req = split[1];
-                URLEncodedUtils.parse(req, StandardCharsets.UTF_8).forEach(nv -> {
-                    if (nv.getName().equals("attribute")) {
-                        if (suppliedAttributes.contains(nv.getValue())) {
-                            LOGGER.warn("Duplicate attribute {} in user info request", nv.getValue());
+                MCRURLQueryParameter.parse(req).forEach(nv -> {
+                    if (nv.name().equals("attribute")) {
+                        if (suppliedAttributes.contains(nv.value())) {
+                            LOGGER.warn("Duplicate attribute {} in user info request", nv.value());
                             return;
                         }
-                        suppliedAttributes.add(nv.getValue());
+                        suppliedAttributes.add(nv.value());
                         Element attribute = new Element("attribute");
-                        attribute.setAttribute("name", nv.getValue());
-                        attribute.setText(userInformation.getUserAttribute(nv.getValue()));
+                        attribute.setAttribute("name", nv.value());
+                        attribute.setText(userInformation.getUserAttribute(nv.value()));
                         root.addContent(attribute);
-                    } else if (nv.getName().equals("role")) {
-                        if (suppliedRoles.contains(nv.getValue())) {
-                            LOGGER.warn("Duplicate role {} in user info request", nv.getValue());
+                    } else if (nv.name().equals("role")) {
+                        if (suppliedRoles.contains(nv.value())) {
+                            LOGGER.warn("Duplicate role {} in user info request", nv.value());
                             return;
                         }
-                        suppliedRoles.add(nv.getValue());
+                        suppliedRoles.add(nv.value());
                         Element role = new Element("role");
-                        role.setAttribute("name", nv.getValue());
-                        role.setText(String.valueOf(userInformation.isUserInRole(nv.getValue())));
+                        role.setAttribute("name", nv.value());
+                        role.setText(String.valueOf(userInformation.isUserInRole(nv.value())));
                         root.addContent(role);
                     }
                 });

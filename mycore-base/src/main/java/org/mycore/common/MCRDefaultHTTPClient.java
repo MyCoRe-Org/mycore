@@ -21,14 +21,19 @@ package org.mycore.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.cache.HttpCacheContext;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.cache.CacheConfig;
-import org.apache.http.impl.client.cache.CachingHttpClients;
+import org.apache.hc.client5.http.cache.HttpCacheContext;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.cache.CacheConfig;
+import org.apache.hc.client5.http.impl.cache.CachingHttpClients;
+import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -53,13 +58,16 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
             .setMaxObjectSize(maxObjectSize)
             .setMaxCacheEntries(maxCacheEntries)
             .build();
-        RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectTimeout(requestTimeout)
-            .setSocketTimeout(requestTimeout)
+        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+            .setConnectTimeout(requestTimeout, TimeUnit.MILLISECONDS)
+            .setSocketTimeout(requestTimeout, TimeUnit.MILLISECONDS)
+            .build();
+        HttpClientConnectionManager connManager = PoolingHttpClientConnectionManagerBuilder.create()
+            .setDefaultConnectionConfig(connectionConfig)
             .build();
         this.restClient = CachingHttpClients.custom()
             .setCacheConfig(cacheConfig)
-            .setDefaultRequestConfig(requestConfig)
+            .setConnectionManager(connManager)
             .setUserAgent(MCRHttpUtils.getHttpUserAgent())
             .useSystemProperties()
             .build();
@@ -93,16 +101,22 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
     public MCRContent get(URI hrefURI) throws IOException {
         HttpCacheContext context = HttpCacheContext.create();
         HttpGet get = new HttpGet(hrefURI);
-        MCRContent retContent = null;
-        try (CloseableHttpResponse response = restClient.execute(get, context);
-            InputStream content = response.getEntity().getContent();) {
-            logger.debug("http query: {}", hrefURI);
-            logger.debug("http resp status: {}", response.getStatusLine());
-            logger.debug(() -> getCacheDebugMsg(hrefURI, context));
-            retContent = (new MCRStreamContent(content)).getReusableCopy();
-        } finally {
-            get.reset();
-        }
+        MCRContent retContent = restClient.execute(get, context, new AbstractHttpClientResponseHandler<MCRContent>() {
+            @Override
+            public MCRContent handleResponse(ClassicHttpResponse response) throws IOException {
+                logger.debug("http query: {}", hrefURI);
+                logger.debug("http resp status: {} {}", response.getCode(), response.getReasonPhrase());
+                logger.debug(() -> getCacheDebugMsg(hrefURI, context));
+                return super.handleResponse(response);
+            }
+
+            @Override
+            public MCRContent handleEntity(HttpEntity entity) throws IOException {
+                try (InputStream content = entity.getContent()) {
+                    return new MCRStreamContent(content, hrefURI.toString()).getReusableCopy();
+                }
+            }
+        });
         return retContent;
     }
 
@@ -114,6 +128,7 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
                 case CACHE_MISS -> "The response came from an upstream server";
                 case VALIDATED -> "The response was generated from the cache after validating the entry "
                     + "with the origin server";
+                case FAILURE -> "The response came from an upstream server after a cache failure";
             };
     }
 }

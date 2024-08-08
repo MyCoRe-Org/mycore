@@ -36,7 +36,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
 
 /**
  * Convenience class for holding the parameters for the solr search url.
@@ -49,7 +49,7 @@ public class MCRSolrURL {
     public static final String FIXED_URL_PART = new MessageFormat("?version={0}", Locale.ROOT)
         .format(new Object[] { SOLR_QUERY_XML_PROTOCOL_VERSION });
 
-    private HttpSolrClient solrClient;
+    private HttpSolrClientBase solrClient;
 
     private String urlQuery, q, sortOptions, wt;
 
@@ -66,7 +66,7 @@ public class MCRSolrURL {
     /**
      * @param solrClient the solr server connection to use
      */
-    public MCRSolrURL(HttpSolrClient solrClient) {
+    public MCRSolrURL(HttpSolrClientBase solrClient) {
         this();
         this.solrClient = solrClient;
         start = 0;
@@ -85,7 +85,7 @@ public class MCRSolrURL {
      * @param solrClient the solr server connection to use
      * @param urlQuery e.g. q=allMeta:Hello&amp;rows=20&amp;defType=edismax
      */
-    public MCRSolrURL(HttpSolrClient solrClient, String urlQuery) {
+    public MCRSolrURL(HttpSolrClientBase solrClient, String urlQuery) {
         this();
         this.solrClient = solrClient;
         this.urlQuery = urlQuery;
@@ -95,7 +95,7 @@ public class MCRSolrURL {
      * @param solrClient the solr server connection to use
      * @param returnScore specify whether to return the score with results;
      */
-    public MCRSolrURL(HttpSolrClient solrClient, boolean returnScore) {
+    public MCRSolrURL(HttpSolrClientBase solrClient, boolean returnScore) {
         this(solrClient);
         this.returnScore = returnScore;
     }

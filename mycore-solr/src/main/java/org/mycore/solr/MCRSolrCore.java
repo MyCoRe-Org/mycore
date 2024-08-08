@@ -24,14 +24,18 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateHttp2SolrClient;
+import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
+import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -49,7 +53,10 @@ public class MCRSolrCore {
 
     public static final int DEFAULT_SHARD_COUNT = 1;
 
-    private static boolean USE_CONCURRENT_SERVER;
+    private static boolean USE_CONCURRENT_SERVER = MCRConfiguration2
+        .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled", Boolean::parseBoolean);
+    private static boolean USE_JETTY_HTTP_CLIENT = MCRConfiguration2
+        .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.JettyHttpClient.Enabled", Boolean::parseBoolean);
 
     protected String serverURL;
 
@@ -61,16 +68,11 @@ public class MCRSolrCore {
 
     // todo: maybe add support for replicaCount and compositeId if required
 
-    protected HttpSolrClient solrClient;
+    protected HttpSolrClientBase solrClient;
 
-    protected HttpSolrClient baseSolrClient;
+    protected HttpSolrClientBase baseSolrClient;
 
-    protected ConcurrentUpdateSolrClient concurrentClient;
-
-    static {
-        USE_CONCURRENT_SERVER = MCRConfiguration2
-            .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled", Boolean::parseBoolean);
-    }
+    protected ConcurrentUpdateHttp2SolrClient concurrentClient;
 
     private Set<MCRSolrCoreType> types;
 
@@ -124,17 +126,9 @@ public class MCRSolrCore {
             .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.SocketTimeout", Integer::parseInt);
 
         // default server
-        solrClient = new HttpSolrClient.Builder(coreURL)
-            .withConnectionTimeout(connectionTimeout)
-            .withSocketTimeout(socketTimeout)
-            .build();
-        solrClient.setRequestWriter(new BinaryRequestWriter());
+        solrClient = getSolrClientInstance(coreURL, connectionTimeout, socketTimeout);
 
-        baseSolrClient = new HttpSolrClient.Builder(getServerURL() + "solr/")
-                .withConnectionTimeout(connectionTimeout)
-                .withSocketTimeout(socketTimeout)
-                .build();
-        baseSolrClient.setRequestWriter(new BinaryRequestWriter());
+        baseSolrClient = getSolrClientInstance(getServerURL() + "solr/", connectionTimeout, socketTimeout);
 
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
@@ -142,13 +136,10 @@ public class MCRSolrCore {
                 .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize", Integer::parseInt);
             int threadCount = MCRConfiguration2
                 .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount", Integer::parseInt);
-            concurrentClient = new ConcurrentUpdateSolrClient.Builder(coreURL)
+            concurrentClient = new ConcurrentUpdateHttp2SolrClient.Builder(coreURL, (Http2SolrClient) solrClient)
                 .withQueueSize(queueSize)
-                .withConnectionTimeout(connectionTimeout)
-                .withSocketTimeout(socketTimeout)
                 .withThreadCount(threadCount)
                 .build();
-            concurrentClient.setRequestWriter(new BinaryRequestWriter());
         }
         // shutdown handler
         MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
@@ -163,6 +154,22 @@ public class MCRSolrCore {
                 shutdown();
             }
         });
+    }
+
+    private static HttpSolrClientBase getSolrClientInstance(String baseSolrUrl, int connectionTimeout,
+        int socketTimeout) {
+        HttpSolrClientBuilderBase baseBuilder = useJettyHttpClient() ? new Http2SolrClient.Builder(baseSolrUrl)
+            : new HttpJdkSolrClient.Builder(baseSolrUrl);
+        return baseBuilder
+            .withConnectionTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
+            .withIdleTimeout(socketTimeout, TimeUnit.MILLISECONDS)
+            .withRequestTimeout(socketTimeout, TimeUnit.MILLISECONDS)
+            .withRequestWriter(new BinaryRequestWriter())
+            .build();
+    }
+
+    private static boolean useJettyHttpClient() {
+        return USE_CONCURRENT_SERVER || USE_JETTY_HTTP_CLIENT;
     }
 
     public String getV1CoreURL() {
@@ -183,7 +190,7 @@ public class MCRSolrCore {
             LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
-            shutdownGracefully(concurrentClient, true);
+            shutdownGracefully(concurrentClient, false);
             concurrentClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
@@ -219,14 +226,14 @@ public class MCRSolrCore {
     /**
      * Returns the default solr client instance. Use this for queries.
      */
-    public HttpSolrClient getClient() {
+    public HttpSolrClientBase getClient() {
         return solrClient;
     }
 
     /**
      * Returns the base solr client instance, without core information. Use this for admin operations.
      */
-    public HttpSolrClient getBaseClient() {
+    public HttpSolrClientBase getBaseClient() {
         return baseSolrClient;
     }
 
