@@ -10,11 +10,13 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
  * Resolves arbitrary static methods of arbitrary classes. Parameters are considerd to be of type
- * {@link java.lang.String}.
+ * {@link java.lang.String}. Encoding parameter values is recommended.
  * <br/><br/>
  * <strong>Invocation</strong>
  * <pre><code>function:&lt;class name&gt;:&lt;method name&gt;:&lt;param1&gt;:&lt;param2&gt;</code></pre>
@@ -35,7 +37,10 @@ public class MCRFunctionResolver implements URIResolver {
         String className = parts[1];
         String methodName = parts[2];
 
-        Object[] params = Arrays.stream(parts).skip(3).toArray(String[]::new);
+        Object[] params = Arrays.stream(parts)
+            .skip(3)
+            .map(p -> URLDecoder.decode(p, StandardCharsets.UTF_8))
+            .toArray(String[]::new);
 
         try {
             Class[] types = new Class[params.length];
