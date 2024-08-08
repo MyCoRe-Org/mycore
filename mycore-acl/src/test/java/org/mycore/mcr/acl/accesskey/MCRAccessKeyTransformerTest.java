@@ -37,6 +37,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+@Deprecated
 public class MCRAccessKeyTransformerTest extends MCRTestCase {
 
     private static final String OBJECT_ID = "mcr_test_00000001";

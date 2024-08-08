@@ -224,6 +224,7 @@ public class MCRAccessKey {
     /**
      * @return the key secret
      */
+    @Deprecated
     @Transient
     public String getSecret() {
         return value;
@@ -232,6 +233,7 @@ public class MCRAccessKey {
     /**
      * @param secret key secret
      */
+    @Deprecated
     public void setSecret(String secret) {
         value = secret;
     }
@@ -259,8 +261,8 @@ public class MCRAccessKey {
     /**
      * @return permission type
      */
-
     @Transient
+    @Deprecated
     public String getType() {
         return permission;
     }
@@ -268,6 +270,7 @@ public class MCRAccessKey {
     /**
      * @param type permission type
      */
+    @Deprecated
     public void setType(String type) {
         permission = type;
     }
