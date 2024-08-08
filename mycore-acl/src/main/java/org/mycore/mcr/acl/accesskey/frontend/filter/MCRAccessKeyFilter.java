@@ -28,7 +28,8 @@ import org.mycore.common.MCRTransactionHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyConfig;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceFactory;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -49,16 +50,16 @@ public class MCRAccessKeyFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
+        if (MCRAccessKeyConfig.getAllowedSessionPermissionTypes().isEmpty()) {
             LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}",
-                String.join(",", MCRAccessKeyUtils.getAllowedSessionPermissionTypes()));
+                String.join(",", MCRAccessKeyConfig.getAllowedSessionPermissionTypes()));
         }
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
+        if (!MCRAccessKeyConfig.getAllowedSessionPermissionTypes().isEmpty()) {
             final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             final MCRObjectID objectId = extractObjectId(httpServletRequest);
             if (objectId != null) {
@@ -68,7 +69,8 @@ public class MCRAccessKeyFilter implements Filter {
                         MCRServlet.initializeMCRSession(httpServletRequest, getFilterName());
                         MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest,
                             (HttpServletResponse) response);
-                        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, value);
+                        MCRAccessKeyServiceFactory.getSessionService()
+                            .activeObjectAccessKeyForReferenceByRawValue(objectId, value);
                     } catch (Exception e) {
                         LOGGER.debug("Cannot set access key to session", e);
                         MCRTransactionHelper.rollbackTransaction();
