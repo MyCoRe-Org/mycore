@@ -32,6 +32,10 @@ public class MCRAccessKeyServiceFactory {
 
     private static volatile MCRAccessKeyService service;
 
+    private static volatile MCRAccessKeyUserService userService;
+
+    private static volatile MCRAccessKeySessionService sessionService;
+
     private static final Object LOCK = new Object();
 
     private MCRAccessKeyServiceFactory() {
@@ -52,6 +56,46 @@ public class MCRAccessKeyServiceFactory {
             }
         }
         return service;
+    }
+
+    /**
+     * Returns single access key user service instance.
+     *
+     * @return the instance
+     */
+    public static MCRAccessKeyUserService getUserService() {
+        if (userService == null) {
+            synchronized (LOCK) {
+                if (userService == null) {
+                    userService = createUserService(getService());
+                }
+            }
+        }
+        return userService;
+    }
+
+    /**
+     * Returns single access key session service instance.
+     *
+     * @return the instance
+     */
+    public static MCRAccessKeySessionService getSessionService() {
+        if (sessionService == null) {
+            synchronized (LOCK) {
+                if (sessionService == null) {
+                    sessionService = createSessionService(getService());
+                }
+            }
+        }
+        return sessionService;
+    }
+
+    private static MCRAccessKeyUserService createUserService(MCRAccessKeyService service) {
+        return new MCRAccessKeyUserService(service);
+    }
+
+    private static MCRAccessKeySessionService createSessionService(MCRAccessKeyService service) {
+        return new MCRAccessKeySessionService(service);
     }
 
     private static MCRAccessKeyService createAndConfigureService(MCRAccessKeyRepository accessKeyRepository,
