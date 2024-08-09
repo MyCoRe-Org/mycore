@@ -24,6 +24,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 import jakarta.servlet.ServletContext;
 
@@ -35,11 +36,11 @@ public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
     protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session,
         String param)
         throws Exception {
-        handle(param, session.getRootBinding());
+        handle(param, session.getRootBinding(), session.getChangeTracker());
         session.setBreakpoint("After handling target " + getClass().getName() + " " + param);
     }
 
-    public void handle(String swapParameter, MCRBinding root) throws JaxenException {
+    public void handle(String swapParameter, MCRBinding rootBinding, MCRChangeTracker tracker) throws JaxenException {
         String[] tokens = swapParameter.split("\\|");
         String parentXPath = tokens[0];
         String posString = tokens[1];
@@ -48,9 +49,11 @@ public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
         String elementNameWithPredicates = swapParameter
             .substring(parentXPath.length() + posString.length() + method.length() + 3);
 
-        MCRBinding parentBinding = new MCRBinding(parentXPath, false, root);
+        MCRBinding parentBinding = new MCRBinding(parentXPath, false, rootBinding);
         MCRRepeatBinding repeatBinding = new MCRRepeatBinding(elementNameWithPredicates, parentBinding, method);
         handle(pos, repeatBinding);
+        tracker.track(repeatBinding.getChanges());
+
         repeatBinding.detach();
         parentBinding.detach();
     }
