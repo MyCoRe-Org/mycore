@@ -12,7 +12,7 @@
     "jquery": "^3.5.1",
     "jszip": "^3.2.1",
     "manifesto.js": "3.0.10",
-    "pdfjs-dist": "^2.6.347"
+    "pdfjs-dist": "^4.2.67"
   },
   "devDependencies": {
     "grunt": "^1.5.3",
