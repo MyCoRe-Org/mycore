@@ -31,9 +31,9 @@ public class MCRAccessKeyConfig {
 
     private static final String ACCESS_KEY_STRATEGY_PROP_PREFX = "MCR.ACL.AccessKey.Strategy";
 
-    private static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX + ".AllowedObjectTypes";
+    public static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX + ".AllowedObjectTypes";
 
-    private static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP
+    public static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP
         = ACCESS_KEY_STRATEGY_PROP_PREFX + ".AllowedSessionPermissionTypes";
 
     private static Set<String> allowedObjectTypes = loadAllowedObjectTypes();
