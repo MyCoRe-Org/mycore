@@ -27,6 +27,7 @@ import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 public class MCRAccessKeyStrategyHelper {
@@ -54,7 +55,8 @@ public class MCRAccessKeyStrategyHelper {
      * @param accessKey the {@link MCRAccessKey}
      * @return true if valid, otherwise false
      */
-    public static boolean verifyAccessKey(final String permission, final MCRAccessKey accessKey) {
+    @Deprecated
+    public static boolean verifyAccessKey(String permission, MCRAccessKey accessKey) {
         final String sanitizedPermission = sanitizePermission(permission);
         if (PERMISSION_READ.equals(sanitizedPermission) || PERMISSION_WRITE.equals(sanitizedPermission)) {
             if (Boolean.FALSE.equals(accessKey.getIsActive())) {
@@ -65,8 +67,35 @@ public class MCRAccessKeyStrategyHelper {
                 return false;
             }
             if ((sanitizedPermission.equals(PERMISSION_READ)
-                && accessKey.getType().equals(PERMISSION_READ))
-                || accessKey.getType().equals(PERMISSION_WRITE)) {
+                && accessKey.getPermission().equals(PERMISSION_READ))
+                || accessKey.getPermission().equals(PERMISSION_WRITE)) {
+                LOGGER.debug("Access granted.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * verifies {@link MCRAccessKey} for permission.
+     *
+     * @param permission permission type
+     * @param accessKeyDto the {@link MCRAccessKey}
+     * @return true if valid, otherwise false
+     */
+    public static boolean verifyAccessKey(String permission, MCRAccessKeyDto accessKeyDto) {
+        final String sanitizedPermission = sanitizePermission(permission);
+        if (PERMISSION_READ.equals(sanitizedPermission) || PERMISSION_WRITE.equals(sanitizedPermission)) {
+            if (Boolean.FALSE.equals(accessKeyDto.getActive())) {
+                return false;
+            }
+            final Date expiration = accessKeyDto.getExpiration();
+            if (expiration != null && new Date().after(expiration)) {
+                return false;
+            }
+            if ((sanitizedPermission.equals(PERMISSION_READ)
+                && accessKeyDto.getPermission().equals(PERMISSION_READ))
+                || accessKeyDto.getPermission().equals(PERMISSION_WRITE)) {
                 LOGGER.debug("Access granted.");
                 return true;
             }

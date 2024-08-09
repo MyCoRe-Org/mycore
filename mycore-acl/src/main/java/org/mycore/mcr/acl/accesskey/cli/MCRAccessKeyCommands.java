@@ -27,126 +27,181 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.access.MCRAccessException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
+import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 
-@MCRCommandGroup(
-    name = "Access keys")
+/**
+ * Provides command to manage access keys.
+ */
+@MCRCommandGroup(name = "Access keys")
 public class MCRAccessKeyCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @MCRCommand(syntax = "clear all access keys",
-        help = "Clears all access keys")
-    public static void clearAccessKeys() {
-        MCRAccessKeyManager.clearAccessKeys();
+    /**
+     * Deletes all access keys.
+     *
+     * @see org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceImpl#deleteAllAccessKeys()
+     */
+    @MCRCommand(syntax = "clear all access keys", help = "Clears all access keys")
+    public static void deleteAllAccessKeys() {
+        MCRAccessKeyServiceFactory.getService().deleteAllAccessKeys();
         LOGGER.info("Cleared all access keys.");
     }
 
-    @MCRCommand(syntax = "clear all access keys for {0}",
-        help = "Clears all access keys for MCRObject/Derivate {0}")
-    public static void clearAccessKeys(final String objectIdString) throws MCRException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-        if (!MCRMetadataManager.exists(objectId)) {
-            throw new MCRException("MCRObject/Derivate doesn't exists.");
-        }
-        MCRAccessKeyManager.clearAccessKeys(objectId);
-        LOGGER.info("Cleared all access keys of {}.", objectIdString);
+    /**
+     * Deletes access keys for reference.
+     *
+     * @param reference the reference
+     *
+     * @see org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceImpl#deleteAccessKeysByReference(String)
+     */
+    @MCRCommand(syntax = "clear all access keys for {0}", help = "Clears all access keys for reference {0}")
+    public static void deleteAccessKeysByReference(String reference) {
+        MCRAccessKeyServiceFactory.getService().deleteAccessKeysByReference(reference);
+        LOGGER.info("Cleared all access keys of {}.", reference);
     }
 
+    /**
+     * Creates access key for reference from file by path.
+     *
+     * @param reference the reference
+     * @param path the path
+     * @throws IOException if an IO error occurs
+     * @throws MCRAccessException if current user is not allowed to created access key
+     * @throws MCRAccessKeyException if an error occurs while creating access key
+     *
+     * @see org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceImpl#createAccessKey(MCRAccessKeyDto)
+     */
     @MCRCommand(syntax = "create access key for {0} from file {1}",
-        help = "Creates an access key {0} for MCRObject/Derivate from file {1} in json format")
-    public static void createAccessKey(final String objectIdString, final String pathString)
-        throws IOException, MCRException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-        if (!MCRMetadataManager.exists(objectId)) {
-            throw new MCRException("MCRObject/Derivate doesn't exists.");
-        }
-        final MCRAccessKey accessKey = readAccessKeyFromFile(pathString);
-        MCRAccessKeyManager.createAccessKey(objectId, accessKey);
-        LOGGER.info("Created access key for {}.", objectIdString);
+        help = "Creates an access key {0} for reference from file {1} in JSON format")
+    public static void createAccessKey(String reference, String path) throws IOException, MCRAccessException {
+        final MCRAccessKeyDto accessKeyDto = readAccessKeyFromFile(path);
+        accessKeyDto.setReference(reference);
+        MCRAccessKeyServiceFactory.getService().createAccessKey(accessKeyDto);
+        LOGGER.info("Created access key for {}.", reference);
     }
 
+    /**
+     * Updates access key for reference by value from file by path.
+     *
+     * @param reference the reference
+     * @param value the value
+     * @param path the path
+     * @throws IOException if an IO error occurs
+     * @throws MCRAccessException if current user is not allowed to update access key
+     * @throws MCRAccessKeyException if an error occurs while updating access key
+     *
+     * @see org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceImpl#updateAccessKeyById(java.util.UUID, MCRAccessKeyDto)
+     */
     @MCRCommand(syntax = "update access key for {0} with secret {1} from file {2}",
-        help = "Updates an access key for MCRObject/Derivate {0}"
-            + " with (hashed) secret {1} from file {2} in json format")
-    public static void updateAccessKey(final String objectIdString, final String secret, final String pathString)
-        throws IOException, MCRException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-        if (!MCRMetadataManager.exists(objectId)) {
-            throw new MCRException("MCRObject/Derivate doesn't exists.");
+        help = "Updates an access key for reference {0} with (hashed) secret {1} from file {2} in JSON format")
+    public static void updateAccessKey(String reference, String value, String path)
+        throws IOException, MCRAccessException {
+        final MCRAccessKeyDto accessKeyDto = readAccessKeyFromFile(path);
+        final MCRAccessKeyDto outdatedAccessKeyDto
+            = MCRAccessKeyServiceFactory.getService().getAccessKeyByReferenceAndValue(reference, value);
+        if (outdatedAccessKeyDto == null) {
+            throw new MCRAccessKeyNotFoundException("Access key does not exist");
         }
-        final MCRAccessKey accessKey = readAccessKeyFromFile(pathString);
-        MCRAccessKeyManager.updateAccessKey(objectId, secret, accessKey);
-        LOGGER.info("Updated access key ({}) for {}.", secret, objectIdString);
+        MCRAccessKeyServiceFactory.getService().updateAccessKeyById(outdatedAccessKeyDto.getId(), accessKeyDto);
+        LOGGER.info("Updated access key ({}) for {}.", value, reference);
     }
 
+    /**
+     * Deletes access key for reference by value.
+     *
+     * @param reference the reference
+     * @param value the value
+     * @throws MCRAccessException if current user is not allowed to delete access key
+     * @throws MCRAccessKeyNotFoundException if access key not found
+     *
+     * @see org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceImpl#deleteAccessKeysByReference(String)
+     */
     @MCRCommand(syntax = "delete access key for {0} with secret {1}",
-        help = "Deletes an access key for MCRObject/Derivate {0} with (hashed) secret {1}")
-    public static void removeAccessKey(final String objectIdString, final String secret) throws MCRException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-        if (!MCRMetadataManager.exists(objectId)) {
-            throw new MCRException("MCRObject/Derivate doesn't exists.");
+        help = "Deletes an access key for reference {0} with (hashed) value {1}")
+    public static void deleteAccessKey(String reference, String value) throws MCRAccessException {
+        final MCRAccessKeyDto outdatedAccessKeyDto
+            = MCRAccessKeyServiceFactory.getService().getAccessKeyByReferenceAndValue(reference, value);
+        if (outdatedAccessKeyDto == null) {
+            throw new MCRAccessKeyNotFoundException("Access key does not exist");
         }
-        MCRAccessKeyManager.removeAccessKey(objectId, secret);
-        LOGGER.info("Deleted access key ({}) for {}.", secret, objectIdString);
+        MCRAccessKeyServiceFactory.getService().deleteAccessKeyById(outdatedAccessKeyDto.getId());
+        LOGGER.info("Deleted access key ({}) for {}.", value, reference);
     }
 
+    /**
+     * Imports access key for reference from file by path.
+     *
+     * @param reference the reference
+     * @param path the path
+     * @throws IOException
+     * @throws MCRAccessException if current user is not allowed to update access key
+     * @throws MCRAccessKeyException if an error occurs while importing access key
+     *
+     * @see org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceImpl#importAccessKey(MCRAccessKeyDto)
+     */
     @MCRCommand(syntax = "import access keys for {0} from file {1}",
-        help = "Imports access keys for MCRObject/Derivate {0} from file {1} in json array format")
-    public static void importAccessKeysFromFile(final String objectIdString, final String pathString)
-        throws IOException, MCRException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-        if (!MCRMetadataManager.exists(objectId)) {
-            throw new MCRException("MCRObject/Derivate doesn't exists.");
+        help = "Imports access keys for reference {0} from file {1} in JSON array format")
+    public static void importAccessKeysFromFile(String reference, String path) throws IOException, MCRAccessException {
+        final String json = Files.readString(Path.of(path), UTF_8);
+        final List<MCRAccessKeyDto> accessKeyDtos
+            = MCRAccessKeyJsonMapper.jsonToAccessKeyDtos(json).stream().peek(a -> a.setReference(reference)).toList();
+        for (MCRAccessKeyDto accessKeyDto : accessKeyDtos) {
+            MCRAccessKeyServiceFactory.getService().importAccessKey(accessKeyDto);
         }
-        final Path path = Path.of(pathString);
-        final String accessKeysJson = Files.readString(path, UTF_8);
-        final List<MCRAccessKey> accessKeys = MCRAccessKeyTransformer.accessKeysFromJson(accessKeysJson);
-        MCRAccessKeyManager.addAccessKeys(objectId, accessKeys);
-        LOGGER.info("Imported access keys for {} from file {}.", objectIdString, pathString);
+        LOGGER.info("Imported access keys for {} from file {}.", reference, path);
     }
 
+    /**
+     * Exports access key for reference to file by path.
+     *
+     * @param reference the reference
+     * @param path the path
+     * @throws MCRAccessKeyException if an error occurs while exporting access keys
+     *
+     * @see org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceImpl#getAccessKeysByReference(String)
+     */
     @MCRCommand(syntax = "export access keys for {0} to file {1}",
-        help = "Exports access keys for MCRObject/Derivate {0} to file {1} in json array format")
-    public static void exportAccessKeysToFile(final String objectIdString, final String pathString)
-        throws IOException, MCRException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-        if (!MCRMetadataManager.exists(objectId)) {
-            throw new MCRException("MCRObject/Derivate doesn't exists.");
-        }
-        final Path path = Path.of(pathString);
-        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.listAccessKeys(objectId);
-        final String accessKeysJson = MCRAccessKeyTransformer.jsonFromAccessKeys(accessKeys);
-        Files.writeString(path, accessKeysJson, UTF_8);
-        LOGGER.info("Exported access keys for {} to file {}.", objectIdString, pathString);
+        help = "Exports access keys for reference {0} to file {1} in JSON array format")
+    public static void exportAccessKeysToFile(String reference, String path) throws IOException {
+        final List<MCRAccessKeyDto> accessKeyDtos
+            = MCRAccessKeyServiceFactory.getService().getAccessKeysByReference(reference);
+        final String json = MCRAccessKeyJsonMapper.accessKeyDtosToJson(accessKeyDtos);
+        Files.writeString(Path.of(path), json, UTF_8);
+        LOGGER.info("Exported access keys for {} to file {}.", reference, path);
     }
 
+    /**
+     * Deletes all access key value attributes of users if corresponding access key does not exist.
+     */
     @MCRCommand(syntax = "clean up access key user attributes",
         help = "Cleans all access key secret attributes of users if the corresponding key does not exist.")
     public static void cleanUp() {
-        MCRAccessKeyUtils.cleanUpUserAttributes();
+        MCRAccessKeyServiceFactory.getUserService().cleanUpUserAttributes();
         LOGGER.info("Cleaned up access keys.");
     }
 
-    @MCRCommand(syntax = "hash access key secret {0} for {1}",
-        help = "Hashes secret {0} for MCRObject/Derivate {1}")
-    public static void hashSecret(final String secret, final String objectIdString) throws MCRException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-        final String result = MCRAccessKeyManager.hashSecret(secret, objectId);
-        LOGGER.info("Hashed secret for {}: '{}'.", objectIdString, result);
+    /**
+     * Returns processed access key value for reference to command output.
+     *
+     * @param value the value
+     * @param reference the reference
+     */
+    @MCRCommand(syntax = "hash access key secret {0} for {1}", help = "Hashes value {0} for reference {1}")
+    public static void hashSecret(String value, String reference) {
+        final String result = MCRAccessKeyServiceFactory.getService().getValue(reference, value);
+        LOGGER.info("Hashed secret for {}: '{}'.", reference, result);
     }
 
-    private static MCRAccessKey readAccessKeyFromFile(final String pathString) throws IOException, MCRException {
-        final Path path = Path.of(pathString);
-        final String accessKeyJson = Files.readString(path, UTF_8);
-        return MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
+    private static MCRAccessKeyDto readAccessKeyFromFile(String path) throws IOException {
+        final String json = Files.readString(Path.of(path), UTF_8);
+        return MCRAccessKeyJsonMapper.jsonToAccessKeyDto(json);
     }
 }

@@ -44,12 +44,14 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidSecretException
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidTypeException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKeyNamedQueries;
 
 import jakarta.persistence.EntityManager;
 
 /**
  * Methods to manage {@link MCRAccessKey}.
  */
+@Deprecated
 public final class MCRAccessKeyManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -70,9 +72,10 @@ public final class MCRAccessKeyManager {
      */
     public static synchronized List<MCRAccessKey> listAccessKeys(final MCRObjectID objectId) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
-            .getResultList();
+        final List<MCRAccessKey> accessKeys
+            = em.createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE, MCRAccessKey.class)
+                .setParameter(MCRAccessKeyNamedQueries.PARAM_REFERENCE, objectId.toString())
+                .getResultList();
         for (MCRAccessKey accessKey : accessKeys) {
             em.detach(accessKey);
         }
@@ -177,7 +180,7 @@ public final class MCRAccessKeyManager {
             throw new MCRAccessKeyInvalidTypeException("Invalid permission type.");
         }
         if (getAccessKeyWithSecret(objectId, secret) == null) {
-            accessKey.setId(0); //prevent collision
+            accessKey.setId(null); //prevent collision
             accessKey.setObjectId(objectId);
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);
@@ -207,7 +210,7 @@ public final class MCRAccessKeyManager {
      */
     public static void clearAccessKeys() {
         MCREntityManagerProvider.getCurrentEntityManager()
-            .createNamedQuery("MCRAccessKey.clear")
+            .createNamedQuery(MCRAccessKeyNamedQueries.NAME_DELETE_ALL)
             .executeUpdate();
     }
 
@@ -218,8 +221,8 @@ public final class MCRAccessKeyManager {
      */
     public static void clearAccessKeys(final MCRObjectID objectId) {
         MCREntityManagerProvider.getCurrentEntityManager()
-            .createNamedQuery("MCRAccessKey.clearWithObjectId")
-            .setParameter("objectId", objectId)
+            .createNamedQuery(MCRAccessKeyNamedQueries.NAME_DELETE_BY_REFERENCE)
+            .setParameter(MCRAccessKeyNamedQueries.PARAM_REFERENCE, objectId.toString())
             .executeUpdate();
     }
 
@@ -246,7 +249,7 @@ public final class MCRAccessKeyManager {
      * Updates {@link MCRAccessKey}
      *
      * @param objectId the {@link MCRObjectID}
-     * @param secret the access key secret 
+     * @param secret the access key secret
      * @param updatedAccessKey access key
      * @throws MCRException if update fails
      */
@@ -292,18 +295,19 @@ public final class MCRAccessKeyManager {
      * Return the {@link MCRAccessKey} for given {@link MCRObjectID} and secret.
      *
      * @param objectId the {@link MCRObjectID}
-     * @param secret the hashed secret 
+     * @param secret the hashed secret
      * @return the {@link MCRAccessKey}
      */
     public static synchronized MCRAccessKey getAccessKeyWithSecret(final MCRObjectID objectId, final String secret) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final MCRAccessKey accessKey = em.createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
-            .setParameter("secret", secret)
-            .getResultList()
-            .stream()
-            .findFirst()
-            .orElse(null);
+        final MCRAccessKey accessKey
+            = em.createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE_AND_VALUE, MCRAccessKey.class)
+                .setParameter(MCRAccessKeyNamedQueries.PARAM_REFERENCE, objectId.toString())
+                .setParameter(MCRAccessKeyNamedQueries.PARAM_VALUE, secret)
+                .getResultList()
+                .stream()
+                .findFirst()
+                .orElse(null);
         if (accessKey != null) {
             em.detach(accessKey);
         }
@@ -320,10 +324,11 @@ public final class MCRAccessKeyManager {
     public static synchronized List<MCRAccessKey> listAccessKeysWithType(final MCRObjectID objectId,
         final String type) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
-            .setParameter("type", type)
-            .getResultList();
+        final List<MCRAccessKey> accessKeys
+            = em.createNamedQuery(MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE_AND_PERMISSION, MCRAccessKey.class)
+                .setParameter(MCRAccessKeyNamedQueries.PARAM_REFERENCE, objectId.toString())
+                .setParameter(MCRAccessKeyNamedQueries.PARAM_PERMISSION, type)
+                .getResultList();
         for (MCRAccessKey accessKey : accessKeys) {
             em.detach(accessKey);
         }

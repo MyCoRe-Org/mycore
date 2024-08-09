@@ -22,23 +22,27 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
+import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 /**
  * This class contains EventHandler methods to manage access keys of
  * MCRObjects and MCRDerivates.
- * 
+ *
  */
 public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String ACCESS_KEY_FLAG_TYPE = "accesskeys";
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
@@ -96,16 +100,18 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
      */
     private void handleBaseCreated(final MCRBase obj) {
         final MCRObjectService service = obj.getService();
+        final List<MCRAccessKeyDto> accessKeyDtos = service.getFlags(ACCESS_KEY_FLAG_TYPE).stream()
+            .map(MCRAccessKeyJsonMapper::jsonToAccessKeyDtos).flatMap(s -> s.stream()).toList();
         try {
-            final List<MCRAccessKey> accessKeys = MCRAccessKeyTransformer
-                .accessKeysFromElement(obj.getId(), service.createXML());
-            if (accessKeys.size() > 0) {
-                MCRAccessKeyManager.addAccessKeys(obj.getId(), accessKeys);
+            for (MCRAccessKeyDto accessKeyDto : accessKeyDtos) {
+                accessKeyDto.setReference(obj.getId().toString());
+                MCRAccessKeyServiceFactory.getService().importAccessKey(accessKeyDto);
             }
-        } catch (MCRAccessKeyTransformationException e) {
-            LOGGER.warn("Access keys can not be handled.");
+        } catch (MCRAccessException e) {
+            LOGGER.error("User is not allowed to import access keys to reference: " + obj.getId());
+        } finally {
+            service.removeFlags(ACCESS_KEY_FLAG_TYPE);
         }
-        service.removeFlags(MCRAccessKeyTransformer.ACCESS_KEY_TYPE);
     }
 
     /**
@@ -114,17 +120,16 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
      * {@link MCRAccessKey} string will not handled
      * @param obj the {@link MCRBase}
      */
-    private void handleBaseUpdated(final MCRBase obj) {
-        final MCRObjectService service = obj.getService();
-        service.removeFlags(MCRAccessKeyTransformer.ACCESS_KEY_TYPE);
+    private void handleBaseUpdated(MCRBase obj) {
+        obj.getService().removeFlags(ACCESS_KEY_FLAG_TYPE);
     }
 
     /**
-     * Deletes all {@link MCRAccessKey} for given {@link MCRBase}
+     * Deletes all access keys for given object by its ID as reference.
      *
-     * @param obj the {@link MCRBase}
+     * @param obj the object
      */
-    private void handleBaseDeleted(final MCRBase obj) {
-        MCRAccessKeyManager.clearAccessKeys(obj.getId());
+    private void handleBaseDeleted(MCRBase obj) {
+        MCRAccessKeyServiceFactory.getService().deleteAccessKeysByReference(obj.getId().toString());
     }
 }
