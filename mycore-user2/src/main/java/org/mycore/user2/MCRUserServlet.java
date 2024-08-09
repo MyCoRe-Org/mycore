@@ -267,7 +267,7 @@ public class MCRUserServlet extends MCRServlet {
             // For new local users, set password
             String pwd = u.getChildText("password");
             if ((pwd != null) && (pwd.trim().length() > 0) && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
-                MCRUserManager.updatePasswordHashToSHA256(user, pwd);
+                MCRUserManager.setUserPassword(user, pwd);
             }
         } else {
             user = MCRUserManager.getUser(userName, realmID);

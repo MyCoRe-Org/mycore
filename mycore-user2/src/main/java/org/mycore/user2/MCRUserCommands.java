@@ -150,7 +150,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             mcrUser.setRealName("Superuser");
             semail.ifPresent(mcrUser::setEMail);
             mcrUser.assignRole(srole);
-            MCRUserManager.updatePasswordHashToSHA256(mcrUser, spasswd);
+            MCRUserManager.setUserPassword(mcrUser, spasswd);
             MCRUserManager.createUser(mcrUser);
         } catch (Exception e) {
             throw new MCRException("Can't create the superuser.", e);
@@ -270,7 +270,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("These data do not correspond to a user.");
         }
 
-        MCRUserManager.updatePasswordHashToSHA256(mcrUser, mcrUser.getPassword());
+        MCRUserManager.setUserPassword(mcrUser, mcrUser.getPassword());
 
         try (FileOutputStream outFile = new FileOutputStream(newFile)) {
             saveToXMLFile(mcrUser, outFile);
@@ -446,7 +446,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         order = 50)
     public static void setPassword(String userID, String password) throws MCRException {
         MCRUser user = MCRUserManager.getUser(userID);
-        MCRUserManager.updatePasswordHashToSHA256(user, password);
+        MCRUserManager.setUserPassword(user, password);
         MCRUserManager.updateUser(user);
     }
 

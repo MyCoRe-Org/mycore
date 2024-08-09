@@ -16,24 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common;
+package org.mycore.user2.hash;
 
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Inherited
-@Target({})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface MCRTestProperty {
-
-    String key();
-
-    boolean empty() default false;
-
-    String string() default "";
-
-    Class<?> classNameOf() default Void.class;
-
+public record MCRPasswordCheckResult(boolean valid, boolean deprecated) {
 }
+

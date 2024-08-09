@@ -911,6 +911,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>at.favre.lib</groupId>
+        <artifactId>bcrypt</artifactId>
+        <version>0.10.2</version>
+      </dependency>
+      <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
         <version>4.4.0</version>
@@ -1056,6 +1061,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.15</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -1382,6 +1392,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <version>1.78.1</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
