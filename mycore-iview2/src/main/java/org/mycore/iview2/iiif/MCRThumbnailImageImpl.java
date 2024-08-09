@@ -19,11 +19,11 @@
 package org.mycore.iview2.iiif;
 
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -40,12 +40,12 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     protected static final String DERIVATE_TYPES = "Derivate.Types";
 
-    private Set<String> derivateTypes;
+    private List<String> derivateTypes = new ArrayList<>();
 
     public MCRThumbnailImageImpl(String implName) {
         super(implName);
-        derivateTypes = new HashSet<>();
-        derivateTypes.addAll(Arrays.asList(getProperties().get(DERIVATE_TYPES).split(",")));
+        derivateTypes.addAll(Arrays.asList(getProperties().get(DERIVATE_TYPES).split(","))
+            .stream().distinct().toList());
     }
 
     @Override
@@ -92,15 +92,17 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     private Optional<MCRTileInfo> createTileInfoForMCRObject(MCRObjectID mcrID) {
         MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
-        for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
-            if (derLink.getClassifications().stream()
-                .map(MCRCategoryID::toString)
-                .anyMatch(derivateTypes::contains)) {
-                final String maindoc = derLink.getMainDoc();
-                if (maindoc != null) {
-                    Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(derLink.getXLinkHref(), maindoc);
-                    if (tileInfoForFile.isPresent()) {
-                        return tileInfoForFile;
+        for (String derType : derivateTypes) {
+            for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                if (derLink.getClassifications().stream()
+                    .map(MCRCategoryID::toString)
+                    .anyMatch(x -> derType.equals(x))) {
+                    final String maindoc = derLink.getMainDoc();
+                    if (maindoc != null) {
+                        Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(derLink.getXLinkHref(), maindoc);
+                        if (tileInfoForFile.isPresent()) {
+                            return tileInfoForFile;
+                        }
                     }
                 }
             }
