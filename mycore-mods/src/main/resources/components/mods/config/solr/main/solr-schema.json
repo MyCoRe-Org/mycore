@@ -253,6 +253,13 @@
     }
   },
   {
+    "add-field": {
+      "name": "mods.note",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
     "add-dynamic-field": {
       "name": "mods.note.*",
       "type": "string",
