@@ -31,7 +31,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
-import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 
@@ -72,8 +71,8 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      *
      * @throws jakarta.ws.rs.ForbiddenException if access is restricted
      */
-    private void checkRestAPIAccess(final ContainerRequestContext requestContext,
-        final MCRRestAPIACLPermission permission, final String path) throws ForbiddenException {
+    private void checkRestAPIAccess(ContainerRequestContext requestContext, String permission, String path)
+        throws ForbiddenException {
         LogManager.getLogger().warn(path + ": Checking API access: " + permission);
         final MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         if (MCRRestAccessManager.checkRestAPIAccess(aclProvider, permission, path)) {
@@ -86,9 +85,8 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .toException();
     }
 
-    private void checkBaseAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
-        String objectId, String derId, String path)
-        throws ForbiddenException {
+    private void checkBaseAccess(ContainerRequestContext requestContext, String permission, String objectId,
+        String derId, String path) throws ForbiddenException {
         LogManager.getLogger().debug("Permission: {}, Object: {}, Derivate: {}, Path: {}", permission, objectId, derId,
             path);
         Optional<String> checkable = Optional.ofNullable(derId)
@@ -140,11 +138,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         if (HttpMethod.OPTIONS.equals(method)) {
             return;
         }
-        final MCRRestRequiredPermission annotation = resourceInfo.getResourceMethod()
-            .getAnnotation(MCRRestRequiredPermission.class);
-        final MCRRestAPIACLPermission permission = Optional.ofNullable(annotation)
-            .map(MCRRestRequiredPermission::value)
-            .orElseGet(() -> MCRRestAPIACLPermission.fromMethod(method));
+        final String permission
+            = Optional.ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class))
+                .map(MCRRestRequiredPermission::value).orElseGet(() -> getPermissionFromHttpMethod(method));
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
@@ -159,5 +155,14 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
                 .filter(Objects::nonNull)
                 .toArray(String[]::new));
+    }
+
+    private static String getPermissionFromHttpMethod(String httpMethod) {
+        return switch (httpMethod) {
+            case HttpMethod.GET, HttpMethod.HEAD -> MCRAccessManager.PERMISSION_READ;
+            case HttpMethod.DELETE -> MCRAccessManager.PERMISSION_DELETE;
+            case HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH -> MCRAccessManager.PERMISSION_WRITE;
+            default -> throw new IllegalArgumentException("Unknown HTTP method: " + httpMethod);
+        };
     }
 }

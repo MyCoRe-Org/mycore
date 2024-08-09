@@ -23,10 +23,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
-
+/**
+ * Defines a required permission for a Rest API path.
+ * This can be a MyCoRe standard permission.
+ *
+ * @see org.mycore.access.MCRAccessManager
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface MCRRestRequiredPermission {
-    MCRRestAPIACLPermission value();
+
+    /**
+     * Returns the permission value.
+     *
+     * @return the permission value
+     */
+    String value();
 }
