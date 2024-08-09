@@ -34,22 +34,18 @@ export class IviewIIIFProvider {
         document: Document
     }, any> {
         const promise = new ViewerPromise<{ model: StructureModel; document: Document }, any>();
-        const settings = {
-            url: manifestDocumentLocation,
-            success: (response: any) => {
+        let document = undefined;
+        loadManifest(manifestDocumentLocation).then((manifest) => {
+            document = manifest;
+            return parseManifest(manifest)
+        }).then((manifestParsed) => {
+            const builder = new IIIFStructureBuilder(manifestParsed as Manifest, tilePathBuilder, imageAPIURL);
+            promise.resolve({model: builder.processManifest(), document: document});
+        }).catch((error) => {
+            console.log("Error loading manifest: " + error);
+            promise.reject(error);
 
-               loadManifest(response).then((manifest) => {
-                    return parseManifest(manifest)
-                }).then((manifest) => {
-                    const builder = new IIIFStructureBuilder(manifest as Manifest, tilePathBuilder, imageAPIURL);
-                    promise.resolve({model: builder.processManifest(), document: response});
-                });
-            },
-            error: (request: any, status: string, exception: string) => {
-                promise.reject(exception);
-            }
-        };
-        jQuery.ajax(settings);
+        });
         return promise;
     }
 
