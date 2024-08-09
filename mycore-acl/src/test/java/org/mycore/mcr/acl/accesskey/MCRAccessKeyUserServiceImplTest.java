@@ -22,13 +22,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
@@ -45,9 +50,9 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
 
     private static final String UNKNOWN_KEY = "unknown";
 
-    private MCRObjectID objectId = null;
+    private MCRObject object = null;
 
-    private MCRObjectID derivateId = null;
+    private MCRDerivate derivate = null;
 
     private MCRObjectID unknownObjectId = null;
 
@@ -59,31 +64,33 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        objectId = getObject().getId();
-        derivateId = getDerivate().getId();
+        object = createObject();
+        MCRMetadataManager.create(object);
+        derivate = createDerivate(object.getId());
+        MCRMetadataManager.create(derivate);
         unknownObjectId = MCRObjectID.getInstance("mcr_object_00000002");
         accessKeyServiceMock = Mockito.mock(MCRAccessKeyService.class);
-        Mockito.when(accessKeyServiceMock.getValue(objectId.toString(), READ_KEY)).thenReturn(READ_KEY);
-        Mockito.when(accessKeyServiceMock.getValue(derivateId.toString(), WRITE_KEY)).thenReturn(WRITE_KEY);
-        Mockito.when(accessKeyServiceMock.getValue(objectId.toString(), UNKNOWN_KEY)).thenReturn(UNKNOWN_KEY);
-        Mockito.when(accessKeyServiceMock.getValue(objectId.toString(), DELETE_KEY)).thenReturn(DELETE_KEY);
+        Mockito.when(accessKeyServiceMock.getValue(object.getId().toString(), READ_KEY)).thenReturn(READ_KEY);
+        Mockito.when(accessKeyServiceMock.getValue(derivate.getId().toString(), WRITE_KEY)).thenReturn(WRITE_KEY);
+        Mockito.when(accessKeyServiceMock.getValue(object.getId().toString(), UNKNOWN_KEY)).thenReturn(UNKNOWN_KEY);
+        Mockito.when(accessKeyServiceMock.getValue(object.getId().toString(), DELETE_KEY)).thenReturn(DELETE_KEY);
         final MCRAccessKeyDto readAccessKeyDto = new MCRAccessKeyDto();
-        readAccessKeyDto.setReference(objectId.toString());
+        readAccessKeyDto.setReference(object.getId().toString());
         readAccessKeyDto.setValue(READ_KEY);
         readAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_READ);
         final MCRAccessKeyDto writeAccessKeyDto = new MCRAccessKeyDto();
-        writeAccessKeyDto.setReference(objectId.toString());
+        writeAccessKeyDto.setReference(object.getId().toString());
         writeAccessKeyDto.setValue(WRITE_KEY);
         writeAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
         final MCRAccessKeyDto deleteAccessKeyDto = new MCRAccessKeyDto();
-        deleteAccessKeyDto.setReference(objectId.toString());
+        deleteAccessKeyDto.setReference(object.getId().toString());
         deleteAccessKeyDto.setValue(DELETE_KEY);
         deleteAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_DELETE);
-        Mockito.when(accessKeyServiceMock.getAccessKeyByReferenceAndValue(objectId.toString(), READ_KEY))
+        Mockito.when(accessKeyServiceMock.getAccessKeyByReferenceAndValue(object.getId().toString(), READ_KEY))
             .thenReturn(readAccessKeyDto);
-        Mockito.when(accessKeyServiceMock.getAccessKeyByReferenceAndValue(derivateId.toString(), WRITE_KEY))
+        Mockito.when(accessKeyServiceMock.getAccessKeyByReferenceAndValue(derivate.getId().toString(), WRITE_KEY))
             .thenReturn(writeAccessKeyDto);
-        Mockito.when(accessKeyServiceMock.getAccessKeyByReferenceAndValue(objectId.toString(), UNKNOWN_KEY))
+        Mockito.when(accessKeyServiceMock.getAccessKeyByReferenceAndValue(object.getId().toString(), UNKNOWN_KEY))
             .thenReturn(null);
         userService = new MCRAccessKeyUserService(accessKeyServiceMock);
         final MCRUser user = new MCRUser("junit");
@@ -92,21 +99,27 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
     }
 
     @Test
+    public void testSetup() {
+        assertTrue(MCRMetadataManager.exists(object.getId()));
+        assertTrue(MCRMetadataManager.exists(derivate.getId()));
+    }
+
+    @Test
     public void testActiveObjectAccessKeyForReferenceByRawValue_object() {
-        userService.activeObjectAccessKeyForReferenceByRawValue(objectId, READ_KEY);
+        userService.activeObjectAccessKeyForReferenceByRawValue(object.getId(), READ_KEY);
         assertEquals(READ_KEY, MCRUserManager.getCurrentUser()
-            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString()));
-        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(objectId.toString(),
-            READ_KEY);
+            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString()));
+        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(
+            object.getId().toString(), READ_KEY);
     }
 
     @Test
     public void testActiveObjectAccessKeyForReferenceByRawValue_derivate() {
-        userService.activeObjectAccessKeyForReferenceByRawValue(derivateId, WRITE_KEY);
+        userService.activeObjectAccessKeyForReferenceByRawValue(derivate.getId(), WRITE_KEY);
         assertEquals(WRITE_KEY, MCRUserManager.getCurrentUser()
-            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + derivateId.toString()));
-        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(derivateId.toString(),
-            WRITE_KEY);
+            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + derivate.getId().toString()));
+        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(
+            derivate.getId().toString(), WRITE_KEY);
     }
 
     @Test
@@ -120,67 +133,74 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
     @Test
     public void testActiveObjectAccessKeyForReferenceByRawValue_unknownAccessKey() {
         assertThrows(MCRAccessKeyException.class,
-            () -> userService.activeObjectAccessKeyForReferenceByRawValue(objectId, UNKNOWN_KEY));
-        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(objectId.toString(),
-            UNKNOWN_KEY);
+            () -> userService.activeObjectAccessKeyForReferenceByRawValue(object.getId(), UNKNOWN_KEY));
+        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(
+            object.getId().toString(), UNKNOWN_KEY);
     }
 
     @Test
     public void testActiveObjectAccessKeyForReferenceByRawValue_override() {
         MCRUserManager.getCurrentUser().setUserAttribute(
-            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString(), WRITE_KEY);
-        userService.activeObjectAccessKeyForReferenceByRawValue(objectId, READ_KEY);
+            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString(), WRITE_KEY);
+        userService.activeObjectAccessKeyForReferenceByRawValue(object.getId(), READ_KEY);
         assertEquals(READ_KEY, MCRUserManager.getCurrentUser()
-            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString()));
-        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(objectId.toString(),
-            READ_KEY);
+            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString()));
+        Mockito.verify(accessKeyServiceMock, Mockito.times(1)).getAccessKeyByReferenceAndValue(
+            object.getId().toString(), READ_KEY);
     }
 
     @Test
     public void testGetActivatedAccessKeyForReference() {
         MCRUserManager.getCurrentUser().setUserAttribute(
-            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString(), READ_KEY);
-        final MCRAccessKeyDto accessKey = userService.getActivatedAccessKeyForReference(objectId.toString());
+            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString(), READ_KEY);
+        final MCRAccessKeyDto accessKey = userService.getActivatedAccessKeyForReference(object.getId().toString());
         assertNotNull(accessKey);
-        assertEquals(READ_KEY, userService.getActivatedAccessKeyForReference(objectId.toString()).getValue());
+        assertEquals(READ_KEY, userService.getActivatedAccessKeyForReference(object.getId().toString()).getValue());
     }
 
     @Test
     public void testGetActivatedAccessKeyForReference_notExists() {
-        assertNull(userService.getActivatedAccessKeyForReference(objectId.toString()));
+        assertNull(userService.getActivatedAccessKeyForReference(object.getId().toString()));
     }
 
     @Test
     public void testRemoveAccessKeySecretFromCurrentSession() {
         MCRUserManager.getCurrentUser().setUserAttribute(
-            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString(), READ_KEY);
-        userService.deactivateAccessKeyForReference(objectId.toString());
+            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString(), READ_KEY);
+        userService.deactivateAccessKeyForReference(object.getId().toString());
         assertNull(MCRUserManager.getCurrentUser()
-            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString()));
+            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString()));
     }
 
     @Test
     public void testCleanUpUserAttributes() {
         MCRUserManager.getCurrentUser().setUserAttribute(
-            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString(), UNKNOWN_KEY);
+            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString(), UNKNOWN_KEY);
         final MCRUser user = new MCRUser("junit1");
         MCRUserManager.createUser(user);
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
         MCRSessionMgr.getCurrentSession().setUserInformation(user);
         MCRUserManager.getCurrentUser().setUserAttribute(
-            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString(), UNKNOWN_KEY);
+            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString(), UNKNOWN_KEY);
         MCRUserManager.getCurrentUser().setUserAttribute(
-            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + derivateId.toString(), WRITE_KEY);
+            MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + derivate.getId().toString(), WRITE_KEY);
         userService.cleanUpUserAttributes();
         assertNull(MCRUserManager.getCurrentUser()
-            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString()));
+            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString()));
         assertNotNull(MCRUserManager.getCurrentUser()
-            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + derivateId.toString()));
+            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + derivate.getId().toString()));
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser("junit"));
         assertNull(MCRUserManager.getCurrentUser()
-            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + objectId.toString()));
+            .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString()));
         Mockito.verify(accessKeyServiceMock, Mockito.times(2)).getAccessKeyByReferenceAndValue(Mockito.anyString(),
             Mockito.anyString());
+    }
+
+    @After
+    public void teardown() throws Exception {
+        MCRMetadataManager.delete(derivate);
+        MCRMetadataManager.delete(object);
+        super.tearDown();
     }
 }
