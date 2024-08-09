@@ -16,5 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoReMetadataComponent.ts" />
-console.log("METADATA MODULE");
+
+import {addViewerComponent} from "../base/Utils";
+import {MyCoReMetadataComponent} from "./components/MyCoReMetadataComponent";
+
+addViewerComponent(MyCoReMetadataComponent);

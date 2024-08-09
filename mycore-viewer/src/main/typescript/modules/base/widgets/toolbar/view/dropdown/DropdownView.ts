@@ -16,14 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../../definitions/jquery.d.ts" />
-/// <reference path="../button/ButtonView.ts" />
+import {ButtonView} from "../button/ButtonView";
 
-namespace mycore.viewer.widgets.toolbar {
+export interface DropdownView extends ButtonView {
+    updateChilds(childs: Array<{
+        id: string; label: string; icon: string
+    }>): void;
 
-    export interface DropdownView extends ButtonView {
-        updateChilds(childs:Array<{id:string;label:string;icon:string
-        }>): void;
-        getChildElement(id:string): JQuery;
-    }
+    getChildElement(id: string): JQuery;
 }

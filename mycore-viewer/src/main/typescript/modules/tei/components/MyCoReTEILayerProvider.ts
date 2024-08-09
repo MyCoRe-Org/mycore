@@ -16,91 +16,92 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../widgets/TEILayer.ts" />
-/// <reference path="TEISettings.ts" />
 
-namespace mycore.viewer.components {
+import {ViewerComponent} from "../../base/components/ViewerComponent";
+import {TEISettings} from "./TEISettings";
+import {StructureModel} from "../../base/components/model/StructureModel";
+import {WaitForEvent} from "../../base/components/events/WaitForEvent";
+import {StructureModelLoadedEvent} from "../../base/components/events/StructureModelLoadedEvent";
+import {ViewerEvent} from "../../base/widgets/events/ViewerEvent";
+import {MyCoReMap} from "../../base/Utils";
+import {ProvideLayerEvent} from "../../base/components/events/ProvideLayerEvent";
+import {TEILayer} from "../widgets/TEILayer";
 
-    export class MyCoReTEILayerProvider extends ViewerComponent {
+export class MyCoReTEILayerProvider extends ViewerComponent {
 
-        constructor(private _settings:TEISettings) {
-            super();
-            this.contentLocation = this._settings.webApplicationBaseURL + "/servlets/MCRDerivateContentTransformerServlet/" + this._settings.derivate + "/";
-        }
+    constructor(private _settings: TEISettings) {
+        super();
+        this.contentLocation = this._settings.webApplicationBaseURL + "/servlets/MCRDerivateContentTransformerServlet/" + this._settings.derivate + "/";
+    }
 
-        private _model:model.StructureModel = null;
-        private contentLocation = null;
+    private _model: StructureModel = null;
+    private contentLocation = null;
 
-        public init() {
-            if (this._settings.doctype == "mets") {
-                this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
-            }
-        }
-
-
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
-            if (e.type == events.StructureModelLoadedEvent.TYPE) {
-                var smle = <events.StructureModelLoadedEvent>e;
-                this._model = smle.structureModel;
-
-                var transcriptions = new MyCoReMap<string,string>();
-                var translations = new MyCoReMap<string,MyCoReMap<string, string>>();
-                var languages = new Array<string>();
-
-                smle.structureModel._imageList.forEach((image)=> {
-                    var additionalHrefs = image.additionalHrefs;
-                    additionalHrefs.forEach((name, href)=> {
-                        if (name.indexOf( "TEI.") == 0) {
-                            var language = name.substr("TEI.".length).toLocaleLowerCase();
-                            if (!translations.has(language)) {
-                                translations.set(language, new MyCoReMap<string, string>());
-                            }
-
-                            var idHrefTranslationMap = translations.get(language);
-                            idHrefTranslationMap.set(image.href, href);
-
-                            if (languages.indexOf(language) == -1) {
-                                languages.push(language);
-                            }
-                        }
-                    });
-
-                });
-
-                if (!transcriptions.isEmpty()) {
-                    this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("transcription", "layer.transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
-                }
-
-                var order = [ "de", "en" ];
-
-                if (languages.length != 0) {
-                    languages
-                        .sort((l1, l2)=> {
-                            var l1Order = order.indexOf(l1);
-                            var l2Order = order.indexOf(l2);
-
-                            return l1Order-l2Order;
-                        })
-                        .forEach((language)=> {
-                            var translationMap = translations.get(language);
-                            this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer(language,  "layer." + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
-                        });
-                }
-
-                return;
-            }
-        }
-
-        public get handlesEvents():string[] {
-            if (this._settings.doctype == "mets") {
-                return [ events.StructureModelLoadedEvent.TYPE ];
-            } else {
-                return [];
-            }
+    public init() {
+        if (this._settings.doctype == "mets") {
+            this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
         }
     }
 
 
-}
+    public handle(e: ViewerEvent): void {
+        if (e.type == StructureModelLoadedEvent.TYPE) {
+            const smle = e as StructureModelLoadedEvent;
+            this._model = smle.structureModel;
 
-addViewerComponent(mycore.viewer.components.MyCoReTEILayerProvider);
+            const transcriptions = new MyCoReMap<string, string>();
+            const translations = new MyCoReMap<string, MyCoReMap<string, string>>();
+            const languages = new Array<string>();
+
+            smle.structureModel._imageList.forEach((image) => {
+                const additionalHrefs = image.additionalHrefs;
+                additionalHrefs.forEach((name, href) => {
+                    if (name.indexOf("TEI.") == 0) {
+                        const language = name.substr("TEI.".length).toLocaleLowerCase();
+                        if (!translations.has(language)) {
+                            translations.set(language, new MyCoReMap<string, string>());
+                        }
+
+                        const idHrefTranslationMap = translations.get(language);
+                        idHrefTranslationMap.set(image.href, href);
+
+                        if (languages.indexOf(language) == -1) {
+                            languages.push(language);
+                        }
+                    }
+                });
+
+            });
+
+            if (!transcriptions.isEmpty()) {
+                this.trigger(new ProvideLayerEvent(this, new TEILayer("transcription", "layer.transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
+            }
+
+            const order = ["de", "en"];
+
+            if (languages.length != 0) {
+                languages
+                    .sort((l1, l2) => {
+                        const l1Order = order.indexOf(l1);
+                        const l2Order = order.indexOf(l2);
+
+                        return l1Order - l2Order;
+                    })
+                    .forEach((language) => {
+                        const translationMap = translations.get(language);
+                        this.trigger(new ProvideLayerEvent(this, new TEILayer(language, "layer." + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
+                    });
+            }
+
+            return;
+        }
+    }
+
+    public get handlesEvents(): string[] {
+        if (this._settings.doctype == "mets") {
+            return [StructureModelLoadedEvent.TYPE];
+        } else {
+            return [];
+        }
+    }
+}

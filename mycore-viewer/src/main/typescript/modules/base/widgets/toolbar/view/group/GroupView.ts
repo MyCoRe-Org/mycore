@@ -16,13 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../../definitions/jquery.d.ts" />
 
-namespace mycore.viewer.widgets.toolbar {
+export interface GroupView {
+    addChild(child: JQuery): void;
 
-    export interface GroupView {
-        addChild(child: JQuery): void;
-        removeChild(child: JQuery): void;
-        getElement(): JQuery;
-    }
+    removeChild(child: JQuery): void;
+
+    getElement(): JQuery;
 }

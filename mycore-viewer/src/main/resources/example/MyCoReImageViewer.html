@@ -8,28 +8,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-base.js"></script>
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-desktop.js"></script>
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-mets.js"></script>
-    <script src="../META-INF/resources/modules/iview2/js/iview-client-metadata.js"></script>
+    <script type="module" src="../META-INF/resources/modules/iview2/js/iview-client-base.es.js"></script>
+    <script type="module" src="../META-INF/resources/modules/iview2/js/iview-client-desktop.es.js"></script>
+    <script type="module" src="../META-INF/resources/modules/iview2/js/iview-client-mets.es.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
     <!--<script src="../META-INF/resources/modules/iview2/js/iview-client-metadata.js"></script>  -->
     <link href="../META-INF/resources/modules/iview2/css/default.css" type="text/css" rel="stylesheet">
 
     <!-- <link rel="stylesheet" href="../META-INF/resources/components/iview/templates/mobile/jquery.mobile-1.3.2.min.css" />     -->
-    <script>
+    <script type="module">
+        import { MyCoReViewer } from "../META-INF/resources/modules/iview2/js/iview-client-base.es.js";
 
         window.onload = function () {
             var json = {
-                    resources: {
-                        script: ["http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-base.js",
-                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-desktop.js",
-                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-mets.js",
-                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-metadata.js",
-                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-piwik.js"],
-                        css: ["http://zs.thulb.uni-jena.de/modules/iview2/css/default.css", "http://zs.thulb.uni-jena.de/css/jp-iview.css"]
-                    },
                     properties: {
                         derivateURL: "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00242075/",
                         metsURL: "https://zs.thulb.uni-jena.de/servlets/MCRMETSServlet/jportal_derivate_00242075",
@@ -117,7 +109,7 @@
                     }
                 }
             ;
-            new mycore.viewer.MyCoReViewer(jQuery("body"), json.properties);
+            new MyCoReViewer(jQuery("body"), json.properties);
         };
         /*
          window.onload = function() {

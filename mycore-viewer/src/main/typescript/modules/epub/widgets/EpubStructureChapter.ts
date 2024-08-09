@@ -16,18 +16,18 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.epub {
 
-    export class EpubStructureChapter extends mycore.viewer.model.StructureChapter {
+import {StructureChapter} from "../../base/components/model/StructureChapter";
+import {MyCoReMap} from "../../base/Utils";
 
-        constructor(parent: mycore.viewer.model.StructureChapter,
-                    type: string,
-                    label: string,
-                    chapter: mycore.viewer.model.StructureChapter[],
-                    public epubChapter: any) {
-            super(parent, type, (epubChapter != null) ? epubChapter.href : 'root', label, chapter, new MyCoReMap(), (c) => c(null));
-        }
+export class EpubStructureChapter extends StructureChapter {
 
+    constructor(parent: StructureChapter,
+                type: string,
+                label: string,
+                chapter: StructureChapter[],
+                public epubChapter: any) {
+        super(parent, type, (epubChapter != null) ? epubChapter.href : 'root', label, chapter, new MyCoReMap(), (c) => c(null));
     }
 
 }

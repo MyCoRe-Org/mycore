@@ -16,19 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../model/MyCoReViewerSearcher.ts" />
+import {MyCoReImageViewerEvent} from "../../../base/components/events/MyCoReImageViewerEvent";
+import {MyCoReViewerSearcher} from "../model/MyCoReViewerSearcher";
+import {ViewerComponent} from "../../../base/components/ViewerComponent";
 
-namespace mycore.viewer.components.events {
-    export class ProvideViewerSearcherEvent extends MyCoReImageViewerEvent {
-        constructor(component:ViewerComponent, private _searcher:model.MyCoReViewerSearcher) {
-            super(component, ProvideViewerSearcherEvent.TYPE);
-        }
-
-        public get searcher(){
-            return this._searcher;
-        }
-
-        public static TYPE:string = "ProvideViewerSearcherEvent";
-
+export class ProvideViewerSearcherEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent, private _searcher: MyCoReViewerSearcher) {
+        super(component, ProvideViewerSearcherEvent.TYPE);
     }
+
+    public get searcher() {
+        return this._searcher;
+    }
+
+    public static TYPE: string = "ProvideViewerSearcherEvent";
+
 }
+

@@ -16,20 +16,18 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.events {
 
-    export interface ViewerEvent {
-        type:string;
-    }
-
-
-    export class DefaultViewerEvent implements ViewerEvent {
-        constructor(private _type:string) {
-        }
-
-        public get type() {
-            return this._type;
-        }
-
-    }
+export interface ViewerEvent {
+    type: string;
 }
+
+export class DefaultViewerEvent implements ViewerEvent {
+    constructor(private _type: string) {
+    }
+
+    public get type() {
+        return this._type;
+    }
+
+}
+

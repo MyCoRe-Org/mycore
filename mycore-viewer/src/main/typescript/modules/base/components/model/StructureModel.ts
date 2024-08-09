@@ -16,73 +16,73 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../Utils.ts" />
-/// <reference path="StructureChapter.ts" />
-/// <reference path="StructureImage.ts" />
 
-namespace mycore.viewer.model {
-    export class StructureModel {
+import {StructureChapter} from "./StructureChapter";
+import {StructureImage} from "./StructureImage";
+import {MyCoReMap, Size2D} from "../../Utils";
 
-        constructor(public _rootChapter:model.StructureChapter,
-                    public _imageList: Array<model.StructureImage>,
-                    public _chapterToImageMap:MyCoReMap<string, model.StructureImage>,
-                    public _imageToChapterMap:MyCoReMap<string, model.StructureChapter>,
-                    public _imageHrefImageMap:MyCoReMap<string, model.StructureImage>,
-                    public _textContentPresent:boolean){
-        }
+export class StructureModel {
 
-        /**
-         * will be used to calculate the default aspect ratio
-         */
-        public defaultPageDimension:Size2D;
-
-        public get rootChapter() {
-            return this._rootChapter;
-        }
-
-        public get imageList() {
-            return this._imageList;
-        }
-
-        public get chapterToImageMap() {
-            return this._chapterToImageMap;
-        }
-
-        public get imageToChapterMap() {
-            return this._imageToChapterMap;
-        }
-
-        public get imageHrefImageMap() {
-            return this._imageHrefImageMap;
-        }
-
-        public get isTextContentPresent():boolean {
-                return this._textContentPresent;
-        }
-
-        public set rootChapter(rootChapter:model.StructureChapter) {
-            this._rootChapter = rootChapter;
-        }
-
-        public set imageList(imageList:Array<model.StructureImage>) {
-            this._imageList = imageList;
-        }
-
-        public set chapterToImageMap(chapterToImageMap:MyCoReMap<string,model.StructureImage>) {
-            this._chapterToImageMap = chapterToImageMap;
-        }
-
-        public set imageToChapterMap(imageToChapterMap:MyCoReMap<string,model.StructureChapter>) {
-            this._imageToChapterMap = imageToChapterMap;
-        }
-
-        public set imageHrefImageMap(imageHrefImageMap:MyCoReMap<string,model.StructureImage>) {
-            this._imageHrefImageMap = imageHrefImageMap;
-        }
-
-        public set isTextContentPresent(textContentPresent:boolean){
-            this._textContentPresent = textContentPresent;
-        }
-
+    constructor(public _rootChapter: StructureChapter,
+                public _imageList: Array<StructureImage>,
+                public _chapterToImageMap: MyCoReMap<string, StructureImage>,
+                public _imageToChapterMap: MyCoReMap<string, StructureChapter>,
+                public _imageHrefImageMap: MyCoReMap<string, StructureImage>,
+                public _textContentPresent: boolean) {
     }
+
+    /**
+     * will be used to calculate the default aspect ratio
+     */
+    public defaultPageDimension: Size2D;
+
+    public get rootChapter() {
+        return this._rootChapter;
+    }
+
+    public get imageList() {
+        return this._imageList;
+    }
+
+    public get chapterToImageMap() {
+        return this._chapterToImageMap;
+    }
+
+    public get imageToChapterMap() {
+        return this._imageToChapterMap;
+    }
+
+    public get imageHrefImageMap() {
+        return this._imageHrefImageMap;
+    }
+
+    public get isTextContentPresent(): boolean {
+        return this._textContentPresent;
+    }
+
+    public set rootChapter(rootChapter: StructureChapter) {
+        this._rootChapter = rootChapter;
+    }
+
+    public set imageList(imageList: Array<StructureImage>) {
+        this._imageList = imageList;
+    }
+
+    public set chapterToImageMap(chapterToImageMap: MyCoReMap<string, StructureImage>) {
+        this._chapterToImageMap = chapterToImageMap;
+    }
+
+    public set imageToChapterMap(imageToChapterMap: MyCoReMap<string, StructureChapter>) {
+        this._imageToChapterMap = imageToChapterMap;
+    }
+
+    public set imageHrefImageMap(imageHrefImageMap: MyCoReMap<string, StructureImage>) {
+        this._imageHrefImageMap = imageHrefImageMap;
+    }
+
+    public set isTextContentPresent(textContentPresent: boolean) {
+        this._textContentPresent = textContentPresent;
+    }
+
 }
+

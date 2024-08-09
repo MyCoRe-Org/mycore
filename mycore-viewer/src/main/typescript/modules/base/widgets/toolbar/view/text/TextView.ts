@@ -16,12 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../../definitions/jquery.d.ts" />
+export interface TextView {
+    updateText(text: string): void;
 
-namespace mycore.viewer.widgets.toolbar {
-
-    export interface TextView {
-        updateText(text: string): void; 
-        getElement(): JQuery;
-    }
+    getElement(): JQuery;
 }
+

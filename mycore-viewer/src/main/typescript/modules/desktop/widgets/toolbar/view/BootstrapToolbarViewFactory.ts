@@ -16,53 +16,61 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="text/BootstrapTextView.ts" />
-/// <reference path="image/BootstrapImageView.ts" />
-/// <reference path="group/BootstrapGroupView.ts" />
-/// <reference path="dropdown/BootstrapDropdownView.ts" />
-/// <reference path="dropdown/BootstrapLargeDropdownView.ts" />
-/// <reference path="button/BootstrapButtonView.ts" />
-/// <reference path="input/BootstrapTextInputView.ts" />
-/// <reference path="BootstrapToolbarView.ts" />
 
-namespace mycore.viewer.widgets.toolbar {
-    export class BootstrapToolbarViewFactory implements ToolbarViewFactory {
+import {ToolbarViewFactory} from "../../../../base/widgets/toolbar/view/ToolbarViewFactory";
+import {ToolbarView} from "../../../../base/widgets/toolbar/view/ToolbarView";
+import {TextView} from "../../../../base/widgets/toolbar/view/text/TextView";
+import {ImageView} from "../../../../base/widgets/toolbar/view/image/ImageView";
+import {GroupView} from "../../../../base/widgets/toolbar/view/group/GroupView";
+import {DropdownView} from "../../../../base/widgets/toolbar/view/dropdown/DropdownView";
+import {ButtonView} from "../../../../base/widgets/toolbar/view/button/ButtonView";
+import {TextInputView} from "../../../../base/widgets/toolbar/view/input/TextInputView";
+import {BootstrapToolbarView} from "./BootstrapToolbarView";
+import {BootstrapTextView} from "./text/BootstrapTextView";
+import {BootstrapImageView} from "./image/BootstrapImageView";
+import {BootstrapGroupView} from "./group/BootstrapGroupView";
+import {BootstrapDropdownView} from "./dropdown/BootstrapDropdownView";
+import {BootstrapLargeDropdownView} from "./dropdown/BootstrapLargeDropdownView";
+import {BootstrapButtonView} from "./button/BootstrapButtonView";
+import {BootstrapTextInputView} from "./input/BootstrapTextInputView";
 
-        createToolbarView():ToolbarView {
-            return new BootstrapToolbarView();
-        }
+export class BootstrapToolbarViewFactory implements ToolbarViewFactory {
 
-        createTextView(id:string):TextView {
-            return new BootstrapTextView(id);
-        }
-
-        createImageView(id:string):ImageView {
-            return new BootstrapImageView(id);
-        }
-
-        createGroupView(id:string, order:number, align:string):GroupView {
-            return new BootstrapGroupView(id, order, align);
-        }
-
-        createDropdownView(id:string):DropdownView {
-            return new BootstrapDropdownView(id);
-        }
-
-        createLargeDropdownView(id:string):DropdownView {
-            return new BootstrapLargeDropdownView(id);
-        }
-
-        createButtonView(id:string):ButtonView {
-            return new BootstrapButtonView(id);
-        }
-
-        createTextInputView(id: string): TextInputView {
-            return new BootstrapTextInputView(id);
-        }
+    createToolbarView(): ToolbarView {
+        return new BootstrapToolbarView();
     }
 
-    ToolbarViewFactoryImpl = new BootstrapToolbarViewFactory();
+    createTextView(id: string): TextView {
+        return new BootstrapTextView(id);
+    }
+
+    createImageView(id: string): ImageView {
+        return new BootstrapImageView(id);
+    }
+
+    createGroupView(id: string, order: number, align: string): GroupView {
+        return new BootstrapGroupView(id, order, align);
+    }
+
+    createDropdownView(id: string): DropdownView {
+        return new BootstrapDropdownView(id);
+    }
+
+    createLargeDropdownView(id: string): DropdownView {
+        return new BootstrapLargeDropdownView(id);
+    }
+
+    createButtonView(id: string): ButtonView {
+        return new BootstrapButtonView(id);
+    }
+
+    createTextInputView(id: string): TextInputView {
+        return new BootstrapTextInputView(id);
+    }
 }
 
+export function register(){
+    ((window as any).ToolbarViewFactoryImpl as ToolbarViewFactory)=new BootstrapToolbarViewFactory();
+}
 
 

@@ -18,13 +18,11 @@
 
 package org.mycore.viewer.configuration;
 
-import java.util.Map;
-
+import com.google.common.collect.Multimap;
+import jakarta.servlet.http.HttpServletRequest;
 import org.mycore.viewer.configuration.MCRViewerConfiguration.ResourceType;
 
-import com.google.common.collect.Multimap;
-
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * Use this class to build your {@link MCRViewerConfiguration}.
@@ -76,7 +74,9 @@ public class MCRViewerConfigurationBuilder {
         Multimap<ResourceType, String> resources = conf2.getResources();
         for (Map.Entry<ResourceType, String> resource : resources.entries()) {
             if (ResourceType.script.equals(resource.getKey())) {
-                conf1.addScript(resource.getValue());
+                conf1.addScript(resource.getValue(), false);
+            }else if (ResourceType.module.equals(resource.getKey())) {
+                conf1.addScript(resource.getValue(), true);
             } else if (ResourceType.css.equals(resource.getKey())) {
                 conf1.addCSS(resource.getValue());
             }

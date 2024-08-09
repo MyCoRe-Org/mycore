@@ -16,47 +16,45 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path='../../../desktop/components/model/MyCoReDesktopToolbarModel.ts' />
-namespace mycore.viewer.model {
-    export class MyCoReFrameToolbarModel extends model.MyCoReDesktopToolbarModel {
-        public maximizeViewerToolbarButton: mycore.viewer.widgets.toolbar.ToolbarButton;
 
-        constructor() {
-            super('MyCoReFrameToolbar');
+import {MyCoReDesktopToolbarModel} from "../../../desktop/components/model/MyCoReDesktopToolbarModel";
+import {ToolbarButton} from "../../../base/widgets/toolbar/model/ToolbarButton";
+import {ToolbarGroup} from "../../../base/widgets/toolbar/model/ToolbarGroup";
+
+export class MyCoReFrameToolbarModel extends MyCoReDesktopToolbarModel {
+    public maximizeViewerToolbarButton: ToolbarButton;
+
+    constructor() {
+        super('MyCoReFrameToolbar');
+    }
+
+
+    public addComponents(): void {
+        this.addGroup(this._sidebarControllGroup);
+        this.addGroup(this._zoomControllGroup);
+        this.addGroup(this._imageChangeControllGroup);
+
+        //this.addGroup(this._layoutControllGroup);
+        //this.addGroup(this._actionControllGroup);
+        const logoGroup = this.getGroup('LogoGroup');
+        if (typeof logoGroup !== 'undefined') {
+            this.removeGroup(logoGroup);
         }
 
+        this.maximizeViewerToolbarButton = new ToolbarButton('MaximizeButton', '', 'maximize', 'expand');
+        const toolbarGroup = new ToolbarGroup('MaximizeToolbarGroup', 100, true);
 
-        public addComponents():void {
-            this.addGroup(this._sidebarControllGroup);
-            this.addGroup(this._zoomControllGroup);
-            this.addGroup(this._imageChangeControllGroup);
-
-            //this.addGroup(this._layoutControllGroup);
-            //this.addGroup(this._actionControllGroup);
-            const logoGroup = this.getGroup('LogoGroup');
-            if (typeof  logoGroup !== 'undefined') {
-                this.removeGroup(logoGroup);
-            }
-
-            this.maximizeViewerToolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton('MaximizeButton', '', 'maximize', 'expand');
-            const toolbarGroup = new mycore.viewer.widgets.toolbar.ToolbarGroup('MaximizeToolbarGroup', 100, true);
-
-            this.addGroup(toolbarGroup);
-            toolbarGroup.addComponent(this.maximizeViewerToolbarButton);
-
-
-        }
-
-        public shrink(){
-            this._sidebarControllGroup.removeComponent(this._sidebarControllDropdownButton);
-            this.removeGroup(this._sidebarControllGroup);
-            if (viewerDeviceSupportTouch) {
-                this._zoomControllGroup.removeComponent(this._zoomInButton);
-                this._zoomControllGroup.removeComponent(this._zoomOutButton);
-                this._zoomControllGroup.removeComponent(this._rotateButton);
-            }
-        }
+        this.addGroup(toolbarGroup);
+        toolbarGroup.addComponent(this.maximizeViewerToolbarButton);
 
 
     }
+
+    public shrink() {
+        this._sidebarControllGroup.removeComponent(this._sidebarControllDropdownButton);
+        this.removeGroup(this._sidebarControllGroup);
+
+    }
+
 }
+

@@ -16,4 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoReTEILayerProvider.ts" />
+
+import {addViewerComponent} from "../base/Utils";
+import {MyCoReTEILayerProvider} from "./components/MyCoReTEILayerProvider";
+
+addViewerComponent(MyCoReTEILayerProvider);

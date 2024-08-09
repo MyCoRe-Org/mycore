@@ -16,16 +16,18 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.components.events {
+import {MyCoReImageViewerEvent} from "../../../base/components/events/MyCoReImageViewerEvent";
+import {ViewerComponent} from "../../../base/components/ViewerComponent";
+import {AltoFile} from "../../widgets/alto/AltoFile";
 
-    export class RequestAltoModelEvent extends MyCoReImageViewerEvent {
+export class RequestAltoModelEvent extends MyCoReImageViewerEvent {
 
-        constructor(component:ViewerComponent,
-                    public _href:string,
-                    public _onResolve:( imgName:string, altoName:string, altoContainer:widgets.alto.AltoFile)=> void) {
-            super(component, RequestAltoModelEvent.TYPE);
-        }
-
-        public static TYPE:string = "RequestAltoModelEvent";
+    constructor(component: ViewerComponent,
+                public _href: string,
+                public _onResolve: (imgName: string, altoName: string, altoContainer: AltoFile) => void) {
+        super(component, RequestAltoModelEvent.TYPE);
     }
+
+    public static TYPE: string = "RequestAltoModelEvent";
 }
+

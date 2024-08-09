@@ -8,14 +8,16 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<script src="/classes/META-INF/resources/modules/iview2/js/iview-client-base.js"></script>
-<script src="/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.js"></script>
-<script src="/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js"></script>
+<script type="module" src="/classes/META-INF/resources/modules/iview2/js/iview-client-base.es.js"></script>
+<script type="module" src="/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.es.js"></script>
+<script type="module" src="/classes/META-INF/resources/modules/iview2/js/iview-client-mets.es.js"></script>
 <link href="/classes/META-INF/resources/modules/iview2/css/default.css" type="text/css"
 	rel="stylesheet">
 
-<script>
-    window.onload = function() {
+<script type="module">
+	import {MyCoReViewer} from "/classes/META-INF/resources/modules/iview2/js/iview-client-base.es.js";
+
+	window.onload = function() {
 	/**
 	 *  location: string;
 	 *  imageXmlPath: string;
@@ -23,7 +25,7 @@
 	 *  startImage: string;
 	 * @type {mycore.iview.imageviewer.MyCoReViewer}
 	 */
-	window["viewer"] = new mycore.viewer.MyCoReViewer(jQuery("body"), {
+	window["viewer"] = new MyCoReViewer(jQuery("body"), {
 	    mobile : false,
 	    doctype : "mets",
 	    metsURL : "{$name}/mets.xml",

@@ -16,15 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../../definitions/jquery.d.ts" />
+export interface TextInputView {
+    updateValue(value: string): void;
 
-namespace mycore.viewer.widgets.toolbar {
+    updatePlaceholder(placeHolder: string): void;
 
-    export interface TextInputView {
-        updateValue(value: string): void;
-        updatePlaceholder(placeHolder:string):void;
-        getValue():string;
-        getElement(): JQuery;
-        onChange:()=>void;
-    }
+    getValue(): string;
+
+    getElement(): JQuery;
+
+    onChange: () => void;
 }
+

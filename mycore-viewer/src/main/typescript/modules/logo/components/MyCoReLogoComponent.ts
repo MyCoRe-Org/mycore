@@ -1,4 +1,3 @@
-
 /*
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -17,52 +16,58 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.components {
 
-    export interface LogoSettings extends MyCoReViewerSettings{
-        logoURL: string
+import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+import {ViewerComponent} from "../../base/components/ViewerComponent";
+import {ViewerEvent} from "../../base/widgets/events/ViewerEvent";
+import {ProvideToolbarModelEvent} from "../../base/components/events/ProvideToolbarModelEvent";
+import {ToolbarImage} from "../../base/widgets/toolbar/model/ToolbarImage";
+import {ToolbarGroup} from "../../base/widgets/toolbar/model/ToolbarGroup";
+import {WaitForEvent} from "../../base/components/events/WaitForEvent";
+
+export interface LogoSettings extends MyCoReViewerSettings {
+    logoURL: string
+}
+
+/**
+ * A Logo component wich inserts a application specific logo to the Toolbar
+ * 1. if you implement your own iview configuration you can add this with setProperty('logoUrl', url);
+ * 2. if you use the default configuration you can add MCR.Module-iview2.logoUrl to mycore properties
+ */
+export class MyCoReLogoComponent extends ViewerComponent {
+
+    constructor(private _settings: LogoSettings) {
+        super();
     }
 
-    /**
-     * A Logo component wich inserts a application specific logo to the Toolbar
-     * 1. if you implement your own iview configuration you can add this with setProperty('logoUrl', url);
-     * 2. if you use the default configuration you can add MCR.Module-iview2.logoUrl to mycore properties
-     */
-    export class MyCoReLogoComponent extends ViewerComponent {
+    public handle(e: ViewerEvent): void {
+        if (e.type == ProvideToolbarModelEvent.TYPE && !this._settings.mobile) {
+            if (this._settings.logoURL) {
+                const logoUrl = this._settings.logoURL;
 
-        constructor(private _settings: LogoSettings) {
-            super();
-        }
+                const ptme = e as ProvideToolbarModelEvent;
 
-        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
-            if (e.type == events.ProvideToolbarModelEvent.TYPE && !this._settings.mobile) {
-                if (this._settings.logoURL) {
-                    var logoUrl = this._settings.logoURL;
+                const logoGroup = new ToolbarGroup('LogoGroup', 90, true);
+                const logo = new ToolbarImage('ToolbarImage', logoUrl);
 
-                    var ptme = <events.ProvideToolbarModelEvent>e;
+                logoGroup.addComponent(logo);
 
-                    const logoGroup = new widgets.toolbar.ToolbarGroup('LogoGroup', 90, true);
-                    var logo = new widgets.toolbar.ToolbarImage('ToolbarImage', logoUrl);
-
-                    logoGroup.addComponent(logo);
-
-                    ptme.model.addGroup(logoGroup);
-                }
+                ptme.model.addGroup(logoGroup);
             }
         }
+    }
 
-        public get handlesEvents(): string[] {
-            var handleEvents: Array<string> = new Array<string>();
-            handleEvents.push(events.ProvideToolbarModelEvent.TYPE);
-            return handleEvents;
-        }
+    public get handlesEvents(): string[] {
+        const handleEvents: Array<string> = new Array<string>();
+        handleEvents.push(ProvideToolbarModelEvent.TYPE);
+        return handleEvents;
+    }
 
 
-        public init() {
-            this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
-        }
-
+    public init() {
+        this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
     }
 
 }
-addViewerComponent(mycore.viewer.components.MyCoReLogoComponent);
+
+

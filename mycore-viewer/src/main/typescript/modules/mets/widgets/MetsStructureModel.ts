@@ -16,21 +16,25 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.mets {
+import {StructureModel} from "../../base/components/model/StructureModel";
+import {MyCoReMap} from "../../base/Utils";
+import {StructureChapter} from "../../base/components/model/StructureChapter";
+import {StructureImage} from "../../base/components/model/StructureImage";
 
-    export class MetsStructureModel extends model.StructureModel {
 
-        constructor(
-                public smLinkMap: MyCoReMap<string, Array<string>>,
-                _rootChapter:model.StructureChapter,
-                _imageList:Array<model.StructureImage>,
-                _chapterToImageMap:MyCoReMap<string,model.StructureImage>,
-                _imageToChapterMap:MyCoReMap<string,model.StructureChapter>,
-                _imageHrefImageMap:MyCoReMap<string, model.StructureImage>,
-                private altoPresent:boolean) {
-            super(_rootChapter, _imageList, _chapterToImageMap, _imageToChapterMap, _imageHrefImageMap, altoPresent);
-        }
+export class MetsStructureModel extends StructureModel {
 
+    constructor(
+        public smLinkMap: MyCoReMap<string, Array<string>>,
+        _rootChapter: StructureChapter,
+        _imageList: Array<StructureImage>,
+        _chapterToImageMap: MyCoReMap<string, StructureImage>,
+        _imageToChapterMap: MyCoReMap<string, StructureChapter>,
+        _imageHrefImageMap: MyCoReMap<string, StructureImage>,
+        private altoPresent: boolean) {
+        super(_rootChapter, _imageList, _chapterToImageMap, _imageToChapterMap, _imageHrefImageMap, altoPresent);
     }
 
 }
+
+

@@ -16,4 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoReEpubDisplayComponent.ts" />
+import {addViewerComponent} from "../base/Utils";
+import {MyCoReEpubDisplayComponent} from "./components/MyCoReEpubDisplayComponent";
+
+addViewerComponent(MyCoReEpubDisplayComponent);

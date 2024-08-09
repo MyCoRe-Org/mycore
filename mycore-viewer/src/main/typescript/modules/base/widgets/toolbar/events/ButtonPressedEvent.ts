@@ -16,20 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../events/ViewerEvent.ts" />
-/// <reference path="../model/ToolbarButton.ts" />
+import {DefaultViewerEvent} from "../../events/ViewerEvent";
+import {ToolbarButton} from "../model/ToolbarButton";
 
-namespace mycore.viewer.widgets.toolbar.events {
-    export class ButtonPressedEvent extends mycore.viewer.widgets.events.DefaultViewerEvent {
-        constructor(private _button:ToolbarButton, type = ButtonPressedEvent.TYPE) {
-            super(type);
-        }
-
-        public static TYPE:string = "ButtonPressedEvent";
-
-        public get button() {
-            return this._button;
-        }
+export class ButtonPressedEvent extends DefaultViewerEvent {
+    constructor(private _button: ToolbarButton, type = ButtonPressedEvent.TYPE) {
+        super(type);
     }
 
+    public static TYPE: string = "ButtonPressedEvent";
+
+    public get button() {
+        return this._button;
+    }
 }
+
+

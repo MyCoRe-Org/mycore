@@ -1,4 +1,3 @@
-
 /*
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -17,36 +16,35 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.alto {
 
-    export class AltoStyle {
-        // style of alto
+export class AltoStyle {
+    // style of alto
 
-        //Attribute der Elemente (die hier genannten MÜSSEN vorliegen)
+    //Attribute der Elemente (die hier genannten MÜSSEN vorliegen)
 
-        constructor(private _id: string,
-                    private _fontFamily: string,
-                    private _fontSize: number,
-                    private _fontStyle: string
-        ){
-        }
+    constructor(private _id: string,
+                private _fontFamily: string,
+                private _fontSize: number,
+                private _fontStyle: string
+    ) {
+    }
 
-        public getId(): string {
-            return this._id;
-        }
+    public getId(): string {
+        return this._id;
+    }
 
-        public getFontFamily(): string {
-            return this._fontFamily;
-        }
+    public getFontFamily(): string {
+        return this._fontFamily;
+    }
 
-        public getFontSize(): number {
-            return this._fontSize;
-        }
+    public getFontSize(): number {
+        return this._fontSize;
+    }
 
-        public getFontStyle(): string {
-            return this._fontStyle;
-        }
-
+    public getFontStyle(): string {
+        return this._fontStyle;
     }
 
 }
+
+

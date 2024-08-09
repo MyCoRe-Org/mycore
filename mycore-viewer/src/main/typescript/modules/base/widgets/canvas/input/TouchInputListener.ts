@@ -16,21 +16,26 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="TouchSession.ts" />
-/// <reference path="TouchMove.ts" />
 
-namespace mycore.viewer.widgets.canvas {
+import {TouchSession} from "./TouchSession";
 
-    export interface TouchInputListener {
-        touchStart( session: TouchSession ): void;
-        touchMove( session: TouchSession ): void;
-        touchEnd( session: TouchSession ): void;
-    }
+export interface TouchInputListener {
+    touchStart(session: TouchSession): void;
 
-    export abstract class TouchInputAdapter implements TouchInputListener {
-        touchStart( session: TouchSession ): void { }
-        touchMove( session: TouchSession ): void { }
-        touchEnd( session: TouchSession ): void { }
-    }
+    touchMove(session: TouchSession): void;
 
+    touchEnd(session: TouchSession): void;
 }
+
+export abstract class TouchInputAdapter implements TouchInputListener {
+    touchStart(session: TouchSession): void {
+    }
+
+    touchMove(session: TouchSession): void {
+    }
+
+    touchEnd(session: TouchSession): void {
+    }
+}
+
+

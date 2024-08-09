@@ -18,7 +18,11 @@
 
 /// <reference path="model/MyCoReDesktopToolbarModel.ts" />
 
-namespace mycore.viewer.components {
+import {ViewerComponent} from "../../base/components/ViewerComponent";
+import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+import {ProvideToolbarModelEvent} from "../../base/components/events/ProvideToolbarModelEvent";
+import {MyCoReDesktopToolbarModel} from "./model/MyCoReDesktopToolbarModel";
+
 
     export class MyCoReDesktopToolbarProviderComponent extends ViewerComponent {
 
@@ -31,11 +35,10 @@ namespace mycore.viewer.components {
         }
 
         public init() {
-            this.trigger(new events.ProvideToolbarModelEvent(
-                this, new mycore.viewer.model.MyCoReDesktopToolbarModel()));
+            this.trigger(new ProvideToolbarModelEvent(
+                this, new MyCoReDesktopToolbarModel()));
         }
     }
 
-}
 
-addViewerComponent(mycore.viewer.components.MyCoReDesktopToolbarProviderComponent);
+

@@ -16,28 +16,32 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MetsStructureModel.ts" />
-/// <reference path="MetsStructureBuilder.ts" />
+import {GivenViewerPromise, ViewerPromise} from "../../base/Utils";
+import {StructureModel} from "../../base/components/model/StructureModel";
+import {MetsStructureBuilder} from "./MetsStructureBuilder";
 
-namespace mycore.viewer.widgets.mets {
-    export class IviewMetsProvider {
 
-        public static loadModel(metsDocumentLocation:string, tilePathBuilder:(href:string)=>string):GivenViewerPromise<{model:model.StructureModel; document:Document}, any> {
-            let promise = new ViewerPromise<{model:model.StructureModel; document:Document}, any>();
-            let settings = {
-                url: metsDocumentLocation,
-                success: function (response) {
-                    let builder = new MetsStructureBuilder(response, tilePathBuilder);
-                    promise.resolve({model : builder.processMets(), document : response});
-                },
-                error: function (request, status, exception) {
-                    promise.reject(exception);
-                }
-            };
-            jQuery.ajax(settings);
-            return promise;
-        }
+export class IviewMetsProvider {
 
+    public static loadModel(metsDocumentLocation: string, tilePathBuilder: (href: string) => string): GivenViewerPromise<{
+        document: Document;
+        model: StructureModel
+    }, any> {
+        let promise = new ViewerPromise<{ model: StructureModel; document: Document }, any>();
+        let settings = {
+            url: metsDocumentLocation,
+            success: function (response) {
+                let builder = new MetsStructureBuilder(response, tilePathBuilder);
+                promise.resolve({model: builder.processMets(), document: response});
+            },
+            error: function (request, status, exception) {
+                promise.reject(exception);
+            }
+        };
+        jQuery.ajax(settings);
+        return promise;
     }
 
 }
+
+

@@ -16,8 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.components {
-    export interface TEISettings extends MyCoReViewerSettings {
-        teiStylesheet: string;
-    }
+import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+
+export interface TEISettings extends MyCoReViewerSettings {
+    teiStylesheet: string;
 }
+

@@ -16,14 +16,13 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.chaptertree {
+export interface ChapterTreeChapter {
+    parent: ChapterTreeChapter;
+    id: string;
+    label: string;
+    chapter: Array<ChapterTreeChapter>;
 
-    export interface ChapterTreeChapter {
-        parent: ChapterTreeChapter;
-        id: string;
-        label: string;
-        chapter: Array<ChapterTreeChapter>;
-        resolveDestination(callbackFn: (targetId) => void): void;
-    }
-
+    resolveDestination(callbackFn: (targetId) => void): void;
 }
+
+

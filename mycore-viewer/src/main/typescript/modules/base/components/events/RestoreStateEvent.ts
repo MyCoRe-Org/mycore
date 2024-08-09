@@ -16,17 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
-/// <reference path="../../Utils.ts" />
 
-namespace mycore.viewer.components.events {
-    export class RestoreStateEvent extends MyCoReImageViewerEvent {
-        constructor(component: ViewerComponent,public restoredState:MyCoReMap<string,string>) {
-            super(component, RestoreStateEvent.TYPE);
-        }
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {ViewerComponent} from "../ViewerComponent";
+import {MyCoReMap} from "../../Utils";
 
-        public static TYPE:string = "RestoreStateEvent";
-
+export class RestoreStateEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent, public restoredState: MyCoReMap<string, string>) {
+        super(component, RestoreStateEvent.TYPE);
     }
+
+    public static TYPE: string = "RestoreStateEvent";
+
 }
+

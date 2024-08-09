@@ -16,16 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
-/// <reference path="../../widgets/canvas/input/DesktopInputListener.ts" />
+import {ViewerComponent} from "../ViewerComponent";
+import {DesktopInputListener} from "../../widgets/canvas/input/DesktopInputListener";
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
 
-namespace mycore.viewer.components.events {
-    export class RequestDesktopInputEvent extends MyCoReImageViewerEvent {
-        constructor(component:ViewerComponent, public listener:widgets.canvas.DesktopInputListener) {
-            super(component, RequestDesktopInputEvent.TYPE);
-        }
-
-        public static TYPE:string = "RequestDesktopInputEvent";
+export class RequestDesktopInputEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent, public listener: DesktopInputListener) {
+        super(component, RequestDesktopInputEvent.TYPE);
     }
+
+    public static TYPE: string = "RequestDesktopInputEvent";
 }
+

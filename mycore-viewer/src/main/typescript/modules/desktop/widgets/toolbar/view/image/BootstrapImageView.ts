@@ -16,25 +16,26 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.toolbar {
 
-    export class BootstrapImageView implements ImageView {
+import {ImageView} from "../../../../../base/widgets/toolbar/view/image/ImageView";
 
-        constructor(id: string) {
-            this._element = jQuery("<img />");
-            this._element.attr("data-id", id);
-        }
+export class BootstrapImageView implements ImageView {
 
-        private _element: JQuery;
+    constructor(id: string) {
+        this._element = jQuery("<img />");
+        this._element.attr("data-id", id);
+    }
 
-        updateHref(href: string): void {
-            this._element.attr("src", href);
-        }
-        
-        getElement(): JQuery {
-            return this._element;
-        }
+    private _element: JQuery;
 
+    updateHref(href: string): void {
+        this._element.attr("src", href);
+    }
+
+    getElement(): JQuery {
+        return this._element;
     }
 
 }
+
+

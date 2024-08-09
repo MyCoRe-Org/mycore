@@ -16,10 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.components {
-    export interface IIIFSettings extends MyCoReViewerSettings {
-        manifestURL: string;
-        imageAPIURL: string;
-        pageRange: number;
-    }
+import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+
+export interface IIIFSettings extends MyCoReViewerSettings {
+    manifestURL: string;
+    imageAPIURL: string;
+    pageRange: number;
 }
+

@@ -37,8 +37,7 @@ public class MCRViewerPDFConfiguration extends MCRViewerBaseConfiguration {
         setProperty("pdfProviderURL", pdfProviderURL);
         setProperty("pdfWorkerURL", pdfWorkerLocation);
         // script
-        addLocalScript("lib/pdf.js", false);
-        addLocalScript("iview-client-pdf.js", true, isDebugMode(request));
+        addLocalScript("iview-client-pdf.es.js", false, true, isDebugMode(request));
 
         return this;
     }

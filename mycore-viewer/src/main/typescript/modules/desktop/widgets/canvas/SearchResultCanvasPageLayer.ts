@@ -16,86 +16,88 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.canvas {
+import {MyCoReMap, Rect, Size2D} from "../../../base/Utils";
+import {CanvasPageLayer} from "../../../base/widgets/canvas/CanvasPageLayer";
 
-    export class SearchResultCanvasPageLayer implements widgets.canvas.CanvasPageLayer {
 
-        private selected: Array<PageArea> = [];
-        private areas: MyCoReMap<string, Array<PageArea>> = new MyCoReMap<string, Array<PageArea>>();
+export class SearchResultCanvasPageLayer implements CanvasPageLayer {
 
-        public select(page:string, rect:Rect) {
-            this.selected.push(new PageArea(page, rect));
-        }
+    private selected: Array<PageArea> = [];
+    private areas: MyCoReMap<string, Array<PageArea>> = new MyCoReMap<string, Array<PageArea>>();
 
-        public add(page:string, rect:Rect) {
-            let pageAreas:Array<PageArea> = this.areas.get(page);
-            if (pageAreas == null) {
-                pageAreas = new Array<PageArea>();
-                this.areas.set(page, pageAreas);
-            }
-            pageAreas.push(new PageArea(page, rect));
-        }
-
-        public clear():void {
-            this.selected = [];
-            this.areas.clear();
-        }
-
-        public clearSelected(): void {
-            this.selected = [];
-        }
-
-        public draw(ctx:CanvasRenderingContext2D, id:string, pageSize:Size2D, drawOnHtml:boolean = false) {
-            this.selected.forEach(area => {
-                if (this.selected != null && id === area.page) {
-                    this.drawWithPadding(ctx, [area], pageSize);
-                }
-            });
-            this.areas.hasThen(id, areas => {
-                this.drawWords(ctx, areas);
-            });
-        }
-
-        private drawWithPadding(ctx:CanvasRenderingContext2D, pageAreas:Array<PageArea>, pageSize:Size2D) {
-            ctx.save();
-            {
-                ctx.strokeStyle = "rgba(244, 244, 66, 0.8)";
-                let lineWidth = Math.max(pageSize.width / 200, pageSize.height / 200) * window.devicePixelRatio;
-                ctx.lineWidth = lineWidth;
-                ctx.beginPath();
-                pageAreas.forEach(word => {
-                    let x = word.rect.getX() - lineWidth / 2;
-                    let y = word.rect.getY() - lineWidth / 2;
-                    let width = word.rect.getWidth() + lineWidth;
-                    let height = word.rect.getHeight() + lineWidth;
-                    ctx.rect(x, y, width, height);
-                });
-                ctx.closePath();
-                ctx.stroke();
-            }
-            ctx.restore();
-        }
-
-        private drawWords(ctx:CanvasRenderingContext2D, pageAreas:Array<PageArea>) {
-            ctx.save();
-            {
-                ctx.fillStyle = "rgba(179,216,253,0.6)";
-                ctx.beginPath();
-                pageAreas.forEach(area => {
-                    ctx.rect(area.rect.getX(), area.rect.getY(), area.rect.getWidth(), area.rect.getHeight());
-                });
-                ctx.closePath();
-                ctx.fill();
-            }
-            ctx.restore();
-        }
+    public select(page: string, rect: Rect) {
+        this.selected.push(new PageArea(page, rect));
     }
 
-    class PageArea {
-        constructor(
-            public page: string,
-            public rect: Rect
-        ) {
+    public add(page: string, rect: Rect) {
+        let pageAreas: Array<PageArea> = this.areas.get(page);
+        if (pageAreas == null) {
+            pageAreas = new Array<PageArea>();
+            this.areas.set(page, pageAreas);
         }
+        pageAreas.push(new PageArea(page, rect));
+    }
+
+    public clear(): void {
+        this.selected = [];
+        this.areas.clear();
+    }
+
+    public clearSelected(): void {
+        this.selected = [];
+    }
+
+    public draw(ctx: CanvasRenderingContext2D, id: string, pageSize: Size2D, drawOnHtml: boolean = false) {
+        this.selected.forEach(area => {
+            if (this.selected != null && id === area.page) {
+                this.drawWithPadding(ctx, [area], pageSize);
+            }
+        });
+        this.areas.hasThen(id, areas => {
+            this.drawWords(ctx, areas);
+        });
+    }
+
+    private drawWithPadding(ctx: CanvasRenderingContext2D, pageAreas: Array<PageArea>, pageSize: Size2D) {
+        ctx.save();
+        {
+            ctx.strokeStyle = "rgba(244, 244, 66, 0.8)";
+            let lineWidth = Math.max(pageSize.width / 200, pageSize.height / 200) * window.devicePixelRatio;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+            pageAreas.forEach(word => {
+                let x = word.rect.getX() - lineWidth / 2;
+                let y = word.rect.getY() - lineWidth / 2;
+                let width = word.rect.getWidth() + lineWidth;
+                let height = word.rect.getHeight() + lineWidth;
+                ctx.rect(x, y, width, height);
+            });
+            ctx.closePath();
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    private drawWords(ctx: CanvasRenderingContext2D, pageAreas: Array<PageArea>) {
+        ctx.save();
+        {
+            ctx.fillStyle = "rgba(179,216,253,0.6)";
+            ctx.beginPath();
+            pageAreas.forEach(area => {
+                ctx.rect(area.rect.getX(), area.rect.getY(), area.rect.getWidth(), area.rect.getHeight());
+            });
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
     }
 }
+
+class PageArea {
+    constructor(
+        public page: string,
+        public rect: Rect
+    ) {
+    }
+}
+

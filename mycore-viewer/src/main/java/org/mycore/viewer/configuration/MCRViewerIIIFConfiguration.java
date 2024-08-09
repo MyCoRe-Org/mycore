@@ -41,8 +41,8 @@ public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
 
         // script
         final boolean debugParameterSet = isDebugMode(request);
-        addLocalScript("iview-client-iiif.js", true, debugParameterSet);
-        addLocalScript("lib/manifesto/manifesto.js", true, debugParameterSet);
+        addLocalScript("iview-client-iiif.es.js", false, true, debugParameterSet);
+        // addLocalScript("lib/manifesto/manifesto.js", true, false, debugParameterSet);
 
         return this;
     }
