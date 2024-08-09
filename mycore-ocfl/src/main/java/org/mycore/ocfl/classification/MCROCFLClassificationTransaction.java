@@ -16,13 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+package org.mycore.ocfl.classification;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,13 +31,18 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
-import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
  * @author Thomas Scheffler (yagee)
  */
-public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction {
+public class MCROCFLClassificationTransaction implements MCRPersistenceTransaction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -59,7 +58,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     private boolean active;
 
-    public MCROCFLPersistenceTransaction() {
+    public MCROCFLClassificationTransaction() {
         rollbackOnly = false;
         active = false;
     }
@@ -172,7 +171,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
      * @param id The ID of the Classification
      * @param type 'A' for created, 'M' for modified, 'D' deleted
      */
-    public static void addClassficationEvent(MCRCategoryID id, char type) {
+    public static void addClassificationEvent(MCRCategoryID id, char type) {
         if (!Objects.requireNonNull(id).isRootID()) {
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }
