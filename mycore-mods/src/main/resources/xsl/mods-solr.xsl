@@ -225,9 +225,18 @@
     </xsl:for-each>
     <xsl:for-each select="mods:note">
       <xsl:variable name="type" select="@type" />
-      <field name="mods.note.{$type}">
-        <xsl:value-of select="text()" />
-      </field>
+      <xsl:choose>
+        <xsl:when test="string-length($type) &gt; 0">
+          <field name="mods.note.{$type}">
+            <xsl:value-of select="text()" />
+          </field>
+        </xsl:when>
+        <xsl:otherwise>
+          <field name="mods.note">
+            <xsl:value-of select="text()" />
+          </field>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
   </xsl:template>
   <xsl:template match="mods:name" mode="childdoc">
