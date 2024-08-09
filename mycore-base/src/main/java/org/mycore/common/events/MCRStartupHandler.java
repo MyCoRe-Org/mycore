@@ -18,18 +18,29 @@
 
 package org.mycore.common.events;
 
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
+import org.mycore.common.log.MCRTableMessage;
 import org.mycore.common.xml.MCRURIResolver;
 
 import jakarta.servlet.ServletContext;
+
+import static jakarta.servlet.ServletContext.ORDERED_LIBS;
+import static org.mycore.common.config.MCRRuntimeComponentDetector.ComponentOrder.LOWEST_PRIORITY_FIRST;
 
 /**
  * Initializes classes that implement {@link AutoExecutable} interface that are defined via
@@ -56,24 +67,69 @@ public class MCRStartupHandler {
         isWebApp = servletContext != null;
         //initialize ClassLoader here, so it can be used later reliably.
         MCRClassTools.updateClassLoader();
+
         ClassLoader resourceClassLoader = MCRClassTools.getClassLoader();
         LOGGER.info("The following ClassLoader is used: {}", resourceClassLoader);
-        LOGGER.info("I have these components for you: {}", MCRRuntimeComponentDetector.getAllComponents());
-        LOGGER.info("I have these mycore components for you: {}", MCRRuntimeComponentDetector.getMyCoReComponents());
-        LOGGER.info("I have these app modules for you: {}", MCRRuntimeComponentDetector.getApplicationModules());
+
+        MCRTableMessage<MCRComponent> componentTable = new MCRTableMessage<>(
+            new MCRTableMessage.Column<>("Type", MCRStartupHandler::toType),
+            new MCRTableMessage.Column<>("Name", MCRComponent::getFullName),
+            new MCRTableMessage.Column<>("Priority", MCRComponent::getPriority),
+            new MCRTableMessage.Column<>("Version", MCRStartupHandler::toVersion),
+            new MCRTableMessage.Column<>("Build time", MCRStartupHandler::toManifestModificationDate),
+            new MCRTableMessage.Column<>("Location", MCRStartupHandler::toJarFile));
+        MCRRuntimeComponentDetector.getAllComponents(LOWEST_PRIORITY_FIRST).forEach(componentTable::add);
+        LOGGER.info(componentTable.logMessage("Detected components:"));
+
         if (servletContext != null) {
-            LOGGER.info("Library order: {}", servletContext.getAttribute(ServletContext.ORDERED_LIBS));
+            LOGGER.info("Library order: {}", servletContext.getAttribute(ORDERED_LIBS));
         }
 
-        MCRConfiguration2.getString("MCR.Startup.Class")
+        MCRTableMessage<AutoExecutable> executableTable = new MCRTableMessage<>(
+            new MCRTableMessage.Column<>("Name", AutoExecutable::getName),
+            new MCRTableMessage.Column<>("Priority", AutoExecutable::getPriority),
+            new MCRTableMessage.Column<>("Class", executable -> executable.getClass().getName()));
+        List<AutoExecutable> executables = MCRConfiguration2.getString("MCR.Startup.Class")
             .map(MCRConfiguration2::splitValue)
             .orElseGet(Stream::empty)
             .map(MCRStartupHandler::getAutoExecutable)
-            //reverse ordering: highest priority first
-            .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))
-            .forEachOrdered(autoExecutable -> startExecutable(servletContext, autoExecutable));
+            .sorted()
+            .peek(executableTable::add)
+            .toList();
+        LOGGER.info(executableTable.logMessage("Detected auto executables:"));
+        executables.forEach(autoExecutable -> startExecutable(servletContext, autoExecutable));
+        
         //initialize MCRURIResolver
         MCRURIResolver.init(servletContext);
+    }
+
+    private static String toType(MCRComponent component) {
+        if (component.isMyCoReBaseComponent()) {
+            return "MyCoRe base component";
+        } else if (component.isMyCoReComponent()) {
+            return "MyCoRe component";
+        } else {
+            return "Application module";
+        }
+    }
+
+    private static Object toVersion(MCRComponent component) {
+        String version = component.getManifestMainAttribute("Implementation-Version");
+        return version != null ? version : "n/a";
+    }
+
+    private static Object toJarFile(MCRComponent component) {
+        return component.getJarFile().getAbsolutePath();
+    }
+
+    private static Object toManifestModificationDate(MCRComponent component) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        try (JarFile jarFile = new JarFile(component.getJarFile())) {
+            return formatter.format(jarFile.getEntry("META-INF/MANIFEST.MF").getLastModifiedTime()
+                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        } catch (IOException e) {
+            return "n/a";
+        }
     }
 
     public static boolean isWebApp() {
@@ -103,7 +159,7 @@ public class MCRStartupHandler {
         }
     }
 
-    public interface AutoExecutable {
+    public interface AutoExecutable extends Comparable<AutoExecutable> {
         /**
          * returns a name to display on start-up.
          */
@@ -118,5 +174,11 @@ public class MCRStartupHandler {
          * This method get executed by {@link MCRStartupHandler#startUp(ServletContext)}
          */
         void startUp(ServletContext servletContext);
+
+        @Override
+        default int compareTo(AutoExecutable other) {
+            return Integer.compare(other.getPriority(), getPriority());
+        }
+        
     }
 }
