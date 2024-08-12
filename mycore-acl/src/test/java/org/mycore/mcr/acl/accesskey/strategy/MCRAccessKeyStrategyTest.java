@@ -20,19 +20,21 @@ package org.mycore.mcr.acl.accesskey.strategy;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRSessionMgr;
+import org.mockito.Mockito;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyConfig;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeySessionService;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTestCase;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
-import org.mycore.user2.MCRUser;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyUserService;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 
 public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
@@ -40,228 +42,211 @@ public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
     private static final String WRITE_VALUE = "blu";
 
+    private MCRAccessKeyUserService userServiceMock = null;
+
+    private MCRAccessKeySessionService sessionServiceMock = null;
+
     private MCRAccessKeyStrategy strategy;
 
-    private MCRObjectID objectId = null;
+    private MCRObject object;
 
-    private MCRObjectID derivateId = null;
+    private MCRDerivate derivate;
 
-    @Before
     @Override
+    @Before
     public void setUp() throws Exception {
         super.setUp();
-        objectId = getObject().getId();
-        derivateId = getDerivate().getId();
-        strategy = new MCRAccessKeyStrategy();
+        object = createObject();
+        MCRMetadataManager.create(object);
+        derivate = createDerivate(object.getId());
+        MCRMetadataManager.create(derivate);
+        userServiceMock = Mockito.mock(MCRAccessKeyUserService.class);
+        sessionServiceMock = Mockito.mock(MCRAccessKeySessionService.class);
+        strategy = new MCRAccessKeyStrategy(userServiceMock, sessionServiceMock);
+
     }
 
     @Test
-    public void testDefaultPermission() {
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
-
-        final MCRAccessKey readKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(objectId, readKey);
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(objectId, writeKey);
-
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    public void testCheckPermission_noPermission() {
+        assertFalse(strategy.checkPermission(object.getId().toString(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkPermission(object.getId().toString(), MCRAccessManager.PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(derivate.getId().toString(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkPermission(derivate.getId().toString(), MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void testSessionFilter() {
-        final MCRAccessKey readKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(objectId, readKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, READ_VALUE);
-
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(objectId, writeKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, WRITE_VALUE);
-
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-
-        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read");
-
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-
-        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "");
-
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-
-        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "writedb");
-
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
+    public void testCheckPermission_noObjectReference() {
+        assertFalse(strategy.checkPermission("noObjectId", MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkPermission("noObjectId", MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void testObjectFilter() {
-        final MCRAccessKey derivateKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(derivateId, derivateKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(derivateId, READ_VALUE);
-
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-
-        final MCRAccessKey objectKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(objectId, objectKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, READ_VALUE);
-
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-
-        MCRConfiguration2.set(ALLOWED_OBJECT_TYPES_PROP, "object");
-
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-
-        MCRConfiguration2.set(ALLOWED_OBJECT_TYPES_PROP, "");
-
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-
-        MCRConfiguration2.set(ALLOWED_OBJECT_TYPES_PROP, "derivate");
-
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
+    public void testCheckObjectPermission_session_readKey() {
+        final MCRAccessKeyDto readAccessKeyDto = new MCRAccessKeyDto();
+        readAccessKeyDto.setReference(object.getId().toString());
+        readAccessKeyDto.setValue(READ_VALUE);
+        readAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_READ);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(readAccessKeyDto);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read,writedb");
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void testPermissionInheritance() {
-        final MCRAccessKey readKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(derivateId, readKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(derivateId, READ_VALUE);
-
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
-
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(objectId, writeKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, WRITE_VALUE);
-
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    public void testCheckObjectPermission_session_writeKey() {
+        final MCRAccessKeyDto writeAccessKeyDto = new MCRAccessKeyDto();
+        writeAccessKeyDto.setReference(object.getId().toString());
+        writeAccessKeyDto.setValue(WRITE_VALUE);
+        writeAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeAccessKeyDto);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object");
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read,writedb");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void testObjectSession() {
-        final MCRAccessKey readKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(objectId, readKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, READ_VALUE);
-
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
-
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(objectId, writeKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, WRITE_VALUE);
-
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    public void testCheckObjectPermission_session_permissionFilter() {
+        final MCRAccessKeyDto writeAccessKeyDto = new MCRAccessKeyDto();
+        writeAccessKeyDto.setReference(object.getId().toString());
+        writeAccessKeyDto.setValue(READ_VALUE);
+        writeAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeAccessKeyDto);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_SESSION_PERMISSION_TYPES_PROP, "");
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object");
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read,writedb");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void testObjectUser() {
-        final MCRUser user = new MCRUser("junit");
-        MCRSessionMgr.getCurrentSession().setUserInformation(user);
-
-        final MCRAccessKey readKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(objectId, readKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, READ_VALUE);
-
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
-
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(objectId, writeKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, WRITE_VALUE);
-
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    public void testCheckObjectPermission_session_objectFilter() {
+        final MCRAccessKeyDto writeAccessKeyDto = new MCRAccessKeyDto();
+        writeAccessKeyDto.setReference(object.getId().toString());
+        writeAccessKeyDto.setValue(READ_VALUE);
+        writeAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeAccessKeyDto);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read,writedb");
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "");
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void testDerivateSession() {
-        final MCRAccessKey readKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(derivateId, readKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(derivateId, READ_VALUE);
-
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
-
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(derivateId, writeKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(derivateId, WRITE_VALUE);
-
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    public void testCheckObjectPermission_user_readKey() {
+        final MCRAccessKeyDto readAccessKeyDto = new MCRAccessKeyDto();
+        readAccessKeyDto.setReference(object.getId().toString());
+        readAccessKeyDto.setValue(READ_VALUE);
+        readAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_READ);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(readAccessKeyDto);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void testDerivateUser() {
-        MCRUser user = new MCRUser("junit");
-        MCRSessionMgr.getCurrentSession().setUserInformation(user);
-
-        final MCRAccessKey readKey = new MCRAccessKey(READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.createAccessKey(derivateId, readKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(derivateId, READ_VALUE);
-
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
-
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(derivateId, writeKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(derivateId, WRITE_VALUE);
-
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(objectId.toString(), PERMISSION_WRITE));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    public void testCheckObjectPermission_user_writeKey() {
+        final MCRAccessKeyDto writeAccessKeyDto = new MCRAccessKeyDto();
+        writeAccessKeyDto.setReference(object.getId().toString());
+        writeAccessKeyDto.setValue(WRITE_VALUE);
+        writeAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeAccessKeyDto);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
-    public void checkDominance() {
-        MCRUser user = new MCRUser("junit");
-        MCRSessionMgr.getCurrentSession().setUserInformation(user);
+    public void testCheckObjectPermission_user_objectFilter() {
+        final MCRAccessKeyDto writeAccessKeyDto = new MCRAccessKeyDto();
+        writeAccessKeyDto.setReference(object.getId().toString());
+        writeAccessKeyDto.setValue(READ_VALUE);
+        writeAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeAccessKeyDto);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "");
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
+    }
 
-        final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(derivateId, writeKey);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(derivateId, WRITE_VALUE);
-        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read");
+    @Test
+    public void testCheckDerivatePermission_user_inheritance() {
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_OBJECT_TYPES_PROP, "object,derivate");
+        final MCRAccessKeyDto readDerivateAccessKeyDto = new MCRAccessKeyDto();
+        readDerivateAccessKeyDto.setReference(derivate.getId().toString());
+        readDerivateAccessKeyDto.setValue(READ_VALUE);
+        readDerivateAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_READ);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(derivate.getId().toString()))
+            .thenReturn(readDerivateAccessKeyDto);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(derivate.getId().toString()))
+            .thenReturn(null);
+        assertTrue(strategy.checkDerivatePermission(derivate.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkDerivatePermission(derivate.getId(), MCRAccessManager.PERMISSION_WRITE));
+        final MCRAccessKeyDto writeObjectAccessKeyDto = new MCRAccessKeyDto();
+        writeObjectAccessKeyDto.setReference(object.getId().toString());
+        writeObjectAccessKeyDto.setValue(WRITE_VALUE);
+        writeObjectAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeObjectAccessKeyDto);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        assertTrue(strategy.checkDerivatePermission(derivate.getId(), MCRAccessManager.PERMISSION_READ));
+        assertTrue(strategy.checkDerivatePermission(derivate.getId(), MCRAccessManager.PERMISSION_WRITE));
+    }
 
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    @Test
+    public void testCheckObjectPermission_dominance() {
+        final MCRAccessKeyDto writeAccessKeyDto = new MCRAccessKeyDto();
+        writeAccessKeyDto.setReference(object.getId().toString());
+        writeAccessKeyDto.setValue(WRITE_VALUE);
+        writeAccessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        Mockito.when(sessionServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeAccessKeyDto);
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(null);
+        MCRConfiguration2.set(MCRAccessKeyConfig.ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read");
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertFalse(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
+        Mockito.when(userServiceMock.getActivatedAccessKeyForReference(object.getId().toString()))
+            .thenReturn(writeAccessKeyDto);
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_READ));
+        assertTrue(strategy.checkObjectPermission(object.getId(), MCRAccessManager.PERMISSION_WRITE));
+    }
 
-        final MCRAccessKey writeKey2 = new MCRAccessKey(READ_VALUE, PERMISSION_WRITE);
-        MCRAccessKeyManager.createAccessKey(derivateId, writeKey2);
-        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(derivateId, READ_VALUE);
-
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
-        assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
+    @After
+    public void teardown() throws Exception {
+        MCRMetadataManager.delete(derivate);
+        MCRMetadataManager.delete(object);
+        super.tearDown();
     }
 }

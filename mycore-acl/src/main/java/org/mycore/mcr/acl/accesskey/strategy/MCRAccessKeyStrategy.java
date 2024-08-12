@@ -18,19 +18,19 @@
 
 package org.mycore.mcr.acl.accesskey.strategy;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_PREVIEW;
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
-import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyConfig;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeySessionService;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyUserService;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 /**
@@ -40,12 +40,36 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final MCRAccessKeyUserService userService;
+
+    private final MCRAccessKeySessionService sessionService;
+
+    /**
+     * Constructs new {@link MCRAccessKeyStrategy} with default user and session service
+     */
+    public MCRAccessKeyStrategy() {
+        userService = MCRAccessKeyServiceFactory.getUserService();
+        sessionService = MCRAccessKeyServiceFactory.getSessionService();
+    }
+
+    /**
+     * Constructs new {@link MCRAccessKeyStrategy} with given user and session service.
+     *
+     * @param userService the user service
+     * @param sessionService the session
+     */
+    protected MCRAccessKeyStrategy(MCRAccessKeyUserService userService, MCRAccessKeySessionService sessionService) {
+        this.userService = userService;
+        this.sessionService = sessionService;
+    }
+
     @Override
-    public boolean checkPermission(final String objectIdString, final String permission) {
-        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
-            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
-            && MCRObjectID.isValid(objectIdString)) {
-            final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
+    public boolean checkPermission(String reference, String permission) {
+        if ((MCRAccessManager.PERMISSION_READ.equals(permission) || MCRAccessManager.PERMISSION_WRITE.equals(permission)
+            || MCRAccessManager.PERMISSION_VIEW.equals(permission)
+            || MCRAccessManager.PERMISSION_PREVIEW.equals(permission))
+            && MCRObjectID.isValid(reference)) {
+            final MCRObjectID objectId = MCRObjectID.getInstance(reference);
             if ("derivate".equals(objectId.getTypeId())) {
                 return checkDerivatePermission(objectId, permission);
             }
@@ -55,41 +79,18 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     }
 
     /**
-     * Fetches access key and checks object permission
+     * Fetches access key and checks derivate permission.
      *
      * @param objectId the {@link MCRObjectID}
      * @param permission permission type
      * @return true if permitted, otherwise false
      */
-    public boolean checkObjectPermission(final MCRObjectID objectId, final String permission) {
-        LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
-        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
-            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
-            && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
-            if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed(permission)) {
-                final MCRAccessKey accessKey = MCRAccessKeyUtils.getLinkedAccessKeyFromCurrentSession(objectId);
-                if (accessKey != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKey)) {
-                    return true;
-                }
-            }
-            final MCRAccessKey accessKey = MCRAccessKeyUtils.getLinkedAccessKeyFromCurrentUser(objectId);
-            return accessKey != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKey);
-        }
-        return false;
-    }
-
-    /**
-     * Fetches access key and checks derivate permission
-     *
-     * @param objectId the {@link MCRObjectID}
-     * @param permission permission type
-     * @return true if permitted, otherwise false
-     */
-    public boolean checkDerivatePermission(final MCRObjectID objectId, final String permission) {
+    public boolean checkDerivatePermission(MCRObjectID objectId, String permission) {
         LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
-            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
-            && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
+        if ((MCRAccessManager.PERMISSION_READ.equals(permission) || MCRAccessManager.PERMISSION_WRITE.equals(permission)
+            || MCRAccessManager.PERMISSION_VIEW.equals(permission)
+            || MCRAccessManager.PERMISSION_PREVIEW.equals(permission))
+            && MCRAccessKeyConfig.getAllowedObjectTypes().contains(objectId.getTypeId())) {
             if (checkObjectPermission(objectId, permission)) {
                 return true;
             }
@@ -100,4 +101,31 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
         }
         return false;
     }
+
+    /**
+     * Fetches access key and checks object permission.
+     *
+     * @param objectId the {@link MCRObjectID}
+     * @param permission permission type
+     * @return true if permitted, otherwise false
+     */
+    public boolean checkObjectPermission(MCRObjectID objectId, String permission) {
+        LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
+        if ((MCRAccessManager.PERMISSION_READ.equals(permission) || MCRAccessManager.PERMISSION_WRITE.equals(permission)
+            || MCRAccessManager.PERMISSION_VIEW.equals(permission)
+            || MCRAccessManager.PERMISSION_PREVIEW.equals(permission))
+            && MCRAccessKeyConfig.getAllowedObjectTypes().contains(objectId.getTypeId())) {
+            if (MCRAccessKeyConfig.getAllowedSessionPermissionTypes().contains(permission)) {
+                final MCRAccessKeyDto accessKeyDto = sessionService
+                    .getActivatedAccessKeyForReference(objectId.toString());
+                if (accessKeyDto != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKeyDto)) {
+                    return true;
+                }
+            }
+            final MCRAccessKeyDto accessKeyDto = userService.getActivatedAccessKeyForReference(objectId.toString());
+            return accessKeyDto != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKeyDto);
+        }
+        return false;
+    }
+
 }
