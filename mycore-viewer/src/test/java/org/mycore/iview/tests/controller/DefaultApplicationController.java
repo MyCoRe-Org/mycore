@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -113,7 +114,7 @@ public class DefaultApplicationController extends ApplicationController {
         LOGGER.info("Open Viewer with path : {}", path);
         webdriver.navigate().to(path);
 
-        WebDriverWait wait = new WebDriverWait(webdriver, 5000);
+        WebDriverWait wait = new WebDriverWait(webdriver, Duration.ofSeconds(5));
         wait.until(ExpectedConditions
             .presenceOfAllElementsLocatedBy(By.xpath("/.//ol[contains(@class, 'chapterTreeDesktop')]")));
 
