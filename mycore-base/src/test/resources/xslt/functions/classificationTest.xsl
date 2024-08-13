@@ -8,15 +8,44 @@
 
   <xsl:param name="classid" as="xs:string"/>
   <xsl:param name="categid" as="xs:string"/>
+  <xsl:param name="lang" as="xs:string"/>
   <xsl:param name="CurrentLang" as="xs:string?" select="'de'"/>
   <xsl:param name="DefaultLang" as="xs:string?" select="'en'"/>
 
+  <xsl:template match="test-category">
+    <result>
+      <xsl:copy-of select="mcrclass:category($classid, $categid)"/>
+    </result>
+  </xsl:template>
+
+  <xsl:template match="test-current-label">
+    <xsl:variable name="class" select="mcrclass:category($classid, $categid)"/>
+    <result>
+      <xsl:copy-of select="mcrclass:current-label($class)"/>
+    </result>
+  </xsl:template>
+
+  <xsl:template match="test-label">
+    <xsl:variable name="class" select="mcrclass:category($classid, $categid)"/>
+    <result>
+      <xsl:copy-of select="mcrclass:label($lang, $class)"/>
+    </result>
+
+  </xsl:template>
 
   <xsl:template match="test-current-label-text">
     <xsl:variable name="class" select="mcrclass:category($classid, $categid)"/>
     <result>
       <xsl:value-of select="mcrclass:current-label-text($class)"/>
     </result>
+  </xsl:template>
+
+  <xsl:template match="test-label-text">
+    <xsl:variable name="class" select="mcrclass:category($classid, $categid)"/>
+    <result>
+      <xsl:copy-of select="mcrclass:label-text($lang, $class)"/>
+    </result>
+
   </xsl:template>
 
 </xsl:stylesheet>
