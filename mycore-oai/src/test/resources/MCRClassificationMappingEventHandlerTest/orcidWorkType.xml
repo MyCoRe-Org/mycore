@@ -11,7 +11,7 @@
       <label xml:lang="x-mapping-xpath"
         text="//*[@classid='mir_genres' and @categid='article'] and //publishedin[@type='journal']" />
       <label xml:lang="x-mapping-xpathfb"
-             text="//*[@classid='mir_genres' and @categid='article']" />
+             text="{pattern:genre(mir_genres,article)}" />
     </category>
   </categories>
 </mycoreclass>

@@ -11,5 +11,12 @@
             <label xml:lang="x-mapping-xpath"
                    text="//*[@classid='mir_genres' and @categid='article']" />
         </category>
+        <category ID="dummy-placeholder">
+            <label xml:lang="de" text="Dummy Artikel"/>
+            <label xml:lang="en" text="Dummy article"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath"
+                   text="{pattern:genre(mir_genres,article)} and {pattern:host(journal)}" />
+        </category>
     </categories>
 </mycoreclass>
