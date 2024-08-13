@@ -44,7 +44,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     public MCRThumbnailImageImpl(String implName) {
         super(implName);
-        derivateTypes.addAll(MCRConfiguration2.splitValue(getConfigPrefix() + DERIVATE_TYPES).distinct().toList());
+        derivateTypes.addAll(MCRConfiguration2.splitValue(getProperties().get(DERIVATE_TYPES)).distinct().toList());
     }
 
     @Override
