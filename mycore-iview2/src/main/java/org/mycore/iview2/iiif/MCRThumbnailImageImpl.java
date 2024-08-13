@@ -20,12 +20,12 @@ package org.mycore.iview2.iiif;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -44,8 +44,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     public MCRThumbnailImageImpl(String implName) {
         super(implName);
-        derivateTypes.addAll(Arrays.asList(getProperties().get(DERIVATE_TYPES).split(","))
-            .stream().distinct().toList());
+        derivateTypes.addAll(MCRConfiguration2.splitValue(getConfigPrefix() + DERIVATE_TYPES).distinct().toList());
     }
 
     @Override
