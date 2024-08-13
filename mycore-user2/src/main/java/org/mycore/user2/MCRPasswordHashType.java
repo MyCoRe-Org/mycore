@@ -33,6 +33,7 @@ import jakarta.xml.bind.annotation.XmlEnum;
  *
  */
 @XmlEnum
+@Deprecated
 public enum MCRPasswordHashType {
 
     crypt, md5, sha1, sha256

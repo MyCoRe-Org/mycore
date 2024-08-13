@@ -16,24 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common;
+package org.mycore.user2.hash;
 
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.security.SecureRandom;
 
-@Inherited
-@Target({})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface MCRTestProperty {
+/**
+ * A {@link MCRPasswordCheckStrategy} implements a password hashing and verification strategy.
+ */
+public interface MCRPasswordCheckStrategy {
 
-    String key();
+    String unmodifiableConfigurationHint();
 
-    boolean empty() default false;
+    MCRPasswordCheckData create(SecureRandom random, String type, String password);
 
-    String string() default "";
-
-    Class<?> classNameOf() default Void.class;
+    MCRPasswordCheckResult verify(MCRPasswordCheckData data, String password);
 
 }

@@ -39,6 +39,11 @@ public class MCRUtilsTest extends MCRTestCase {
 
     private static final String TEST_SHA1 = "2ef7bde608ce5404e97d5f042f95f89f1c232871";
 
+    private static final String TEST_SHA256 = "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069";
+
+    private static final String TEST_SHA512 = "861844d6704e8573fec34d967e20bcfef3d424cf48be04e6dc08f2bd58c72974" +
+        "3371015ead891cc3cf1c9d34b49264b510751b1ff9e537937bc46b5d6ff4ecc8";
+
     private static final String TEST_MD5 = "ed076287532e86365e841e92bfc50d8c";
 
     @Rule
@@ -58,6 +63,34 @@ public class MCRUtilsTest extends MCRTestCase {
             assertEquals("SHA-1 string does not match", TEST_SHA1, sha1String);
         } catch (NoSuchAlgorithmException e) {
             LogManager.getLogger(this.getClass()).warn("SHA-1 algorithm not available");
+        }
+    }
+
+    /**
+     * Test method for {@link org.mycore.common.MCRUtils#asSHA256String(int, byte[], String)}.
+     */
+    @Test
+    public final void testAsSHA256String() {
+        try {
+            String sha256String = MCRUtils.asSHA256String(1, null, TEST);
+            assertEquals("SHA-256 string has not the right length", TEST_SHA256.length(), sha256String.length());
+            assertEquals("SHA-256 string does not match", TEST_SHA256, sha256String);
+        } catch (NoSuchAlgorithmException e) {
+            LogManager.getLogger(this.getClass()).warn("SHA-256 algorithm not available");
+        }
+    }
+
+    /**
+     * Test method for {@link org.mycore.common.MCRUtils#asSHA512String(int, byte[], String)}.
+     */
+    @Test
+    public final void testAsSHA512String() {
+        try {
+            String sha512String = MCRUtils.asSHA512String(1, null, TEST);
+            assertEquals("SHA-512 string has not the right length", TEST_SHA512.length(), sha512String.length());
+            assertEquals("SHA-512 string does not match", TEST_SHA512, sha512String);
+        } catch (NoSuchAlgorithmException e) {
+            LogManager.getLogger(this.getClass()).warn("SHA-512 algorithm not available");
         }
     }
 
