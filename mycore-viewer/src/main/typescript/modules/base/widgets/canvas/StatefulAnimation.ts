@@ -16,52 +16,50 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="Animation.ts" />
 
-namespace mycore.viewer.widgets.canvas {
+import {Animation} from "./Animation";
 
-    /**
-     * An animation that knows about its own state.
-     */
-    export abstract class StatefulAnimation implements Animation {
+/**
+ * An animation that knows about its own state.
+ */
+export abstract class StatefulAnimation implements Animation {
 
-        public isRunning;
-        public isFinished;
-        public isPaused;
-        protected totalElapsedTime;
+    public isRunning;
+    public isFinished;
+    public isPaused;
+    protected totalElapsedTime;
 
-        constructor() {
-            this.isRunning = false;
-            this.isFinished = false;
-            this.isPaused = false;
-            this.totalElapsedTime = 0;
-        }
+    constructor() {
+        this.isRunning = false;
+        this.isFinished = false;
+        this.isPaused = false;
+        this.totalElapsedTime = 0;
+    }
 
-        updateAnimation( elapsedTime: number ): boolean {
-            if(this.isPaused || this.isFinished) {
-                return this.isFinished;
-            }
-            if(!this.isRunning) {
-                elapsedTime = 0;
-                this.totalElapsedTime = 0;
-            }
-            this.totalElapsedTime += elapsedTime;
-            this.isFinished = this.update(elapsedTime);
-            this.isRunning = !this.isFinished;
+    updateAnimation(elapsedTime: number): boolean {
+        if (this.isPaused || this.isFinished) {
             return this.isFinished;
         }
-
-        abstract update(elapsedTime: number):boolean;
-
-        pause() {
-            this.isPaused = true;
+        if (!this.isRunning) {
+            elapsedTime = 0;
+            this.totalElapsedTime = 0;
         }
+        this.totalElapsedTime += elapsedTime;
+        this.isFinished = this.update(elapsedTime);
+        this.isRunning = !this.isFinished;
+        return this.isFinished;
+    }
 
-        continue() {
-            this.isPaused = false;
-        }
+    abstract update(elapsedTime: number): boolean;
 
+    pause() {
+        this.isPaused = true;
+    }
+
+    continue() {
+        this.isPaused = false;
     }
 
 }
+
 

@@ -16,18 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.canvas {
-    export class DoublePageRelocatedLayout extends DoublePageLayout {
-
-        public get relocated() : boolean {
-            return true;
-        }
-
-        public getLabelKey(): string {
-            return "doublePageRelocatedLayout";
-        }
+import {DoublePageLayout} from "./DoublePageLayout";
 
 
+export class DoublePageRelocatedLayout extends DoublePageLayout {
+
+    public get relocated(): boolean {
+        return true;
+    }
+
+    public getLabelKey(): string {
+        return "doublePageRelocatedLayout";
     }
 
 }
+
+

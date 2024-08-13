@@ -16,22 +16,24 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.toolbar {
 
-    export class BootstrapTextView implements TextView{
+import {TextView} from "../../../../../base/widgets/toolbar/view/text/TextView";
 
-        constructor(private _id:string) { 
-            this.element = jQuery("<p></p>");
-            this.element.addClass("navbar-text");
-        }
-        
-        private element: JQuery;
+export class BootstrapTextView implements TextView {
 
-        updateText(text: string): void {
-            this.element.text(text);
-        }
-        getElement(): JQuery {
-            return this.element;
-        }
+    constructor(private _id: string) {
+        this.element = jQuery("<p></p>");
+        this.element.addClass("navbar-text");
+    }
+
+    private element: JQuery;
+
+    updateText(text: string): void {
+        this.element.text(text);
+    }
+
+    getElement(): JQuery {
+        return this.element;
     }
 }
+

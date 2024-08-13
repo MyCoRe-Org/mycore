@@ -16,11 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.thumbnail {
-    export interface ThumbnailOverviewThumbnail {
-        id: string;
-        label: string;
-        requestImgdataUrl:(callback:(imgdata:string)=>void)=>void;
-    }
-
+export interface ThumbnailOverviewThumbnail {
+    id: string;
+    label: string;
+    requestImgdataUrl: (callback: (imgdata: string) => void) => void;
 }

@@ -16,12 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../definitions/jquery.d.ts" />
-/// <reference path="IviewChapterTree.ts" />
+import {IviewChapterTree} from "./IviewChapterTree";
 
-namespace mycore.viewer.widgets.chaptertree {
-
-    export interface ChapterTreeInputHandler {
+export interface ChapterTreeInputHandler {
         // called from ctrl
         register(ctrl: IviewChapterTree): void;
 
@@ -58,20 +55,18 @@ namespace mycore.viewer.widgets.chaptertree {
         }
 
         registerNode(node: JQuery, id: string): void {
-            var that = this;
-            node.click(function() {
-                var newSelectedChapter = that._ctrl.getChapterById(id);
-                that._ctrl.setChapterSelected(newSelectedChapter);
+            node.click(() => {
+                const newSelectedChapter = this._ctrl.getChapterById(id);
+                this._ctrl.setChapterSelected(newSelectedChapter);
             });
         }
 
         registerExpander(expander: JQuery, id: string): void {
-            var that = this;
-            expander.click(function() {
-                var chapterToChange = that._ctrl.getChapterById(id);
-                that._ctrl.setChapterExpanded(chapterToChange, !that._ctrl.getChapterExpanded(chapterToChange));
+            expander.click(() => {
+                const chapterToChange = this._ctrl.getChapterById(id);
+                this._ctrl.setChapterExpanded(chapterToChange, !this._ctrl.getChapterExpanded(chapterToChange));
             });
         }
     }
 
-}
+

@@ -16,20 +16,23 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.iiif {
 
-    export class IIIFStructureModel extends model.StructureModel {
+import {MyCoReMap} from "../../base/Utils";
+import {StructureChapter} from "../../base/components/model/StructureChapter";
+import {StructureImage} from "../../base/components/model/StructureImage";
+import {StructureModel} from "../../base/components/model/StructureModel";
 
-        constructor(
-                public smLinkMap: MyCoReMap<string, string[]>,
-                rootChapter: model.StructureChapter,
-                imageList: model.StructureImage[],
-                chapterToImageMap: MyCoReMap<string, model.StructureImage>,
-                imageToChapterMap: MyCoReMap<string, model.StructureChapter>,
-                imageHrefImageMap: MyCoReMap<string, model.StructureImage>) {
-            super(rootChapter, imageList, chapterToImageMap, imageToChapterMap, imageHrefImageMap, false);
-        }
+export class IIIFStructureModel extends StructureModel {
 
+    constructor(
+        public smLinkMap: MyCoReMap<string, string[]>,
+        rootChapter: StructureChapter,
+        imageList: StructureImage[],
+        chapterToImageMap: MyCoReMap<string, StructureImage>,
+        imageToChapterMap: MyCoReMap<string, StructureChapter>,
+        imageHrefImageMap: MyCoReMap<string, StructureImage>) {
+        super(rootChapter, imageList, chapterToImageMap, imageToChapterMap, imageHrefImageMap, false);
     }
 
 }
+

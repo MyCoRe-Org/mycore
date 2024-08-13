@@ -16,16 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
 
-namespace mycore.viewer.components.events {
-  export class AddCanvasPageLayerEvent extends MyCoReImageViewerEvent {
-      constructor(component:ViewerComponent, public zIndex:number, public canvasPageLayer:widgets.canvas.CanvasPageLayer) {
-          super(component, AddCanvasPageLayerEvent.TYPE);
-      }
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {ViewerComponent} from "../ViewerComponent";
+import {CanvasPageLayer} from "../../widgets/canvas/CanvasPageLayer";
 
-      public static TYPE:string = "AddCanvasPageLayerEvent";
+export class AddCanvasPageLayerEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent, public zIndex: number, public canvasPageLayer: CanvasPageLayer) {
+        super(component, AddCanvasPageLayerEvent.TYPE);
+    }
 
-  }
+    public static TYPE: string = "AddCanvasPageLayerEvent";
+
 }
+

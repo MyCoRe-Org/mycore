@@ -16,232 +16,236 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../definitions/pdf.d.ts" />
-/// <reference path="PDFStructureBuilder.ts" />
 
-namespace mycore.viewer.widgets.canvas {
-    export class PDFPage implements model.AbstractPage {
+import {AbstractPage} from "../../base/components/model/AbstractPage";
+import {Position2D, Rect, Size2D} from "../../base/Utils";
+import {TextContentModel, TextElement} from "../../base/components/model/TextContent";
+import {PDFStructureBuilder} from "./PDFStructureBuilder";
+import {PDFPageProxy, Util} from "pdfjs-dist";
+import {TextContent, TextItem} from "pdfjs-dist/types/src/display/api";
 
-        constructor(public id: string, private pdfPage: PDFPageProxy, private builder: pdf.PDFStructureBuilder) {
-            let width = (this.pdfPage.view[ 2 ] - this.pdfPage.view[ 0 ]) * PDFPage.CSS_UNITS;
-            let height = (this.pdfPage.view[ 3 ] - this.pdfPage.view[ 1 ]) * PDFPage.CSS_UNITS;
+export class PDFPage implements AbstractPage {
 
-            const pageRotation = pdfPage.rotate;
-            if (pageRotation == 90 || pageRotation == 270) {
-                width = width ^ height;
-                height = height ^ width;
-                width = width ^ height;
-            }
+    constructor(public id: string, private pdfPage: PDFPageProxy, private builder: PDFStructureBuilder) {
+        let width = (this.pdfPage.view[2] - this.pdfPage.view[0]) * PDFPage.CSS_UNITS;
+        let height = (this.pdfPage.view[3] - this.pdfPage.view[1]) * PDFPage.CSS_UNITS;
 
-            this._rotation = pageRotation;
-            this.size = new Size2D(width, height);
+        const pageRotation = pdfPage.rotate;
+        if (pageRotation == 90 || pageRotation == 270) {
+            width = width ^ height;
+            height = height ^ width;
+            width = width ^ height;
         }
 
-        static CSS_UNITS = 96.0 / 72.0;
-        public refreshCallback:() => void;
-        public size:Size2D;
+        this._rotation = pageRotation;
+        this.size = new Size2D(width, height);
+    }
 
-        private _rotation:number;
-        private _frontBuffer:HTMLCanvasElement = document.createElement("canvas");
-        private _backBuffer:HTMLCanvasElement = document.createElement("canvas");
-        private _timeOutIDHolder: number = null;
+    static CSS_UNITS = 96.0 / 72.0;
+    public refreshCallback: () => void;
+    public size: Size2D;
 
-        private _bbScale:number = -1;
-        private _fbScale:number = -1;
-        private _promiseRunning:boolean = false;
-        private _textData:model.TextContentModel = null;
+    private _rotation: number;
+    private _frontBuffer: HTMLCanvasElement = document.createElement("canvas");
+    private _backBuffer: HTMLCanvasElement = document.createElement("canvas");
+    private _timeOutIDHolder: number = null;
 
-        public resolveTextContent(callback:(content:model.TextContentModel)=>void):void {
-            if (this._textData == null) {
-                var textContent:model.TextContentModel = {
-                    content : [],
-                    links : [],
-                    internLinks: []
-                };
-                this._textData = textContent;
-                let contentReady = false, linksReady = false;
-                let completeCall = () => (contentReady && linksReady) ? callback(textContent) : null;
+    private _bbScale: number = -1;
+    private _fbScale: number = -1;
+    private _promiseRunning: boolean = false;
+    private _textData: TextContentModel = null;
 
-                this.pdfPage.getAnnotations().then((anotations) => {
-                    linksReady = true;
-                    if (anotations.length > 0) {
-                        for (var annotation of anotations) {
-                            if ((<any>annotation).annotationType == 2 && (<any>annotation).subtype == 'Link') {
-                                if ("url" in annotation) {
-                                    textContent.links.push({
+    public resolveTextContent(callback: (content: TextContentModel) => void): void {
+        if (this._textData == null) {
+            const textContent: TextContentModel = {
+                content: [],
+                links: [],
+                internLinks: []
+            };
+            this._textData = textContent;
+            let contentReady = false, linksReady = false;
+            let completeCall = () => (contentReady && linksReady) ? callback(textContent) : null;
+
+            this.pdfPage.getAnnotations().then((anotations) => {
+                linksReady = true;
+                if (anotations.length > 0) {
+                    for (let annotation of anotations) {
+                        if ((annotation as any).annotationType == 2 && (annotation as any).subtype == 'Link') {
+                            if ("url" in annotation) {
+                                textContent.links.push({
+                                    rect: this.getRectFromAnnotation(annotation),
+                                    url: (<any>annotation).url
+                                });
+                            } else if ("dest" in annotation) {
+                                let numberResolver = ((annotation: any) => {
+                                    return (callback) => {
+                                        this.builder.getPageNumberFromDestination(annotation.dest, (pageNumber) => {
+                                            callback(pageNumber + "");
+                                        });
+                                    }
+                                })(annotation);
+
+                                textContent.internLinks.push(
+                                    {
                                         rect: this.getRectFromAnnotation(annotation),
-                                        url: (<any>annotation).url
-                                    });
-                                } else if ("dest" in annotation) {
-                                    let numberResolver = ((annotation:any) => {
-                                        return (callback) => {
-                                            this.builder.getPageNumberFromDestination(annotation.dest, (pageNumber) => {
-                                                callback(pageNumber+"");
-                                            });
-                                        }
-                                    })(annotation);
-
-                                    textContent.internLinks.push(
-                                        {
-                                            rect: this.getRectFromAnnotation(annotation),
-                                            pageNumberResolver:numberResolver
-                                        }
-                                    );
-                                }
+                                        pageNumberResolver: numberResolver
+                                    }
+                                );
                             }
                         }
                     }
-                    completeCall();
-                });
-
-                this.pdfPage.getTextContent().then((textData:PDFPageTextData)=> {
-                    contentReady = true;
-                    textData.items.forEach((e)=> {
-
-                        var vp = (<any>this.pdfPage.getViewport({scale: 1}));
-                        var transform = (<any>pdfjsLib).Util.transform(vp.transform, e.transform);
-
-                        var style = textData.styles[ e.fontName ];
-                        var angle = Math.atan2(transform[ 1 ], transform[ 0 ]) + ((style.vertical == true ) ? Math.PI / 2 : 0);
-                        var fontHeight = Math.sqrt((transform[ 2 ] * transform[ 2 ]) + (transform[ 3 ] * transform[ 3 ]));
-                        var fontAscent = fontHeight;
-
-                        if (style.ascent) {
-                            fontAscent = style.ascent * fontAscent;
-                        } else if (style.descent) {
-                            fontAscent = (1 + style.descent) * fontAscent;
-                        }
-
-                        var x;
-                        var y;
-
-                            x = transform[ 4 ]  * PDFPage.CSS_UNITS;
-                            y = transform[ 5 ]  * PDFPage.CSS_UNITS;
-
-
-                        var textElement = new PDFTextElement(angle, new Size2D(e.width, e.height).scale(PDFPage.CSS_UNITS).roundDown(), fontHeight, e.str, new Position2D(x, y), style.fontFamily, this.id);
-                        textContent.content.push(textElement);
-                    });
-
-                    completeCall();
-                }, (reason:string) => {
-                    contentReady = true;
-                    console.error("PDF Page Text Content rejected");
-                    console.error("Reason: " + reason);
-                    completeCall();
-                });
-
-            } else {
-                callback(this._textData);
-            }
-
-
-        }
-
-        private getRectFromAnnotation(annotation) {
-            return new Rect(
-                new Position2D(annotation.rect[0] * PDFPage.CSS_UNITS, this.size.height - (annotation.rect[1] * PDFPage.CSS_UNITS) - ((annotation.rect[3] - annotation.rect[1]) * PDFPage.CSS_UNITS)),
-                new Size2D((annotation.rect[2] - annotation.rect[0]) * PDFPage.CSS_UNITS, (annotation.rect[3] - annotation.rect[1]) * PDFPage.CSS_UNITS)
-            );
-
-        }
-
-        public draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, overview: boolean, infoScale:number): void {
-            if ((!overview && sourceScale !== this._fbScale) || this._fbScale === -1) {
-                if(!this._promiseRunning ){
-                    this._updateBackBuffer(sourceScale);
                 }
-            }
-
-            if (this._fbScale == -1) {
-                return;
-            }
-
-            var scaledRect = rect.scale(this._fbScale);
-            var sourceScaleRect = rect.scale(sourceScale);
-
-            var sw =scaledRect.size.width;
-            var sh = scaledRect.size.height;
-
-            if (sw > 0 && sh > 0) {
-                ctx.save();
-                {
-                    ctx.drawImage(this._frontBuffer, scaledRect.pos.x, scaledRect.pos.y, Math.min(sw, this._frontBuffer.width), Math.min(sh, this._frontBuffer.height), 0, 0, sourceScaleRect.size.width, sourceScaleRect.size.height)
-                }
-                ctx.restore();
-            }
-
-        }
-
-        private _updateBackBuffer(newScale) {
-            var vp = this.pdfPage.getViewport({scale: newScale * PDFPage.CSS_UNITS, rotation: this._rotation});
-            var task = <any> this.pdfPage.render(<PDFRenderParams>{
-                canvasContext : <CanvasRenderingContext2D>this._backBuffer.getContext('2d'),
-                viewport : vp
+                completeCall();
             });
 
-            this._bbScale = newScale;
-            this._promiseRunning = true;
+            this.pdfPage.getTextContent().then((textData: TextContent) => {
+                contentReady = true;
+                textData.items.forEach((e) => {
 
-            this._backBuffer.width = this.size.width * newScale;
-            this._backBuffer.height = this.size.height * newScale;
+                    const vp = (this.pdfPage.getViewport({scale: 1}));
+                    const textItem = e as TextItem;
+                    const transform = Util.transform(vp.transform, textItem.transform);
 
-            var resolve = (page:PDFPageProxy) => {
-                this._promiseRunning = false;
-                this._swapBuffers();
-                this.refreshCallback();
-            };
+                    const style = textData.styles[textItem.fontName];
+                    const angle = Math.atan2(transform[1], transform[0]) + ((style.vertical == true) ? Math.PI / 2 : 0);
+                    const fontHeight = Math.sqrt((transform[2] * transform[2]) + (transform[3] * transform[3]));
+                    let fontAscent = fontHeight;
 
-            var error = (err) => {
-                console.log("Render Error", err);
-            };
+                    if (style.ascent) {
+                        fontAscent = style.ascent * fontAscent;
+                    } else if (style.descent) {
+                        fontAscent = (1 + style.descent) * fontAscent;
+                    }
 
-            task.promise.then(resolve, error);
+                    let x;
+                    let y;
+
+                    x = transform[4] * PDFPage.CSS_UNITS;
+                    y = transform[5] * PDFPage.CSS_UNITS;
+
+
+                    const textElement = new PDFTextElement(angle, new Size2D(textItem.width, textItem.height).scale(PDFPage.CSS_UNITS).roundDown(), fontHeight, textItem.str, new Position2D(x, y), style.fontFamily, this.id);
+                    textContent.content.push(textElement);
+                });
+
+                completeCall();
+            }, (reason: string) => {
+                contentReady = true;
+                console.error("PDF Page Text Content rejected");
+                console.error("Reason: " + reason);
+                completeCall();
+            });
+
+        } else {
+            callback(this._textData);
         }
 
 
-        private _swapBuffers() {
-            var swap:any = null;
+    }
 
-            swap = this._backBuffer;
-            this._backBuffer = this._frontBuffer;
-            this._frontBuffer = swap;
+    private getRectFromAnnotation(annotation) {
+        return new Rect(
+            new Position2D(annotation.rect[0] * PDFPage.CSS_UNITS, this.size.height - (annotation.rect[1] * PDFPage.CSS_UNITS) - ((annotation.rect[3] - annotation.rect[1]) * PDFPage.CSS_UNITS)),
+            new Size2D((annotation.rect[2] - annotation.rect[0]) * PDFPage.CSS_UNITS, (annotation.rect[3] - annotation.rect[1]) * PDFPage.CSS_UNITS)
+        );
 
-            swap = this._bbScale;
-            this._bbScale = this._fbScale;
-            this._fbScale = swap;
+    }
+
+    public draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, overview: boolean, infoScale: number): void {
+        if ((!overview && sourceScale !== this._fbScale) || this._fbScale === -1) {
+            if (!this._promiseRunning) {
+                this._updateBackBuffer(sourceScale);
+            }
         }
 
-        toString():string {
-            return <any>this.pdfPage.pageNumber;
+        if (this._fbScale == -1) {
+            return;
         }
 
-        public clear() {
-            this._frontBuffer.width = this._backBuffer.width = 1;
-            this._frontBuffer.width = this._backBuffer.width = 1;
-            this._bbScale = -1;
-            this._fbScale = -1;
+        const scaledRect = rect.scale(this._fbScale);
+        const sourceScaleRect = rect.scale(sourceScale);
+
+        const sw = scaledRect.size.width;
+        const sh = scaledRect.size.height;
+
+        if (sw > 0 && sh > 0) {
+            ctx.save();
+            {
+                ctx.drawImage(this._frontBuffer, scaledRect.pos.x, scaledRect.pos.y, Math.min(sw, this._frontBuffer.width), Math.min(sh, this._frontBuffer.height), 0, 0, sourceScaleRect.size.width, sourceScaleRect.size.height)
+            }
+            ctx.restore();
+        }
+
+    }
+
+    private _updateBackBuffer(newScale) {
+        const vp = this.pdfPage.getViewport({scale: newScale * PDFPage.CSS_UNITS, rotation: this._rotation});
+        const task = this.pdfPage.render({
+            canvasContext: <CanvasRenderingContext2D>this._backBuffer.getContext('2d'),
+            viewport: vp
+        });
+
+        this._bbScale = newScale;
+        this._promiseRunning = true;
+
+        this._backBuffer.width = this.size.width * newScale;
+        this._backBuffer.height = this.size.height * newScale;
+
+        const resolve = () => {
             this._promiseRunning = false;
-        }
+            this._swapBuffers();
+            this.refreshCallback();
+        };
 
+        const error = (err) => {
+            console.log("Render Error", err);
+        };
+
+        task.promise.then(resolve, error);
     }
 
-    class PDFTextElement implements model.TextElement {
-        constructor(public angle:number, public size:Size2D, public fontSize:number, public text:string, pos:Position2D, public fontFamily:string, public pageHref:string) {
-            this.pos = new Position2D(pos.x, pos.y - fontSize);
-        }
 
-        public pos:Position2D;
-        public fromBottomLeft = false;
+    private _swapBuffers() {
+        let swap: any = null;
 
-        toString() {
-            return this.pageHref.toString + "-" + this.pos.toString() + "-" + this.text.toString() + "-" + this.angle.toString();
-        }
+        swap = this._backBuffer;
+        this._backBuffer = this._frontBuffer;
+        this._frontBuffer = swap;
+
+        swap = this._bbScale;
+        this._bbScale = this._fbScale;
+        this._fbScale = swap;
     }
 
-    interface DrawInformation {
-        //area:Rect;
-        scale: number;
+    toString(): string {
+        return <any>this.pdfPage.pageNumber;
+    }
+
+    public clear() {
+        this._frontBuffer.width = this._backBuffer.width = 1;
+        this._frontBuffer.width = this._backBuffer.width = 1;
+        this._bbScale = -1;
+        this._fbScale = -1;
+        this._promiseRunning = false;
     }
 
 }
+
+export class PDFTextElement implements TextElement {
+    constructor(public angle: number, public size: Size2D, public fontSize: number, public text: string, pos: Position2D, public fontFamily: string, public pageHref: string) {
+        this.pos = new Position2D(pos.x, pos.y - fontSize);
+    }
+
+    public pos: Position2D;
+    public fromBottomLeft = false;
+
+    toString() {
+        return this.pageHref.toString + "-" + this.pos.toString() + "-" + this.text.toString() + "-" + this.angle.toString();
+    }
+}
+
+export interface DrawInformation {
+    //area:Rect;
+    scale: number;
+}
+

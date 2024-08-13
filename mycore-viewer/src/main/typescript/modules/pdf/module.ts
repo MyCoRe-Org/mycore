@@ -16,5 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoRePDFViewerComponent.ts" />
-console.log("PDF MODULE");
+import {addViewerComponent} from "../base/Utils";
+import {MyCoRePDFViewerComponent} from "./components/MyCoRePDFViewerComponent";
+
+addViewerComponent(MyCoRePDFViewerComponent);

@@ -16,55 +16,48 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../widgets/events/ViewerEvent.ts" />
-/// <reference path="events/MyCoReImageViewerEvent.ts" />
-/// <reference path="../widgets/events/ViewerEventManager.ts" />
-/// <reference path="../Utils.ts" />
-/// <reference path="events/WaitForEvent.ts" />
+import {MyCoReMap} from "../Utils";
+import {ViewerEvent} from "../widgets/events/ViewerEvent";
+import {ViewerEventManager} from "../widgets/events/ViewerEventManager";
+import {WaitForEvent} from "./events/WaitForEvent";
 
-namespace mycore.viewer.components {
+export class ViewerComponent extends ViewerEventManager {
 
-    export class ViewerComponent extends mycore.viewer.widgets.events.ViewerEventManager {
-
-        constructor() {
-            super();
-            this._eventCache = new MyCoReMap<string, mycore.viewer.widgets.events.ViewerEvent>();
-        }
-
-        private _eventCache: MyCoReMap<string, mycore.viewer.widgets.events.ViewerEvent>;
-
-        public init() {
-            console.info("Warning: IviewComponent doesnt implements init " + this);
-            return;
-        }
-
-        public get handlesEvents(): string[] {
-            return [];
-        }
-
-        public _handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
-            if(e instanceof events.WaitForEvent){
-                var wfe = <events.WaitForEvent>e;
-
-                if(this._eventCache.has(wfe.eventType)) {
-                    var cachedEvent = this._eventCache.get(wfe.eventType);
-                    wfe.component.handle(cachedEvent);
-                }
-
-
-            }
-
-            this.handle(e);
-            return;
-        }
-
-        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
-        }
-        
-        public trigger(e: mycore.viewer.widgets.events.ViewerEvent) {
-            this._eventCache.set(e.type, e);
-            super.trigger(e);
-        }
-
+    constructor() {
+        super();
+        this._eventCache = new MyCoReMap<string, ViewerEvent>();
     }
+
+    private _eventCache: MyCoReMap<string, ViewerEvent>;
+
+    public init() {
+        console.info("Warning: IviewComponent doesnt implements init " + this);
+        return;
+    }
+
+    public get handlesEvents(): string[] {
+        return [];
+    }
+
+    public _handle(e: ViewerEvent): void {
+        if (e instanceof WaitForEvent) {
+
+            if (this._eventCache.has(e.eventType)) {
+                const cachedEvent = this._eventCache.get(e.eventType);
+                e.component.handle(cachedEvent);
+            }
+        }
+
+        this.handle(e);
+        return;
+    }
+
+    public handle(e: ViewerEvent): void {
+    }
+
+    public trigger(e: ViewerEvent) {
+        this._eventCache.set(e.type, e);
+        super.trigger(e);
+    }
+
 }

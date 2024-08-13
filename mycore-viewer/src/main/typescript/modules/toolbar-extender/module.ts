@@ -16,5 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoReToolbarComponent.ts" />
-console.log("toolbar-extender MODULE");
+import {addViewerComponent} from "../base/Utils";
+import {MyCoReToolbarExtenderComponent} from "./components/MyCoReToolbarComponent";
+
+addViewerComponent(MyCoReToolbarExtenderComponent);
