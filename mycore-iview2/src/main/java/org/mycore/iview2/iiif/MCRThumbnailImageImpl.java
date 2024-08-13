@@ -19,7 +19,6 @@
 package org.mycore.iview2.iiif;
 
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -40,11 +39,11 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     protected static final String DERIVATE_TYPES = "Derivate.Types";
 
-    private List<String> derivateTypes = new ArrayList<>();
+    private List<String> derivateTypes;
 
     public MCRThumbnailImageImpl(String implName) {
         super(implName);
-        derivateTypes.addAll(MCRConfiguration2.splitValue(getProperties().get(DERIVATE_TYPES)).distinct().toList());
+        derivateTypes = MCRConfiguration2.splitValue(getProperties().get(DERIVATE_TYPES)).distinct().toList();
     }
 
     @Override
