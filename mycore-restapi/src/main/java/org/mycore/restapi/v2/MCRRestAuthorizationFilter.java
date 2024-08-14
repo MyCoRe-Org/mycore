@@ -32,11 +32,14 @@ import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
+import org.mycore.restapi.v2.access.MCRRestRequiredPermissionDefaultResolver;
+import org.mycore.restapi.v2.access.MCRRestRequiredPermissionResolver;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -138,9 +141,26 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         if (HttpMethod.OPTIONS.equals(method)) {
             return;
         }
-        final String permission
-            = Optional.ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class))
-                .map(MCRRestRequiredPermission::value).orElseGet(() -> getPermissionFromHttpMethod(method));
+        final String permission = Optional
+            .ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class)).map(a -> {
+                final String requiredPermission = a.value();
+                final Class<? extends MCRRestRequiredPermissionResolver> requiredPermissionResolver = a.resolver();
+                if (requiredPermission.isEmpty()
+                    && MCRRestRequiredPermissionDefaultResolver.class.equals(requiredPermissionResolver)) {
+                    LogManager.getLogger("explicit value and resolver is not allowed");
+                    throw new InternalServerErrorException();
+                } else if (!requiredPermission.isEmpty()) {
+                    return requiredPermission;
+                } else {
+                    try {
+                        return requiredPermissionResolver.getDeclaredConstructor().newInstance()
+                            .resolvePermission(requestContext);
+                    } catch (Exception e) {
+                        LogManager.getLogger().error(e);
+                        throw new InternalServerErrorException();
+                    }
+                }
+            }).orElseGet(() -> getPermissionFromHttpMethod(method));
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
