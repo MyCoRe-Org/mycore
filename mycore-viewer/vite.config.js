@@ -40,7 +40,7 @@ export default defineConfig({
 
             targets: [
                 {
-                    src: 'node_modules/pdfjs-dist/build/pdf.worker.min.js',
+                    src: 'node_modules/pdfjs-dist/build/pdf.worker.mjs',
                     dest: 'js/lib/'
                 },
                 {
