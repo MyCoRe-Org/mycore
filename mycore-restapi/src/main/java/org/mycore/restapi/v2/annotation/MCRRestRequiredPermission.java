@@ -23,6 +23,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.mycore.restapi.v2.access.MCRRestRequiredPermissionDefaultResolver;
+import org.mycore.restapi.v2.access.MCRRestRequiredPermissionResolver;
+
 /**
  * Defines a required permission for a Rest API path.
  * This can be a MyCoRe standard permission.
@@ -38,5 +41,13 @@ public @interface MCRRestRequiredPermission {
      *
      * @return the permission value
      */
-    String value();
+    String value() default "";
+
+    /**
+     * Resolves the required permission.
+     *
+     * @return the permission value
+     */
+    Class<? extends MCRRestRequiredPermissionResolver> resolver()
+        default MCRRestRequiredPermissionDefaultResolver.class;
 }
