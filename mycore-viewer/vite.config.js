@@ -41,7 +41,8 @@ export default defineConfig({
             targets: [
                 {
                     src: 'node_modules/pdfjs-dist/build/pdf.worker.min.mjs',
-                    dest: 'js/lib/pdf.worker.min.js'
+                    dest: 'js/lib/',
+                    rename: 'pdf.worker.min.js'
                 },
                 {
                     src: 'node_modules/epubjs/dist/*',
