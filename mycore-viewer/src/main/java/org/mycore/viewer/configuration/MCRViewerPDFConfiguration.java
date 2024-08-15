@@ -32,7 +32,7 @@ public class MCRViewerPDFConfiguration extends MCRViewerBaseConfiguration {
 
         String pdfProviderURL = MCRConfiguration2.getString("MCR.Viewer.pdfProviderURL")
             .orElse(MCRServlet.getServletBaseURL() + "MCRFileNodeServlet/{derivate}/{filePath}");
-        String pdfWorkerLocation = MCRFrontendUtil.getBaseURL() + "modules/iview2/js/lib/pdf.worker.mjs";
+        String pdfWorkerLocation = MCRFrontendUtil.getBaseURL() + "modules/iview2/js/lib/pdf.worker.min.js";
 
         setProperty("pdfProviderURL", pdfProviderURL);
         setProperty("pdfWorkerURL", pdfWorkerLocation);
