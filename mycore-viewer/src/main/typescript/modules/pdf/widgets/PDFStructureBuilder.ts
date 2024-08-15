@@ -21,8 +21,8 @@ import {GivenViewerPromise, MyCoReMap, Size2D, Utils, ViewerPromise} from "../..
 import {StructureImage} from "../../base/components/model/StructureImage";
 import {StructureChapter} from "../../base/components/model/StructureChapter";
 import {PDFStructureModel} from "./PDFStructureModel";
-import {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist";
-import {RefProxy} from "pdfjs-dist/types/src/display/api";
+import {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist/legacy/build/pdf.min.mjs";
+import type {RefProxy} from "pdfjs-dist/types/src/display/api";
 
 export class PDFStructureBuilder {
     private _startPage: number = -1;
