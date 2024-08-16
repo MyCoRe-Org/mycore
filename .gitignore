@@ -178,3 +178,5 @@ bower_components/
 typings/
 .tscache/
 package-lock.json
+
+.env.development
