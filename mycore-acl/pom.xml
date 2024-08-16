@@ -69,6 +69,28 @@
             </configuration>
           </execution>
           <execution>
+            <id>yarn-install_access-key-manager2</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <arguments>install</arguments>
+              <workingDirectory>src/main/vue/access-key-manager2/</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-build_access-key-manager2</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <arguments>build</arguments>
+              <workingDirectory>src/main/vue/access-key-manager2/</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
             <id>grunt-build</id>
             <phase>none</phase>
           </execution>
