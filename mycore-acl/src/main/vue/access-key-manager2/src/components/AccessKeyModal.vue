@@ -1,0 +1,199 @@
+<template>
+  <BaseModal
+    v-if="accessKey"
+    :show="showModal"
+    :title="$t('component.acl.accesskey.frontend.title.viewAccessKey')"
+    ok-only
+    scrollable
+    :busy="busy"
+    @close="handleClose"
+  >
+    <div v-if="errorMessage" class="alert alert-danger text-center" role="alert">
+      {{ $t(errorMessage) }}
+    </div>
+    <form>
+      <div v-if="globalReference === undefined" class="form-group required">
+        <label for="inputReference">
+          {{ $t("component.acl.accesskey.frontend.label.reference") }}
+        </label>
+        <div class="input-group">
+          <input id="inputReference" v-model="form.reference" type="text" class="form-control" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="inputPermission">
+            {{ $t("component.acl.accesskey.frontend.label.permission") }}
+          </label>
+          <select
+            v-if="availablePermissions"
+            id="inputPermission"
+            v-model="form.permission"
+            class="form-control"
+          >
+            <template v-for="permissionValue in availablePermissions" :key="permissionValue">
+              <option :value="permissionValue">
+                {{ $t(`component.acl.accesskey.frontend.label.permission.${permissionValue}`) }}
+              </option>
+            </template>
+          </select>
+          <input v-else id="inputPermission" v-model="form.permission" class="form-control" />
+        </div>
+        <div class="form-group col-md-6">
+          <label for="expirationInput">
+            {{ $t("component.acl.accesskey.frontend.label.expiration") }}
+          </label>
+          <input id="expirationInput" v-model="form.expiration" type="date" class="form-control" />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-check">
+          <input
+            id="inputActive"
+            v-model="form.isActive"
+            class="form-check-input"
+            type="checkbox"
+          />
+          <label class="form-check-label" for="inputActive">
+            {{ $t("component.acl.accesskey.frontend.label.active") }}
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="commentTextarea">
+          {{ $t("component.acl.accesskey.frontend.label.comment") }}
+        </label>
+        <textarea id="commentTextarea" v-model="form.comment" class="form-control" rows="3" />
+      </div>
+    </form>
+    <template #footer>
+      <button
+        type="button"
+        class="btn btn-primary"
+        :disabled="busy || v.$invalid"
+        @click="handleUpdateAccessKey"
+      >
+        <span
+          v-if="busy"
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        />
+        {{ $t("component.acl.accesskey.frontend.button.updateAccessKey") }}
+      </button>
+    </template>
+  </BaseModal>
+</template>
+<script setup lang="ts">
+import { computed, ref, onErrorCaptured, inject, watch } from "vue";
+import AccessKeyDto from "@/dtos/AccessKeyDto";
+import PartialUpdateAccessKeyDto from "@/dtos/PartialUpdateAccessKeyDto";
+import BaseModal from "@/components/BaseModal.vue";
+import { availablePermissionsKey, referenceKey } from "@/keys";
+import { required } from "@vuelidate/validators";
+import useVuelidate from "@vuelidate/core";
+import { getAccessKey, patchAccessKey } from "@/api/service";
+
+const props = defineProps<{
+  showModal: boolean;
+  accessKey: AccessKeyDto | undefined;
+}>();
+const emit = defineEmits<{
+  (event: "access-key-updated", value: string, accessKey: AccessKeyDto): void;
+  (event: "close"): void;
+}>();
+const rules = computed(() => ({
+  reference: {
+    required,
+  },
+  permission: {
+    required,
+  },
+}));
+const availablePermissions: string[] | undefined = inject(availablePermissionsKey);
+const globalReference: string | undefined = inject(referenceKey);
+const errorMessage = ref<string | undefined>(undefined);
+const busy = ref<boolean>(false);
+
+interface FormData {
+  reference: string;
+  permission: string;
+  expiration: string | undefined;
+  comment: string | undefined;
+  isActive: boolean;
+}
+
+const form = ref<FormData>({
+  reference: "",
+  permission: "",
+  isActive: false,
+  comment: undefined,
+  expiration: undefined,
+});
+
+const v = useVuelidate(rules, form);
+watch(
+  () => props.accessKey,
+  (newAccessKey: AccessKeyDto | undefined) => {
+    if (newAccessKey) {
+      form.value.reference = newAccessKey.reference;
+      form.value.permission = newAccessKey.permission;
+      form.value.expiration = newAccessKey.expiration
+        ? new Date(newAccessKey.expiration).toISOString().slice(0, 10)
+        : undefined;
+      form.value.comment = newAccessKey.comment || undefined;
+      form.value.isActive = newAccessKey.isActive;
+    }
+  },
+  { deep: true }
+);
+const handleError = (error: unknown) => {
+  errorMessage.value =
+    error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
+};
+const handleClose = (force: boolean) => {
+  if (force || !busy.value) {
+    emit("close");
+  }
+};
+const handleUpdateAccessKey = async () => {
+  if (!busy.value) {
+    v.value.$validate();
+    if (!v.value.$invalid && props.accessKey && props.accessKey.id) {
+      busy.value = true;
+      try {
+        const accessKeyDto: PartialUpdateAccessKeyDto = {};
+        if (form.value.reference !== props.accessKey.reference) {
+          accessKeyDto.reference = form.value.reference;
+        }
+        if (form.value.comment !== props.accessKey.comment) {
+          accessKeyDto.comment = form.value.comment;
+        }
+        if (form.value.permission !== props.accessKey.permission) {
+          accessKeyDto.permission = form.value.permission;
+        }
+        if (form.value.expiration !== props.accessKey.expiration) {
+          accessKeyDto.expiration = form.value.expiration
+            ? Math.floor(new Date(form.value.expiration).getTime())
+            : null;
+        }
+        if (form.value.isActive !== props.accessKey.isActive) {
+          accessKeyDto.isActive = form.value.isActive;
+        }
+        await patchAccessKey(props.accessKey.id, accessKeyDto);
+        const updatedAccessKey = await getAccessKey(props.accessKey.id);
+        emit("access-key-updated", props.accessKey.value, updatedAccessKey);
+        handleClose(true);
+      } catch (error) {
+        handleError(error);
+      } finally {
+        busy.value = false;
+      }
+    }
+  }
+};
+onErrorCaptured((err) => {
+  handleError(err);
+  return false;
+});
+</script>
