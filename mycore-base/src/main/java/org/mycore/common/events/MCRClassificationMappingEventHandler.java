@@ -70,6 +70,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private static final String X_PATH_MAPPING_CLASSIFICATIONS
         = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
 
+    /** Maps all configurations defining patterns for x-path-mapping,
+     * comp. {@link MCRClassificationMappingEventHandler#replacePattern(String)} */
     private static final Map<String, String> MAPPING_PATTERNS = MCRConfiguration2.getSubPropertiesMap(
         "MCR.Category.XPathMapping.Pattern.");
 
