@@ -16,12 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
-/// <reference path="../model/StructureImage.ts" />
 
-namespace mycore.viewer.components.events {
-    export class CanvasTapedEvent extends MyCoReImageViewerEvent {
+
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {ViewerComponent} from "../ViewerComponent";
+
+export class CanvasTapedEvent extends MyCoReImageViewerEvent {
         constructor(component:ViewerComponent) {
             super(component, CanvasTapedEvent.TYPE);
         }
@@ -29,4 +29,4 @@ namespace mycore.viewer.components.events {
         public static TYPE:string = "CanvasTapedEvent";
 
     }
-}
+

@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
+import org.mycore.services.http.MCRHttpStatus;
 
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.Produces;
@@ -102,10 +102,12 @@ public class MCRCacheFilter implements ContainerResponseFilter {
                 return;
             }
             boolean statusCacheable = IntStream
-                .of(HttpStatus.SC_OK, HttpStatus.SC_NON_AUTHORITATIVE_INFORMATION, HttpStatus.SC_NO_CONTENT,
-                    HttpStatus.SC_PARTIAL_CONTENT, HttpStatus.SC_MULTIPLE_CHOICES, HttpStatus.SC_MOVED_PERMANENTLY,
-                    HttpStatus.SC_NOT_FOUND, HttpStatus.SC_METHOD_NOT_ALLOWED, HttpStatus.SC_GONE,
-                    HttpStatus.SC_REQUEST_URI_TOO_LONG, HttpStatus.SC_NOT_IMPLEMENTED)
+                .of(MCRHttpStatus.OK.value(), MCRHttpStatus.NON_AUTHORITATIVE_INFORMATION.value(),
+                    MCRHttpStatus.NO_CONTENT.value(), MCRHttpStatus.PARTIAL_CONTENT.value(),
+                    MCRHttpStatus.MULTIPLE_CHOICES.value(), MCRHttpStatus.MOVED_PERMANENTLY.value(),
+                    MCRHttpStatus.NOT_FOUND.value(), MCRHttpStatus.METHOD_NOT_ALLOWED.value(),
+                    MCRHttpStatus.GONE.value(), MCRHttpStatus.PAYLOAD_TOO_LARGE.value(),
+                    MCRHttpStatus.NOT_IMPLEMENTED.value())
                 .anyMatch(i -> i == responseContext.getStatus());
             if (!statusCacheable) {
                 return;

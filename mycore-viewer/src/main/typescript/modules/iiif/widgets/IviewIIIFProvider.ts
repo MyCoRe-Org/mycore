@@ -16,39 +16,37 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="IIIFStructureModel.ts" />
-/// <reference path="IIIFStructureBuilder.ts" />
+import {GivenViewerPromise, ViewerPromise} from "../../base/Utils";
+import {StructureModel} from "../../base/components/model/StructureModel";
 
-/// <reference path="../../base/definitions/manifesto.d.ts" />
+import {loadManifest, Manifest, parseManifest} from "manifesto.js";
+import {IIIFStructureBuilder} from "./IIIFStructureBuilder";
 
-namespace mycore.viewer.widgets.iiif {
-    import Manifest = Manifesto.Manifest;
+export class IviewIIIFProvider {
 
-    export class IviewIIIFProvider {
+    public static loadModel(manifestDocumentLocation: string,
+                            imageAPIURL: string,
+                            tilePathBuilder: (href: string,
+                                              width: number,
+                                              height: number)
+                                => string): GivenViewerPromise<{
+        model: StructureModel;
+        document: Document
+    }, any> {
+        const promise = new ViewerPromise<{ model: StructureModel; document: Document }, any>();
+        let document = undefined;
+        loadManifest(manifestDocumentLocation).then((manifest) => {
+            document = manifest;
+            return parseManifest(manifest)
+        }).then((manifestParsed) => {
+            const builder = new IIIFStructureBuilder(manifestParsed as Manifest, tilePathBuilder, imageAPIURL);
+            promise.resolve({model: builder.processManifest(), document: document});
+        }).catch((error) => {
+            console.log("Error loading manifest: " + error);
+            promise.reject(error);
 
-        public static loadModel(manifestDocumentLocation: string,
-                                imageAPIURL: string,
-                                tilePathBuilder: (href: string,
-                                                  width: number,
-                                                  height: number)
-                                    => string): GivenViewerPromise<{model: model.StructureModel;
-                                    document: Document}, any> {
-            const promise = new ViewerPromise<{model: model.StructureModel; document: Document}, any>();
-            const settings = {
-                url: manifestDocumentLocation,
-                success: (response: any) => {
-                    const manifest = <Manifest> manifesto.create(response);
-                    const builder = new IIIFStructureBuilder(<Manifest> manifest, tilePathBuilder, imageAPIURL);
-                    promise.resolve({model : builder.processManifest(), document : response});
-                },
-                error: (request: any, status: string, exception: string) => {
-                    promise.reject(exception);
-                }
-            };
-            jQuery.ajax(settings);
-            return promise;
-        }
-
+        });
+        return promise;
     }
 
 }

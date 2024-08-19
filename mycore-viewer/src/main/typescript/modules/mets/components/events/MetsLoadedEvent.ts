@@ -16,13 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.components.events {
-    export class MetsLoadedEvent extends MyCoReImageViewerEvent {
 
-        constructor(component:ViewerComponent, public mets:{ model:model.StructureModel; document:Document }) {
-            super(component, MetsLoadedEvent.TYPE);
-        }
+import { MyCoReImageViewerEvent } from "../../../base/components/events/MyCoReImageViewerEvent";
+import {ViewerComponent} from "../../../base/components/ViewerComponent";
+import {StructureModel} from "../../../base/components/model/StructureModel";
 
-        public static TYPE:string = "MetsLoadedEvent";
+export class MetsLoadedEvent extends MyCoReImageViewerEvent {
+
+    constructor(component: ViewerComponent, public mets: { model: StructureModel; document: Document }) {
+        super(component, MetsLoadedEvent.TYPE);
     }
+
+    public static TYPE: string = "MetsLoadedEvent";
 }
+

@@ -35,24 +35,23 @@ import java.util.Scanner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -68,6 +67,8 @@ import org.mycore.pi.exceptions.MCRDatacenterAuthenticationException;
 import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.util.MCRResultOrException;
+import org.mycore.services.http.MCRHttpUtils;
 
 /**
  * Used for DOI registration.
@@ -86,6 +87,8 @@ public class MCRDataciteClient {
     private static final String HTTPS_SCHEME = "https";
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final AuthScope ANY_AUTHSCOPE = new AuthScope(null, -1);
 
     private String host;
 
@@ -112,14 +115,14 @@ public class MCRDataciteClient {
         return outputStream.toByteArray();
     }
 
-    private static String getStatusString(final HttpResponse resp) throws IOException {
-        StatusLine statusLine = resp.getStatusLine();
+    private static String getStatusString(final ClassicHttpResponse resp) throws IOException {
         StringBuilder statusStringBuilder = new StringBuilder();
 
-        statusStringBuilder.append(statusLine.getStatusCode()).append(" - ").append(statusLine.getReasonPhrase())
+        statusStringBuilder.append(resp.getCode()).append(" - ").append(resp.getReasonPhrase())
             .append(" - ");
 
-        try (Scanner scanner = new Scanner(resp.getEntity().getContent(), StandardCharsets.UTF_8)) {
+        try (InputStream content = resp.getEntity().getContent();
+            Scanner scanner = new Scanner(content, StandardCharsets.UTF_8)) {
             while (scanner.hasNextLine()) {
                 statusStringBuilder.append(scanner.nextLine());
             }
@@ -136,34 +139,40 @@ public class MCRDataciteClient {
         HttpGet httpGet = new HttpGet(requestURI);
 
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            CloseableHttpResponse response = httpClient.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    try (Scanner scanner = new Scanner(response.getEntity().getContent(), StandardCharsets.UTF_8)) {
-                        while (scanner.hasNextLine()) {
-                            String line = scanner.nextLine();
-                            String[] parts = line.split("=", 2);
-                            String mediaType = parts[0];
-                            URI mediaURI = new URI(parts[1]);
-                            entries.add(new AbstractMap.SimpleEntry<>(mediaType, mediaURI));
+            MCRResultOrException<List<Map.Entry<String, URI>>, MCRPersistentIdentifierException> result
+                = httpClient.execute(httpGet, response -> {
+                    return switch (response.getCode()) {
+                        case HttpStatus.SC_OK -> {
+                            try (InputStream content = response.getEntity().getContent();
+                                Scanner scanner = new Scanner(content, StandardCharsets.UTF_8)) {
+                                while (scanner.hasNextLine()) {
+                                    String line = scanner.nextLine();
+                                    String[] parts = line.split("=", 2);
+                                    String mediaType = parts[0];
+                                    URI mediaURI = new URI(parts[1]);
+                                    entries.add(new AbstractMap.SimpleEntry<>(mediaType, mediaURI));
+                                }
+                                yield MCRResultOrException.ofResult(entries);
+                            } catch (URISyntaxException e) {
+                                yield MCRResultOrException
+                                    .ofException(new MCRDatacenterException("Could not parse media url!", e));
+                            }
                         }
-                        return entries;
-                    }
-                }
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCRDatacenterAuthenticationException();
-                case HttpStatus.SC_NOT_FOUND -> throw new MCRIdentifierUnresolvableException(doi.asString(),
-                    doi.asString() + " is not resolvable! " + getStatusString(response));
+                        case HttpStatus.SC_UNAUTHORIZED
+                            -> MCRResultOrException.ofException(new MCRDatacenterAuthenticationException());
+                        case HttpStatus.SC_NOT_FOUND
+                            -> MCRResultOrException.ofException(new MCRIdentifierUnresolvableException(doi.asString(),
+                                doi.asString() + " is not resolvable! " + getStatusString(response)));
 
-                // return entries; // datacite says no media attached or doi does not exist (not sure what to do)
-                default -> throw new MCRDatacenterException(
-                    String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
-                        doi.asString(), getStatusString(response)));
-            }
+                        // datacite says no media attached or doi does not exist (not sure what to do)
+                        default -> MCRResultOrException.ofException(new MCRDatacenterException(
+                            String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
+                                doi.asString(), getStatusString(response))));
+                    };
+                });
+            return result.getResultOrThrow();
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while set media list", e);
-        } catch (URISyntaxException e) {
-            throw new MCRDatacenterException("Could not parse media url!", e);
         }
     }
 
@@ -182,20 +191,19 @@ public class MCRDataciteClient {
         StringEntity requestEntity = new StringEntity(requestBodyString, ContentType.create("text/plain", "UTF-8"));
         post.setEntity(requestEntity);
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            CloseableHttpResponse response = httpClient.execute(post);
-            StatusLine statusLine = response.getStatusLine();
+            httpClient.<MCRResultOrException<Object, MCRPersistentIdentifierException>>execute(post, response -> {
+                return switch (response.getCode()) {
+                    case HttpStatus.SC_OK -> MCRResultOrException.ofResult(null);
+                    case HttpStatus.SC_BAD_REQUEST -> MCRResultOrException.ofException(new MCRDatacenterException(
+                        getStatusString(response))); // non-supported mime-type, not allowed URL domain
+                    case HttpStatus.SC_UNAUTHORIZED
+                        -> MCRResultOrException.ofException(new MCRDatacenterAuthenticationException());
+                    default -> MCRResultOrException.ofException(new MCRDatacenterException(
+                        String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
+                            doi.asString(), getStatusString(response))));
+                };
+            }).getResultOrThrow();
 
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    return;
-                }
-                case HttpStatus.SC_BAD_REQUEST -> throw new MCRDatacenterException(
-                    getStatusString(response)); // non-supported mime-type, not allowed URL domain
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCRDatacenterAuthenticationException();
-                default -> throw new MCRDatacenterException(
-                    String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
-                        doi.asString(), getStatusString(response)));
-            }
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while set media list", e);
         }
@@ -212,21 +220,21 @@ public class MCRDataciteClient {
 
         try (CloseableHttpClient httpClient = getHttpClient()) {
             post.setEntity(new StringEntity(
-                String.format(Locale.ENGLISH, DOI_REGISTER_REQUEST_TEMPLATE, doi.asString(), url.toString())));
-            CloseableHttpResponse response = httpClient.execute(post);
-            StatusLine statusLine = response.getStatusLine();
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_CREATED -> {
-                    return;
-                }
-                case HttpStatus.SC_BAD_REQUEST -> throw new MCRDatacenterException(
-                    getStatusString(response)); // invalid PREFIX or wrong format, but format is hard defined!
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCRDatacenterAuthenticationException();
-                case HttpStatus.SC_PRECONDITION_FAILED -> throw new MCRDatacenterException(String.format(Locale.ENGLISH,
-                    "Metadata must be uploaded first! (%s)", getStatusString(response)));
-                default -> throw new MCRDatacenterException(String.format(Locale.ENGLISH,
-                    "Datacenter-Error while minting doi: \"%s\" : %s", doi.asString(), getStatusString(response)));
-            }
+                String.format(Locale.ROOT, DOI_REGISTER_REQUEST_TEMPLATE, doi.asString(), url.toString())));
+            httpClient.<MCRResultOrException<Object, MCRPersistentIdentifierException>>execute(post,
+                response -> switch (response.getCode()) {
+                    case HttpStatus.SC_CREATED -> MCRResultOrException.ofResult(null);
+                    case HttpStatus.SC_BAD_REQUEST -> MCRResultOrException.ofException(new MCRDatacenterException(
+                        getStatusString(response))); // invalid PREFIX or wrong format, but format is hard defined!
+                    case HttpStatus.SC_UNAUTHORIZED
+                        -> MCRResultOrException.ofException(new MCRDatacenterAuthenticationException());
+                    case HttpStatus.SC_PRECONDITION_FAILED
+                        -> MCRResultOrException.ofException(new MCRDatacenterException(String.format(Locale.ENGLISH,
+                            "Metadata must be uploaded first! (%s)", getStatusString(response))));
+                    default -> MCRResultOrException.ofException(new MCRDatacenterException(String.format(Locale.ENGLISH,
+                        "Datacenter-Error while minting doi: \"%s\" : %s", doi.asString(), getStatusString(response))));
+
+                }).getResultOrThrow();
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while mint new doi", e);
         }
@@ -237,30 +245,31 @@ public class MCRDataciteClient {
 
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            CloseableHttpResponse response = httpClient.execute(get);
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    try (Scanner scanner = new Scanner(entity.getContent(), StandardCharsets.UTF_8)) {
-                        List<MCRDigitalObjectIdentifier> doiList = new ArrayList<>();
-                        while (scanner.hasNextLine()) {
-                            String line = scanner.nextLine();
-                            Optional<MCRDigitalObjectIdentifier> parse = new MCRDOIParser().parse(line);
-                            MCRDigitalObjectIdentifier doi = parse
-                                .orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
-                            doiList.add(doi);
+            MCRResultOrException<List<MCRDigitalObjectIdentifier>, MCRPersistentIdentifierException> result
+                = httpClient.execute(get, response -> {
+                    HttpEntity entity = response.getEntity();
+                    return switch (response.getCode()) {
+                        case HttpStatus.SC_OK -> {
+                            try (InputStream content = entity.getContent();
+                                Scanner scanner = new Scanner(content, StandardCharsets.UTF_8)) {
+                                List<MCRDigitalObjectIdentifier> doiList = new ArrayList<>();
+                                while (scanner.hasNextLine()) {
+                                    String line = scanner.nextLine();
+                                    Optional<MCRDigitalObjectIdentifier> parse = new MCRDOIParser().parse(line);
+                                    MCRDigitalObjectIdentifier doi = parse
+                                        .orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
+                                    doiList.add(doi);
+                                }
+                                yield MCRResultOrException.ofResult(doiList);
+                            }
                         }
-                        return doiList;
-                    }
-                }
-                case HttpStatus.SC_NO_CONTENT -> {
-                    return Collections.emptyList();
-                }
-                default -> throw new MCRDatacenterException(
-                    String.format(Locale.ENGLISH, "Unknown error while resolving all doi’s \n %d - %s",
-                        statusLine.getStatusCode(), statusLine.getReasonPhrase()));
-            }
+                        case HttpStatus.SC_NO_CONTENT -> MCRResultOrException.ofResult(Collections.emptyList());
+                        default -> MCRResultOrException.ofException(new MCRDatacenterException(
+                            String.format(Locale.ENGLISH, "Unknown error while resolving all doi’s \n %d - %s",
+                                response.getCode(), response.getReasonPhrase())));
+                    };
+                });
+            return result.getResultOrThrow();
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while resolving all doi’s", e);
         }
@@ -271,29 +280,40 @@ public class MCRDataciteClient {
         URI requestURI = getRequestURI("/doi/" + doiParam.asString());
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            CloseableHttpResponse response = httpClient.execute(get);
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    try (Scanner scanner = new Scanner(entity.getContent(), StandardCharsets.UTF_8)) {
-                        String uriString = scanner.nextLine();
-                        return new URI(uriString);
+            MCRResultOrException<URI, MCRPersistentIdentifierException> result = httpClient.execute(get, response -> {
+                HttpEntity entity = response.getEntity();
+                return switch (response.getCode()) {
+                    case HttpStatus.SC_OK -> {
+                        String uriString = null;
+                        try (InputStream content = entity.getContent();
+                            Scanner scanner = new Scanner(content, StandardCharsets.UTF_8)) {
+                            uriString = scanner.nextLine();
+                            yield MCRResultOrException.ofResult(new URI(uriString));
+                        } catch (URISyntaxException e) {
+                            yield MCRResultOrException
+                                .ofException(new MCRDatacenterException(String.format(Locale.ENGLISH,
+                                    "Unknown error while resolving doi: \"%s\"", doiParam.asString()), e));
+                        }
                     }
-                }
-                case HttpStatus.SC_NO_CONTENT -> throw new MCRIdentifierUnresolvableException(doiParam.asString(),
-                    "The identifier " + doiParam.asString() + " is currently not resolvable");
-                case HttpStatus.SC_NOT_FOUND -> throw new MCRIdentifierUnresolvableException(doiParam.asString(),
-                    "The identifier " + doiParam.asString() + " was not found in the Datacenter!");
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCRDatacenterAuthenticationException();
-                case HttpStatus.SC_INTERNAL_SERVER_ERROR -> throw new MCRDatacenterException(
-                    String.format(Locale.ENGLISH, "Datacenter error while resolving doi: \"%s\" : %s",
-                        doiParam.asString(), getStatusString(response)));
-                default -> throw new MCRDatacenterException(String.format(Locale.ENGLISH,
-                    "Unknown error while resolving doi: \"%s\" : %s", doiParam.asString(),
-                    getStatusString(response)));
-            }
-        } catch (IOException | URISyntaxException ex) {
+                    case HttpStatus.SC_NO_CONTENT
+                        -> MCRResultOrException.ofException(new MCRIdentifierUnresolvableException(doiParam.asString(),
+                            "The identifier " + doiParam.asString() + " is currently not resolvable"));
+                    case HttpStatus.SC_NOT_FOUND
+                        -> MCRResultOrException.ofException(new MCRIdentifierUnresolvableException(doiParam.asString(),
+                            "The identifier " + doiParam.asString() + " was not found in the Datacenter!"));
+                    case HttpStatus.SC_UNAUTHORIZED
+                        -> MCRResultOrException.ofException(new MCRDatacenterAuthenticationException());
+                    case HttpStatus.SC_INTERNAL_SERVER_ERROR
+                        -> MCRResultOrException.ofException(new MCRDatacenterException(
+                            String.format(Locale.ENGLISH, "Datacenter error while resolving doi: \"%s\" : %s",
+                                doiParam.asString(), getStatusString(response))));
+                    default -> MCRResultOrException.ofException(new MCRDatacenterException(String.format(Locale.ENGLISH,
+                        "Unknown error while resolving doi: \"%s\" : %s", doiParam.asString(),
+                        getStatusString(response))));
+                };
+            });
+            return result.getResultOrThrow();
+        } catch (IOException ex) {
             throw new MCRDatacenterException(
                 String.format(Locale.ENGLISH, "Unknown error while resolving doi: \"%s\"", doiParam.asString()), ex);
         }
@@ -326,23 +346,46 @@ public class MCRDataciteClient {
         URI requestURI = getRequestURI("/metadata/" + doi.asString());
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            CloseableHttpResponse response = httpClient.execute(get);
-            HttpEntity entity = response.getEntity();
-            StatusLine statusLine = response.getStatusLine();
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    SAXBuilder builder = new SAXBuilder();
-                    return builder.build(entity.getContent());
+            MCRResultOrException<Document, Exception> resultOrException = httpClient.execute(get, response -> {
+                HttpEntity entity = response.getEntity();
+                if (entity != null && response.getCode() != HttpStatus.SC_OK) {
+                    EntityUtils.consume(entity);
                 }
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCRDatacenterAuthenticationException();
-                case HttpStatus.SC_NO_CONTENT -> throw new MCRIdentifierUnresolvableException(doi.asString(),
-                    "The identifier " + doi.asString() + " is currently not resolvable");
-                case HttpStatus.SC_NOT_FOUND -> throw new MCRIdentifierUnresolvableException(doi.asString(),
-                    "The identifier " + doi.asString() + " was not found!");
-                case HttpStatus.SC_GONE -> throw new MCRIdentifierUnresolvableException(doi.asString(),
-                    "The identifier " + doi.asString() + " was deleted!");
-                default -> throw new MCRDatacenterException("Unknown return status: " + getStatusString(response));
+                return switch (response.getCode()) {
+                    case HttpStatus.SC_OK -> {
+                        SAXBuilder builder = new SAXBuilder();
+                        try (InputStream content = entity.getContent();) {
+                            Document result = builder.build(content);
+                            yield MCRResultOrException.ofResult(result);
+                        } catch (JDOMException e) {
+                            yield MCRResultOrException.ofException(e);
+                        }
+                    }
+                    case HttpStatus.SC_UNAUTHORIZED
+                        -> MCRResultOrException.ofException(new MCRDatacenterAuthenticationException());
+                    case HttpStatus.SC_NO_CONTENT
+                        -> MCRResultOrException.ofException(new MCRIdentifierUnresolvableException(doi.asString(),
+                            "The identifier " + doi.asString() + " is currently not resolvable"));
+                    case HttpStatus.SC_NOT_FOUND
+                        -> MCRResultOrException.ofException(new MCRIdentifierUnresolvableException(doi.asString(),
+                            "The identifier " + doi.asString() + " was not found!"));
+                    case HttpStatus.SC_GONE
+                        -> MCRResultOrException.ofException(new MCRIdentifierUnresolvableException(doi.asString(),
+                            "The identifier " + doi.asString() + " was deleted!"));
+                    default -> MCRResultOrException
+                        .ofException(new MCRDatacenterException("Unknown return status: " + getStatusString(response)));
+                };
+            });
+            if (resultOrException.exception() != null) {
+                if (resultOrException.exception() instanceof JDOMException je) {
+                    throw je;
+                }
+                if (resultOrException.exception() instanceof MCRDatacenterException dce) {
+                    throw dce;
+                }
+                throw new MCRDatacenterException("Error while resolving doi: " + doi, resultOrException.exception());
             }
+            return resultOrException.result();
         } catch (IOException e) {
             throw new MCRDatacenterException("Error while resolving metadata!", e);
         }
@@ -357,41 +400,41 @@ public class MCRDataciteClient {
             ByteArrayEntity inputStreamEntity = new ByteArrayEntity(documentBytes,
                 ContentType.create("application/xml", "UTF-8"));
             post.setEntity(inputStreamEntity);
-            CloseableHttpResponse response = httpClient.execute(post);
-            StatusLine statusLine = response.getStatusLine();
-
-            StringBuilder sb = new StringBuilder();
-            try (InputStream is = response.getEntity().getContent()) {
-                Scanner scanner = new Scanner(is, StandardCharsets.UTF_8);
-                while (scanner.hasNextLine()) {
-                    sb.append(scanner.nextLine()).append(System.lineSeparator());
-                }
-            } catch (IOException | UnsupportedOperationException e) {
-                LOGGER.warn("Could not read content!", e);
-            }
-            String responseString = sb.toString();
-
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_CREATED -> {
-                    Header[] responseHeaders = response.getAllHeaders();
-                    for (Header responseHeader : responseHeaders) {
-                        if (responseHeader.getName().equals("Location")) {
-                            return new URI(responseHeader.getValue());
+            MCRResultOrException<URI, MCRDatacenterException> resultOrException = httpClient.execute(post, response -> {
+                final HttpEntity entity = response.getEntity();
+                String responseString = EntityUtils.toString(entity);
+                return switch (response.getCode()) {
+                    case HttpStatus.SC_CREATED -> {
+                        Header[] responseHeaders = response.getHeaders();
+                        for (Header responseHeader : responseHeaders) {
+                            if (responseHeader.getName().equals("Location")) {
+                                try {
+                                    URI newLocation = new URI(responseHeader.getValue());
+                                    yield MCRResultOrException.ofResult(newLocation);
+                                } catch (URISyntaxException e) {
+                                    yield MCRResultOrException
+                                        .ofException(new MCRDatacenterException("Error while storing metadata.", e));
+                                }
+                            }
                         }
+                        // should not happen
+                        yield MCRResultOrException.ofException(
+                            new MCRDatacenterException("Location header not found in response! - " + responseString));
                     }
-                    // should not happen
-                    throw new MCRDatacenterException("Location header not found in response! - " + responseString);
-                }
-                case HttpStatus.SC_BAD_REQUEST -> // invalid xml or wrong PREFIX
-                    throw new MCRDatacenterException("Invalid xml or wrong PREFIX: " + statusLine.getStatusCode()
-                        + " - " + statusLine.getReasonPhrase() + " - " + responseString);
-                case HttpStatus.SC_UNAUTHORIZED -> // no login
-                    throw new MCRDatacenterAuthenticationException();
-                default -> throw new MCRDatacenterException(
-                    "Unknown return status: " + statusLine.getStatusCode() + " - "
-                        + statusLine.getReasonPhrase() + " - " + responseString);
-            }
-        } catch (IOException | URISyntaxException e) {
+                    case HttpStatus.SC_BAD_REQUEST -> // invalid xml or wrong PREFIX
+                        MCRResultOrException
+                            .ofException(new MCRDatacenterException("Invalid xml or wrong PREFIX: " + response.getCode()
+                                + " - " + response.getReasonPhrase() + " - " + responseString));
+                    case HttpStatus.SC_UNAUTHORIZED -> // no login
+                        MCRResultOrException.ofException(new MCRDatacenterAuthenticationException());
+                    default -> MCRResultOrException.ofException(new MCRDatacenterException(
+                        "Unknown return status: " + response.getCode() + " - "
+                            + response.getReasonPhrase() + " - " + responseString));
+                };
+            });
+            return resultOrException.getResultOrThrow();
+
+        } catch (IOException e) {
             throw new MCRDatacenterException("Error while storing metadata!", e);
         }
     }
@@ -401,18 +444,21 @@ public class MCRDataciteClient {
 
         HttpDelete delete = new HttpDelete(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            CloseableHttpResponse response = httpClient.execute(delete);
-            StatusLine statusLine = response.getStatusLine();
+            MCRDatacenterException datacenterException = httpClient.execute(delete, response -> {
+                final HttpEntity entity = response.getEntity();
+                EntityUtils.consume(entity);
+                return switch (response.getCode()) {
+                    case HttpStatus.SC_OK -> null;
+                    case HttpStatus.SC_UNAUTHORIZED -> new MCRDatacenterAuthenticationException();
+                    case HttpStatus.SC_NOT_FOUND -> new MCRIdentifierUnresolvableException(doi.asString(),
+                        doi.asString() + " was not found!");
+                    default -> new MCRDatacenterException(
+                        "Unknown return status: " + response.getCode() + " - " + response.getReasonPhrase());
 
-            switch (statusLine.getStatusCode()) {
-                case HttpStatus.SC_OK -> {
-                    return;
-                }
-                case HttpStatus.SC_UNAUTHORIZED -> throw new MCRDatacenterAuthenticationException();
-                case HttpStatus.SC_NOT_FOUND -> throw new MCRIdentifierUnresolvableException(doi.asString(),
-                    doi.asString() + " was not found!");
-                default -> throw new MCRDatacenterException(
-                    "Unknown return status: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase());
+                };
+            });
+            if (datacenterException != null) {
+                throw datacenterException;
             }
         } catch (IOException e) {
             throw new MCRDatacenterException("Error while deleting metadata!", e);
@@ -420,7 +466,10 @@ public class MCRDataciteClient {
     }
 
     private CloseableHttpClient getHttpClient() {
-        return HttpClientBuilder.create().useSystemProperties().setDefaultCredentialsProvider(getCredentialsProvider())
+        return HttpClientBuilder.create()
+            .setUserAgent(MCRHttpUtils.getHttpUserAgent())
+            .useSystemProperties()
+            .setDefaultCredentialsProvider(getCredentialsProvider())
             .build();
     }
 
@@ -428,14 +477,14 @@ public class MCRDataciteClient {
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
         if (userName != null && !userName.isEmpty() && password != null && !password.isEmpty()) {
-            credentialsProvider.setCredentials(AuthScope.ANY, getCredentials());
+            credentialsProvider.setCredentials(ANY_AUTHSCOPE, getCredentials());
         }
 
         return credentialsProvider;
     }
 
     private UsernamePasswordCredentials getCredentials() {
-        return new UsernamePasswordCredentials(this.userName, this.password);
+        return new UsernamePasswordCredentials(this.userName, this.password.toCharArray());
     }
 
 }

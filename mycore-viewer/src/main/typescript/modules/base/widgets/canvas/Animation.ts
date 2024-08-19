@@ -16,11 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.canvas {
-
-    export interface Animation {
-        updateAnimation(elapsedTime:number):boolean;
-    }
-
+export interface Animation {
+    updateAnimation(elapsedTime: number): boolean;
 }
 

@@ -16,35 +16,37 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.widgets.toolbar {
-    export class BootstrapToolbarView implements ToolbarView {
 
-        private _toolbar: JQuery;
+import {ToolbarView} from "../../../../base/widgets/toolbar/view/ToolbarView";
 
-        constructor() {
-            this._toolbar = jQuery('<nav></nav>');
-            this._toolbar.addClass('navbar navbar-expand-lg navbar-light bg-light');
-        }
+export class BootstrapToolbarView implements ToolbarView {
+
+    private _toolbar: JQuery;
+
+    constructor() {
+        this._toolbar = jQuery('<nav></nav>');
+        this._toolbar.addClass('navbar navbar-expand-lg navbar-light bg-light');
+    }
 
 //navbar-header
-        public addChild(child: JQuery): void {
-            this._toolbar.append(child);
-            this._toolbar.find('.btn-group.right.ml-auto').removeClass('ml-auto');
-            const sortedElements = this._toolbar.find('.btn-group.right[data-tb-order]')
-                .toArray()
-                .sort((a, b) => parseInt(a.getAttribute('data-tb-order')) - parseInt(b.getAttribute('data-tb-order')));
+    public addChild(child: JQuery): void {
+        this._toolbar.append(child);
+        this._toolbar.find('.btn-group.right.ml-auto').removeClass('ml-auto');
+        const sortedElements = this._toolbar.find('.btn-group.right[data-tb-order]')
+            .toArray()
+            .sort((a, b) => parseInt(a.getAttribute('data-tb-order')) - parseInt(b.getAttribute('data-tb-order')));
 
-            if (sortedElements.length > 0) {
-                jQuery(sortedElements[0]).addClass('ml-auto');
-            }
-        }
-
-        public removeChild(child: JQuery): void {
-            child.remove();
-        }
-
-        public getElement(): JQuery {
-            return this._toolbar;
+        if (sortedElements.length > 0) {
+            jQuery(sortedElements[0]).addClass('ml-auto');
         }
     }
-} 
+
+    public removeChild(child: JQuery): void {
+        child.remove();
+    }
+
+    public getElement(): JQuery {
+        return this._toolbar;
+    }
+}
+

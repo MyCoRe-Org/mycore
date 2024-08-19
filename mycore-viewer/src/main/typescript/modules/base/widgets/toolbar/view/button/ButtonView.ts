@@ -16,18 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../../definitions/jquery.d.ts" />
 
-namespace mycore.viewer.widgets.toolbar {
+export interface ButtonView {
+    updateButtonLabel(label: string): void;
 
-    export interface ButtonView {
-        updateButtonLabel(label: string): void;
-        updateButtonTooltip(tooltip: string): void;
-        updateButtonIcon(icon: string): void;
-        updateButtonClass(buttonClass: string): void;
-        updateButtonActive(active: boolean): void;
-        updateButtonDisabled(disabled: boolean): void;
-        getElement(): JQuery;
-    }
+    updateButtonTooltip(tooltip: string): void;
 
+    updateButtonIcon(icon: string): void;
+
+    updateButtonClass(buttonClass: string): void;
+
+    updateButtonActive(active: boolean): void;
+
+    updateButtonDisabled(disabled: boolean): void;
+
+    getElement(): JQuery;
 }
+
+

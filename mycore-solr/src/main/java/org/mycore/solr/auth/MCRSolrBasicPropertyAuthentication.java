@@ -18,10 +18,10 @@
 
 package org.mycore.solr.auth;
 
+import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.mycore.common.config.annotation.MCRProperty;
 
@@ -56,9 +56,9 @@ public class MCRSolrBasicPropertyAuthentication implements MCRSolrAuthentication
     }
 
     @Override
-    public void applyAuthentication(HttpRequestBase request) {
+    public void applyAuthentication(HttpRequest.Builder request) {
         String authString = username + ":" + password;
-        request.addHeader("Authorization", "Basic " +
+        request.header("Authorization", "Basic " +
                 Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8)));
     }
 

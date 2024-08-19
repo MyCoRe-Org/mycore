@@ -18,38 +18,25 @@
 
 package org.mycore.services.http;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.time.Duration;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.concurrent.Executors;
 
-import org.apache.http.HttpHost;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.config.ConnectionConfig;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRHttpUtils {
 
-    public static CloseableHttpClient getHttpClient(HttpClientConnectionManager connectionManager, int maxConnections) {
-
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000).setSocketTimeout(30000).build();
-
-        ConnectionConfig connectionConfig = ConnectionConfig.custom().setCharset(StandardCharsets.UTF_8).build();
-        SocketConfig socketConfig = SocketConfig.custom().setTcpNoDelay(true).setSoKeepAlive(true)
-            .setSoReuseAddress(true).build();
-
+    public static HttpClient getHttpClient() {
         //setup http client
-        return HttpClients.custom().setConnectionManager(connectionManager)
-            .setUserAgent(getHttpUserAgent()).setRetryHandler(new MCRRetryHandler(maxConnections))
-            .setDefaultRequestConfig(requestConfig).setDefaultConnectionConfig(connectionConfig)
-            .setDefaultSocketConfig(socketConfig).build();
+        return HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(30))
+            .executor(Executors.newVirtualThreadPerTaskExecutor())
+            .followRedirects(HttpClient.Redirect.NEVER)
+            .build();
     }
 
     public static String getHttpUserAgent() {
@@ -58,23 +45,13 @@ public class MCRHttpUtils {
             System.getProperty("java.version"));
     }
 
-    public static PoolingHttpClientConnectionManager getConnectionManager(int maxConnections) {
-        //configure connection manager
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultMaxPerRoute(maxConnections);
-        connectionManager.setMaxTotal(maxConnections);
-        connectionManager.setValidateAfterInactivity(30000);
-        return connectionManager;
+    public static HttpRequest.Builder getRequestBuilder() {
+        return HttpRequest.newBuilder()
+            .header("User-Agent", getHttpUserAgent());
     }
 
-    public static HttpHost getHttpHost(String serverUrl) {
-        HttpHost host = null;
-        //determine host name
-        HttpGet serverGet = new HttpGet(serverUrl);
-        final URI requestURI = serverGet.getURI();
-        if (requestURI.isAbsolute()) {
-            host = URIUtils.extractHost(requestURI);
-        }
-        return host;
+    // Utility method to map status codes to reason phrases
+    public static Optional<String> getReasonPhrase(int statusCode) {
+        return MCRHttpStatus.resolve(statusCode).map(MCRHttpStatus::getReasonPhrase);
     }
 }

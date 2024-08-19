@@ -16,54 +16,54 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../definitions/jquery.d.ts" />
-/// <reference path="../../Utils.ts" />
+import {ThumbnailOverviewThumbnail} from "./ThumbnailOverviewThumbnail";
+import {Size2D} from "../../Utils";
+import {ThumbnailOverviewInputHandler} from "./ThumbnailOverviewInputHandler";
 
-/// <reference path="ThumbnailOverviewThumbnail.ts" />
-/// <reference path="ThumbnailOverviewInputHandler.ts" />
+export interface ThumbnailOverviewSettings {
+    /**
+     * Array of all Thumbnails
+     */
+    thumbnails: Array<ThumbnailOverviewThumbnail>;
 
-namespace mycore.viewer.widgets.thumbnail {
+    /**
+     * Container needs a size(width/height).
+     */
+    container: JQuery;
 
-    export interface ThumbnailOverviewSettings {
-        /**
-         * Array of all Thumbnails
-         */
-        thumbnails: Array<ThumbnailOverviewThumbnail>;
+    /**
+     * Maximal Size a Thumbnail should displayed. (this should include the gaps between thumbnails)
+     */
+    maxThumbnailSize: Size2D;
 
-        /**
-         * Container needs a size(width/height).
-         */
-        container: JQuery;
+    inputHandler: ThumbnailOverviewInputHandler;
+}
 
-        /**
-         * Maximal Size a Thumbnail should displayed. (this should include the gaps between thumbnails)
-         */
-        maxThumbnailSize: Size2D;
-
-        inputHandler: ThumbnailOverviewInputHandler;
+export class DefaultThumbnailOverviewSettings implements ThumbnailOverviewSettings {
+    constructor(private _thumbnails: Array<ThumbnailOverviewThumbnail>,
+                private _container: JQuery,
+                private _inputHandler: ThumbnailOverviewInputHandler = {
+                    addedThumbnail: function (id: string, element: JQuery) {
+                    }
+                },
+                private _maxThumbnailSize = new Size2D(255, 255)) {
     }
 
-    export class DefaultThumbnailOverviewSettings implements ThumbnailOverviewSettings {
-        constructor(private _thumbnails: Array<ThumbnailOverviewThumbnail>, private _container: JQuery, private _inputHandler: ThumbnailOverviewInputHandler = { addedThumbnail: function(id:string, element:JQuery) { } }, private _maxThumbnailSize = new Size2D(255, 255)) {
-        }
+    public get thumbnails() {
+        return this._thumbnails;
+    }
 
-        public get thumbnails() {
-            return this._thumbnails;
-        }
+    public get container() {
+        return this._container;
+    }
 
-        public get container() {
-            return this._container;
-        }
+    public get maxThumbnailSize() {
+        return this._maxThumbnailSize;
+    }
 
-        public get maxThumbnailSize() {
-            return this._maxThumbnailSize;
-        }
-
-        public get inputHandler(): ThumbnailOverviewInputHandler {
-            return this._inputHandler;
-        }
-
-
+    public get inputHandler(): ThumbnailOverviewInputHandler {
+        return this._inputHandler;
     }
 
 }
+

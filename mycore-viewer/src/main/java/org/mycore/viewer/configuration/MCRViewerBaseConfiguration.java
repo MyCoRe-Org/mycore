@@ -81,26 +81,21 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
 
         // script & css
         boolean developerMode = isDebugMode(request);
-        addLocalScript("iview-client-base.js", true, developerMode);
+        addLocalScript("iview-client-base.es.js", false, true, developerMode);
         final boolean framed = this.isFramed(request);
 
-        if (mobile && !framed && !"js".equals(request.getParameter("XSL.Style"))) {
-            addLocalScript("iview-client-mobile.js", true, developerMode);
-            addLocalCSS("mobile.css");
+        if (framed) {
+            addLocalScript("iview-client-frame.es.js", false, true, developerMode);
+        } else if (this.getEmbeddedParameter(request) != null) {
+            addLocalScript("iview-client-frame.es.js", false, true, developerMode);
+            setProperty("embedded", "true");
+            setProperty("permalink.updateHistory", false);
+            setProperty("chapter.showOnStart", false);
         } else {
-            if (framed) {
-                addLocalScript("iview-client-frame.js", true, developerMode);
-            } else if (this.getEmbeddedParameter(request) != null) {
-                addLocalScript("iview-client-frame.js", true, developerMode);
-                setProperty("embedded", "true");
-                setProperty("permalink.updateHistory", false);
-                setProperty("chapter.showOnStart", false);
-            } else {
-                addLocalScript("iview-client-desktop.js", true, developerMode);
-            }
-
-            addLocalCSS("default.css");
+            addLocalScript("iview-client-desktop.es.js", false, true, developerMode);
         }
+
+        addLocalCSS("default.css");
 
         String maximalScale = MCRConfiguration2.getString("MCR.Viewer.Canvas.Startup.MaximalPageScale").orElse("");
         if (!maximalScale.isEmpty()) {

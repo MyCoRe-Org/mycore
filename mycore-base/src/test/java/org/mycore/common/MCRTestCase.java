@@ -117,14 +117,19 @@ public class MCRTestCase {
 
     private static void extendTestProperties(Map<String, String> testProperties, MCRTestProperty testProperty) {
 
+        boolean empty = testProperty.empty();
+
         String stringValue = testProperty.string();
         boolean nonDefaultString = !Objects.equals(stringValue, "");
 
         Class<?> classNameOfValue = testProperty.classNameOf();
         boolean nonDefaultClassNameOf = Void.class != classNameOfValue;
 
-        if (nonDefaultString && nonDefaultClassNameOf) {
-            throw new MCRConfigurationException("MCRTestProperty can have either a string- or a classNameOf-value");
+        if (empty && nonDefaultString && nonDefaultClassNameOf) {
+            throw new MCRConfigurationException("MCRTestProperty can either be empty or " +
+                "have either a string- or a classNameOf-value");
+        } else if (empty) {
+            testProperties.put(testProperty.key(), "");
         } else if (nonDefaultString) {
             testProperties.put(testProperty.key(), stringValue);
         } else if (nonDefaultClassNameOf) {

@@ -16,16 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../definitions/jquery.d.ts" />
-/// <reference path="ChapterTreeChapter.ts" />
-/// <reference path="ChapterTreeView.ts" />
-/// <reference path="DesktopChapterTreeView.ts" />
-/// <reference path="MobileChapterTreeView.ts" />
-/// <reference path="ChapterTreeInputHandler.ts" />
+    import {ChapterTreeChapter} from "./ChapterTreeChapter";
+import {MyCoReMap} from "../../Utils";
+import {ChapterTreeInputHandler, DefaultChapterTreeInputHandler} from "./ChapterTreeInputHandler";
+import {ChapterTreeView} from "./ChapterTreeView";
+import {MobileChapterTreeView} from "./MobileChapterTreeView";
+import {DesktopChapterTreeView} from "./DesktopChapterTreeView";
 
-namespace mycore.viewer.widgets.chaptertree {
-
-    export interface ChapterTreeSettings {
+export interface ChapterTreeSettings {
         /**
          * Should hold the Chapters to Display.
          */
@@ -50,7 +48,7 @@ namespace mycore.viewer.widgets.chaptertree {
     }
 
     /**
-     * The IviewChapterTree doesnt know how to build the View.
+     * The IviewChapterTree does not know how to build the View.
      * So you can Exchange the view without change the Controller.
      */
     export interface ChapterTreeViewFactory {
@@ -63,7 +61,11 @@ namespace mycore.viewer.widgets.chaptertree {
      */
     export class DefaultChapterTreeSettings implements ChapterTreeSettings, ChapterTreeViewFactory {
 
-        constructor(private _container: JQuery, private _chapterLabelMap: MyCoReMap<string, string>, private _chapter: ChapterTreeChapter = null, private mobile: boolean = false, private _inputHandler: ChapterTreeInputHandler = new DefaultChapterTreeInputHandler()) {
+        constructor(private _container: JQuery,
+                    private _chapterLabelMap: MyCoReMap<string, string>,
+                    private _chapter: ChapterTreeChapter = null,
+                    private mobile: boolean = false,
+                    private _inputHandler: ChapterTreeInputHandler = new DefaultChapterTreeInputHandler()) {
         }
 
 
@@ -92,4 +94,3 @@ namespace mycore.viewer.widgets.chaptertree {
         }
 
     }
-}

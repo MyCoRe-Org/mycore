@@ -16,18 +16,18 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../model/MyCoReBasicToolbarModel.ts" />
-/// <reference path="../ViewerComponent.ts" />
 
-namespace mycore.viewer.components.events {
-    export class ProvideToolbarModelEvent extends MyCoReImageViewerEvent {
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {ViewerComponent} from "../ViewerComponent";
+import {MyCoReBasicToolbarModel} from "../model/MyCoReBasicToolbarModel";
 
-        constructor(component:ViewerComponent, public model:model.MyCoReBasicToolbarModel) {
-            super(component, ProvideToolbarModelEvent.TYPE);
-        }
+export class ProvideToolbarModelEvent extends MyCoReImageViewerEvent {
 
-        public static TYPE = "ProvideToolbarModelEvent";
-
+    constructor(component: ViewerComponent, public model: MyCoReBasicToolbarModel) {
+        super(component, ProvideToolbarModelEvent.TYPE);
     }
+
+    public static TYPE = "ProvideToolbarModelEvent";
+
 }
+

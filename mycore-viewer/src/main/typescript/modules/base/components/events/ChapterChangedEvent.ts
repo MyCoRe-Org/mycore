@@ -16,21 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../ViewerComponent.ts" />
-/// <reference path="../../widgets/events/ViewerEvent.ts" />
-/// <reference path="../model/StructureImage.ts" />
 
-namespace mycore.viewer.components.events {
-    export class ChapterChangedEvent extends MyCoReImageViewerEvent{
-        constructor(component: ViewerComponent,private _chapter:model.StructureChapter) {
-            super(component, ChapterChangedEvent.TYPE);
-        }
+import {ViewerComponent} from "../ViewerComponent";
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {StructureChapter} from "../model/StructureChapter";
 
-        public get chapter() {
-            return this._chapter;
-        }
-
-        public static TYPE:string = "ChapterChangedEvent";
+export class ChapterChangedEvent extends MyCoReImageViewerEvent {
+    constructor(component: ViewerComponent, private _chapter: StructureChapter) {
+        super(component, ChapterChangedEvent.TYPE);
     }
+
+    public get chapter() {
+        return this._chapter;
+    }
+
+    public static TYPE: string = "ChapterChangedEvent";
 }
+

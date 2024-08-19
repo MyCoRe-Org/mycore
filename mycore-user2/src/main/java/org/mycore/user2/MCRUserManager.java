@@ -18,10 +18,7 @@
 
 package org.mycore.user2;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -38,13 +35,14 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Format;
+import org.mycore.user2.hash.MCRPasswordCheckData;
+import org.mycore.user2.hash.MCRPasswordCheckManager;
+import org.mycore.user2.hash.MCRPasswordCheckResult;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -65,20 +63,7 @@ import jakarta.persistence.metamodel.SingularAttribute;
  */
 public class MCRUserManager {
 
-    private static final int HASH_ITERATIONS = MCRConfiguration2
-        .getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations").orElse(1000);
-
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final SecureRandom SECURE_RANDOM;
-
-    static {
-        try {
-            SECURE_RANDOM = SecureRandom.getInstance("SHA1PRNG");
-        } catch (NoSuchAlgorithmException e) {
-            throw new MCRException("Could not initialize secure SECURE_RANDOM number", e);
-        }
-    }
 
     /** The table that stores login user information */
     static String table;
@@ -344,7 +329,8 @@ public class MCRUserManager {
         return em.createQuery(
             query
                 .distinct(true)
-                .where(cb.equal(users.get(MCRUser_.owner), owner)))
+                .where(
+                    owner == null ? cb.isNull(users.get(MCRUser_.owner)) : cb.equal(users.get(MCRUser_.owner), owner)))
             .getResultList();
     }
 
@@ -640,8 +626,8 @@ public class MCRUserManager {
      * Returns a {@link MCRUser} instance if the login succeeds.
      * This method will return <code>null</code> if the user does not exist, no password was given or
      * the login is disabled.
-     * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt}, {@link MCRPasswordHashType#md5} or
-     * {@link MCRPasswordHashType#sha1} the hash value is automatically upgraded to {@link MCRPasswordHashType#sha256}.
+     * If the {@link MCRUser#getHashType()} is not the currently preferred hash type, the stored password hash is
+     * automatically updated.
      * @param userName Name of the user to login.
      * @param password clear text password.
      * @return authenticated {@link MCRUser} instance or <code>null</code>.
@@ -650,12 +636,12 @@ public class MCRUserManager {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
             LOGGER.warn(() -> "User not found: " + userName);
-            waitLoginPanalty();
+            waitLoginPenalty();
             return null;
         }
         if (password == null) {
             LOGGER.warn("No password for user {} entered", userName);
-            waitLoginPanalty();
+            waitLoginPenalty();
             return null;
         }
         if (!user.loginAllowed()) {
@@ -667,53 +653,26 @@ public class MCRUserManager {
             }
             return null;
         }
-        try {
-            switch (user.getHashType()) {
-                case crypt -> {
-                    //Wahh! did we ever thought about what "salt" means for passwd management?
-                    String passwdHash = user.getPassword();
-                    String salt = passwdHash.substring(0, 3);
-                    if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
-                        //login failed
-                        waitLoginPanalty();
-                        return null;
-                    }
-                    //update to SHA-256
-                    updatePasswordHashToSHA256(user, password);
-                }
-                case md5 -> {
-                    if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
-                        waitLoginPanalty();
-                        return null;
-                    }
-                    //update to SHA-256
-                    updatePasswordHashToSHA256(user, password);
-                }
-                case sha1 -> {
-                    if (!MCRUtils.asSHA1String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
-                        .equals(user.getPassword())) {
-                        waitLoginPanalty();
-                        return null;
-                    }
-                    //update to SHA-256
-                    updatePasswordHashToSHA256(user, password);
-                }
-                case sha256 -> {
-                    if (!MCRUtils.asSHA256String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
-                        .equals(user.getPassword())) {
-                        waitLoginPanalty();
-                        return null;
-                    }
-                }
-                default -> throw new MCRException("Cannot validate hash type " + user.getHashType());
-            }
-        } catch (NoSuchAlgorithmException e) {
-            throw new MCRException("Error while validating login", e);
+
+        MCRPasswordCheckData hash = new MCRPasswordCheckData(user.getHashType(), user.getSalt(), user.getPassword());
+        MCRPasswordCheckResult result = MCRPasswordCheckManager.instance().verify(hash, password);
+
+        if (!result.valid()) {
+            waitLoginPenalty();
+            return null;
         }
+
+        if (result.deprecated()) {
+            setUserPassword(user, password);
+        }
+
         return user;
+
     }
 
-    private static void waitLoginPanalty() {
+
+
+    private static void waitLoginPenalty() {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -735,25 +694,24 @@ public class MCRUserManager {
         if (!allowed) {
             throw new MCRException("You are not allowed to change password of user: " + user);
         }
-        updatePasswordHashToSHA256(myUser, password);
+        setUserPassword(myUser, password);
         updateUser(myUser);
     }
 
+    @Deprecated
     static void updatePasswordHashToSHA256(MCRUser user, String password) {
-        String newHash;
-        byte[] salt = generateSalt();
-        try {
-            newHash = MCRUtils.asSHA256String(HASH_ITERATIONS, salt, password);
-        } catch (Exception e) {
-            throw new MCRException("Could not update user password hash to SHA-256.", e);
-        }
-        user.setSalt(Base64.getEncoder().encodeToString(salt));
-        user.setHashType(MCRPasswordHashType.sha256);
-        user.setPassword(newHash);
+        setUserPassword(MCRPasswordCheckManager.instance(), user, password);
     }
 
-    private static byte[] generateSalt() {
-        return SECURE_RANDOM.generateSeed(8);
+    public static void setUserPassword(MCRUser user, String password) {
+        setUserPassword(MCRPasswordCheckManager.instance(), user, password);
+    }
+
+    private static void setUserPassword(MCRPasswordCheckManager passwordCheckManager, MCRUser user, String password) {
+        MCRPasswordCheckData data = passwordCheckManager.create(password);
+        user.setHashType(data.type());
+        user.setSalt(data.salt());
+        user.setPassword(data.hash());
     }
 
     private static Optional<MCRUser> getByNaturalID(EntityManager em, String userName, String realmId) {

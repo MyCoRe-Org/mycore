@@ -21,6 +21,10 @@ package org.mycore.solr.schema;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,12 +32,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -42,13 +40,13 @@ import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRConfigurationInputStream;
+import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
-import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -183,7 +181,7 @@ public class MCRSolrSchemaReloader {
             .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
         LOGGER.info("Load schema definitions for core " + coreID + " using configuration " + configType);
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
             Collection<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + configType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME).values();
             for (byte[] schemaFileData : schemaFileContents) {
@@ -199,32 +197,29 @@ public class MCRSolrSchemaReloader {
                     LOGGER.debug(e);
                     String command = e.toString();
 
-                    HttpPost post = new HttpPost(solrCore.getV1CoreURL() + "/schema");
-                    SOLR_AUTHENTICATION_MANAGER.applyAuthentication(post,
+                    HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+                        .uri(URI.create(solrCore.getV1CoreURL() + "/schema"))
+                        .header("Content-type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(command));
+                    SOLR_AUTHENTICATION_MANAGER.applyAuthentication(solrRequestBuilder,
                         MCRSolrAuthenticationLevel.ADMIN);
-                    post.setHeader("Content-type", "application/json");
-                    post.setEntity(new StringEntity(command));
                     String commandprefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))
                         : "unknown command";
 
-                    try (CloseableHttpResponse response = httpClient.execute(post)) {
-                        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                                StandardCharsets.UTF_8);
-                            LOGGER.debug("SOLR schema " + commandprefix + " successful \n{}", respContent);
-                        } else {
+                    HttpResponse<String> response = httpClient.send(solrRequestBuilder.build(),
+                        HttpResponse.BodyHandlers.ofString());
 
-                            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                                StandardCharsets.UTF_8);
-                            LOGGER
-                                .error("SOLR schema " + commandprefix + " error: {} {}\n{}",
-                                    response.getStatusLine().getStatusCode(),
-                                    response.getStatusLine().getReasonPhrase(), respContent);
-                        }
+                    if (response.statusCode() == 200) {
+                        LOGGER.debug("SOLR schema {} successful \n{}", commandprefix, response.body());
+                    } else {
+
+                        LOGGER
+                            .error("SOLR schema {} error: {} {}\n{}", commandprefix, response.statusCode(),
+                                MCRHttpUtils.getReasonPhrase(response.statusCode()), response.body());
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             LOGGER.error(e);
         }
     }

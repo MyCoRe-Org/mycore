@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateHttp2SolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
@@ -73,7 +73,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         int totalCount = documents.size();
         LOGGER.info("Handling {} documents", totalCount);
         for (SolrClient client : getClients()) {
-            if (client instanceof ConcurrentUpdateSolrClient) {
+            if (client instanceof ConcurrentUpdateHttp2SolrClient) {
                 LOGGER.info("Detected ConcurrentUpdateSolrClient. Split up batch update.");
                 splitDocuments();
                 //for statistics:

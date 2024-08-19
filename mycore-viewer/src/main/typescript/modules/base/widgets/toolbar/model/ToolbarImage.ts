@@ -16,24 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../Utils.ts" />
-/// <reference path="ToolbarComponent.ts" />
+import {ToolbarComponent} from "./ToolbarComponent";
+import {ViewerProperty} from "../../../Utils";
 
-namespace mycore.viewer.widgets.toolbar {
-
-    export class ToolbarImage extends ToolbarComponent {
-        constructor(id: string, href: string) {
-            super(id);
-            this.addProperty(new ViewerProperty<string>(this, "href", href));
-        }
-
-        public get href(): string {
-            return this.getProperty("href").value;
-        }
-
-        public set href(href: string) {
-            this.getProperty("href").value = href;
-        }
+export class ToolbarImage extends ToolbarComponent {
+    constructor(id: string, href: string) {
+        super(id);
+        this.addProperty(new ViewerProperty<string>(this, "href", href));
     }
 
+    public get href(): string {
+        return this.getProperty("href").value;
+    }
+
+    public set href(href: string) {
+        this.getProperty("href").value = href;
+    }
 }

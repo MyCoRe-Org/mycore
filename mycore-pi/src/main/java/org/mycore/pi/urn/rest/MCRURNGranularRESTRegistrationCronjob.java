@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -94,6 +94,6 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
             LOGGER.warn("Could not instantiate {} as required credentials are not set", this.getClass().getName());
             return Optional.empty();
         }
-        return Optional.of(new UsernamePasswordCredentials(username, password));
+        return Optional.of(new UsernamePasswordCredentials(username, password.toCharArray()));
     }
 }

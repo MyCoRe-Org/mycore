@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src/main/typescript/modules/",
+    "target": "ESNext",
+    "typeRoots": ["node_modules/@types"],
+    "moduleResolution": "Node",
+    "lib": ["ESNext", "DOM"]
+  },
+  "files": [
+    "src/main/typescript/modules/base/module.ts",
+    "src/main/typescript/modules/desktop/module.ts",
+    "src/main/typescript/modules/mets/module.ts",
+    "src/main/typescript/modules/pdf/module.ts",
+    "src/main/typescript/modules/frame/module.ts",
+    "src/main/typescript/modules/logo/module.ts",
+    "src/main/typescript/modules/metadata/module.ts",
+    "src/main/typescript/modules/piwik/module.ts",
+    "src/main/typescript/modules/tei/module.ts",
+    "src/main/typescript/modules/toolbar-extender/module.ts",
+    "src/main/typescript/modules/epub/module.ts",
+    "src/main/typescript/modules/iiif/module.ts"
+  ]
+}

@@ -18,9 +18,12 @@
 
 package org.mycore.solr.common.xml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -29,19 +32,16 @@ import java.util.regex.Pattern;
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.search.MCRSolrURL;
 
 /**
@@ -105,36 +105,40 @@ public class MCRSolrQueryResolver implements URIResolver {
                 }
             }
 
-            HttpSolrClient client = core.flatMap(MCRSolrCoreManager::get)
+            HttpSolrClientBase client = core.flatMap(MCRSolrCoreManager::get)
                 .map(MCRSolrCore::getClient)
-                .orElse((HttpSolrClient) MCRSolrCoreManager.getMainSolrClient());
+                .orElse((HttpSolrClientBase) MCRSolrCoreManager.getMainSolrClient());
 
             if (query.isPresent()) {
                 MCRSolrURL solrURL = new MCRSolrURL(client, query.get());
                 requestHandler.map("/"::concat).ifPresent(solrURL::setRequestHandler);
-                HttpGet get;
 
+                URI solrRequestURI;
                 try {
-                    get = new HttpGet(solrURL.getUrl().toURI());
+                    solrRequestURI = solrURL.getUrl().toURI();
                 } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("Could not create URI from " + solrURL.getUrl(), e);
                 }
 
-                MCRSolrAuthenticationManager.getInstance().applyAuthentication(get,
-                    MCRSolrAuthenticationLevel.SEARCH);
+                HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder().uri(solrRequestURI);
 
-                HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-                try (CloseableHttpClient httpClient = clientBuilder.build();
-                    CloseableHttpResponse response = httpClient.execute(get)) {
+                MCRSolrAuthenticationManager.getInstance()
+                    .applyAuthentication(solrRequestBuilder, MCRSolrAuthenticationLevel.SEARCH);
 
-                    if (response.getStatusLine().getStatusCode() != 200) {
-                        throw new MCRException("Error while executing request: " + response.getStatusLine());
+                try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
+                    HttpRequest solrRequest = solrRequestBuilder.build();
+                    HttpResponse<byte[]> response = httpClient.send(solrRequest,
+                        HttpResponse.BodyHandlers.ofByteArray());
+
+                    if (response.statusCode() != 200) {
+                        throw new MCRException(
+                            "Error while executing request: " + response.version() + " " + response.statusCode());
                     }
 
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    response.getEntity().getContent().transferTo(byteArrayOutputStream);
-                    return new MCRByteContent(byteArrayOutputStream.toByteArray()).getSource();
-                } catch (IOException e) {
+                    MCRByteContent result = new MCRByteContent(response.body());
+                    result.setSystemId(solrRequest.uri().toString());
+                    return result.getSource();
+                } catch (InterruptedException | IOException e) {
                     throw new MCRException("Error while executing request", e);
                 }
             }

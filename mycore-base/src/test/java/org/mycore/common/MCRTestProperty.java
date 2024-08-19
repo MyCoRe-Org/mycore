@@ -30,6 +30,8 @@ public @interface MCRTestProperty {
 
     String key();
 
+    boolean empty() default false;
+
     String string() default "";
 
     Class<?> classNameOf() default Void.class;

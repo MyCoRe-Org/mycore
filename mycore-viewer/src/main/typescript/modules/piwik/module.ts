@@ -16,5 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoRePiwikComponent.ts" />
-console.log("PIWIK MODULE");
+
+import {addViewerComponent} from "../base/Utils";
+import {MyCoRePiwikComponent} from "./components/MyCoRePiwikComponent";
+
+addViewerComponent(MyCoRePiwikComponent);

@@ -45,8 +45,6 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -321,16 +319,23 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the hashType
      */
     @Column(name = "hashType")
-    @Enumerated(EnumType.STRING)
-    public MCRPasswordHashType getHashType() {
+    public String getHashType() {
         return password == null ? null : password.hashType;
     }
 
     /**
      * @param hashType the hashType to set
      */
-    public void setHashType(MCRPasswordHashType hashType) {
+    public void setHashType(String hashType) {
         this.password.hashType = hashType;
+    }
+
+    /**
+     * @param hashType the hashType to set
+     */
+    @Deprecated
+    public void setHashType(MCRPasswordHashType hashType) {
+        setPassword(hashType.name());
     }
 
     /**
@@ -828,7 +833,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         private String salt;
 
         @XmlAttribute
-        private MCRPasswordHashType hashType;
+        private String hashType;
 
         /** A hint stored by the user in case hash is forgotten */
         @XmlAttribute

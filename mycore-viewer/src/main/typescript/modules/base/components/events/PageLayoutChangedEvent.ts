@@ -16,21 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="MyCoReImageViewerEvent.ts" />
-/// <reference path="../../widgets/canvas/PageLayout.ts" />
-/// <reference path="../ViewerComponent.ts" />
+import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import {PageLayout} from "../../widgets/canvas/PageLayout";
+import {ViewerComponent} from "../ViewerComponent";
 
-namespace mycore.viewer.components.events {
-    /**
-     * Fired when a PageLayoutChanges
-     */
-    export class PageLayoutChangedEvent extends MyCoReImageViewerEvent {
+/**
+ * Fired when a PageLayoutChanges
+ */
+export class PageLayoutChangedEvent extends MyCoReImageViewerEvent {
 
-        constructor(component:ViewerComponent, public pageLayout:widgets.canvas.PageLayout) {
-            super(component, PageLayoutChangedEvent.TYPE);
-        }
-
-        public static TYPE = "PageLayoutChangedEvent";
-
+    constructor(component: ViewerComponent, public pageLayout: PageLayout) {
+        super(component, PageLayoutChangedEvent.TYPE);
     }
+
+    public static TYPE = "PageLayoutChangedEvent";
+
 }
+

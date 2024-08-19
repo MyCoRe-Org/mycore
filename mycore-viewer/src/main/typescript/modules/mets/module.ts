@@ -16,11 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="components/MyCoReMetsComponent.ts" />
-/// <reference path="components/MyCoReAltoModelProvider.ts" />
-/// <reference path="components/MyCoReMetsPageProviderComponent.ts" />
-/// <reference path="components/MyCoRePrintComponent.ts" />
-/// <reference path="components/MyCoReHighlightAltoComponent.ts" />
-/// <reference path="components/MyCoReAltoEditorComponent.ts" />
+import {addViewerComponent} from "../base/Utils";
+import {MyCoReMetsComponent} from "./components/MyCoReMetsComponent";
+import {MyCoReAltoModelProvider} from "./components/MyCoReAltoModelProvider";
+import {MyCoReMetsPageProviderComponent} from "./components/MyCoReMetsPageProviderComponent";
+import {MyCoRePrintComponent} from "./components/MyCoRePrintComponent";
+import {MyCoReHighlightAltoComponent} from "./components/MyCoReHighlightAltoComponent";
+import {MyCoReAltoEditorComponent} from "./components/MyCoReAltoEditorComponent";
 
-console.log("METS MODULE"); 
+addViewerComponent(MyCoReMetsComponent);
+addViewerComponent(MyCoReAltoModelProvider)
+addViewerComponent(MyCoReMetsPageProviderComponent);
+addViewerComponent(MyCoRePrintComponent);
+addViewerComponent(MyCoReHighlightAltoComponent);
+addViewerComponent(MyCoReAltoEditorComponent);

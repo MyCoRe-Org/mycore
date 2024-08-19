@@ -16,9 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mycore.viewer.components {
-    export interface PDFSettings extends MyCoReViewerSettings {
-        pdfProviderURL: string;
-        pdfWorkerURL: string;
-    }
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
+
+export interface PDFSettings extends MyCoReViewerSettings {
+    pdfProviderURL: string;
+    pdfWorkerURL: string;
 }
