@@ -266,21 +266,20 @@ public abstract class MCRServletContentHelper {
         final String eTag = content.getETag();
         final String headerValue = request.getHeader("If-Match");
         if (headerValue != null&&headerValue.indexOf('*') == -1) {
-                final StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
-                boolean conditionSatisfied = false;
-
-                while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
-                    final String currentToken = commaTokenizer.nextToken();
-                    if (currentToken.trim().equals(eTag)) {
-                        conditionSatisfied = true;
-                    }
+            final StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
+            boolean conditionSatisfied = false;
+            while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
+                final String currentToken = commaTokenizer.nextToken();
+                if (currentToken.trim().equals(eTag)) {
+                    conditionSatisfied = true;
                 }
+            }
 
-                // none of the given ETags match
-                if (!conditionSatisfied) {
-                    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-                    return false;
-                }
+            // none of the given ETags match
+            if (!conditionSatisfied) {
+                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return false;
+            }
 
         }
         return true;
@@ -296,14 +295,11 @@ public abstract class MCRServletContentHelper {
             final long headerValue = request.getDateHeader("If-Modified-Since");
             final long lastModified = content.lastModified();
             if (headerValue != -1&&request.getHeader("If-None-Match") == null && lastModified < headerValue + 1000) {
-
                 // If an If-None-Match header has been specified, if modified since
                 // is ignored.
-                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", content.getETag());
-
-                    return false;
-
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                response.setHeader("ETag", content.getETag());
+                return false;
             }
         } catch (final IllegalArgumentException illegalArgument) {
             return true;
@@ -360,9 +356,9 @@ public abstract class MCRServletContentHelper {
             final long lastModified = resource.lastModified();
             final long headerValue = request.getDateHeader("If-Unmodified-Since");
             if (headerValue != -1&&lastModified >= headerValue + 1000) {
-                    // The content has been modified.
-                    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-                    return false;
+                // The content has been modified.
+                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return false;
             }
         } catch (final IllegalArgumentException illegalArgument) {
             return true;

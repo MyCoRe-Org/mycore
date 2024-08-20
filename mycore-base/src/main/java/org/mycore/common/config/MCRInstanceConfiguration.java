@@ -129,16 +129,20 @@ public class MCRInstanceConfiguration {
         return new MCRInstanceConfiguration(name, className, reducedProperties, properties);
     }
 
+    @SuppressWarnings("PMD.CollapsibleIfStatements")
+    //The condition was intentionally split into to warts, to make it to follow the thought-process.
     private static Map<String, String> reduceProperties(MCRInstanceName name, String prefix,
         Map<String, String> properties) {
         Map<String, String> reducedProperties = new HashMap<>();
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            if (key.startsWith(prefix)&&key.length() != prefix.length() && key.charAt(prefix.length()) == '.') {
+            if (key.startsWith(prefix)) {
+                if (key.length() != prefix.length() && key.charAt(prefix.length()) == '.') {
                     String reducedKey = key.substring(prefix.length() + 1);
                     if (!name.ignoredKeys().contains(reducedKey)) {
                         reducedProperties.put(reducedKey, value);
+                    }
                 }
             }
         }

@@ -114,7 +114,7 @@ import org.xml.sax.XMLReader;
 
 import jakarta.servlet.ServletContext;
 
-import static org.mycore.common.xml.MCRURIResolver.MCRLayoutTransformerResolver.findAndThrowTransformerException;
+
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
@@ -169,6 +169,15 @@ public final class MCRURIResolver implements URIResolver {
                     return null;
                 }
             }).orElse(HashMap::new);
+    }
+    private static void findAndThrowTransformerException(Exception e) throws TransformerException {
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            if (cause instanceof TransformerException te) {
+                throw te;
+            }
+            cause = cause.getCause();
+        }
     }
 
     /**
@@ -1211,16 +1220,6 @@ public final class MCRURIResolver implements URIResolver {
             } catch (Exception e) {
                 findAndThrowTransformerException(e);
                 throw new TransformerException(e);
-            }
-        }
-
-        static void findAndThrowTransformerException(Exception e) throws TransformerException {
-            Throwable cause = e.getCause();
-            while (cause != null) {
-                if (cause instanceof TransformerException te) {
-                    throw te;
-                }
-                cause = cause.getCause();
             }
         }
 

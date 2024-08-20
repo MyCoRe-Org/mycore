@@ -116,10 +116,7 @@ public class MCRLayoutService {
         try {
             MCRParameterCollector parameter = new MCRParameterCollector(req);
             MCRContentTransformer transformer = getContentTransformer(docType, parameter);
-            String filename = getFileName(req, parameter);
-            MCRContent transformed = transform(transformer, source, parameter);
-            transformed.setName(filename);
-            return transformed;
+            return transform(transformer, source, parameter);
         } catch (IOException | TransformerException | SAXException ex) {
             throw ex;
         } catch (MCRException ex) {

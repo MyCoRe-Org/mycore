@@ -283,10 +283,10 @@ public class MCRTopologicalSort<T> {
             // for each node m with an edge e from n to m do
             for (Integer to : new TreeSet<>(edgeSources.keySet())) {
                 Set<Integer> ts = edgeSources.get(to);
+                // remove edge e from the graph
                 if (ts != null && ts.contains(node)&&removeEdge(node, to)) {
-                    // remove edge e from the graph
-                        // if m has no other incoming edges then insert m  into S
-                        leafs.add(to);
+                    // if m has no other incoming edges then insert m  into S
+                    leafs.add(to);
                 }
             }
         }

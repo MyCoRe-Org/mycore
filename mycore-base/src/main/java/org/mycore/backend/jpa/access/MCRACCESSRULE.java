@@ -123,6 +123,6 @@ public class MCRACCESSRULE {
     }
 
     private boolean stringsAreEqual(String string, String otherString) {
-        return (!((string == null && otherString != null) || !Objects.equals(string, otherString)));
+        return (!Objects.equals(string, otherString));
     }
 }

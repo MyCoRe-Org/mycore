@@ -172,14 +172,13 @@ public class MCRDataURL implements Serializable {
     public static String build(final String str, final String encoding, final String mimeType, final String charset)
         throws MalformedURLException {
         MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;
-
         final Matcher mtm = PATTERN_MIMETYPE.matcher(mimeType);
         if (mtm.matches()&&enc == null) {
-                if ("text".equals(mtm.group(1))) {
-                    enc = MCRDataURLEncoding.URL;
-                } else {
-                    enc = MCRDataURLEncoding.BASE64;
-                }
+            if ("text".equals(mtm.group(1))) {
+                enc = MCRDataURLEncoding.URL;
+            } else {
+                enc = MCRDataURLEncoding.BASE64;
+            }
         }
 
         final MCRDataURL dataURL = new MCRDataURL(str.getBytes(Charset.forName(charset)), enc, mimeType, charset);

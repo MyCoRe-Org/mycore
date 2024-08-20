@@ -134,7 +134,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
                     add(base, field2, value2);
                 }
             } else if (a == Action.REMOVE_IF&&!find(base, field1, value1).isEmpty()) {
-                    find(base, field2, value2).forEach(Element::detach);
+                find(base, field2, value2).forEach(Element::detach);
             }
         }
 

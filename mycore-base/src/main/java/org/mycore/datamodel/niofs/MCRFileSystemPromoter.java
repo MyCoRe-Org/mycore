@@ -80,8 +80,9 @@ public class MCRFileSystemPromoter implements AutoExecutable {
                 .collect(Collectors.toCollection(ArrayList::new)));
         }
     }
-@SuppressWarnings("PMD.UnusedPrivateMethod")
-//Method is used. Warning is result of a bug in PMD
+
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    //Method is used. Warning is result of a bug in PMD
     private void promoteFileSystemProvider(List<FileSystemProvider> detectedProviders) {
         if (detectedProviders.isEmpty()) {
             return;
