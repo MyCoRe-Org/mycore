@@ -134,11 +134,7 @@ public abstract class MCRServletContentHelper {
             = configureResponseHeaders(content, serveContent, request, httpServletResponse, config);
         try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {
             if (serveContent) {
-                try {
                     response.setBufferSize(config.outputBufferSize);
-                } catch (final IllegalStateException e) {
-                    //does not matter if we fail
-                }
             }
             List<Range> ranges = parseRange(request, response, content);
             if (response instanceof ServletResponseWrapper) {
@@ -147,36 +143,27 @@ public abstract class MCRServletContentHelper {
                 }
                 ranges = ContentUtils.FULL;
             }
-            deliverContent(content, request, response, config, isError, ranges, contentType, contentLength,
-                serveContent,
-                out);
-        }
-    }
-
-    private static void deliverContent(MCRContent content, HttpServletRequest request,
-        HttpServletResponse response,
-        Config config, boolean isError, List<Range> ranges, String contentType, long contentLength,
-        boolean serveContent, ServletOutputStream out) throws IOException {
-        if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null
-            || ranges.equals(ContentUtils.FULL)) {
-            //No ranges
-            if (contentType != null) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("contentType='{}'", contentType);
+            if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null
+                || ranges.equals(ContentUtils.FULL)) {
+                //No ranges
+                if (contentType != null) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("contentType='{}'", contentType);
+                    }
+                    response.setContentType(contentType);
                 }
-                response.setContentType(contentType);
-            }
-            if (contentLength >= 0) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("contentLength={}", contentLength);
+                if (contentLength >= 0) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("contentLength={}", contentLength);
+                    }
+                    setContentLengthLong(response, contentLength);
                 }
-                setContentLengthLong(response, contentLength);
+                if (serveContent) {
+                    ContentUtils.copy(content, out, config.inputBufferSize, config.outputBufferSize);
+                }
+            } else {
+                handlePartialContent(content, response, config, ranges, contentType, serveContent, out);
             }
-            if (serveContent) {
-                ContentUtils.copy(content, out, config.inputBufferSize, config.outputBufferSize);
-            }
-        } else {
-            handlePartialContent(content, response, config, ranges, contentType, serveContent, out);
         }
     }
 
