@@ -45,22 +45,15 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  */
 public class MCRMetaLink extends MCRMetaDefault {
+    private static final Logger LOGGER = LogManager.getLogger();
     // MetaLink data
     protected String href;
-
     protected String label;
-
     protected String title;
-
     protected String linktype;
-
     protected String role;
-
     protected String from;
-
     protected String to;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * initializes with empty values.
@@ -205,19 +198,19 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method sets the xlink:role.
-     * 
-     */
-    public void setXLinkRole(String role) {
-        this.role = role;
-    }
-
-    /**
      * This method get the xlink:role element as string.
      * 
      */
     public String getXLinkRole() {
         return role;
+    }
+
+    /**
+     * This method sets the xlink:role.
+     * 
+     */
+    public void setXLinkRole(String role) {
+        this.role = role;
     }
 
     /**
@@ -234,15 +227,14 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @return true if it is compare, else return false
      */
     public final boolean compare(MCRMetaLink input) {
-        if (linktype.equals("locator")&&linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
+        if (linktype.equals("locator") && linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
             return true;
         }
-
         if (linktype.equals("arc")) {
-            return linktype.equals(input.getXLinkType()) && from.equals(input.getXLinkFrom())
+            return linktype.equals(input.getXLinkType())
+                && from.equals(input.getXLinkFrom())
                 && to.equals(input.getXLinkTo());
         }
-
         return false;
     }
 
@@ -251,17 +243,16 @@ public class MCRMetaLink extends MCRMetaDefault {
         return Objects.hash(super.hashCode(), from, href, label, linktype, role, title, to);
     }
 
-
     @Override
     public boolean equals(Object obj) {
         boolean result;
         if (this == obj) {
-            result= true;
-        }else if (!super.equals(obj) || getClass() != obj.getClass()) {
-            result= false;
-        }else{
-        MCRMetaLink other = (MCRMetaLink) obj;
-        result= Objects.equals(from, other.from) &&
+            result = true;
+        } else if (!super.equals(obj) || getClass() != obj.getClass()) {
+            result = false;
+        } else {
+            MCRMetaLink other = (MCRMetaLink) obj;
+            result = Objects.equals(from, other.from) &&
                 Objects.equals(href, other.href) &&
                 Objects.equals(label, other.label) &&
                 Objects.equals(linktype, other.linktype) &&
@@ -400,7 +391,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if (label != null && label.length() > 0&&!XMLChar.isValidNCName(label)) {
+        if (label != null && label.length() > 0 && !XMLChar.isValidNCName(label)) {
             throw new MCRException(getSubTag() + ": label is no valid NCName:" + label);
         }
         if (linktype == null) {
@@ -413,17 +404,17 @@ public class MCRMetaLink extends MCRMetaDefault {
             throwMCRExceptionIfNullOrInvalid(from);
             throwMCRExceptionIfNullOrInvalid(to);
         }
-        if (linktype.equals("locator")&&(href == null || href.length() == 0)) {
+        if (linktype.equals("locator") && (href == null || href.length() == 0)) {
             throw new MCRException(getSubTag() + ": href is null or empty");
         }
     }
 
-    private void throwMCRExceptionIfNullOrInvalid(String string){
-            if (string == null || string.length() == 0) {
-                throw new MCRException(getSubTag() + ": is null or empty");
-            } else if (!XMLChar.isValidNCName(string)) {
-                throw new MCRException(getSubTag() + ": is no valid NCName:" + string);
-            }
+    private void throwMCRExceptionIfNullOrInvalid(String string) {
+        if (string == null || string.length() == 0) {
+            throw new MCRException(getSubTag() + ": is null or empty");
+        } else if (!XMLChar.isValidNCName(string)) {
+            throw new MCRException(getSubTag() + ": is no valid NCName:" + string);
+        }
     }
 
     /**

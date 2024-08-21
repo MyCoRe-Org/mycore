@@ -66,10 +66,6 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     private static final String CFG_SUFFIX_ADD = ".Path2Add";
 
-    private enum Action {
-        ADD, ADD_IF, REMOVE, REMOVE_IF, REPLACE
-    }
-
     @MCRCommand(syntax = "edit {0} at {1} add {2} {3}",
         help = "Edit XML elements in object {0} at level {1} in object {1}, add field {2} with value {3}",
         order = 2)
@@ -133,7 +129,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
                 if (!find(base, field1, value1).isEmpty()) {
                     add(base, field2, value2);
                 }
-            } else if (a == Action.REMOVE_IF&&!find(base, field1, value1).isEmpty()) {
+            } else if (a == Action.REMOVE_IF && !find(base, field1, value1).isEmpty()) {
                 find(base, field2, value2).forEach(Element::detach);
             }
         }
@@ -174,5 +170,9 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
         XPathExpression<Element> fPath = XPathFactory.instance().compile(path, FE, null, NS);
         List<Element> selected = fPath.evaluate(base);
         return selected;
+    }
+
+    private enum Action {
+        ADD, ADD_IF, REMOVE, REMOVE_IF, REPLACE
     }
 }
