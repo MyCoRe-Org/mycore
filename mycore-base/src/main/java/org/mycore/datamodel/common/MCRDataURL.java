@@ -45,6 +45,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.mycore.common.MCRException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -309,8 +310,8 @@ public class MCRDataURL implements Serializable {
             .map(s -> s.split(PARAM_SEPARATOR, 2)).collect(Collectors.toMap(sl -> sl[0], sl -> {
                 try {
                     return decode(sl[1], StandardCharsets.UTF_8);
-                } catch (Exception e) {
-                    throw new UnsupportedCharsetException("Error encoding the parameter value \"" + sl[1]
+                } catch (UnsupportedCharsetException e) {
+                    throw new MCRException("Error encoding the parameter value \"" + sl[1]
                         + "\". Error: " + e.getMessage());
                 }
             }));

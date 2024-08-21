@@ -108,10 +108,10 @@ public class MCRACCESSRULE {
             return false;
         }
         return timestampsAreEqual(creationdate, other.getCreationdate()) &&
-                stringsAreEqual(creator, other.getCreator()) &&
-                stringsAreEqual(description, other.getDescription()) &&
-                stringsAreEqual(rid, other.getRid()) &&
-                stringsAreEqual(rule, other.getRule());
+                !stringsAreEqual(creator, other.getCreator()) &&
+                !stringsAreEqual(description, other.getDescription()) &&
+                !stringsAreEqual(rid, other.getRid()) &&
+                !stringsAreEqual(rule, other.getRule());
     }
 
 
@@ -123,6 +123,6 @@ public class MCRACCESSRULE {
     }
 
     private boolean stringsAreEqual(String string, String otherString) {
-        return (!Objects.equals(string, otherString));
+        return Objects.equals(string, otherString);
     }
 }

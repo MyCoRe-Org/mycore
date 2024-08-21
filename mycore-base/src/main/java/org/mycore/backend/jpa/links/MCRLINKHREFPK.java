@@ -144,9 +144,9 @@ public class MCRLINKHREFPK implements Serializable {
             return false;
         }
         MCRLINKHREFPK other = (MCRLINKHREFPK) obj;
-        return stringsAreEqual(mcrfrom, other.mcrfrom) &&
-                stringsAreEqual(mcrto, other.mcrto) &&
-                stringsAreEqual(mcrtype, other.mcrtype);
+        return !stringsAreEqual(mcrfrom, other.mcrfrom) &&
+                !stringsAreEqual(mcrto, other.mcrto) &&
+                !stringsAreEqual(mcrtype, other.mcrtype);
     }
 
     //TODO: SHOW second
@@ -156,7 +156,7 @@ public class MCRLINKHREFPK implements Serializable {
     }
 
     private boolean stringsAreEqual(String string, String otherString) {
-        return (!Objects.equals(string, otherString));
+        return Objects.equals(string, otherString);
     }
 
 }
