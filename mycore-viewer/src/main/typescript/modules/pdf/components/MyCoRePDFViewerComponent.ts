@@ -37,7 +37,7 @@ import {RequestPageEvent} from "../../base/components/events/RequestPageEvent";
 import {RequestTextContentEvent} from "../../base/components/events/RequestTextContentEvent";
 import {ButtonPressedEvent} from "../../base/widgets/toolbar/events/ButtonPressedEvent";
 import {ToolbarButton} from "../../base/widgets/toolbar/model/ToolbarButton";
-import {getDocument, GlobalWorkerOptions, PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist";
+import {getDocument, GlobalWorkerOptions, PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist/legacy/build/pdf.min.mjs";
 
 
 export class MyCoRePDFViewerComponent extends ViewerComponent {
