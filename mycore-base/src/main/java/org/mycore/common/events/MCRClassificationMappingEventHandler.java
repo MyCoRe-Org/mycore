@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.oai.classmapping;
+package org.mycore.common.events;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,8 +39,6 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -72,6 +70,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private static final String X_PATH_MAPPING_CLASSIFICATIONS
         = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
 
+    /** Maps all configurations defining patterns for x-path-mapping,
+     * comp. {@link MCRClassificationMappingEventHandler#replacePattern(String)} */
     private static final Map<String, String> MAPPING_PATTERNS = MCRConfiguration2.getSubPropertiesMap(
         "MCR.Category.XPathMapping.Pattern.");
 
@@ -291,7 +291,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * @param xPath the XPath containing a pattern to substitute
      * @return the resolved xPath
      */
-    private static String replacePattern(String xPath) {
+    public static String replacePattern(String xPath) {
         String updatedXPath = xPath;
         final Pattern pattern = Pattern.compile("\\{pattern:([^(}]*)\\(?([^)]*)\\)?}");
         Matcher matcher = pattern.matcher(updatedXPath);
