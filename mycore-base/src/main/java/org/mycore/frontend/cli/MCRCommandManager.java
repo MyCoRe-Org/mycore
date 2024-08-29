@@ -43,6 +43,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Frank Lützenkirchen
  * @author Robert Stephan
  */
+@SuppressWarnings("PMD.DoNotTerminateVM")
 public class MCRCommandManager {
     private static final Logger LOGGER = LogManager.getLogger(MCRCommandManager.class);
 

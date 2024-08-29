@@ -78,7 +78,7 @@ public abstract class MCRServletContentHelper {
     }
 
     public static boolean isServeContent(final HttpServletRequest request) {
-        return Objects.equals(request.getAttribute(ATT_SERVE_CONTENT),Boolean.FALSE);
+        return Objects.equals(request.getAttribute(ATT_SERVE_CONTENT), Boolean.FALSE);
     }
 
     /**
@@ -134,7 +134,7 @@ public abstract class MCRServletContentHelper {
             = configureResponseHeaders(content, serveContent, request, httpServletResponse, config);
         try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {
             if (serveContent) {
-                    response.setBufferSize(config.outputBufferSize);
+                response.setBufferSize(config.outputBufferSize);
             }
             List<Range> ranges = parseRange(request, response, content);
             if (response instanceof ServletResponseWrapper) {
@@ -245,6 +245,7 @@ public abstract class MCRServletContentHelper {
         }
         return response;
     }
+
     /**
      * Check if all conditions specified in the If headers are
      * satisfied.
@@ -265,7 +266,7 @@ public abstract class MCRServletContentHelper {
 
         final String eTag = content.getETag();
         final String headerValue = request.getHeader("If-Match");
-        if (headerValue != null&&headerValue.indexOf('*') == -1) {
+        if (headerValue != null && headerValue.indexOf('*') == -1) {
             final StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
             boolean conditionSatisfied = false;
             while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
@@ -294,7 +295,7 @@ public abstract class MCRServletContentHelper {
         try {
             final long headerValue = request.getDateHeader("If-Modified-Since");
             final long lastModified = content.lastModified();
-            if (headerValue != -1&&request.getHeader("If-None-Match") == null && lastModified < headerValue + 1000) {
+            if (headerValue != -1 && request.getHeader("If-None-Match") == null && lastModified < headerValue + 1000) {
                 // If an If-None-Match header has been specified, if modified since
                 // is ignored.
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -355,7 +356,7 @@ public abstract class MCRServletContentHelper {
         try {
             final long lastModified = resource.lastModified();
             final long headerValue = request.getDateHeader("If-Unmodified-Since");
-            if (headerValue != -1&&lastModified >= headerValue + 1000) {
+            if (headerValue != -1 && lastModified >= headerValue + 1000) {
                 // The content has been modified.
                 response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return false;

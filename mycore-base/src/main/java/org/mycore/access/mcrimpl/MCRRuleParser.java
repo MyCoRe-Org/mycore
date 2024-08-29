@@ -111,33 +111,46 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     protected MCRCondition<?> parseString(String s) {
-        // handle specific rules
-        if (s.equalsIgnoreCase("false")) {
+        /* handle specific rules */
+        String parsedstring = s;
+        if (parsedstring.equalsIgnoreCase("false")) {
             return new MCRFalseCondition<>();
-        } else if (s.equalsIgnoreCase("true")) {
+        } else if (parsedstring.equalsIgnoreCase("true")) {
             return new MCRTrueCondition<>();
-        } else if (s.startsWith("group")) {
-            return handleUserGroupCondition(s.substring(5).trim());
-        } else if (s.startsWith("user")) {
-            return handleUserGroupCondition(s.substring(4).trim());
-        } else if (s.startsWith("ip ")) {
-            return getIPClause(s.substring(3).trim());
-        } else if (s.startsWith("date ")) {
-            return handleDateCondition(s.substring(5).trim());
         } else {
-            return null;
-        }
-    }
 
+            if (parsedstring.startsWith("group")) {
+                parsedstring = parsedstring.substring(5).trim();
+                if (parsedstring.startsWith("!=")) {
+                    return new MCRGroupClause(parsedstring.substring(2).trim(), true);
+                } else if (parsedstring.startsWith("=")) {
+                    return new MCRGroupClause(parsedstring.substring(1).trim(), false);
+                } else {
+                    throw new MCRParseException("syntax error: " + parsedstring);
+                }
+            }
 
-    private MCRCondition<?> handleUserGroupCondition(String s) {
-        if (s.startsWith("!=")) {
-            return new MCRUserClause(s.substring(2).trim(), true);
-        } else if (s.startsWith("=")) {
-            return new MCRUserClause(s.substring(1).trim(), false);
-        } else {
-            throw new MCRParseException("syntax error: " + s);
+            if (parsedstring.startsWith("user")) {
+                parsedstring = parsedstring.substring(4).trim();
+                if (parsedstring.startsWith("!=")) {
+                    return new MCRUserClause(parsedstring.substring(2).trim(), true);
+                } else if (parsedstring.startsWith("=")) {
+                    return new MCRUserClause(parsedstring.substring(1).trim(), false);
+                } else {
+                    throw new MCRParseException("syntax error: " + parsedstring);
+                }
+            }
+
+            if (parsedstring.startsWith("ip ")) {
+                return getIPClause(parsedstring.substring(3).trim());
+            }
+
+            if (parsedstring.startsWith("date ")) {
+                parsedstring = parsedstring.substring(5).trim();
+                return handleDateCondition(parsedstring);
+            }
         }
+        return null;
     }
 
     private MCRCondition<?> handleDateCondition(String s) {
@@ -154,5 +167,4 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
             throw new MCRParseException("syntax error: " + s);
         }
     }
-
 }

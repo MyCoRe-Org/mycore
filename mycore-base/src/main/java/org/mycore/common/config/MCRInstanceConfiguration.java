@@ -130,7 +130,7 @@ public class MCRInstanceConfiguration {
     }
 
     @SuppressWarnings("PMD.CollapsibleIfStatements")
-    //The condition was intentionally split into to warts, to make it to follow the thought-process.
+    //The condition was intentionally split into two parts, to make it easier to follow the thought-process.
     //The latter two checks only make sense in the case, where the first condition is met.
     private static Map<String, String> reduceProperties(MCRInstanceName name, String prefix,
         Map<String, String> properties) {

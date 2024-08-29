@@ -68,6 +68,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */
+@SuppressWarnings("PMD.DoNotTerminateVM")
 public class MCRCommandLineInterface {
 
     private static final Logger LOGGER = LogManager.getLogger();
