@@ -5,8 +5,5 @@
     <mods:titleInfo xml:lang="de" xlink:type="simple">
         <mods:title>Test-Titel</mods:title>
     </mods:titleInfo>
-    <mods:language>
-        <mods:languageTerm authority="rfc5646" type="code">de</mods:languageTerm>
-    </mods:language>
     <mods:accessCondition type="use and reproduction" xlink:type="simple">cc_by-nc</mods:accessCondition>
 </mods:mods>

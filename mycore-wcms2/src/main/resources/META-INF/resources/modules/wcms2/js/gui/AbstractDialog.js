@@ -145,7 +145,7 @@ wcms.gui.AbstractDialog = function() {
 
 	function show() {
 		if(!this.created) {
-			var createFunc = dojo.hitch(this, create);
+			const createFunc = dojo.hitch(this, create);
 			createFunc();
 			if(this.createContent) {
 				this.createContent();

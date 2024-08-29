@@ -209,6 +209,115 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
+    /**
+     * Tests if placeholder patterns are properly evaluated in different scenarios. The tested cases are:<p>
+     * <ol>
+     *     <li>A pattern with 3 values to substitute</li>
+     *     <li>A pattern that tests for a specific genre</li>
+     *     <li>A pattern without values to substitute</li>
+     *     <li>Multiple patterns in one XPath</li>
+     * </ol>
+     */
+    @Test
+    public void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.isTransactionActive();
+        ClassLoader classLoader = getClass().getClassLoader();
+        SAXBuilder saxBuilder = new SAXBuilder();
+
+        loadCategory("placeholderClassification.xml");
+
+        // test placeholder with multiple values
+        Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods.xml"));
+        MCRObject mcro = new MCRObject();
+
+        MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 4);
+
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        mapper.handleObjectUpdated(null, mcro);
+
+        Document xml = mcro.createXML();
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+
+        String expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-language')]";
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull(
+            "The mapped classification 'dummy-placeholder-language' should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        // test placeholder with genre
+        document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods2.xml"));
+        mcro = new MCRObject();
+        mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 5);
+
+        mapper.handleObjectUpdated(null, mcro);
+        xml = mcro.createXML();
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-genre')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped classification 'dummy-placeholder-genre' should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        // test fallback placeholder without values
+        document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods3.xml"));
+        mcro = new MCRObject();
+        mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 6);
+
+        mapper.handleObjectUpdated(null, mcro);
+        xml = mcro.createXML();
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-fb')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped classification 'dummy-placeholder-fb' should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        // test multiple placeholders in one XPath
+        document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods2.xml"));
+        mcro = new MCRObject();
+        mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 7);
+
+        mapper.handleObjectUpdated(null, mcro);
+        xml = mcro.createXML();
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2placeholderClassification') "
+            + "and contains(@valueURI, 'dummy-placeholder-multiple')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull("The mapped classification 'dummy-placeholder-multiple' "
+            + "should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+    }
+
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
