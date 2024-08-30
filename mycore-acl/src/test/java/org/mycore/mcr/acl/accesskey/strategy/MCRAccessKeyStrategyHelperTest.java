@@ -21,62 +21,64 @@ package org.mycore.mcr.acl.accesskey.strategy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_PREVIEW;
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
-import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRTestCase;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 
-public class MCRAccessKeyStrategyHelperTest extends MCRTestCase {
+public class MCRAccessKeyStrategyHelperTest {
 
-    private static MCRAccessKey accessKey;
+    private static MCRAccessKeyDto accessKeyDto;
 
-    @Override
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        accessKey = new MCRAccessKey("bla", PERMISSION_READ);
+    public void setup() {
+        accessKeyDto = new MCRAccessKeyDto();
+        accessKeyDto.setReference("bla");
+        accessKeyDto.setPermission(MCRAccessManager.PERMISSION_READ);
     }
 
     @Test
     public void testSanitizePermission() {
-        assertEquals(PERMISSION_DELETE, MCRAccessKeyStrategyHelper.sanitizePermission(PERMISSION_DELETE));
-        assertEquals(PERMISSION_READ, MCRAccessKeyStrategyHelper.sanitizePermission(PERMISSION_PREVIEW));
-        assertEquals(PERMISSION_READ, MCRAccessKeyStrategyHelper.sanitizePermission(PERMISSION_READ));
-        assertEquals(PERMISSION_READ, MCRAccessKeyStrategyHelper.sanitizePermission(PERMISSION_VIEW));
-        assertEquals(PERMISSION_WRITE, MCRAccessKeyStrategyHelper.sanitizePermission(PERMISSION_WRITE));
+        assertEquals(MCRAccessManager.PERMISSION_DELETE,
+            MCRAccessKeyStrategyHelper.sanitizePermission(MCRAccessManager.PERMISSION_DELETE));
+        assertEquals(MCRAccessManager.PERMISSION_READ,
+            MCRAccessKeyStrategyHelper.sanitizePermission(MCRAccessManager.PERMISSION_PREVIEW));
+        assertEquals(MCRAccessManager.PERMISSION_READ,
+            MCRAccessKeyStrategyHelper.sanitizePermission(MCRAccessManager.PERMISSION_READ));
+        assertEquals(MCRAccessManager.PERMISSION_READ,
+            MCRAccessKeyStrategyHelper.sanitizePermission(MCRAccessManager.PERMISSION_VIEW));
+        assertEquals(MCRAccessManager.PERMISSION_WRITE,
+            MCRAccessKeyStrategyHelper.sanitizePermission(MCRAccessManager.PERMISSION_WRITE));
     }
 
     @Test
     public void testVerifyAccessKey() {
-        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
-        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_WRITE, accessKey));
-        accessKey.setType(PERMISSION_WRITE);
-        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
-        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_WRITE, accessKey));
-        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_DELETE, accessKey));
+        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
+        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_WRITE, accessKeyDto));
+        accessKeyDto.setPermission(MCRAccessManager.PERMISSION_WRITE);
+        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
+        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_WRITE, accessKeyDto));
+        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_DELETE, accessKeyDto));
     }
 
+    @Test
     public void testVerifyAccessKeyIsActive() {
-        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
-        accessKey.setIsActive(false);
-        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
-        accessKey.setIsActive(true);
-        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
+        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
+        accessKeyDto.setActive(false);
+        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
+        accessKeyDto.setActive(true);
+        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
     }
 
+    @Test
     public void testVerifyAccessKeyExpiration() {
-        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
-        accessKey.setExpiration(new Date());
-        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
-        accessKey.setExpiration(new Date(new Date().getTime() + (1000 * 60 * 60 * 24))); //tomorrow
-        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(PERMISSION_READ, accessKey));
+        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
+        accessKeyDto.setExpiration(new Date(new Date().getTime() - (1000 * 60 * 60 * 24))); // yesterday
+        assertFalse(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
+        accessKeyDto.setExpiration(new Date(new Date().getTime() + (1000 * 60 * 60 * 24))); //tomorrow
+        assertTrue(MCRAccessKeyStrategyHelper.verifyAccessKey(MCRAccessManager.PERMISSION_READ, accessKeyDto));
     }
 }

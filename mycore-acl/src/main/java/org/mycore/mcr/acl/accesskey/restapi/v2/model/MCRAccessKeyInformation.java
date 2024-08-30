@@ -20,36 +20,11 @@ package org.mycore.mcr.acl.accesskey.restapi.v2.model;
 
 import java.util.List;
 
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MCRAccessKeyInformation {
+public record MCRAccessKeyInformation(@JsonProperty("items") List<MCRAccessKeyDto> accessKeyDtos,
+    @JsonProperty("totalResults") int totalAccessKeyCount) {
 
-    private List<MCRAccessKey> accessKeys;
-
-    private int totalAccessKeyCount;
-
-    public MCRAccessKeyInformation(List<MCRAccessKey> accessKeys, int totalAccessKeyCount) {
-        setAccessKeys(accessKeys);
-        setTotalAccessKeyCount(totalAccessKeyCount);
-    }
-
-    public void setAccessKeys(List<MCRAccessKey> accessKeys) {
-        this.accessKeys = accessKeys;
-    }
-
-    @JsonProperty("items")
-    public List<MCRAccessKey> getAccessKeys() {
-        return this.accessKeys;
-    }
-
-    public void setTotalAccessKeyCount(int totalAccessKeyCount) {
-        this.totalAccessKeyCount = totalAccessKeyCount;
-    }
-
-    @JsonProperty("totalResults")
-    public int getTotalAccessKeyCount() {
-        return this.totalAccessKeyCount;
-    }
 }
