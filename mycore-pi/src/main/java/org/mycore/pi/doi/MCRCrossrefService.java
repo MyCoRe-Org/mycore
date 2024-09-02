@@ -28,8 +28,6 @@ import java.util.UUID;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -61,8 +59,6 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     private static final String TEST_HOST = "test.crossref.org";
 
     private static final String PRODUCTION_HOST = "doi.crossref.org";
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private String registrant;
 
