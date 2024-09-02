@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -70,7 +71,7 @@ public enum MCRMODSDateFormat {
 
     MCRMODSDateFormat(String encoding, String dateFormat) {
         this.encoding = encoding;
-        this.attributeValue = encoding == "iso8601" ? encoding : encoding.split("-")[0];
+        this.attributeValue = Objects.equals(encoding, "iso8601") ? encoding : encoding.split("-")[0];
         this.dateFormat = dateFormat;
         this.dateOnly = dateFormat != null && !dateFormat.endsWith("ss"); //see above
     }
