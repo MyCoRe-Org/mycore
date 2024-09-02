@@ -245,7 +245,7 @@ public class MCRJob implements Cloneable {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "MCRJobParameter", joinColumns = @JoinColumn(name = "jobID"))
     @MapKeyColumn(name = "paramKey", length = 128)
-    @Column(name = "paramValue")
+    @Column(name="paramValue", length = 16384)
     public Map<String, String> getParameters() {
         return parameters;
     }

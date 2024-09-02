@@ -14,7 +14,7 @@
     "jquery": "^3.5.1",
     "jszip": "^3.2.1",
     "manifesto.js": "^4.2.17",
-    "pdfjs-dist": "^2.6.347"
+    "pdfjs-dist": "^v4.5.136"
   },
   "author": "Sebastian Hofmann <hofmann.s@uni-jena.de>",
   "license": "GPL-3.0-or-later",

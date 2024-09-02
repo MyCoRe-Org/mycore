@@ -20,7 +20,7 @@ import {StructureModel} from "../../base/components/model/StructureModel";
 import {StructureChapter} from "../../base/components/model/StructureChapter";
 import {StructureImage} from "../../base/components/model/StructureImage";
 import {MyCoReMap} from "../../base/Utils";
-import {PDFPageProxy} from "pdfjs-dist";
+import {PDFPageProxy} from "pdfjs-dist/legacy/build/pdf.min.mjs";
 
 export class PDFStructureModel extends StructureModel {
     /**

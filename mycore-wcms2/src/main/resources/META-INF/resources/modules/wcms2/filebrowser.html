@@ -18,8 +18,14 @@
 
 		</div>
 		<div id="file-view" class="well" ondragover="return false">
-			<div id="drag-and-drop-info"><span id="hide-drag-drop-info" class="glyphicon glyphicon-remove"></span></div>
-			<div id="uploadbar"></div>
+			<div id="drop-area">
+				<form class="upload-drop-form">
+					<p>Dateien hochladen mit Drag-and-Drop.</p>
+					<input type="file" id="upload-file-input" multiple accept="image/*" onchange="wcms2FileBrowser.uploadFiles(this.files)">
+					<label class="button" for="upload-file-input">Select</label>
+					<progress id="upload-progress-bar" max=100 value=0></progress>
+				</form>
+			</div>
 			<div id="files"></div>
 		</div>
 	</div>

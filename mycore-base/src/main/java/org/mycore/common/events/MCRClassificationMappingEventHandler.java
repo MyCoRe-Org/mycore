@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.oai.classmapping;
+package org.mycore.common.events;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +24,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -36,8 +39,6 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -66,10 +67,14 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     public static final String LABEL_LANG_X_MAPPING = "x-mapping";
 
     /** This configuration lists all eligible classifications for x-path-mapping */
-    private static final String X_PATH_MAPPING_CLASSIFICATIONS
-        = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
+    private String xPathMappingClassifications;
 
     private MCRMetaElement oldMappings = null;
+
+    public MCRClassificationMappingEventHandler() {
+        this.xPathMappingClassifications = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs")
+               .orElse("");
+    }
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -174,7 +179,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     /**
      * For a list of configured classifications
-     * (see {@link MCRClassificationMappingEventHandler#X_PATH_MAPPING_CLASSIFICATIONS}),
+     * (see {@link MCRClassificationMappingEventHandler#xPathMappingClassifications}),
      * searches for categories with at least one of the labels
      * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}
      * or {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}
@@ -188,7 +193,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private List<MCRCategory> getXPathMappingCategories(Document doc, MCRCategoryDAO dao) {
         List<MCRCategory> listToAdd = new ArrayList<>();
         final Map<String, Set<MCRCategory>> xPathMappingRelevantCategories = Arrays
-            .stream(X_PATH_MAPPING_CLASSIFICATIONS.trim().split(",")).collect(Collectors.toMap(
+            .stream(xPathMappingClassifications.trim().split(",")).collect(Collectors.toMap(
                 relevantClass -> relevantClass,
                 relevantClass -> Stream.concat(
                     dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream(),
@@ -202,6 +207,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
                     String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                    xPath = replacePattern(xPath);
                     MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
 
                     if (evaluator.test(xPath)) {
@@ -219,6 +225,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
 
                         String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
+                        xPath = replacePattern(xPath);
                         MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), doc);
 
                         if (evaluator.test(xPath)) {
@@ -266,6 +273,52 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 mappings.addMetaObject(metaClass);
             });
         }
+    }
+
+    /**
+     * Replaces a specific pattern in an XPath with the value of a matching property. Placeholders in the
+     * property value are substituted with the specific values given in an XPath. It is possible to use
+     * multiple patterns per XPath.<p>
+     * Syntax:<p>
+     * {pattern:&lt;name of property&gt;(&lt;comma-separated list of values&gt;)}<p>
+     * (when there are no values, use empty parenthesis)<p>
+     * Ex.:<p>
+     * <b>Input XPath:</b> {pattern:genre(article)} and not(mods:relatedItem[@type='host'])<p>
+     * <b>Property:</b> MCR.Category.XPathMapping.Pattern.genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
+     * <b>Substituted XPath:</b> mods:genre[substring-after(@valueURI,'#')='article']
+     * and not(mods:relatedItem[@type='host'])
+     * @param xPath the XPath containing a pattern to substitute
+     * @return the resolved xPath
+     */
+    public static String replacePattern(String xPath) {
+        String updatedXPath = xPath;
+        final Pattern pattern = Pattern.compile("\\{pattern:([^(}]*)\\(?([^)]*)\\)?}");
+        Matcher matcher = pattern.matcher(updatedXPath);
+        while (matcher.find()) {
+            String patternName = matcher.group(1);
+            String placeholderText = MCRConfiguration2.getSubPropertiesMap("MCR.Category.XPathMapping.Pattern.")
+                    .get(patternName);
+            if (placeholderText != null) {
+                if (!matcher.group(2).isEmpty()) { // if there are values to substitute
+                    String[] placeholderValues = matcher.group(2).split(",");
+                    Map<String, String> placeholderValuesMap = new HashMap<>();
+                    for (int i = 0; i < placeholderValues.length; i++) {
+                        placeholderValuesMap.put(String.valueOf(i), placeholderValues[i]);
+                    }
+                    StringSubstitutor sub = new StringSubstitutor(placeholderValuesMap, "{", "}");
+                    String substitute = sub.replace(placeholderText);
+                    updatedXPath = updatedXPath.substring(0, matcher.start()) + substitute +
+                        updatedXPath.substring(matcher.end());
+                } else {
+                    updatedXPath = updatedXPath.substring(0, matcher.start()) + placeholderText +
+                        updatedXPath.substring(matcher.end());
+                }
+            } else {
+                break; // break while-loop for unconfigured patterns
+            }
+            matcher = pattern.matcher(updatedXPath);
+        }
+        return updatedXPath;
     }
 
     /**

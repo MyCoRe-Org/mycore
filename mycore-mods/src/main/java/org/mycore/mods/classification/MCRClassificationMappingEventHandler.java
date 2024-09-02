@@ -193,6 +193,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
                     String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
+                    xPath = org.mycore.common.events.MCRClassificationMappingEventHandler.replacePattern(xPath);
                     MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                     if (evaluator.test(xPath)) {
@@ -213,6 +214,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
 
                         String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
+                        xPath = org.mycore.common.events.MCRClassificationMappingEventHandler.replacePattern(xPath);
                         MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                         if (evaluator.test(xPath)) {

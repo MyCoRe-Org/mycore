@@ -24,6 +24,7 @@ import {
     ToolbarDropdownButtonChild
 } from "../../../base/widgets/toolbar/model/ToolbarDropdownButton";
 import {ToolbarButton} from "../../../base/widgets/toolbar/model/ToolbarButton";
+import {LanguageModel} from "../../../base/components/model/LanguageModel";
 
 export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
 
@@ -31,9 +32,11 @@ export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
         super(name);
     }
 
+    public _languageModel:LanguageModel;
     public _viewSelectGroup: ToolbarGroup;
     public viewSelectChilds: Array<ToolbarDropdownButtonChild>;
     public viewSelect: ToolbarDropdownButton;
+
 
     public selectionSwitchButton: ToolbarButton;
 
@@ -76,10 +79,14 @@ export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
     }
 
     public addSelectionSwitchButton(): void {
-        this.selectionSwitchButton = new ToolbarButton("selectionSwitchButton", "", "");
-        this.selectionSwitchButton.icon = 'text-width';
+        this.selectionSwitchButton = new ToolbarButton("selectionSwitchButton", "", "text-select", "text-width");
+        this.selectionSwitchButton.tooltip = this._languageModel.getTranslation('toolbar.textSelect');
+
         //this._actionControllGroup.addComponent(this.selectionSwitchButton);
     }
 
+    public i18n(model: LanguageModel) {
+        this._languageModel = model;
+    }
 }
 

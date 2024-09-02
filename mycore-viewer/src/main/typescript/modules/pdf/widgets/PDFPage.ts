@@ -21,8 +21,8 @@ import {AbstractPage} from "../../base/components/model/AbstractPage";
 import {Position2D, Rect, Size2D} from "../../base/Utils";
 import {TextContentModel, TextElement} from "../../base/components/model/TextContent";
 import {PDFStructureBuilder} from "./PDFStructureBuilder";
-import {PDFPageProxy, Util} from "pdfjs-dist";
-import {TextContent, TextItem} from "pdfjs-dist/types/src/display/api";
+import {PDFPageProxy, Util} from 'pdfjs-dist/legacy/build/pdf.min.mjs'
+import type {TextContent, TextItem} from "pdfjs-dist/types/src/display/api";
 
 export class PDFPage implements AbstractPage {
 

@@ -986,16 +986,21 @@ class DesktopInputHandler extends DesktopInputAdapter {
         vp.startAnimation(new ZoomAnimation(vp, 2, position));
     }
 
-    public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D): void {
-        if (!this.component.isAltoSelectable()) {
-            const xMove = currentPosition.x - startPosition.x;
-            const yMove = currentPosition.y - startPosition.y;
-            const move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
-            this.component.getPageController().viewport.position = startViewport
-                .scale(this.component.getPageController().viewport.scale)
-                .move(move)
-                .scale(1 / this.component.getPageController().viewport.scale);
+    public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
+                     event: JQuery.MouseEventBase): void {
+        const isAltoSelectable = this.component.isAltoSelectable();
+        const isImageCanvas = event.target === this.component._imageView.drawCanvas ||
+            event.target === this.component._imageView.markCanvas;
+        if (!isImageCanvas && isAltoSelectable) {
+            return;
         }
+        const xMove = currentPosition.x - startPosition.x;
+        const yMove = currentPosition.y - startPosition.y;
+        const move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
+        this.component.getPageController().viewport.position = startViewport
+            .scale(this.component.getPageController().viewport.scale)
+            .move(move)
+            .scale(1 / this.component.getPageController().viewport.scale);
     }
 
     public scroll(e: {
