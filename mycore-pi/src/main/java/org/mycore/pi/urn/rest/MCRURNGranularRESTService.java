@@ -275,7 +275,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
 
         //just update flag for derivate, where additional is ""

@@ -132,7 +132,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      */
     public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
         int flagCount = flags.size();
         for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
             String flag = flags.get(flagIndex);
@@ -155,7 +155,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public static boolean hasFlag(MCRBase obj, String additional, MCRPIRegistrationInfo mcrpi) {
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
         return flags.stream().anyMatch(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
@@ -165,7 +165,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
         return flags.stream().anyMatch(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
@@ -175,8 +175,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     public static void updateFlagsInDatabase(MCRBase obj) {
-        Gson gson = MCRPIService.getGson();
-        obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
+        Gson gson = getGson();
+        obj.getService().getFlags(PI_FLAG).stream()
             .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
             .map(entry -> {
                 // disabled: Git does not provide a revision number as integer (see MCR-1393)
@@ -461,7 +461,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
         String stringFlag = flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);

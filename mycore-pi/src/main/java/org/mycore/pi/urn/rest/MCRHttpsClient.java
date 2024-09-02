@@ -63,7 +63,7 @@ public class MCRHttpsClient {
     }
 
     public static <R> R head(String url, HttpClientResponseHandler<R> responseHandler) {
-        return MCRHttpsClient.head(url, Optional.empty(), responseHandler);
+        return head(url, Optional.empty(), responseHandler);
     }
 
     public static <R> R head(String url, Optional<UsernamePasswordCredentials> credentials,
@@ -99,7 +99,7 @@ public class MCRHttpsClient {
     }
 
     public static <R> R put(String url, String contentType, String data, HttpClientResponseHandler<R> responseHandler) {
-        return MCRHttpsClient.put(url, contentType, data, Optional.empty(), responseHandler);
+        return put(url, contentType, data, Optional.empty(), responseHandler);
     }
 
     public static <R> R put(String url, String contentType, String data,
@@ -110,7 +110,7 @@ public class MCRHttpsClient {
 
     public static <R> R post(String url, String contentType, String data,
         HttpClientResponseHandler<R> responseHandler) {
-        return MCRHttpsClient.post(url, contentType, data, Optional.empty(), responseHandler);
+        return post(url, contentType, data, Optional.empty(), responseHandler);
     }
 
     public static <R> R post(String url, String contentType, String data,
@@ -121,7 +121,7 @@ public class MCRHttpsClient {
 
     public static <R> R patch(String url, String contentType, String data,
         HttpClientResponseHandler<R> responseHandler) {
-        return MCRHttpsClient.patch(url, contentType, data, Optional.empty(), responseHandler);
+        return patch(url, contentType, data, Optional.empty(), responseHandler);
     }
 
     public static <R> R patch(String url, String contentType, String data,
