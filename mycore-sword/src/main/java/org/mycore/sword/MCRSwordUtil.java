@@ -230,18 +230,18 @@ public class MCRSwordUtil {
 
         final Path zipTempFile = Files.createTempFile("swordv2_", fileName);
         MessageDigest md5Digest = null;
-
+        InputStream digestedInputStream=inputStream;
         if (checkMd5 != null) {
             try {
                 md5Digest = MessageDigest.getInstance("MD5");
-                inputStream = new DigestInputStream(inputStream, md5Digest);
+                digestedInputStream = new DigestInputStream(inputStream, md5Digest);
             } catch (NoSuchAlgorithmException e) {
                 MCRTransactionHelper.beginTransaction();
                 throw new MCRConfigurationException("No MD5 available!", e);
             }
         }
 
-        Files.copy(inputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(digestedInputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
 
         if (checkMd5 != null) {
             final String md5String = MCRUtils.toHexString(md5Digest.digest());
@@ -374,6 +374,10 @@ public class MCRSwordUtil {
     public static MCRObject getMcrObjectForDerivateID(String requestDerivateID) {
         final MCRObjectID objectID = MCRObjectID.getInstance(MCRXMLFunctions.getMCRObjectID(requestDerivateID));
         return (MCRObject) MCRMetadataManager.retrieve(objectID);
+    }
+
+    public interface MCRFileValidator {
+        MCRValidationResult validate(Path pathToFile);
     }
 
     public static class ParseLinkUtil {
@@ -550,7 +554,7 @@ public class MCRSwordUtil {
          * @param collectionIRI      IRI of the collection
          * @param collection         name of the collection
          * @param feed               the feed where the link will be inserted
-         * @param collectionProvider 
+         * @param collectionProvider
          * {@link MCRSwordCollectionProvider} of the collection (needed to count how much objects)
          * @throws SwordServerException when the {@link MCRSwordObjectIDSupplier} throws a exception.
          */
@@ -570,10 +574,6 @@ public class MCRSwordUtil {
         static void addEditMediaLinks(String collection, DepositReceipt depositReceipt, MCRObjectID derivateId) {
             getEditMediaFileIRIStream(collection, derivateId.toString()).forEach(depositReceipt::addEditMediaIRI);
         }
-    }
-
-    public interface MCRFileValidator {
-        MCRValidationResult validate(Path pathToFile);
     }
 
     public static class MCRValidationResult {
