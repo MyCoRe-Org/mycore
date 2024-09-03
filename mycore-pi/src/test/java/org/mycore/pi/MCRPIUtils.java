@@ -74,8 +74,7 @@ public class MCRPIUtils {
         try {
             return new URI(url).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
-            LOGGER.error(e.getMessage(), e);
-            LOGGER.error("Malformed URL: {}", url);
+            LOGGER.error("Malformed URL: {}", url,e);
         }
 
         return null;
