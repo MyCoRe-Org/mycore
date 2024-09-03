@@ -117,14 +117,9 @@ public class MCRMODSWrapper {
      * @return true, if mods is supported
      */
     public static boolean isSupported(MCRObject obj) {
-        boolean supported;
-        if (isSupported(obj.getId())) {
-            supported = true;
-        } else {
-            supported = obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
-                && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null;
-        }
-        return supported;
+        return isSupported(obj.getId())
+            || (obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
+                && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null);
     }
 
     /**
