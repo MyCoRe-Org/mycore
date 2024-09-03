@@ -32,17 +32,21 @@ import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
+import io.ocfl.api.model.FileChangeHistory;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
 /**
- * Represents a virtual object stored locally in an OCFL repository.
+ * Represents a virtual object that is stored on the same drive as the OCFL repository. This provides the implementation
+ * direct access to the files of the OCFL repository when needed. For example a file can be accessed directly for read
+ * operations without copying it first to the local storage.
  * <p>
  * This class extends {@link MCROCFLVirtualObject} and provides implementations specific to local storage.
  * It handles file operations such as copying, moving, and deleting files within the local file system,
@@ -90,7 +94,8 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      * @param directoryTracker the directory tracker.
      */
     protected MCROCFLLocalVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
-        OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage, boolean readonly,
+        OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage,
+        boolean readonly,
         MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
         MCROCFLEmptyDirectoryTracker directoryTracker) {
         super(repository, versionId, objectVersion, localStorage, readonly, fileTracker, directoryTracker);
@@ -100,7 +105,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      * {@inheritDoc}
      */
     @Override
-    public void copyFile(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
+    public void copy(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
         checkPurged(source);
         checkReadOnly();
         boolean targetExists = exists(target);
@@ -119,7 +124,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      * {@inheritDoc}
      */
     @Override
-    public void copyFileToVirtualObject(MCROCFLVirtualObject virtualTarget, MCRVersionedPath source,
+    public void externalCopy(MCROCFLVirtualObject virtualTarget, MCRVersionedPath source,
         MCRVersionedPath target, CopyOption... options) throws IOException {
         checkPurged(source);
         virtualTarget.checkReadOnly();
@@ -172,7 +177,6 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
 
     @Override
     public FileTime getModifiedTime(MCRVersionedPath path) throws IOException {
-        checkPurged(path);
         checkExists(path);
         Path physicalPath = toPhysicalPath(path);
         return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastModifiedTime();
@@ -180,31 +184,33 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
 
     @Override
     public FileTime getAccessTime(MCRVersionedPath path) throws IOException {
-        checkPurged(path);
         checkExists(path);
         Path physicalPath = toPhysicalPath(path);
         return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastAccessTime();
     }
 
-    @Override
-    public long getSize(MCRVersionedPath path) throws IOException {
-        checkPurged(path);
+    /**
+     * {@inheritDoc}
+     */
+    public Path toPhysicalPath(MCRVersionedPath path) throws IOException {
         checkExists(path);
-        if (isDirectory(path)) {
-            return 0;
+        if (this.localStorage.exists(path)) {
+            return this.localStorage.toPhysicalPath(path);
         }
-        Path physicalPath = toPhysicalPath(path);
-        return Files.size(physicalPath);
+        FileChangeHistory changeHistory = getChangeHistory(path);
+        String storageRelativePath = changeHistory.getMostRecent().getStorageRelativePath();
+        return getLocalRepositoryPath().resolve(storageRelativePath);
     }
 
-    @Override
-    public Object getFileKey(MCRVersionedPath path) throws IOException {
-        checkPurged(path);
-        checkExists(path);
-        // TODO the fileKey between the localstorage and the ocfl repository should always be the same
-        // this implementation is just a hack for testing
-        Path physicalPath = toPhysicalPath(path);
-        return Files.readAttributes(physicalPath, BasicFileAttributes.class).fileKey();
+    /**
+     * Returns the local OCFL repository path.
+     *
+     * @return the local repository path.
+     */
+    protected Path getLocalRepositoryPath() {
+        return Path.of(MCRConfiguration2
+            .getString("MCR.OCFL.Repository." + repository.getId() + ".RepositoryRoot")
+            .orElseThrow());
     }
 
     /**

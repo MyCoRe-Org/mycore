@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -34,6 +35,10 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import io.ocfl.api.model.ObjectVersionId;
 
 public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
+
+    public MCROCFLFileSystemProviderTest(boolean remote) {
+        super(remote);
+    }
 
     @Test
     public void checkAccess() {
@@ -139,10 +144,17 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
     }
 
     @Test
-    public void copy() throws IOException, URISyntaxException {
+    public void copyFiles() throws IOException, URISyntaxException {
+        Path whiteV1 = MCRVersionedPath.head(DERIVATE_1, "white.png");
+        Path copiedV2 = MCRVersionedPath.head(DERIVATE_1, "copied.png");
+
+        // copy non-existing file
         MCRTransactionHelper.beginTransaction();
-        Path whiteV1 = MCRVersionedPath.getPath(DERIVATE_1, "v1", "white.png");
-        Path copiedV2 = MCRPath.getPath(DERIVATE_1, "copied.png");
+        assertThrows(NoSuchFileException.class, () -> Files.copy(copiedV2, whiteV1));
+        MCRTransactionHelper.commitTransaction();
+
+        // copy white to copied
+        MCRTransactionHelper.beginTransaction();
         Files.copy(whiteV1, copiedV2);
         assertTrue("'white.png' should exist", Files.exists(whiteV1));
         assertTrue("'copied.png' should exist", Files.exists(copiedV2));
@@ -179,6 +191,26 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
         assertTrue("'copied3.png' should exist", Files.exists(ocflTarget));
         MCRTransactionHelper.commitTransaction();
         assertTrue("'copied3.png' should exist after committing", Files.exists(ocflTarget));
+    }
+
+    @Test
+    public void copyDirectories() throws IOException {
+        Path emptyDirectory = MCRVersionedPath.head(DERIVATE_1, "empty");
+        Path copiedEmptyDirectory = MCRVersionedPath.head(DERIVATE_1, "emptyCopy");
+
+        // copy empty directory
+        MCRTransactionHelper.beginTransaction();
+        Files.copy(emptyDirectory, copiedEmptyDirectory);
+        assertTrue("'empty' directory should exist", Files.exists(emptyDirectory));
+        assertTrue("'emptyCopy' directory should exist", Files.exists(copiedEmptyDirectory));
+        MCRTransactionHelper.commitTransaction();
+
+        // copy to non-empty directory
+        MCRTransactionHelper.beginTransaction();
+        Files.write(emptyDirectory.resolve("file"), new byte[] { 1, 3, 3, 7 });
+        assertThrows(DirectoryNotEmptyException.class,
+            () -> Files.copy(copiedEmptyDirectory, emptyDirectory, StandardCopyOption.REPLACE_EXISTING));
+        MCRTransactionHelper.commitTransaction();
     }
 
     @Test

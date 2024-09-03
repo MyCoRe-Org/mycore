@@ -10,6 +10,10 @@ import static org.junit.Assert.assertEquals;
 
 public class MCROCFLFileTypeDetectorTest extends MCROCFLTestCase {
 
+    public MCROCFLFileTypeDetectorTest(boolean remote) {
+        super(remote);
+    }
+
     @Test
     public void probeContentType() throws IOException {
         String contentType = Files.probeContentType(MCRPath.getPath(DERIVATE_1, "white.png"));

@@ -25,6 +25,7 @@ import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
+// TODO javadoc
 public class MCROCFLFileAttributes implements MCRFileAttributes<Object> {
 
     private final FileTime creationTime;

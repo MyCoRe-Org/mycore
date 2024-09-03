@@ -1,19 +1,27 @@
 package org.mycore.ocfl.niofs;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.OffsetDateTime;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 
-import io.ocfl.api.model.ObjectVersionId;
-import io.ocfl.api.model.VersionInfo;
-
+@RunWith(Parameterized.class)
 public abstract class MCROCFLTestCase extends MCRTestCase {
 
     /**
@@ -28,7 +36,23 @@ public abstract class MCROCFLTestCase extends MCRTestCase {
 
     protected MCROCFLRepository repository;
 
-    protected ObjectVersionId derivateVersionId;
+    private final boolean remote;
+
+    @Parameterized.Parameters(name = "remote: {0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][] { { false }, { true } });
+    }
+
+    public MCROCFLTestCase(boolean remote) {
+        this.remote = remote;
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put("MCR.OCFL.Repository.Test.FS.Remote", remote ? "true" : "false");
+        return properties;
+    }
 
     @Override
     public void setUp() throws Exception {
@@ -40,7 +64,7 @@ public abstract class MCROCFLTestCase extends MCRTestCase {
 
         MCROCFLFileSystemProvider.get().init();
 
-        this.derivateVersionId = loadObject(DERIVATE_1);
+        loadObject(DERIVATE_1);
     }
 
     @Override
@@ -54,18 +78,44 @@ public abstract class MCROCFLTestCase extends MCRTestCase {
         }
     }
 
-    protected ObjectVersionId loadObject(String id) throws URISyntaxException {
+    protected void loadObject(String id) throws URISyntaxException, IOException {
         URL derivateURL = getClass().getClassLoader().getResource(id);
         if (derivateURL == null) {
             throw new NullPointerException("Unable to locate '" + id + "' folder in resources.");
         }
-        return repository.putObject(
-            ObjectVersionId.head(id),
-            Path.of(derivateURL.toURI()),
-            new VersionInfo()
-                .setMessage("created")
-                .setCreated(OffsetDateTime.now())
-                .setUser("junit", ""));
+        final Path sourcePath = Path.of(derivateURL.toURI());
+        final MCRVersionedPath targetPath = MCRVersionedPath.head(id, "/");
+        MCRTransactionHelper.beginTransaction();
+        Files.walkFileTree(sourcePath, new CopyFileVisitor(targetPath));
+        MCRTransactionHelper.commitTransaction();
+    }
+
+    private static class CopyFileVisitor extends SimpleFileVisitor<Path> {
+
+        private final Path targetPath;
+
+        private Path sourcePath = null;
+
+        public CopyFileVisitor(Path targetPath) {
+            this.targetPath = targetPath;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+            if (sourcePath == null) {
+                sourcePath = dir;
+            } else {
+                Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+            Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
+            return FileVisitResult.CONTINUE;
+        }
+
     }
 
 }

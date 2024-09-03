@@ -118,6 +118,9 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         return seekableByteChannel;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FileTime getModifiedTime(MCRVersionedPath path) throws IOException {
         checkExists(path);
@@ -129,9 +132,13 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FileTime getAccessTime(MCRVersionedPath path) throws IOException {
         checkExists(path);
+        // TODO is the localStorage check required? Or does the localVirtualObject take care of that
         if (this.localStorage.exists(path)) {
             Path physicalPath = this.localStorage.toPhysicalPath(path);
             return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastAccessTime();
@@ -140,37 +147,11 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
     }
 
-    @Override
-    public long getSize(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        if (isDirectory(path)) {
-            return 0;
-        }
-        // TODO right now we just copy and deliver from local storage
-        // in future versions we should use the database to get the size
-        localCopy(path);
-        //if(this.localStorage.exists(path)) {
-        Path physicalPath = this.localStorage.toPhysicalPath(path);
-        return Files.size(physicalPath);
-        //}
-    }
-
-    @Override
-    public Object getFileKey(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        // TODO rm this
-        localCopy(path);
-        // TODO the fileKey between the localstorage and the ocfl repository should always be the same
-        // this implementation is just a hack for testing
-        Path physicalPath = toPhysicalPath(path);
-        return Files.readAttributes(physicalPath, BasicFileAttributes.class).fileKey();
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public void copyFile(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
+    public void copy(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
         checkPurged(source);
         checkReadOnly();
         boolean targetExists = exists(target);
@@ -183,7 +164,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      * {@inheritDoc}
      */
     @Override
-    public void copyFileToVirtualObject(MCROCFLVirtualObject virtualTarget, MCRVersionedPath source,
+    public void externalCopy(MCROCFLVirtualObject virtualTarget, MCRVersionedPath source,
         MCRVersionedPath target, CopyOption... options) throws IOException {
         checkPurged(source);
         virtualTarget.checkReadOnly();
@@ -202,7 +183,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
     public Path toPhysicalPath(MCRVersionedPath path) throws IOException {
         checkExists(path);
         localCopy(path);
-        return super.toPhysicalPath(path);
+        return this.localStorage.toPhysicalPath(path);
     }
 
     /**

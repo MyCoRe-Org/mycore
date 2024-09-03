@@ -14,6 +14,10 @@ public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLTestCase {
 
     private MCROCFLEmptyDirectoryTracker directoryTracker;
 
+    public MCROCFLEmptyDirectoryTrackerTest(boolean remote) {
+        super(remote);
+    }
+
     @Before
     public void setUp() throws Exception {
         super.setUp();

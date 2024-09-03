@@ -43,9 +43,9 @@ import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
  */
 public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage {
 
-    private final static String TRANSACTION_DIRECTORY = "transaction";
+    public final static String TRANSACTION_DIRECTORY = "transaction";
 
-    private final static String ROLLING_DIRECTORY = "rolling";
+    public final static String ROLLING_DIRECTORY = "rolling";
 
     private MCROCFLDefaultTransactionalTempFileStorage transactionalStorage;
 
@@ -56,7 +56,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
     @MCRProperty(name = "Path")
     public String rootPathProperty;
 
-    @MCRInstance(name = "EvictionStrategy", valueClass = MCROCFLEvictionStrategy.class, required = false)
+    @MCRInstance(name = "EvictionStrategy", valueClass = MCROCFLEvictionStrategy.class)
     public MCROCFLEvictionStrategy evictionStrategy;
 
     /**

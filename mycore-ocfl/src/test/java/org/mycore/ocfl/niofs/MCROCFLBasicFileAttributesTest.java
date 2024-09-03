@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -20,21 +19,14 @@ import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 
-import io.ocfl.api.model.ObjectVersionId;
-import io.ocfl.api.model.VersionInfo;
-
 public class MCROCFLBasicFileAttributesTest extends MCROCFLTestCase {
+
+    public MCROCFLBasicFileAttributesTest(boolean remote) {
+        super(remote);
+    }
 
     @Test
     public void testDirectoryAttributes() throws IOException, InterruptedException {
-        // add some versions
-        repository.updateObject(ObjectVersionId.head(DERIVATE_1), new VersionInfo(), updater -> {
-            updater.writeFile(new ByteArrayInputStream(new byte[] { 1, 3, 3, 7 }), "file1");
-        });
-        repository.updateObject(ObjectVersionId.head(DERIVATE_1), new VersionInfo(), updater -> {
-            updater.writeFile(new ByteArrayInputStream(new byte[] { 1, 3, 3, 7 }), "file2");
-        });
-
         MCRPath root = MCRPath.getPath(DERIVATE_1, "/");
         MCRFileAttributes<?> rootAttributes = Files.readAttributes(root, MCRFileAttributes.class);
         assertTrue("root should be a directory", rootAttributes.isDirectory());
@@ -42,7 +34,7 @@ public class MCROCFLBasicFileAttributesTest extends MCROCFLTestCase {
 
         Thread.sleep(1);
         MCRTransactionHelper.requireTransaction(MCROCFLFileSystemTransaction.class);
-        Files.write(MCRPath.getPath(DERIVATE_1, "file3"), new byte[] { 1, 3, 3, 7 });
+        Files.write(MCRPath.getPath(DERIVATE_1, "file1"), new byte[] { 1, 3, 3, 7 });
         MCRFileAttributes<?> rootAttributes2 = Files.readAttributes(root, MCRFileAttributes.class);
         assertEquals("should have the same creation time after writing a file", rootAttributes.creationTime(),
             rootAttributes2.creationTime());

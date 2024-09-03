@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,10 @@ import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
 public class MCRVirtualObjectTest extends MCROCFLTestCase {
+
+    public MCRVirtualObjectTest(boolean remote) {
+        super(remote);
+    }
 
     @Test
     public void toPhysicalPath() throws IOException {
@@ -227,7 +232,7 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
         MCRTransactionHelper.beginTransaction();
         Files.move(whitePng, movedPng);
         assertTrue("Renamed file should be marked as modified", getVirtualObject().isAddedOrModified(movedPng));
-        assertThrows(NoSuchFileException.class, () -> getVirtualObject().isAddedOrModified(whitePng));
+        assertFalse(getVirtualObject().isAddedOrModified(whitePng));
         MCRTransactionHelper.commitTransaction();
 
         // Add a new file (recreate white.png)
@@ -246,7 +251,7 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
         // Delete the file
         MCRTransactionHelper.beginTransaction();
         Files.delete(whitePng);
-        assertThrows(NoSuchFileException.class, () -> getVirtualObject().isAddedOrModified(whitePng));
+        assertFalse(getVirtualObject().isAddedOrModified(whitePng));
         MCRTransactionHelper.commitTransaction();
 
         // Check no modification scenario (recreate white.png with same initial content)
@@ -282,7 +287,7 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
         MCRTransactionHelper.beginTransaction();
         Files.move(testDir, movedDir);
         assertTrue("movedDir should be marked as modified", getVirtualObject().isAddedOrModified(movedDir));
-        assertThrows(NoSuchFileException.class, () -> getVirtualObject().isAddedOrModified(testDir));
+        assertFalse(getVirtualObject().isAddedOrModified(testDir));
         assertTrue("Renaming directory should mark root as modified", getVirtualObject().isAddedOrModified(rootDir));
         MCRTransactionHelper.commitTransaction();
 
@@ -312,9 +317,48 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
         // Delete the directory
         MCRTransactionHelper.beginTransaction();
         Files.delete(movedDir);
-        assertThrows(NoSuchFileException.class, () -> getVirtualObject().isAddedOrModified(movedDir));
+        assertFalse(getVirtualObject().isAddedOrModified(movedDir));
         assertTrue("Deleting directory should mark root as modified", getVirtualObject().isAddedOrModified(rootDir));
         MCRTransactionHelper.commitTransaction();
+    }
+
+    @Test
+    public void getSize() throws IOException {
+        MCRVersionedPath headWhitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
+        assertEquals("original white.png should have 554 bytes", 554, Files.size(headWhitePng));
+
+        // write 4 bytes
+        MCRTransactionHelper.beginTransaction();
+        Files.write(headWhitePng, new byte[] { 5, 6, 7, 8 });
+        assertEquals("written white.png should have 4 bytes", 4, Files.size(headWhitePng));
+        MCRTransactionHelper.commitTransaction();
+
+        // check v1
+        MCRVersionedPath v1WhitePng = MCRVersionedPath.getPath(DERIVATE_1, "v1", "white.png");
+        assertEquals("v1 white.png should have 554 bytes", 554, Files.size(v1WhitePng));
+
+        // check v2
+        MCRVersionedPath v2WhitePng = MCRVersionedPath.getPath(DERIVATE_1, "v2", "white.png");
+        assertEquals("v2 white.png should have 4 bytes", 4, Files.size(v2WhitePng));
+    }
+
+    @Test
+    public void getFileKey() throws IOException {
+        MCRVersionedPath v1WhitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
+        MCRVersionedPath v1BlackPng = MCRVersionedPath.head(DERIVATE_1, "black.png");
+        MCRVersionedPath notFoundPng = MCRVersionedPath.head(DERIVATE_1, "notFound.png");
+
+        Object v1WhitePngFileKey = getFileKey(v1WhitePng);
+        Object v1BlackPngFileKey = getFileKey(v1BlackPng);
+
+        assertNotNull("fileKey of original white.png should not be null", v1WhitePngFileKey);
+        assertNotNull("fileKey of original black.png should not be null", v1BlackPngFileKey);
+        assertThrows("fileKey of notFound.png should not exist yet", NoSuchFileException.class,
+            () -> getFileKey(notFoundPng));
+    }
+
+    private static Object getFileKey(MCRVersionedPath path) throws IOException {
+        return Files.readAttributes(path, BasicFileAttributes.class).fileKey();
     }
 
     private static MCROCFLVirtualObject getVirtualObject() {
