@@ -43,12 +43,9 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
 public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
+    private final static ScheduledExecutorService STALLED_JOB_SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static MCRTilingQueue instance = new MCRTilingQueue();
-
-    private static Queue<MCRTileJob> preFetch;
-
-    private static ScheduledExecutorService StalledJobScheduler;
-
+    private final static Queue<MCRTileJob> PRE_FETCH= new ConcurrentLinkedQueue<>();
     private static Logger LOGGER = LogManager.getLogger(MCRTilingQueue.class);
 
     private final ReentrantLock pollLock;
@@ -58,10 +55,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     private MCRTilingQueue() {
         // periodische Ausführung von runProcess
         int waitTime = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset")) * 60;
-        StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
-        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
+        STALLED_JOB_SCHEDULER.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
             TimeUnit.SECONDS);
-        preFetch = new ConcurrentLinkedQueue<>();
         running = true;
         pollLock = new ReentrantLock();
         MCRShutdownHandler.getInstance().addCloseable(this);
@@ -268,7 +263,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     private MCRTileJob getNextPrefetchedElement() {
-        MCRTileJob job = preFetch.poll();
+        MCRTileJob job = PRE_FETCH.poll();
         LOGGER.debug("Fetched job: {}", job);
         return job;
     }
@@ -283,7 +278,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         while (queryResult.hasNext()) {
             i++;
             MCRTileJob job = queryResult.next();
-            preFetch.add(job.clone());
+            PRE_FETCH.add(job.clone());
             em.detach(job);
         }
         LOGGER.debug("prefetched {} tile jobs", i);
@@ -291,7 +286,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     private void clearPreFetch() {
-        preFetch.clear();
+        PRE_FETCH.clear();
     }
 
     private boolean updateJob(MCRTileJob job) {
@@ -365,13 +360,13 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
      * Shuts down {@link MCRStalledJobResetter} and does not alter any job anymore.
      */
     public void prepareClose() {
-        StalledJobScheduler.shutdownNow();
+        STALLED_JOB_SCHEDULER.shutdownNow();
         running = false;
         try {
-            StalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
+            STALLED_JOB_SCHEDULER.awaitTermination(60, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             LOGGER.info("Could not wait for 60 seconds...");
-            StalledJobScheduler.shutdownNow();
+            STALLED_JOB_SCHEDULER.shutdownNow();
         }
     }
 
