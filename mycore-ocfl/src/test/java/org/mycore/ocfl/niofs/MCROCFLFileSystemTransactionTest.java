@@ -16,6 +16,10 @@ import io.ocfl.api.model.OcflObjectVersion;
 
 public class MCROCFLFileSystemTransactionTest extends MCROCFLTestCase {
 
+    public MCROCFLFileSystemTransactionTest(boolean remote) {
+        super(remote);
+    }
+
     @Test
     public void commit() throws IOException {
         MCRVersionedPath whitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");

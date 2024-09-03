@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.mycore.ocfl.niofs.MCROCFLTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
@@ -18,8 +19,12 @@ import static org.junit.Assert.assertThrows;
 
 public class MCROCFLRepositoryTest extends MCROCFLTestCase {
 
+    public MCROCFLRepositoryTest(boolean remote) {
+        super(remote);
+    }
+
     @Test
-    public void directoryChangeHistory() throws URISyntaxException {
+    public void directoryChangeHistory() throws URISyntaxException, IOException {
         assertThrows(NotFoundException.class, () -> {
             repository.directoryChangeHistory(DERIVATE_2, "/");
         });
