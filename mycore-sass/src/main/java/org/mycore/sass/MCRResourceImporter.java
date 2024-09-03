@@ -43,8 +43,6 @@ public class MCRResourceImporter extends CustomImporter {
 
     static final String SASS_URL_PREFIX = "sass:/";
 
-    private final ServletContext servletContext;
-
     private static final UrlHelper URL_HELPER = new UrlHelper();
 
     /**
@@ -53,7 +51,6 @@ public class MCRResourceImporter extends CustomImporter {
      * @param servletContext The ServletContext used for importing resources.
      */
     public MCRResourceImporter(ServletContext servletContext) {
-        this.servletContext = servletContext;
     }
 
     /**
