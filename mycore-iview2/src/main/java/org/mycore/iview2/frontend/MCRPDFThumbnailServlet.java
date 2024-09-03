@@ -120,7 +120,8 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
     }
 
     private static class ThumnailInfo {
-        String derivate, filePath;
+        String derivate;
+        String filePath;
 
         ThumnailInfo(final String derivate, final String imagePath) {
             this.derivate = derivate;

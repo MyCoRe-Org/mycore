@@ -186,7 +186,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
                 graphics.translate(-width, 0);
             }
 
-            int xt = (int) ((targetWidth - 1) / 2), yt = (int) ((targetHeight - 1) / 2);
+            int xt = (int) ((targetWidth - 1) / 2);
+            int yt = (int) ((targetHeight - 1) / 2);
             graphics.translate((width - targetWidth) / 2, (height - targetHeight) / 2);
             graphics.rotate(rotatationRadians, xt, yt);
 

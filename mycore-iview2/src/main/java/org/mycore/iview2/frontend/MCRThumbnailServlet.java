@@ -235,7 +235,8 @@ public class MCRThumbnailServlet extends MCRServlet {
     }
 
     private static class ThumnailInfo {
-        String derivate, imagePath;
+        String derivate;
+        String imagePath;
 
         ThumnailInfo(final String derivate, final String imagePath) {
             this.derivate = derivate;
