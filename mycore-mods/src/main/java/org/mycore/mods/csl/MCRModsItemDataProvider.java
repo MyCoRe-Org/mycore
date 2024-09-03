@@ -58,46 +58,33 @@ import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 
 public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final String NON_DROPPING_PARTICLE = "nonDroppingParticle";
-
-    private static final String DROPPING_PARTICLE = "droppingParticle";
-
     public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
         " or @xlink:type='simple')]";
-
     public static final String SHORT_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
         " or @xlink:type='simple') and @type='abbreviated']";
-
     public static final String MODS_RELATED_ITEM_XPATH = "mods:relatedItem/";
-
     public static final String MODS_ORIGIN_INFO_PUBLICATION = "mods:originInfo[@eventType='publication' or not" +
         "(@eventType)]";
-
     public static final String NONE_TYPE = "none";
-
     public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/";
-
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final String NON_DROPPING_PARTICLE = "nonDroppingParticle";
+    private static final String DROPPING_PARTICLE = "droppingParticle";
     private static final Set<String> KNOWN_UNMAPPED_PERSON_ROLES = MCRConfiguration2
         .getString("MCR.CSL.KnownUnmappedPersonRoles")
         .stream()
         .flatMap(str -> Stream.of(str.split(",")))
         .collect(Collectors.toUnmodifiableSet());
-
-    private MCRMODSWrapper wrapper;
-
-    private String id;
-
     private final Set<String> nonDroppingParticles = MCRConfiguration2.getString("MCR.CSL.NonDroppingParticles")
         .stream()
         .flatMap(str -> Stream.of(str.split(",")))
         .collect(Collectors.toSet());
-
     private final Set<String> droppingParticles = MCRConfiguration2.getString("MCR.CSL.DroppingParticles")
         .stream()
         .flatMap(str -> Stream.of(str.split(",")))
         .collect(Collectors.toSet());
+    private MCRMODSWrapper wrapper;
+    private String id;
 
     private static Stream<String> getModsElementTextStream(Element element, String elementName) {
         return element.getChildren(elementName, MODS_NAMESPACE)
@@ -218,11 +205,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
             final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
             final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
-            
+
             if (list != null) {
                 idb.page(list);
             } else if (start != null && end != null && start.matches("\\d+") && end.matches("\\d+")) {
-                idb.page(Integer.parseInt(start) , Integer.parseInt(end));
+                idb.page(Integer.parseInt(start), Integer.parseInt(end));
             } else if (start != null && end != null) {
                 idb.page(start + "-" + end);
             } else if (start != null && total != null) {
@@ -248,76 +235,141 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     protected void processGenre(CSLItemDataBuilder idb) {
         final List<Element> elements = wrapper.getElements("mods:genre");
-        final Set<String> genres = elements.stream()
-            .map(this::getGenreStringFromElement)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
-
+        final Set<String> genres = getStrings(elements);
         final List<Element> parentElements = wrapper.getElements("mods:relatedItem[@type='host']/mods:genre");
+        final Set<String> parentGenres = getStrings(parentElements);
+        String genreType = getGenreType(genres);
+
+        switch (genreType) {
+            case "article":
+                idb.type(handleArticleType(parentGenres));
+                break;
+
+            case "conference":
+                idb.type(CSLType.PAPER_CONFERENCE);
+                break;
+
+            case "book":
+                idb.type(CSLType.BOOK);
+                break;
+
+            case "interview":
+                idb.type(CSLType.INTERVIEW);
+                break;
+
+            case "research_data":
+                idb.type(CSLType.DATASET);
+                break;
+
+            case "patent":
+                idb.type(CSLType.PATENT);
+                break;
+
+            case "chapter":
+                idb.type(CSLType.CHAPTER);
+                break;
+
+            case "entry":
+                idb.type(CSLType.ENTRY_ENCYCLOPEDIA);
+                break;
+
+            case "preface":
+                idb.type(CSLType.ARTICLE);
+                break;
+
+            case "speech":
+                idb.type(CSLType.SPEECH);
+                break;
+
+            case "video":
+                idb.type(CSLType.MOTION_PICTURE);
+                break;
+
+            case "broadcasting":
+                idb.type(CSLType.BROADCAST);
+                break;
+
+            case "picture":
+                idb.type(CSLType.GRAPHIC);
+                break;
+
+            case "review":
+                idb.type(parentGenres.contains("book") ? CSLType.REVIEW_BOOK : CSLType.REVIEW);
+                break;
+
+            case "thesis":
+                idb.type(CSLType.THESIS);
+                break;
+
+            case "report":
+                idb.type(CSLType.REPORT);
+                break;
+
+            default:
+                idb.type(CSLType.ARTICLE);
+                break;
+        }
+    }
+
+    private Set<String> getStrings(List<Element> parentElements) {
         final Set<String> parentGenres = parentElements.stream()
             .map(this::getGenreStringFromElement)
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
+        return parentGenres;
+    }
 
-        if (genres.contains("article") || genres.contains ("review_article")) {
-            if (parentGenres.contains("journal")) {
-                idb.type(CSLType.ARTICLE_JOURNAL);
-            } else if (parentGenres.contains("newspaper")) {
-                idb.type(CSLType.ARTICLE_NEWSPAPER);
-            } else {
-                idb.type(CSLType.ARTICLE);
-            }
-        } else if (genres.contains("conference_essay") || genres.contains ("abstract")) {
-            idb.type(CSLType.PAPER_CONFERENCE);
+    private CSLType handleArticleType(Set<String> parentGenres) {
+        if (parentGenres.contains("journal")) {
+            return CSLType.ARTICLE_JOURNAL;
+        } else if (parentGenres.contains("newspaper")) {
+            return CSLType.ARTICLE_NEWSPAPER;
+        } else {
+            return CSLType.ARTICLE;
+        }
+    }
+
+    private String getGenreType(Set<String> genres) {
+        if (genres.contains("article") || genres.contains("review_article")) {
+            return "article";
+        } else if (genres.contains("conference_essay") || genres.contains("abstract")) {
+            return "conference";
         } else if (genres.contains("book") || genres.contains("proceedings") || genres.contains("collection")
             || genres.contains("festschrift") || genres.contains("lexicon") || genres.contains("monograph")
             || genres.contains("lecture")) {
-            idb.type(CSLType.BOOK);
+            return "book";
         } else if (genres.contains("interview")) {
-            idb.type(CSLType.INTERVIEW);
+            return "interview";
         } else if (genres.contains("research_data")) {
-            idb.type(CSLType.DATASET);
+            return "research_data";
         } else if (genres.contains("patent")) {
-            idb.type(CSLType.PATENT);
+            return "patent";
         } else if (genres.contains("chapter") || genres.contains("contribution")) {
-            idb.type(CSLType.CHAPTER);
+            return "chapter";
         } else if (genres.contains("entry")) {
-            idb.type(CSLType.ENTRY_ENCYCLOPEDIA);
+            return "entry";
         } else if (genres.contains("preface")) {
-            idb.type(CSLType.ARTICLE);
+            return "preface";
         } else if (genres.contains("speech") || genres.contains("poster")) {
-            idb.type(CSLType.SPEECH);
+            return "speech";
         } else if (genres.contains("video") || genres.contains("video_contribution")) {
-            idb.type(CSLType.MOTION_PICTURE);
+            return "video";
         } else if (genres.contains("broadcasting")) {
-            idb.type(CSLType.BROADCAST);
+            return "broadcasting";
         } else if (genres.contains("picture")) {
-            idb.type(CSLType.GRAPHIC);
+            return "picture";
         } else if (genres.contains("review")) {
-            idb.type(CSLType.REVIEW);
-            if (parentGenres.contains("book")) {
-                idb.type(CSLType.REVIEW_BOOK);
-            }
+            return "review";
         } else if (genres.contains("thesis") || genres.contains("exam") || genres.contains("dissertation")
             || genres.contains("habilitation") || genres.contains("diploma_thesis") || genres.contains("master_thesis")
             || genres.contains("bachelor_thesis") || genres.contains("student_research_project")
             || genres.contains("magister_thesis")) {
-            idb.type(CSLType.THESIS);
+            return "thesis";
         } else if (genres.contains("report") || genres.contains("research_results") || genres.contains("in_house")
             || genres.contains("press_release") || genres.contains("declaration") || genres.contains("researchpaper")) {
-            idb.type(CSLType.REPORT);
-            /* } else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
-               || genres.contains("course_resources")) {
-               // TODO: find right mapping
-              } else if (genres.contains("series")) {
-               // TODO: find right mapping
-              } else if (genres.contains("journal")) {
-               // TODO: find right mapping
-              } else if (genres.contains("newspaper")) {
-               // TODO: find right mapping
-              */
+            return "report";
         } else {
-            idb.type(CSLType.ARTICLE);
+            return "default";
         }
     }
 
@@ -375,7 +427,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         final String type = identifierElement.getAttributeValue("type");
         final String identifier = identifierElement.getTextNormalize();
 
-        if(type == null){
+        if (type == null) {
             LOGGER.info("Type is null for identifier {}", identifier);
             return;
         }
