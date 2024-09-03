@@ -12,6 +12,10 @@ import static org.junit.Assert.assertTrue;
 
 public class MCROCFLVirtualObjectProviderTest extends MCROCFLTestCase {
 
+    public MCROCFLVirtualObjectProviderTest(boolean remote) {
+        super(remote);
+    }
+
     @Test
     public void exists() throws FileSystemException {
         MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
