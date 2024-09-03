@@ -27,6 +27,10 @@ public abstract class MCROCFLStorageTestCase extends MCROCFLTestCase {
 
     protected MCRVersionedPath path3;
 
+    public MCROCFLStorageTestCase(boolean remote) {
+        super(remote);
+    }
+
     @Override
     public void setUp() throws Exception {
         super.setUp();

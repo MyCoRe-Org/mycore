@@ -14,6 +14,10 @@ public class MCROCFLDefaultTransactionalTempFileStorageTest extends MCROCFLStora
 
     private MCROCFLDefaultTransactionalTempFileStorage storage;
 
+    public MCROCFLDefaultTransactionalTempFileStorageTest(boolean remote) {
+        super(remote);
+    }
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -37,10 +41,10 @@ public class MCROCFLDefaultTransactionalTempFileStorageTest extends MCROCFLStora
     @Test
     public void toPhysicalPath() {
         MCRTransactionHelper.beginTransaction();
-        assertTrue(storage.toPhysicalPath(path1).endsWith("1/owner1/v0/file1"));
+        assertTrue(storage.toPhysicalPath(path1).endsWith("2/owner1/v0/file1"));
         MCRTransactionHelper.commitTransaction();
         MCRTransactionHelper.beginTransaction();
-        assertTrue(storage.toPhysicalPath(path1).endsWith("2/owner1/v0/file1"));
+        assertTrue(storage.toPhysicalPath(path1).endsWith("3/owner1/v0/file1"));
         MCRTransactionHelper.commitTransaction();
     }
 
