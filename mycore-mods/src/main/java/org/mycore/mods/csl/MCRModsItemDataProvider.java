@@ -488,6 +488,31 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             fillRoleMap(roleNameMap, modsName, cslName);
         }
 
+        mapRolesToCSLNames(idb, roleNameMap);
+
+        HashMap<String, List<CSLName>> parentRoleMap = new HashMap<>();
+        final List<Element> parentModsNameElements = wrapper.getElements("mods:relatedItem/mods:name");
+
+        for (Element modsName : parentModsNameElements) {
+            final CSLName cslName = buildName(modsName);
+            if (isNameEmpty(cslName)) {
+                continue;
+            }
+            fillRoleMap(parentRoleMap, modsName, cslName);
+        }
+        parentRoleMap.forEach((role, list) -> {
+            final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
+            switch (role) {
+                case "aut" -> idb.containerAuthor(cslNames);
+                case "edt" -> idb.collectionEditor(cslNames);
+                default -> {
+                }
+                // we dont care
+            }
+        });
+    }
+
+    private void mapRolesToCSLNames(CSLItemDataBuilder idb, HashMap<String, List<CSLName>> roleNameMap) {
         roleNameMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
@@ -509,27 +534,6 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                         LOGGER.warn("Unknown person role " + role + " in " + this.id);
                     }
                 }
-            }
-        });
-
-        HashMap<String, List<CSLName>> parentRoleMap = new HashMap<>();
-        final List<Element> parentModsNameElements = wrapper.getElements("mods:relatedItem/mods:name");
-
-        for (Element modsName : parentModsNameElements) {
-            final CSLName cslName = buildName(modsName);
-            if (isNameEmpty(cslName)) {
-                continue;
-            }
-            fillRoleMap(parentRoleMap, modsName, cslName);
-        }
-        parentRoleMap.forEach((role, list) -> {
-            final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
-            switch (role) {
-                case "aut" -> idb.containerAuthor(cslNames);
-                case "edt" -> idb.collectionEditor(cslNames);
-                default -> {
-                }
-                // we dont care
             }
         });
     }
@@ -558,44 +562,34 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         nameBuilder.isInstitution(isInstitution);
 
         if (!isInstitution) {
-            //todo: maybe better mapping here
             HashMap<String, List<String>> typeContentsMap = new HashMap<>();
             modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
                 final String type = namePart.getAttributeValue("type");
                 final String content = namePart.getTextNormalize();
+
                 if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
                     && nonDroppingParticles.contains(content)) {
-                    typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE, t -> new ArrayList<>())
-                        .add(content);
+                    typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE, t -> new ArrayList<>()).add(content);
                 } else if ((Objects.equals(type, "family") || Objects.equals(type, "given"))
                     && droppingParticles.contains(content)) {
-                    typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE, t -> new ArrayList<>())
-                        .add(content);
+                    typeContentsMap.computeIfAbsent(DROPPING_PARTICLE, t -> new ArrayList<>()).add(content);
                 } else {
                     typeContentsMap.computeIfAbsent(Optional.ofNullable(type).orElse(NONE_TYPE), t -> new ArrayList<>())
                         .add(content);
                 }
             });
 
-            if (typeContentsMap.containsKey("family")) {
-                nameBuilder.family(String.join(" ", typeContentsMap.get("family")));
-            }
-
-            if (typeContentsMap.containsKey("given")) {
-                nameBuilder.given(String.join(" ", typeContentsMap.get("given")));
-            }
-
-            if (typeContentsMap.containsKey(NON_DROPPING_PARTICLE)) {
-                nameBuilder.nonDroppingParticle(String.join(" ", typeContentsMap.get(NON_DROPPING_PARTICLE)));
-            }
-
-            if (typeContentsMap.containsKey(DROPPING_PARTICLE)) {
-                nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
-            }
-
-            if (typeContentsMap.containsKey(NONE_TYPE)) {
-                nameBuilder.literal(String.join(" ", typeContentsMap.get(NONE_TYPE)));
-            }
+            typeContentsMap.forEach((key, value) -> {
+                String joinedValue = String.join(" ", value);
+                switch (key) {
+                    case "family" -> nameBuilder.family(joinedValue);
+                    case "given" -> nameBuilder.given(joinedValue);
+                    case NON_DROPPING_PARTICLE -> nameBuilder.nonDroppingParticle(joinedValue);
+                    case DROPPING_PARTICLE -> nameBuilder.droppingParticle(joinedValue);
+                    case NONE_TYPE -> nameBuilder.literal(joinedValue);
+                    default -> LOGGER.warn("Unexpected key '{}' encountered with value '{}'", key, joinedValue);
+                }
+            });
 
             Element displayForm = modsName.getChild("displayForm", MODS_NAMESPACE);
             if (typeContentsMap.isEmpty() && displayForm != null) {
@@ -605,14 +599,14 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
         } else {
             String lit = Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
-                .orElse(modsName.getChildren("namePart", MODS_NAMESPACE).stream().map(Element::getTextNormalize)
+                .orElse(modsName.getChildren("namePart", MODS_NAMESPACE).stream()
+                    .map(Element::getTextNormalize)
                     .collect(Collectors.joining(" ")));
 
             if (!lit.isBlank()) {
                 nameBuilder.literal(lit);
             }
         }
-
         return nameBuilder.build();
     }
 
