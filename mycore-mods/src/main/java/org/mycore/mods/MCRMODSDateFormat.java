@@ -121,8 +121,8 @@ public enum MCRMODSDateFormat {
     }
 
     public SimpleDateFormat getDateFormat() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(this.dateFormat, MCRMODSDateFormat.DATE_LOCALE);
-        dateFormat.setTimeZone(MCRMODSDateFormat.MODS_TIMEZONE);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(this.dateFormat, DATE_LOCALE);
+        dateFormat.setTimeZone(MODS_TIMEZONE);
         return dateFormat;
     }
 }
