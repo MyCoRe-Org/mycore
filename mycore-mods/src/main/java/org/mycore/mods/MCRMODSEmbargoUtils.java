@@ -76,7 +76,7 @@ public class MCRMODSEmbargoUtils {
             LOGGER.warn("Could not determine last modified timestamp of object {}", objectId);
         }
         if (embargo != null) {
-            return embargo == EMPTY_VALUE ? null : embargo;
+            return embargo.equals(EMPTY_VALUE) ? null : embargo;
         }
         try {
             MCRMODSWrapper modsWrapper = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(objectId));
