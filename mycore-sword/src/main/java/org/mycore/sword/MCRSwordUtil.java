@@ -72,8 +72,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
@@ -178,7 +176,6 @@ public class MCRSwordUtil {
     }
 
     private static void addDirectoryToZip(ZipArchiveOutputStream zipOutputStream, Path directory) {
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory)) {
             paths.forEach(p -> {
@@ -223,7 +220,6 @@ public class MCRSwordUtil {
      */
     public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5)
         throws IOException {
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
         if (MCRTransactionHelper.isTransactionActive()) {
             MCRTransactionHelper.commitTransaction();
         }
@@ -281,7 +277,6 @@ public class MCRSwordUtil {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                         throws IOException {
-                        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
                         LOGGER.info("Extracting: {}", file);
                         Path targetFilePath = target.resolve(sourcePath.relativize(file));
