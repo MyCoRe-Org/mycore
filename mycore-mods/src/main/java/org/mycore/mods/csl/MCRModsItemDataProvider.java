@@ -446,6 +446,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     idb.PMCID(identifier);
                 }
             }
+            default -> LOGGER.info("Unknown identifier type {}", identifier);
+
         }
     }
 
