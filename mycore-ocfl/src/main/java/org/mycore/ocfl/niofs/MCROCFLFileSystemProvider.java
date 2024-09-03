@@ -23,6 +23,7 @@ import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessMode;
 import java.nio.file.CopyOption;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileAlreadyExistsException;
@@ -97,7 +98,8 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
                 .getSingleInstanceOfOrThrow(MCROCFLTransactionalTempFileStorage.class, tempFileClassProperty);
             Files.createDirectories(this.localStorage.getRoot());
             boolean remote = MCRConfiguration2.getBoolean(configurationPrefix + "FS.Remote").orElseThrow();
-            this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), localStorage, remote);
+            this.virtualObjectProvider
+                = new MCROCFLVirtualObjectProvider(getRepository(), localStorage, remote);
         } catch (Exception exception) {
             throw new IOException("Unable to create MCROCFLFileSystem.", exception);
         }
@@ -245,7 +247,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
             throw new NoSuchFileException(source.toString());
         }
         if (virtualSource.isDirectory(source)) {
-            createDirectory(target);
+            copyDirectory(target, options);
         } else {
             copyFile(source, target, options);
         }
@@ -291,9 +293,6 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         delete(source);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private void copyFile(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
         MCROCFLVirtualObject virtualSource = virtualObjectProvider().get(source);
         MCROCFLVirtualObject virtualTarget = virtualObjectProvider().getWritable(target);
@@ -304,11 +303,26 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         }
         if (virtualSource.equals(virtualTarget)) {
             // same virtual object
-            virtualSource.copyFile(source, target, options);
+            virtualSource.copy(source, target, options);
         } else {
             // different virtual object
-            virtualSource.copyFileToVirtualObject(virtualTarget, source, target, options);
+            virtualSource.externalCopy(virtualTarget, source, target, options);
         }
+    }
+
+    private void copyDirectory(MCRVersionedPath target, CopyOption... options)
+        throws IOException {
+        MCROCFLVirtualObject virtualTarget = virtualObjectProvider().getWritable(target);
+        boolean targetExists = virtualTarget.exists(target);
+        boolean replaceExisting = Arrays.asList(options).contains(StandardCopyOption.REPLACE_EXISTING);
+        if (targetExists && replaceExisting) {
+            boolean targetIsDirectory = virtualTarget.isDirectory(target);
+            boolean targetDirectoryIsEmpty = virtualTarget.isDirectoryEmpty(target);
+            if (targetIsDirectory && !targetDirectoryIsEmpty) {
+                throw new DirectoryNotEmptyException(target.toString());
+            }
+        }
+        createDirectory(target);
     }
 
     /**

@@ -12,6 +12,10 @@ public class MCROCFLRollingCacheStorageTest extends MCROCFLStorageTestCase {
 
     private MCROCFLRollingCacheStorage storage;
 
+    public MCROCFLRollingCacheStorageTest(boolean remote) {
+        super(remote);
+    }
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
