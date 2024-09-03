@@ -128,13 +128,12 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
         } catch (MCRException e) {
             Throwable ex = e;
             if (Optional.ofNullable(e.getCause()).map(Object::getClass)
-                    .filter(MCRAccessException.class::isAssignableFrom).isPresent()) {
+                .filter(MCRAccessException.class::isAssignableFrom).isPresent()) {
                 ex = e.getCause();
             }
             throw new SwordServerException("Error while deleting Object.", ex);
         }
     }
-
 
     @Override
     public void init(MCRSwordLifecycleConfiguration lifecycleConfiguration) {
@@ -143,6 +142,6 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
 
     @Override
     public void destroy() {
-
+        //intentionally empty, does nothing
     }
 }
