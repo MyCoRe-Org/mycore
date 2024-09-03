@@ -10,6 +10,10 @@ import static org.junit.Assert.assertNotNull;
 
 public class MCROCFLFileStoreTest extends MCROCFLTestCase {
 
+    public MCROCFLFileStoreTest(boolean remote) {
+        super(remote);
+    }
+
     @Test
     public void name() {
         assertNotNull("file store should have a name", fs().name());
