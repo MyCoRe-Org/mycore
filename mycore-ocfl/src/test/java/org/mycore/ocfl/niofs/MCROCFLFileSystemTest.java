@@ -18,6 +18,10 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 public class MCROCFLFileSystemTest extends MCROCFLTestCase {
 
+    public MCROCFLFileSystemTest(boolean remote) {
+        super(remote);
+    }
+
     @Test
     public void createRoot() throws Exception {
         MCROCFLFileSystem fs = MCROCFLFileSystemProvider.getMCROCFLFileSystem();
