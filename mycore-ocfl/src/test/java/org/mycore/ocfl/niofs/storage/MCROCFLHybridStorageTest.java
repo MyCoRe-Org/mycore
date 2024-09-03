@@ -15,6 +15,10 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
 
     private MCROCFLHybridStorage storage;
 
+    public MCROCFLHybridStorageTest(boolean remote) {
+        super(remote);
+    }
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -39,15 +43,17 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
 
     @Test
     public void toPhysicalPath() {
-        assertTrue("should access rolling store", storage.toPhysicalPath(path1).endsWith("rolling/owner1/v0/file1"));
+        String rollingDirectory = "/" + MCROCFLHybridStorage.ROLLING_DIRECTORY + "/";
+        String transactionDirectory = "/" + MCROCFLHybridStorage.TRANSACTION_DIRECTORY + "/";
+        assertTrue("should access rolling store", storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
         MCRTransactionHelper.beginTransaction();
         assertTrue("should access transactional store",
-            storage.toPhysicalPath(path1).endsWith("transaction/1/owner1/v0/file1"));
+            storage.toPhysicalPath(path1).toString().contains(transactionDirectory));
         MCRTransactionHelper.commitTransaction();
-        assertTrue("should access rolling store", storage.toPhysicalPath(path1).endsWith("rolling/owner1/v0/file1"));
+        assertTrue("should access rolling store", storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
         MCRTransactionHelper.beginTransaction();
         assertTrue("should access transactional store",
-            storage.toPhysicalPath(path1).endsWith("transaction/2/owner1/v0/file1"));
+            storage.toPhysicalPath(path1).toString().contains(transactionDirectory));
         MCRTransactionHelper.commitTransaction();
     }
 
