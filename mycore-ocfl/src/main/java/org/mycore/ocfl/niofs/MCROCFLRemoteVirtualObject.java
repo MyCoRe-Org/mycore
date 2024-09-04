@@ -33,12 +33,16 @@ import java.util.Set;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.niofs.channels.MCROCFLCachingSeekableByteChannel;
+import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
+import org.mycore.ocfl.niofs.channels.MCROCFLReadableByteChannel;
 import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
 import io.ocfl.api.model.FileChangeHistory;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.OcflObjectVersionFile;
 
 /**
  * Represents a virtual object stored remotely in an OCFL repository.
@@ -108,14 +112,32 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
     protected SeekableByteChannel readOrWriteByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes) throws IOException {
         boolean write = options.contains(StandardOpenOption.WRITE);
-        localCopy(path);
-        SeekableByteChannel seekableByteChannel = this.localStorage.newByteChannel(path, options, fileAttributes);
-        if (write) {
-            return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
-                trackFileWrite(path, MCREvent.EventType.UPDATE);
-            });
+        boolean truncateExisting = options.contains(StandardOpenOption.TRUNCATE_EXISTING); // TODO
+        boolean inLocalStorage = this.localStorage.exists(path);
+        if (write || inLocalStorage) {
+            localCopy(path);
+            SeekableByteChannel seekableByteChannel = this.localStorage.newByteChannel(path, options, fileAttributes);
+            if (write) {
+                return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
+                    trackFileWrite(path, MCREvent.EventType.UPDATE);
+                });
+            }
+            return seekableByteChannel;
         }
-        return seekableByteChannel;
+        // the file is open for read, and it's not available in the local storage
+        OcflObjectVersionFile ocflFile = fromOcfl(path);
+        this.localStorage.createDirectories(path.getParent());
+        Path cacheFilePath = this.localStorage.toPhysicalPath(path);
+
+        MCROCFLReadableByteChannel readableByteChannel = new MCROCFLReadableByteChannel(ocflFile);
+        MCROCFLCachingSeekableByteChannel cachingByteChannel
+            = new MCROCFLCachingSeekableByteChannel(readableByteChannel, cacheFilePath);
+        return new MCROCFLClosableCallbackChannel(cachingByteChannel, () -> {
+            // delete partial files from cache
+            if (!cachingByteChannel.isFileComplete()) {
+                Files.delete(cacheFilePath);
+            }
+        });
     }
 
     /**
