@@ -76,15 +76,12 @@ public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
 
         if (ta instanceof ParameterizedType lpt) {
             return (lpt.getRawType() instanceof Class rawType)
-                && JAXBElement.class.isAssignableFrom(rawType);
+                    && JAXBElement.class.isAssignableFrom(rawType);
         }
 
-        if (!(pt.getActualTypeArguments()[0] instanceof Class listClass)) {
-            return false;
-        }
-
-        return JAXB_CHECKER.test(listClass);
+        return pt.getActualTypeArguments()[0] instanceof Class listClass;
     }
+
 
     private static Class getElementClass(Class<?> type, Type genericType) {
         Type ta;
