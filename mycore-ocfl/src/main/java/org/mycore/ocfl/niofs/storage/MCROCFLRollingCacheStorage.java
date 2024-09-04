@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.MCROCFLClosableCallbackChannel;
+import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 
 /**
  * Implementation of {@link MCROCFLTempFileStorage} that provides a rolling cache storage mechanism.
