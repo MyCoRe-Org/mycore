@@ -215,10 +215,8 @@ public class MCROAISetManager {
                     for (Element setElement : resolved.getChildren("set", OAIConstants.NS_OAI)) {
                         MCRSet set = createSet(conf.getId(), setElement);
                         setMap.put(set.getSpec(), set);
-                        if (!contains(set.getSpec(), setList)) {
-                            if (!handler.filter(set)) {
+                        if (!contains(set.getSpec(), setList)&&!handler.filter(set)) {
                                 setList.add(set);
-                            }
                         }
                     }
                 }
