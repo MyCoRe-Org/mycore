@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -65,7 +64,7 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
     public void createDirectory() throws IOException {
         // create directory in existing ocfl object
         final MCRPath path1 = MCRPath.getPath(DERIVATE_1, "test");
-        Assert.assertFalse("'test' directory should not exists", Files.exists(path1));
+        assertFalse("'test' directory should not exists", Files.exists(path1));
         MCRTransactionHelper.beginTransaction();
         Files.createDirectory(path1);
         assertTrue("'test' directory should exist before committing", Files.exists(path1));
@@ -79,7 +78,7 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
 
         // create directory in non-existing ocfl object
         final MCRPath path2 = MCRPath.getPath(DERIVATE_2, "test");
-        Assert.assertFalse("'test' directory should not exists", Files.exists(path2));
+        assertFalse("'test' directory should not exists", Files.exists(path2));
         MCRTransactionHelper.beginTransaction();
         Files.createDirectory(path2);
         assertTrue("'test' directory should exist after create", Files.exists(path2));
@@ -89,13 +88,12 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
 
     @Test
     public void newByteChannel() throws IOException, URISyntaxException {
-        URL whitePngURL = getClass().getResource("/junit_derivate_00000001/white.png");
-        assertNotNull(whitePngURL);
+        final MCRPath whitePng = MCRPath.getPath(DERIVATE_1, "white.png");
+        final MCRPath testFile = MCRPath.getPath(DERIVATE_1, "testFile");
         // prepare
         byte[] expectedTestFileData = { 1, 3, 3, 7 };
-        byte[] expectedWhitePngData = Files.readAllBytes(Path.of(whitePngURL.toURI()));
+        byte[] expectedWhitePngData = Files.readAllBytes(whitePng);
         // write
-        MCRPath testFile = MCRPath.getPath(DERIVATE_1, "testFile");
         assertFalse("'testFile' should not exists", Files.exists(testFile));
         MCRTransactionHelper.beginTransaction();
         Files.write(testFile, expectedTestFileData);
@@ -113,11 +111,20 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
             assertArrayEquals("byte array should be equal", expectedTestFileData, seekBytes);
         }
 
+        // read range
+        try (SeekableByteChannel byteChannel = Files.newByteChannel(testFile)) {
+            byte[] seekBytes = new byte[2];
+            ByteBuffer byteBuffer = ByteBuffer.wrap(seekBytes);
+            byteChannel.position(1);
+            byteChannel.read(byteBuffer);
+            assertArrayEquals("byte array should be equal", new byte[] { 3, 3 }, seekBytes);
+        }
+
         // read v1
         ObjectVersionId versionId = ObjectVersionId.version(DERIVATE_1, 1);
-        MCRVersionedPath whitePng = MCRVersionedPath.getPath(
+        MCRVersionedPath whitePngV1 = MCRVersionedPath.getPath(
             versionId.getObjectId(), versionId.getVersionNum().toString(), "white.png");
-        byte[] whitePngData = Files.readAllBytes(whitePng);
+        byte[] whitePngData = Files.readAllBytes(whitePngV1);
         assertArrayEquals("byte array should be equal", expectedWhitePngData, whitePngData);
     }
 
