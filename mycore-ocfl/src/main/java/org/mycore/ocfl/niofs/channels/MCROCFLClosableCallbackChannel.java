@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl.niofs;
+package org.mycore.ocfl.niofs.channels;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

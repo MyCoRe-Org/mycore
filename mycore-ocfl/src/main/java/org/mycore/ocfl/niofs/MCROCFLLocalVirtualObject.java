@@ -36,6 +36,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
