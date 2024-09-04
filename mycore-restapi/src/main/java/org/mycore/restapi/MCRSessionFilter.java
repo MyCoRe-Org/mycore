@@ -343,8 +343,8 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         @Override
         public String getUserAttribute(String attribute) {
             return switch (attribute) {
-                case MCRUserInformation.ATT_REAL_NAME -> jwt.getClaim("name").asString();
-                case MCRUserInformation.ATT_EMAIL -> jwt.getClaim("email").asString();
+                case ATT_REAL_NAME -> jwt.getClaim("name").asString();
+                case ATT_EMAIL -> jwt.getClaim("email").asString();
                 case MCRRealm.USER_INFORMATION_ATTR -> {
                     if (getUserID().contains("@")) {
                         yield getUserID().substring(getUserID().lastIndexOf("@") + 1);
@@ -390,7 +390,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 return null;
             }
             if (ui instanceof MCRUser) {
-                return SecurityContext.BASIC_AUTH;
+                return BASIC_AUTH;
             }
             if (ui instanceof MCRJWTUserInformation) {
                 return "BEARER";
