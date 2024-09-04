@@ -60,8 +60,9 @@ public class MCREvents {
     @Context
     UriInfo uriInfo;
 
-    private volatile SseBroadcaster objectBroadcaster,
-        derivateBroadcaster, pathBroadcaster;
+    private volatile SseBroadcaster objectBroadcaster;
+    private volatile SseBroadcaster derivateBroadcaster;
+    private volatile SseBroadcaster pathBroadcaster;
 
     @PostConstruct
     public void init() {
