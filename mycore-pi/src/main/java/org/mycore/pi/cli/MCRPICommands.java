@@ -80,9 +80,9 @@ public class MCRPICommands {
     public static void addFlagToObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
-        final List<MCRPIRegistrationInfo> pi = MCRPIManager.getInstance().getRegistered(base);
+        final List<MCRPIRegistrationInfo> piRegistrationInfos = MCRPIManager.getInstance().getRegistered(base);
         boolean addedAFlag = false;
-        for (MCRPIRegistrationInfo registrationInfo : pi.stream().toList()) {
+        for (MCRPIRegistrationInfo registrationInfo : piRegistrationInfos) {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
                 LOGGER.info("Add PI-Flag to " + mycoreIDString);
                 MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
