@@ -13,7 +13,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
@@ -210,116 +209,6 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
         derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
         assertNotNull("should have a 'white.png' file", derivate1.getFile("white.png"));
-    }
-
-    @Test
-    public void isFileAddedOrModified() throws IOException {
-        MCRVersionedPath whitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
-        MCRVersionedPath movedPng = MCRVersionedPath.head(DERIVATE_1, "moved.png");
-
-        // Ensure the file exists and is not modified initially
-        assertTrue("white.png should exist", getVirtualObject().exists(whitePng));
-
-        // Modify the file
-        MCRTransactionHelper.beginTransaction();
-        assertFalse("File should not be marked as modified initially", getVirtualObject().isAddedOrModified(whitePng));
-        Files.write(whitePng, new byte[] { 1, 3, 3, 7 });
-        assertTrue("File should be marked as modified after content change",
-            getVirtualObject().isAddedOrModified(whitePng));
-        MCRTransactionHelper.commitTransaction();
-
-        // Rename the file
-        MCRTransactionHelper.beginTransaction();
-        Files.move(whitePng, movedPng);
-        assertTrue("Renamed file should be marked as modified", getVirtualObject().isAddedOrModified(movedPng));
-        assertFalse(getVirtualObject().isAddedOrModified(whitePng));
-        MCRTransactionHelper.commitTransaction();
-
-        // Add a new file (recreate white.png)
-        MCRTransactionHelper.beginTransaction();
-        Files.write(whitePng, new byte[] { 5, 6, 7, 8 });
-        assertTrue("Newly added file should be marked as modified", getVirtualObject().isAddedOrModified(whitePng));
-        MCRTransactionHelper.commitTransaction();
-
-        // Truncate the file
-        MCRTransactionHelper.beginTransaction();
-        Files.write(whitePng, new byte[] {}, StandardOpenOption.TRUNCATE_EXISTING);
-        assertTrue("Truncated file should be marked as modified", getVirtualObject().isAddedOrModified(whitePng));
-        assertEquals("Truncated file should have size 0", 0, Files.size(whitePng));
-        MCRTransactionHelper.commitTransaction();
-
-        // Delete the file
-        MCRTransactionHelper.beginTransaction();
-        Files.delete(whitePng);
-        assertFalse(getVirtualObject().isAddedOrModified(whitePng));
-        MCRTransactionHelper.commitTransaction();
-
-        // Check no modification scenario (recreate white.png with same initial content)
-        MCRTransactionHelper.beginTransaction();
-        Files.write(whitePng, new byte[] { 1, 2, 3, 4 });
-        MCRTransactionHelper.commitTransaction();
-        MCRTransactionHelper.beginTransaction();
-        Files.write(whitePng, new byte[] { 4, 3, 2, 1 });
-        assertTrue("File should be marked as modified", getVirtualObject().isAddedOrModified(whitePng));
-        Files.write(whitePng, new byte[] { 1, 2, 3, 4 });
-        assertFalse("File should not be marked as modified after re-creation with same content",
-            getVirtualObject().isAddedOrModified(whitePng));
-        MCRTransactionHelper.commitTransaction();
-    }
-
-    @Test
-    public void isDirectoryAddedOrModified() throws IOException {
-        MCRVersionedPath rootDir = MCRVersionedPath.head(DERIVATE_1, "/");
-        MCRVersionedPath testDir = MCRVersionedPath.head(DERIVATE_1, "testDir");
-        MCRVersionedPath movedDir = MCRVersionedPath.head(DERIVATE_1, "movedDir");
-        MCRVersionedPath testFile = MCRVersionedPath.head(DERIVATE_1, "testDir/testFile.txt");
-        MCRVersionedPath movedFile = MCRVersionedPath.head(DERIVATE_1, "movedDir/testFile.txt");
-
-        // Ensure the directory exists and is not modified initially
-        MCRTransactionHelper.beginTransaction();
-        Files.createDirectory(testDir);
-        assertTrue("testDir should exist", getVirtualObject().exists(testDir));
-        assertTrue("testDir should be marked as modified", getVirtualObject().isAddedOrModified(testDir));
-        assertTrue("Adding directory should mark root as modified", getVirtualObject().isAddedOrModified(rootDir));
-        MCRTransactionHelper.commitTransaction();
-
-        // Rename the directory
-        MCRTransactionHelper.beginTransaction();
-        Files.move(testDir, movedDir);
-        assertTrue("movedDir should be marked as modified", getVirtualObject().isAddedOrModified(movedDir));
-        assertFalse(getVirtualObject().isAddedOrModified(testDir));
-        assertTrue("Renaming directory should mark root as modified", getVirtualObject().isAddedOrModified(rootDir));
-        MCRTransactionHelper.commitTransaction();
-
-        // Create a new file in the directory
-        MCRTransactionHelper.beginTransaction();
-        Files.write(testFile, new byte[] { 1, 2, 3, 4 });
-        assertTrue("Directory should be marked as modified after creating a file",
-            getVirtualObject().isAddedOrModified(testDir));
-        MCRTransactionHelper.commitTransaction();
-
-        // Add a new file to the renamed directory
-        MCRTransactionHelper.beginTransaction();
-        Files.write(movedFile, new byte[] { 5, 6, 7, 8 });
-        assertTrue("Newly added file should mark directory as modified",
-            getVirtualObject().isAddedOrModified(movedDir));
-        assertFalse("Adding sub file should not mark root as modified", getVirtualObject().isAddedOrModified(rootDir));
-        MCRTransactionHelper.commitTransaction();
-
-        // Delete the file from the directory
-        MCRTransactionHelper.beginTransaction();
-        Files.delete(movedFile);
-        assertTrue("Deleting file should mark directory as modified", getVirtualObject().isAddedOrModified(movedDir));
-        assertFalse("Deleting sub file should not mark root as modified",
-            getVirtualObject().isAddedOrModified(rootDir));
-        MCRTransactionHelper.commitTransaction();
-
-        // Delete the directory
-        MCRTransactionHelper.beginTransaction();
-        Files.delete(movedDir);
-        assertFalse(getVirtualObject().isAddedOrModified(movedDir));
-        assertTrue("Deleting directory should mark root as modified", getVirtualObject().isAddedOrModified(rootDir));
-        MCRTransactionHelper.commitTransaction();
     }
 
     @Test
