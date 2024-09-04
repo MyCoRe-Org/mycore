@@ -30,7 +30,6 @@ import org.mycore.frontend.servlets.MCRServlet;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -43,13 +42,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class MCRPersistenceServletFilter implements Filter {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRPersistenceServletFilter.class);
-
-    /* (non-Javadoc)
-     * @see jakarta.servlet.Filter#destroy()
-     */
-    @Override
-    public void destroy() {
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -117,13 +109,6 @@ public class MCRPersistenceServletFilter implements Filter {
         }
         String mcrId = MCRServlet.getProperty(req, "id");
         return MCRClassificationUtils.getCollection(mcrId);
-    }
-
-    /* (non-Javadoc)
-     * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
-     */
-    @Override
-    public void init(FilterConfig config) {
     }
 
 }
