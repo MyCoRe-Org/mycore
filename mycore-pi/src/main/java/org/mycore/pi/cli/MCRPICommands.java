@@ -81,16 +81,16 @@ public class MCRPICommands {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
         final List<MCRPIRegistrationInfo> pi = MCRPIManager.getInstance().getRegistered(base);
-        final AtomicBoolean addedAFlag = new AtomicBoolean(false);
-        pi.stream().forEach(registrationInfo -> {
+        boolean addedAFlag = false;
+        for (MCRPIRegistrationInfo registrationInfo : pi.stream().toList()) {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
                 LOGGER.info("Add PI-Flag to " + mycoreIDString);
                 MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
-                addedAFlag.set(true);
+                addedAFlag = true;
             }
-        });
+        }
 
-        if (addedAFlag.get()) {
+        if (addedAFlag) {
             try {
                 MCRMetadataManager.update(base);
             } catch (MCRAccessException e) {
