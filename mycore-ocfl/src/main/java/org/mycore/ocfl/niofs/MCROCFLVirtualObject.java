@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +58,7 @@ import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
@@ -66,7 +66,6 @@ import io.ocfl.api.DigestAlgorithmRegistry;
 import io.ocfl.api.OcflObjectUpdater;
 import io.ocfl.api.OcflOption;
 import io.ocfl.api.io.FixityCheckInputStream;
-import io.ocfl.api.model.FileChange;
 import io.ocfl.api.model.FileChangeHistory;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
@@ -679,27 +678,20 @@ public abstract class MCROCFLVirtualObject {
     protected FileChangeHistory getChangeHistory(MCRVersionedPath path) throws NoSuchFileException {
         boolean isDirectory = isDirectory(path);
         MCRVersionedPath resolvedPath = isDirectory ? path : this.fileTracker.findPath(path);
-        FileChangeHistory fullChangeHistory = this.changeHistoryCache.get(resolvedPath);
-        if (fullChangeHistory == null) {
-            fullChangeHistory = isDirectory
-                ? getRepository().directoryChangeHistory(getOwner(), resolvedPath.toRelativePath())
-                : getRepository().fileChangeHistory(getOwner(), resolvedPath.toRelativePath());
-            this.changeHistoryCache.put(resolvedPath, fullChangeHistory);
-        }
-        String requestedVersion = path.getVersion() == null ? getVersion() : path.getVersion();
-        if (fullChangeHistory.getMostRecent().getVersionNum().toString().equals(requestedVersion)) {
-            return fullChangeHistory;
-        }
-        FileChangeHistory changeHistory = new FileChangeHistory();
-        changeHistory.setPath(fullChangeHistory.getPath());
-        changeHistory.setFileChanges(new ArrayList<>());
-        Iterator<FileChange> forwardChangeIterator = fullChangeHistory.getForwardChangeIterator();
-        while (forwardChangeIterator.hasNext()) {
-            FileChange change = forwardChangeIterator.next();
-            changeHistory.getFileChanges().add(change);
-            if (change.getVersionNum().toString().equals(requestedVersion)) {
-                break;
+        FileChangeHistory changeHistory = this.changeHistoryCache.get(resolvedPath);
+        if (changeHistory == null) {
+            VersionNum versionNum = this.objectVersionId.getVersionNum();
+            String logicalPath = resolvedPath.toRelativePath();
+            if (versionNum != null) {
+                changeHistory = isDirectory
+                    ? getRepository().directoryChangeHistory(getOwner(), logicalPath, versionNum)
+                    : getRepository().fileChangeHistory(getOwner(), logicalPath, versionNum);
+            } else {
+                changeHistory = isDirectory
+                    ? getRepository().directoryChangeHistory(getOwner(), logicalPath)
+                    : getRepository().fileChangeHistory(getOwner(), logicalPath);
             }
+            this.changeHistoryCache.put(resolvedPath, changeHistory);
         }
         return changeHistory;
     }
@@ -769,57 +761,6 @@ public abstract class MCROCFLVirtualObject {
     }
 
     /**
-     * Checks whether the path was newly added or modified (written) in any way.
-     * <p>The method will return false if the path does not exist anymore!</p>
-     *
-     * @param path the versioned path to check
-     * @return true if the path was added or modified, otherwise false
-     * @throws IOException if an I/O exception occurred
-     */
-    public boolean isAddedOrModified(MCRVersionedPath path) throws IOException {
-        if (this.readonly || this.markForPurge || !this.exists(path)) {
-            return false;
-        }
-        return this.isDirectory(path) ? isDirectoryModified(path) : isFileModified(path);
-    }
-
-    @SuppressWarnings("PMD")
-    protected boolean isFileModified(MCRVersionedPath file) throws IOException {
-        if (!this.fileTracker.exists(file)) {
-            return false;
-        }
-        return fileTracker.isAddedOrModified(file);
-    }
-
-    protected boolean isDirectoryModified(MCRVersionedPath directory) throws IOException {
-        Set<MCRVersionedPath> ocflFiles = objectVersion.getFiles().stream()
-            .map(OcflObjectVersionFile::getPath)
-            .map(this::toMCRPath)
-            .flatMap(ocflFile -> {
-                List<MCRVersionedPath> paths = new ArrayList<>();
-                paths.add(ocflFile);
-                Path parent = ocflFile.getParent();
-                while (parent != null) {
-                    paths.add((MCRVersionedPath) parent);
-                    parent = parent.getParent();
-                }
-                return paths.stream();
-            })
-            // TODO // MCRVersionedPath#endsWith seems to be wrongly implemented
-            .filter(ocflFile -> !ocflFile.getOwnerRelativePath().endsWith(KEEP_FILE))
-            .collect(Collectors.toSet());
-        // if the directory never existed in the OCFL repository, consider it as modified
-        if (ocflFiles.stream().noneMatch(ocflFile -> directory.equals(ocflFile.getParent()))) {
-            return true;
-        }
-        // collect directories
-        Set<Path> ocflDirectoryFiles = new HashSet<>(list(directory, ocflFiles));
-        Set<Path> currentDirectoryFiles = new HashSet<>(list(directory));
-        // compare the two sets to determine if the directory is modified
-        return !ocflDirectoryFiles.equals(currentDirectoryFiles);
-    }
-
-    /**
      * Persists changes to this virtual object.
      *
      * @return {@code true} if changes were persisted, {@code false} otherwise.
@@ -872,6 +813,7 @@ public abstract class MCROCFLVirtualObject {
                     String ocflTargetPath = change.target().toRelativePath();
                     updater.renameFile(ocflSourcePath, ocflTargetPath);
                 }
+                default -> throw new IllegalStateException("Unexpected value: " + change.type());
             }
         }
         return !changes.isEmpty();

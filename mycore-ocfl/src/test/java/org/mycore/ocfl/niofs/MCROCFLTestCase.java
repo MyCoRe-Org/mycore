@@ -81,7 +81,7 @@ public abstract class MCROCFLTestCase extends MCRTestCase {
     protected void loadObject(String id) throws URISyntaxException, IOException {
         URL derivateURL = getClass().getClassLoader().getResource(id);
         if (derivateURL == null) {
-            throw new NullPointerException("Unable to locate '" + id + "' folder in resources.");
+            throw new IllegalArgumentException("Unable to locate '" + id + "' folder in resources.");
         }
         final Path sourcePath = Path.of(derivateURL.toURI());
         final MCRVersionedPath targetPath = MCRVersionedPath.head(id, "/");
@@ -96,7 +96,7 @@ public abstract class MCROCFLTestCase extends MCRTestCase {
 
         private Path sourcePath = null;
 
-        public CopyFileVisitor(Path targetPath) {
+        CopyFileVisitor(Path targetPath) {
             this.targetPath = targetPath;
         }
 
