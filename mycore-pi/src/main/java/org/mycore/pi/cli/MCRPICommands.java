@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -78,17 +79,16 @@ public class MCRPICommands {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
         final List<MCRPIRegistrationInfo> pi = MCRPIManager.getInstance().getRegistered(base);
-
-        final boolean addedAFlag = pi.stream().anyMatch(registrationInfo -> {
+        final AtomicBoolean addedAFlag = new AtomicBoolean(false);
+        pi.stream().forEach(registrationInfo -> {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
                 LOGGER.info("Add PI-Flag to " + mycoreIDString);
                 MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
-                return true;
+                addedAFlag.set(true);
             }
-            return false;
         });
 
-        if (addedAFlag) {
+        if (addedAFlag.get()) {
             try {
                 MCRMetadataManager.update(base);
             } catch (MCRAccessException e) {
