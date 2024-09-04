@@ -686,11 +686,13 @@ public class MCRRestAPIObjectsHelper {
                         String result = listDerivateContentAsJson(derObj, path, depth, info, app);
                         return response(result, "application/json", lastModified);
                     }
+                    // fallthrough
                 default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                         new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
                             "Unexepected program flow termination.",
                             "Please contact a developer!"));
+
             }
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
