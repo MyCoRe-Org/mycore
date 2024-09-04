@@ -135,8 +135,9 @@ public class MCROCFLRepository implements OcflRepository {
     }
 
     /**
-     * Returns the FileChangeHistory for a certain version.
-     * TODO unit tests & javadoc
+     * Retrieves the change history for a logical path within an object for a certain version. Each entry in the change
+     * history marks an object version where the contents at the logical path were changed or the logical path was
+     * removed. Object versions where there were no changes to the logical path are not included.
      *
      * @param objectId  the id of the object
      * @param logicalPath the logical path
@@ -148,6 +149,7 @@ public class MCROCFLRepository implements OcflRepository {
         throws NotFoundException {
         FileChangeHistory originalChangeHistory = base.fileChangeHistory(objectId, logicalPath);
         FileChangeHistory newChangeHistory = new FileChangeHistory();
+        newChangeHistory.setFileChanges(new ArrayList<>());
         newChangeHistory.setPath(originalChangeHistory.getPath());
         for (FileChange fileChange : originalChangeHistory.getFileChanges()) {
             if (fileChange.getVersionNum().getVersionNum() > targetVersion.getVersionNum()) {
