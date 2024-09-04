@@ -414,19 +414,19 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         LOGGER.info("removed tiles from {} images", removed);
     }
 
-    private static void deleteFileAndEmptyDirectories(Path file) throws IOException {
-        if (Files.isRegularFile(file)) {
-            Files.delete(file);
-        }
-        if (Files.isDirectory(file)) {
-            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file)) {
-                for (@SuppressWarnings("unused")
-                Path entry : directoryStream) {
-                    return;
-                }
+        private static void deleteFileAndEmptyDirectories(Path file) throws IOException {
+            if (Files.isRegularFile(file)) {
                 Files.delete(file);
+            } else if (Files.isDirectory(file)) {
+                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file)) {
+                    if (!directoryStream.iterator().hasNext()) {
+                        Files.delete(file);
+                    }else {
+                        return;
+                    }
+                }
             }
-        }
+
         Path parent = file.getParent();
         if (parent != null && parent.getNameCount() > 0) {
             deleteFileAndEmptyDirectories(parent);
