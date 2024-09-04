@@ -265,22 +265,27 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 tileImage(derivate, absoluteImagePath);
                 return;
             }
+            checkImageContent(iviewFileRoot, props, iviewFile, derivate, absoluteImagePath);
+        }
+    }
+
+    private static void checkImageContent(Path iviewFileRoot, MCRTiledPictureProps props, Path iviewFile,
+        String derivate, String absoluteImagePath) throws IOException {
+        try {
+            ImageReader imageReader = MCRIView2Tools.getTileImageReader();
             try {
-                ImageReader imageReader = MCRIView2Tools.getTileImageReader();
                 MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
                 int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
                 int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
                 LOGGER.debug("Image size:{}x{}, tiles:{}x{}", props.getWidth(), props.getHeight(), maxX, maxY);
-                try {
-                    MCRIView2Tools.readTile(iviewFileRoot, imageReader,
-                        props.getZoomlevel(), maxX - 1, 0);
-                } finally {
-                    imageReader.dispose();
-                }
-            } catch (IOException e) {
-                LOGGER.warn("Could not read thumbnail of {}", iviewFile, e);
-                tileImage(derivate, absoluteImagePath);
+
+                MCRIView2Tools.readTile(iviewFileRoot, imageReader, props.getZoomlevel(), maxX - 1, 0);
+            } finally {
+                imageReader.dispose();
             }
+        } catch (IOException e) {
+            LOGGER.warn("Could not read thumbnail of {}", iviewFile, e);
+            tileImage(derivate, absoluteImagePath);
         }
     }
 

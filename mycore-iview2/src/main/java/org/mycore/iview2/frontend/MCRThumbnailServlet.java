@@ -17,9 +17,8 @@
  */
 
 package org.mycore.iview2.frontend;
-
-import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,18 +66,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Deprecated
 public class MCRThumbnailServlet extends MCRServlet {
     private static final long serialVersionUID = 1506443527774956290L;
-
-    //stores max png size for byte array buffer of output
-    private AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
-
-    private ImageWriteParam imageWriteParam;
-
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
-
     private static Logger LOGGER = LogManager.getLogger(MCRThumbnailServlet.class);
-
-    private int thumbnailSize = MCRImage.getTileSize();
-
     private static LoadingCache<String, Long> modifiedCache = CacheBuilder.newBuilder().maximumSize(5000)
         .expireAfterWrite(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS).weakKeys().build(new CacheLoader<>() {
             @Override
@@ -93,6 +81,22 @@ public class MCRThumbnailServlet extends MCRServlet {
                 }
             }
         });
+    //stores max png size for byte array buffer of output
+    private AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
+    private ImageWriteParam imageWriteParam;
+    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
+    private int thumbnailSize = MCRImage.getTileSize();
+
+    private static ThumnailInfo getThumbnailInfo(String pathInfo) {
+        String pInfo = pathInfo;
+        if (pInfo.startsWith("/")) {
+            pInfo = pInfo.substring(1);
+        }
+        final String derivate = pInfo.substring(0, pInfo.indexOf('/'));
+        String imagePath = pInfo.substring(derivate.length());
+        LOGGER.debug("derivate: {}, image: {}", derivate, imagePath);
+        return new ThumnailInfo(derivate, imagePath);
+    }
 
     @Override
     public void init() throws ServletException {
@@ -157,7 +161,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                     ByteArrayOutputStream bout = new ByteArrayOutputStream(maxPngSize.get());
                     ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(bout)) {
                     imageWriter.setOutput(imageOutputStream);
-                    //tile = addWatermark(scaleBufferedImage(tile));        
+                    //tile = addWatermark(scaleBufferedImage(tile));
                     IIOImage iioImage = new IIOImage(thumbnail, null, null);
                     imageWriter.write(null, iioImage, imageWriteParam);
                     int contentLength = bout.size();
@@ -176,54 +180,53 @@ public class MCRThumbnailServlet extends MCRServlet {
         }
     }
 
-    private static ThumnailInfo getThumbnailInfo(String pathInfo) {
-        String pInfo = pathInfo;
-        if (pInfo.startsWith("/")) {
-            pInfo = pInfo.substring(1);
-        }
-        final String derivate = pInfo.substring(0, pInfo.indexOf('/'));
-        String imagePath = pInfo.substring(derivate.length());
-        LOGGER.debug("derivate: {}, image: {}", derivate, imagePath);
-        return new ThumnailInfo(derivate, imagePath);
+    private BufferedImage getThumbnail(Path iviewFile, boolean centered) throws IOException {
+        BufferedImage level1Image = loadLevel1Image(iviewFile);
+
+        final double width = level1Image.getWidth();
+        final double height = level1Image.getHeight();
+        int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
+        int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
+        int imageType = centered ? BufferedImage.TYPE_INT_ARGB : MCRImage.getImageType(level1Image);
+        final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize
+            : newHeight, imageType);
+        drawScaledImage(level1Image, bicubic, centered, newWidth, newHeight, width, height);
+
+        return bicubic;
     }
 
-    private BufferedImage getThumbnail(Path iviewFile, boolean centered) throws IOException {
-        BufferedImage level1Image;
+    private BufferedImage loadLevel1Image(Path iviewFile) throws IOException {
         try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
             Path iviewFileRoot = fs.getRootDirectories().iterator().next();
             MCRTiledPictureProps props = MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot);
-            //get next bigger zoomLevel and scale image to THUMBNAIL_SIZE
             ImageReader reader = MCRIView2Tools.getTileImageReader();
             try {
-                level1Image = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, reader,
-                    Math.min(1, props.getZoomlevel()));
+                return MCRIView2Tools.getZoomLevel(iviewFileRoot, props, reader, Math.min(1, props.getZoomlevel()));
             } finally {
                 reader.dispose();
             }
         }
-        final double width = level1Image.getWidth();
-        final double height = level1Image.getHeight();
-        final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
-        final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
-        //if centered make transparent image
-        int imageType = centered ? BufferedImage.TYPE_INT_ARGB : MCRImage.getImageType(level1Image);
-        //if centered make thumbnailSize x thumbnailSize image
-        final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize
-            : newHeight, imageType);
-        final Graphics2D bg = bicubic.createGraphics();
+    }
+
+
+
+    private void drawScaledImage(BufferedImage sourceImage, BufferedImage targetImage, boolean centered, int newWidth,
+        int newHeight, double width, double height) {
+        Graphics2D bg = targetImage.createGraphics();
         try {
             bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
             int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
+
             if (x != 0 && y != 0) {
                 LOGGER.warn("Writing at position {},{}", x, y);
             }
-            bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
+
+            bg.drawImage(sourceImage, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
                 (int) Math.ceil(height), null);
         } finally {
             bg.dispose();
         }
-        return bicubic;
     }
 
     private ImageWriter getImageWriter() {

@@ -18,8 +18,8 @@
 
 package org.mycore.iview2.iiif;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
@@ -74,10 +74,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     private static final String IDENTIFIER_SEPARATOR_PROPERTY = "IdentifierSeparator";
 
     private static final Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
-
-    private final java.util.List<String> transparentFormats;
-
     protected final MCRTileFileProvider tileFileProvider;
+    private final java.util.List<String> transparentFormats;
 
     public MCRIVIEWIIIFImageImpl(String implName) {
         super(implName);
@@ -91,6 +89,62 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         }
 
         transparentFormats = Arrays.asList(properties.get("TransparentFormats").split(","));
+    }
+
+    private static Graphics2D getGraphics2D(
+        MCRIIIFImageSourceRegion region,
+        MCRIIIFImageTargetRotation rotation,
+        BufferedImage targetImage,
+        MCRIIIFImageTargetSize targetSize,
+        int width,
+        int height,
+        double rotatationRadians,
+        double zoomLevelScale,
+        int sourceWidth,
+        int sourceHeight) {
+
+        double targetWidth = targetSize.width();
+        double targetHeight = targetSize.height();
+        double x1 = (targetWidth / (sourceWidth * zoomLevelScale)),
+            y1 = (targetHeight / (sourceHeight * zoomLevelScale));
+
+        Graphics2D graphics = targetImage.createGraphics();
+        if (rotation.mirrored()) {
+            graphics.scale(-1, 1);
+            graphics.translate(-width, 0);
+        }
+        int xt = (int) ((targetWidth - 1) / 2);
+        int yt = (int) ((targetHeight - 1) / 2);
+        graphics.translate((width - targetWidth) / 2, (height - targetHeight) / 2);
+        graphics.rotate(rotatationRadians, xt, yt);
+        graphics.scale(x1, y1);
+        graphics.translate(-x1, -y1);
+
+        graphics.scale(zoomLevelScale, zoomLevelScale);
+        graphics.setClip(region.x1(), region.y1(), sourceWidth, sourceHeight);
+        graphics.scale(1 / zoomLevelScale, 1 / zoomLevelScale);
+        return graphics;
+    }
+
+    private static void renderImageTiles(Optional<Path> oTileFile, int sourceZoomLevel, double drawScaleX,
+        double drawScaleY,
+        int x1Tile, int x2Tile, int y1Tile, int y2Tile, Graphics2D graphics) throws MCRIIIFImageProvidingException {
+        try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(oTileFile.get())) {
+            Path rootPath = zipFileSystem.getPath("/");
+            LOGGER.info(String.format(Locale.ROOT, "Using zoom-level: %d and scales %s/%s!", sourceZoomLevel,
+                drawScaleX, drawScaleY));
+
+            for (int x = x1Tile; x < x2Tile; x++) {
+                for (int y = y1Tile; y < y2Tile; y++) {
+                    ImageReader imageReader = MCRIView2Tools.getTileImageReader();
+                    BufferedImage tile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, x, y);
+                    graphics.drawImage(tile, x * 256, y * 256, null);
+                }
+            }
+
+        } catch (IOException e) {
+            throw new MCRIIIFImageProvidingException("Error while reading tiles!", e);
+        }
     }
 
     private String buildURL(String identifier) {
@@ -177,41 +231,10 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             x2Tile = (int) Math.ceil(x2 / 256),
             y2Tile = (int) Math.ceil(y2 / 256);
 
-        try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(oTileFile.get())) {
-            Path rootPath = zipFileSystem.getPath("/");
+        Graphics2D graphics = getGraphics2D(region, rotation, targetImage, targetSize, width, height,
+            rotatationRadians, zoomLevelScale, sourceWidth, sourceHeight);
 
-            Graphics2D graphics = targetImage.createGraphics();
-            if (rotation.mirrored()) {
-                graphics.scale(-1, 1);
-                graphics.translate(-width, 0);
-            }
-
-            int xt = (int) ((targetWidth - 1) / 2);
-            int yt = (int) ((targetHeight - 1) / 2);
-            graphics.translate((width - targetWidth) / 2, (height - targetHeight) / 2);
-            graphics.rotate(rotatationRadians, xt, yt);
-
-            graphics.scale(drawScaleX, drawScaleY);
-            graphics.translate(-x1, -y1);
-
-            graphics.scale(zoomLevelScale, zoomLevelScale);
-            graphics.setClip(region.x1(), region.y1(), sourceWidth, sourceHeight);
-            graphics.scale(1 / zoomLevelScale, 1 / zoomLevelScale);
-
-            LOGGER.info(String.format(Locale.ROOT, "Using zoom-level: %d and scales %s/%s!", sourceZoomLevel,
-                drawScaleX, drawScaleY));
-
-            for (int x = x1Tile; x < x2Tile; x++) {
-                for (int y = y1Tile; y < y2Tile; y++) {
-                    ImageReader imageReader = MCRIView2Tools.getTileImageReader();
-                    BufferedImage tile = MCRIView2Tools.readTile(rootPath, imageReader, sourceZoomLevel, x, y);
-                    graphics.drawImage(tile, x * 256, y * 256, null);
-                }
-            }
-
-        } catch (IOException e) {
-            throw new MCRIIIFImageProvidingException("Error while reading tiles!", e);
-        }
+        renderImageTiles(oTileFile, sourceZoomLevel, drawScaleX, drawScaleY, x1Tile, x2Tile, y1Tile, y2Tile, graphics);
 
         return targetImage;
     }

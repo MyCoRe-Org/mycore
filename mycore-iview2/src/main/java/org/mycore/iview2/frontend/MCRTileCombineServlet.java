@@ -84,8 +84,27 @@ public class MCRTileCombineServlet extends MCRServlet {
     private MCRFooterInterface footerImpl = null;
 
     /**
+     * attaches <code>footer</code> to <code>combinedImage</code>.
+     * @param combinedImage image to attach footer to
+     * @param footer image of same with as <code>combinedImage</code>
+     * @return a {@link BufferedImage} with <code>footer</code> attached to <code>combinedImage</code>
+     */
+    protected static BufferedImage attachFooter(final BufferedImage combinedImage, final BufferedImage footer) {
+        final BufferedImage resultImage = new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight()
+            + footer.getHeight(), combinedImage.getType());
+        final Graphics2D graphics = resultImage.createGraphics();
+        try {
+            graphics.drawImage(combinedImage, 0, 0, null);
+            graphics.drawImage(footer, 0, combinedImage.getHeight(), null);
+            return resultImage;
+        } finally {
+            graphics.dispose();
+        }
+    }
+
+    /**
      * Initializes this instance.
-     * 
+     *
      * Use parameter <code>org.mycore.iview2.frontend.MCRFooterInterface</code> to specify implementation of
      * {@link MCRFooterInterface} (can be omitted).
      */
@@ -124,9 +143,10 @@ public class MCRTileCombineServlet extends MCRServlet {
      * <tr><td>'MAX'</td><td>3</td></tr>
      * <tr><td>default and all others</td><td>0</td></tr>
      * </table>
-     * 
+     *
      * See {@link #init()} how to attach a footer to every generated image.
      */
+
     @Override
     protected void think(final MCRServletJob job) throws IOException, URISyntaxException {
         final HttpServletRequest request = job.getRequest();
@@ -175,26 +195,33 @@ public class MCRTileCombineServlet extends MCRServlet {
                     //we're done, sendThumbnail is called in render phase
                     return;
                 }
-                ImageReader reader = MCRIView2Tools.getTileImageReader();
-                try {
-                    BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFileRoot, pictureProps, reader,
-                        zoomLevel);
-                    if (combinedImage != null) {
-                        if (footerImpl != null) {
-                            BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
-                            combinedImage = attachFooter(combinedImage, footer);
-                        }
-                        request.setAttribute(IMAGE_KEY, combinedImage);
-                    } else {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    }
-                } finally {
-                    reader.dispose();
-                }
+                renderImage(request, response, iviewFileRoot,
+                    pictureProps, zoomLevel, derivate, imagePath);
             }
 
         } finally {
             LOGGER.info("Finished sending {}", request.getPathInfo());
+        }
+    }
+
+    private void renderImage(HttpServletRequest request, HttpServletResponse response, Path iviewFileRoot,
+        MCRTiledPictureProps pictureProps, int zoomLevel, String derivate, String imagePath) throws IOException {
+        ImageReader reader = MCRIView2Tools.getTileImageReader();
+
+        try {
+            BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFileRoot, pictureProps, reader, zoomLevel);
+
+            if (combinedImage != null) {
+                if (footerImpl != null) {
+                    BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
+                    combinedImage = attachFooter(combinedImage, footer);
+                }
+                request.setAttribute(IMAGE_KEY, combinedImage);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } finally {
+            reader.dispose();
         }
     }
 
@@ -242,25 +269,6 @@ public class MCRTileCombineServlet extends MCRServlet {
             curImgWriter.write(null, iioImage, imageWriteParam);
         } finally {
             curImgWriter.reset();
-        }
-    }
-
-    /**
-     * attaches <code>footer</code> to <code>combinedImage</code>.
-     * @param combinedImage image to attach footer to
-     * @param footer image of same with as <code>combinedImage</code>
-     * @return a {@link BufferedImage} with <code>footer</code> attached to <code>combinedImage</code>
-     */
-    protected static BufferedImage attachFooter(final BufferedImage combinedImage, final BufferedImage footer) {
-        final BufferedImage resultImage = new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight()
-            + footer.getHeight(), combinedImage.getType());
-        final Graphics2D graphics = resultImage.createGraphics();
-        try {
-            graphics.drawImage(combinedImage, 0, 0, null);
-            graphics.drawImage(footer, 0, combinedImage.getHeight(), null);
-            return resultImage;
-        } finally {
-            graphics.dispose();
         }
     }
 
