@@ -105,14 +105,17 @@ public class MCRImageTiler implements Runnable, Closeable {
     public void run() {
         waiter = Thread.currentThread();
         Thread.currentThread().setName("TileMaster");
-        //get this MCRSession a speaking name
+
+        // get this MCRSession a speaking name
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+
         boolean activated = MCRConfiguration2.getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated")
-            .orElse(true) && MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
-            && MCREntityManagerProvider.getEntityManagerFactory() != null;
+                .orElse(true) && MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
+                && MCREntityManagerProvider.getEntityManagerFactory() != null;
         LOGGER.info("Local Tiling is {}", activated ? "activated" : "deactivated");
+
         ImageIO.scanForPlugins();
         LOGGER.info("Supported image file types for reading: {}", Arrays.toString(ImageIO.getReaderFormatNames()));
 
@@ -122,19 +125,24 @@ public class MCRImageTiler implements Runnable, Closeable {
 
         if (activated) {
             int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
+
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();
 
-                ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
-
+                @Override
                 public Thread newThread(Runnable r) {
-                    return new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
+                    Thread thread = new Thread(r, "TileSlave#" + tNum.incrementAndGet());
+                    thread.setUncaughtExceptionHandler((t, e) ->
+                            LOGGER.error("Error in thread {}: {}", t.getName(), e.getMessage(), e));
+                    return thread;
                 }
             };
+
             final AtomicInteger activeThreads = new AtomicInteger();
             final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+
             ThreadPoolExecutor baseExecutor = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1,
-                TimeUnit.DAYS, workQueue, slaveFactory) {
+                    TimeUnit.DAYS, workQueue, slaveFactory) {
 
                 @Override
                 protected void afterExecute(Runnable r, Throwable t) {
@@ -148,16 +156,21 @@ public class MCRImageTiler implements Runnable, Closeable {
                     activeThreads.incrementAndGet();
                 }
             };
+
             this.tilingServe = MCRProcessableFactory.newPool(baseExecutor, imageTilerCollection);
             imageTilerCollection.setProperty("running", running);
             LOGGER.info("TilingMaster is started");
+
             processTilingJobs(activeThreads, tilingThreadCount, imageTilerCollection);
+
             imageTilerCollection.setProperty("running", false);
         }
+
         LOGGER.info("Tiling thread finished");
         MCRSessionMgr.releaseCurrentSession();
         waiter = null;
     }
+
 
     public void processTilingJobs(AtomicInteger activeThreads, int tilingThreadCount,
         MCRProcessableDefaultCollection imageTilerCollection) {
@@ -249,6 +262,9 @@ public class MCRImageTiler implements Runnable, Closeable {
                 }
             }
         }
+        LOGGER.info("Tiling thread finished");
+        MCRSessionMgr.releaseCurrentSession();
+        waiter = null;
     }
 
     private MCRTilingAction getTilingAction(MCRTileJob job) {
