@@ -74,7 +74,7 @@ public class MCRPICommands {
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "add pi flags to object {0}", help = "see add pi flags to all objects!", order = 20)
+    @MCRCommand(syntax = "add pi flags to object {0}", help = "recreates all pi flags for an object from PI service", order = 20)
     public static void addFlagToObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
@@ -89,6 +89,20 @@ public class MCRPICommands {
         });
 
         if (addedAFlag.get()) {
+            try {
+                MCRMetadataManager.update(base);
+            } catch (MCRAccessException e) {
+                throw new MCRException(e);
+            }
+        }
+    }
+    
+    @MCRCommand(syntax = "remove pi flags from object {0}", help = "removes all pi flags from an object", order = 21)
+    public static void removeFlagsFromObject(String mycoreIDString) {
+        MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
+        MCRBase base = MCRMetadataManager.retrieve(objectID);
+        if (base.getService().getFlags(MCRPIService.PI_FLAG).size() > 0) {
+            base.getService().removeFlags(MCRPIService.PI_FLAG);
             try {
                 MCRMetadataManager.update(base);
             } catch (MCRAccessException e) {
