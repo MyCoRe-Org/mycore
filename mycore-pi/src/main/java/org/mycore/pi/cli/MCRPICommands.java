@@ -74,7 +74,9 @@ public class MCRPICommands {
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "add pi flags to object {0}", help = "recreates all pi flags for an object from PI service", order = 20)
+    @MCRCommand(syntax = "add pi flags to object {0}",
+        help = "recreates all pi flags for an object from PI service",
+        order = 20)
     public static void addFlagToObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
@@ -96,7 +98,7 @@ public class MCRPICommands {
             }
         }
     }
-    
+
     @MCRCommand(syntax = "remove pi flags from object {0}", help = "removes all pi flags from an object", order = 21)
     public static void removeFlagsFromObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
