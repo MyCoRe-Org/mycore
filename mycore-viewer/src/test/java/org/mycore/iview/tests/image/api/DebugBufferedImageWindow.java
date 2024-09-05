@@ -22,7 +22,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
-import javax.swing.WindowConstants;
+
 
 public class DebugBufferedImageWindow extends JFrame {
 
