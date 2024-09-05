@@ -44,10 +44,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class DefaultApplicationController extends ApplicationController {
 
     private static final String webpath = "target/test-classes/testFiles";
-
-    private static Map<TestDerivate, String> derivateHTMLMapping;
-
     private static final Logger LOGGER = LogManager.getLogger();
+    private static Map<TestDerivate, String> derivateHTMLMapping;
 
     @Override
     public void init() {
@@ -103,7 +101,7 @@ public class DefaultApplicationController extends ApplicationController {
 
     @Override
     public void shutDownDerivate(WebDriver webdriver, TestDerivate testDerivate) {
-
+        //TODO: Is only implementation, with only one usage. What is the purpose of this method?
     }
 
     @Override
