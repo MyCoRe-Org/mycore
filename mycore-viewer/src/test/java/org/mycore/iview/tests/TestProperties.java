@@ -44,11 +44,11 @@ public class TestProperties extends Properties {
     private static TestProperties singleton = null;
 
     public static synchronized TestProperties getInstance() {
-        if (TestProperties.singleton == null) {
-            TestProperties.singleton = new TestProperties();
+        if (singleton == null) {
+            singleton = new TestProperties();
         }
 
-        return TestProperties.singleton;
+        return singleton;
     }
 
     @Override

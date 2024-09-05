@@ -34,7 +34,7 @@ public class DebugBufferedImageWindow extends JFrame {
         super("Debug-Window");
         this.imageToShow = imageToShow;
         setSize(imageToShow.getWidth(), imageToShow.getHeight());
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
     }
 
