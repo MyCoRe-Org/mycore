@@ -306,19 +306,16 @@ public class MCRRestAPIObjects {
 
     /**
      * upload a file into a given derivate
-     * @param info - the injected Jersey URIInfo object
-     * @param request - the injected HTTPServletRequest object
-     * 
-     * @param mcrObjID - a MyCoRe Object ID
-     * @param mcrDerID - a MyCoRe Derivate ID
-     * 
+     *
+     * @param info                - the injected Jersey URIInfo object
+     * @param mcrObjID            - a MyCoRe Object ID
+     * @param mcrDerID            - a MyCoRe Derivate ID
      * @param uploadedInputStream - the inputstream from HTTP Post
-     * @param fileDetails - file information from HTTP Post
-     * @param path - the target path inside the derivate
-     * @param maindoc - true, if the file should be set as maindoc
-     * @param unzip - true, if the file is a zip file, that should be extracted
-     * @param md5 - the md5 sum of the uploaded file
-     * @param size - the size of the uploaded file
+     * @param path                - the target path inside the derivate
+     * @param maindoc             - true, if the file should be set as maindoc
+     * @param unzip               - true, if the file is a zip file, that should be extracted
+     * @param md5                 - the md5 sum of the uploaded file
+     * @param size                - the size of the uploaded file
      * @return a Jersey Response object
      */
     @POST
@@ -327,16 +324,16 @@ public class MCRRestAPIObjects {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
-    public Response uploadFile(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam(PARAM_MCRID) String mcrObjID,
+    public Response uploadFile(@Context UriInfo info,
+                               @PathParam(PARAM_MCRID) String mcrObjID,
         @PathParam(PARAM_DERID) String mcrDerID,
         @FormDataParam("file") InputStream uploadedInputStream,
-        @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("path") String path,
+                               @FormDataParam("path") String path,
         @FormDataParam("maindoc") @DefaultValue("false") boolean maindoc,
         @FormDataParam("unzip") @DefaultValue("false") boolean unzip, @FormDataParam("md5") String md5,
         @FormDataParam("size") Long size) throws MCRRestAPIException {
-        return MCRRestAPIUploadHelper.uploadFile(info, request, mcrObjID, mcrDerID, uploadedInputStream, fileDetails,
-            path, maindoc, unzip, md5, size);
+        return MCRRestAPIUploadHelper.uploadFile(info, mcrObjID, mcrDerID, uploadedInputStream,
+                path, maindoc, unzip, md5, size);
     }
 
     /**

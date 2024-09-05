@@ -241,21 +241,20 @@ public class MCRRestAPIUploadHelper {
 
     /**
      * uploads a file into a given derivate
-     * @param info - the Jersey UriInfo object
-     * @param request - the HTTPServletRequest object 
-     * @param pathParamMcrObjID - a MyCoRe Object ID
-     * @param pathParamMcrDerID - a MyCoRe Derivate ID
+     *
+     * @param info                - the Jersey UriInfo object
+     * @param pathParamMcrObjID   - a MyCoRe Object ID
+     * @param pathParamMcrDerID   - a MyCoRe Derivate ID
      * @param uploadedInputStream - the inputstream from HTTP Post request
-     * @param fileDetails - the file information from HTTP Post request
-     * @param formParamPath - the path of the file inside the derivate
-     * @param formParamMaindoc - true, if this file should be marked as maindoc
-     * @param formParamUnzip - true, if the upload is zip file that should be unzipped inside the derivate
-     * @param formParamMD5 - the MD5 sum of the uploaded file 
-     * @param formParamSize - the size of the uploaded file
+     * @param formParamPath       - the path of the file inside the derivate
+     * @param formParamMaindoc    - true, if this file should be marked as maindoc
+     * @param formParamUnzip      - true, if the upload is zip file that should be unzipped inside the derivate
+     * @param formParamMD5        - the MD5 sum of the uploaded file
+     * @param formParamSize       - the size of the uploaded file
      * @return a Jersey Response object
      */
-    public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
-        String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
+    public static Response uploadFile(UriInfo info, String pathParamMcrObjID,
+        String pathParamMcrDerID, InputStream uploadedInputStream,
         String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5,
         Long formParamSize) throws MCRRestAPIException {
 

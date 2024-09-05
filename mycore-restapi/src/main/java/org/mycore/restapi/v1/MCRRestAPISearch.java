@@ -31,16 +31,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.solr.MCRSolrCoreManager;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 
 /**
  * Rest API methods that cover SOLR searches.
@@ -50,47 +47,31 @@ import jakarta.ws.rs.core.UriInfo;
  */
 @Path("/search")
 public class MCRRestAPISearch {
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
-
     public static final String FORMAT_JSON = "json";
-
     public static final String FORMAT_XML = "xml";
-
     public static final String FORMAT_CSV = "csv";
+    private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
     /**
      * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters
      *
-     * @param info - the injected Jersey URIInfo object
-     * @param request - the injected HTTPServletRequest object
-     *
-     * @param query
-     *      the Query in SOLR Query syntax
-     * @param sort
-     *      the sort parameter - syntax as defined by SOLR
-     * @param wt
-     *      the format parameter - syntax as defined by SOLR
-     * @param start
-     *      the start parameter (number) - syntax as defined by SOLR      
-     * @param rows
-     *      the rows parameter (number) - syntax as defined by SOLR
-     * @param fq
-     *      the filter query parameter - syntax as defined by SOLR
-     * @param fl
-     *      the list of fields to be returned - syntax as defined by SOLR
-     * @param facet
-     *      the facet parameter (true to return facets)  - syntax as defined by SOLR
-     * @param facetFields
-     *      the list of facetFields to be returned - syntax as defined by SOLR
-     * @param jsonWrf
-     *      the name of the JSONP callback function - syntax as defined by SOLR 
-     *
+     * @param query       the Query in SOLR Query syntax
+     * @param sort        the sort parameter - syntax as defined by SOLR
+     * @param wt          the format parameter - syntax as defined by SOLR
+     * @param start       the start parameter (number) - syntax as defined by SOLR
+     * @param rows        the rows parameter (number) - syntax as defined by SOLR
+     * @param fq          the filter query parameter - syntax as defined by SOLR
+     * @param fl          the list of fields to be returned - syntax as defined by SOLR
+     * @param facet       the facet parameter (true to return facets)  - syntax as defined by SOLR
+     * @param facetFields the list of facetFields to be returned - syntax as defined by SOLR
+     * @param jsonWrf     the name of the JSONP callback function - syntax as defined by SOLR
      * @return a Jersey Response Object
      */
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response search(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("q") String query,
+    public Response search(@QueryParam("q") String query,
         @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
         @QueryParam("start") String start, @QueryParam("rows") String rows,
         @QueryParam("fq") List<String> fq, @QueryParam("fl") List<String> fl,
