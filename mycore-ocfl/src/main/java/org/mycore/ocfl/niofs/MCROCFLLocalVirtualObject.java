@@ -137,43 +137,33 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
         virtualTarget.trackFileWrite(target, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
     }
 
-    /**
-     * Opens or creates a byte channel to a file.
-     *
-     * @param path the path to the file.
-     * @param options the options specifying how the file is opened.
-     * @param fileAttributes the file attributes to set atomically when creating the file.
-     * @return a new seekable byte channel.
-     * @throws IOException if an I/O error occurs.
-     */
     @Override
-    protected SeekableByteChannel readOrWriteByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
+    protected SeekableByteChannel readByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes) throws IOException {
-        // write
-        boolean write = options.contains(StandardOpenOption.WRITE);
-        if (write) {
-            Set<OpenOption> writeOptions = new HashSet<>(options);
-            if (options.contains(StandardOpenOption.APPEND)) {
-                // only need local copy if we want to append
-                localCopy(path);
-            } else {
-                // need to add CREATE if it exists in virtual object but not in local storage
-                boolean hasCreateOption = options.contains(StandardOpenOption.CREATE);
-                boolean existsInVirtualObject = exists(path);
-                boolean existsInLocalStorage = this.localStorage.exists(path);
-                if (!hasCreateOption && existsInVirtualObject && !existsInLocalStorage) {
-                    writeOptions.add(StandardOpenOption.CREATE);
-                }
-            }
-            SeekableByteChannel seekableByteChannel
-                = this.localStorage.newByteChannel(path, writeOptions, fileAttributes);
-            return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
-                trackFileWrite(path, MCREvent.EventType.UPDATE);
-            });
-        }
-        // read
         return this.localStorage.exists(path) ? this.localStorage.newByteChannel(path, options, fileAttributes)
             : Files.newByteChannel(toPhysicalPath(path), options, fileAttributes);
+    }
+
+    @Override
+    protected SeekableByteChannel writeByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
+        FileAttribute<?>... fileAttributes) throws IOException {
+        Set<OpenOption> writeOptions = new HashSet<>(options);
+        if (options.contains(StandardOpenOption.APPEND)) {
+            // only need local copy if we want to append
+            localCopy(path);
+        } else {
+            // need to add CREATE if it exists in virtual object but not in local storage
+            boolean existsInVirtualObject = exists(path);
+            boolean existsInLocalStorage = this.localStorage.exists(path);
+            if (existsInVirtualObject && !existsInLocalStorage) {
+                writeOptions.add(StandardOpenOption.CREATE);
+            }
+        }
+        SeekableByteChannel seekableByteChannel
+            = this.localStorage.newByteChannel(path, writeOptions, fileAttributes);
+        return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
+            trackFileWrite(path, MCREvent.EventType.UPDATE);
+        });
     }
 
     @Override

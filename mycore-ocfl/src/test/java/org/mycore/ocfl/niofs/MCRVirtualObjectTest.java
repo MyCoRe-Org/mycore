@@ -109,6 +109,29 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
     }
 
     @Test
+    public void isAdded() throws IOException {
+        MCRVersionedPath root = MCRVersionedPath.head(DERIVATE_1, "/");
+        MCRVersionedPath whitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
+        MCRVersionedPath testFile = MCRVersionedPath.head(DERIVATE_1, "testFile");
+
+        assertFalse("'root' should not be added", getVirtualObject().isAdded(root));
+        assertFalse("'white.png' should not be added", getVirtualObject().isAdded(whitePng));
+        assertFalse("'testFile' should not be added", getVirtualObject().isAdded(testFile));
+
+        MCRTransactionHelper.beginTransaction();
+        Files.write(testFile, new byte[] { 1 });
+        assertTrue("'testFile' should be added", getVirtualObject().isAdded(testFile));
+        root.getFileSystem().removeRoot(DERIVATE_1);
+        assertFalse("'testFile' should not be added", getVirtualObject().isAdded(testFile));
+        MCRTransactionHelper.commitTransaction();
+
+        MCRTransactionHelper.beginTransaction();
+        root.getFileSystem().createRoot(DERIVATE_1);
+        assertTrue("'root' should be added", getVirtualObject().isAdded(root));
+        MCRTransactionHelper.commitTransaction();
+    }
+
+    @Test
     public void delete() throws IOException {
         MCRVersionedPath directory = MCRVersionedPath.head(DERIVATE_1, "testDir");
         MCRVersionedPath subFile = MCRVersionedPath.head(DERIVATE_1, "testDir/subFile.txt");
