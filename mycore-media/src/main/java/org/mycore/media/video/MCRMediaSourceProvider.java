@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -113,7 +114,7 @@ public class MCRMediaSourceProvider {
             try {
                 return token.toURI(b, suffix, hashParameterName).toString();
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                throw new MCRException(e);
             }
         });
     }
@@ -143,7 +144,7 @@ public class MCRMediaSourceProvider {
             LogManager.getLogger().info("{} -> {} -> {}", mcrPath, absolutePath, relativePath);
             return relativePath.toString();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MCRException(e);
         }
     }
 

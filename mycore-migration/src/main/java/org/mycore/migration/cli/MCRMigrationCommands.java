@@ -184,7 +184,7 @@ public class MCRMigrationCommands {
                     // 1. the file does not exist on the file system
                     // 2. maybe the path isn't correct URI decoded
                     //    -> e.g. a?c.tif -> path (a), query (c.tif) which is obvious wrong
-                    if (tryRawPath(objectID, derivateLinkElement, href, link, owner)) {
+                    if (tryRawPath(objectID, derivateLinkElement, link, owner)) {
                         changedObject = true;
                     } else {
                         LOGGER.warn("{} of {}cannot be found on file system. This is most likly a dead link.", href,
@@ -195,7 +195,7 @@ public class MCRMigrationCommands {
                 // path could not be decoded, so maybe its already decoded
                 // check if the file with href exists, if so, the path is
                 // not encoded properly
-                if (tryRawPath(objectID, derivateLinkElement, href, link, owner)) {
+                if (tryRawPath(objectID, derivateLinkElement, link, owner)) {
                     changedObject = true;
                 } else {
                     LOGGER.warn(
@@ -217,8 +217,8 @@ public class MCRMigrationCommands {
         }
     }
 
-    private static boolean tryRawPath(MCRObjectID objectID, Element derivateLinkElement, String href,
-        MCRMetaDerivateLink link, String owner) {
+    private static boolean tryRawPath(MCRObjectID objectID, Element derivateLinkElement,
+                                      MCRMetaDerivateLink link, String owner) {
         String rawPath = link.getRawPath();
         MCRPath mcrPath = MCRPath.getPath(owner, rawPath);
         if (Files.exists(mcrPath)) {
