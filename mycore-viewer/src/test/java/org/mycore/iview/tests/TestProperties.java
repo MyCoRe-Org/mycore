@@ -26,11 +26,10 @@ import org.apache.logging.log4j.Logger;
 
 public class TestProperties extends Properties {
 
-    private static final long serialVersionUID = -1135672087633884258L;
-
-    private static final Logger LOGGER = LogManager.getLogger(TestProperties.class);
-
     public static final String TEST_PROPERTIES = "test.properties";
+    private static final long serialVersionUID = -1135672087633884258L;
+    private static final Logger LOGGER = LogManager.getLogger(TestProperties.class);
+    private static TestProperties singleton = null;
 
     private TestProperties() {
         LOGGER.info("Load TestProperties");
@@ -40,8 +39,6 @@ public class TestProperties extends Properties {
             LOGGER.error("Error while loading test properties!");
         }
     }
-
-    private static TestProperties singleton = null;
 
     public static synchronized TestProperties getInstance() {
         if (singleton == null) {
