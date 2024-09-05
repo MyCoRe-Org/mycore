@@ -130,23 +130,27 @@ public class MCRRestAPIClassifications {
             writer.beginObject();
             writer.name("ID").value(e.getAttributeValue("ID"));
             writer.name("labels").beginArray();
-            for (Element eLabel : e.getChildren("label")) {
-                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writer.beginObject();
-                    writer.name("lang").value(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE));
-                    writer.name("text").value(eLabel.getAttributeValue("text"));
-                    if (eLabel.getAttributeValue("description") != null) {
-                        writer.name("description").value(eLabel.getAttributeValue("description"));
-                    }
-                    writer.endObject();
-                }
-            }
-            writer.endArray();
+            extracted(writer, lang, e);
 
             if (e.getChildren("category").size() > 0) {
                 writeChildrenAsJSON(e, writer, lang);
             }
             writer.endObject();
+        }
+        writer.endArray();
+    }
+
+    private static void extracted(JsonWriter writer, String lang, Element e) throws IOException {
+        for (Element eLabel : e.getChildren("label")) {
+            if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                writer.beginObject();
+                writer.name("lang").value(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE));
+                writer.name("text").value(eLabel.getAttributeValue("text"));
+                if (eLabel.getAttributeValue("description") != null) {
+                    writer.name("description").value(eLabel.getAttributeValue("description"));
+                }
+                writer.endObject();
+            }
         }
         writer.endArray();
     }
@@ -431,51 +435,37 @@ public class MCRRestAPIClassifications {
     private String writeJSON(Element eRoot, String lang, String style) throws IOException {
         StringWriter sw = new StringWriter();
         JsonWriter writer = new JsonWriter(sw);
+        String finalLang = (lang != null) ? lang : "de";
+
         writer.setIndent("  ");
+
+        Element categoriesElement = eRoot.getChild("categories");
         if (style.contains("checkboxtree")) {
-            if (lang == null) {
-                lang = "de";
-            }
             writer.beginObject();
             writer.name("identifier").value(eRoot.getAttributeValue("ID"));
             for (Element eLabel : eRoot.getChildren("label")) {
-                if (lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                if (finalLang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
                     writer.name("label").value(eLabel.getAttributeValue("text"));
                 }
             }
             writer.name("items");
-            eRoot = eRoot.getChild("categories");
-            writeChildrenAsJSONCBTree(eRoot, writer, lang, style.contains("checked"));
+            writeChildrenAsJSONCBTree(categoriesElement, writer, finalLang, style.contains("checked"));
             writer.endObject();
         } else if (style.contains("jstree")) {
-            if (lang == null) {
-                lang = "de";
-            }
-            eRoot = eRoot.getChild("categories");
-            writeChildrenAsJSONJSTree(eRoot, writer, lang, style.contains("opened"),
-                style.contains("disabled"), style.contains("selected"));
+            writeChildrenAsJSONJSTree(categoriesElement, writer, finalLang, style.contains("opened"),
+                    style.contains("disabled"), style.contains("selected"));
+
         } else {
             writer.beginObject(); // {
             writer.name("ID").value(eRoot.getAttributeValue("ID"));
             writer.name("label");
             writer.beginArray();
-            for (Element eLabel : eRoot.getChildren("label")) {
-                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writer.beginObject();
-                    writer.name("lang").value(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE));
-                    writer.name("text").value(eLabel.getAttributeValue("text"));
-                    if (eLabel.getAttributeValue("description") != null) {
-                        writer.name("description").value(eLabel.getAttributeValue("description"));
-                    }
-                    writer.endObject();
-                }
-            }
-            writer.endArray();
+            extracted(writer, finalLang, eRoot);
 
             if (eRoot.equals(eRoot.getDocument().getRootElement())) {
-                writeChildrenAsJSON(eRoot.getChild("categories"), writer, lang);
+                writeChildrenAsJSON(eRoot.getChild("categories"), writer, finalLang);
             } else {
-                writeChildrenAsJSON(eRoot, writer, lang);
+                writeChildrenAsJSON(eRoot, writer, finalLang);
             }
 
             writer.endObject();

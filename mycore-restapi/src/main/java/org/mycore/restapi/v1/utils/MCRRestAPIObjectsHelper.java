@@ -211,12 +211,11 @@ public class MCRRestAPIObjectsHelper {
         StringWriter sw = new StringWriter();
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
         root = MCRPath.toMCRPath(root.resolve(path));
-        if (depth == -1) {
-            depth = Integer.MAX_VALUE;
-        }
+        int finalDepth = (depth != -1) ? depth : Integer.MAX_VALUE;
+
         if (root != null) {
             JsonWriter writer = new JsonWriter(sw);
-            Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), depth,
+            Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), finalDepth,
                 new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId(), info, app));
             writer.close();
         }
@@ -230,22 +229,20 @@ public class MCRRestAPIObjectsHelper {
 
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
         root = MCRPath.toMCRPath(root.resolve(path));
-        if (depth == -1) {
-            depth = Integer.MAX_VALUE;
-        }
+        int finalDepth = (depth != -1) ? depth : Integer.MAX_VALUE;
+
         if (root != null) {
             Element eContents = new Element("contents");
             eContents.setAttribute("mycoreobject", derObj.getOwnerID().toString());
             eContents.setAttribute("mycorederivate", derObj.getId().toString());
             doc.addContent(eContents);
-            if (!path.endsWith("/")) {
-                path += "/";
-            }
-            MCRPath p = MCRPath.getPath(derObj.getId().toString(), path);
+            String finalPath = (path.endsWith("/")) ? path : path + "/";
+
+            MCRPath p = MCRPath.getPath(derObj.getId().toString(), finalPath);
             if (p != null && Files.exists(p)) {
                 Element eRoot = MCRPathXML.getDirectoryXML(p).getRootElement();
                 eContents.addContent(eRoot.detach());
-                createXMLForSubdirectories(p, eRoot, 1, depth);
+                createXMLForSubdirectories(p, eRoot, 1, finalDepth);
             }
 
             //add href Attributes
@@ -746,9 +743,8 @@ public class MCRRestAPIObjectsHelper {
         if (test.length() > base.length()) {
             return false;
         }
-        test = test + base.substring(test.length());
         try {
-            SDF_UTC.parse(test);
+            SDF_UTC.parse(test + base.substring(test.length()));
         } catch (ParseException e) {
             return false;
         }
