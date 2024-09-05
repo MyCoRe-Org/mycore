@@ -94,7 +94,7 @@ public class MCROCFLEmptyDirectoryTracker {
      * @return {@code true} if the path exists, {@code false} otherwise.
      */
     public boolean exists(MCRVersionedPath path) {
-        return this.current.containsKey(path);
+        return this.rootPath.equals(path) || this.current.containsKey(path);
     }
 
     /**
@@ -107,7 +107,12 @@ public class MCROCFLEmptyDirectoryTracker {
         return this.current.get(path);
     }
 
-    // TODO javadoc & junit tests
+    /**
+     * Checks if the specified path is newly added.
+     *
+     * @param path the path to check.
+     * @return {@code true} if the path was added, {@code false} otherwise.
+     */
     public boolean isAdded(MCRVersionedPath path) {
         boolean existsNow = exists(path);
         boolean existsInOriginal = this.original.containsKey(path);

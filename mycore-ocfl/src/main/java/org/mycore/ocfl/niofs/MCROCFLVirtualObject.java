@@ -313,7 +313,6 @@ public abstract class MCROCFLVirtualObject {
         boolean create = options.contains(StandardOpenOption.CREATE);
         boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
         boolean read = options.isEmpty() || options.contains(StandardOpenOption.READ);
-        boolean isKeepFile = path.getFileName().toString().equals(KEEP_FILE);
         // check read
         if (!read) {
             checkReadOnly();
@@ -327,20 +326,34 @@ public abstract class MCROCFLVirtualObject {
             throw new NoSuchFileException(path.toString());
         }
         if (create || createNew) {
-            boolean fireCreateEvent = createNew || Files.notExists(path);
-            SeekableByteChannel seekableByteChannel = this.localStorage.newByteChannel(path, options, fileAttributes);
-            return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
-                if (!isKeepFile) {
-                    trackFileWrite(path, fireCreateEvent ? MCREvent.EventType.CREATE : MCREvent.EventType.UPDATE);
-                } else {
-                    trackEmptyDirectory(path.getParent());
-                }
-            });
+            return createByteChannel(path, options, fileAttributes, createNew);
+        } else if (read) {
+            return readByteChannel(path, options, fileAttributes);
+        } else {
+            return writeByteChannel(path, options, fileAttributes);
         }
-        return readOrWriteByteChannel(path, options, fileAttributes);
     }
 
-    protected abstract SeekableByteChannel readOrWriteByteChannel(MCRVersionedPath path,
+    protected MCROCFLClosableCallbackChannel createByteChannel(MCRVersionedPath path,
+        Set<? extends OpenOption> options, FileAttribute<?>[] fileAttributes, boolean createNew)
+        throws IOException {
+        boolean isKeepFile = path.getFileName().toString().equals(KEEP_FILE);
+        boolean fireCreateEvent = createNew || Files.notExists(path);
+        SeekableByteChannel seekableByteChannel = this.localStorage.newByteChannel(path, options, fileAttributes);
+        return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
+            if (!isKeepFile) {
+                trackFileWrite(path, fireCreateEvent ? MCREvent.EventType.CREATE : MCREvent.EventType.UPDATE);
+            } else {
+                trackEmptyDirectory(path.getParent());
+            }
+        });
+    }
+
+    protected abstract SeekableByteChannel readByteChannel(MCRVersionedPath path,
+        Set<? extends OpenOption> options,
+        FileAttribute<?>... fileAttributes) throws IOException;
+
+    protected abstract SeekableByteChannel writeByteChannel(MCRVersionedPath path,
         Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes) throws IOException;
 
@@ -748,7 +761,12 @@ public abstract class MCROCFLVirtualObject {
         return !this.fileTracker.changes().isEmpty() || !this.emptyDirectoryTracker.changes().isEmpty();
     }
 
-    // TODO javadoc & junit
+    /**
+     * Checks if the given path is newly added.
+     *
+     * @param path versioned path
+     * @return {@code true} if the path was added, {@code false} otherwise.
+     */
     public boolean isAdded(MCRVersionedPath path) {
         if (this.readonly || this.markForPurge || !this.exists(path)) {
             return false;

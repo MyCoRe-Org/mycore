@@ -25,7 +25,21 @@ import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
-// TODO javadoc
+/**
+ * Implementation of {@link MCRFileAttributes} that provides file attributes for a file stored in an OCFL repository.
+ * <p>
+ * This class wraps the file metadata and attributes such as creation time, last modified time, access time,
+ * file size, and digest, which are retrieved from the {@link MCROCFLVirtualObject}.
+ * </p>
+ * <p>
+ * This class is typically used in conjunction with {@link MCRVersionedPath} to retrieve the attributes of
+ * a specific versioned file or directory within the OCFL storage system.
+ * </p>
+ *
+ * @see MCRFileAttributes
+ * @see MCROCFLVirtualObject
+ * @see MCRVersionedPath
+ */
 public class MCROCFLFileAttributes implements MCRFileAttributes<Object> {
 
     private final FileTime creationTime;
@@ -44,6 +58,14 @@ public class MCROCFLFileAttributes implements MCRFileAttributes<Object> {
 
     private final Object fileKey;
 
+    /**
+     * Constructs an instance of {@code MCROCFLFileAttributes} by extracting the necessary attributes
+     * from the given {@link MCROCFLVirtualObject} and the specified {@link MCRVersionedPath}.
+     *
+     * @param virtualObject the OCFL virtual object from which the file attributes are retrieved.
+     * @param path the versioned path representing the file or directory.
+     * @throws IOException if there is an issue retrieving the file attributes from the virtual object.
+     */
     public MCROCFLFileAttributes(MCROCFLVirtualObject virtualObject, MCRVersionedPath path) throws IOException {
         this.creationTime = virtualObject.getCreationTime(path);
         this.modifiedTime = virtualObject.getModifiedTime(path);
@@ -55,51 +77,84 @@ public class MCROCFLFileAttributes implements MCRFileAttributes<Object> {
         this.fileKey = virtualObject.getFileKey(path);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FileTime creationTime() {
         return this.creationTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FileTime lastModifiedTime() {
         return this.modifiedTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FileTime lastAccessTime() {
         return this.accessTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isRegularFile() {
         return this.file;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isDirectory() {
         return this.directory;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Returns {@code false} as this implementation does not support symbolic links.</p>
+     */
     @Override
     public boolean isSymbolicLink() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Returns {@code false} as this implementation does not support other file types.</p>
+     */
     @Override
     public boolean isOther() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long size() {
         return this.size;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object fileKey() {
         return this.fileKey;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Returns the digest (checksum) of the file content as a {@link MCRDigest} object.</p>
+     */
     @Override
     public MCRDigest digest() {
         return this.digest;

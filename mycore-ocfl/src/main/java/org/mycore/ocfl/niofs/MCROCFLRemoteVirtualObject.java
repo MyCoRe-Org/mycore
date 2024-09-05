@@ -28,6 +28,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.mycore.common.digest.MCRDigest;
@@ -99,36 +100,17 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         super(repository, versionId, objectVersion, localStorage, readonly, fileTracker, directoryTracker);
     }
 
-    /**
-     * Opens or creates a byte channel to a file.
-     *
-     * @param path the path to the file.
-     * @param options the options specifying how the file is opened.
-     * @param fileAttributes the file attributes to set atomically when creating the file.
-     * @return a new seekable byte channel.
-     * @throws IOException if an I/O error occurs.
-     */
     @Override
-    protected SeekableByteChannel readOrWriteByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
+    protected SeekableByteChannel readByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes) throws IOException {
-        boolean write = options.contains(StandardOpenOption.WRITE);
-        boolean truncateExisting = options.contains(StandardOpenOption.TRUNCATE_EXISTING); // TODO
-        boolean inLocalStorage = this.localStorage.exists(path);
-        if (write || inLocalStorage) {
-            localCopy(path);
-            SeekableByteChannel seekableByteChannel = this.localStorage.newByteChannel(path, options, fileAttributes);
-            if (write) {
-                return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
-                    trackFileWrite(path, MCREvent.EventType.UPDATE);
-                });
-            }
-            return seekableByteChannel;
+        // read from local storage
+        if (this.localStorage.exists(path)) {
+            return this.localStorage.newByteChannel(path, options, fileAttributes);
         }
-        // the file is open for read, and it's not available in the local storage
+        // read from remote ocfl repository
         OcflObjectVersionFile ocflFile = fromOcfl(path);
         this.localStorage.createDirectories(path.getParent());
         Path cacheFilePath = this.localStorage.toPhysicalPath(path);
-
         MCROCFLReadableByteChannel readableByteChannel = new MCROCFLReadableByteChannel(ocflFile);
         MCROCFLCachingSeekableByteChannel cachingByteChannel
             = new MCROCFLCachingSeekableByteChannel(readableByteChannel, cacheFilePath);
@@ -137,6 +119,33 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
             if (!cachingByteChannel.isFileComplete()) {
                 Files.delete(cacheFilePath);
             }
+        });
+    }
+
+    @Override
+    protected SeekableByteChannel writeByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
+        FileAttribute<?>... fileAttributes) throws IOException {
+        // serve from local storage if exist
+        if (this.localStorage.exists(path)) {
+            SeekableByteChannel seekableByteChannel = this.localStorage.newByteChannel(path, options, fileAttributes);
+            return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
+                trackFileWrite(path, MCREvent.EventType.UPDATE);
+            });
+        }
+        // serve from remote
+        boolean truncateExisting = options.contains(StandardOpenOption.TRUNCATE_EXISTING);
+        SeekableByteChannel seekableByteChannel;
+        if (truncateExisting) {
+            // if the file is truncated anyway, we don't need to make a local copy
+            Set<OpenOption> truncateOptions = new HashSet<>(options);
+            truncateOptions.add(StandardOpenOption.CREATE);
+            seekableByteChannel = this.localStorage.newByteChannel(path, truncateOptions, fileAttributes);
+        } else {
+            localCopy(path);
+            seekableByteChannel = this.localStorage.newByteChannel(path, options, fileAttributes);
+        }
+        return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
+            trackFileWrite(path, MCREvent.EventType.UPDATE);
         });
     }
 

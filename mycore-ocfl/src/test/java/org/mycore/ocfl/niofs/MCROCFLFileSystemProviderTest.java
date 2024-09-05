@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.List;
@@ -93,6 +94,7 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
         // prepare
         byte[] expectedTestFileData = { 1, 3, 3, 7 };
         byte[] expectedWhitePngData = Files.readAllBytes(whitePng);
+
         // write
         assertFalse("'testFile' should not exists", Files.exists(testFile));
         MCRTransactionHelper.beginTransaction();
@@ -126,6 +128,29 @@ public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
             versionId.getObjectId(), versionId.getVersionNum().toString(), "white.png");
         byte[] whitePngData = Files.readAllBytes(whitePngV1);
         assertArrayEquals("byte array should be equal", expectedWhitePngData, whitePngData);
+    }
+
+    @Test
+    public void write() throws IOException {
+        final MCRPath testFile = MCRPath.getPath(DERIVATE_1, "testFile");
+
+        // simple write
+        MCRTransactionHelper.beginTransaction();
+        Files.write(testFile, new byte[] { 1, 2 });
+        MCRTransactionHelper.commitTransaction();
+        assertArrayEquals("byte array should be equal", new byte[] { 1, 2 }, Files.readAllBytes(testFile));
+
+        // append
+        MCRTransactionHelper.beginTransaction();
+        Files.write(testFile, new byte[] { 3, 4 }, StandardOpenOption.APPEND);
+        MCRTransactionHelper.commitTransaction();
+        assertArrayEquals("byte array should be equal", new byte[] { 1, 2, 3, 4 }, Files.readAllBytes(testFile));
+
+        // truncate
+        MCRTransactionHelper.beginTransaction();
+        Files.write(testFile, new byte[] { 4, 3, 2, 1 }, StandardOpenOption.TRUNCATE_EXISTING);
+        MCRTransactionHelper.commitTransaction();
+        assertArrayEquals("byte array should be equal", new byte[] { 4, 3, 2, 1 }, Files.readAllBytes(testFile));
     }
 
     @Test
