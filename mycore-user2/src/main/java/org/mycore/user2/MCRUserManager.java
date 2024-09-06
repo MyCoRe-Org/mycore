@@ -180,9 +180,9 @@ public class MCRUserManager {
         CriteriaQuery<Number> query = cb.createQuery(Number.class);
         Root<MCRUser> users = query.from(MCRUser.class);
         return em.createQuery(
-                query
-                    .select(cb.count(users))
-                    .where(getUserRealmCriterion(cb, users, userName, realm)))
+            query
+                .select(cb.count(users))
+                .where(getUserRealmCriterion(cb, users, userName, realm)))
             .getSingleResult().intValue() > 0;
     }
 
@@ -335,9 +335,8 @@ public class MCRUserManager {
     }
 
     private static String buildSearchPattern(String searchPattern) {
-        searchPattern = searchPattern.replace('*', '%');
-        searchPattern = searchPattern.replace('?', '_');
-        return searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
+        return searchPattern.replace('*', '%').replace('?', '_')
+            .toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
     }
 
     private static boolean isValidSearchPattern(String searchPattern) {
@@ -670,8 +669,6 @@ public class MCRUserManager {
 
     }
 
-
-
     private static void waitLoginPenalty() {
         try {
             Thread.sleep(3000);
@@ -731,12 +728,11 @@ public class MCRUserManager {
         }
     }
 
+
     private static Predicate[] getUserRealmCriterion(CriteriaBuilder cb, Root<MCRUser> root, String user,
         String realmId) {
-        if (realmId == null) {
-            realmId = MCRRealmFactory.getLocalRealm().getID();
-        }
         return new Predicate[] { cb.equal(root.get(MCRUser_.userName), user),
-            cb.equal(root.get(MCRUser_.realmID), realmId) };
+            cb.equal(root.get(MCRUser_.realmID), realmId == null ? MCRRealmFactory.getLocalRealm().getID() : realmId) };
     }
+
 }
