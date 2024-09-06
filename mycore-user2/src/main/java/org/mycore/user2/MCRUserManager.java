@@ -233,10 +233,8 @@ public class MCRUserManager {
      * @return true if {@link #createUser(MCRUser)} or {@link #updateUser(MCRUser)} would reject the given user
      */
     public static boolean isInvalidUser(MCRUser user) {
-        if (MCRSystemUserInformation.getGuestInstance().getUserID().equals(user.getUserID())) {
-            return true;
-        }
-        return MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(user.getUserID());
+        return MCRSystemUserInformation.getGuestInstance().getUserID().equals(user.getUserID())
+            || MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(user.getUserID());
     }
 
     /**
@@ -727,7 +725,6 @@ public class MCRUserManager {
             return Optional.empty();
         }
     }
-
 
     private static Predicate[] getUserRealmCriterion(CriteriaBuilder cb, Root<MCRUser> root, String user,
         String realmId) {

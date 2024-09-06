@@ -104,7 +104,7 @@ public class MCRUserServlet extends MCRServlet {
             case "show" -> showUser(req, res, user, uid);
             case "save" -> saveUser(req, res);
             case "saveCurrentUser" -> saveCurrentUser(req, res);
-            case "changeMyPassword" -> redirectToPasswordChangePage(req, res);
+            case "changeMyPassword" -> redirectToPasswordChangePage(res);
             case "password" -> changePassword(req, res, user, uid);
             case "delete" -> deleteUser(req, res, user);
             case "listUsers" -> listUsers(req, res);
@@ -112,7 +112,7 @@ public class MCRUserServlet extends MCRServlet {
         }
     }
 
-    private void redirectToPasswordChangePage(HttpServletRequest req, HttpServletResponse res) throws Exception {
+    private void redirectToPasswordChangePage(HttpServletResponse res) throws Exception {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         if (!checkUserIsNotNull(res, currentUser, null)) {
             return;

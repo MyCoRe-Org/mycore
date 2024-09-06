@@ -546,10 +546,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public boolean isUserInRole(final String role) {
         boolean directMember = getSystemRoleIDs().contains(role) || getExternalRoleIDs().contains(role);
-        if (directMember) {
-            return true;
-        }
-        return MCRRoleManager.isAssignedToRole(this, role);
+        return directMember||MCRRoleManager.isAssignedToRole(this, role);
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
