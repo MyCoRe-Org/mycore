@@ -21,6 +21,7 @@ package org.mycore.iview.tests.controller;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -102,16 +103,14 @@ public class ToolBarController extends WebDriverController {
         element.click();
     }
 
-    // TODO: do this better!
     private WebElement getNotStaleElement(By selector) {
-        int trys = 10;
-
-        if (trys <= 0) {
-            throw new IllegalArgumentException("trys should be more then 0! [" + trys + "]");
+        final int maxTries = 10;
+        if (maxTries <= 0) {
+            throw new IllegalArgumentException("maxTries should be more than 0! [" + maxTries + "]");
         }
 
-        Exception sere = null;
-        while (--trys > 0) {
+        StaleElementReferenceException lastException = null;
+        for (int attempt = 1; attempt <= maxTries; attempt++) {
             try {
                 ViewerTestBase.sleep(1000);
             } catch (InterruptedException e) {
@@ -119,14 +118,17 @@ public class ToolBarController extends WebDriverController {
             try {
                 WebElement element = this.getDriver().findElement(selector);
 
-                element.isEnabled();
-                return element;
+                if (element.isEnabled()) {
+                    return element;
+                }
             } catch (StaleElementReferenceException e) {
-                sere = e;
-                LOGGER.debug("Stale check failed! [{}]", trys);
+                lastException = e;
+                LOGGER.debug("Stale check failed! [{}]", attempt);
             }
         }
-        throw new RuntimeException(sere);
+
+        throw new NoSuchElementException("Failed to retrieve a non-stale element after " + maxTries + " attempts.",
+            lastException);
     }
 
     /**
