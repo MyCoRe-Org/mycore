@@ -125,69 +125,71 @@ public class MCRUserAttributeMapper {
                 final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
                 final List<Attribute> attribs = attributeMapping.get(name);
 
-                if (attributes != null) {
-                    for (Attribute attribute : attribs) {
-                        if (attributes.containsKey(attribute.mapping)) {
-                            Object value = attributes.get(attribute.mapping);
-                            if(value == null){
-                                LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
-                            }
+                if (attributes == null) {
+                    return changed;
+                }
+                for (Attribute attribute : attribs) {
+                    if (attributes.containsKey(attribute.mapping)) {
+                        Object value = attributes.get(attribute.mapping);
+                        if (value == null) {
+                            LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
+                        }
 
-                            MCRUserAttributeJavaConverter aConv = null;
+                        MCRUserAttributeJavaConverter aConv = null;
+
+                        if (annotated instanceof Field field) {
+                            aConv = field.getAnnotation(MCRUserAttributeJavaConverter.class);
+                        } else if (annotated instanceof Method method) {
+                            aConv = method.getAnnotation(MCRUserAttributeJavaConverter.class);
+                        }
+
+                        Class<? extends MCRUserAttributeConverter> convCls = null;
+                        if (attribute.converter != null) {
+                            convCls = (Class<? extends MCRUserAttributeConverter>) Class
+                                .forName(attribute.converter);
+                        } else if (aConv != null) {
+                            convCls = aConv.value();
+                        }
+
+                        if (convCls != null) {
+                            MCRUserAttributeConverter converter = convCls.getDeclaredConstructor().newInstance();
+                            LOGGER.debug("convert value \"{}\" with \"{}\"", value, converter.getClass().getName());
+                            value = converter.convert(value,
+                                attribute.separator != null ? attribute.separator : attrAnno.separator(),
+                                attribute.getValueMap());
+                        }
+
+                        if (value != null || ((attrAnno.nullable() || attribute.nullable) && value == null)) {
+                            Object oldValue = getValue(object, annotated);
+                            if (oldValue != null && oldValue.equals(value)) {
+                                continue;
+                            }
 
                             if (annotated instanceof Field field) {
-                                aConv = field.getAnnotation(MCRUserAttributeJavaConverter.class);
+
+                                LOGGER.debug("map attribute \"{}\" with value \"{}\" to field \"{}\"",
+                                    attribute.mapping, value, field.getName());
+
+                                field.setAccessible(true);
+                                field.set(object, value);
+
+                                changed = true;
                             } else if (annotated instanceof Method method) {
-                                aConv = method.getAnnotation(MCRUserAttributeJavaConverter.class);
+
+                                LOGGER.debug("map attribute \"{}\" with value \"{}\" to method \"{}\"",
+                                    attribute.mapping, value, method.getName());
+
+                                method.setAccessible(true);
+                                method.invoke(object, value);
+
+                                changed = true;
                             }
-
-                            Class<? extends MCRUserAttributeConverter> convCls = null;
-                            if (attribute.converter != null) {
-                                convCls = (Class<? extends MCRUserAttributeConverter>) Class
-                                    .forName(attribute.converter);
-                            } else if (aConv != null) {
-                                convCls = aConv.value();
-                            }
-
-                            if (convCls != null) {
-                                MCRUserAttributeConverter converter = convCls.getDeclaredConstructor().newInstance();
-                                LOGGER.debug("convert value \"{}\" with \"{}\"", value, converter.getClass().getName());
-                                value = converter.convert(value,
-                                    attribute.separator != null ? attribute.separator : attrAnno.separator(),
-                                    attribute.getValueMap());
-                            }
-
-                            if (value != null || ((attrAnno.nullable() || attribute.nullable) && value == null)) {
-                                Object oldValue = getValue(object, annotated);
-                                if (oldValue != null && oldValue.equals(value)) {
-                                    continue;
-                                }
-
-                                if (annotated instanceof Field field) {
-
-                                    LOGGER.debug("map attribute \"{}\" with value \"{}\" to field \"{}\"",
-                                        attribute.mapping, value, field.getName());
-
-                                    field.setAccessible(true);
-                                    field.set(object, value);
-
-                                    changed = true;
-                                } else if (annotated instanceof Method method) {
-
-                                    LOGGER.debug("map attribute \"{}\" with value \"{}\" to method \"{}\"",
-                                        attribute.mapping, value, method.getName());
-
-                                    method.setAccessible(true);
-                                    method.invoke(object, value);
-
-                                    changed = true;
-                                }
-                            } else {
-                                throw new IllegalArgumentException(
-                                    "A not nullable attribute \"" + name + "\" was null.");
-                            }
+                        } else {
+                            throw new IllegalArgumentException(
+                                "A not nullable attribute \"" + name + "\" was null.");
                         }
                     }
+
                 }
             }
         }
