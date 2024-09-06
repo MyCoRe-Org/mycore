@@ -552,13 +552,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return MCRRoleManager.isAssignedToRole(this, role);
     }
 
-    /**
-     * @param attributes the attributes to set
-     */
-    public void setAttributes(SortedSet<MCRUserAttribute> attributes) {
-        this.attributes = attributes;
-    }
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "MCRUserAttr",
         joinColumns = @JoinColumn(name = "id"),
@@ -569,6 +562,13 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @XmlElement(name = "attribute")
     public SortedSet<MCRUserAttribute> getAttributes() {
         return this.attributes;
+    }
+
+    /**
+     * @param attributes the attributes to set
+     */
+    public void setAttributes(SortedSet<MCRUserAttribute> attributes) {
+        this.attributes = attributes;
     }
 
     /**
@@ -725,7 +725,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (anyMatch.isPresent()) {
             MCRUserAttribute attr = anyMatch.get();
             attr.setValue(value);
-            getAttributes().removeIf(a -> a.getName().equals(name) && a != attr);
+            getAttributes().removeIf(a -> a.getName().equals(name) && !(a.equals(attr)));
         } else {
             getAttributes().add(new MCRUserAttribute(name, value));
         }
