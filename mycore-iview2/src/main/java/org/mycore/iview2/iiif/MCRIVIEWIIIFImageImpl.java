@@ -18,8 +18,8 @@
 
 package org.mycore.iview2.iiif;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
@@ -98,16 +98,14 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         MCRIIIFImageTargetSize targetSize,
         int width,
         int height,
-        double rotatationRadians,
-        double zoomLevelScale,
-        int sourceWidth,
-        int sourceHeight) {
-
+        double zoomLevelScale) {
+        double rotatationRadians = Math.toRadians(rotation.degrees());
+        int sourceWidth = region.x2() - region.x1();
+        int sourceHeight = region.y2() - region.y1();
         double targetWidth = targetSize.width();
         double targetHeight = targetSize.height();
         double x1 = (targetWidth / (sourceWidth * zoomLevelScale)),
             y1 = (targetHeight / (sourceHeight * zoomLevelScale));
-
         Graphics2D graphics = targetImage.createGraphics();
         if (rotation.mirrored()) {
             graphics.scale(-1, 1);
@@ -231,8 +229,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             x2Tile = (int) Math.ceil(x2 / 256),
             y2Tile = (int) Math.ceil(y2 / 256);
 
-        Graphics2D graphics = getGraphics2D(region, rotation, targetImage, targetSize, width, height,
-            rotatationRadians, zoomLevelScale, sourceWidth, sourceHeight);
+        Graphics2D graphics = getGraphics2D(region, rotation, targetImage, targetSize, width, height, zoomLevelScale);
 
         renderImageTiles(oTileFile, sourceZoomLevel, drawScaleX, drawScaleY, x1Tile, x2Tile, y1Tile, y2Tile, graphics);
 
