@@ -78,7 +78,7 @@ public class MCRLoginServlet extends MCRServlet {
     private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
     private static final List<String> ALLOWED_ROLES = MCRConfiguration2
-        .getString(MCRLoginServlet.ALLOWED_ROLES_PROPERTY)
+        .getString(ALLOWED_ROLES_PROPERTY)
         .map(MCRConfiguration2::splitValue)
         .map(s -> s.collect(Collectors.toList()))
         .orElse(Collections.emptyList());

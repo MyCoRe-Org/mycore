@@ -523,10 +523,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public String getUserAttribute(String attribute) {
         switch (attribute) {
-            case MCRUserInformation.ATT_REAL_NAME -> {
+            case ATT_REAL_NAME -> {
                 return getRealName();
             }
-            case MCRUserInformation.ATT_EMAIL -> {
+            case ATT_EMAIL -> {
                 return getEMailAddress();
             }
             default -> {

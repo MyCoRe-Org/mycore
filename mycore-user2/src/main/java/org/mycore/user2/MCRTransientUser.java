@@ -70,7 +70,7 @@ public class MCRTransientUser extends MCRUser {
                 }
             }
         } else {
-            super.setRealName(getUserAttribute(MCRUserInformation.ATT_REAL_NAME));
+            super.setRealName(getUserAttribute(ATT_REAL_NAME));
             for (MCRRole role : MCRRoleManager.listSystemRoles()) {
                 LOGGER.debug("Test is in role: {}", role.getName());
                 if (userInfo.isUserInRole(role.getName())) {
