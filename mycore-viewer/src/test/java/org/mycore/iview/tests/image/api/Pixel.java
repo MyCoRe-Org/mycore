@@ -18,7 +18,7 @@
 
 package org.mycore.iview.tests.image.api;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class Pixel {
 
