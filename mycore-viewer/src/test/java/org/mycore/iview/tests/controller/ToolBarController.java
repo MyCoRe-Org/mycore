@@ -85,12 +85,10 @@ public class ToolBarController extends WebDriverController {
      * @param id
      */
     public void clickElementById(String id) {
-        int trys = 10;
-
         By selector = By
             .cssSelector(new MessageFormat(ELEMENT_SELECTOR_PATTERN, Locale.ROOT).format(new String[] { id }));
 
-        WebElement element = getNotStaleElement(trys, selector);
+        WebElement element = getNotStaleElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
@@ -105,7 +103,9 @@ public class ToolBarController extends WebDriverController {
     }
 
     // TODO: do this better!
-    private WebElement getNotStaleElement(int trys, By selector) {
+    private WebElement getNotStaleElement(By selector) {
+        int trys = 10;
+
         if (trys <= 0) {
             throw new IllegalArgumentException("trys should be more then 0! [" + trys + "]");
         }
