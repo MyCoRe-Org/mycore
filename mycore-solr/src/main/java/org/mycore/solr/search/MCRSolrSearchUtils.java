@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -203,7 +204,9 @@ public abstract class MCRSolrSearchUtils {
         @Override
         public void forEachRemaining(Consumer<? super SolrDocument> action) {
             if (action == null) {
-                throw new NullPointerException();
+                action = solrDocument -> {
+                    throw new IllegalStateException("action is null");
+                };
             }
             ModifiableSolrParams p = new ModifiableSolrParams(params);
             p.set("rows", (int) rows);
@@ -233,8 +236,11 @@ public abstract class MCRSolrSearchUtils {
         @Override
         public boolean tryAdvance(Consumer<? super SolrDocument> action) {
             if (action == null) {
-                throw new NullPointerException();
+                action = solrDocument -> {
+                    throw new IllegalStateException("action is null");
+                };
             }
+            Objects.requireNonNull(action);
             long i = start, size = estimateSize();
             if (size > 0) {
                 if (response == null) {
