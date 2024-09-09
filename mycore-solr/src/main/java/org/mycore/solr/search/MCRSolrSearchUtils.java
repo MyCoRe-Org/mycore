@@ -204,9 +204,7 @@ public abstract class MCRSolrSearchUtils {
         @Override
         public void forEachRemaining(Consumer<? super SolrDocument> action) {
             if (action == null) {
-                action = solrDocument -> {
-                    throw new IllegalStateException("action is null");
-                };
+                throw new IllegalArgumentException("Action cannot be null");
             }
             ModifiableSolrParams p = new ModifiableSolrParams(params);
             p.set("rows", (int) rows);
@@ -238,9 +236,7 @@ public abstract class MCRSolrSearchUtils {
         @Override
         public boolean tryAdvance(Consumer<? super SolrDocument> action) {
             if (action == null) {
-                action = solrDocument -> {
-                    throw new IllegalStateException("action is null");
-                };
+                throw new IllegalArgumentException("Action cannot be null");
             }
             Objects.requireNonNull(action);
             long i = start;

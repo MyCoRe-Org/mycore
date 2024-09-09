@@ -111,10 +111,8 @@ public class MCRSolrCore {
 
     protected void setup(String serverURL, String name, String configSet,
                          Integer shardCount, Set<MCRSolrCoreType> types) {
-        if (!serverURL.endsWith("/")) {
-            serverURL += "/";
-        }
-        this.serverURL = serverURL;
+
+        this.serverURL = serverURL.endsWith("/") ? serverURL : serverURL + "/";
         this.name = name;
         this.configSet = configSet;
         this.shardCount = Objects.requireNonNull(shardCount, "shardCount must not be null");
