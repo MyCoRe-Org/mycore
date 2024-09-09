@@ -210,7 +210,9 @@ public abstract class MCRSolrSearchUtils {
             }
             ModifiableSolrParams p = new ModifiableSolrParams(params);
             p.set("rows", (int) rows);
-            long start = this.start, size = estimateSize(), fetched = 0;
+            long start = this.start;
+            long size = estimateSize();
+            long fetched = 0;
             while (fetched < size) {
                 p.set("start", (int) (start + fetched));
                 response = query(p);
@@ -241,7 +243,8 @@ public abstract class MCRSolrSearchUtils {
                 };
             }
             Objects.requireNonNull(action);
-            long i = start, size = estimateSize();
+            long i = start;
+            long size = estimateSize();
             if (size > 0) {
                 if (response == null) {
                     ModifiableSolrParams p = new ModifiableSolrParams(params);
@@ -259,7 +262,9 @@ public abstract class MCRSolrSearchUtils {
 
         @Override
         public Spliterator<SolrDocument> trySplit() {
-            long s = estimateSize(), i = start, l = rows;
+            long s = estimateSize();
+            long i = start;
+            long l = rows;
             if (l >= s) {
                 return null;
             }
