@@ -30,12 +30,6 @@ import org.mycore.common.config.MCRConfigurationException;
  *
  */
 public class MCRSolrUtils {
-    //    private static String specialChars = "!&|+-(){}[]\"~*?:\\/^";
-    /* '*' and '?' should always be threatened as special character */
-    private static String specialChars = "!&|+-(){}[]\"~:\\/^";
-
-    private static Pattern PATTERN_RESTRICTED = Pattern.compile("([\\Q" + specialChars + "\\E])");
-
     /**
      * Escapes characters in search values that need to be escaped for SOLR.
      * @see <a href="http://lucene.apache.org/core/4_3_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Escaping_Special_Characters">List of special characters</a>
@@ -43,10 +37,14 @@ public class MCRSolrUtils {
      * @return null if value is null
      */
     public static String escapeSearchValue(final String value) {
+        //    specialChars = "!&|+-(){}[]\"~*?:\\/^";
+        /* '*' and '?' should always be threatened as special character */
+        String specialChars = "!&|+-(){}[]\"~:\\/^";
+        Pattern patternRestricted = Pattern.compile("([\\Q" + specialChars + "\\E])");
         if (value == null) {
             return null;
         }
-        return PATTERN_RESTRICTED.matcher(value).replaceAll("\\\\$1");
+        return patternRestricted.matcher(value).replaceAll("\\\\$1");
     }
 
     /**
