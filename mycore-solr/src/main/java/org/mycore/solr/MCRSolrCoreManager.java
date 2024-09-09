@@ -46,8 +46,8 @@ public final class MCRSolrCoreManager {
     static {
         try {
             CORE_MAP = Collections.synchronizedMap(loadCoresFromProperties());
-        } catch (Throwable t) {
-            LOGGER.error("Exception creating solr client object", t);
+        } catch (Exception e) {
+            LOGGER.error("Exception creating solr client object", e);
         }
     }
 
