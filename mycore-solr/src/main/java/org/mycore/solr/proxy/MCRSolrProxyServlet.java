@@ -220,7 +220,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         filterParams(solrParameter);
-        HttpRequest.Builder solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
+        HttpRequest.Builder solrHttpMethod = getSolrHttpMethod(queryHandlerPath, solrParameter,
             Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
 
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(solrHttpMethod, MCRSolrAuthenticationLevel.SEARCH);

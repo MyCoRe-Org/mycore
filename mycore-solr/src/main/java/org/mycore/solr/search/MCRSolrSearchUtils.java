@@ -179,7 +179,7 @@ public abstract class MCRSolrSearchUtils {
 
         @Override
         public int characteristics() {
-            return Spliterator.SIZED | Spliterator.SUBSIZED | Spliterator.ORDERED;
+            return SIZED | SUBSIZED | ORDERED;
         }
 
         @Override
