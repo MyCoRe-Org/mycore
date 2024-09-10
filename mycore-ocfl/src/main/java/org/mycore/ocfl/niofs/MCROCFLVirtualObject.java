@@ -535,6 +535,13 @@ public abstract class MCROCFLVirtualObject {
         };
     }
 
+    /**
+     * Returns a list of paths within the specified directory.
+     *
+     * @param directory the directory whose paths are to be listed.
+     * @return a list of paths within the specified directory.
+     * @throws IOException if an I/O error occurs while listing the directory.
+     */
     public List<Path> list(MCRVersionedPath directory) throws IOException {
         return list(directory, path -> true, paths());
     }
@@ -570,7 +577,13 @@ public abstract class MCROCFLVirtualObject {
         return relativePath.getNameCount() == 1;
     }
 
-    // TODO javadoc
+    /**
+     * Returns the digest (hash) of the file at the specified path.
+     *
+     * @param path the path to the file whose digest is to be calculated.
+     * @return the digest of the file, or {@code null} if the path is a directory.
+     * @throws IOException if an I/O error occurs while retrieving the digest.
+     */
     public MCRDigest getDigest(MCRVersionedPath path) throws IOException {
         checkExists(path);
         if (this.isDirectory(path)) {
@@ -856,6 +869,7 @@ public abstract class MCROCFLVirtualObject {
                 case REMOVE_KEEP -> {
                     updater.removeFile(ocflKeepFile);
                 }
+                default -> throw new IllegalStateException("Unexpected value: " + change.type());
             }
         }
         return !changes.isEmpty();

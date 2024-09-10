@@ -169,7 +169,6 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
     @Override
     public FileTime getAccessTime(MCRVersionedPath path) throws IOException {
         checkExists(path);
-        // TODO is the localStorage check required? Or does the localVirtualObject take care of that
         if (this.localStorage.exists(path)) {
             Path physicalPath = this.localStorage.toPhysicalPath(path);
             return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastAccessTime();
