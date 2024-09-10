@@ -54,7 +54,7 @@ public class MCRLogin {
     public MCRLogin(MCRUserInformation userInformation, String formAction) {
         this();
         this.user = userInformation.getUserID();
-        this.guest = userInformation == MCRSystemUserInformation.getGuestInstance();
+        this.guest = userInformation.equals(MCRSystemUserInformation.getGuestInstance());
         this.form = new Form(formAction);
     }
 

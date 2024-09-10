@@ -70,9 +70,12 @@ public class MCRLanguageDetector {
     }
 
     private static int buildScore(String text, String lang, String wordList, String endings) {
-        text = text.toLowerCase(Locale.ROOT).trim();
-        text = text.replace(',', ' ').replace('-', ' ').replace('/', ' ');
-        text = " " + text + " ";
+        String cleanedText = text.toLowerCase(Locale.ROOT).trim();
+        cleanedText = cleanedText
+                .replace(',', ' ')
+                .replace('-', ' ')
+                .replace('/', ' ');
+        cleanedText = " " + cleanedText + " ";
 
         int score = 0;
 
@@ -80,9 +83,9 @@ public class MCRLanguageDetector {
         while (st.hasMoreTokens()) {
             String word = st.nextToken();
             int pos = 0;
-            while ((pos = text.indexOf(" " + word + " ", pos)) >= 0) {
+            while ((pos = cleanedText.indexOf(" " + word + " ", pos)) >= 0) {
                 score += 2;
-                pos = Math.min(pos + word.length() + 1, text.length());
+                pos = Math.min(pos + word.length() + 1, cleanedText.length());
             }
         }
 
@@ -90,13 +93,13 @@ public class MCRLanguageDetector {
         while (st.hasMoreTokens()) {
             String ending = st.nextToken();
 
-            if (text.contains(ending + " ")) {
+            if (cleanedText.contains(ending + " ")) {
                 score += 1;
             }
             int pos = 0;
-            while ((pos = text.indexOf(ending + " ", pos)) >= 0) {
+            while ((pos = cleanedText.indexOf(ending + " ", pos)) >= 0) {
                 score += 1;
-                pos = Math.min(pos + ending.length() + 1, text.length());
+                pos = Math.min(pos + ending.length() + 1, cleanedText.length());
             }
         }
 

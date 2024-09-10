@@ -69,10 +69,6 @@ public class MCRUserAgentFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
-    }
-
-    @Override
     public void doFilter(final ServletRequest sreq, final ServletResponse sres, final FilterChain chain)
         throws IOException, ServletException {
         final HttpServletRequest request = (HttpServletRequest) sreq;

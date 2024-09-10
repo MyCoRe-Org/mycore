@@ -38,7 +38,8 @@ import org.mycore.common.content.MCRURLContent;
  */
 public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
-    MCRProperties properties, deprecated;
+    MCRProperties properties;
+    MCRProperties deprecated;
 
     public MCRDefaultConfigurationLoader() {
         properties = new MCRProperties();

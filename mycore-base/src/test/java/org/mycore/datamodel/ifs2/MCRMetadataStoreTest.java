@@ -183,7 +183,7 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
             }
             l1.add(id);
         }
-        assertTrue(l1.size() == 3);
+        assertEquals(3, l1.size());
         ArrayList<Integer> l2 = new ArrayList<>();
         IDs = getMetaDataStore().listIDs(false);
         while (IDs.hasNext()) {
@@ -193,7 +193,7 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
             }
             l2.add(id);
         }
-        assertTrue(l2.size() == 3);
+        assertEquals(3, l2.size());
         Collections.sort(l2);
         assertEquals(l1, l2);
     }

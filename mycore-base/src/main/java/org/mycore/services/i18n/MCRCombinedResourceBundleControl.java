@@ -54,17 +54,21 @@ public class MCRCombinedResourceBundleControl extends Control {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("New bundle: {}, locale {}", baseName, locale);
         }
+        Locale resolvedLocale;
+
         if (locale.equals(Locale.ROOT)) {
             //MCR-1064 fallback should be default language, if property key does not exist
-            locale = defaultLocale;
+            resolvedLocale = defaultLocale;
+        }else{
+            resolvedLocale= locale;
         }
         String bundleName = baseName.substring(baseName.indexOf(':') + 1);
-        String filename = CONTROL_HELPER.toBundleName(bundleName, locale) + ".properties";
+        String filename = CONTROL_HELPER.toBundleName(bundleName, resolvedLocale) + ".properties";
         try (MCRConfigurationInputStream propertyStream = new MCRConfigurationInputStream(filename)) {
             if (propertyStream.isEmpty()) {
-                String className = bundleName + "_" + locale;
+                String className = bundleName + "_" + resolvedLocale;
                 throw new MissingResourceException(
-                    "Can't find bundle for base name " + baseName + ", locale " + locale, className, "");
+                    "Can't find bundle for base name " + baseName + ", locale " + resolvedLocale, className, "");
             }
             return new PropertyResourceBundle(propertyStream);
         }

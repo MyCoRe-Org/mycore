@@ -70,13 +70,13 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
 
     public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
-        List<Element> childrenList = element.getChildren(MCRMetaDerivateLink.ANNOTATION);
+        List<Element> childrenList = element.getChildren(ANNOTATION);
         if (childrenList == null) {
             return;
         }
 
         for (Element anAnnotation : childrenList) {
-            String key = anAnnotation.getAttributeValue(MCRMetaDerivateLink.ATTRIBUTE, Namespace.XML_NAMESPACE);
+            String key = anAnnotation.getAttributeValue(ATTRIBUTE, Namespace.XML_NAMESPACE);
             String annotationText = anAnnotation.getText();
             this.map.put(key, annotationText);
         }
@@ -86,8 +86,8 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         Element elm = super.createXML();
 
         for (String key : map.keySet()) {
-            Element annotationElem = new Element(MCRMetaDerivateLink.ANNOTATION);
-            annotationElem.setAttribute(MCRMetaDerivateLink.ATTRIBUTE, key, Namespace.XML_NAMESPACE);
+            Element annotationElem = new Element(ANNOTATION);
+            annotationElem.setAttribute(ATTRIBUTE, key, Namespace.XML_NAMESPACE);
             String content = map.get(key);
             if (content == null || content.length() == 0) {
                 continue;

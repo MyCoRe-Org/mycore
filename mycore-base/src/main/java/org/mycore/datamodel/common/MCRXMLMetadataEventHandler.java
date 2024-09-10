@@ -144,6 +144,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
                             if (isUptodate(retrieveContent, content)) {
                                 return;
                             }
+                            //Fall-Through
                         case UPDATE:
                             metaDataManager.update(id, content, modified);
                             break;

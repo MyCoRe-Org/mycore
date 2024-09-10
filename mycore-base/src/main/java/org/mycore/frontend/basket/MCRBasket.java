@@ -187,10 +187,13 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
      */
     public boolean removeEntry(String id) {
         MCRBasketEntry entry = get(id);
+        boolean result;
         if (entry == null) {
-            return false;
+            result= false;
+        }else {
+            result = remove(entry);
         }
-        return remove(entry);
+        return result;
     }
 
     @Override

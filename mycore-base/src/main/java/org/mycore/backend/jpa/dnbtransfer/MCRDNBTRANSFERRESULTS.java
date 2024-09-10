@@ -37,7 +37,12 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
 
     private boolean transferPackageArchived;
 
-    private String protocolType, errorMessage, deliveryRole, objectId, errorModule, tpName;
+    private String protocolType;
+    private String errorMessage;
+    private String deliveryRole;
+    private String objectId;
+    private String errorModule;
+    private String tpName;
 
     private Date date;
 

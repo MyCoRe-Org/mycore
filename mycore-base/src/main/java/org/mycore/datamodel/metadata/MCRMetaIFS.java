@@ -126,17 +126,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
     }
 
     /**
-     * This method set the value of derivate IFS ID.
-     * 
-     * @param ifsId
-     *            the derivate IFS ID
-     * @deprecated out of use
-     */
-    @Deprecated
-    public void setIFSID(String ifsId) {
-    }
-
-    /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
      * 

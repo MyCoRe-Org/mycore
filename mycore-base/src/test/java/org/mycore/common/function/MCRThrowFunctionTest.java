@@ -44,7 +44,7 @@ public class MCRThrowFunctionTest {
                 ((MCRThrowFunction<String, String, IOException>) MCRThrowFunctionTest::failExceptionally).toFunction())
                 .findFirst();
         } catch (RuntimeException e) {
-            if (e.getCause() != null && e.getCause() instanceof IOException ioe) {
+            if (e.getCause() instanceof IOException ioe) {
                 throw ioe;
             }
             throw e;

@@ -55,7 +55,7 @@ public class MCRCacheFilter implements ContainerResponseFilter {
                 (int) cacheControlAnnotation.maxAge().unit().toSeconds(cacheControlAnnotation.maxAge().time()));
             cc.setSMaxAge(
                 (int) cacheControlAnnotation.sMaxAge().unit().toSeconds(cacheControlAnnotation.sMaxAge().time()));
-            Optional.ofNullable(cacheControlAnnotation.private_())
+            Optional.ofNullable(cacheControlAnnotation.codeIsPrivate())
                 .filter(MCRCacheControl.FieldArgument::active)
                 .map(MCRCacheControl.FieldArgument::fields)
                 .map(Stream::of)
@@ -63,7 +63,7 @@ public class MCRCacheFilter implements ContainerResponseFilter {
                     cc.setPrivate(true);
                     cc.getPrivateFields().addAll(s.collect(Collectors.toList()));
                 });
-            if (cacheControlAnnotation.public_()) {
+            if (cacheControlAnnotation.codeIsPublic()) {
                 cc.getCacheExtension().put("public", null);
             }
             cc.setNoTransform(cacheControlAnnotation.noTransform());

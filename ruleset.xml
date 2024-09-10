@@ -18,12 +18,7 @@
   <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
   <rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
   <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
-  
-  <rule ref="category/java/codestyle.xml/ClassNamingConventions">
-    <properties>
-      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Utils?|Helper|Manager|Commands|Constants|HintKeys)" />
-    </properties>
-  </rule>
+
   <rule ref="category/java/codestyle.xml/ExtendsObject" />
   <rule ref="category/java/codestyle.xml/EmptyControlStatement" />
   <rule ref="category/java/codestyle.xml/FieldDeclarationsShouldBeAtStartOfClass" />

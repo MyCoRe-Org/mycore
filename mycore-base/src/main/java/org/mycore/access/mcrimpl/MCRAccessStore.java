@@ -99,13 +99,13 @@ public abstract class MCRAccessStore {
     public Collection<MCRAccessDefinition> getDefinition(String type) {
         try {
             HashMap<String, Collection<String>> sqlDefinition = new HashMap<>();
-            Collection<String> pools = MCRAccessStore.getInstance().getDatabasePools();
+            Collection<String> pools = getInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());
             pools.addAll(getPools());
 
             for (String pool : pools) {
-                sqlDefinition.put(pool, MCRAccessStore.getInstance().getMappedObjectId(pool));
+                sqlDefinition.put(pool, getInstance().getMappedObjectId(pool));
             }
 
             Collection<MCRAccessDefinition> ret = new ArrayList<>();
@@ -140,7 +140,7 @@ public abstract class MCRAccessStore {
 
     public Collection<MCRAccessDefinition> getRules(String objid) {
         try {
-            Collection<String> pools = MCRAccessStore.getInstance().getDatabasePools();
+            Collection<String> pools = getInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());
             pools.addAll(getPools());

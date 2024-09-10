@@ -193,7 +193,8 @@ public class MCRCategoryTransformer {
 
         private String labelFormat;
 
-        private boolean emptyLeaves, completeId;
+        private boolean emptyLeaves;
+        private boolean completeId;
 
         private Map<MCRCategoryID, Number> countMap = null;
 
@@ -270,8 +271,8 @@ public class MCRCategoryTransformer {
             String text;
             try {
                 text = TEXT_PATTERN.matcher(labelFormat).replaceAll(labtext);
-            } catch (RuntimeException e) {
-                throw new RuntimeException("Error while inserting '" + labtext + "' into: " + labelFormat, e);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Error while inserting '" + labtext + "' into: " + labelFormat, e);
             }
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getId());
             text = DESCR_PATTERN.matcher(text)

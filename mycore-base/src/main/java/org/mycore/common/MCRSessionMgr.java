@@ -82,12 +82,6 @@ public class MCRSessionMgr {
         return theThreadLocalSession.get();
     }
 
-    private static void checkSessionLock() {
-        if (isSessionCreationLocked.get()) {
-            throw new MCRException("Session creation is locked!");
-        }
-    }
-
     /**
      * This method sets a MyCoRe session object for the current Thread. This method fires a "activated" event, when
      * called the first time for this session and thread.
@@ -98,7 +92,7 @@ public class MCRSessionMgr {
     public static void setCurrentSession(MCRSession theSession) {
         if (hasCurrentSession()) {
             MCRSession currentSession = getCurrentSession();
-            if (currentSession != theSession && currentSession.getID() != null) {
+            if (!currentSession.equals(theSession) && currentSession.getID() != null) {
                 LOGGER.error("Current session will be released: " + currentSession,
                     new MCRException("Current thread already has a session attached!"));
                 releaseCurrentSession();

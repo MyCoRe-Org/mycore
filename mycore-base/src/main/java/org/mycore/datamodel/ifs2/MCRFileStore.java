@@ -116,7 +116,7 @@ public class MCRFileStore extends MCRStore {
      * 
      */
     public void repairAllMetadata() throws IOException {
-        for (Iterator<Integer> e = listIDs(MCRStore.ASCENDING); e.hasNext();) {
+        for (Iterator<Integer> e = listIDs(ASCENDING); e.hasNext();) {
             retrieve(e.next()).repairMetadata();
         }
     }

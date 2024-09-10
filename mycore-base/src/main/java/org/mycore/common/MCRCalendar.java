@@ -169,13 +169,13 @@ public class MCRCalendar {
         if (dateString.equals("4713-01-01 BC")) {
             LOGGER.debug("Date string contains MIN_JULIAN_DAY_NUMBER");
             out = new GregorianCalendar();
-            out.set(Calendar.JULIAN_DAY, MCRCalendar.MIN_JULIAN_DAY_NUMBER);
+            out.set(Calendar.JULIAN_DAY, MIN_JULIAN_DAY_NUMBER);
             return out;
         }
         if (dateString.equals("4000-01-28 AD")) {
             LOGGER.debug("Date string contains MAX_JULIAN_DAY_NUMBER");
             out = new GregorianCalendar();
-            out.set(Calendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
+            out.set(Calendar.JULIAN_DAY, MAX_JULIAN_DAY_NUMBER);
             return out;
         }
 
@@ -889,9 +889,9 @@ public class MCRCalendar {
     public static String getISODateToFormattedString(String date, boolean useLastValue, String calendarName) {
         String formattedDate = null;
         try {
-            Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date, useLastValue, calendarName);
-            GregorianCalendar gregorianCalendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
-            formattedDate = MCRCalendar.getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
+            Calendar calendar = getHistoryDateAsCalendar(date, useLastValue, calendarName);
+            GregorianCalendar gregorianCalendar = getGregorianCalendarOfACalendar(calendar);
+            formattedDate = getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
                 + "T00:00:00.000Z";
             if (gregorianCalendar.get(Calendar.ERA) == GregorianCalendar.BC) {
                 formattedDate = "-" + formattedDate;
@@ -1415,7 +1415,7 @@ public class MCRCalendar {
         }
 
         public static CalendarType of(String type) {
-            return Arrays.stream(CalendarType.values())
+            return Arrays.stream(values())
                 .filter(current -> StringUtils.equals(current.getType(), type))
                 .findFirst().orElseThrow();
         }

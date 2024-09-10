@@ -34,7 +34,7 @@ public @interface MCRCacheControl {
      * sets {@code private} directive
      * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.2.2.6">private definition</a>
      */
-    FieldArgument private_() default @FieldArgument();
+    FieldArgument codeIsPrivate() default @FieldArgument();
 
     /**
      * sets {@code no-cache} directive
@@ -76,7 +76,7 @@ public @interface MCRCacheControl {
      * if true, sets {@code public} directive
      * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.2.2.5">public definition</a>
      */
-    boolean public_() default false;
+    boolean codeIsPublic() default false;
 
     /**
      * Sets {@code max-age} directive

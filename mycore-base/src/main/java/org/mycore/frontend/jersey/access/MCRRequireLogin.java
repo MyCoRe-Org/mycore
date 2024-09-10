@@ -35,11 +35,12 @@ public class MCRRequireLogin implements MCRResourceAccessChecker {
      */
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
+        boolean result = false;
         if (MCRSessionMgr.hasCurrentSession()) {
-            return !MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(
+            result= !MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(
                 MCRSystemUserInformation.getGuestInstance().getUserID());
         }
-        return false;
+        return result;
     }
 
 }

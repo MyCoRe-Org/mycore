@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdom2.Element;
+import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
@@ -44,7 +45,8 @@ import org.mycore.parsers.bool.MCRSetCondition;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
-
+    /** Pattern for MCRQueryConditions expressed as String */
+    private static Pattern pattern = Pattern.compile("([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
     /**
      * Parses XML element containing a simple query condition
      *
@@ -118,9 +120,10 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value) {
         if (Objects.equals(value, "TODAY")) {
-            value = getToday();
-        }
+            return new MCRQueryCondition(field, oper, getToday());
+        } else {
         return new MCRQueryCondition(field, oper, value);
+        }
     }
 
     private String getToday() {
@@ -128,8 +131,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             .format(DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY));
     }
 
-    /** Pattern for MCRQueryConditions expressed as String */
-    private static Pattern pattern = Pattern.compile("([^ \t\r\n]+)\\s+([^ \t\r\n]+)\\s+([^ \"\t\r\n]+|\"[^\"]*\")");
+
 
     /**
      * Parses a String containing a simple query condition, for example: (title
@@ -233,6 +235,10 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             }
         }
 
+        return getMcrCondition(qc, values);
+    }
+
+    private static MCRCondition<Void> getMcrCondition(MCRQueryCondition qc, List<String> values) {
         MCRAndCondition<Void> ac = new MCRAndCondition<>();
         for (String value : values) {
             if (value.startsWith("'")) {
@@ -274,26 +280,27 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
 
     private static MCRCondition<Void> normalizeSetCondition(MCRSetCondition<Void> sc) {
         List<MCRCondition<Void>> children = sc.getChildren();
-        sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
+        MCRSetCondition<Void> source;
+        source = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
         for (MCRCondition<Void> child : children) {
             MCRCondition<Void> normalizedChild = normalizeCondition(child);
             if (normalizedChild != null) {
                 if (normalizedChild instanceof MCRSetCondition
-                    && sc.getOperator().equals(((MCRSetCondition) normalizedChild).getOperator())) {
+                    && source.getOperator().equals(((MCRSetCondition) normalizedChild).getOperator())) {
                     // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
-                    sc.addAll(((MCRSetCondition<Void>) normalizedChild).getChildren());
+                    source.addAll(((MCRSetCondition<Void>) normalizedChild).getChildren());
                 } else {
-                    sc.addChild(normalizedChild);
+                    source.addChild(normalizedChild);
                 }
             }
         }
-        children = sc.getChildren();
+        children = source.getChildren();
         if (children.isEmpty()) {
             return null;
         } else if (children.size() == 1) {
-            return children.getFirst();
+            return children.get(0);
         } else {
-            return sc;
+            return source;
         }
     }
 
@@ -302,7 +309,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
         try {
             MCRCondition<Void> cond = new MCRQueryParser().parse(query);
             return cond != null;
-        } catch (Throwable t) {
+        } catch (MCRException t) {
             return false;
         }
     }

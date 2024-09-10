@@ -199,7 +199,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
             return 1;
         }
         //both are not null
-        if (this.getLang() == other.getLang()) { // this intentionally uses == to allow for both null
+        if (Objects.equals(this.getLang(), other.getLang())) { // this intentionally uses == to allow for both null
             return 0;
         }
         if (this.getLang() == null) {

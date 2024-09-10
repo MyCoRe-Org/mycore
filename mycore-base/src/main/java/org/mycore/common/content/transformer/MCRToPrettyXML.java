@@ -41,7 +41,7 @@ public class MCRToPrettyXML extends MCRContentTransformer {
         } catch (JDOMException e) {
             throw new IOException(e);
         }
-        if (content != source) {
+        if (!content.equals(source)) {
             content.setName(source.getName());
             content.setLastModified(source.lastModified());
         }

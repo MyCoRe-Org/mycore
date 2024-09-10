@@ -49,9 +49,13 @@ public class MCRCategoryDTO {
 
     MCRCategoryID id;
 
-    int leftValue, level, rightValue;
+    int leftValue;
+    int level;
+    int rightValue;
 
-    String lang, text, description;
+    String lang;
+    String text;
+    String description;
 
     public MCRCategoryDTO(int internalID, URI uri, MCRCategoryID id, int leftValue, int rightValue,
         int level, String lang, String text, String description) {

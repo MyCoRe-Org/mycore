@@ -120,6 +120,7 @@ public final class MCRISO8601FormatChooser {
                 return COMPLETE_FORMAT;
             case 17: // YYYY-MM-DDThh:mm'Z'
                 test = true;
+                // Fall-Through
             case 22:
                 if (test || !isoString.endsWith("Z")) {
                     // YYYY-MM-DDThh:mm[+-]hh:mm
@@ -140,6 +141,7 @@ public final class MCRISO8601FormatChooser {
                 return COMPLETE_HH_MM_SS_SSS_FORMAT;
         }
     }
+
 
     /**
      * returns a String that has not more than 3 digits representing "fractions of a second". If isoString has no or not

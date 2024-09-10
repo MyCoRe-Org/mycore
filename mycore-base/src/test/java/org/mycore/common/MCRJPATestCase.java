@@ -181,9 +181,7 @@ public class MCRJPATestCase extends MCRTestCase {
         doSchemaOperation(schema -> "drop schema " + schema);
     }
 
-    public MCRJPATestCase() {
-        super();
-    }
+
 
     @After
     public void tearDown() throws Exception {

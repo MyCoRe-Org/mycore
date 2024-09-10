@@ -99,7 +99,7 @@ public class MCRTemplatesCompiler {
         msg.append(resource);
 
         if (cause instanceof TransformerException tex) {
-            msg.append("\n").append(tex.getMessage());
+            msg.append('\n').append(tex.getMessage());
             SourceLocator sl = tex.getLocator();
             if (sl != null) {
                 msg.append(" (").append(sl.getSystemId()).append(") ");

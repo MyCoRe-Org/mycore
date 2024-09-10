@@ -20,6 +20,7 @@ package org.mycore.datamodel.ifs2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -127,7 +128,7 @@ public class MCRDirectoryTest extends MCRIFS2TestCase {
         assertNotNull(parent.getChild("bar"));
         assertNotNull(parent.getChild("readme.txt"));
         MCRNode[] children = parent.getChildren().toArray(MCRNode[]::new);
-        assertFalse(children[0].getName().equals(children[1].getName()));
+        assertNotEquals(children[0].getName(), children[1].getName());
         assertTrue("bar readme.txt".contains(children[0].getName()));
         assertTrue("bar readme.txt".contains(children[1].getName()));
     }

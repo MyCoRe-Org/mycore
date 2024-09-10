@@ -27,8 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -51,9 +49,9 @@ public class MCRLanguageFactory {
 
     private static final MCRLanguageFactory SINGLETON = new MCRLanguageFactory();
 
-    public static final MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
+    public static final MCRLanguage GERMAN = instance().getLanguage("de");
 
-    public static final MCRLanguage ENGLISH = MCRLanguageFactory.instance().getLanguage("en");
+    public static final MCRLanguage ENGLISH = instance().getLanguage("en");
 
     /**
      * Map of languages by ISO 639-1 or -2 code
@@ -116,16 +114,18 @@ public class MCRLanguageFactory {
     }
 
     private MCRLanguage lookupLanguage(String code) {
+        String languageCode;
         if ((!languageByCode.containsKey(code)) && code.contains("-") && !code.startsWith("x-")) {
-            code = code.split("-")[0];
+            languageCode = code.split("-")[0];
+        }else{
+            languageCode=code;
+        }
+        if (!languageByCode.containsKey(languageCode)) {
+            LOGGER.warn("Unknown language: {}", languageCode);
+            buildLanguage(languageCode, languageCode.length() > 2 ? languageCode : null, null);
         }
 
-        if (!languageByCode.containsKey(code)) {
-            LOGGER.warn("Unknown language: {}", code);
-            buildLanguage(code, code.length() > 2 ? code : null, null);
-        }
-
-        return languageByCode.get(code);
+        return languageByCode.get(languageCode);
     }
 
     /**
@@ -142,14 +142,14 @@ public class MCRLanguageFactory {
         if (code == null) {
             return false;
         }
-        code = code.trim();
-        if (code.length() == 0) {
+        String codeTrimmed = code.trim();
+        if (codeTrimmed.length() == 0) {
             return false;
         }
-        if (code.startsWith("x-") || code.startsWith("i-")) {
+        if (codeTrimmed.startsWith("x-") || codeTrimmed.startsWith("i-")) {
             return true;
         }
-        return languageByCode.containsKey(code);
+        return languageByCode.containsKey(codeTrimmed);
     }
 
     /**
@@ -218,7 +218,6 @@ public class MCRLanguageFactory {
      * Reads in the language classification and builds language objects from its categories
      */
     private void readLanguageClassification() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
         if (!MCRTransactionHelper.isTransactionActive()) {
             MCRTransactionHelper.beginTransaction();
             buildLanguagesFromClassification();

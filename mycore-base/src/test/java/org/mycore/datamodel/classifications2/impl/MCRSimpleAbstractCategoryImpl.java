@@ -17,19 +17,12 @@
  */
 
 package org.mycore.datamodel.classifications2.impl;
-
-import java.util.List;
 import java.util.TreeSet;
 
-import org.mycore.datamodel.classifications2.MCRCategory;
 
 final class MCRSimpleAbstractCategoryImpl extends MCRAbstractCategoryImpl {
     {
         labels = new TreeSet<>();
-    }
-
-    @Override
-    protected void setChildrenUnlocked(List<MCRCategory> children) {
     }
 
     @Override

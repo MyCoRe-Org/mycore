@@ -143,12 +143,11 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     private static Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
 
-    private int left, right, internalID;
+    private int left;
+    private int right;
+    private int internalID;
 
     int level;
-
-    public MCRCategoryImpl() {
-    }
 
     //Mapping definition
 
@@ -344,16 +343,17 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     static MCRCategoryImpl wrapCategory(MCRCategory category, MCRCategory parent, MCRCategory root) {
-        if (category.getParent() != null && category.getParent() != parent) {
+        MCRCategory rootCategory=root;
+        if (category.getParent() != null && !category.getParent().equals(parent)) {
             throw new MCRException("MCRCategory is already attached to a different parent.");
         }
         if (category instanceof MCRCategoryImpl catImpl) {
             // don't use setParent() as it call add() from ChildList
             catImpl.parent = parent;
             if (root == null) {
-                root = catImpl;
+                rootCategory = catImpl;
             }
-            catImpl.setRoot(root);
+            catImpl.setRoot(rootCategory);
             if (parent != null) {
                 catImpl.level = parent.getLevel() + 1;
             } else if (category.isCategory()) {
@@ -374,10 +374,11 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         catImpl.setId(category.getId());
         catImpl.labels = category.getLabels();
         catImpl.parent = parent;
+
         if (root == null) {
-            root = catImpl;
+            rootCategory = catImpl;
         }
-        catImpl.setRoot(root);
+        catImpl.setRoot(rootCategory);
         catImpl.level = parent.getLevel() + 1;
         catImpl.children = new ArrayList<>(category.getChildren().size());
         catImpl.getChildren().addAll(category.getChildren());
@@ -496,27 +497,18 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        boolean result;
+        if (obj == null||getClass() != obj.getClass()) {
+            result= false;
+        } else if (this == obj) {
+            result = true;
+        } else {
         MCRCategoryImpl other = (MCRCategoryImpl) obj;
-        if (internalID != other.internalID) {
-            return false;
+        result= internalID == other.internalID && left == other.left && level == other.level && right == other.right;
         }
-        if (left != other.left) {
-            return false;
-        }
-        if (level != other.level) {
-            return false;
-        }
-        return right == other.right;
+        return result;
     }
+
 
     @Transient
     public String getRootID() {
