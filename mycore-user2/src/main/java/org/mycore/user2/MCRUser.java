@@ -730,6 +730,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     @Transient
     @XmlElement(name = "owner")
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private UserIdentifier getOwnerId() {
         if (owner == null) {
             return null;
