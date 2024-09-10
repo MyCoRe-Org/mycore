@@ -199,6 +199,20 @@
     </mods:identifier>
   </xsl:template>
 
+  <!-- K10Plus to mods:identifier -->
+  <xsl:template match="common:external-id[contains('k10plus',common:external-id-type)]">
+    <mods:identifier type="ppn">
+      <xsl:value-of select="common:external-id-value/text()" />
+    </mods:identifier>
+  </xsl:template>
+
+  <!-- Handle to mods:identifier -->
+  <xsl:template match="common:external-id[contains('handle',common:external-id-type)]">
+    <mods:identifier type="hdl">
+      <xsl:value-of select="common:external-id-value/text()" />
+    </mods:identifier>
+  </xsl:template>
+
   <!-- Ignore remaining IDs -->
   <xsl:template match="common:external-id" />
   <xsl:template match="common:external-ids" />
