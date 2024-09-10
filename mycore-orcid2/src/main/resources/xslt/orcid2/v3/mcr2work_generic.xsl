@@ -191,6 +191,7 @@
     <common:external-id>
       <common:external-id-type><xsl:value-of select="@type" /></common:external-id-type>
       <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://europepmc.org/article/pmc/<xsl:value-of select="text()" /></common:external-id-url>
       <xsl:call-template name="external-id-relationship" />
     </common:external-id>
   </xsl:template>
@@ -199,7 +200,7 @@
     <common:external-id>
       <common:external-id-type>oclc</common:external-id-type>
       <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
-      <common:external-id-url>https://europepmc.org/article/pmc/<xsl:value-of select="text()" /></common:external-id-url>
+      <common:external-id-url>https://www.worldcat.org/oclc/<xsl:value-of select="text()" /></common:external-id-url>
       <xsl:call-template name="external-id-relationship" />
     </common:external-id>
   </xsl:template>
@@ -217,7 +218,7 @@
     <common:external-id>
       <common:external-id-type>handle</common:external-id-type>
       <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
-      <common:external-id-url>http://hdl.handle.net/<xsl:value-of select="text()" /></common:external-id-url>
+      <common:external-id-url>https://hdl.handle.net/<xsl:value-of select="text()" /></common:external-id-url>
       <xsl:call-template name="external-id-relationship" />
     </common:external-id>
   </xsl:template>
