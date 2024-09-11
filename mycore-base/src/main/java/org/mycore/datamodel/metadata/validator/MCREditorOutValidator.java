@@ -52,7 +52,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
@@ -70,6 +69,7 @@ import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.resource.MCRResourceHelper;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -372,9 +372,9 @@ public class MCREditorOutValidator {
         Element validatedService;
         if (service == null) {
             validatedService = new Element("service");
-            root.addContent(service);
-        }else{
-            validatedService= service;
+            root.addContent(validatedService);
+        } else {
+            validatedService = service;
         }
         List<Element> servicelist = validatedService.getChildren();
         for (Element datatag : servicelist) {
@@ -434,14 +434,14 @@ public class MCREditorOutValidator {
                 }
                 if (value.equals("$CurrentGroup")) {
                     throw new MCRException(
-                            "The parameter $CurrentGroup in default ACLs is not supported as of MyCoRe 2014.06"
-                                    + " because it is not supported in Servlet API 3.0");
+                        "The parameter $CurrentGroup in default ACLs is not supported as of MyCoRe 2014.06"
+                            + " because it is not supported in Servlet API 3.0");
                 }
                 int i = value.indexOf("$CurrentIP");
                 if (i != -1) {
                     String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
                     firstcond.setAttribute("value",
-                            value.substring(0, i) + thisip + value.substring(i + 10));
+                        value.substring(0, i) + thisip + value.substring(i + 10));
                 }
             }
         }
@@ -455,7 +455,7 @@ public class MCREditorOutValidator {
             aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
             if (aclxml == null) {
                 LOGGER.warn("Can't find default object ACL file {} or {}", resourcebase.substring(1),
-                        resourcetype.substring(1));
+                    resourcetype.substring(1));
                 String resource = "/editor_default_acls.xml"; // fallback
                 aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
                 if (aclxml == null) {
@@ -465,7 +465,6 @@ public class MCREditorOutValidator {
         }
         return SAX_BUILDER.build(aclxml);
     }
-
 
     private void checkObjectMetadata(Element metadata) {
         if (metadata.getAttribute("lang") != null) {
