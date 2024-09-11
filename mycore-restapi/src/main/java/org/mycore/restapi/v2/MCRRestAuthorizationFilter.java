@@ -141,26 +141,10 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         if (HttpMethod.OPTIONS.equals(method)) {
             return;
         }
-        final String permission = Optional
-            .ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class)).map(a -> {
-                final String requiredPermission = a.value();
-                final Class<? extends MCRRestRequiredPermissionResolver> requiredPermissionResolver = a.resolver();
-                if (requiredPermission.isEmpty()
-                    && MCRRestRequiredPermissionDefaultResolver.class.equals(requiredPermissionResolver)) {
-                    LogManager.getLogger("explicit value and resolver is not allowed");
-                    throw new InternalServerErrorException();
-                } else if (!requiredPermission.isEmpty()) {
-                    return requiredPermission;
-                } else {
-                    try {
-                        return requiredPermissionResolver.getDeclaredConstructor().newInstance()
-                            .resolvePermission(requestContext);
-                    } catch (Exception e) {
-                        LogManager.getLogger().error(e);
-                        throw new InternalServerErrorException();
-                    }
-                }
-            }).orElseGet(() -> getPermissionFromHttpMethod(method));
+        final String permission
+            = Optional.ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class))
+                .map(a -> resolveRequiredPermission(a, requestContext))
+                .orElseGet(() -> getPermissionFromHttpMethod(method));
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
@@ -175,6 +159,26 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
                 .filter(Objects::nonNull)
                 .toArray(String[]::new));
+    }
+
+    private String resolveRequiredPermission(MCRRestRequiredPermission annotation,
+        ContainerRequestContext requestContext) {
+        final String requiredPermission = annotation.value();
+        final Class<? extends MCRRestRequiredPermissionResolver> requiredPermissionResolver = annotation.resolver();
+        if (requiredPermission.isEmpty()
+            && MCRRestRequiredPermissionDefaultResolver.class.equals(requiredPermissionResolver)) {
+            LogManager.getLogger().error("explicit value and resolver is not allowed");
+            throw new InternalServerErrorException();
+        } else if (!requiredPermission.isEmpty()) {
+            return requiredPermission;
+        } else {
+            try {
+                return requiredPermissionResolver.getDeclaredConstructor().newInstance()
+                    .resolvePermission(requestContext);
+            } catch (Exception e) {
+                throw new InternalServerErrorException(e);
+            }
+        }
     }
 
     private static String getPermissionFromHttpMethod(String httpMethod) {
