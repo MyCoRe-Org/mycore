@@ -108,14 +108,12 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     @Override
     public boolean equals(Object obj) {
-        boolean result;
-        if (!(obj instanceof MCRVersionedPath that) || !getFileSystem().equals(that.getFileSystem())
-            || !this.path.equals(that.path) || !this.getOwner().equals(that.getOwner())) {
-            result = false;
-        } else {
-            result = this.hasSameVersion(that);
-        }
-        return result;
+        return
+            obj instanceof MCRVersionedPath that &&
+            getFileSystem().equals(that.getFileSystem()) &&
+            this.path.equals(that.path) &&
+            this.getOwner().equals(that.getOwner()) &&
+            this.hasSameVersion(that);
     }
 
     /**

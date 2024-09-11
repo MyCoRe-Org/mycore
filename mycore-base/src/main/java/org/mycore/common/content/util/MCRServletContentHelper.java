@@ -78,7 +78,7 @@ public abstract class MCRServletContentHelper {
     }
 
     public static boolean isServeContent(final HttpServletRequest request) {
-        return Objects.equals(request.getAttribute(ATT_SERVE_CONTENT), Boolean.FALSE);
+        return !Objects.equals(request.getAttribute(ATT_SERVE_CONTENT), Boolean.FALSE);
     }
 
     /**
