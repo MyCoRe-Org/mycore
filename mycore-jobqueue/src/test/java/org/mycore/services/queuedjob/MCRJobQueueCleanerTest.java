@@ -101,7 +101,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -119,7 +119,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -137,7 +137,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 10, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 10));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -156,7 +156,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 3, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 3));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -174,7 +174,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 1, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 1));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -193,7 +193,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1);
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -212,7 +212,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_2);
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -231,7 +231,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1);
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -250,7 +250,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_2);
         List<MCRJobStatus> statuses = Collections.emptyList();
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -269,7 +269,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = List.of(STATUS_1);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -288,7 +288,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = List.of(STATUS_1, STATUS_3);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -307,7 +307,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = List.of(STATUS_1);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, EXCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, EXCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -326,7 +326,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = List.of(STATUS_1, STATUS_2);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, EXCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, EXCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -345,7 +345,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1);
         List<MCRJobStatus> statuses = List.of(STATUS_5);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -364,7 +364,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_5);
         List<MCRJobStatus> statuses = List.of(STATUS_1, STATUS_5);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, INCLUDE, statuses, INCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -383,7 +383,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_2, ACTION_3);
         List<MCRJobStatus> statuses = List.of(STATUS_3, STATUS_4, STATUS_5);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();
@@ -402,7 +402,7 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_2, ACTION_3, ACTION_4);
         List<MCRJobStatus> statuses = List.of(STATUS_2, STATUS_3, STATUS_4);
-        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 0, true));
+        selectors.put("selector", new MCRSimpleJobSelector(actions, EXCLUDE, statuses, EXCLUDE, 0));
 
         int numberOfJobs = new MCRJobQueueCleaner(selectors, true).clean();
         List<MCRJob> remainingJobs = getAllJobs();

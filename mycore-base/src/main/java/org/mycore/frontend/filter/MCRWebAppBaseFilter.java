@@ -24,7 +24,6 @@ import org.mycore.frontend.MCRFrontendUtil;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -39,12 +38,6 @@ public class MCRWebAppBaseFilter implements Filter {
             req.setAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE, webappBase);
         }
         chain.doFilter(req, res);
-    }
-
-    public void destroy() {
-    }
-
-    public void init(FilterConfig arg0) {
     }
 
 }

@@ -28,10 +28,9 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -80,7 +79,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
 
     private void guardWebsiteCurrentlyReadOnly() {
         if (MCRWebsiteWriteProtection.isActive()) {
-            throw new RuntimeException("System is currently in read-only mode");
+            throw new MCRConfigurationException("System is currently in read-only mode");
         }
     }
 
@@ -92,8 +91,6 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         int numFiles = (int) files.stream().map(Part::getSubmittedFileName).filter(Objects::nonNull).count();
         LOGGER.info("UploadHandler uploading {} file(s)", numFiles);
         handler.startUpload(numFiles);
-
-        MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRTransactionHelper.commitTransaction();
 
         for (Part file : files) {
@@ -158,15 +155,13 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         nis.reallyClose();
     }
 
-    private String convertAbsolutePathToRelativePath(String path) {
-        int pos = path.indexOf(":");
-        if (pos >= 0) {
-            path = path.substring(pos + 1);
+    private String convertAbsolutePathToRelativePath(String absolutePath) {
+        int pos = absolutePath.indexOf(":");
+        String relativePath = (pos >= 0) ? absolutePath.substring(pos + 1) : absolutePath;
+        while (relativePath.startsWith("\\") || relativePath.startsWith("/")) {
+            relativePath = relativePath.substring(1);
         }
-        while (path.startsWith("\\") || path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        return path;
+        return relativePath;
     }
 
 }

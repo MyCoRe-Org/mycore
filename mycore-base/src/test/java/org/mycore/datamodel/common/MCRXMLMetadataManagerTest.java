@@ -56,7 +56,9 @@ import org.xml.sax.SAXException;
  */
 public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
-    private XMLInfo MyCoRe_document_00000001, MyCoRe_document_00000001_new, MCR_document_00000001;
+    private XMLInfo mycoreDocument;
+    private XMLInfo mycoreDocumentNew;
+    private XMLInfo mcrDocument;
 
     private static final SAXBuilder SAX_BUILDER = new SAXBuilder();
 
@@ -68,11 +70,11 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         if (MCRObjectID.getInstance(testId).toString().length() != testId.length()) {
             MCRObjectIDTest.resetObjectIDFormat();
         }
-        MyCoRe_document_00000001 = new XMLInfo("MyCoRe_document_00000001",
+        mycoreDocument = new XMLInfo("MyCoRe_document_00000001",
             "<object id=\"MyCoRe_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
-        MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001",
+        mycoreDocumentNew = new XMLInfo("MyCoRe_document_00000001",
             "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>".getBytes(StandardCharsets.UTF_8), new Date());
-        MCR_document_00000001 = new XMLInfo("MCR_document_00000001",
+        mcrDocument = new XMLInfo("MCR_document_00000001",
             "<object id=\"MCR_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
     }
 
@@ -103,34 +105,34 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     @Test
     public void create() {
-        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
-            MyCoRe_document_00000001.lastModified);
-        getStore().create(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
+        getStore().create(mycoreDocument.id, mycoreDocument.blob,
+            mycoreDocument.lastModified);
+        getStore().create(mcrDocument.id, mcrDocument.blob, mcrDocument.lastModified);
     }
 
     @Test
     public void delete() {
-        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
-            MyCoRe_document_00000001.lastModified);
-        assertTrue(MyCoRe_document_00000001.id + " should exist", getStore().exists(MyCoRe_document_00000001.id));
+        getStore().create(mycoreDocument.id, mycoreDocument.blob,
+            mycoreDocument.lastModified);
+        assertTrue(mycoreDocument.id + " should exist", getStore().exists(mycoreDocument.id));
         try {
-            getStore().delete(MCR_document_00000001.id);
+            getStore().delete(mcrDocument.id);
         } catch (MCRPersistenceException e) {
             //is expected as MCR_document_00000001 does not exist
         }
-        assertTrue(MyCoRe_document_00000001.id + " should not have been deleted",
-            getStore().exists(MyCoRe_document_00000001.id));
+        assertTrue(mycoreDocument.id + " should not have been deleted",
+            getStore().exists(mycoreDocument.id));
     }
 
     @Test
     public void update() {
-        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
-            MyCoRe_document_00000001.lastModified);
-        getStore().update(MyCoRe_document_00000001_new.id, MyCoRe_document_00000001_new.blob,
-            MyCoRe_document_00000001_new.lastModified);
+        getStore().create(mycoreDocument.id, mycoreDocument.blob,
+            mycoreDocument.lastModified);
+        getStore().update(mycoreDocumentNew.id, mycoreDocumentNew.blob,
+            mycoreDocumentNew.lastModified);
         try {
-            getStore().update(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
-            fail("Update for non existent " + MCR_document_00000001.id + " succeeded.");
+            getStore().update(mcrDocument.id, mcrDocument.blob, mcrDocument.lastModified);
+            fail("Update for non existent " + mcrDocument.id + " succeeded.");
         } catch (RuntimeException e) {
             //this exception is expected here
         }
@@ -138,20 +140,20 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     @Test
     public void retrieve() throws JDOMException, IOException, SAXException {
-        assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(),
-            SAX_BUILDER.build(new ByteArrayInputStream(MyCoRe_document_00000001.blob)).getRootElement()
+        assertEquals("Stored document ID do not match:", mycoreDocument.id.toString(),
+            SAX_BUILDER.build(new ByteArrayInputStream(mycoreDocument.blob)).getRootElement()
                 .getAttributeValue("id"));
-        getStore().create(MyCoRe_document_00000001.id,
-            new MCRByteContent(MyCoRe_document_00000001.blob, MCR_document_00000001.lastModified.getTime()),
-            MyCoRe_document_00000001.lastModified);
-        assertTrue(getStore().exists(MyCoRe_document_00000001.id));
-        Document doc = getStore().retrieveXML(MyCoRe_document_00000001.id);
-        assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement()
+        getStore().create(mycoreDocument.id,
+            new MCRByteContent(mycoreDocument.blob, mcrDocument.lastModified.getTime()),
+            mycoreDocument.lastModified);
+        assertTrue(getStore().exists(mycoreDocument.id));
+        Document doc = getStore().retrieveXML(mycoreDocument.id);
+        assertEquals("Stored document ID do not match:", mycoreDocument.id.toString(), doc.getRootElement()
             .getAttributeValue("id"));
         try {
-            doc = getStore().retrieveXML(MCR_document_00000001.id);
+            doc = getStore().retrieveXML(mcrDocument.id);
             if (doc != null) {
-                fail("Requested " + MCR_document_00000001.id + ", retrieved wrong document:\n"
+                fail("Requested " + mcrDocument.id + ", retrieved wrong document:\n"
                     + new XMLOutputter(Format.getPrettyFormat()).outputString(doc));
             }
         } catch (Exception e) {
@@ -165,28 +167,29 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         for (Method method : methods) {
             if (method.getName().equals("getHighestStoredID") && method.getParameterTypes().length == 0) {
                 fail(
-                    "org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID() does not respect ProjectID");
+                    "org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID()" +
+                        " does not respect ProjectID");
             }
         }
     }
 
     @Test
     public void exists() {
-        assertFalse("Object " + MyCoRe_document_00000001.id + " should not exist.",
-            getStore().exists(MyCoRe_document_00000001.id));
-        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
-            MyCoRe_document_00000001.lastModified);
-        assertTrue("Object " + MyCoRe_document_00000001.id + " should exist.",
-            getStore().exists(MyCoRe_document_00000001.id));
+        assertFalse("Object " + mycoreDocument.id + " should not exist.",
+            getStore().exists(mycoreDocument.id));
+        getStore().create(mycoreDocument.id, mycoreDocument.blob,
+            mycoreDocument.lastModified);
+        assertTrue("Object " + mycoreDocument.id + " should exist.",
+            getStore().exists(mycoreDocument.id));
     }
 
     @Test
     public void retrieveAllIDs() {
         assertEquals("Store should not contain any objects.", 0, getStore().listIDs().size());
-        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
-            MyCoRe_document_00000001.lastModified);
-        assertTrue("Store does not contain object " + MyCoRe_document_00000001.id,
-            getStore().listIDs().contains(MyCoRe_document_00000001.id.toString()));
+        getStore().create(mycoreDocument.id, mycoreDocument.blob,
+            mycoreDocument.lastModified);
+        assertTrue("Store does not contain object " + mycoreDocument.id,
+            getStore().listIDs().contains(mycoreDocument.id.toString()));
     }
 
     @Test
@@ -194,20 +197,6 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         assertTrue(getStore().listIDsForBase("foo_bar").isEmpty());
         assertTrue(getStore().listIDsOfType("bar").isEmpty());
         assertTrue(getStore().listIDs().isEmpty());
-    }
-
-    private static class XMLInfo {
-        XMLInfo(String id, byte[] blob, Date lastModified) {
-            this.id = MCRObjectID.getInstance(id);
-            this.blob = blob;
-            this.lastModified = lastModified;
-        }
-
-        MCRObjectID id;
-
-        byte[] blob;
-
-        Date lastModified;
     }
 
     @Override
@@ -218,4 +207,19 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         testProperties.put("MCR.Metadata.ObjectID.NumberPattern", "00000000");
         return testProperties;
     }
+    private static class XMLInfo {
+        MCRObjectID id;
+        byte[] blob;
+        Date lastModified;
+
+        XMLInfo(String id, byte[] blob, Date lastModified) {
+            this.id = MCRObjectID.getInstance(id);
+            this.blob = blob;
+            this.lastModified = lastModified;
+        }
+
+
+    }
+
+
 }

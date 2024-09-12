@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.mycore.services.mbeans.MCRJMXBridge;
 
@@ -93,12 +94,9 @@ public class MCRCache<K, V> implements Closeable {
      *            the non-null object to be put into the cache
      */
     public void put(K key, V value) {
-        if (key == null) {
-            throw new NullPointerException("The key of a cache entry may not be null.");
-        }
-        if (value == null) {
-            throw new NullPointerException("The value of a cache entry may not be null.");
-        }
+        Objects.requireNonNull(key, "The key of a cache entry may not be null.");
+        Objects.requireNonNull(value, "The key of a cache entry may not be null.");
+
         MCRCacheEntry<V> entry = new MCRCacheEntry<>(value);
         backingCache.put(key, entry);
     }
@@ -116,12 +114,8 @@ public class MCRCache<K, V> implements Closeable {
      *            the given last modified time for this key
      */
     public void put(K key, V value, long insertTime) {
-        if (key == null) {
-            throw new NullPointerException("The key of a cache entry may not be null.");
-        }
-        if (value == null) {
-            throw new NullPointerException("The value of a cache entry may not be null.");
-        }
+        Objects.requireNonNull(key, "The key of a cache entry may not be null.");
+        Objects.requireNonNull(value, "The key of a cache entry may not be null.");
         MCRCacheEntry<V> entry = new MCRCacheEntry<>(value);
         entry.insertTime = insertTime;
         backingCache.put(key, entry);

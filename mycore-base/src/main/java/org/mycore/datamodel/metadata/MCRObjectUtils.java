@@ -71,11 +71,12 @@ public abstract class MCRObjectUtils {
      */
     public static List<MCRObject> getAncestors(MCRObject mcrObject) {
         List<MCRObject> ancestorList = new ArrayList<>();
-        while (mcrObject.hasParent()) {
-            MCRObjectID parentID = mcrObject.getStructure().getParentID();
+        MCRObject currentAncestor= mcrObject;
+        while (currentAncestor.hasParent()) {
+            MCRObjectID parentID = currentAncestor.getStructure().getParentID();
             MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
             ancestorList.add(parent);
-            mcrObject = parent;
+            currentAncestor = parent;
         }
         return ancestorList;
     }
@@ -195,7 +196,7 @@ public abstract class MCRObjectUtils {
     public static Stream<MCRObject> removeLinks(MCRObjectID sourceId) {
         return MCRLinkTableManager.instance().getSourceOf(sourceId).stream().filter(MCRObjectID::isValid)
             .map(MCRObjectID::getInstance).distinct().map(MCRMetadataManager::retrieveMCRObject)
-            .flatMap(linkedObject -> MCRObjectUtils.removeLink(linkedObject, sourceId) ? Stream.of(linkedObject)
+            .flatMap(linkedObject -> removeLink(linkedObject, sourceId) ? Stream.of(linkedObject)
                 : Stream.empty());
     }
 

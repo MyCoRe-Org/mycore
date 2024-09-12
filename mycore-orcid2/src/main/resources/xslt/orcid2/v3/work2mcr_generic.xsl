@@ -178,13 +178,20 @@
     </mods:location>
   </xsl:template>
 
-  <!-- DOI, OCLC, PubMed, PubMedCentral, URN to mods:identifier -->
-  <xsl:template match="common:external-id[contains('doi oclc pmid pmc urn',common:external-id-type)]">
+  <!-- DOI, PubMed, PubMedCentral, URN to mods:identifier -->
+  <xsl:template match="common:external-id[contains('doi pmid pmc urn',common:external-id-type)]">
     <mods:identifier type="{common:external-id-type}">
       <xsl:value-of select="common:external-id-value/text()" />
     </mods:identifier>
   </xsl:template>
-  
+
+  <!-- OCLC to mods:identifier -->
+  <xsl:template match="common:external-id[contains('oclc',common:external-id-type)]">
+    <mods:identifier type="worldcat">
+      <xsl:value-of select="common:external-id-value/text()" />
+    </mods:identifier>
+  </xsl:template>
+
   <!-- External ID from SCOPUS to mods:identifier -->
   <xsl:template match="common:external-id[common:external-id-type='eid'][common:external-id-value[starts-with(.,'2-s2.0-')]]">
     <mods:identifier type="scopus">
@@ -196,6 +203,20 @@
   <xsl:template match="common:external-id[contains('isbn issn',common:external-id-type)]">
     <mods:identifier type="{common:external-id-type}">
       <xsl:value-of select="upper-case(common:external-id-value/text())" />
+    </mods:identifier>
+  </xsl:template>
+
+  <!-- K10Plus to mods:identifier -->
+  <xsl:template match="common:external-id[contains('k10plus',common:external-id-type)]">
+    <mods:identifier type="ppn">
+      <xsl:value-of select="common:external-id-value/text()" />
+    </mods:identifier>
+  </xsl:template>
+
+  <!-- Handle to mods:identifier -->
+  <xsl:template match="common:external-id[contains('handle',common:external-id-type)]">
+    <mods:identifier type="hdl">
+      <xsl:value-of select="common:external-id-value/text()" />
     </mods:identifier>
   </xsl:template>
 

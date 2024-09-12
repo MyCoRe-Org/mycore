@@ -85,9 +85,7 @@ public abstract class MCRPath implements Path {
     }
 
     public static MCRPath toMCRPath(final Path other) {
-        if (other == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(other);
         if (!(other instanceof MCRPath)) {
             throw new ProviderMismatchException("other is not an instance of MCRPath: " + other.getClass());
         }
@@ -150,35 +148,42 @@ public abstract class MCRPath implements Path {
         if (length == 0) {
             return input;
         }
+
         int newLength = length;
         while (newLength > 0 && input.charAt(newLength - 1) == SEPARATOR) {
             newLength--;
         }
+
         if (newLength == 0) {
             return SEPARATOR_STRING;
         }
+
         final StringBuilder sb = new StringBuilder(input.length());
         boolean afterSeparator = false;
+
         if (offset > 0) {
             final String prefix = input.substring(0, offset);
             afterSeparator = prefix.contains(SEPARATOR_STRING);
             sb.append(prefix);
         }
+
         char prevChar = 0;
         for (int i = offset; i < newLength; i++) {
             final char c = input.charAt(i);
             checkCharacter(input, c, afterSeparator);
+
             if (c == SEPARATOR && prevChar == SEPARATOR) {
                 continue;
             }
+
             sb.append(c);
-            if (!afterSeparator && c == SEPARATOR) {
-                afterSeparator = true;
-            }
+            afterSeparator = afterSeparator || c == SEPARATOR;
             prevChar = c;
         }
+
         return sb.toString();
     }
+
 
     /* (non-Javadoc)
      * @see java.nio.file.Path#compareTo(java.nio.file.Path)
@@ -194,64 +199,73 @@ public abstract class MCRPath implements Path {
      */
     @Override
     public boolean endsWith(final Path other) {
-        if (!(Objects.requireNonNull(other, "other Path may not be null.") instanceof MCRPath)) {
-            return false;
+        Objects.requireNonNull(other, "other Path may not be null.");
+        final MCRPath that;
+        final int thatPathLength;
+        final int thisPathLength;
+        final boolean thatIsAbsolute;
+        final boolean thisIsAbsolute;
+        int thisOffsetStart;
+        int thisPos;
+        int thatPos;
+        if ((other instanceof MCRPath)) {
+            that = (MCRPath) other;
+            // Early return if both paths are equal
+            if (this.equals(that)) {
+                return true;
+            } else {
+                thatPathLength = that.path.length();
+                thisPathLength = path.length();
+                // thatPath cannot be longer than thisPath
+                if (thatPathLength < thisPathLength) {
+                    thatIsAbsolute = that.isAbsolute();
+                    thisIsAbsolute = isAbsolute();
+                    // When both paths are absolute, root and full path must match
+                    if (thatIsAbsolute && (!thisIsAbsolute || !root.equals(that.root))) {
+                        return false;
+                    } else if (thatIsAbsolute) {
+                        return Objects.deepEquals(offsets, that.offsets)
+                            && path.equals(that.path)
+                            && that.getFileSystem().equals(getFileSystem());
+                    }
+                    thisOffsetStart = createThisOffsetStart(that);
+                    if (thisOffsetStart != -1) {
+                        // Check if the remaining characters in the path match
+                        thisPos = offsets[thisOffsetStart];
+                        thatPos = that.offsets[0];
+
+                    if (thisPathLength - thisPos == thatPathLength - thatPos) {
+                        while (thisPos < thisPathLength) {
+                            if (path.charAt(thisPos++) != that.path.charAt(thatPos++)) {
+                                return false;
+                            }
+                        }
+                        return that.getFileSystem().equals(getFileSystem());
+                    }
+                }
+            }
         }
-        final MCRPath that = (MCRPath) other;
-        if (this == that) {
-            return true;
-        }
+    }
+    return false;
+    }
+
+    private int createThisOffsetStart(MCRPath that) {
         final int thatOffsetCount = that.offsets.length;
         final int thisOffsetCount = offsets.length;
         final int thatPathLength = that.path.length();
         final int thisPathLength = path.length();
-
-        if (thatPathLength > thisPathLength) {
-            return false;
+        // If `that` is not absolute, we check the offsets and path characters
+        if (thatOffsetCount > thisOffsetCount
+            || (thisOffsetCount == thatOffsetCount && thisPathLength != thatPathLength)) {
+            return -1;
         }
-        //checks required by Path.endsWidth()
-        final boolean thatIsAbsolute = that.isAbsolute();
-        final boolean thisIsAbsolute = isAbsolute();
-        if (thatIsAbsolute) {
-            if (!thisIsAbsolute) {
-                return false;
-            }
-            //roots must be equal if both path contains one
-            if (!root.equals(that.root)) {
-                return false;
-            }
-            //path must be equal too
-            return Objects.deepEquals(offsets, that.offsets) && path.equals(that.path)
-                && that.getFileSystem().equals(getFileSystem());
-        }
-
-        //that is not absolute
-        //check offsets
-        if (thatOffsetCount > thisOffsetCount) {
-            return false;
-        }
-        if (thisOffsetCount == thatOffsetCount && thisPathLength != thatPathLength) {
-            return false;
-        }
-        int thisPos = thisOffsetCount - thatOffsetCount;
-        for (int i = thisPos; i < thisOffsetCount; i++) {
-            if (that.offsets[i - thisPos] != offsets[i]) {
-                return false;
+        int thisOffsetStart = thisOffsetCount - thatOffsetCount;
+        for (int i = 0; i < thatOffsetCount; i++) {
+            if (that.offsets[i] != offsets[thisOffsetStart + i]) {
+                return -1;
             }
         }
-        //check characters
-        thisPos = offsets[thisOffsetCount - thatOffsetCount];
-        int thatPos = that.offsets[0];
-        if (thatPathLength - thatPos != thisPathLength - thisPos) {
-            return false;
-        }
-        while (thisPos < thisPathLength) {
-            if (path.charAt(thisPos++) != that.path.charAt(thatPos++)) {
-                return false;
-            }
-        }
-
-        return that.getFileSystem().equals(getFileSystem());
+        return thisOffsetStart;
     }
 
     /* (non-Javadoc)
@@ -264,16 +278,13 @@ public abstract class MCRPath implements Path {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
+        boolean result;
+        if (!(obj instanceof MCRPath that) || !getFileSystem().equals(that.getFileSystem())) {
+            result= false;
+        } else {
+            result= stringValue.equals(that.stringValue);
         }
-        if (!(obj instanceof MCRPath that)) {
-            return false;
-        }
-        if (!getFileSystem().equals(that.getFileSystem())) {
-            return false;
-        }
-        return stringValue.equals(that.stringValue);
+        return result;
     }
 
     /* (non-Javadoc)
@@ -599,33 +610,26 @@ public abstract class MCRPath implements Path {
             return false;
         }
         final MCRPath that = (MCRPath) other;
-        if (this == that) {
+        if (this.equals(that)) {
             return true;
         }
         final int thatOffsetCount = that.offsets.length;
         final int thisOffsetCount = offsets.length;
 
         //checks required by Path.startsWidth()
-        if (thatOffsetCount > thisOffsetCount || that.path.length() > path.length()) {
+        if ((thatOffsetCount > thisOffsetCount || that.path.length() > path.length()) ||
+            (thatOffsetCount == thisOffsetCount && that.path.length() != path.length()) ||
+            (!Objects.deepEquals(root, that.root) || !Objects.deepEquals(getFileSystem(), that.getFileSystem())) ||
+            !path.startsWith(that.path)) {
             return false;
         }
-        if (thatOffsetCount == thisOffsetCount && that.path.length() != path.length()) {
-            return false;
-        }
-        if (!Objects.deepEquals(root, that.root)) {
-            return false;
-        }
-        if (!Objects.deepEquals(getFileSystem(), that.getFileSystem())) {
-            return false;
-        }
+
         for (int i = 0; i < thatOffsetCount; i++) {
             if (that.offsets[i] != offsets[i]) {
                 return false;
             }
         }
-        if (!path.startsWith(that.path)) {
-            return false;
-        }
+
         final int thatPathLength = that.path.length();
         // return false if this.path==/foo/bar and that.path==/path
         return thatPathLength <= path.length() || path.charAt(thatPathLength) == SEPARATOR;
@@ -689,7 +693,7 @@ public abstract class MCRPath implements Path {
     @Override
     public Path toRealPath(final LinkOption... options) throws IOException {
         if (isAbsolute()) {
-            final MCRPath normalized = (MCRPath) normalize();
+            final MCRPath normalized = normalize();
             getFileSystem().provider().checkAccess(normalized); //eventually throws IOException
             return normalized;
         }
@@ -728,7 +732,7 @@ public abstract class MCRPath implements Path {
             }
             return new URI(null, null, path, null);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 

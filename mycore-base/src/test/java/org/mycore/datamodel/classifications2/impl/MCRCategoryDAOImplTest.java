@@ -27,9 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +37,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
-import org.hibernate.Session;
+
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
@@ -77,7 +75,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
     static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
-    private MCRCategory category, category2;
+    private MCRCategory category;
+    private MCRCategory category2;
 
     @Override
     @Before
@@ -167,7 +166,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
             .longValue();
         // category + india
         assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
-        assertTrue("No root category present", rootCategory.getRoot() != null);
+        assertNotNull("No root category present", rootCategory.getRoot());
     }
 
     /**

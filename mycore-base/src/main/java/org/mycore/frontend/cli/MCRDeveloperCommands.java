@@ -316,7 +316,7 @@ public class MCRDeveloperCommands {
         help = "Resolve textual resource {0}",
         order = 95)
     public static void resolveTextualResource(String path) {
-        MCRDeveloperCommands.resolveTextualResource(path, Charset.defaultCharset().name());
+        resolveTextualResource(path, Charset.defaultCharset().name());
     }
 
     @MCRCommand(

@@ -26,6 +26,7 @@ import java.security.MessageDigest;
 
 import org.jdom2.output.Format;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.digest.MCRMD5Digest;
@@ -58,7 +59,7 @@ public abstract class MCRXMLContent extends MCRContent {
         try {
             this.setEncoding(MCRConstants.DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new MCRException("MCRXMLContent encoding not supported", e);
         }
     }
 

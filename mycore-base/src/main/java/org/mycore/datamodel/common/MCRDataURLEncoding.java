@@ -55,7 +55,7 @@ public enum MCRDataURLEncoding {
      * @return the the data url encoding for value
      */
     public static MCRDataURLEncoding fromValue(final String value) {
-        for (MCRDataURLEncoding encodings : MCRDataURLEncoding.values()) {
+        for (MCRDataURLEncoding encodings : values()) {
             if (encodings.value.equals(value)) {
                 return encodings;
             }

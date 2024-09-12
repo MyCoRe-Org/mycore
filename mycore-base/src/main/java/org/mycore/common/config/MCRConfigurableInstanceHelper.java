@@ -26,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +48,7 @@ import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
 
 import jakarta.inject.Singleton;
 
@@ -866,6 +868,18 @@ class MCRConfigurableInstanceHelper {
 
             MCRInstanceConfiguration nestedConfiguration = configuration.nestedConfiguration(annotation().name());
 
+            MCRSentinel sentinel = annotation.sentinel();
+            if (sentinel.enabled()) {
+                boolean sentinelValue = sentinel.defaultValue();
+                String configurationValue = nestedConfiguration.properties().get(sentinel.name());
+                if (configurationValue != null) {
+                    sentinelValue = Boolean.parseBoolean(configurationValue);
+                }
+                if (!sentinelValue) {
+                    nestedConfiguration = MCRInstanceConfiguration.ofName("", Collections.emptyMap());
+                }
+            }
+
             String nestedClassName = nestedConfiguration.className();
             if (nestedClassName == null || nestedClassName.isBlank()) {
                 if (annotation.required()) {
@@ -933,6 +947,21 @@ class MCRConfigurableInstanceHelper {
         public Map<String, Object> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
             Map<String, MCRInstanceConfiguration> nestedConfigurationMap = nestedConfigurationMap(configuration);
+
+            MCRSentinel sentinel = annotation.sentinel();
+            if (sentinel.enabled()) {
+                Set<String> keys = new HashSet<>(nestedConfigurationMap.keySet());
+                for (String key : keys) {
+                    boolean sentinelValue = sentinel.defaultValue();
+                    String configurationValue = nestedConfigurationMap.get(key).properties().get(sentinel.name());
+                    if (configurationValue != null) {
+                        sentinelValue = Boolean.parseBoolean(configurationValue);
+                    }
+                    if (!sentinelValue) {
+                        nestedConfigurationMap.remove(key);
+                    }
+                }
+            }
 
             if (nestedConfigurationMap.isEmpty() && annotation.required()) {
                 throw new MCRConfigurationException("Missing configuration entries like: "
@@ -1016,6 +1045,20 @@ class MCRConfigurableInstanceHelper {
         public List<Object> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
             List<MCRInstanceConfiguration> nestedConfigurationList = nestededConfigurationList(configuration);
+
+            MCRSentinel sentinel = annotation.sentinel();
+            if (sentinel.enabled()) {
+                for (int i = nestedConfigurationList.size() - 1; i >= 0; i--) {
+                    boolean sentinelValue = sentinel.defaultValue();
+                    String configurationValue = nestedConfigurationList.get(i).properties().get(sentinel.name());
+                    if (configurationValue != null) {
+                        sentinelValue = Boolean.parseBoolean(configurationValue);
+                    }
+                    if (!sentinelValue) {
+                        nestedConfigurationList.remove(i);
+                    }
+                }
+            }
 
             if (nestedConfigurationList.isEmpty() && annotation.required()) {
                 throw new MCRConfigurationException("Missing configuration entries like: "

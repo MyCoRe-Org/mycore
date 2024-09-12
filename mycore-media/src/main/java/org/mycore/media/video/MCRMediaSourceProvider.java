@@ -19,6 +19,7 @@
 package org.mycore.media.video;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -113,7 +114,7 @@ public class MCRMediaSourceProvider {
             try {
                 return token.toURI(b, suffix, hashParameterName).toString();
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Unexpected URL syntax error", e);
             }
         });
     }
@@ -143,7 +144,7 @@ public class MCRMediaSourceProvider {
             LogManager.getLogger().info("{} -> {} -> {}", mcrPath, absolutePath, relativePath);
             return relativePath.toString();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException("Error accessing file store", e);
         }
     }
 

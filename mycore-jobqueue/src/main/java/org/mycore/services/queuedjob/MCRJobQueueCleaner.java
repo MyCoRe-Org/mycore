@@ -31,6 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -52,15 +53,18 @@ import jakarta.persistence.criteria.Root;
  * The following configuration options are available, if configured automatically:
  * <ul>
  * <li> Selectors are configured as a map using the property suffix {@link MCRJobQueueCleaner#SELECTORS_KEY}.
+ * <li> Each selector can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
  * <li> The property suffix {@link MCRJobQueueCleaner#ENABLED_KEY} can be used to enable or disable all selectors.
  * </ul>
  * Example:
  * <pre>
  * MCR.QueuedJob.Cleaner.Class=org.mycore.services.queuedjob.MCRJobQueueCleaner
  * MCR.QueuedJob.Cleaner.Selectors.foo.Class=foo.bar.FooSelector
+ * MCR.QueuedJob.Cleaner.Selectors.foo.Enabled=true
  * MCR.QueuedJob.Cleaner.Selectors.foo.Key1=Value1
  * MCR.QueuedJob.Cleaner.Selectors.foo.Key2=Value2
  * MCR.QueuedJob.Cleaner.Selectors.bar.Class=foo.bar.BarSelector
+ * MCR.QueuedJob.Cleaner.Selectors.bar.Enabled=false
  * MCR.QueuedJob.Cleaner.Selectors.bar.Key1=Value1
  * MCR.QueuedJob.Cleaner.Selectors.bar.Key2=Value2
  * MCR.QueuedJob.Cleaner.Enabled=true
@@ -69,7 +73,7 @@ import jakarta.persistence.criteria.Root;
 @MCRConfigurationProxy(proxyClass = MCRJobQueueCleaner.Factory.class)
 public final class MCRJobQueueCleaner {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRJobQueueCleaner.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String CLEANER_PROPERTY = "MCR.QueuedJob.Cleaner";
 
@@ -82,10 +86,13 @@ public final class MCRJobQueueCleaner {
     private final boolean enabled;
 
     public MCRJobQueueCleaner(Map<String, MCRJobSelector> selectors, boolean enabled) {
+
         this.selectors = new HashMap<>(Objects.requireNonNull(selectors, "Selectors must not be null"));
-        this.selectors.values().forEach(selector -> Objects.requireNonNull(selector,
-            "Selector must not be null"));
+        this.selectors.values().forEach(selector -> Objects.requireNonNull(selector, "Selector must not be null"));
         this.enabled = enabled;
+
+        LOGGER.info("Working with selectors: " + String.join(", ", selectors.keySet()));
+
     }
 
     public static MCRJobQueueCleaner instantiate() {
@@ -147,11 +154,7 @@ public final class MCRJobQueueCleaner {
             MCRJobSelector selector = entry.getValue();
             String name = entry.getKey();
             if (selectorName == null || selectorName.equals(name)) {
-                if (!selector.isEnabled()) {
-                    LOGGER.info("Skipping selector " + name + ", because selector is not enabled");
-                } else {
-                    numberOfJobs += doClean(manager, name, selector);
-                }
+                numberOfJobs += doClean(manager, name, selector);
             }
         }
 
@@ -181,7 +184,7 @@ public final class MCRJobQueueCleaner {
 
     public static class Factory implements Supplier<MCRJobQueueCleaner> {
 
-        @MCRInstanceMap(name = SELECTORS_KEY, valueClass = MCRJobSelector.class)
+        @MCRInstanceMap(name = SELECTORS_KEY, valueClass = MCRJobSelector.class, sentinel = @MCRSentinel)
         public Map<String, MCRJobSelector> selectors;
 
         @MCRProperty(name = ENABLED_KEY)

@@ -40,7 +40,6 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Description;
-import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.OAIDataList;
 import org.mycore.oai.pmh.Set;
 import org.mycore.oai.set.MCROAISetConfiguration;
@@ -212,13 +211,11 @@ public class MCROAISetManager {
                         throw new MCRException(
                             "Could not resolve set URI " + conf.getURI() + " for set " + conf.getId() + ".");
                     }
-                    for (Element setElement : resolved.getChildren("set", OAIConstants.NS_OAI)) {
+                    for (Element setElement : resolved.getChildren("set", NS_OAI)) {
                         MCRSet set = createSet(conf.getId(), setElement);
                         setMap.put(set.getSpec(), set);
-                        if (!contains(set.getSpec(), setList)) {
-                            if (!handler.filter(set)) {
-                                setList.add(set);
-                            }
+                        if (!contains(set.getSpec(), setList) && !handler.filter(set)) {
+                            setList.add(set);
                         }
                     }
                 }

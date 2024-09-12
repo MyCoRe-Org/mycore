@@ -178,16 +178,17 @@ public class MCRErrorServlet extends HttpServlet {
         if (source != null) {
             root.setAttribute("source", source);
         }
-        while (ex != null) {
+        Throwable throwableException= ex;
+        while (throwableException != null) {
             Element exception = new Element("exception");
-            exception.setAttribute("type", ex.getClass().getName());
+            exception.setAttribute("type", throwableException.getClass().getName());
             Element trace = new Element("trace");
             Element message = new Element("message");
-            trace.setText(MCRException.getStackTraceAsString(ex));
-            message.setText(ex.getMessage());
+            trace.setText(MCRException.getStackTraceAsString(throwableException));
+            message.setText(throwableException.getMessage());
             exception.addContent(message).addContent(trace);
             root.addContent(exception);
-            ex = ex.getCause();
+            throwableException = throwableException.getCause();
         }
         return new Document(root, new DocType(rootname));
     }

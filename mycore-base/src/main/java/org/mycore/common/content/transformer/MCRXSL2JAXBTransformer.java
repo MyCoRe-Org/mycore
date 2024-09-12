@@ -20,6 +20,7 @@ package org.mycore.common.content.transformer;
 
 import java.io.IOException;
 import java.util.Deque;
+import java.util.Objects;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -118,9 +119,7 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
     }
 
     private void checkContext() {
-        if (this.context == null) {
-            throw new NullPointerException("No JAXBContext defined!");
-        }
+        Objects.requireNonNull(this.context, "No JAXBContext defined!");
     }
 
     @Override

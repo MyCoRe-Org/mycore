@@ -38,9 +38,6 @@ import jakarta.servlet.ServletContextListener;
  */
 public class MCRServletContextListener implements ServletContextListener {
 
-    public void contextInitialized(ServletContextEvent sce) {
-    }
-
     public void contextDestroyed(ServletContextEvent sce) {
         MCRShutdownHandler.getInstance().shutDown();
     }

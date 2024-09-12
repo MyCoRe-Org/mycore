@@ -45,22 +45,15 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  */
 public class MCRMetaLink extends MCRMetaDefault {
+    private static final Logger LOGGER = LogManager.getLogger();
     // MetaLink data
     protected String href;
-
     protected String label;
-
     protected String title;
-
     protected String linktype;
-
     protected String role;
-
     protected String from;
-
     protected String to;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * initializes with empty values.
@@ -205,19 +198,19 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method sets the xlink:role.
-     * 
-     */
-    public void setXLinkRole(String role) {
-        this.role = role;
-    }
-
-    /**
      * This method get the xlink:role element as string.
      * 
      */
     public String getXLinkRole() {
         return role;
+    }
+
+    /**
+     * This method sets the xlink:role.
+     * 
+     */
+    public void setXLinkRole(String role) {
+        this.role = role;
     }
 
     /**
@@ -234,17 +227,14 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @return true if it is compare, else return false
      */
     public final boolean compare(MCRMetaLink input) {
-        if (linktype.equals("locator")) {
-            if (linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
-                return true;
-            }
+        if (linktype.equals("locator") && linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
+            return true;
         }
-
         if (linktype.equals("arc")) {
-            return linktype.equals(input.getXLinkType()) && from.equals(input.getXLinkFrom())
+            return linktype.equals(input.getXLinkType())
+                && from.equals(input.getXLinkFrom())
                 && to.equals(input.getXLinkTo());
         }
-
         return false;
     }
 
@@ -255,25 +245,22 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if (!super.equals(obj)) {
-            return false;
-        }
-        MCRMetaLink other = (MCRMetaLink) obj;
-        if (!Objects.equals(from, other.from)) {
-            return false;
-        } else if (!Objects.equals(href, other.href)) {
-            return false;
-        } else if (!Objects.equals(label, other.label)) {
-            return false;
-        } else if (!Objects.equals(linktype, other.linktype)) {
-            return false;
-        } else if (!Objects.equals(role, other.role)) {
-            return false;
-        } else if (!Objects.equals(title, other.title)) {
-            return false;
+        boolean result;
+        if (this == obj) {
+            result = true;
+        } else if (!super.equals(obj) || getClass() != obj.getClass()) {
+            result = false;
         } else {
-            return Objects.equals(to, other.to);
+            MCRMetaLink other = (MCRMetaLink) obj;
+            result = Objects.equals(from, other.from) &&
+                Objects.equals(href, other.href) &&
+                Objects.equals(label, other.label) &&
+                Objects.equals(linktype, other.linktype) &&
+                Objects.equals(role, other.role) &&
+                Objects.equals(title, other.title) &&
+                Objects.equals(to, other.to);
         }
+        return result;
     }
 
     /**
@@ -404,10 +391,8 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if (label != null && label.length() > 0) {
-            if (!XMLChar.isValidNCName(label)) {
-                throw new MCRException(getSubTag() + ": label is no valid NCName:" + label);
-            }
+        if (label != null && label.length() > 0 && !XMLChar.isValidNCName(label)) {
+            throw new MCRException(getSubTag() + ": label is no valid NCName:" + label);
         }
         if (linktype == null) {
             throw new MCRException(getSubTag() + ": linktype is null");
@@ -416,22 +401,19 @@ public class MCRMetaLink extends MCRMetaDefault {
             throw new MCRException(getSubTag() + ": linktype is unsupported: " + linktype);
         }
         if (linktype.equals("arc")) {
-            if (from == null || from.length() == 0) {
-                throw new MCRException(getSubTag() + ": from is null or empty");
-            } else if (!XMLChar.isValidNCName(from)) {
-                throw new MCRException(getSubTag() + ": from is no valid NCName:" + from);
-            }
-
-            if (to == null || to.length() == 0) {
-                throw new MCRException(getSubTag() + ": to is null or empty");
-            } else if (!XMLChar.isValidNCName(to)) {
-                throw new MCRException(getSubTag() + ": to is no valid NCName:" + to);
-            }
+            throwMCRExceptionIfNullOrInvalid(from);
+            throwMCRExceptionIfNullOrInvalid(to);
         }
-        if (linktype.equals("locator")) {
-            if (href == null || href.length() == 0) {
-                throw new MCRException(getSubTag() + ": href is null or empty");
-            }
+        if (linktype.equals("locator") && (href == null || href.length() == 0)) {
+            throw new MCRException(getSubTag() + ": href is null or empty");
+        }
+    }
+
+    private void throwMCRExceptionIfNullOrInvalid(String string) {
+        if (string == null || string.length() == 0) {
+            throw new MCRException(getSubTag() + ": is null or empty");
+        } else if (!XMLChar.isValidNCName(string)) {
+            throw new MCRException(getSubTag() + ": is no valid NCName:" + string);
         }
     }
 

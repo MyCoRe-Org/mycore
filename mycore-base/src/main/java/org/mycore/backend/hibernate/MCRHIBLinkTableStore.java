@@ -49,8 +49,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     /**
      * The constructor for the class MCRHIBLinkTableStore.
      */
-    public MCRHIBLinkTableStore() {
-    }
+
 
     /**
      * The method create a new item in the datastore.
@@ -66,21 +65,21 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public final void create(String from, String to, String type, String attr) {
-        from = checkAttributeIsNotEmpty(from, "from");
-        to = checkAttributeIsNotEmpty(to, "to");
-        type = checkAttributeIsNotEmpty(type, "type");
-        attr = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
+        String fromChecked = checkAttributeIsNotEmpty(from, "from");
+        String toChecked = checkAttributeIsNotEmpty(to, "to");
+        String typeChecked = checkAttributeIsNotEmpty(type, "type");
+        String attrChecked = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
         EntityManager entityMananger = MCREntityManagerProvider.getCurrentEntityManager();
-        LOGGER.debug("Inserting {}/{}/{} into database MCRLINKHREF", from, to, type);
+        LOGGER.debug("Inserting {}/{}/{} into database MCRLINKHREF", fromChecked, toChecked, typeChecked);
 
-        MCRLINKHREFPK key = getKey(from, to, type);
+        MCRLINKHREFPK key = getKey(fromChecked, toChecked, typeChecked);
         MCRLINKHREF linkHref = entityMananger.find(MCRLINKHREF.class, key);
         if (linkHref != null) {
-            linkHref.setMcrattr(attr);
+            linkHref.setMcrattr(attrChecked);
         } else {
             linkHref = new MCRLINKHREF();
             linkHref.setKey(key);
-            linkHref.setMcrattr(attr);
+            linkHref.setMcrattr(attrChecked);
             entityMananger.persist(linkHref);
         }
     }
@@ -110,14 +109,14 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public final void delete(String from, String to, String type) {
-        from = checkAttributeIsNotEmpty(from, "from");
+        String fromChecked = checkAttributeIsNotEmpty(from, "from");
         StringBuilder sb = new StringBuilder();
-        sb.append("from ").append(classname).append(" where key.mcrfrom = '").append(from).append('\'');
+        sb.append("from ").append(classname).append(" where key.mcrfrom = '").append(fromChecked).append('\'');
         MCRUtils.filterTrimmedNotEmpty(to)
             .ifPresent(trimmedTo -> sb.append(" and key.mcrto = '").append(trimmedTo).append('\''));
         MCRUtils.filterTrimmedNotEmpty(type)
             .ifPresent(trimmedType -> sb.append(" and key.mcrtype = '").append(trimmedType).append('\''));
-        LOGGER.debug("Deleting {} from database MCRLINKHREF", from);
+        LOGGER.debug("Deleting {} from database MCRLINKHREF", fromChecked);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.createQuery(sb.toString(), MCRLINKHREF.class)
             .getResultList()

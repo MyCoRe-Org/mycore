@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -184,7 +185,7 @@ public class MCRConfigurationInputStream extends InputStream {
             }
         }
         // load config file from classpath
-        try (InputStream configStream = MCRConfigurationInputStream.getConfigFileStream(filename)) {
+        try (InputStream configStream = getConfigFileStream(filename)) {
             if (configStream != null) {
                 LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
                 map.put("classpath_" + filename, configStream.readAllBytes());
@@ -212,9 +213,8 @@ public class MCRConfigurationInputStream extends InputStream {
 
         if (e.hasMoreElements()) {
             in = e.nextElement();
-            if (in == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(in);
+
         } else {
             in = null;
         }

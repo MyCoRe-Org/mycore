@@ -25,37 +25,30 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to mark methods that should be called after the creation of the object.
- * <p>
- * The method may have a single parameter of type {@link String} for which, if present, the name of the
- * configuration property containing the class name of the configured instance will be passed.
- * <p>
- * The method needs to be public.
- *
- * @author Sebastian Hofmann
+ * This annotation is used to configure which sub-property acts as a sentinel, i.e. which property should be used to
+ * decide if a component, otherwise included in a field annotated with {@link MCRInstance}, {@link MCRInstanceMap}
+ * or {@link MCRInstanceList}, should actually be instantiated and configured.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Inherited
-public @interface MCRPostConstruction {
+public @interface MCRSentinel {
+
+    String ENABLED_KEY = "Enabled";
 
     /**
-     * @return Weather to inject the actual or the canonical property.
+     * @return The name of sub-property to act as a sentinel.
      */
-    Value value() default Value.ACTUAL;
+    String name() default ENABLED_KEY;
 
     /**
-     * @return The order in which the annotated methods are processed. The higher the value, the later the
-     * method is processed.
+     * @return The default value to be used if the configured sub-property is not present.
      */
-    int order() default 0;
+    boolean defaultValue() default true;
 
-    enum Value {
-
-        ACTUAL,
-
-        CANONICAL
-
-    }
+    /**
+     * @return Weather or not the sentinel is enabled.
+     */
+    boolean enabled() default true;
 
 }

@@ -87,13 +87,13 @@ public class MCRFrontendUtil {
 
     static {
         try {
-            SESSION_NETMASK_IPV4 = InetAddress.getByName(MCRFrontendUtil.SESSION_NETMASK_IPV4_STRING).getAddress();
+            SESSION_NETMASK_IPV4 = InetAddress.getByName(SESSION_NETMASK_IPV4_STRING).getAddress();
         } catch (UnknownHostException e) {
             throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv4 is not a correct IPv4 network mask.",
                 e);
         }
         try {
-            SESSION_NETMASK_IPV6 = InetAddress.getByName(MCRFrontendUtil.SESSION_NETMASK_IPV6_STRING).getAddress();
+            SESSION_NETMASK_IPV6 = InetAddress.getByName(SESSION_NETMASK_IPV6_STRING).getAddress();
         } catch (UnknownHostException e) {
             throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv6 is not a correct IPv6 network mask.",
                 e);

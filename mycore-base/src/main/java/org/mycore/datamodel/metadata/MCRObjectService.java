@@ -136,10 +136,20 @@ public class MCRObjectService {
      */
     public final void setFromDOM(Element service) {
 
-        // date part
         Element datesElement = service.getChild("servdates");
-        dates.clear();
+        Element rulesElement = service.getChild("servacls");
+        Element flagsElement = service.getChild("servflags");
+        Element classificationsElement = service.getChild("servclasses");
+        Element messagesElement = service.getChild("servmessages");
+        Element statesElement = service.getChild("servstates");
 
+        addContent(rulesElement, "servacl", new MCRMetaAccessRule(), rules);
+        addContent(flagsElement, "servflag", new MCRMetaLangText(), flags);
+        addContent(classificationsElement, "servclass", new MCRMetaClassification(), classifications);
+        addContent(messagesElement, "servmessage", new MCRMetaDateLangText(), messages);
+
+        // date part
+        dates.clear();
         if (datesElement != null) {
             List<Element> dateElements = datesElement.getChildren();
             for (Element dateElement : dateElements) {
@@ -152,65 +162,7 @@ public class MCRObjectService {
                 setDate(date);
             }
         }
-
-        // rule part
-        Element rulesElement = service.getChild("servacls");
-        if (rulesElement != null) {
-            List<Element> ruleElements = rulesElement.getChildren();
-            for (Element ruleElement : ruleElements) {
-                if (!ruleElement.getName().equals("servacl")) {
-                    continue;
-                }
-                MCRMetaAccessRule user = new MCRMetaAccessRule();
-                user.setFromDOM(ruleElement);
-                rules.add(user);
-            }
-        }
-
-        // flag part
-        Element flagsElement = service.getChild("servflags");
-        if (flagsElement != null) {
-            List<Element> flagElements = flagsElement.getChildren();
-            for (Element flagElement : flagElements) {
-                if (!flagElement.getName().equals("servflag")) {
-                    continue;
-                }
-                MCRMetaLangText flag = new MCRMetaLangText();
-                flag.setFromDOM(flagElement);
-                flags.add(flag);
-            }
-        }
-
-        // classification part
-        Element classificationsElement = service.getChild("servclasses");
-        if (classificationsElement != null) {
-            List<Element> classificationElements = classificationsElement.getChildren();
-            for (Element classificationElement : classificationElements) {
-                if (!classificationElement.getName().equals("servclass")) {
-                    continue;
-                }
-                MCRMetaClassification classification = new MCRMetaClassification();
-                classification.setFromDOM(classificationElement);
-                classifications.add(classification);
-            }
-        }
-
-        // nessage part
-        Element messagesElement = service.getChild("servmessages");
-        if (messagesElement != null) {
-            List<Element> messageElements = messagesElement.getChildren();
-            for (Element messageElement : messageElements) {
-                if (!messageElement.getName().equals("servmessage")) {
-                    continue;
-                }
-                MCRMetaDateLangText message = new MCRMetaDateLangText();
-                message.setFromDOM(messageElement);
-                messages.add(message);
-            }
-        }
-
         // States part
-        Element statesElement = service.getChild("servstates");
         if (statesElement != null) {
             List<Element> stateElements = statesElement.getChildren();
             for (Element stateElement : stateElements) {
@@ -220,6 +172,19 @@ public class MCRObjectService {
                 MCRMetaClassification stateClass = new MCRMetaClassification();
                 stateClass.setFromDOM(stateElement);
                 state = new MCRCategoryID(stateClass.getClassId(), stateClass.getCategId());
+            }
+        }
+    }
+
+    private <T extends MCRMetaDefault> void addContent(Element element, String name, T newItem, List<T> items) {
+        if (element != null) {
+            List<Element> elements = element.getChildren();
+            for (Element elm : elements) {
+                if (!elm.getName().equals(name)) {
+                    continue;
+                }
+                newItem.setFromDOM(elm);
+                items.add(newItem);
             }
         }
     }
@@ -696,63 +661,17 @@ public class MCRObjectService {
         } catch (MCRException exc) {
             throw new MCRException("The content is not valid.", exc);
         }
+
         Element elm = new Element("service");
 
-        if (dates.size() != 0) {
-            Element elmm = new Element("servdates");
-            elmm.setAttribute("class", "MCRMetaISO8601Date");
+        // Create XML elements for each list
+        addContentIfNotEmpty(elm, dates, "servdates", "MCRMetaISO8601Date");
+        addContentIfNotEmpty(elm, rules, "servacls", "MCRMetaAccessRule");
+        addContentIfNotEmpty(elm, flags, "servflags", "MCRMetaLangText");
+        addContentIfNotEmpty(elm, messages, "servmessages", "MCRMetaDateLangText");
+        addContentIfNotEmpty(elm, classifications, "servclasses", "MCRMetaClassification");
 
-            for (MCRMetaISO8601Date date : dates) {
-                elmm.addContent(date.createXML());
-            }
-
-            elm.addContent(elmm);
-        }
-
-        if (rules.size() != 0) {
-            Element elmm = new Element("servacls");
-            elmm.setAttribute("class", "MCRMetaAccessRule");
-
-            for (MCRMetaAccessRule rule : rules) {
-                elmm.addContent(rule.createXML());
-            }
-
-            elm.addContent(elmm);
-        }
-
-        if (flags.size() != 0) {
-            Element elmm = new Element("servflags");
-            elmm.setAttribute("class", "MCRMetaLangText");
-
-            for (MCRMetaLangText flag : flags) {
-                elmm.addContent(flag.createXML());
-            }
-
-            elm.addContent(elmm);
-        }
-
-        if (messages.size() != 0) {
-            Element elmm = new Element("servmessages");
-            elmm.setAttribute("class", "MCRMetaDateLangText");
-
-            for (MCRMetaDateLangText message : messages) {
-                elmm.addContent(message.createXML());
-            }
-
-            elm.addContent(elmm);
-        }
-
-        if (classifications.size() != 0) {
-            Element elmm = new Element("servclasses");
-            elmm.setAttribute("class", "MCRMetaClassification");
-
-            for (MCRMetaClassification classification : classifications) {
-                elmm.addContent(classification.createXML());
-            }
-
-            elm.addContent(elmm);
-        }
-
+        // Handle the state separately
         if (state != null) {
             Element elmm = new Element("servstates");
             elmm.setAttribute("class", "MCRMetaClassification");
@@ -762,6 +681,22 @@ public class MCRObjectService {
         }
 
         return elm;
+    }
+
+    private <T extends MCRMetaDefault> void addContentIfNotEmpty(Element parent, List<T> items, String elementName,
+        String className) {
+        if (items.isEmpty()) {
+            return;
+        }
+
+        Element elmm = new Element(elementName);
+        elmm.setAttribute("class", className);
+
+        for (T item : items) {
+            elmm.addContent(item.createXML());
+        }
+
+        parent.addContent(elmm);
     }
 
     /**

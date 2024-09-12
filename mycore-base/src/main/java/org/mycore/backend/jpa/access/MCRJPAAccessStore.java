@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -83,9 +84,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
         if (!existAccessDefinition(rulemapping.getPool(), rulemapping.getObjId())) {
             EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
-            if (accessRule == null) {
-                throw new NullPointerException("Cannot map a null rule.");
-            }
+            Objects.requireNonNull(accessRule, "Cannot map a null rule.");
             MCRACCESS accdef = new MCRACCESS();
 
             accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
@@ -140,9 +139,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
-        if (accessRule == null) {
-            throw new NullPointerException("Cannot map a null rule.");
-        }
+        Objects.requireNonNull(accessRule, "Cannot map a null rule.");
         // update
         MCRACCESS accdef = em.find(MCRACCESS.class,
             new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));

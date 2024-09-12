@@ -78,50 +78,79 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return countLinksForType(parent, null, childrenOnly);
     }
 
+
     @Override
     public Map<MCRCategoryID, Number> countLinksForType(MCRCategory parent, String type, boolean childrenOnly) {
         boolean restrictedByType = type != null;
+        String queryName = determineLinkCountQueryName(childrenOnly, restrictedByType);
+        Map<MCRCategoryID, Number> countLinks = initializeCountLinkMap(childrenOnly, parent);
+        final EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategory parentRoot = getEffectiveParentRoot(parent, childrenOnly, entityManager);
+
+        LOGGER.info("parentID:{}", parentRoot.getId());
+        String classID = parentRoot.getId().getRootID();
+        TypedQuery<Object[]> query = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + queryName, Object[].class);
+        // query can take long time, please cache result
+        setCacheable(query);
+        setReadOnly(query);
+        setQueryParametersForLinkCount(classID, query, parent, childrenOnly, restrictedByType, type);
+        populateCountLinkMap(countLinks, query, classID);
+
+        return countLinks;
+    }
+
+    private void setQueryParametersForLinkCount(String classID, TypedQuery<Object[]> query, MCRCategory parent,
+                                                boolean childrenOnly, boolean restrictedByType, String type) {
+        query.setParameter("classID", classID);
+        if (childrenOnly) {
+            query.setParameter("parentID", ((MCRCategoryImpl) parent).getInternalID());
+        }
+        if (restrictedByType) {
+            query.setParameter("type", type);
+        }
+        // get object count for every category (not accumulated)
+    }
+
+    private String determineLinkCountQueryName(boolean childrenOnly, boolean restrictedByType) {
         String queryName;
         if (childrenOnly) {
             queryName = restrictedByType ? "NumberByTypePerChildOfParentID" : "NumberPerChildOfParentID";
         } else {
             queryName = restrictedByType ? "NumberByTypePerClassID" : "NumberPerClassID";
         }
+        return queryName;
+    }
+
+    private MCRCategory getEffectiveParentRoot(MCRCategory parent, boolean childrenOnly, EntityManager entityManager) {
+        //have to use rootID here if childrenOnly=false
+        //old classification browser/editor could not determine links correctly otherwise
+        MCRCategory parentRoot = parent;
+        if (!childrenOnly) {
+            parentRoot = parent.getRoot();
+        } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
+            parentRoot = MCRCategoryDAOImpl.getByNaturalID(entityManager, parent.getId());
+        }
+        return parentRoot;
+    }
+
+    private Map<MCRCategoryID, Number> initializeCountLinkMap(boolean childrenOnly, MCRCategory parent) {
         Map<MCRCategoryID, Number> countLinks = new HashMap<>();
         Collection<MCRCategoryID> ids = childrenOnly ? getAllChildIDs(parent) : getAllCategIDs(parent);
         for (MCRCategoryID id : ids) {
             // initialize all categIDs with link count of zero
             countLinks.put(id, 0);
         }
-        //have to use rootID here if childrenOnly=false
-        //old classification browser/editor could not determine links correctly otherwise
-        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        if (!childrenOnly) {
-            parent = parent.getRoot();
-        } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
-            parent = MCRCategoryDAOImpl.getByNaturalID(em, parent.getId());
-        }
-        LOGGER.info("parentID:{}", parent.getId());
-        String classID = parent.getId().getRootID();
-        TypedQuery<Object[]> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + queryName, Object[].class);
-        // query can take long time, please cache result
-        setCacheable(q);
-        setReadOnly(q);
-        q.setParameter("classID", classID);
-        if (childrenOnly) {
-            q.setParameter("parentID", ((MCRCategoryImpl) parent).getInternalID());
-        }
-        if (restrictedByType) {
-            q.setParameter("type", type);
-        }
-        // get object count for every category (not accumulated)
-        List<Object[]> result = q.getResultList();
-        for (Object[] sr : result) {
-            MCRCategoryID key = new MCRCategoryID(classID, sr[0].toString());
-            Number value = (Number) sr[1];
+        return countLinks;
+    }
+
+    private void populateCountLinkMap
+            (Map<MCRCategoryID, Number> countLinks, TypedQuery<Object[]> query, String classID) {
+        List<Object[]> result = query.getResultList();
+        for (Object[] streamResult : result) {
+            MCRCategoryID key = new MCRCategoryID(classID, streamResult[0].toString());
+            Number value = (Number) streamResult[1];
             countLinks.put(key, value);
         }
-        return countLinks;
     }
 
     @Override
@@ -153,7 +182,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             objectIds.add(ref.getObjectID());
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        jakarta.persistence.Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
+        Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
         int deleted = 0;
         for (Map.Entry<String, Collection<String>> entry : typeMap.entrySet()) {
             q.setParameter("ids", entry.getValue());
@@ -308,10 +337,10 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
         Path<Integer> internalId = li.get(MCRCategoryLinkImpl_.category).get(MCRCategoryImpl_.internalID);
         List<Number> result = em
-            .createQuery(
-                query.select(internalId)
-                    .orderBy(cb.desc(internalId)))
-            .getResultList();
+                .createQuery(
+                        query.select(internalId)
+                                .orderBy(cb.desc(internalId)))
+                .getResultList();
 
         int maxSize = result.size() == 0 ? 1 : result.getFirst().intValue() + 1;
         BitSet linkSet = new BitSet(maxSize);

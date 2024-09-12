@@ -73,9 +73,9 @@ public class MCROAIAdapter implements OAIAdapter {
     protected MCROAISetManager setManager;
 
     static {
-        String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
+        String prefix = PREFIX + "ResumptionTokens.";
         DEFAULT_PARTITION_SIZE = MCRConfiguration2.getInt(prefix + "PartitionSize").orElse(50);
-        LOGGER.info(MCROAIAdapter.PREFIX + "ResumptionTokens.PartitionSize is set to {}", DEFAULT_PARTITION_SIZE);
+        LOGGER.info(PREFIX + "ResumptionTokens.PartitionSize is set to {}", DEFAULT_PARTITION_SIZE);
     }
 
     /**
@@ -96,7 +96,7 @@ public class MCROAIAdapter implements OAIAdapter {
             String setManager = getConfigPrefix() + "SetManager";
             this.setManager = MCRConfiguration2.getInstanceOf(MCROAISetManager.class, setManager)
                 .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
-                    MCROAISetManager.class, MCROAIAdapter.PREFIX + "DefaultSetManager"));
+                    MCROAISetManager.class, PREFIX + "DefaultSetManager"));
             int cacheMaxAge = MCRConfiguration2.getInt(this.configPrefix + "SetCache.MaxAge").orElse(0);
             this.setManager.init(getConfigPrefix(), cacheMaxAge);
         }

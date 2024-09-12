@@ -26,15 +26,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.junit.Before;
 import org.junit.Test;
 
 public class MCRStreamUtilsTest {
 
-    @Before
-    public void setUp() {
-    }
+
 
     @Test
     public void test() {

@@ -129,38 +129,51 @@ public class MCRConfigurationDir {
 
     private static String buildAppName() {
         String appName = System.getProperty("MCR.AppName");
-        if (appName != null) {
-            return appName;
-        }
         String nameOfProject = System.getProperty("MCR.NameOfProject");
-        if (nameOfProject != null) {
-            return nameOfProject;
-        }
-        if (SERVLET_CONTEXT != null) {
-            String servletAppName = SERVLET_CONTEXT.getInitParameter("appName");
-            if (servletAppName != null && !servletAppName.isEmpty()) {
-                return servletAppName;
-            }
-            String contextPath = SERVLET_CONTEXT.getContextPath();
-            if (!contextPath.isEmpty()) {
-                return contextPath.substring(1);//remove leading '/'
-            }
-            String servletContextName = SERVLET_CONTEXT.getServletContextName();
-            if (servletContextName != null
-                && !(servletContextName.trim().isEmpty() || servletContextName.contains("/"))) {
-                return servletContextName.replaceAll("\\s", "");
+        if (appName == null) {
+            if (nameOfProject != null) {
+                appName = nameOfProject;
+            } else {
+                appName = (buildAppNameFromContext() != null) ?
+                        (buildAppNameFromContext()) : (buildAppNameFromFileName(getSource(MCRConfigurationDir.class)));
             }
         }
-        String sourceFileName = getSource(MCRConfigurationDir.class);
-        if (sourceFileName != null) {
-            int beginIndex = sourceFileName.lastIndexOf('.') - 1;
-            if (beginIndex > 0) {
-                sourceFileName = sourceFileName.substring(0, beginIndex);
-            }
-            return sourceFileName.replaceAll("-\\d.*", "");//strips version 
-        }
-        return "default";
+        return appName;
     }
+
+    private static String buildAppNameFromContext() {
+        String servletAppName = SERVLET_CONTEXT.getInitParameter("appName");
+        String contextPath = SERVLET_CONTEXT.getContextPath();
+        String servletContextName = SERVLET_CONTEXT.getServletContextName();
+        String updatedAppname;
+        if (servletAppName != null && !servletAppName.isEmpty()) {
+            updatedAppname = servletAppName;
+        } else if (!contextPath.isEmpty()) {
+            updatedAppname = contextPath.substring(1);//remove leading '/'
+        } else if (servletContextName != null && !(servletContextName.trim().isEmpty()
+                || servletContextName.contains("/"))) {
+            updatedAppname = servletContextName.replaceAll("\\s", "");
+        } else {
+            updatedAppname = null;
+        }
+        return updatedAppname;
+    }
+
+
+    private static String buildAppNameFromFileName(String sourceFileName) {
+        String appName=sourceFileName;
+        if (appName != null) {
+            int beginIndex = appName.lastIndexOf('.') - 1;
+            if (beginIndex > 0) {
+                appName = sourceFileName.substring(0, beginIndex);
+            }
+            appName = appName.replaceAll("-\\d.*", "");//strips version
+        } else {
+            appName = "default";
+        }
+        return appName;
+    }
+
 
     private static String getPrefix() {
         String dataPrefix = System.getProperty("MCR.DataPrefix");

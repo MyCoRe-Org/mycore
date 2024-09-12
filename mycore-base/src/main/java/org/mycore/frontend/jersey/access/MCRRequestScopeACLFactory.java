@@ -47,26 +47,32 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
 
         @Override
         public boolean checkPermission(String privilege) {
+            boolean result;
             if (!isPrivate()) {
                 isPrivate = !MCRAccessManager.checkPermission(GUEST, () -> MCRAccessManager.checkPermission(privilege));
             }
             if (isPrivate()) {
-                return MCRAccessManager.checkPermission(privilege);
+                result=  MCRAccessManager.checkPermission(privilege);
+            }else {
+            result= true;
             }
-            return true;
+            return result;
         }
 
         @Override
         public boolean checkPermission(String id, String permission) {
+            boolean result;
             if (!isPrivate()) {
                 isPrivate = !MCRAccessManager.checkPermission(GUEST,
-                    () -> MCRAccessManager.checkPermission(id, permission));
+                        () -> MCRAccessManager.checkPermission(id, permission));
             }
             if (isPrivate()) {
                 LogManager.getLogger().debug("response is private");
-                return MCRAccessManager.checkPermission(id, permission);
+                result= MCRAccessManager.checkPermission(id, permission);
+            }else {
+                result = true;
             }
-            return true;
+            return result;
         }
 
         @Override

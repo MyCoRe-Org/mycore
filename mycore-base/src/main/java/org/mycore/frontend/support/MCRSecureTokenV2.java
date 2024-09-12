@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.mycore.common.MCRException;
+
 /**
  * An implementation of SecureToken V2 used by "Wowza Streaming Engine".
  * <p>
@@ -48,7 +50,10 @@ import java.util.stream.Stream;
  */
 public class MCRSecureTokenV2 {
 
-    private String contentPath, ipAddress, sharedSecret, hash;
+    private String contentPath;
+    private String ipAddress;
+    private String sharedSecret;
+    private String hash;
 
     private String[] queryParameters;
 
@@ -60,7 +65,7 @@ public class MCRSecureTokenV2 {
         try {
             this.contentPath = new URI(null, null, this.contentPath, null).getRawPath();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
         buildHash();
     }
@@ -74,7 +79,7 @@ public class MCRSecureTokenV2 {
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);//should never happen for 'SHA-256'
+            throw new MCRException(e);//should never happen for 'SHA-256'
         }
         digest.update(URI.create(forHashing).toASCIIString().getBytes(StandardCharsets.US_ASCII));
         byte[] sha256 = digest.digest();
@@ -135,29 +140,24 @@ public class MCRSecureTokenV2 {
 
     @Override
     public boolean equals(Object obj) {
+        boolean result;
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
+        if (obj == null||getClass() != obj.getClass()) {
+            result= false;
+        } else{
+            MCRSecureTokenV2 other = (MCRSecureTokenV2) obj;
+            if(!hash.equals(other.hash)||
+                    !contentPath.equals(other.contentPath)||
+                    !ipAddress.equals(other.ipAddress)||
+                    !sharedSecret.equals(other.sharedSecret)) {
+                result = false;
+            } else {
+                result= Arrays.equals(queryParameters, other.queryParameters);
+            }
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        MCRSecureTokenV2 other = (MCRSecureTokenV2) obj;
-        if (!hash.equals(other.hash)) {
-            return false;
-        }
-        if (!contentPath.equals(other.contentPath)) {
-            return false;
-        }
-        if (!ipAddress.equals(other.ipAddress)) {
-            return false;
-        }
-        if (!sharedSecret.equals(other.sharedSecret)) {
-            return false;
-        }
-        return Arrays.equals(queryParameters, other.queryParameters);
-    }
 
+        return result;
+    }
 }
