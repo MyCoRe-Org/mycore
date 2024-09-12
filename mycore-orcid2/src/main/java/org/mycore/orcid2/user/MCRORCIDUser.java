@@ -38,13 +38,10 @@ import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.orcid2.util.MCRORCIDJSONMapper;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Provides functionality to interact with MCRUser that is also an ORCID user.
@@ -142,7 +139,7 @@ public class MCRORCIDUser {
         }
         String credentialString = null;
         try {
-            credentialString = serializeCredential(credential);
+            credentialString = MCRORCIDJSONMapper.credentialToJSON(credential);
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Credential is invalid");
         }
@@ -214,7 +211,7 @@ public class MCRORCIDUser {
             return user.getAttributes().stream()
                 .filter(a -> a.getName().startsWith(ATTR_ORCID_CREDENTIAL))
                 .collect(Collectors.toMap(a -> a.getName().substring(ATTR_ORCID_CREDENTIAL.length()),
-                    a -> deserializeCredential(a.getValue())));
+                    a -> MCRORCIDJSONMapper.jsonToCredential(a.getValue())));
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Found corrupt credential", e);
         }
@@ -230,7 +227,7 @@ public class MCRORCIDUser {
     public MCRORCIDCredential getCredentialByORCID(String orcid) {
         try {
             return Optional.ofNullable(getCredentialAttributeValueByORCID(orcid))
-                .map(s -> deserializeCredential(s)).orElse(null);
+                .map(MCRORCIDJSONMapper::jsonToCredential).orElse(null);
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Credential is corrupt", e);
         }
@@ -293,7 +290,7 @@ public class MCRORCIDUser {
         }
         try {
             return Optional.ofNullable(getUserPropertiesAttributeValueByORCID(orcid))
-                .map(p -> deserializeUserProperties(p)).orElseGet(() -> new MCRORCIDUserProperties());
+                .map(MCRORCIDJSONMapper::jsonToUserProperties).orElseGet(() -> new MCRORCIDUserProperties());
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Found corrupt user properites", e);
         }
@@ -312,7 +309,7 @@ public class MCRORCIDUser {
         }
         String userPropertiesString = null;
         try {
-            userPropertiesString = serializeUserProperties(userProperties);
+            userPropertiesString = MCRORCIDJSONMapper.userPropertiesToString(userProperties);
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("User properties are invalid");
         }
@@ -332,62 +329,6 @@ public class MCRORCIDUser {
         }
         MCRORCIDUser other = (MCRORCIDUser) obj;
         return Objects.equals(user, other.user);
-    }
-
-    /**
-     * Serializes MCRORCIDCredential to String.
-     *
-     * @param credential MCRORCIDCredential
-     * @return MCRORCIDCredential as String
-     * @throws IllegalArgumentException if serialization fails
-     */
-    protected static String serializeCredential(MCRORCIDCredential credential) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.findAndRegisterModules();
-            mapper.setSerializationInclusion(Include.NON_NULL);
-            return mapper.writeValueAsString(credential);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * Deserializes String to MCRORCIDCredential.
-     *
-     * @param credentialString MCRORCIDCredential as String
-     * @return MCRORCIDCredential
-     * @throws IllegalArgumentException if deserialization fails
-     */
-    protected static MCRORCIDCredential deserializeCredential(String credentialString) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.findAndRegisterModules();
-            return mapper.readValue(credentialString, MCRORCIDCredential.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private static String serializeUserProperties(MCRORCIDUserProperties userProperties) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.findAndRegisterModules();
-            mapper.setSerializationInclusion(Include.NON_NULL);
-            return mapper.writeValueAsString(userProperties);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private static MCRORCIDUserProperties deserializeUserProperties(String userPropertiesString) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.findAndRegisterModules();
-            return mapper.readValue(userPropertiesString, MCRORCIDUserProperties.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(e);
-        }
     }
 
     private String getCredentialAttributeValueByORCID(String orcid) {
