@@ -20,6 +20,7 @@ package org.mycore.mets.model.simple;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MCRMetsPage {
     private String id;
@@ -60,7 +61,7 @@ public class MCRMetsPage {
     }
 
     public void setOrderLabel(String orderLabel) {
-        if (orderLabel == "") {
+        if (Objects.equals(orderLabel, "")) {
             orderLabel = null;
         }
         this.orderLabel = orderLabel;
@@ -71,7 +72,7 @@ public class MCRMetsPage {
     }
 
     public void setContentIds(String contentIds) {
-        if (contentIds == "") {
+        if (Objects.equals(contentIds, "")) {
             contentIds = null;
         }
         this.contentIds = contentIds;

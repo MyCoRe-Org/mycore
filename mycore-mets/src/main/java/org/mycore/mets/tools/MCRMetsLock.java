@@ -20,6 +20,7 @@ package org.mycore.mets.tools;
 
 import java.util.Hashtable;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,7 +67,7 @@ public class MCRMetsLock {
     public static synchronized boolean doLock(String derivateIdString) {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
         if (isLocked(derivateIdString)
-            && metsAccessSessionTable.get(derivateId) != MCRSessionMgr.getCurrentSessionID()) {
+            && !Objects.equals(metsAccessSessionTable.get(derivateId), MCRSessionMgr.getCurrentSessionID())) {
             LOGGER.info("Could not lock {}, because its already locked.", derivateIdString);
             return false;
         } else {
