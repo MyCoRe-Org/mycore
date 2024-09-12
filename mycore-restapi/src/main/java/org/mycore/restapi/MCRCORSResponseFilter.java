@@ -104,9 +104,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
             //check if the Authorization header was sent
             || requestContext.getHeaderString(HttpHeaders.AUTHORIZATION) != null;
         MultivaluedMap<String, Object> responseHeaders = responseContext.getHeaders();
-        if (authenticatedRequest) {
-            responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
-        }
+        responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, authenticatedRequest);
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, authenticatedRequest ? origin : "*");
         if (!handlePreFlight(requestContext, responseHeaders)) {
             //not a CORS preflight request

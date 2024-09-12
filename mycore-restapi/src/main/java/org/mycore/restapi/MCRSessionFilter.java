@@ -136,7 +136,6 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         currentSession.setCurrentIP(MCRFrontendUtil.getRemoteAddr(httpServletRequest));
         MCRTransactionHelper.beginTransaction();
         //3 cases for authentication
-        Optional<MCRUserInformation> userInformation = Optional.empty();
         String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         //1. no authentication
         if (authorization == null) {
@@ -144,6 +143,24 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             return;
         }
         //2. Basic Authentification
+        Optional<MCRUserInformation> userInformation
+            = getMcrUserInformation(requestContext, authorization, currentSession);
+
+        if (userInformation.isEmpty()) {
+            LOGGER.warn(() -> "Unsupported " + HttpHeaders.AUTHORIZATION + " header: " + authorization);
+        }
+
+        userInformation
+            .ifPresent(ui -> {
+                currentSession.setUserInformation(ui);
+                requestContext.setSecurityContext(new MCRRestSecurityContext(ui, isSecure));
+            });
+        LOGGER.info("user detected: " + currentSession.getUserInformation().getUserID());
+    }
+
+    private Optional<MCRUserInformation> getMcrUserInformation(ContainerRequestContext requestContext,
+        String authorization, MCRSession currentSession) {
+        Optional<MCRUserInformation> userInformation = Optional.empty();
         String basicPrefix = "Basic ";
         if (authorization.startsWith(basicPrefix)) {
             LOGGER.debug("Using 'Basic' authentication.");
@@ -219,17 +236,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                     MCRRestAPIUtil.getWWWAuthenticateHeader("Bearer", attrs, app));
             }
         }
-
-        if (userInformation.isEmpty()) {
-            LOGGER.warn(() -> "Unsupported " + HttpHeaders.AUTHORIZATION + " header: " + authorization);
-        }
-
-        userInformation
-            .ifPresent(ui -> {
-                currentSession.setUserInformation(ui);
-                requestContext.setSecurityContext(new MCRRestSecurityContext(ui, isSecure));
-            });
-        LOGGER.info("user detected: " + currentSession.getUserInformation().getUserID());
+        return userInformation;
     }
 
     private static void checkIPClaim(Claim ipClaim, String remoteAddr) {

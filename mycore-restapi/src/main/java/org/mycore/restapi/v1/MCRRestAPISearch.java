@@ -82,69 +82,69 @@ public class MCRRestAPISearch {
         StringBuilder url = new StringBuilder(MCRSolrCoreManager.getMainSolrCore().getV1CoreURL());
         url.append("/select?");
 
-        if (query != null) {
-            url.append("&q=").append(URLEncoder.encode(query, StandardCharsets.UTF_8));
+        // Append query parameters using helper methods
+        appendQueryParam(url, "q", query);
+        appendQueryParam(url, "sort", sort);
+        appendQueryParam(url, "wt", wt);
+        appendQueryParam(url, "start", start);
+        appendQueryParam(url, "rows", rows);
+
+        appendListQueryParam(url, "fq", fq);
+        appendListQueryParam(url, "fl", fl);
+
+        appendQueryParam(url, "facet", facet);
+        appendQueryParam(url, "facet.sort", facetSort);
+        appendQueryParam(url, "facet.limit", facetLimit);
+        appendQueryParam(url, "facet.mincount", facetMinCount);
+        appendListQueryParam(url, "facet.field", facetFields);
+        appendQueryParam(url, "json.wrf", jsonWrf);
+
+        return executeSolrQuery(url.toString(), wt);
+    }
+
+    // Helper method to append single query parameters
+    private void appendQueryParam(StringBuilder url, String param, String value) {
+        if (value != null) {
+            url.append('&').append(param).append('=')
+                .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
         }
-        if (sort != null) {
-            url.append("&sort=").append(URLEncoder.encode(sort, StandardCharsets.UTF_8));
-        }
-        if (wt != null) {
-            url.append("&wt=").append(wt);
-        }
-        if (start != null) {
-            url.append("&start=").append(start);
-        }
-        if (rows != null) {
-            url.append("&rows=").append(rows);
-        }
-        if (fq != null) {
-            for (String fqItem : fq) {
-                url.append("&fq=").append(URLEncoder.encode(fqItem, StandardCharsets.UTF_8));
+    }
+
+    // Helper method to append list-based query parameters
+    private void appendListQueryParam(StringBuilder url, String param, List<String> values) {
+        if (values != null) {
+            for (String value : values) {
+                appendQueryParam(url, param, value);
             }
         }
-        if (fl != null) {
-            for (String flItem : fl) {
-                url.append("&fl=").append(URLEncoder.encode(flItem, StandardCharsets.UTF_8));
-            }
-        }
-        if (facet != null) {
-            url.append("&facet=").append(URLEncoder.encode(facet, StandardCharsets.UTF_8));
-        }
-        for (String ff : facetFields) {
-            url.append("&facet.field=").append(URLEncoder.encode(ff, StandardCharsets.UTF_8));
-        }
-        if (facetSort != null) {
-            url.append("&facet.sort=").append(facetSort);
-        }
-        if (facetLimit != null) {
-            url.append("&facet.limit=").append(facetLimit);
-        }
-        if (facetMinCount != null) {
-            url.append("&facet.mincount=").append(facetMinCount);
-        }
-        if (jsonWrf != null) {
-            url.append("&json.wrf=").append(jsonWrf);
-        }
+    }
 
-        try (InputStream is = new URI(url.toString()).toURL().openStream()) {
-            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
-                String text = scanner.useDelimiter("\\A").next();
+    // Method to execute the Solr query and handle response
+    private Response executeSolrQuery(String url, String wt) {
+        try (InputStream is = new URI(url).toURL().openStream();
+            Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
 
-                String contentType = switch (wt) {
-                    case FORMAT_XML -> "application/xml; charset=UTF-8";
-                    case FORMAT_JSON -> "application/json; charset=UTF-8";
-                    case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
-                    default -> "text";
-                };
-                return Response.ok(text)
-                    .type(contentType)
-                    .build();
+            String text = scanner.useDelimiter("\\A").next();
+            String contentType = getContentType(wt);
 
-            }
+            return Response.ok(text)
+                .type(contentType)
+                .build();
+
         } catch (IOException | URISyntaxException e) {
             LOGGER.error(e);
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
-
-        return Response.status(Response.Status.BAD_REQUEST).build();
     }
+
+    // Helper method to determine content type based on 'wt'
+    private String getContentType(String wt) {
+        return switch (wt) {
+            case FORMAT_XML -> "application/xml; charset=UTF-8";
+            case FORMAT_JSON -> "application/json; charset=UTF-8";
+            case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
+            default -> "text";
+        };
+    }
+
 }
