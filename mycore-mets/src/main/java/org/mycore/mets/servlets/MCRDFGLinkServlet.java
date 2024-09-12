@@ -81,7 +81,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
         }
 
-        String encodedMetsURL = URLEncoder.encode(MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivateID
+        String encodedMetsURL = URLEncoder.encode(getServletBaseURL() + "MCRMETSServlet/" + derivateID
             + "?XSL.Style=dfg", StandardCharsets.UTF_8);
         LOGGER.info(request.getPathInfo());
 

@@ -176,9 +176,9 @@ public class MCRMetsSave {
             LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
-        mets = MCRMetsSave.updateOnFileAdd(mets, file);
+        mets = updateOnFileAdd(mets, file);
         if (mets != null) {
-            MCRMetsSave.saveMets(mets, derivateID);
+            saveMets(mets, derivateID);
         }
 
     }
@@ -479,9 +479,9 @@ public class MCRMetsSave {
             LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
-        mets = MCRMetsSave.updateOnFileDelete(mets, file);
+        mets = updateOnFileDelete(mets, file);
         if (mets != null) {
-            MCRMetsSave.saveMets(mets, derivateID);
+            saveMets(mets, derivateID);
         }
     }
 
@@ -691,7 +691,7 @@ public class MCRMetsSave {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (!file.getFileName().toString().equals(MCRMetsSave.getMetsFileName())) {
+                    if (!file.getFileName().toString().equals(getMetsFileName())) {
                         MCRPath mcrPath = MCRPath.toMCRPath(file);
                         String path;
                         try {
@@ -801,7 +801,7 @@ public class MCRMetsSave {
             MCRPath filePath = (MCRPath) derivatePath.resolve(href);
             String fileBase = getFileBase(href);
             try {
-                String fileGroupUse = MCRMetsSave.getFileGroupUse(filePath);
+                String fileGroupUse = getFileGroupUse(filePath);
                 // build file
                 String mimeType = MCRContentTypes.probeContentType(filePath);
                 String fileId = fileGroupUse.toLowerCase(Locale.ROOT) + "_" + fileBase;
