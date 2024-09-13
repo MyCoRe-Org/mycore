@@ -659,7 +659,7 @@ public class MCRMetsSave {
 
         //no files associated to the parent of the log div
         LogicalDiv logicalDiv = ((LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE)).getDivContainer();
-        if (parent.getParent() == logicalDiv) {
+        if (parent.getParent().equals(logicalDiv)) {
             //the parent the log div container itself, thus we quit here and remove the log div
             logicalDiv.remove(parent);
         } else {
