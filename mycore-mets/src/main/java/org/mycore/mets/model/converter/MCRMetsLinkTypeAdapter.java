@@ -20,11 +20,11 @@ package org.mycore.mets.model.converter;
 
 import java.io.IOException;
 
-import com.google.gson.JsonParseException;
 import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
 
+import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -61,6 +61,7 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         return ml;
     }
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected static class MCRMetsLinkPlaceholder extends MCRMetsLink {
         public static final String PLACEHOLDER_EXCEPTION_MESSAGE = "this is a placeholder class";
 
@@ -90,17 +91,17 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         }
 
         @Override
+        public void setTo(MCRMetsPage to) {
+            throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
+        }
+
+        @Override
         public MCRMetsSection getFrom() {
             throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
         }
 
         @Override
         public void setFrom(MCRMetsSection from) {
-            throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
-        }
-
-        @Override
-        public void setTo(MCRMetsPage to) {
             throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
         }
     }
