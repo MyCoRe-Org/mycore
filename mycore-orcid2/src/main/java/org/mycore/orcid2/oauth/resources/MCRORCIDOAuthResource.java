@@ -75,9 +75,8 @@ public class MCRORCIDOAuthResource {
 
     private static final String SCOPE = MCRConfiguration2.getString(CONFIG_PREFIX + "Scope").orElse(null);
 
-    // TODO wrong config prefix
     private static final boolean IS_PREFILL_REGISTRATION_FORM = MCRConfiguration2
-        .getOrThrow(MCRORCIDConstants.CONFIG_PREFIX + "PreFillRegistrationForm", Boolean::parseBoolean);
+        .getOrThrow(CONFIG_PREFIX + "PreFillRegistrationForm", Boolean::parseBoolean);
 
     private static final boolean ALLOW_GUESTS_TO_AUTH = MCRConfiguration2
         .getOrThrow(CONFIG_PREFIX + "EnableForGuests", Boolean::parseBoolean);
