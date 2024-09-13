@@ -20,6 +20,7 @@ package org.mycore.mets.model.converter;
 
 import java.io.IOException;
 
+import com.google.gson.JsonParseException;
 import org.mycore.common.MCRException;
 import org.mycore.mets.model.simple.MCRMetsAltoLink;
 
@@ -52,10 +53,12 @@ public class MCRAltoLinkTypeAdapter extends TypeAdapter<MCRMetsAltoLink> {
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             //CSOFF: InnerAssignment
-            switch (jsonReader.nextName()) {
+            String name = jsonReader.nextName();
+            switch (name) {
                 case "altoFile" -> fileID = jsonReader.nextString();
                 case "begin" -> begin = jsonReader.nextString();
-                case "end" -> end = jsonReader.nextString();
+                case "end"-> end = jsonReader.nextString();
+                default -> throw new JsonParseException(name + " not recognized");
             }
             //CSON: InnerAssignment
         }

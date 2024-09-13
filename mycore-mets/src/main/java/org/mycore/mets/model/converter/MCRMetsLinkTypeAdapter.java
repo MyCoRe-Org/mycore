@@ -20,6 +20,7 @@ package org.mycore.mets.model.converter;
 
 import java.io.IOException;
 
+import com.google.gson.JsonParseException;
 import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
@@ -48,9 +49,11 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
 
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
-            switch (jsonReader.nextName()) {
+            String name = jsonReader.nextName();
+            switch (name) {
                 case "from" -> ml.setFromString(jsonReader.nextString());
                 case "to" -> ml.setToString(jsonReader.nextString());
+                default -> throw new JsonParseException(name + " is not a valid link type");
             }
         }
         jsonReader.endObject();
