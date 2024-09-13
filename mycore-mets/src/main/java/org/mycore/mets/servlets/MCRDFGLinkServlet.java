@@ -18,6 +18,7 @@
 
 package org.mycore.mets.servlets;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -163,7 +164,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
         if (linkList.isEmpty()) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.format(Locale.ENGLISH,
-                "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));
+                    "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));
             return;
         }
 
@@ -172,21 +173,38 @@ public class MCRDFGLinkServlet extends MCRServlet {
             filePath = derivate.getDerivate().getInternals().getMainDoc();
         }
 
+        int imageNumber = getImageNumber(filePath, rootPath, job, request, derivateID);
+
+        handleRedirectOrError(imageNumber, filePath, response, encodedMetsURL);
+    }
+
+
+
+    private int getImageNumber(String filePath, MCRPath rootPath, MCRServletJob job, HttpServletRequest request,
+        String derivateID) throws Exception {
         MCRPath metsPath = (MCRPath) rootPath.resolve("mets.xml");
-        int imageNumber = -2;
         if (Files.exists(metsPath)) {
-            imageNumber = getOrderNumber(new MCRPathContent(metsPath).asXML(), filePath);
+            return getOrderNumber(new MCRPathContent(metsPath).asXML(), filePath);
         } else {
             MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivateID);
-            imageNumber = getOrderNumber(metsContent.asXML(), filePath);
+            return getOrderNumber(metsContent.asXML(), filePath);
         }
+    }
 
-        switch (imageNumber) {
-            case -1 -> response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
-                "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
-            case -2 -> response.sendRedirect("https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL);
-            default -> response.sendRedirect(
-                "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber);
+    private void handleRedirectOrError(int imageNumber, String filePath, HttpServletResponse response,
+        String encodedMetsURL) {
+        try {
+            switch (imageNumber) {
+                case -1 -> response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
+                    "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
+                case -2 -> {
+                    response.sendRedirect("https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL);
+                }
+                default -> response.sendRedirect(
+                    "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while handling redirect or error response", e);
         }
     }
 
