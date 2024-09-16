@@ -63,7 +63,6 @@ public class MCRSassResource {
     @Produces("text/css")
     public Response getCSS(@PathParam("fileName") String name, @Context Request request) {
         try {
-            final String fileName = MCRSassCompilerManager.getRealFileName(name);
             Optional<String> cssFile = MCRSassCompilerManager.getInstance()
                 .getCSSFile(name, context);
 

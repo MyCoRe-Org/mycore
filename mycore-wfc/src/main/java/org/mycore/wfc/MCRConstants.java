@@ -34,8 +34,6 @@ import jakarta.xml.bind.JAXBException;
  *
  */
 public abstract class MCRConstants {
-    private MCRConstants() {
-    }
 
     public static final String CONFIG_PREFIX = "MCR.Module-wfc.";
 
@@ -44,6 +42,9 @@ public abstract class MCRConstants {
     public static final MCRCategoryID STATUS_CLASS_ID = getStatusClassID();
 
     public static final MCRCategoryID COLLECTION_CLASS_ID = getCollectionClassID();
+
+    private MCRConstants() {
+    }
 
     private static JAXBContext initContext() {
         try {

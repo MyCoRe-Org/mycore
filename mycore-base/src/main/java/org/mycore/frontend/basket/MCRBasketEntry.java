@@ -23,11 +23,11 @@ import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Represents an entry in a basket. Each entry has at least
- * a unique ID, for example the MCRObjectID, and an URI that
+ * a unique ID, for example the MCRObjectID, and a URI that
  * can be used to read the object's XML representation to
  * render the object in the basket UI. Each basket entry
  * may have an optional comment. The basket entry provides 
- * methods to resolve the object's XML and to set in in the
+ * methods to resolve the object's XML and to set in the
  * basket entry. This can be used by applications that wish
  * to edit XML in the basket itself.
  * 
@@ -111,11 +111,7 @@ public class MCRBasketEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRBasketEntry basketEntry) {
-            return basketEntry.id.equals(id);
-        } else {
-            return false;
-        }
+        return obj instanceof MCRBasketEntry basketEntry&& basketEntry.id.equals(id);
     }
 
     @Override

@@ -199,9 +199,10 @@ public class MCRQuery {
      */
     public void setSortBy(List<MCRSortBy> sortBy) {
         if (sortBy == null) {
-            sortBy = new ArrayList<>();
+            this.sortBy = new ArrayList<>();
+        } else {
+            this.sortBy = sortBy;
         }
-        this.sortBy = sortBy;
         doc = null;
     }
 

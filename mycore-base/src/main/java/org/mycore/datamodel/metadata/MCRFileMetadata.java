@@ -37,8 +37,8 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
 
     private Collection<MCRCategoryID> categories;
 
-    private String urn, handle;
-
+    private String urn;
+    private String handle;
     private String name;
 
     public MCRFileMetadata(Element file) {

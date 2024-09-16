@@ -48,8 +48,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MCRObjectServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final int REV_CURRENT = 0;
-
     private static final String I18N_ERROR_PREFIX = "component.base.error";
 
     private MCRXMLMetadataManager metadataManager = null;

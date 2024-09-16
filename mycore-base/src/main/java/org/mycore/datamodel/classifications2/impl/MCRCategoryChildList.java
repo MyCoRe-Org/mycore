@@ -20,6 +20,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 
@@ -98,7 +99,7 @@ class MCRCategoryChildList extends ArrayList<MCRCategory> {
     @Override
     public MCRCategory set(int index, MCRCategory element) {
         MCRCategory category = super.set(index, element);
-        if (category != element) {
+        if (!Objects.equals(category,element)) {
             removeAncestorReferences(category);
         }
         return category;

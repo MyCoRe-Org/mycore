@@ -28,9 +28,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.text.MessageFormat;
-import java.util.Locale;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRStore;
@@ -111,10 +108,6 @@ public class MCRStoreCenterTest {
             return "4-4-2";
         }
 
-    }
-
-    private String getPropName(String storeID, String propType) {
-        return new MessageFormat("MCR.IFS2.Store.{0}.{1}", Locale.ROOT).format(new Object[] { storeID, propType });
     }
 
     public static class FakeStore extends MCRStore {

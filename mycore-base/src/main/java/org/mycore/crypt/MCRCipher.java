@@ -124,10 +124,13 @@ public abstract class MCRCipher {
     }
 
     private boolean checkPermission(String action) {
+        boolean result;
         if (aclEnabled) {
-            return MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
+            result= MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
+        } else {
+            result = true;
         }
-        return true;
+        return result;
     }
 
     abstract protected String encryptImpl(String text);

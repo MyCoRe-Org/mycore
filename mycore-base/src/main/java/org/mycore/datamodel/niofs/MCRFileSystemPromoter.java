@@ -46,8 +46,6 @@ public class MCRFileSystemPromoter implements AutoExecutable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRFileSystemPromoter.class);
 
-    public MCRFileSystemPromoter() {
-    }
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#getName()
@@ -83,6 +81,8 @@ public class MCRFileSystemPromoter implements AutoExecutable {
         }
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    //Method is used. Warning is result of a bug in PMD
     private void promoteFileSystemProvider(List<FileSystemProvider> detectedProviders) {
         if (detectedProviders.isEmpty()) {
             return;

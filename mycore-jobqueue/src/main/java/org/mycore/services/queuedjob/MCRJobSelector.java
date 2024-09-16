@@ -30,8 +30,6 @@ import jakarta.persistence.criteria.Root;
  */
 public interface MCRJobSelector {
 
-    boolean isEnabled();
-
     List<Predicate> getPredicates(CriteriaBuilder builder, Root<MCRJob> jobs);
 
 }

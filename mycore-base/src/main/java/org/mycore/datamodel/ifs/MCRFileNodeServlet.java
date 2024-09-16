@@ -85,6 +85,26 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         String path = getPath(request);
         MCRPath mcrPath = MCRPath.getPath(ownerID, path);
+        BasicFileAttributes attr = getBasicFileAttributes(response, mcrPath);
+        if (attr == null) {
+            return null;
+        }
+        if (attr.isDirectory()) {
+            try {
+                return sendDirectory(request, response, mcrPath);
+            } catch (TransformerException | SAXException e) {
+                throw new IOException(e);
+            }
+        }
+        if (attr.isRegularFile()) {
+            return new MCRPathContent(mcrPath);
+        }
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not a file or directory: " + mcrPath);
+        return null;
+    }
+
+    private static BasicFileAttributes getBasicFileAttributes(HttpServletResponse response, MCRPath mcrPath)
+        throws IOException {
         BasicFileAttributes attr;
         try {
             attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
@@ -96,18 +116,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
             return null;
         }
-        if (attr.isDirectory()) {
-            try {
-                return sendDirectory(request, response, mcrPath);
-            } catch (TransformerException | SAXException e) {
-                throw new IOException(e);
-            }
-        }
-        if (attr.isRegularFile()) {
-            return sendFile(request, response, mcrPath);
-        }
-        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not a file or directory: " + mcrPath);
-        return null;
+        return attr;
     }
 
     private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -153,11 +162,6 @@ public class MCRFileNodeServlet extends MCRContentServlet {
             return "/";
         }
         return path;
-    }
-
-    private MCRContent sendFile(HttpServletRequest request, HttpServletResponse response, MCRPath mcrPath) {
-        // TODO: Does MCRFileNodeServlet really has to handle IFS1 AudioVideoExtender support? (last rev: 30037))
-        return new MCRPathContent(mcrPath);
     }
 
     /**

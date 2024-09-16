@@ -40,7 +40,6 @@ import org.mycore.common.MCRStreamUtils;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -60,10 +59,7 @@ public class MCRRequestDebugFilter implements Filter {
     /* (non-Javadoc)
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
-    @Override
-    public void init(FilterConfig filterConfig) {
 
-    }
 
     /* (non-Javadoc)
      * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)
@@ -78,7 +74,8 @@ public class MCRRequestDebugFilter implements Filter {
 
     private String getLogMsg(ServletRequest request) {
         HttpServletRequest req = (HttpServletRequest) request;
-        StringBuilder sb = new StringBuilder("REQUEST (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("REQUEST (").append(req.getMethod()).append(") URI: ").append(req.getRequestURI()).append('\n');
         logCookies(req, sb);
         logRequestParameters(request, sb);
         logSessionAttributes(req, sb);
@@ -88,7 +85,8 @@ public class MCRRequestDebugFilter implements Filter {
 
     private String getLogMsg(ServletRequest request, ServletResponse response) {
         HttpServletRequest req = (HttpServletRequest) request;
-        StringBuilder sb = new StringBuilder("RESPONSE (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("RESPONSE (").append(req.getMethod()).append(") URI: ").append(req.getRequestURI()).append('\n');
         HttpServletResponse res = (HttpServletResponse) response;
         sb.append("Status: ").append(res.getStatus()).append('\n');
         logHeader(res.getHeaderNames().stream(), s -> res.getHeaders(s).stream(), sb);
@@ -106,7 +104,7 @@ public class MCRRequestDebugFilter implements Filter {
                     .append(header)
                     .append(": ")
                     .append(value)
-                    .append("\n")));
+                    .append('\n')));
         sb.append("HEADERS END \n\n");
     }
 
@@ -141,7 +139,7 @@ public class MCRRequestDebugFilter implements Filter {
                 .append(" created at: ")
                 .append(LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()),
                     ZoneId.systemDefault()))
-                .append("\n");
+                .append('\n');
             sb.append("SESSION ATTRIBUTES: \n");
             MCRStreamUtils
                 .asStream(session.getAttributeNames())
@@ -151,7 +149,7 @@ public class MCRRequestDebugFilter implements Filter {
                     .append(": ")
                     .append(getValue(attrName,
                         Optional.ofNullable(session.getAttribute(attrName))))
-                    .append("\n"));
+                    .append('\n'));
             sb.append("SESSION ATTRIBUTES END \n\n");
         }
     }
@@ -196,16 +194,8 @@ public class MCRRequestDebugFilter implements Filter {
                     sb.append(s);
                     sb.append(", ");
                 }
-                sb.append("\n");
+                sb.append('\n');
             });
         sb.append("REQUEST PARAMETERS END \n\n");
     }
-
-    /* (non-Javadoc)
-     * @see jakarta.servlet.Filter#destroy()
-     */
-    @Override
-    public void destroy() {
-    }
-
 }

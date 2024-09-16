@@ -64,8 +64,8 @@ public class MCRPathEventHelper {
     }
 
     public static void fireFileMoveEvent(Path source, Path target, boolean create) throws IOException {
-        MCRPathEventHelper.fireFileEvent(create ? MCREvent.EventType.CREATE : MCREvent.EventType.UPDATE, target);
-        MCRPathEventHelper.fireFileDeleteEvent(source);
+        fireFileEvent(create ? MCREvent.EventType.CREATE : MCREvent.EventType.UPDATE, target);
+        fireFileDeleteEvent(source);
     }
 
 }

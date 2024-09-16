@@ -112,7 +112,7 @@
   <xsl:template name="externalIDs">
     <common:external-ids>
       <xsl:apply-templates select="//mods:identifier" />
-      <xsl:if test="not(mods:identifier[@type='doi' or @type='scopus' or @type='isbn' or @type='issn' or @type='urn' or @type='pubmed' or @type='pubmedcentral'])">
+      <xsl:if test="not(mods:identifier[@type='doi' or @type='scopus' or @type='isbn' or @type='issn' or @type='urn' or @type='pmid' or @type='pmc' or @type='worldcat' or @type='ppn' or @type='hdl'])">
         <xsl:call-template name="source-work-id" />
       </xsl:if>
     </common:external-ids>
@@ -151,35 +151,74 @@
     </common:external-id>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='isbn']|mods:identifier[@type='issn']">
+  <xsl:template match="mods:identifier[@type='isbn']">
     <common:external-id>
       <common:external-id-type><xsl:value-of select="@type" /></common:external-id-type>
       <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://www.worldcat.org/isbn/<xsl:value-of select="text()" /></common:external-id-url>
+      <xsl:call-template name="external-id-relationship" />
+    </common:external-id>
+  </xsl:template>
+
+  <xsl:template match="mods:identifier[@type='issn']">
+    <common:external-id>
+      <common:external-id-type><xsl:value-of select="@type" /></common:external-id-type>
+      <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://portal.issn.org/resource/issn/<xsl:value-of select="text()" /></common:external-id-url>
       <xsl:call-template name="external-id-relationship" />
     </common:external-id>
   </xsl:template>
 
   <xsl:template match="mods:identifier[@type='urn']">
     <common:external-id>
-      <common:external-id-type>urn</common:external-id-type>
+      <common:external-id-type><xsl:value-of select="@type" /></common:external-id-type>
       <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
       <common:external-id-url>https://nbn-resolving.org/html/<xsl:value-of select="text()" /></common:external-id-url>
       <xsl:call-template name="external-id-relationship" />
     </common:external-id>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='pubmed']">
+  <xsl:template match="mods:identifier[@type='pmid']">
     <common:external-id>
-      <common:external-id-type>pmid</common:external-id-type>
+      <common:external-id-type><xsl:value-of select="@type" /></common:external-id-type>
       <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://pubmed.ncbi.nlm.nih.gov/<xsl:value-of select="text()" /></common:external-id-url>
       <xsl:call-template name="external-id-relationship" />
     </common:external-id>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='pubmedcentral']">
+  <xsl:template match="mods:identifier[@type='pmc']">
     <common:external-id>
-      <common:external-id-type>pmc</common:external-id-type>
+      <common:external-id-type><xsl:value-of select="@type" /></common:external-id-type>
       <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://europepmc.org/article/pmc/<xsl:value-of select="text()" /></common:external-id-url>
+      <xsl:call-template name="external-id-relationship" />
+    </common:external-id>
+  </xsl:template>
+
+  <xsl:template match="mods:identifier[@type='worldcat']">
+    <common:external-id>
+      <common:external-id-type>oclc</common:external-id-type>
+      <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://www.worldcat.org/oclc/<xsl:value-of select="text()" /></common:external-id-url>
+      <xsl:call-template name="external-id-relationship" />
+    </common:external-id>
+  </xsl:template>
+
+  <xsl:template match="mods:identifier[@type='ppn']">
+    <common:external-id>
+      <common:external-id-type>k10plus</common:external-id-type>
+      <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://opac.k10plus.de/DB=2.299/PPNSET?PPN=<xsl:value-of select="text()" /></common:external-id-url>
+      <xsl:call-template name="external-id-relationship" />
+    </common:external-id>
+  </xsl:template>
+
+  <xsl:template match="mods:identifier[@type='hdl']">
+    <common:external-id>
+      <common:external-id-type>handle</common:external-id-type>
+      <common:external-id-value><xsl:value-of select="text()" /></common:external-id-value>
+      <common:external-id-url>https://hdl.handle.net/<xsl:value-of select="text()" /></common:external-id-url>
       <xsl:call-template name="external-id-relationship" />
     </common:external-id>
   </xsl:template>

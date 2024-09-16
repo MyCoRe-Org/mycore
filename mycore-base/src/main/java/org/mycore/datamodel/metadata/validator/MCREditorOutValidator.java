@@ -52,7 +52,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
@@ -70,6 +69,7 @@ import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.resource.MCRResourceHelper;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -230,20 +230,20 @@ public class MCREditorOutValidator {
     }
 
     static MCREditorMetadataValidator getObjectCheckInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObject(datasubtag, clazz, false);
+        return datasubtag -> checkMetaObject(datasubtag, clazz, false);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLangInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLang(datasubtag, clazz);
+        return datasubtag -> checkMetaObjectWithLang(datasubtag, clazz);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLangNotEmptyInstance(
         final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLangNotEmpty(datasubtag, clazz);
+        return datasubtag -> checkMetaObjectWithLangNotEmpty(datasubtag, clazz);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLinksInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLinks(datasubtag, clazz);
+        return datasubtag -> checkMetaObjectWithLinks(datasubtag, clazz);
     }
 
     /**
@@ -369,20 +369,23 @@ public class MCREditorOutValidator {
     }
 
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
+        Element validatedService;
         if (service == null) {
-            service = new Element("service");
-            root.addContent(service);
+            validatedService = new Element("service");
+            root.addContent(validatedService);
+        } else {
+            validatedService = service;
         }
-        List<Element> servicelist = service.getChildren();
+        List<Element> servicelist = validatedService.getChildren();
         for (Element datatag : servicelist) {
             checkMetaTags(datatag);
         }
 
-        if (service.getChild("servacls") == null &&
+        if (validatedService.getChild("servacls") == null &&
             MCRAccessManager.getAccessImpl() instanceof MCRRuleAccessInterface) {
             Collection<String> li = MCRAccessManager.getPermissionsForID(id.toString());
             if (li == null || li.isEmpty()) {
-                setDefaultObjectACLs(service);
+                setDefaultObjectACLs(validatedService);
             }
         }
     }
@@ -396,24 +399,7 @@ public class MCREditorOutValidator {
             LOGGER.info("Adding object default acl rule is disabled.");
             return;
         }
-        String resourcetype = "/editor_default_acls_" + id.getTypeId() + ".xml";
-        String resourcebase = "/editor_default_acls_" + id.getBase() + ".xml";
-        // Read stylesheet and add user
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcebase);
-        if (aclxml == null) {
-            aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
-            if (aclxml == null) {
-                LOGGER.warn("Can't find default object ACL file {} or {}", resourcebase.substring(1),
-                    resourcetype.substring(1));
-                String resource = "/editor_default_acls.xml"; // fallback
-                aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
-                if (aclxml == null) {
-                    return;
-                }
-            }
-        }
-        Document xml = SAX_BUILDER.build(aclxml);
-        Element acls = xml.getRootElement().getChild("servacls");
+        Element acls = loadDefaultAclDocument().getRootElement().getChild("servacls");
         if (acls == null) {
             return;
         }
@@ -426,35 +412,58 @@ public class MCREditorOutValidator {
             if (rootbool == null) {
                 continue;
             }
-            for (Element orbool : rootbool.getChildren("boolean")) {
-                for (Element firstcond : orbool.getChildren("condition")) {
-                    if (firstcond == null) {
-                        continue;
-                    }
-                    String value = firstcond.getAttributeValue("value");
-                    if (value == null) {
-                        continue;
-                    }
-                    if (value.equals("$CurrentUser")) {
-                        String thisuser = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-                        firstcond.setAttribute("value", thisuser);
-                        continue;
-                    }
-                    if (value.equals("$CurrentGroup")) {
-                        throw new MCRException(
-                            "The parameter $CurrentGroup in default ACLs is not supported as of MyCoRe 2014.06"
-                                + " because it is not supported in Servlet API 3.0");
-                    }
-                    int i = value.indexOf("$CurrentIP");
-                    if (i != -1) {
-                        String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-                        firstcond.setAttribute("value",
-                            value.substring(0, i) + thisip + value.substring(i + 10));
-                    }
+            updateConditionsValueAttribute(rootbool);
+        }
+        service.addContent(acls.detach());
+    }
+
+    private void updateConditionsValueAttribute(Element rootbool) {
+        for (Element orbool : rootbool.getChildren("boolean")) {
+            for (Element firstcond : orbool.getChildren("condition")) {
+                if (firstcond == null) {
+                    continue;
+                }
+                String value = firstcond.getAttributeValue("value");
+                if (value == null) {
+                    continue;
+                }
+                if (value.equals("$CurrentUser")) {
+                    String thisuser = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
+                    firstcond.setAttribute("value", thisuser);
+                    continue;
+                }
+                if (value.equals("$CurrentGroup")) {
+                    throw new MCRException(
+                        "The parameter $CurrentGroup in default ACLs is not supported as of MyCoRe 2014.06"
+                            + " because it is not supported in Servlet API 3.0");
+                }
+                int i = value.indexOf("$CurrentIP");
+                if (i != -1) {
+                    String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
+                    firstcond.setAttribute("value",
+                        value.substring(0, i) + thisip + value.substring(i + 10));
                 }
             }
         }
-        service.addContent(acls.detach());
+    }
+
+    private Document loadDefaultAclDocument() throws IOException, JDOMException {
+        String resourcetype = "/editor_default_acls_" + id.getTypeId() + ".xml";
+        String resourcebase = "/editor_default_acls_" + id.getBase() + ".xml";
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcebase);
+        if (aclxml == null) {
+            aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
+            if (aclxml == null) {
+                LOGGER.warn("Can't find default object ACL file {} or {}", resourcebase.substring(1),
+                    resourcetype.substring(1));
+                String resource = "/editor_default_acls.xml"; // fallback
+                aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
+                if (aclxml == null) {
+                    return null;
+                }
+            }
+        }
+        return SAX_BUILDER.build(aclxml);
     }
 
     private void checkObjectMetadata(Element metadata) {

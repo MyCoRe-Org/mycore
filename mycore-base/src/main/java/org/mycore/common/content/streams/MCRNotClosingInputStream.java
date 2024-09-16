@@ -42,6 +42,7 @@ public class MCRNotClosingInputStream extends FilterInputStream {
      * Does nothing. When you want to really close the stream, call reallyClose().
      */
     public void close() {
+        //Does nothing. When you want to really close the stream, call reallyClose().
     }
 
     /**

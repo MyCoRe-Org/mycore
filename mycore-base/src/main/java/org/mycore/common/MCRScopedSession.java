@@ -90,7 +90,7 @@ public final class MCRScopedSession extends MCRSession {
         ScopedValues values = scopedValues.get();
         try {
             if (values != null) {
-                MCRSession.clearClosableValues(values.map);
+                clearClosableValues(values.map);
             }
         } finally {
             scopedValues.remove();

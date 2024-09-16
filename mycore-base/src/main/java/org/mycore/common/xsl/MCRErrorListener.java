@@ -63,15 +63,15 @@ public class MCRErrorListener implements ErrorListener {
      */
     @Override
     public void warning(TransformerException exception) {
-        exception = unwrapException(exception);
-        StackTraceElement[] stackTrace = exception.getStackTrace();
+        TransformerException unwrappedException = unwrapException(exception);
+        StackTraceElement[] stackTrace = unwrappedException.getStackTrace();
         if (stackTrace.length > 0 && stackTrace[0].getMethodName().equals("message")) {
             //org.apache.xalan.transformer.MsgMgr.message to print a message
-            String messageAndLocation = getMyMessageAndLocation(exception);
+            String messageAndLocation = getMyMessageAndLocation(unwrappedException);
             this.lastMessage = messageAndLocation;
             LOGGER.info(messageAndLocation);
         } else {
-            LOGGER.warn("Exception while XSL transformation:{}", exception.getMessageAndLocation());
+            LOGGER.warn("Exception while XSL transformation:{}", unwrappedException.getMessageAndLocation());
         }
     }
 
@@ -80,11 +80,11 @@ public class MCRErrorListener implements ErrorListener {
      */
     @Override
     public void error(TransformerException exception) throws TransformerException {
-        exception = unwrapException(exception);
-        if (triggerException(exception)) {
-            LOGGER.error("Exception while XSL transformation:{}", exception.getMessageAndLocation());
+        TransformerException unwrappedException = unwrapException(exception);
+        if (triggerException(unwrappedException)) {
+            LOGGER.error("Exception while XSL transformation:{}", unwrappedException.getMessageAndLocation());
         }
-        throw exception;
+        throw unwrappedException;
     }
 
     /* (non-Javadoc)
@@ -92,17 +92,17 @@ public class MCRErrorListener implements ErrorListener {
      */
     @Override
     public void fatalError(TransformerException exception) throws TransformerException {
-        exception = unwrapException(exception);
-        StackTraceElement[] stackTrace = exception.getStackTrace();
+        TransformerException unwrappedException = unwrapException(exception);
+        StackTraceElement[] stackTrace = unwrappedException.getStackTrace();
         if (stackTrace.length > 0 && stackTrace[0].getMethodName().equals("execute")
             && stackTrace[0].getClassName().endsWith("ElemMessage")) {
-            LOGGER.debug("Original exception: ", exception);
-            exception = new TransformerException(lastMessage);
+            LOGGER.debug("Original exception: ", unwrappedException);
+            unwrappedException = new TransformerException(lastMessage);
         }
-        if (triggerException(exception)) {
-            LOGGER.fatal("Exception while XSL transformation.", exception);
+        if (triggerException(unwrappedException)) {
+            LOGGER.fatal("Exception while XSL transformation.", unwrappedException);
         }
-        throw exception;
+        throw unwrappedException;
     }
 
     public static TransformerException unwrapException(TransformerException exception) {

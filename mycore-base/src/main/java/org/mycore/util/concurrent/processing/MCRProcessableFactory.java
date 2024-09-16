@@ -19,6 +19,7 @@
 package org.mycore.util.concurrent.processing;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -52,9 +53,7 @@ public abstract class MCRProcessableFactory {
      * @throws NullPointerException if task null
      */
     public static Callable<Object> progressableCallable(Runnable task) {
-        if (task == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(task);
         return new RunnableProgressableAdapter<>(task);
     }
 

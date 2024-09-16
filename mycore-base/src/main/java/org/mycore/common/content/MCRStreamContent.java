@@ -20,6 +20,7 @@ package org.mycore.common.content;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 
@@ -36,9 +37,7 @@ public class MCRStreamContent extends MCRContent {
     private InputStream in;
 
     public MCRStreamContent(InputStream in) {
-        if (in == null) {
-            throw new NullPointerException("Cannot instantiate MCRStreamContent without InputStream.");
-        }
+        Objects.requireNonNull(in, "Cannot instantiate MCRStreamContent without InputStream.");
         this.in = in;
     }
 

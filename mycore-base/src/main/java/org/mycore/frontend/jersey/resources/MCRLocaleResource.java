@@ -46,7 +46,8 @@ public class MCRLocaleResource {
     @Context
     private ServletContext context;
 
-    private long cacheTime, startUpTime;
+    private long cacheTime;
+    private long startUpTime;
 
     @PostConstruct
     public void init() {

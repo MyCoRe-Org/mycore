@@ -194,7 +194,7 @@ public class MCRCategoryID implements Serializable {
      */
     public static boolean isValid(String id) {
         try {
-            MCRCategoryID.fromString(id);
+            fromString(id);
             return true;
         } catch (Exception e) {
             return false;

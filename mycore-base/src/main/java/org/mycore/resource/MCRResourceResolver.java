@@ -18,20 +18,13 @@
 
 package org.mycore.resource;
 
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
@@ -40,6 +33,14 @@ import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
+
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * A {@link MCRResourceResolver} is a component that uses a {@link MCRResourceProvider} instance to lookup resources.
@@ -55,6 +56,7 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * <ul>
  * <li> Hints are configured as a map using the property suffix {@link MCRResourceResolver#HINTS_KEY}.
  * <li> Providers are configured as a map using the property suffix {@link MCRResourceResolver#PROVIDERS_KEY}.
+ * <li> Each provider can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
  * <li> The selected provider is configured using the property suffix {@link MCRResourceResolver#SELECTED_PROVIDER_KEY}.
  * </ul>
  * Example:
@@ -67,8 +69,13 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * MCR.Resource.Resolver.Hints.bar.Key1=Value1
  * MCR.Resource.Resolver.Hints.bar.Key2=Value2
  * MCR.Resource.Resolver.Providers.foo.Class=foo.bar.FooProvider
+ * MCR.Resource.Resolver.Providers.foo.Enabled=true
  * MCR.Resource.Resolver.Providers.foo.Key1=Value1
  * MCR.Resource.Resolver.Providers.foo.Key2=Value2
+ * MCR.Resource.Resolver.Providers.bar.Class=foo.bar.BarProvider
+ * MCR.Resource.Resolver.Providers.bar.Enabled=false
+ * MCR.Resource.Resolver.Providers.bar.Key1=Value1
+ * MCR.Resource.Resolver.Providers.bar.Key2=Value2
  * MCR.Resource.Resolver.SelectedProvider=foo
  * </pre>
  * Although only one provider is ever in use, multiple providers can be prepared. This configuration mechanism greatly
@@ -324,7 +331,7 @@ public final class MCRResourceResolver {
         @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class)
         public Map<String, MCRHint<?>> hints;
 
-        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class)
+        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, sentinel = @MCRSentinel)
         public Map<String, MCRResourceProvider> providers;
 
         @MCRProperty(name = SELECTED_PROVIDER_KEY)
@@ -332,7 +339,12 @@ public final class MCRResourceResolver {
 
         @Override
         public MCRResourceResolver get() {
+
+            LOGGER.info("Found providers: " + String.join(", ", providers.keySet()));
+            LOGGER.info("Resolving resources with provider: " + selectedProvider);
+
             return new MCRResourceResolver(getHints(), getProvider(selectedProvider));
+
         }
 
         private MCRHints getHints() {
@@ -344,7 +356,8 @@ public final class MCRResourceResolver {
                 description.add(entry.getKey(), hint.getClass().getName());
                 builder.add(hint);
             }
-            LOGGER.info(description.logMessage("Resolving resources with default hints:"));
+
+            LOGGER.info(description.logMessage("Default hints:"));
 
             return builder.build();
 
@@ -359,7 +372,7 @@ public final class MCRResourceResolver {
             }
 
             MCRTreeMessage description = selectedProvider.compileDescription(LOGGER.getLevel());
-            LOGGER.info(description.logMessage("Resolving resources with provider " + selectedProviderName + ":"));
+            LOGGER.info(description.logMessage("Configuration of selected provider " + selectedProviderName + ":"));
 
             return selectedProvider;
 

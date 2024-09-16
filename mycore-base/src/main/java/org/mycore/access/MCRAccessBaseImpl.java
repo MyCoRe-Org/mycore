@@ -52,8 +52,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
     /** the logger */
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessBaseImpl.class);
 
-    public MCRAccessBaseImpl() {
-    }
+
 
     /*
      * (non-Javadoc)

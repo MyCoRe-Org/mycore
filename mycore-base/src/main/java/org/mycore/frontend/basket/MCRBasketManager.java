@@ -74,9 +74,6 @@ public class MCRBasketManager {
      */
     public static boolean contains(String type, String id) {
         MCRBasket basket = getBasketFromSession(type);
-        if (basket == null) {
-            return false;
-        }
-        return (basket.get(id) != null);
+        return basket != null && basket.get(id) != null;
     }
 }

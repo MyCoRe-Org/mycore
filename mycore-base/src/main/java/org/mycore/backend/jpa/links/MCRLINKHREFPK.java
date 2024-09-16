@@ -19,6 +19,7 @@
 package org.mycore.backend.jpa.links;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -139,37 +140,23 @@ public class MCRLINKHREFPK implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         MCRLINKHREFPK other = (MCRLINKHREFPK) obj;
-        if (mcrfrom == null) {
-            if (other.mcrfrom != null) {
-                return false;
-            }
-        } else if (!mcrfrom.equals(other.mcrfrom)) {
-            return false;
-        }
-        if (mcrto == null) {
-            if (other.mcrto != null) {
-                return false;
-            }
-        } else if (!mcrto.equals(other.mcrto)) {
-            return false;
-        }
-        if (mcrtype == null) {
-            return other.mcrtype == null;
-        } else {
-            return mcrtype.equals(other.mcrtype);
-        }
+        return !stringsAreEqual(mcrfrom, other.mcrfrom) &&
+                !stringsAreEqual(mcrto, other.mcrto) &&
+                !stringsAreEqual(mcrtype, other.mcrtype);
     }
 
+    //TODO: SHOW second
     @Override
     public String toString() {
         return "MCRLINKHREFPK [mcrfrom=" + mcrfrom + ", mcrto=" + mcrto + ", mcrtype=" + mcrtype + "]";
+    }
+
+    private boolean stringsAreEqual(String string, String otherString) {
+        return Objects.equals(string, otherString);
     }
 
 }

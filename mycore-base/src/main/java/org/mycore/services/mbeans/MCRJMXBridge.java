@@ -59,7 +59,7 @@ public class MCRJMXBridge implements Closeable {
         try {
             name = getObjectName(type, component);
         } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
+            LOGGER.debug(e);
             return;
         }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -70,7 +70,7 @@ public class MCRJMXBridge implements Closeable {
             mbs.registerMBean(mbean, name);
             ONAME_LIST.add(new WeakReference<>(name));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.debug(e);
         }
 
     }
@@ -83,7 +83,7 @@ public class MCRJMXBridge implements Closeable {
         try {
             name = getObjectName(type, component);
         } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
+            LOGGER.debug(e);
             return;
         }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -94,7 +94,7 @@ public class MCRJMXBridge implements Closeable {
             // As WeakReference does not overwrite Object.equals():
             ONAME_LIST.removeIf(wr -> name.equals(wr.get()));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.debug(e);
         }
 
     }
@@ -123,7 +123,7 @@ public class MCRJMXBridge implements Closeable {
                 mbs.unregisterMBean(objectName);
                 wrIterator.remove();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.debug(e);
             }
         }
         SINGLETON.clear();

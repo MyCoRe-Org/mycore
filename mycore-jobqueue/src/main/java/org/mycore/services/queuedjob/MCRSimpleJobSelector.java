@@ -64,7 +64,6 @@ import static org.mycore.common.config.MCRConfiguration2.splitValue;
  * {@link MCRSimpleJobSelector#STATUS_MODE_KEY}.
  * <li> The number of days con be configured using the configuration property
  * {@link MCRSimpleJobSelector#AGE_DAYS_KEY}.
- * <li> The property suffix {@link MCRJobQueueCleaner#ENABLED_KEY} can be used to enable or disable the selector.
  * </ul>
  * Example:
  * <pre>
@@ -74,7 +73,6 @@ import static org.mycore.common.config.MCRConfiguration2.splitValue;
  * [...].Statuses=NEW,PROCESSING
  * [...].StatusMode=EXCLUDE
  * [...].AgeDays=42
- * [...].Enabled=true
  * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRSimpleJobSelector.Factory.class)
@@ -90,8 +88,6 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public static final String AGE_DAYS_KEY = "AgeDays";
 
-    public static final String ENABLED_KEY = "Enabled";
-
     private final List<Class<? extends MCRJobAction>> actions;
 
     private final Mode actionMode;
@@ -102,10 +98,8 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     private final int ageDays;
 
-    private final boolean enabled;
-
     public MCRSimpleJobSelector(List<Class<? extends MCRJobAction>> actions, Mode actionMode,
-                                List<MCRJobStatus> statuses, Mode statusMode, int ageDays, boolean enabled) {
+                                List<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
         this.actions = new ArrayList<>(Objects.requireNonNull(actions, "Actions must not be null"));
         this.actions.forEach(obj -> Objects.requireNonNull(obj, "Action must not be null"));
         this.actionMode = Objects.requireNonNull(actionMode, "Action mode must not be null");
@@ -116,12 +110,6 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
             throw new IllegalArgumentException("Age [days] must not be negative");
         }
         this.ageDays = ageDays;
-        this.enabled = enabled;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 
     @Override
@@ -183,9 +171,6 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
         @MCRProperty(name = AGE_DAYS_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.AgeDays")
         public String ageDays;
 
-        @MCRProperty(name = ENABLED_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Enabled")
-        public String enabled;
-
         private String property;
 
         @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
@@ -205,9 +190,8 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
             Mode statusMode = Mode.valueOf(this.statusMode);
 
             int ageDays = Integer.parseInt(this.ageDays);
-            boolean enabled = Boolean.parseBoolean(this.enabled);
 
-            return new MCRSimpleJobSelector(actions, actionMode, statuses, statusMode, ageDays, enabled);
+            return new MCRSimpleJobSelector(actions, actionMode, statuses, statusMode, ageDays);
 
         }
 

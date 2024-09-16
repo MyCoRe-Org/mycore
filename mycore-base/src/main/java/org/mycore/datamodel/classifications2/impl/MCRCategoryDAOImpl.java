@@ -555,7 +555,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void repairLeftRightValue(String classID) {
         final MCRCategoryID rootID = MCRCategoryID.rootID(classID);
         withoutFlush(MCREntityManagerProvider.getCurrentEntityManager(), true, entityManager -> {
-            MCRCategoryImpl classification = MCRCategoryDAOImpl.getByNaturalID(entityManager, rootID);
+            MCRCategoryImpl classification = getByNaturalID(entityManager, rootID);
             classification.calculateLeftRightAndLevel(Integer.MAX_VALUE / 2, LEVEL_START_VALUE);
             entityManager.flush();
             classification.calculateLeftRightAndLevel(LEFT_START_VALUE, LEVEL_START_VALUE);

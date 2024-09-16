@@ -33,7 +33,6 @@ import com.sass_lang.embedded_protocol.InboundMessage.ImportResponse.ImportSucce
 import de.larsgrefer.sass.embedded.importer.CustomImporter;
 import de.larsgrefer.sass.embedded.importer.CustomUrlImporter;
 import de.larsgrefer.sass.embedded.util.SyntaxUtil;
-import jakarta.servlet.ServletContext;
 
 /**
  * The MCRResourceImporter class is responsible for importing resources from URLs that start with the "sass:/" prefix.
@@ -43,18 +42,7 @@ public class MCRResourceImporter extends CustomImporter {
 
     static final String SASS_URL_PREFIX = "sass:/";
 
-    private final ServletContext servletContext;
-
     private static final UrlHelper URL_HELPER = new UrlHelper();
-
-    /**
-     * Initializes a new instance of the MCRResourceImporter class.
-     *
-     * @param servletContext The ServletContext used for importing resources.
-     */
-    public MCRResourceImporter(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
 
     /**
      * Canonicalizes the given URL of the import and determines if it is from an `@import` rule.

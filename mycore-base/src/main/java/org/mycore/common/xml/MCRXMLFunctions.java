@@ -69,6 +69,7 @@ import org.jdom2.output.DOMOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
@@ -640,7 +641,7 @@ public class MCRXMLFunctions {
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
             return MCRCategLinkServiceHolder.INSTANCE.isInCategory(reference, categID);
-        } catch (Throwable e) {
+        } catch (MCRException e) {
             LOGGER.error("Error while checking if object is in category", e);
             return false;
         }
@@ -671,7 +672,7 @@ public class MCRXMLFunctions {
                 .map(Optional::get)
                 .map(MCRLabel::getText)
                 .orElse("");
-        } catch (Throwable e) {
+        } catch (MCRException e) {
             LOGGER.error("Could not determine display name for classification id {} and category id {}",
                 classificationId, categoryId, e);
             return "";
@@ -699,7 +700,7 @@ public class MCRXMLFunctions {
             MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             category = dao.getCategory(categID, 0);
-        } catch (Throwable e) {
+        } catch (MCRException e) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
                 categoryId, e);
         }
@@ -783,21 +784,25 @@ public class MCRXMLFunctions {
      */
     public static String nextImportStep(String includePart) {
         int border = includePart.indexOf(':');
+        String includePartSubString;
         String selfName = null;
         if (border > 0) {
             selfName = includePart.substring(border + 1);
-            includePart = includePart.substring(0, border);
+            includePartSubString = includePart.substring(0, border);
+        } else {
+            includePartSubString = includePart;
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("get next import step for {}", includePart);
+            LOGGER.debug("get next import step for {}", includePartSubString);
         }
         // get the parameters from mycore.properties
-        List<String> importList = MCRConfiguration2.getString("MCR.URIResolver.xslImports." + includePart)
+        List<String> importList = MCRConfiguration2.getString
+                        ("MCR.URIResolver.xslImports." + includePartSubString)
             .map(MCRConfiguration2::splitValue)
             .map(s -> s.collect(Collectors.toList()))
             .orElseGet(Collections::emptyList);
         if (importList.isEmpty()) {
-            LOGGER.info("MCR.URIResolver.xslImports.{} has no Stylesheets defined", includePart);
+            LOGGER.info("MCR.URIResolver.xslImports.{} has no Stylesheets defined", includePartSubString);
         } else {
             ListIterator<String> listIterator = importList.listIterator(importList.size());
 
@@ -900,14 +905,15 @@ public class MCRXMLFunctions {
      * @throws IllegalArgumentException if there is no way to convert the string to an NCName
      */
     public static String toNCName(String name) {
-        while (name.length() > 0 && !XMLChar.isNameStart(name.charAt(0))) {
-            name = name.substring(1);
+        String remainingName = name;
+        while (remainingName.length() > 0 && !XMLChar.isNameStart(remainingName.charAt(0))) {
+            remainingName = remainingName.substring(1);
         }
-        name = toNCNameSecondPart(name);
-        if (name.length() == 0) {
-            throw new IllegalArgumentException("Unable to convert '" + name + "' to valid NCName.");
+        String validNCName = toNCNameSecondPart(remainingName);
+        if (validNCName.length() == 0) {
+            throw new IllegalArgumentException("Unable to convert '" + validNCName + "' to valid NCName.");
         }
-        return name;
+        return validNCName;
     }
 
     /**

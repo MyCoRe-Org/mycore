@@ -249,7 +249,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     }
 
     public MCRPath toThisFileSystem(final MCRPath other) {
-        if (Objects.requireNonNull(other).getFileSystem() == this) {
+        if (Objects.requireNonNull(other).getFileSystem().equals(this)) {
             return other;
         }
         return getPath(other.root, other.path, this);
