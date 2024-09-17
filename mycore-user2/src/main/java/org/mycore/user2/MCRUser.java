@@ -546,7 +546,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public boolean isUserInRole(final String role) {
         boolean directMember = getSystemRoleIDs().contains(role) || getExternalRoleIDs().contains(role);
-        return directMember||MCRRoleManager.isAssignedToRole(this, role);
+        return directMember || MCRRoleManager.isAssignedToRole(this, role);
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -715,6 +715,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             .forEach(this::assignRole);
     }
 
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
     public void setUserAttribute(String name, String value) {
         Optional<MCRUserAttribute> anyMatch = getAttributes().stream()
             .filter(a -> a.getName().equals(Objects.requireNonNull(name)))
@@ -722,7 +723,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (anyMatch.isPresent()) {
             MCRUserAttribute attr = anyMatch.get();
             attr.setValue(value);
-            getAttributes().removeIf(a -> a.getName().equals(name) && !(a.equals(attr)));
+            getAttributes().removeIf(a -> a.getName().equals(name) && a != attr);
         } else {
             getAttributes().add(new MCRUserAttribute(name, value));
         }

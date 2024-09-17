@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
-import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -361,7 +360,8 @@ public class MCRUserServlet extends MCRServlet {
             try {
                 dateInUTC = validUntilText.length() == 10 ? convertToUTC(validUntilText, "yyyy-MM-dd") : validUntilText;
             } catch (ParseException e) {
-                throw new MCRException(MessageFormat.format("Failed to convert {0} to UTC", validUntilText), e);
+                String message = "Failed to convert " + validUntilText + " to UTC";
+                throw new MCRException(message, e);
             }
             MCRISO8601Date date = new MCRISO8601Date(dateInUTC);
             user.setValidUntil(date.getDate());
