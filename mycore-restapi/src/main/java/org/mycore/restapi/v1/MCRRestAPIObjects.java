@@ -325,15 +325,15 @@ public class MCRRestAPIObjects {
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     public Response uploadFile(@Context UriInfo info,
-                               @PathParam(PARAM_MCRID) String mcrObjID,
+        @PathParam(PARAM_MCRID) String mcrObjID,
         @PathParam(PARAM_DERID) String mcrDerID,
         @FormDataParam("file") InputStream uploadedInputStream,
-                               @FormDataParam("path") String path,
+        @FormDataParam("path") String path,
         @FormDataParam("maindoc") @DefaultValue("false") boolean maindoc,
         @FormDataParam("unzip") @DefaultValue("false") boolean unzip, @FormDataParam("md5") String md5,
         @FormDataParam("size") Long size) throws MCRRestAPIException {
         return MCRRestAPIUploadHelper.uploadFile(info, mcrObjID, mcrDerID, uploadedInputStream,
-                path, maindoc, unzip, md5, size);
+            path, maindoc, unzip, md5, size);
     }
 
     /**

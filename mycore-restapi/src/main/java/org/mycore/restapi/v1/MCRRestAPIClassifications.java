@@ -133,6 +133,7 @@ public class MCRRestAPIClassifications {
             writer.name("ID").value(e.getAttributeValue("ID"));
             writer.name("labels").beginArray();
             writeLabelJson(writer, lang, e);
+            writer.endArray();
 
             if (e.getChildren("category").size() > 0) {
                 writeChildrenAsJSON(e, writer, lang);
@@ -154,7 +155,6 @@ public class MCRRestAPIClassifications {
                 writer.endObject();
             }
         }
-        writer.endArray();
     }
 
     /**
@@ -358,7 +358,7 @@ public class MCRRestAPIClassifications {
 
         } catch (Exception e) {
             LogManager.getLogger(this.getClass()).error("Error outputting classification", e);
-           //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
+            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
             return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error outputting classification").build();
         }
     }
@@ -374,11 +374,11 @@ public class MCRRestAPIClassifications {
     }
 
     private Element getRootElement(Document doc, String filter) throws MCRRestAPIException {
-        String rootCategoryID=null;
+        String rootCategoryID = null;
         Element rootElement = doc.getRootElement();
         for (String f : filter.split(";")) {
             if (f.startsWith("root:")) {
-                rootCategoryID= f.substring(5);
+                rootCategoryID = f.substring(5);
             }
         }
         if (rootCategoryID != null) {
@@ -395,7 +395,6 @@ public class MCRRestAPIClassifications {
         }
         return rootElement;
     }
-
 
     private Response createResponse(String format, Element rootElement, String style, String callback, String filter)
         throws XMLParseException {
@@ -478,7 +477,7 @@ public class MCRRestAPIClassifications {
             writer.name("label");
             writer.beginArray();
             writeLabelJson(writer, finalLang, eRoot);
-
+            writer.endArray();
             if (eRoot.equals(eRoot.getDocument().getRootElement())) {
                 writeChildrenAsJSON(eRoot.getChild("categories"), writer, finalLang);
             } else {

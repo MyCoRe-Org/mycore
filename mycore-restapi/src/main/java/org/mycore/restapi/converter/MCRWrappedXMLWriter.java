@@ -64,11 +64,8 @@ public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
     }
 
     private static boolean verifyGenericType(Type genericType) {
-        if (!(genericType instanceof ParameterizedType pt)) {
-            return false;
-        }
-
-        if (pt.getActualTypeArguments().length > 1) {
+        if (!(genericType instanceof ParameterizedType pt) ||
+            pt.getActualTypeArguments().length > 1) {
             return false;
         }
 
@@ -76,12 +73,11 @@ public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
 
         if (ta instanceof ParameterizedType lpt) {
             return (lpt.getRawType() instanceof Class rawType)
-                    && JAXBElement.class.isAssignableFrom(rawType);
+                && JAXBElement.class.isAssignableFrom(rawType);
         }
 
-        return pt.getActualTypeArguments()[0] instanceof Class listClass;
+        return pt.getActualTypeArguments()[0] instanceof Class listClass && JAXB_CHECKER.test(listClass);
     }
-
 
     private static Class getElementClass(Class<?> type, Type genericType) {
         Type ta;

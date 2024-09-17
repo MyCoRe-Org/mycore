@@ -104,7 +104,9 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
             //check if the Authorization header was sent
             || requestContext.getHeaderString(HttpHeaders.AUTHORIZATION) != null;
         MultivaluedMap<String, Object> responseHeaders = responseContext.getHeaders();
-        responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, authenticatedRequest);
+        if (authenticatedRequest) {
+            responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
+        }
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, authenticatedRequest ? origin : "*");
         if (!handlePreFlight(requestContext, responseHeaders)) {
             //not a CORS preflight request
@@ -131,6 +133,11 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
                     exposedHeaders.stream().collect(Collectors.joining(",")));
             }
         }
+        setAccessControlAllowCredentials(responseHeaders);
+        LOGGER.debug("Response-Header: {}", responseHeaders);
+    }
+
+    private void setAccessControlAllowCredentials(MultivaluedMap<String, Object> responseHeaders) {
         if (!Objects.equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN), "*")) {
             String vary = Stream
                 .concat(Stream.of(ORIGIN),
@@ -143,7 +150,6 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
                 .collect(Collectors.joining(","));
             responseHeaders.putSingle(HttpHeaders.VARY, vary);
         }
-        LOGGER.debug("Response-Header: {}", responseHeaders);
     }
 
 }

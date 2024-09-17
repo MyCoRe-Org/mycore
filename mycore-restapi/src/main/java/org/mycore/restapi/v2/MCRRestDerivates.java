@@ -417,7 +417,7 @@ public class MCRRestDerivates {
 
         LOGGER.debug(der);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
-        boolean modified = isModified(der, derivate);
+        boolean modified = updateIfModified(der, derivate);
         if (modified) {
             try {
                 MCRMetadataManager.update(derivate);
@@ -434,7 +434,7 @@ public class MCRRestDerivates {
         return Response.noContent().build();
     }
 
-    private static boolean isModified(DerivateMetadata der, MCRDerivate derivate) {
+    private static boolean updateIfModified(DerivateMetadata der, MCRDerivate derivate) {
         boolean modified = false;
 
         // Check if the 'order' field has been updated

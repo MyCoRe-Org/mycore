@@ -609,11 +609,8 @@ public class MCRRestAPIObjectsHelper {
                                 e.getMessage()));
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
-                    if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
                         String result = listDerivateContentAsJson(derObj, path, depth, info, app);
                         return response(result, "application/json", lastModified);
-                    }
-                    // fallthrough
                 default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                         new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
