@@ -55,7 +55,7 @@ public class MCRURLConfigSetProvider extends MCRSolrConfigSetProvider {
     }
 
     @Override
-    protected Supplier<InputStream> getStreamSupplier() {
+    public Supplier<InputStream> getStreamSupplier() {
         return () -> {
             try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
                 HttpRequest request = MCRHttpUtils.getRequestBuilder().uri(uri).build();

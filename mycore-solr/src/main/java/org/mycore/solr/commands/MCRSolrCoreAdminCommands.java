@@ -26,6 +26,10 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_TYPE_SUFFIX;
 
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -39,6 +43,8 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.cloud.configsets.MCRSolrConfigSetHelper;
+import org.mycore.solr.cloud.configsets.MCRSolrConfigSetProvider;
 import org.mycore.solr.schema.MCRSolrConfigReloader;
 import org.mycore.solr.schema.MCRSolrSchemaReloader;
 
@@ -188,4 +194,33 @@ public class MCRSolrCoreAdminCommands {
         MCRSolrSchemaReloader.processSchemaFiles(configType, coreID);
         MCRSolrConfigReloader.processConfigFiles(configType, coreID);
     }
+
+    @MCRCommand(
+            syntax = "export solr configset {0} to folder {1}",
+            help = "exports a solr configset to a folder",
+            order = 80)
+    public static void exportSolrConfigSet(String configSet, String folder) {
+        Path exportFolder = Paths.get(folder);
+        if(Files.notExists(exportFolder)) {
+            LOGGER.error("Folder {} does not exist", exportFolder);
+            return;
+        }
+
+        Map<String, MCRSolrConfigSetProvider> configSets = MCRSolrConfigSetHelper.getLocalConfigSets();
+        if(!configSets.containsKey(configSet)) {
+            LOGGER.error("ConfigSet {} not found", configSet);
+            return;
+        }
+
+        MCRSolrConfigSetProvider configSetProvider = configSets.get(configSet);
+        InputStream zipStream = configSetProvider.getStreamSupplier().get();
+        Path zipFile = exportFolder.resolve(configSet + ".zip");
+        try {
+            Files.copy(zipStream, zipFile);
+            LOGGER.info("ConfigSet {} exported to {}", configSet, zipFile);
+        } catch (Exception e) {
+            LOGGER.error("Error exporting configset", e);
+        }
+    }
+
 }

@@ -29,6 +29,6 @@ public abstract class MCRSolrConfigSetProvider {
     /**
      * Provides the file content as input stream.
      */
-    protected abstract Supplier<InputStream> getStreamSupplier();
+    public abstract Supplier<InputStream> getStreamSupplier();
 
 }
