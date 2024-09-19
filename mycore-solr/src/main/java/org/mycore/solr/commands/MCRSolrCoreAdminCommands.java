@@ -206,6 +206,11 @@ public class MCRSolrCoreAdminCommands {
             return;
         }
 
+        if(!Files.isDirectory(exportFolder)){
+            LOGGER.error("Folder {} is not a directory", exportFolder);
+            return;
+        }
+
         Map<String, MCRSolrConfigSetProvider> configSets = MCRSolrConfigSetHelper.getLocalConfigSets();
         if(!configSets.containsKey(configSet)) {
             LOGGER.error("ConfigSet {} not found", configSet);
