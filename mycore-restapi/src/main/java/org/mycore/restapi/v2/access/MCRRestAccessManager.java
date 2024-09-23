@@ -30,12 +30,13 @@ public class MCRRestAccessManager {
     private static final String REST_API_OBJECT_ID = "restapi:/";
 
     /**
-     * Checks access to a REST API resource based on a given permission and path.
+     * Checks access to the REST API based on general and specific permissions and rules.
      *
-     * This method first checks whether a rule applies to the entire REST API
-     * ({@code REST_API_OBJECT_ID}). If this rule exists and the required permission is granted,
-     * it proceeds to check whether a specific rule exists for the given path.
-     * Based on the rules, it determines whether access to the path is allowed or not.
+     * This method evaluates both general permissions and specific permissions for a given
+     * object identified by its path. First, it evaluates the rules for general and specific permissions.
+     * If no specific rule for the object exists, only the general permission is considered.
+     * If no general rule exists, the specific permission will determine access.
+     * If both rules are present, both permissions must be granted.
      *
      * @param aclProvider an {@code MCRAccessInterface} used to check permissions
      * @param permission the permission to be checked
@@ -43,16 +44,19 @@ public class MCRRestAccessManager {
      * @return {@code true} if access is granted, otherwise {@code false}.
      */
     public static boolean checkRestAPIAccess(MCRAccessInterface aclProvider, String permission, String path) {
-        final MCRAccessInterface acl = MCRAccessManager.getAccessImpl(); // TODO use aclProvider instead?
+        final MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
         final String objectId = getObjectId(path);
-        if ((acl instanceof MCRRuleAccessInterface ruleAccess) && !ruleAccess.hasRule(REST_API_OBJECT_ID, permission)
-            && ruleAccess.hasRule(objectId, permission)) {
-            return aclProvider.checkPermission(objectId, permission);
+        final boolean hasGeneralPermission = aclProvider.checkPermission(REST_API_OBJECT_ID, permission);
+        // check has no specific rule
+        if (!checkHasRule(acl, objectId, permission)) {
+            return hasGeneralPermission;
         }
-        if (!aclProvider.checkPermission(REST_API_OBJECT_ID, permission)) {
-            return false;
+        final boolean hasSpecificPermission = aclProvider.checkPermission(objectId, permission);
+        // check has no general rule
+        if (!checkHasRule(acl, REST_API_OBJECT_ID, permission)) {
+            return hasSpecificPermission;
         }
-        return checkHasRule(acl, objectId, permission) ? aclProvider.checkPermission(objectId, permission) : true;
+        return hasGeneralPermission && hasSpecificPermission;
     }
 
     private static boolean checkHasRule(MCRAccessInterface aclProvider, String objectId, String permission) {
