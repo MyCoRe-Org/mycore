@@ -166,7 +166,7 @@ public class NavbarIT extends ViewerTestBase {
     private int selectPrevImgAndCountColor(ToolBarController tbController, String label, Color color)
         throws InterruptedException {
         tbController.pressButton(ToolBarController.BUTTON_ID_PREV_IMG);
-        ViewerTestBase.sleep(500);
+        sleep(500);
 
         return countColor(tbController, label, color);
     }
@@ -174,7 +174,7 @@ public class NavbarIT extends ViewerTestBase {
     private int selectNextImgAndCountColor(ToolBarController tbController, String label, Color color)
         throws InterruptedException {
         tbController.pressButton(ToolBarController.BUTTON_ID_NEXT_IMG);
-        ViewerTestBase.sleep(500);
+        sleep(500);
 
         return countColor(tbController, label, color);
     }
@@ -202,7 +202,7 @@ public class NavbarIT extends ViewerTestBase {
     private int selectImgAndCountColor(ToolBarController tbController, String label, Color color)
         throws InterruptedException {
         tbController.selectPictureWithOrder(label);
-        ViewerTestBase.sleep(500);
+        sleep(500);
 
         return countColor(tbController, label, color);
     }

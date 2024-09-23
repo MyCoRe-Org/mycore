@@ -22,8 +22,6 @@ import org.mycore.iview.tests.model.TestDerivate;
 import org.openqa.selenium.WebDriver;
 
 public abstract class ApplicationController {
-    public ApplicationController() {
-    }
 
     public abstract void init();
 
