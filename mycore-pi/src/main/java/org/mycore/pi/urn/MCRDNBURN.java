@@ -39,6 +39,7 @@ public class MCRDNBURN extends MCRUniformResourceName {
      *
      * @throws IllegalArgumentException when the given char is not allowed
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     private static int getIntegerAlias(char c) throws IllegalArgumentException {
         return switch (c) {
             case '0' -> 1;
