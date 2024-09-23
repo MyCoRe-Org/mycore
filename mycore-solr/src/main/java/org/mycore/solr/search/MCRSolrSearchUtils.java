@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -238,7 +237,6 @@ public abstract class MCRSolrSearchUtils {
             if (action == null) {
                 throw new IllegalArgumentException("Action cannot be null");
             }
-            Objects.requireNonNull(action);
             long i = start;
             long size = estimateSize();
             if (size > 0) {
