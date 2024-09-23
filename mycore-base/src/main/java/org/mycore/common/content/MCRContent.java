@@ -80,7 +80,9 @@ public abstract class MCRContent {
      */
     protected long lastModified = -1;
 
-    protected String mimeType, encoding, name;
+    protected String mimeType;
+    protected String encoding;
+    protected String name;
 
     protected boolean usingSession = false;
 

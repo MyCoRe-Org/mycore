@@ -45,7 +45,7 @@ public class MCRSecureTokenV2FilterConfig {
 
     private static Pattern securedExtensions;
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static {
         List<String> propertyValues = MCRConfiguration2.getString("MCR.SecureTokenV2.Extensions")

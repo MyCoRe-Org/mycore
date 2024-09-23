@@ -166,7 +166,7 @@ public class MCRDNBURNRestClient {
     }
 
     public static Optional<JsonObject> getRegistrationInfo(String identifier) {
-        String url = MCRDNBURNRestClient.getBaseServiceURL() + "/urn/" + identifier;
+        String url = getBaseServiceURL() + "/urn/" + identifier;
         return MCRHttpsClient.get(url, Optional.empty(), response -> {
             int statusCode = response.getCode();
             switch (statusCode) {
@@ -182,7 +182,7 @@ public class MCRDNBURNRestClient {
                 }
                 default -> {
                     LOGGER.error("Error while get registration info for URN {} using url {}.", identifier, url);
-                    MCRDNBURNRestClient.logFailure("", response, statusCode, identifier, url);
+                    logFailure("", response, statusCode, identifier, url);
                 }
             }
             return Optional.empty();

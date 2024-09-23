@@ -19,6 +19,7 @@
 package org.mycore.backend.jpa.access;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -103,52 +104,25 @@ public class MCRACCESSRULE {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof MCRACCESSRULE other)) {
             return false;
         }
-        if (creationdate == null) {
-            if (other.getCreationdate() != null) {
-                return false;
-            }
-        } else {
-            if (other.getCreationdate() == null) {
-                return false;
-            }
-            // We will remove milliseconds as they don't need to be saved
-            long thisLong = creationdate.getTime() / 1000;
-            long otherLong = other.getCreationdate().getTime() / 1000;
-            if (thisLong != otherLong) {
-                return false;
-            }
-        }
-        if (creator == null) {
-            if (other.getCreator() != null) {
-                return false;
-            }
-        } else if (!creator.equals(other.getCreator())) {
-            return false;
-        }
-        if (description == null) {
-            if (other.getDescription() != null) {
-                return false;
-            }
-        } else if (!description.equals(other.getDescription())) {
-            return false;
-        }
-        if (rid == null) {
-            if (other.getRid() != null) {
-                return false;
-            }
-        } else if (!rid.equals(other.getRid())) {
-            return false;
-        }
-        if (rule == null) {
-            return other.getRule() == null;
-        } else {
-            return rule.equals(other.getRule());
-        }
+        return timestampsAreEqual(creationdate, other.getCreationdate()) &&
+                stringsAreEqual(creator, other.getCreator()) &&
+                stringsAreEqual(description, other.getDescription()) &&
+                stringsAreEqual(rid, other.getRid()) &&
+                stringsAreEqual(rule, other.getRule());
+    }
+
+
+
+    private boolean timestampsAreEqual(Timestamp timestamp, Timestamp otherTimestamp) {
+        return (!((timestamp == null && otherTimestamp != null)
+                || !Objects.equals(timestamp, otherTimestamp) &&
+                !Objects.equals(timestamp.getTime() / 1000, otherTimestamp.getTime() / 1000)));
+    }
+
+    private boolean stringsAreEqual(String string, String otherString) {
+        return Objects.equals(string, otherString);
     }
 }

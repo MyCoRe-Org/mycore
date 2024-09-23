@@ -238,25 +238,20 @@ public class MCRMetaLinkID extends MCRMetaLink {
 
     @Override
     public boolean equals(Object obj) {
-        if (!super.equals(obj)) {
-            return false;
-        }
+        boolean result;
         MCRMetaLinkID other = (MCRMetaLinkID) obj;
-        if (!Objects.equals(from, other.from)) {
-            return false;
-        } else if (!Objects.equals(href, other.href)) {
-            return false;
-        } else if (!Objects.equals(label, other.label)) {
-            return false;
-        } else if (!Objects.equals(linktype, other.linktype)) {
-            return false;
-        } else if (!Objects.equals(role, other.role)) {
-            return false;
-        } else if (!Objects.equals(title, other.title)) {
-            return false;
+        if (!super.equals(obj)||(!Objects.equals(from, other.from)
+                ||!Objects.equals(href, other.href)
+                ||!Objects.equals(label, other.label)
+                ||!Objects.equals(linktype, other.linktype)
+                ||!Objects.equals(title, other.title)
+                ||!Objects.equals(role, other.role))
+        ){
+            result= false;
         } else {
-            return Objects.equals(to, other.to);
+            result= Objects.equals(to, other.to);
         }
+        return result;
     }
 
     @Override

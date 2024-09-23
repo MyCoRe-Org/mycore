@@ -83,81 +83,100 @@ public class MCRFunctions {
     }
 
     private static int addCharacterClass(final StringBuilder regex, final String globPattern, int nextPos) {
-        regex.append("[[^/]&&[");
-        if (nextCharAt(globPattern, nextPos) == '^') {
-            // escape the regex negation char if it appears
-            regex.append("\\^");
-            nextPos++;
-        } else {
-            // negation
-            if (nextCharAt(globPattern, nextPos) == '!') {
-                regex.append('^');
-                nextPos++;
-            }
-            // hyphen allowed at start
-            if (nextCharAt(globPattern, nextPos) == '-') {
-                regex.append('-');
-                nextPos++;
-            }
-        }
+        int currentIndex = getCurrentIndex(regex, globPattern, nextPos);
         boolean inRange = false;
         char rangeStartChar = 0;
         char curChar = '[';
-        while (nextPos < globPattern.length()) {
-            curChar = globPattern.charAt(nextPos++);
-            if (curChar == ']') {
-                break;
-            }
-            if (curChar == MCRAbstractFileSystem.SEPARATOR) {
-                throw new PatternSyntaxException("Chracter classes cannot cross directory boundaries.", globPattern,
-                    nextPos - 1);
-            }
-            if (curChar == '\\' || curChar == '[' || curChar == '&' && nextCharAt(globPattern, nextPos) == '&') {
-                // escape '\', '[' or "&&"
-                regex.append('\\');
-            }
-            regex.append(curChar);
+        while (currentIndex < globPattern.length()) {
+            curChar = globPattern.charAt(currentIndex++);
 
-            if (curChar == '-') {
-                if (!inRange) {
-                    throw new PatternSyntaxException("Invalid range.", globPattern, nextPos - 1);
-                }
-                curChar = nextCharAt(globPattern, nextPos++);
-                if (curChar == END_OF_PATTERN || curChar == ']') {
+            switch (curChar) {
+                case ']':
                     break;
-                }
-                if (curChar < rangeStartChar) {
-                    throw new PatternSyntaxException("Invalid range.", globPattern, nextPos - 3);
-                }
-                regex.append(curChar);
-                inRange = false;
-            } else {
-                inRange = true;
-                rangeStartChar = curChar;
+
+                case MCRAbstractFileSystem.SEPARATOR:
+                    throw new PatternSyntaxException("Character classes cannot cross directory boundaries.",
+                        globPattern, currentIndex - 1);
+
+                case '\\':
+                case '[':
+                    regex.append('\\');
+                    regex.append(curChar);
+                    break;
+
+                case '&':
+                    if (nextCharAt(globPattern, currentIndex) == '&') {
+                        regex.append('\\');
+                    }
+                    regex.append(curChar);
+                    break;
+
+                case '-':
+                    if (!inRange) {
+                        throw new PatternSyntaxException("Invalid range.", globPattern, currentIndex - 1);
+                    }
+                    curChar = nextCharAt(globPattern, currentIndex++);
+                    if (curChar == END_OF_PATTERN || curChar == ']') {
+                        break;
+                    }
+                    if (curChar < rangeStartChar) {
+                        throw new PatternSyntaxException("Invalid range.", globPattern, currentIndex - 3);
+                    }
+                    regex.append(curChar);
+                    inRange = false;
+                    break;
+
+                default:
+                    regex.append(curChar);
+                    inRange = true;
+                    rangeStartChar = curChar;
+                    break;
             }
         }
+
         if (curChar != ']') {
-            throw new PatternSyntaxException("Missing ']'.", globPattern, nextPos - 1);
+            throw new PatternSyntaxException("Missing ']'.", globPattern, currentIndex - 1);
         }
         regex.append("]]");
-        return nextPos;
+        return currentIndex;
+    }
+
+    private static int getCurrentIndex(StringBuilder regex, String globPattern, int nextPos) {
+        int currentIndex = nextPos;
+        regex.append("[[^/]&&[");
+        if (nextCharAt(globPattern, currentIndex) == '^') {
+            // escape the regex negation char if it appears
+            regex.append("\\^");
+            currentIndex++;
+        } else {
+            // negation
+            if (nextCharAt(globPattern, currentIndex) == '!') {
+                regex.append('^');
+                currentIndex++;
+            }
+            // hyphen allowed at start
+            if (nextCharAt(globPattern, currentIndex) == '-') {
+                regex.append('-');
+                currentIndex++;
+            }
+        }
+        return currentIndex;
     }
 
     private static boolean endGroup(final StringBuilder regex, boolean isInGroup) {
         if (isInGroup) {
-            isInGroup = false;
             regex.append("))");
         } else {
             regex.append('}');
         }
-        return isInGroup;
+        return false;
     }
 
     private static int escapeCharacter(final StringBuilder regex, final String globPattern, int nextPos) {
         if (nextPos == globPattern.length()) {
             throw new PatternSyntaxException("No character left to escape.", globPattern, nextPos - 1);
         }
-        final char next = globPattern.charAt(nextPos++);
+        final char next = globPattern.charAt(nextPos+1);
         if (isGlobReserved(next) || isRegexReserved(next)) {
             regex.append('\\');
         }
@@ -169,12 +188,12 @@ public class MCRFunctions {
         if (nextCharAt(globPattern, nextPos) == '*') {
             //The ** characters matches zero or more characters crossing directory boundaries.
             regex.append(".*");
-            nextPos++;
+            return nextPos+1;
         } else {
             //The * character matches zero or more characters of a name component without crossing directory boundaries
             regex.append("[^/]*");
+            return nextPos;
         }
-        return nextPos;
     }
 
     private static boolean isGlobReserved(final char c) {

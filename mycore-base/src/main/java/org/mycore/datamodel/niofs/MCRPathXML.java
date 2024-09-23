@@ -17,7 +17,7 @@
  */
 
 package org.mycore.datamodel.niofs;
-
+//@TODO TEST: testclass and test (0% coverage)
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
@@ -130,27 +130,27 @@ public class MCRPathXML {
         //store current directory statistics
         addString(here, "directories", Integer.toString(directories.size()), false);
         addString(here, "files", Integer.toString(files.size()), false);
-        for (Map.Entry<MCRPath, MCRFileAttributes<?>> dirEntry : directories.entrySet()) {
-            Element child = new Element("child");
-            child.setAttribute("type", "directory");
-            addString(child, "name", dirEntry.getKey().getFileName().toString(), true);
-            addString(child, "uri", dirEntry.getKey().toUri().toString(), false);
-            nodes.addContent(child);
-            addBasicAttributes(child, dirEntry.getValue(), dirEntry.getKey());
-        }
-        for (Map.Entry<MCRPath, MCRFileAttributes<?>> fileEntry : files.entrySet()) {
-            Element child = new Element("child");
-            child.setAttribute("type", "file");
-            addString(child, "name", fileEntry.getKey().getFileName().toString(), true);
-            addString(child, "uri", fileEntry.getKey().toUri().toString(), false);
-            nodes.addContent(child);
-            addAttributes(child, fileEntry.getValue(), fileEntry.getKey());
-        }
+        directories = mapItemsToElementAndType(nodes, "directory");
+        files = mapItemsToElementAndType(nodes, "file");
 
         LOGGER.debug("MCRDirectoryXML: end listing of directory {}", path);
 
         return doc;
 
+    }
+
+    private static SortedMap<MCRPath, MCRFileAttributes<?>> mapItemsToElementAndType(Element nodes, String type)
+        throws IOException {
+        SortedMap<MCRPath, MCRFileAttributes<?>> itemMap = new TreeMap<>();
+        for (Map.Entry<MCRPath, MCRFileAttributes<?>> fileEntry : itemMap.entrySet()) {
+            Element child = new Element("child");
+            child.setAttribute("type", type);
+            addString(child, "name", fileEntry.getKey().getFileName().toString(), true);
+            addString(child, "uri", fileEntry.getKey().toUri().toString(), false);
+            nodes.addContent(child);
+            addAttributes(child, fileEntry.getValue(), fileEntry.getKey());
+        }
+        return itemMap;
     }
 
     /**
@@ -177,10 +177,10 @@ public class MCRPathXML {
         String absolutePath = path.getOwnerRelativePath();
         root.setAttribute("path", absolutePath);
         root.setAttribute("extension", getFileExtension(fileName));
-        root.setAttribute("returnId",
-            MCRMetadataManager.getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
-        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
-            new MCRCategLinkReference(path));
+        root.setAttribute("returnId", MCRMetadataManager
+                .getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
+        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
+                .getLinksFromReference(new MCRCategLinkReference(path));
         for (MCRCategoryID category : linksFromReference) {
             Element catEl = new Element("category");
             catEl.setAttribute("id", category.toString());

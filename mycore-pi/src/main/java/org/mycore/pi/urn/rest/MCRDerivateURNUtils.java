@@ -148,7 +148,7 @@ public class MCRDerivateURNUtils {
         try {
             return SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
 
         return false;

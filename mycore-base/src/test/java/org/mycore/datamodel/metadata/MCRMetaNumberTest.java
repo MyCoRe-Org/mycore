@@ -89,8 +89,8 @@ public class MCRMetaNumberTest extends MCRTestCase {
         imported.addContent(new Text("0.100"));
         meta_number.setFromDOM(imported);
         Element exported = meta_number.createXML();
-        print_data(imported, exported);
-        check_data(imported, exported);
+        printData(imported, exported);
+        checkData(imported, exported);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
         return testProperties;
     }
 
-    private void print_data(Element imported, Element exported) {
+    private void printData(Element imported, Element exported) {
         if (LOGGER.isDebugEnabled()) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             StringWriter sw = new StringWriter();
@@ -116,7 +116,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
         }
     }
 
-    private void check_data(Element imported, Element exported) {
+    private void checkData(Element imported, Element exported) {
         try {
             assertTrue(MCRXMLHelper.deepEqual(new Document(imported), new Document(exported)));
         } catch (AssertionError e) {

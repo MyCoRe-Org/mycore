@@ -409,7 +409,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
                         //typically if a RuntimeException has no cause,
                         //we can get the "real cause" from MCRErrorListener, yeah!!!
-                        throw new RuntimeException(MCRErrorListener.getMyMessageAndLocation(el.getExceptionThrown()),
+                        throw new MCRException(MCRErrorListener.getMyMessageAndLocation(el.getExceptionThrown()),
                             el.getExceptionThrown());
                     }
                     throw e;

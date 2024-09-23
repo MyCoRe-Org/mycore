@@ -65,17 +65,17 @@ public class MCRWorkflowRuleParser extends MCRRuleParser {
     @Override
     protected MCRCondition<?> parseString(String s) {
         if (s.startsWith(STATUS)) {
-            s = s.substring(STATUS.length()).trim();
+            String remainingString = s.substring(STATUS.length()).trim();
             boolean not;
             String value;
-            if (s.startsWith(EQUALS_NOT)) {
+            if (remainingString.startsWith(EQUALS_NOT)) {
                 not = true;
-                value = s.substring(EQUALS_NOT.length()).trim();
-            } else if (s.startsWith(EQUALS)) {
+                value = remainingString.substring(EQUALS_NOT.length()).trim();
+            } else if (remainingString.startsWith(EQUALS)) {
                 not = false;
-                value = s.substring(EQUALS.length()).trim();
+                value = remainingString.substring(EQUALS.length()).trim();
             } else {
-                throw new MCRParseException("syntax error: " + s);
+                throw new MCRParseException("syntax error: " + remainingString);
             }
             return new MCRCategoryCondition(STATUS, new MCRCategoryID(statusClassId.getRootID(), value), not);
         }

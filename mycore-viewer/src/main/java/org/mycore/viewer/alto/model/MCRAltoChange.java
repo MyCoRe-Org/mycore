@@ -19,6 +19,9 @@
 package org.mycore.viewer.alto.model;
 
 public class MCRAltoChange {
+    private String file;
+    private String type;
+
     public MCRAltoChange(String file, String type) {
         this.file = file;
         this.type = type;
@@ -26,10 +29,6 @@ public class MCRAltoChange {
 
     public MCRAltoChange() {
     }
-
-    private String file;
-
-    private String type;
 
     public String getFile() {
         return file;

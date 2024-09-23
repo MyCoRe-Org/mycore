@@ -72,9 +72,10 @@ public class MCRBlockingInputStream extends BufferedInputStream {
     public int read(byte[] buf, int off, int len) throws IOException {
         int total = 0;
         int num = 0;
-
-        while (len > 0) {
-            num = super.read(buf, off, len);
+        int length = len;
+        int offset = off;
+        while (length > 0) {
+            num = super.read(buf, offset, length);
 
             if (num == 0) {
                 continue;
@@ -85,8 +86,8 @@ public class MCRBlockingInputStream extends BufferedInputStream {
             }
 
             total += num;
-            off += num;
-            len -= num;
+            offset += num;
+            length -= num;
         }
 
         return total == 0 ? num : total;

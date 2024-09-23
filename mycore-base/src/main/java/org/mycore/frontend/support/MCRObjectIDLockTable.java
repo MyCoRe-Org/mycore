@@ -79,12 +79,12 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
 
     public static boolean isLockedByCurrentSession(String objectId) {
         MCRObjectID objId = MCRObjectID.getInstance(objectId);
-        return MCRObjectIDLockTable.isLockedByCurrentSession(objId);
+        return isLockedByCurrentSession(objId);
     }
 
     public static String getLockingUserName(String objectId) {
         MCRObjectID objId = MCRObjectID.getInstance(objectId);
-        MCRSession locker = MCRObjectIDLockTable.getLocker(objId);
+        MCRSession locker = getLocker(objId);
         if (locker == null) {
             return null;
         }

@@ -20,6 +20,7 @@ package org.mycore.common.xml;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
@@ -58,7 +59,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
         if (!silent) {
             LOGGER.error(getSAXErrorMessage(ex), ex);
         }
-        throw new RuntimeException(ex);
+        throw new MCRException(ex);
     }
 
     /**
@@ -68,7 +69,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
         if (!silent) {
             LOGGER.fatal(getSAXErrorMessage(ex));
         }
-        throw new RuntimeException(ex);
+        throw new MCRException(ex);
     }
 
     /**

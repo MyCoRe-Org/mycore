@@ -28,8 +28,6 @@ import java.util.UUID;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -48,21 +46,14 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRCrossrefService extends MCRDOIBaseService {
 
-    private static final String CONFIG_TEST = "Test";
-
-    private static final String CONFIG_REGISTRANT = "Registrant";
-
-    private static final String CONFIG_DEPOSITOR_MAIL = "DepositorMail";
-
-    private static final String CONFIG_DEPOSITOR = "Depositor";
-
     public static final String DEFAULT_SCHEMA = "http://data.crossref.org/schemas/crossref4.4.1.xsd";
-
+    private static final String CONFIG_TEST = "Test";
+    private static final String CONFIG_REGISTRANT = "Registrant";
+    private static final String CONFIG_DEPOSITOR_MAIL = "DepositorMail";
+    private static final String CONFIG_DEPOSITOR = "Depositor";
     private static final String TEST_HOST = "test.crossref.org";
 
     private static final String PRODUCTION_HOST = "doi.crossref.org";
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private String registrant;
 
@@ -141,9 +132,9 @@ public class MCRCrossrefService extends MCRDOIBaseService {
             new OperationNotSupportedException("Delete is not Supported!"));
     }
 
-    @Override
-    protected void deleteJob(Map<String, String> parameters) {
 
+    protected void deleteJob(Map<String, String> parameters) {
+        //TODO: should this method do something or can it be removed?
     }
 
     @Override

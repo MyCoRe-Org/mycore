@@ -87,6 +87,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
     }
 
     private void copyFile(Path source, Path target) {
+        Path newTarget;
         try {
             if (renameExisting && Files.exists(target)) {
                 int nameTry = 1;
@@ -98,14 +99,16 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 Path parent = target.getParent();
                 do {
                     newName = prefixString + nameTry++ + suffixString;
-                    target = parent.resolve(newName);
-                } while (Files.exists(target));
+                    newTarget = parent.resolve(newName);
+                } while (Files.exists(newTarget));
+            }else{
+                newTarget= target;
             }
             if (restartDatabaseTransaction && MCRSessionMgr.hasCurrentSession()) {
                 MCRTransactionHelper.commitTransaction(MCREntityTransaction.class);
                 MCRTransactionHelper.beginTransaction(MCREntityTransaction.class);
             }
-            Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(source, newTarget, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {
             LOGGER.error("Unable to copy: {}", source, x);
         }

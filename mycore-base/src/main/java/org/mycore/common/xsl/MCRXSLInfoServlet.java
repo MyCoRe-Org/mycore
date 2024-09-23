@@ -224,12 +224,15 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private void foundStylesheet(String path, String source) {
         String file = path.substring(path.lastIndexOf(xslFolder) + 4);
+        String sourceWithoutPrefix;
         LOGGER.info("Found {} in {}", file, source);
         Stylesheet stylesheet = getStylesheet(file);
         if (source.startsWith("/WEB-INF/")) {
-            source = source.substring("/WEB-INF/".length()); // cut off
+            sourceWithoutPrefix = source.substring("/WEB-INF/".length()); // cut off
+        } else {
+            sourceWithoutPrefix = source;
         }
-        stylesheet.origin.add(source);
+        stylesheet.origin.add(sourceWithoutPrefix);
     }
 
     private Stylesheet getStylesheet(String name) {

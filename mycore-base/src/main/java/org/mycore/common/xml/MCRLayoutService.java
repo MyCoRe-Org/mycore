@@ -116,8 +116,7 @@ public class MCRLayoutService {
         try {
             MCRParameterCollector parameter = new MCRParameterCollector(req);
             MCRContentTransformer transformer = getContentTransformer(docType, parameter);
-            String filename = getFileName(req, parameter);
-            return transform(transformer, source, parameter, filename);
+            return transform(transformer, source, parameter);
         } catch (IOException | TransformerException | SAXException ex) {
             throw ex;
         } catch (MCRException ex) {
@@ -165,23 +164,24 @@ public class MCRLayoutService {
 
     private String extractFileName(String filename) {
         int filePosition = filename.lastIndexOf('/') + 1;
-        filename = filename.substring(filePosition);
-        filePosition = filename.lastIndexOf('.');
+        String filenameSubstring = filename.substring(filePosition);
+        filePosition = filenameSubstring.lastIndexOf('.');
         if (filePosition > 0) {
-            filename = filename.substring(0, filePosition);
+            filenameSubstring = filenameSubstring.substring(0, filePosition);
         }
-        return filename;
+        return filenameSubstring;
     }
 
     private void transform(HttpServletResponse response, MCRContentTransformer transformer, MCRContent source,
         MCRParameterCollector parameter, String filename) throws IOException, TransformerException, SAXException {
+        String fullFilename= filename;
         try {
             String fileExtension = transformer.getFileExtension();
             if (fileExtension != null && fileExtension.length() > 0) {
-                filename += "." + fileExtension;
+                fullFilename =filename+ "." + fileExtension;
             }
             response.setHeader("Content-Disposition",
-                transformer.getContentDisposition() + ";filename=\"" + filename + "\"");
+                transformer.getContentDisposition() + ";filename=\"" + fullFilename + "\"");
             String ct = transformer.getMimeType();
             String enc = transformer.getEncoding();
             if (enc != null) {
@@ -224,8 +224,8 @@ public class MCRLayoutService {
         }
     }
 
-    private MCRContent transform(MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter,
-        String filename) throws IOException, TransformerException, SAXException {
+    private MCRContent transform(MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter)
+        throws IOException, TransformerException, SAXException {
         LOGGER.debug("MCRLayoutService starts to output {}", getMimeType(transformer));
         long start = System.currentTimeMillis();
         try {

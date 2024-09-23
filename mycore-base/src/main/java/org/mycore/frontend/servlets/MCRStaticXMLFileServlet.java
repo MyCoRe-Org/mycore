@@ -72,7 +72,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     protected static final Logger LOGGER = LogManager.getLogger(MCRStaticXMLFileServlet.class);
 
     @Override
-    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
+    public void doGetPost(MCRServletJob job) throws IOException, MCRException, SAXException, JDOMException,
         TransformerException {
         String webpageID = getWebpageId(job.getRequest());
         boolean hasAccess = MCRLayoutUtilities.webpageAccess(READ_WEBPAGE_PERMISSION, webpageID, true);

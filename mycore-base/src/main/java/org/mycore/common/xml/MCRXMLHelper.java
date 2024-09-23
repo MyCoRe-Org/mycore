@@ -272,8 +272,6 @@ public class MCRXMLHelper {
 
     private static class JDOMEquivalent {
 
-        private JDOMEquivalent() {
-        }
 
         public static boolean equivalent(Element e1, Element e2) {
             return equivalentName(e1, e2) && equivalentAttributes(e1, e2)

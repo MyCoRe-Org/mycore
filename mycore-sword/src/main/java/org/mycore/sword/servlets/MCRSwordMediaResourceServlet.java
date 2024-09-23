@@ -31,13 +31,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
     private static final long serialVersionUID = 1L;
 
-    private MCRSwordMediaManager mrm;
-
     private MediaResourceAPI api;
 
     public void init() {
         MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
-        mrm = new MCRSwordMediaManager();
+        MCRSwordMediaManager mrm = new MCRSwordMediaManager();
         api = new MediaResourceAPI(mrm, swordConfiguration);
     }
 

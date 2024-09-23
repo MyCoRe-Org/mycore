@@ -25,7 +25,6 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,9 +37,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -78,45 +75,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method sets the new permissions given in a certain file
-     * 
-     * @param filename
-     *            the filename of the file that contains the mcrpermissions
-     * 
-     */
-    public static void createPermissionsFromFile(String filename) throws Exception {
-        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
-        if (!checkFilename(filename)) {
-            return;
-        }
-        LOGGER.info("Reading file {} ...", filename);
-
-        Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
-        Element rootelm = doc.getRootElement();
-
-        if (!rootelm.getName().equals("mcrpermissions")) {
-            throw new MCRException("The data are not for mcrpermissions.");
-        }
-
-        List<Element> listelm = rootelm.getChildren("mcrpermission");
-
-        for (Element mcrpermission : listelm) {
-            String permissionName = mcrpermission.getAttributeValue("name").trim();
-            String ruleDescription = mcrpermission.getAttributeValue("ruledescription");
-            if (ruleDescription == null) {
-                ruleDescription = "";
-            }
-            Element rule = mcrpermission.getChild("condition").clone();
-            String objectid = mcrpermission.getAttributeValue("objectid");
-            if (objectid == null) {
-                accessImpl.addRule(permissionName, rule, ruleDescription);
-            } else {
-                accessImpl.addRule(objectid, permissionName, rule, ruleDescription);
-            }
-        }
-    }
-
-    /**
      * This method deletes the old permissions (if given any) and sets the new
      * permissions given in a certain file
      * 
@@ -129,6 +87,78 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         order = 10)
     public static void loadPermissionsFromFile(String filename) throws Exception {
         createPermissionsFromFile(filename);
+    }
+
+    /**
+     * This method sets the new permissions given in a certain file
+     *
+     * @param filename
+     *            the filename of the file that contains the mcrpermissions
+     *
+     */
+    public static void createPermissionsFromFile(String filename) throws Exception {
+        createPermissionsFrom(filenameToUri(filename));
+    }
+
+    /**
+     * This method deletes the old permissions (if given any) and sets the new
+     * permissions given in a certain file
+     *
+     * @param permissionsUri
+     *            the URI of to the XML resource that contains the mcrpermissions
+     * @see #createPermissionsFrom(String)
+     */
+    @MCRCommand(syntax = "load permissions data from {0}",
+        help = "The command loads the permissions data of the access control system with data from URI {0}.",
+        order = 10)
+    public static void loadPermissionsFrom(String permissionsUri) throws Exception {
+        createPermissionsFrom(permissionsUri);
+    }
+
+    /**
+     * This method sets the new permissions given in a certain file
+     *
+     * @param permissionsUri
+     *            the URI of to the XML resource that contains the mcrpermissions
+     *
+     */
+    public static void createPermissionsFrom(String permissionsUri) throws Exception {
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
+        LOGGER.info("Reading {} ...", permissionsUri);
+
+        Element permissions = getPermissionsFromUri(permissionsUri);
+
+        if(permissions != null) {
+            for (Element permission : permissions.getChildren("mcrpermission")) {
+                String permissionName = permission.getAttributeValue("name").trim();
+                String ruleDescription = permission.getAttributeValue("ruledescription");
+                if (ruleDescription == null) {
+                    ruleDescription = "";
+                }
+                Element rule = permission.getChild("condition").clone();
+                String objectid = permission.getAttributeValue("objectid");
+                if (objectid == null) {
+                    accessImpl.addRule(permissionName, rule, ruleDescription);
+                } else {
+                    accessImpl.addRule(objectid, permissionName, rule, ruleDescription);
+                }
+            }
+        }
+    }
+
+    private static Element getPermissionsFromUri(String uri) {
+        Element permissions = MCRURIResolver.instance().resolve(uri);
+        if (permissions == null || !Objects.equals(permissions.getName(), "mcrpermissions")) {
+            LOGGER.warn("ROOT element is not valid, valid permissions would be for example:");
+            LOGGER.warn("<mcrpermissions xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                + " xsi:noNamespaceSchemaLocation=\"MCRPermissions.xsd\">");
+            LOGGER.warn("  <mcrpermission name=\"anyone\" description=\"anyone\" ruledescription=\"anyone\">");
+            LOGGER.warn("    <mcrpermissions format=\"xml\"><boolean operator=\"true\" /></condition>");
+            LOGGER.warn("  </mcrpermission>");
+            LOGGER.warn("</mcrpermissions>");
+            return null;
+        }
+        return permissions;
     }
 
     /**

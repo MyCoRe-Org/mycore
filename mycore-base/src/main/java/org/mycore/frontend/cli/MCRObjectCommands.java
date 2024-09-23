@@ -168,7 +168,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             .map(MCRObjectID::toString)
             .collect(Collectors.toList());
 
-        MCRObjectCommands.setSelectedObjectIDs(selectedObjectIds);
+        setSelectedObjectIDs(selectedObjectIds);
 
     }
 
@@ -181,7 +181,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
             fillWithDescendants(id, descendants);
         }
-        MCRObjectCommands.setSelectedObjectIDs(descendants);
+        setSelectedObjectIDs(descendants);
     }
 
     private static void fillWithDescendants(String mcrObjID, List<String> descendants) {
@@ -915,7 +915,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 log.append(revision.getType()).append(' ');
                 log.append(sdf.format(revision.getDate())).append(' ');
                 log.append(revision.getUser());
-                log.append("\n");
+                log.append('\n');
             }
             LOGGER.info(log.toString());
         } catch (Exception exc) {

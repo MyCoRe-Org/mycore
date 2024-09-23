@@ -108,19 +108,12 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof MCRVersionedPath that)) {
-            return false;
-        }
-        if (!getFileSystem().equals(that.getFileSystem())) {
-            return false;
-        }
-        if (!this.path.equals(that.path)) {
-            return false;
-        }
-        if (!this.getOwner().equals(that.getOwner())) {
-            return false;
-        }
-        return this.hasSameVersion(that);
+        return
+            obj instanceof MCRVersionedPath that &&
+            getFileSystem().equals(that.getFileSystem()) &&
+            this.path.equals(that.path) &&
+            this.getOwner().equals(that.getOwner()) &&
+            this.hasSameVersion(that);
     }
 
     /**
@@ -151,10 +144,13 @@ public abstract class MCRVersionedPath extends MCRPath {
      * @return {@code true} if the path is associated with the head version; {@code false} otherwise.
      */
     public boolean isHeadVersion() {
+        boolean result;
         if (this.ownerVersion.version == null) {
-            return true;
+            result = true;
+        } else {
+            result = getHeadVersion().equals(this.ownerVersion.version);
         }
-        return getHeadVersion().equals(this.ownerVersion.version);
+        return result;
     }
 
     /**

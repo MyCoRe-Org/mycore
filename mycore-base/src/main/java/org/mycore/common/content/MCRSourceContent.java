@@ -84,7 +84,8 @@ public class MCRSourceContent extends MCRWrappedContent {
             }
         }
     }
-
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    //false positive, is used
     private static MCRByteContent getBaseContent(JAXBSource source) {
         TransformerFactory transformerFactory = TransformerFactory.newDefaultInstance();
         try {
@@ -96,7 +97,8 @@ public class MCRSourceContent extends MCRWrappedContent {
             throw new MCRException("Error while resolving JAXBSource", e);
         }
     }
-
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    //false positive, is used
     private static MCRJDOMContent getBaseContent(JDOMSource src) {
         Document xml = src.getDocument();
         if (xml != null) {

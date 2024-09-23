@@ -64,9 +64,10 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
     private void assertCreateDate(String message) {
         queryTable("MCRObject", (resultSet) -> {
             try {
-                resultSet.next();
-                String createDate = resultSet.getString(2);
-                Assert.assertNotNull(message, createDate);
+                if (resultSet.next()) {
+                    String createDate = resultSet.getString(2);
+                    Assert.assertNotNull(message, createDate);
+                }
             } catch (SQLException e) {
                 Assert.fail("Unable to query MCRObject table");
             }

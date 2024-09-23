@@ -341,17 +341,19 @@ public class MCRUtils {
     private static String getHash(int iterations, byte[] salt, String text, String algorithm)
         throws NoSuchAlgorithmException {
         MessageDigest digest;
-        if (--iterations < 0) {
-            iterations = 0;
+        int currentIndex= iterations;
+        if (--currentIndex < 0) {
+            currentIndex = 0;
         }
         byte[] data;
         digest = MessageDigest.getInstance(algorithm);
-        text = Normalizer.normalize(text, Form.NFC);
+        String textNormalized = Normalizer.normalize(text, Form.NFC);
         if (salt != null) {
             digest.update(salt);
         }
-        data = digest.digest(text.getBytes(StandardCharsets.UTF_8));
-        for (int i = 0; i < iterations; i++) {
+        data = digest.digest(textNormalized.getBytes(StandardCharsets.UTF_8));
+
+        for (int i = 0; i < currentIndex; i++) {
             data = digest.digest(data);
         }
         return toHexString(data);

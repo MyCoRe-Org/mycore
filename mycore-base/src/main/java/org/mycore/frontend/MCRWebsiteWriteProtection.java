@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -40,7 +42,7 @@ public final class MCRWebsiteWriteProtection {
 
     private static final String CONFIG_FOLDER_PATH = MCRConfiguration2.getStringOrThrow("MCR.datadir") + FS
         + "config";
-
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml";
 
     private static final File CONFIG_FILE = new File(CONFIG_FILE_PATH);
@@ -105,7 +107,7 @@ public final class MCRWebsiteWriteProtection {
                     // update cache
                     updateCache(config);
                 } catch (JDOMException | IOException e) {
-                    e.printStackTrace();
+                    LOGGER.debug(e);
                     return null;
                 }
             }
@@ -127,7 +129,7 @@ public final class MCRWebsiteWriteProtection {
             fos.flush();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.debug(e);
         }
         updateCache(configXML);
     }
@@ -171,7 +173,7 @@ public final class MCRWebsiteWriteProtection {
 
     public static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response,
         String baseURL) throws IOException {
-        if (MCRWebsiteWriteProtection.isActive()) {
+        if (isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             String pageURL = baseURL + MCRConfiguration2.getStringOrThrow("MCR.WriteProtectionWebsite.ErrorPage");
             response.sendRedirect(response.encodeRedirectURL(pageURL));

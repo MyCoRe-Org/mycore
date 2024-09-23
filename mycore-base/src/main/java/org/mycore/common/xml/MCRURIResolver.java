@@ -114,6 +114,8 @@ import org.xml.sax.XMLReader;
 
 import jakarta.servlet.ServletContext;
 
+
+
 /**
  * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
  * usages, xsl:include usages and MyCoRe Editor include declarations. DTDs and Schema files are read from the CLASSPATH
@@ -167,6 +169,15 @@ public final class MCRURIResolver implements URIResolver {
                     return null;
                 }
             }).orElse(HashMap::new);
+    }
+    private static void findAndThrowTransformerException(Exception e) throws TransformerException {
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            if (cause instanceof TransformerException te) {
+                throw te;
+            }
+            cause = cause.getCause();
+        }
     }
 
     /**
@@ -486,7 +497,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            URI hrefURI = MCRURIResolver.resolveURI(href, base);
+            URI hrefURI = resolveURI(href, base);
             if (!hrefURI.getScheme().equals("file")) {
                 throw new TransformerException("Unsupport file uri scheme: " + hrefURI.getScheme());
             }
@@ -510,7 +521,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            URI hrefURI = MCRURIResolver.resolveURI(href, base);
+            URI hrefURI = resolveURI(href, base);
             try {
                 final Source source = client.get(hrefURI).getSource();
                 source.setSystemId(hrefURI.toASCIIString());
@@ -607,7 +618,7 @@ public final class MCRURIResolver implements URIResolver {
                     LOGGER.debug("include stylesheet: {}", saxSource.getSystemId());
                     return saxSource;
                 } else {
-                    return MCRURIResolver.instance().resolve(resource.toString(), base);
+                    return instance().resolve(resource.toString(), base);
                 }
             }
             return null;
@@ -893,6 +904,14 @@ public final class MCRURIResolver implements URIResolver {
             } catch (URISyntaxException e) {
                 categ = categID.toString();
             }
+            MCRCategory cl = getMcrCategory(uri, axis, categ, classID, levels);
+            if (cl == null) {
+                return null;
+            }
+            return getElement(uri, format, classID, cl, emptyLeaves);
+        }
+
+        private static MCRCategory getMcrCategory(String uri, String axis, String categ, String classID, int levels) {
             MCRCategory cl = null;
             LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
             if (axis.equals("children")) {
@@ -914,7 +933,11 @@ public final class MCRURIResolver implements URIResolver {
             if (cl == null) {
                 return null;
             }
+            return cl;
+        }
 
+        private static Element getElement(String uri, String format, String classID, MCRCategory cl,
+            boolean emptyLeaves) {
             Element returns;
             LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
@@ -946,7 +969,7 @@ public final class MCRURIResolver implements URIResolver {
             String target = href.substring(href.indexOf(":") + 1);
 
             try {
-                return MCRURIResolver.instance().resolve(target, base);
+                return instance().resolve(target, base);
             } catch (Exception ex) {
                 LOGGER.debug("Caught {}. Put it into XML to process in XSL!", ex.getClass().getName());
                 Element exception = new Element("exception");
@@ -989,7 +1012,7 @@ public final class MCRURIResolver implements URIResolver {
             // end fix
             LOGGER.debug("Ensuring xml is not null: {}", target);
             try {
-                Source result = MCRURIResolver.instance().resolve(target, base);
+                Source result = instance().resolve(target, base);
                 if (result != null) {
                     // perform actual construction of xml document, as in MCRURIResolver#resolve(String),
                     // by performing the same actions as MCRSourceContent#asXml(),
@@ -1108,7 +1131,7 @@ public final class MCRURIResolver implements URIResolver {
             String stylesheetPaths = help.substring(0, configurationEnd);
 
             // resolve target URI
-            Source resolved = MCRURIResolver.instance().resolve(targetUri, base);
+            Source resolved = instance().resolve(targetUri, base);
             assert resolved != null;
 
             try {
@@ -1130,13 +1153,7 @@ public final class MCRURIResolver implements URIResolver {
                 return transformer.transform(content, parameterCollector).getSource();
 
             } catch (IOException e) {
-                Throwable cause = e.getCause();
-                while (cause != null) {
-                    if (cause instanceof TransformerException te) {
-                        throw te;
-                    }
-                    cause = cause.getCause();
-                }
+                findAndThrowTransformerException( e);
                 throw new TransformerException(e);
             }
 
@@ -1148,16 +1165,14 @@ public final class MCRURIResolver implements URIResolver {
             }
             return stylesheets;
         }
-
         private record Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {}
-
     }
 
     /**
      * Transform result of other resolver with stylesheet. Usage: xslTransform:<transformer><?param1=value1
      * <&param2=value2>>:<anyMyCoReURI>
      */
-    private static class MCRLayoutTransformerResolver implements URIResolver {
+    static class MCRLayoutTransformerResolver implements URIResolver {
 
         private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
 
@@ -1181,7 +1196,7 @@ public final class MCRURIResolver implements URIResolver {
             } else {
                 params = Collections.emptyMap();
             }
-            Source resolved = MCRURIResolver.instance().resolve(target, base);
+            Source resolved = instance().resolve(target, base);
 
             try {
                 if (resolved != null) {
@@ -1203,13 +1218,7 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(new Element("null"));
                 }
             } catch (Exception e) {
-                Throwable cause = e.getCause();
-                while (cause != null) {
-                    if (cause instanceof TransformerException te) {
-                        throw te;
-                    }
-                    cause = cause.getCause();
-                }
+                findAndThrowTransformerException(e);
                 throw new TransformerException(e);
             }
         }
@@ -1333,31 +1342,30 @@ public final class MCRURIResolver implements URIResolver {
 
         private static void constructElement(Element current, String xpath, String value) {
             StringTokenizer st = new StringTokenizer(xpath, "/");
+            Element currentToken = current;
             String name = null;
             while (st.hasMoreTokens()) {
                 name = st.nextToken();
                 if (name.startsWith("@")) {
                     break;
                 }
-
                 String localName = getLocalName(name);
                 Namespace namespace = getNamespace(name);
 
-                Element child = current.getChild(localName, namespace);
+                Element child = currentToken.getChild(localName, namespace);
                 if (child == null) {
                     child = new Element(localName, namespace);
-                    current.addContent(child);
+                    currentToken.addContent(child);
                 }
-                current = child;
+                currentToken = child;
             }
-
             if (name.startsWith("@")) {
                 name = name.substring(1);
                 String localName = getLocalName(name);
                 Namespace namespace = getNamespace(name);
-                current.setAttribute(localName, value, namespace);
+                currentToken.setAttribute(localName, value, namespace);
             } else {
-                current.setText(value);
+                currentToken.setText(value);
             }
         }
 
@@ -1399,7 +1407,7 @@ public final class MCRURIResolver implements URIResolver {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 constructElement(root, entry.getKey(), entry.getValue());
             }
-            if (root == defaultRoot && root.getChildren().size() > 1) {
+            if (root.equals(defaultRoot) && root.getChildren().size() > 1) {
                 LOGGER.warn("More than 1 root node defined, returning first");
                 return new JDOMSource(root.getChildren().getFirst().detach());
             }
@@ -1786,7 +1794,7 @@ public final class MCRURIResolver implements URIResolver {
                 throw new TransformerException("No Access to " + uri + " (" + href + " )");
             }
 
-            return MCRURIResolver.instance().resolve(uri, base);
+            return instance().resolve(uri, base);
         }
     }
 
@@ -1857,7 +1865,7 @@ public final class MCRURIResolver implements URIResolver {
 
             if (resolvedXML == null) {
                 LOGGER.debug(hrefToCache + " not in cache, must resolve");
-                resolvedXML = MCRURIResolver.instance().resolve(hrefToCache);
+                resolvedXML = instance().resolve(hrefToCache);
                 cache.put(hrefToCache, resolvedXML);
             } else {
                 LOGGER.debug(hrefToCache + " already in cache");

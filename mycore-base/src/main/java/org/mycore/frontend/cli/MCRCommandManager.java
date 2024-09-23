@@ -43,6 +43,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Frank Lützenkirchen
  * @author Robert Stephan
  */
+@SuppressWarnings("PMD.DoNotTerminateVM")
 public class MCRCommandManager {
     private static final Logger LOGGER = LogManager.getLogger(MCRCommandManager.class);
 
@@ -61,6 +62,7 @@ public class MCRCommandManager {
     protected void handleInitException(Exception ex) {
         MCRCLIExceptionHandler.handleException(ex);
         System.exit(1);
+
     }
 
     public static TreeMap<String, List<MCRCommand>> getKnownCommands() {

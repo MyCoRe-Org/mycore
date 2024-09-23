@@ -20,14 +20,14 @@ package org.mycore.iview.tests.image.api;
 
 public class Position {
 
+    private int x;
+
+    private int y;
+
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
-
-    private int x;
-
-    private int y;
 
     public int getX() {
         return x;

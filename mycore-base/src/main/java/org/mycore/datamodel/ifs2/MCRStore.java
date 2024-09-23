@@ -222,6 +222,7 @@ public abstract class MCRStore {
      *            the order in which IDs should be returned.
      * @return all IDs currently used in the store
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     public Iterator<Integer> listIDs(final boolean order) {
         return new Iterator<Integer>() {
             /**
@@ -438,9 +439,7 @@ public abstract class MCRStore {
      * @return the ID of that data
      */
     int slot2id(String slot) {
-        slot = slot.substring(prefix.length());
-        slot = slot.substring(0, idLength);
-        return Integer.parseInt(slot);
+        return Integer.parseInt(slot.substring(prefix.length()).substring(0, idLength));
     }
 
     /**
@@ -495,7 +494,7 @@ public abstract class MCRStore {
                 toNativePath = s -> s;
             } else {
                 toNativePath = s -> {
-                    if (s.contains("/")) {
+                    if (s.contains("/")&&(s.contains(separator))) {
                         if (s.contains(separator)) {
                             throw new IllegalArgumentException(
                                 s + " may not contain both '/' and '" + separator + "'.");
@@ -506,23 +505,27 @@ public abstract class MCRStore {
                 };
             }
 
-            try {
-                BasicFileAttributes attrs = Files.readAttributes(baseDirectory, BasicFileAttributes.class);
-                if (!attrs.isDirectory()) {
-                    final String msg = "Store " + getStoreConfig().getBaseDir() + " is not a directory";
-                    throw new MCRConfigurationException(msg);
-                }
-
-                if (!Files.isReadable(baseDirectory)) {
-                    final String msg = "Store directory " + getStoreConfig().getBaseDir() + " is not readable";
-                    throw new MCRConfigurationException(msg);
-                }
-            } catch (IOException e) {
-                //does not exist;
-                Files.createDirectories(baseDirectory);
-            }
+            validateAndInitializeBaseDirectory();
         } catch (final IOException e) {
             LOGGER.error("Could not initialize store " + config.getID() + " correctly.", e);
+        }
+    }
+
+    private void validateAndInitializeBaseDirectory() throws IOException {
+        try {
+            BasicFileAttributes attrs = Files.readAttributes(baseDirectory, BasicFileAttributes.class);
+            if (!attrs.isDirectory()) {
+                final String msg = "Store " + getStoreConfig().getBaseDir() + " is not a directory";
+                throw new MCRConfigurationException(msg);
+            }
+
+            if (!Files.isReadable(baseDirectory)) {
+                final String msg = "Store directory " + getStoreConfig().getBaseDir() + " is not readable";
+                throw new MCRConfigurationException(msg);
+            }
+        } catch (IOException e) {
+            //does not exist;
+            Files.createDirectories(baseDirectory);
         }
     }
 

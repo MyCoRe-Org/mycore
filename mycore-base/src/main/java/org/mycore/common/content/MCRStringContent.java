@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
+
 
 /**
  * Reads MCRContent from a String's text.
@@ -44,7 +46,7 @@ public class MCRStringContent extends MCRContent {
         try {
             setEncoding(MCRConstants.DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new MCRException("MCRStringContent encoding not supported", e);
         }
     }
 

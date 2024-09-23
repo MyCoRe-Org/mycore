@@ -63,29 +63,6 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
      * to the type element. The boolean string <em>value</em>
      * was set to a boolean element, if it is null, false was set.
      * @param subtag       the name of the subtag
-     * @param lang         the language
-     * @param type         the optional type string
-     * @param inherted     a value &gt;= 0
-     * @param value        the boolean value (true or false) as string
-     *
-     * @exception MCRException if the subtag value is null or empty
-     */
-    @Deprecated
-    public MCRMetaBoolean(String subtag, String lang, String type, int inherted, String value)
-        throws MCRException {
-        this(subtag, type, inherted, false);
-        setValue(value);
-    }
-
-    /**
-     * This is the constructor. <br>
-     * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>subtag</em>. If the value of <em>subtag</em>
-     * is null or empty an exception was thrown. The type element was set to
-     * the value of <em>type</em>, if it is null, an empty string was set
-     * to the type element. The boolean string <em>value</em>
-     * was set to a boolean element, if it is null, false was set.
-     * @param subtag       the name of the subtag
      * @param type         the optional type string
      * @param inherted     a value &gt;= 0
      * @param value        the boolean value (true or false) as string

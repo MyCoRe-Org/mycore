@@ -101,7 +101,7 @@ public abstract class MCRRestContentHelper {
         response.header(HttpHeaders.CONTENT_DISPOSITION,
             config.dispositionType.name() + ";filename=\"" + filename + "\"");
 
-        boolean noRangeRequest = ranges == null || ranges == ContentUtils.FULL;
+        boolean noRangeRequest = ranges == null || ranges.equals(ContentUtils.FULL);
         if (noRangeRequest) {
             LOGGER.debug("contentType='{}'", contentType);
             LOGGER.debug("contentLength={}", contentLength);

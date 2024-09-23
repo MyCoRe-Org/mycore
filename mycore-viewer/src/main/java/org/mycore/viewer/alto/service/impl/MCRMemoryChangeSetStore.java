@@ -44,9 +44,6 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
 
     private final Map<String, MCRStoredChangeSet> idChangeSet = new HashMap<>();
 
-    public MCRMemoryChangeSetStore() {
-    }
-
     @Override
     public MCRStoredChangeSet get(String pid) {
         return this.idChangeSet.get(pid);

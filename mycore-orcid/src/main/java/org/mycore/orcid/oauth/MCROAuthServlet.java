@@ -66,7 +66,7 @@ public class MCROAuthServlet extends MCRServlet {
         String baseURL = MCRFrontendUtil.getBaseURL();
 
         this.redirectURL = baseURL + job.getRequest().getServletPath().substring(1);
-        String userProfileURL = MCRServlet.getServletBaseURL() + userServlet;
+        String userProfileURL = getServletBaseURL() + userServlet;
 
         String code = job.getRequest().getParameter("code");
         String error = job.getRequest().getParameter("error");
