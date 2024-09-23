@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
