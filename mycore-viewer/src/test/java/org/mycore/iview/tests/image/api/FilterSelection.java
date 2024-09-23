@@ -23,14 +23,14 @@ import java.util.List;
 
 public class FilterSelection extends Selection {
 
+    private Selection source;
+
+    private PixelFilter filter;
+
     public FilterSelection(Selection fs, PixelFilter filter) {
         this.source = fs;
         this.filter = filter;
     }
-
-    private Selection source;
-
-    private PixelFilter filter;
 
     @Override
     public List<Pixel> getPixel() {

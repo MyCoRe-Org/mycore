@@ -20,14 +20,14 @@ package org.mycore.viewer.alto.model;
 
 public class MCRAltoChangePID {
 
+    private String pid;
+
     public MCRAltoChangePID(String pid) {
         this.pid = pid;
     }
 
     public MCRAltoChangePID() {
     }
-
-    private String pid;
 
     public String getPid() {
         return pid;
