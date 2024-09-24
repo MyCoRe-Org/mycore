@@ -49,12 +49,11 @@ public class MCRORCIDCredentialResolver implements URIResolver {
      * If it exists, the response is an XML element with "true"; otherwise, "false".</p>
      *
      * <p>If the method is "scope", the function returns the credential's scope if it exists.
-     * If no credential for current user exists, an error with message is returned as XML element.</p>
      *
      * @param href the URI in the syntax above
      * @param base not used
      * @return the XML result element
-     * @throws IllegalArgumentException if the URI format is invalid or the method is not recognized
+     * @throws IllegalArgumentException if the URI format is invalid or the input is invalid
      * @throws TransformerException if an error occurs during the transformation process
      *
      * @see javax.xml.transform.URIResolver
@@ -80,8 +79,7 @@ public class MCRORCIDCredentialResolver implements URIResolver {
                 root = new Element("string");
                 root.setText(credential.getScope());
             } else {
-                root = new Element("error");
-                root.setText("Credential does not exist");
+                throw new IllegalArgumentException("Credential for " + orcid + " does not exist");
             }
         } else {
             throw new IllegalArgumentException("Invalid method: " + method);
