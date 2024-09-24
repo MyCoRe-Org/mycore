@@ -265,6 +265,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
 
     @Override
     public void destroy() {
+        //intentionally empty, does nothing
 
     }
 

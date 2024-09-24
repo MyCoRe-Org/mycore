@@ -75,7 +75,7 @@ public class StructureOverviewIT extends ViewerTestBase {
         StructureOverviewController soController = controller.getStructureOverviewController();
 
         tbController.pressButton(ToolBarController.BUTTON_ID_SIDEBAR_CONTROLL);
-        ViewerTestBase.sleep(1000);
+        sleep(1000);
         tbController.clickElementById(StructureOverviewController.CHAPTER_OVERVIEW_SELECTOR);
 
         int greenPixelCount = selectImgAndCountColor(soController, getGreenLabel(), Color.GREEN);
@@ -109,7 +109,7 @@ public class StructureOverviewIT extends ViewerTestBase {
     private int selectImgAndCountColor(StructureOverviewController soController, String label, Color color)
         throws InterruptedException {
         soController.selectImageByOrder(label);
-        ViewerTestBase.sleep(500);
+        sleep(500);
 
         String message = color + " schould be selected (class-attribut 'selected' should be set)!";
         Assert.assertTrue(message, soController.isImageSelected(label));

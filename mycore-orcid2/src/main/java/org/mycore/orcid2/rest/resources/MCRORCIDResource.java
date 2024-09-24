@@ -72,7 +72,7 @@ public class MCRORCIDResource {
 
     /**
      * Revokes ORCID iD for current user.
-     * 
+     *
      * @param orcid the ORCID iD
      * @return Response
      * @throws WebApplicationException if ORCID iD is null, user is guest or revoke fails
@@ -96,10 +96,10 @@ public class MCRORCIDResource {
 
     /**
      * Returns MCRORCIDUserProperties for ORCID iD.
-     * 
+     *
      * @param orcid the ORCID iD
      * @return the MCRORCIDUserProperties
-     * @throws WebApplicationException if ORCID iD is null, user is guest
+     * @throws WebApplicationException if ORCID iD does not exist or user is guest
      */
     @GET
     @Path("{orcid}/user-properties")
@@ -109,13 +109,12 @@ public class MCRORCIDResource {
         if (orcid == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        return orcidUser.getUserPropertiesByORCID(orcid);
+        return MCRORCIDSessionUtils.getCurrentUser().getUserPropertiesByORCID(orcid);
     }
 
     /**
      * Updates MCRORCIDUserProperties for ORCID iD.
-     * 
+     *
      * @param orcid the ORCID iD
      * @param userProperties the MCRORCIDUserProperties
      * @return Response

@@ -67,7 +67,7 @@ public class ImageSectionIT extends ViewerTestBase {
         tbController.selectPictureWithOrder(getStartImage());
 
         tbController.pressButton(ToolBarController.BUTTON_ID_ZOOM_WIDTH);
-        ViewerTestBase.sleep(DELAY_TIME);
+        sleep(DELAY_TIME);
 
         BufferedImage notZoomed = ControllerUtil.getScreenshot(getDriver(), this.getClassname() + "-notZoomed");
         int redPixelCountNotZoomed = getColorCount(notZoomed, Color.RED);
@@ -76,7 +76,7 @@ public class ImageSectionIT extends ViewerTestBase {
         //-
 
         tbController.pressButton(ToolBarController.BUTTON_ID_ZOOM_IN);
-        ViewerTestBase.sleep(DELAY_TIME);
+        sleep(DELAY_TIME);
 
         BufferedImage zoomed = ControllerUtil.getScreenshot(getDriver(), this.getClassname() + "-zoomed");
         int redPixelCountZoomed = getColorCount(zoomed, Color.RED);
@@ -94,7 +94,7 @@ public class ImageSectionIT extends ViewerTestBase {
         //-
 
         tbController.pressButton(ToolBarController.BUTTON_ID_ZOOM_IN);
-        ViewerTestBase.sleep(DELAY_TIME);
+        sleep(DELAY_TIME);
 
         BufferedImage zoomed2 = ControllerUtil.getScreenshot(getDriver(), this.getClassname() + "-zoomed2");
         int greenPixelCountZoomed2 = getColorCount(zoomed2, Color.GREEN);
@@ -111,7 +111,7 @@ public class ImageSectionIT extends ViewerTestBase {
         //-
 
         tbController.pressButton(ToolBarController.BUTTON_ID_ZOOM_OUT);
-        ViewerTestBase.sleep(DELAY_TIME);
+        sleep(DELAY_TIME);
 
         BufferedImage zoomed3 = ControllerUtil.getScreenshot(getDriver(), this.getClassname() + "zoomed3");
         int greenPixelCountZoomed3 = getColorCount(zoomed3, Color.GREEN);
@@ -129,7 +129,7 @@ public class ImageSectionIT extends ViewerTestBase {
         //-
 
         tbController.pressButton(ToolBarController.BUTTON_ID_ZOOM_OUT);
-        ViewerTestBase.sleep(DELAY_TIME);
+        sleep(DELAY_TIME);
 
         BufferedImage zoomed4 = ControllerUtil.getScreenshot(getDriver(), this.getClassname() + "zoomed4");
         int greenPixelCountZoomed4 = getColorCount(zoomed4, Color.GREEN);
@@ -137,7 +137,7 @@ public class ImageSectionIT extends ViewerTestBase {
         int redPixelCountZoomed4 = getColorCount(zoomed4, Color.RED);
 
         tbController.pressButton(ToolBarController.BUTTON_ID_ZOOM_OUT);
-        ViewerTestBase.sleep(DELAY_TIME);
+        sleep(DELAY_TIME);
 
         String message7Pattern
             = "There should be less blue pixels in the zoomed4 screenshot than in the zoomed3 ({0} > {1})";

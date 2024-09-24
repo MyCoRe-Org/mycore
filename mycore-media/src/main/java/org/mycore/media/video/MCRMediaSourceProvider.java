@@ -144,7 +144,9 @@ public class MCRMediaSourceProvider {
             LogManager.getLogger().info("{} -> {} -> {}", mcrPath, absolutePath, relativePath);
             return relativePath.toString();
         } catch (IOException e) {
+
             throw new UncheckedIOException("Error accessing file store", e);
+
         }
     }
 
