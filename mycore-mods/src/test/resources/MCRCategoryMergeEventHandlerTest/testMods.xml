@@ -9,7 +9,7 @@
   </mods:titleInfo>
   <mods:relatedItem type="series" xlink:href="host">
     <mods:classification authority="sdnb" displayLabel="sdnb">000</mods:classification>
-    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#book"/>
+    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#collection"/>
   </mods:relatedItem>
   <mods:language>
     <mods:languageTerm authority="rfc5646" type="code">de</mods:languageTerm>

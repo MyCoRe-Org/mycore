@@ -3,7 +3,6 @@ package org.mycore.mods.merger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -45,17 +44,19 @@ public class MCRCategoryMergeEventHandler extends MCREventHandlerBase {
         LOGGER.info("merge redundant classification categories for {}", obj.getId());
 
         Element filledMods = mcrmodsWrapper.getMODS();
-        Element emtpyMods = new Element("mods", MCRConstants.MODS_NAMESPACE);
-
         List<Element> supportedElements = filledMods.getChildren().stream()
             .filter(element -> MCRClassMapper.getCategoryID(element) != null).toList();
-        supportedElements.forEach(Element::detach);
 
-        for (Element testedElement : supportedElements) {
-            emtpyMods.addContent(testedElement);
-            MCRMergeTool.merge(filledMods, emtpyMods);
+        for (int i = 0; i < supportedElements.size(); i++) {
+            for (int j = i + 1; j < supportedElements.size(); j++) {
 
-            emtpyMods = new Element("mods", MCRConstants.MODS_NAMESPACE);
+                Element element1 = supportedElements.get(i);
+                Element element2 = supportedElements.get(j);
+                Element parentElement = MCRCategoryMerger.getElementWithParentCategory(element1, element2);
+                if (parentElement != null) {
+                    parentElement.detach();
+                }
+            }
         }
 
         MCRMODSSorter.sort(filledMods);

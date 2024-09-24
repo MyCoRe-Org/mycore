@@ -2,10 +2,13 @@ package org.mycore.mods.merger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Attribute;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
@@ -19,6 +22,9 @@ import org.mycore.mods.MCRMODSWrapper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class MCRCategoryMergeEventHandlerTest extends MCRJPATestCase {
 
@@ -36,8 +42,7 @@ public class MCRCategoryMergeEventHandlerTest extends MCRJPATestCase {
     }
 
     /**
-     * Test has no assertions yet, only logs final mods.
-     * TODO: Current implementation changes order of genres, fix?
+     * Tests if parent genres are succesfully removed from mods.
      */
     @Test
     public void testHandleObjectCreatedMultipleGenres() throws IOException, JDOMException, URISyntaxException {
@@ -63,5 +68,15 @@ public class MCRCategoryMergeEventHandlerTest extends MCRJPATestCase {
         Document xml = mcro.createXML();
 
         LOGGER.info(new MCRJDOMContent(xml).asString());
+
+        List<Element> genres = mw.getMODS().getChildren("genre", MCRConstants.MODS_NAMESPACE);
+        assertEquals(2, genres.size());
+        String url = genres.get(0).getAttribute("valueURI").getValue();
+        String genre = url.substring(url.indexOf('#') + 1);
+        assertEquals("book", genre);
+
+        url = genres.get(1).getAttribute("valueURI").getValue();
+        genre = url.substring(url.indexOf('#') + 1);
+        assertEquals("subchapter", genre);
     }
 }
