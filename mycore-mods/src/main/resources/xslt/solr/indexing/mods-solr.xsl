@@ -278,7 +278,7 @@
   <xsl:template name="printModsName">
     <xsl:choose>
       <xsl:when test="mods:displayForm">
-        <xsl:value-of select="fn:normalize-unicode(mods:displayForm)" />
+        <xsl:value-of select="fn:string-join(fn:normalize-unicode(mods:displayForm), ' ')" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
