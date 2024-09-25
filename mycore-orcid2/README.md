@@ -26,6 +26,23 @@ See https://info.orcid.org/faq/what-is-an-oauth-scope-and-which-scopes-does-orci
 
 MCR.ORCID2.OAuth.Scope is not a mandatory property. You can also provide the scope as parameter using rsc/orcid/oauth/init.
 
+### Authorization
+Existing users, such as Shibboleth users, have the option to additionally authorize with ORCID and benefit from its advantages.
+Alternatively, new users can authorize directly with ORCID. To enable this, you need to add the realm `orcid.org` to the `realms.xml` file.
+An example of this would be:
+
+      <realm id="orcid.org">
+        <label xml:lang="de">Externe Personen</label>
+        <label xml:lang="en">External Persons</label>
+        <login url="/mir/rsc/orcid/oauth/init">
+          <label xml:lang="de">Anmelden mit ORCID</label>
+          <label xml:lang="en">Login with ORCID</label>
+        </login>
+      </realm>
+      
+In addition, authorization must be activated for guests with the following property: `MCR.ORCID2.OAuth.EnableForGuests=true`.
+By default, ORCID users are not persisted in the application. To enable this, the following property must apply: `MCR.ORCID2.OAuth.PersistUser=true`.
+
 
 ## Examples
 
