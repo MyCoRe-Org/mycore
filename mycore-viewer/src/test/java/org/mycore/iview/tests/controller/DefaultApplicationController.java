@@ -44,14 +44,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class DefaultApplicationController extends ApplicationController {
 
     private static final String webpath = "target/test-classes/testFiles";
-
-    private static Map<TestDerivate, String> derivateHTMLMapping;
-
     private static final Logger LOGGER = LogManager.getLogger();
+    private static Map<TestDerivate, String> derivateHTMLMapping;
 
     @Override
     public void init() {
-        DefaultApplicationController.derivateHTMLMapping = new HashMap<>();
+        derivateHTMLMapping = new HashMap<>();
     }
 
     @Override
@@ -75,7 +73,7 @@ public class DefaultApplicationController extends ApplicationController {
                 buildHTMLFile(baseURL, name, testDerivate.getStartFile(), "MyCoReImageViewer");
             }
 
-            DefaultApplicationController.derivateHTMLMapping.put(testDerivate, buildFileName(name));
+            derivateHTMLMapping.put(testDerivate, buildFileName(name));
         } catch (IOException e) {
             LOGGER.error("Error while open connection to File Location!", e);
         }
@@ -103,14 +101,14 @@ public class DefaultApplicationController extends ApplicationController {
 
     @Override
     public void shutDownDerivate(WebDriver webdriver, TestDerivate testDerivate) {
-
+        //TODO: Is only implementation, with only one usage. What is the purpose of this method?
     }
 
     @Override
     public void openViewer(WebDriver webdriver, String baseURL, TestDerivate testDerivate) {
         String path = null;
         path = baseURL + "/test-classes/testFiles/"
-            + DefaultApplicationController.derivateHTMLMapping.get(testDerivate);
+            + derivateHTMLMapping.get(testDerivate);
         LOGGER.info("Open Viewer with path : {}", path);
         webdriver.navigate().to(path);
 

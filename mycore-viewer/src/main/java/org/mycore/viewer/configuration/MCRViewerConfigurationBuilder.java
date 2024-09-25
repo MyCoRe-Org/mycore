@@ -98,7 +98,7 @@ public class MCRViewerConfigurationBuilder {
      */
     public static MCRViewerConfigurationBuilder mets(HttpServletRequest request) {
         MCRViewerMetsConfiguration metsConfig = new MCRViewerMetsConfiguration();
-        return MCRViewerConfigurationBuilder.build(request)
+        return build(request)
             .mixin(metsConfig)
             .mixin(new MCRViewerAltoEditorConfiguration().setup(request));
     }
@@ -108,7 +108,7 @@ public class MCRViewerConfigurationBuilder {
      */
     public static MCRViewerConfigurationBuilder iiif(HttpServletRequest request) {
         MCRViewerIIIFConfiguration iiifConfig = new MCRViewerIIIFConfiguration();
-        return MCRViewerConfigurationBuilder.build(request)
+        return build(request)
             .mixin(iiifConfig)
             .mixin(new MCRViewerAltoEditorConfiguration().setup(request));
     }
@@ -125,7 +125,7 @@ public class MCRViewerConfigurationBuilder {
      */
     public static MCRViewerConfigurationBuilder pdf(HttpServletRequest request) {
         MCRViewerPDFConfiguration pdfConfig = new MCRViewerPDFConfiguration();
-        return MCRViewerConfigurationBuilder.build(request).mixin(pdfConfig);
+        return build(request).mixin(pdfConfig);
     }
 
     /**
@@ -133,14 +133,14 @@ public class MCRViewerConfigurationBuilder {
      */
     public static MCRViewerConfigurationBuilder epub(HttpServletRequest request) {
         MCRViewerEPUBConfiguration epubConfig = new MCRViewerEPUBConfiguration();
-        return MCRViewerConfigurationBuilder.build(request).mixin(epubConfig);
+        return build(request).mixin(epubConfig);
     }
 
     /**
      * Builds just the plugins (metadata, piwik, logo).
      */
     public static MCRViewerConfigurationBuilder plugins(HttpServletRequest request) {
-        return MCRViewerConfigurationBuilder.build(request).mixin(new MCRViewerLogoConfiguration())
+        return build(request).mixin(new MCRViewerLogoConfiguration())
             .mixin(new MCRViewerMetadataConfiguration()).mixin(new MCRViewerPiwikConfiguration());
     }
 

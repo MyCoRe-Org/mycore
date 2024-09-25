@@ -43,23 +43,23 @@ public class MCRSwordServiceDocumentManager implements ServiceDocumentManager {
         ServiceDocument serviceDocument = new ServiceDocument();
 
         MCRSword.getWorkspaces().forEach(workspaceName -> {
-            SwordWorkspace workspace = buildSwordWorkspace(workspaceName, auth);
+            SwordWorkspace workspace = buildSwordWorkspace(workspaceName);
             serviceDocument.addWorkspace(workspace);
         });
 
         return serviceDocument;
     }
 
-    private SwordWorkspace buildSwordWorkspace(String workspaceName, AuthCredentials auth) {
+    private SwordWorkspace buildSwordWorkspace(String workspaceName) {
         SwordWorkspace workspace = new SwordWorkspace();
         workspace.setTitle(workspaceName);
 
-        buildSwordCollectionList(workspaceName, auth).forEach(workspace::addCollection);
+        buildSwordCollectionList(workspaceName).forEach(workspace::addCollection);
 
         return workspace;
     }
 
-    private List<SwordCollection> buildSwordCollectionList(String workspaceName, AuthCredentials auth) {
+    private List<SwordCollection> buildSwordCollectionList(String workspaceName) {
         String baseURL = MCRFrontendUtil.getBaseURL();
         List<SwordCollection> swordCollections = new ArrayList<>();
 

@@ -22,17 +22,17 @@ import java.awt.Color;
 
 public class ColorFilter implements PixelFilter {
 
-    public ColorFilter(Color colorToFilter, boolean throwOut, int tolerance) {
-        this.colorToFilter = colorToFilter;
-        this.throwOut = throwOut;
-        this.tolerance = tolerance;
-    }
-
     private final Color colorToFilter;
 
     private final boolean throwOut;
 
     private final int tolerance;
+
+    public ColorFilter(Color colorToFilter, boolean throwOut, int tolerance) {
+        this.colorToFilter = colorToFilter;
+        this.throwOut = throwOut;
+        this.tolerance = tolerance;
+    }
 
     @Override
     public boolean filter(Pixel pixel) {

@@ -67,7 +67,9 @@ public class MCRCrossrefClient {
 
     private static final XMLOutputter METADATA_OUTPUTTER = new XMLOutputter(Format.getPrettyFormat());
 
-    private String host, username, password;
+    private String host;
+    private String username;
+    private String password;
 
     public MCRCrossrefClient(@NotNull String host, @NotNull String username, @NotNull String password) {
         if (host == null) {

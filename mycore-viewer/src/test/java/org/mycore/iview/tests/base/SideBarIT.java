@@ -112,7 +112,7 @@ public class SideBarIT extends ViewerTestBase {
             return;
         }
 
-        ViewerTestBase.sleep(1000);
+        sleep(1000);
         int after = sbController.countThumbnails();
 
         // this test does not really work, because there are only 4 thumbnails left

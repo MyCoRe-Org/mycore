@@ -22,14 +22,14 @@ import java.awt.Color;
 
 public class Pixel {
 
+    private Color color;
+
+    private Position position;
+
     public Pixel(Color color, Position position) {
         this.color = color;
         this.position = position;
     }
-
-    private Color color;
-
-    private Position position;
 
     public Color getColor() {
         return color;
