@@ -24,7 +24,6 @@ import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
 
-import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -50,10 +49,10 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             String name = jsonReader.nextName();
-            switch (name) {
-                case "from" -> ml.setFromString(jsonReader.nextString());
-                case "to" -> ml.setToString(jsonReader.nextString());
-                default -> throw new JsonParseException(name + " is not a valid link type");
+            if (name.equals("from")) {
+                ml.setFromString(jsonReader.nextString());
+            } else if (name.equals("to")) {
+                ml.setToString(jsonReader.nextString());
             }
         }
         jsonReader.endObject();
