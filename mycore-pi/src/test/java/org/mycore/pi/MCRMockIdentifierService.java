@@ -25,19 +25,15 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
-    protected static final String TYPE = "mock";
-
     public static final Logger LOGGER = LogManager.getLogger();
+    protected static final String TYPE = "mock";
+    private boolean registerCalled = false;
+    private boolean deleteCalled = false;
+    private boolean updatedCalled = false;
 
     public MCRMockIdentifierService() {
         super(TYPE);
     }
-
-    private boolean registerCalled = false;
-
-    private boolean deleteCalled = false;
-
-    private boolean updatedCalled = false;
 
     @Override
     protected MCRPIServiceDates registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi) {

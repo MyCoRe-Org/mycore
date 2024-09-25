@@ -140,7 +140,7 @@ public class MCRPersistentIdentifierRegistrationResource {
             LOGGER.error("Error while registering PI:", e);
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();
-        } catch (Throwable t) {
+        } catch (RuntimeException t) {
             LOGGER.error("Error while registering PI:", t);
             throw t;
         }

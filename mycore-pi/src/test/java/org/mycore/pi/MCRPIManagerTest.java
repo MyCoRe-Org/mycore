@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,7 +51,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     private static final String MOCK_METADATA_SERVICE = "MockInscriber";
 
     private static final String MOCK_PID_GENERATOR = "MockIDGenerator";
-
+    final private static Logger LOGGER = LogManager.getLogger();
     @Rule
     public TemporaryFolder baseDir = new TemporaryFolder();
 
@@ -165,7 +167,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
             instance.setAccessible(true);
             instance.set(null, null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

@@ -28,6 +28,10 @@ import jakarta.persistence.Transient;
 @MappedSuperclass
 public class MCRStoredChangeSet extends MCRStoredAltoChangeSetMetadata {
 
+    @Transient
+    @JsonInclude()
+    private MCRAltoChangeSet changeSet;
+
     public MCRStoredChangeSet() {
     }
 
@@ -35,10 +39,6 @@ public class MCRStoredChangeSet extends MCRStoredAltoChangeSetMetadata {
         Date applied, String user) {
         super(sessionID, derivateID, objectTitle, created, applied, user);
     }
-
-    @Transient
-    @JsonInclude()
-    private MCRAltoChangeSet changeSet;
 
     public MCRAltoChangeSet getChangeSet() {
         return changeSet;

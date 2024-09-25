@@ -69,8 +69,23 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+
+    private static final String WORK_EVENT_HANDLER_PROPERTY_PREFIX = "MCR.ORCID2.WorkEventHandler.";
+
     private static final boolean COLLECT_EXTERNAL_PUT_CODES = MCRConfiguration2
-        .getBoolean("MCR.ORCID2.WorkEventHandler.CollectExternalPutCodes").orElse(false);
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CollectExternalPutCodes").orElse(false);
+
+    private static final boolean CREATE_FIRST = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateFirstWork").orElse(false);
+
+    private static final boolean ALWAYS_UPDATE = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "AlwaysUpdateWork").orElse(false);
+
+    private static final boolean CREATE_OWN_DUPLICATE = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "CreateDuplicateWork").orElse(false);
+
+    private static final boolean RECREATE_DELETED = MCRConfiguration2
+        .getBoolean(WORK_EVENT_HANDLER_PROPERTY_PREFIX + "RecreateDeletedWork").orElse(false);
 
     private static final boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2
         .getBoolean("MCR.ORCID2.Metadata.WorkInfo.SaveOtherPutCodes").orElse(false);
@@ -229,12 +244,29 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                     userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
                 }
                 updateWorkInfo(identifiers, userInfo.getWorkInfo(), orcid, credential);
-                publishWork(work, user.getUserPropertiesByORCID(orcid), userInfo.getWorkInfo(), orcid, credential);
+                final MCRORCIDUserProperties userProperties = user.getUserPropertiesByORCID(orcid);
+                fixUserProperties(userProperties);
+                publishWork(work, userProperties, userInfo.getWorkInfo(), orcid, credential);
                 successful.add(orcid);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (Exception e) {
                 LOGGER.warn("Error while publishing Work to {}", orcid, e);
             }
+        }
+    }
+
+    private void fixUserProperties(MCRORCIDUserProperties userProperties) {
+        if (userProperties.isCreateFirstWork() == null) {
+            userProperties.setCreateFirstWork(CREATE_FIRST);
+        }
+        if (userProperties.isAlwaysUpdateWork() == null) {
+            userProperties.setAlwaysUpdateWork(ALWAYS_UPDATE);
+        }
+        if (userProperties.isCreateDuplicateWork() == null) {
+            userProperties.setCreateDuplicateWork(CREATE_OWN_DUPLICATE);
+        }
+        if (userProperties.isRecreateDeletedWork() == null) {
+            userProperties.setRecreateDeleted(RECREATE_DELETED);
         }
     }
 
@@ -376,7 +408,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Lists trusted identifiers as Set of MCRIdentifier.
-     * 
+     *
      * @param work the Work
      * @return Set of MCRIdentifier
      */
@@ -384,7 +416,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Lists matching ORCID iDs based on search via MCRIdentifier
-     * 
+     *
      * @param identifiers the MCRIdentifiers
      * @return Set of ORCID iDs as String
      * @throws MCRORCIDException if request fails
@@ -393,7 +425,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Removes Work in ORCID profile and updates MCRORCIDPutCodeInfo.
-     * 
+     *
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
@@ -405,7 +437,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Updates Work in ORCID profile.
-     * 
+     *
      * @param putCode the put code
      * @param work the Work
      * @param orcid the ORCID iD
@@ -418,7 +450,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Creates Work in ORCID profile and updates MCRORCIDPutCodeInfo.
-     * 
+     *
      * @param work the Work
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -431,7 +463,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Updates work info based on MCRIdentifier.
-     * 
+     *
      * @param identifiers the MCRIdentifier
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -443,7 +475,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Updates work info based on MCRIdentifier.
-     * 
+     *
      * @param identifiers the MCRIdentifier
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -453,7 +485,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Transforms MCRObject as MCRJDOMContent to Work.
-     * 
+     *
      * @param object the MCRObject
      * @return the Work
      */
