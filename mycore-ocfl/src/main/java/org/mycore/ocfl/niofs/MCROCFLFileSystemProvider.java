@@ -52,6 +52,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
@@ -415,7 +416,8 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
             return null;
         }
         try {
-            return getRepository().describeObject(owner).getHeadVersion().getVersionNum().toString();
+            String objectId = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + owner;
+            return getRepository().describeObject(objectId).getHeadVersion().getVersionNum().toString();
         } catch (NotFoundException ignore) {
             return null;
         }
@@ -428,8 +430,12 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      * @return {@code true} if the version ID is the head version, {@code false} otherwise.
      */
     public boolean isHeadVersion(ObjectVersionId versionId) {
-        return versionId.getVersionNum() == null ||
-            this.isHeadVersion(versionId.getObjectId(), versionId.getVersionNum().toString());
+        if (versionId.getVersionNum() == null) {
+            return true;
+        }
+        String objectId = versionId.getObjectId();
+        String owner = MCROCFLObjectIDPrefixHelper.fromDerivateObjectId(objectId);
+        return this.isHeadVersion(owner, versionId.getVersionNum().toString());
     }
 
     /**
