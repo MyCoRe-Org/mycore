@@ -48,15 +48,16 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -94,13 +95,14 @@ public class MCRORCIDOAuthResource {
      *
      * @param scope the scope
      * @return auth URI
-     * @throws WebApplicationException if scope is null
+     * @throws ForbiddenException if user is not allowed to initiate authentication
+     * @throws BadRequestException if scope is null
      */
     @GET
     @Path("init")
     public Response getOAuthURI(@QueryParam("scope") String scope) {
         if (checkCurrentUserIsGuest() && !ALLOW_GUESTS_TO_AUTH) {
-            throw new WebApplicationException(Status.FORBIDDEN);
+            throw new ForbiddenException();
         }
         String langCode = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         if (!MCRORCIDConstants.SUPPORTED_LANGUAGE_CODES.contains(langCode)) {
@@ -121,7 +123,7 @@ public class MCRORCIDOAuthResource {
                     buildRequestCodeURI(SCOPE, state, langCode, MCRUserManager.getCurrentUser(), prefillRegistration))
                 .build();
         } else {
-            throw new WebApplicationException("Scope is required", Status.BAD_REQUEST);
+            throw new BadRequestException("Scope is required");
         }
     }
 
@@ -185,25 +187,23 @@ public class MCRORCIDOAuthResource {
      * @param code the code
      * @param state the state
      * @param error the error
-     * @param errorDescription the errorDescription
+     * @param errorDescription the error description
      * @return Response
-     * @throws WebApplicationException is request is invalid or error
+     * @throws BadRequestException if the request is invalid
+     * @throws InternalServerErrorException if an error occurs during processing the request
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response handleCodeRequest(@QueryParam("code") String code, @QueryParam("state") String state,
         @QueryParam("error") String error, @QueryParam("error_description") String errorDescription) {
         if (checkCurrentUserIsGuest() && !ALLOW_GUESTS_TO_AUTH) {
-            throw new WebApplicationException(Status.FORBIDDEN);
+            throw new ForbiddenException();
         }
         if (code != null) {
-            if (state == null
-                || !Objects.equals(MCRORCIDUtils.hashString(MCRSessionMgr.getCurrentSessionID()), state)) {
-                throw new WebApplicationException(Status.BAD_REQUEST);
-            }
             final String codeTrimmed = code.trim();
-            if (codeTrimmed.isEmpty()) {
-                throw new WebApplicationException(Status.BAD_REQUEST);
+            if (state == null || codeTrimmed.isEmpty()
+                || !Objects.equals(MCRORCIDUtils.hashString(MCRSessionMgr.getCurrentSessionID()), state)) {
+                throw new BadRequestException();
             }
             final MCRORCIDOAuthAccessTokenResponse accessTokenResponse = MCRORCIDOAuthClient.getInstance()
                 .exchangeCode(codeTrimmed, MCRFrontendUtil.getBaseURL() + redirectURI);
@@ -217,7 +217,7 @@ public class MCRORCIDOAuthResource {
                 try {
                     return Response.ok(MCRJerseyUtil.transform(result.asXML(), req).getInputStream()).build();
                 } catch (Exception e) {
-                    throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+                    throw new InternalServerErrorException(e);
                 }
             }
         } else if (error != null) {
@@ -229,11 +229,11 @@ public class MCRORCIDOAuthResource {
                 try {
                     return Response.ok(MCRJerseyUtil.transform(result.asXML(), req).getInputStream()).build();
                 } catch (Exception e) {
-                    throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+                    throw new InternalServerErrorException(e);
                 }
             }
         } else {
-            throw new WebApplicationException(Status.BAD_REQUEST);
+            throw new BadRequestException();
         }
     }
 
