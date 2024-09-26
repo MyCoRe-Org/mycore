@@ -221,7 +221,7 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
         MCRTransactionHelper.commitTransaction();
         assertFalse("white.png should not exist", getVirtualObject().exists(whitePng));
 
-        OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1));
+        OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
         assertNotNull("should have a .keep file", derivate1.getFile(".keep"));
 
@@ -229,7 +229,7 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
         Files.write(whitePng, new byte[] { 1, 3, 3, 7 });
         MCRTransactionHelper.commitTransaction();
 
-        derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1));
+        derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
         assertNotNull("should have a 'white.png' file", derivate1.getFile("white.png"));
     }
