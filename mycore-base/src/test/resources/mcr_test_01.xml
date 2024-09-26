@@ -7,4 +7,17 @@
       <textfield>JUnit Test object 1</textfield>
     </def.textfield>
   </metadata>
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2024-09-24T12:00:00.123Z</servdate>
+      <servdate type="modifydate" inherited="0">2024-09-24T17:00:00.123Z</servdate>
+    </servdates>
+    <servflags class="MCRMetaLangText">
+      <servflag type="createdby" inherited="0" form="plain">editorA</servflag>
+      <servflag type="modifiedby" inherited="0" form="plain">editorB</servflag>
+    </servflags>
+    <servstates class="MCRMetaClassification">
+      <servstate inherited="0" classid="state" categid="published" />
+    </servstates>
+  </service>
 </mycoreobject>

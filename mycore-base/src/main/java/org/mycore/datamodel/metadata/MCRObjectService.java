@@ -143,10 +143,10 @@ public class MCRObjectService {
         Element messagesElement = service.getChild("servmessages");
         Element statesElement = service.getChild("servstates");
 
-        addContent(rulesElement, "servacl", new MCRMetaAccessRule(), rules);
-        addContent(flagsElement, "servflag", new MCRMetaLangText(), flags);
-        addContent(classificationsElement, "servclass", new MCRMetaClassification(), classifications);
-        addContent(messagesElement, "servmessage", new MCRMetaDateLangText(), messages);
+        addContent(rulesElement, "servacl", MCRMetaAccessRule.class, rules);
+        addContent(flagsElement, "servflag", MCRMetaLangText.class, flags);
+        addContent(classificationsElement, "servclass", MCRMetaClassification.class, classifications);
+        addContent(messagesElement, "servmessage", MCRMetaDateLangText.class, messages);
 
         // date part
         dates.clear();
@@ -176,15 +176,21 @@ public class MCRObjectService {
         }
     }
 
-    private <T extends MCRMetaDefault> void addContent(Element element, String name, T newItem, List<T> items) {
+    private <T extends MCRMetaDefault> void addContent(Element element, String name,
+        Class<T> itemClass, List<T> items) {
         if (element != null) {
             List<Element> elements = element.getChildren();
             for (Element elm : elements) {
                 if (!elm.getName().equals(name)) {
                     continue;
                 }
-                newItem.setFromDOM(elm);
-                items.add(newItem);
+                try {
+                    T newItem = itemClass.getDeclaredConstructor().newInstance();
+                    newItem.setFromDOM(elm);
+                    items.add(newItem);
+                } catch (ReflectiveOperationException e) {
+                    LOGGER.error("Could not instantiate " + itemClass.getSimpleName(), e);
+                }
             }
         }
     }

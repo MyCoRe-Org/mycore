@@ -18,7 +18,6 @@
 
 package org.mycore.orcid2.oauth.resources;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,35 +27,37 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
-import org.mycore.frontend.jersey.access.MCRRequireLogin;
-import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
-import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.oauth.MCRORCIDOAuthAccessTokenResponse;
 import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
+import org.mycore.orcid2.oauth.MCRORCIDOAuthUserInformation;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
+import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -76,7 +77,13 @@ public class MCRORCIDOAuthResource {
     private static final String SCOPE = MCRConfiguration2.getString(CONFIG_PREFIX + "Scope").orElse(null);
 
     private static final boolean IS_PREFILL_REGISTRATION_FORM = MCRConfiguration2
-        .getOrThrow(MCRORCIDConstants.CONFIG_PREFIX + "PreFillRegistrationForm", Boolean::parseBoolean);
+        .getOrThrow(CONFIG_PREFIX + "PreFillRegistrationForm", Boolean::parseBoolean);
+
+    private static final boolean ALLOW_GUESTS_TO_AUTH = MCRConfiguration2
+        .getOrThrow(CONFIG_PREFIX + "EnableForGuests", Boolean::parseBoolean);
+
+    private static final boolean PERSIST_USER = MCRConfiguration2
+        .getOrThrow(CONFIG_PREFIX + "PersistUser", Boolean::parseBoolean);
 
     private final String redirectURI = "rsc/orcid/oauth";
 
@@ -84,139 +91,44 @@ public class MCRORCIDOAuthResource {
     HttpServletRequest req;
 
     /**
-     * Handles ORCID code request.
-     *
-     * @param code the code
-     * @param state the state
-     * @param error the error
-     * @param errorDescription the errorDescription
-     * @return Response
-     * @throws WebApplicationException is request is invalid or error
-     */
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    @MCRRestrictedAccess(MCRRequireLogin.class)
-    public InputStream handleCodeRequest(@QueryParam("code") String code, @QueryParam("state") String state,
-        @QueryParam("error") String error, @QueryParam("error_description") String errorDescription) {
-        try {
-            MCRContent result = null;
-            if (code != null) {
-                final String userID = MCRUserManager.getCurrentUser().getUserID();
-                if (state == null || !Objects.equals(MCRORCIDUtils.hashString(userID), state)) {
-                    throw new WebApplicationException(Status.BAD_REQUEST);
-                }
-                final String codeTrimmed = code.trim();
-                if (codeTrimmed.isEmpty()) {
-                    throw new WebApplicationException(Status.BAD_REQUEST);
-                }
-                result = handleCode(codeTrimmed);
-            } else if (error != null) {
-                result = handleError(error, errorDescription);
-            } else {
-                throw new WebApplicationException(Status.BAD_REQUEST);
-            }
-            return MCRJerseyUtil.transform(result.asXML(), req).getInputStream();
-        } catch (Exception e) {
-            throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
      * Returns authorization URI
      *
      * @param scope the scope
      * @return auth URI
-     * @throws WebApplicationException if scope is null
+     * @throws ForbiddenException if user is not allowed to initiate authentication
+     * @throws BadRequestException if scope is null
      */
     @GET
     @Path("init")
-    @MCRRestrictedAccess(MCRRequireLogin.class)
     public Response getOAuthURI(@QueryParam("scope") String scope) {
+        if (checkCurrentUserIsGuest() && !ALLOW_GUESTS_TO_AUTH) {
+            throw new ForbiddenException();
+        }
         String langCode = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         if (!MCRORCIDConstants.SUPPORTED_LANGUAGE_CODES.contains(langCode)) {
             // use english as fallback
             langCode = "en";
         }
-        final String userID = MCRUserManager.getCurrentUser().getUserID();
-        final String state = MCRORCIDUtils.hashString(userID);
+        final String state = MCRORCIDUtils.hashString(MCRSessionMgr.getCurrentSessionID());
+        final boolean prefillRegistration = checkCurrentUserIsGuest() ? false : IS_PREFILL_REGISTRATION_FORM;
+
         if (scope != null) {
-            return Response.seeOther(buildRequestCodeURI(scope, state, langCode)).build();
+            return Response
+                .seeOther(
+                    buildRequestCodeURI(scope, state, langCode, MCRUserManager.getCurrentUser(), prefillRegistration))
+                .build();
         } else if (SCOPE != null) {
-            return Response.seeOther(buildRequestCodeURI(SCOPE, state, langCode)).build();
+            return Response
+                .seeOther(
+                    buildRequestCodeURI(SCOPE, state, langCode, MCRUserManager.getCurrentUser(), prefillRegistration))
+                .build();
         } else {
-            throw new WebApplicationException("Scope is required", Status.BAD_REQUEST);
+            throw new BadRequestException("Scope is required");
         }
     }
 
-    /**
-     * Builds the URL where to redirect the user's browser to initiate a three-way
-     * authorization and request permission to access the given scopes. If
-     *
-     * MCR.ORCID2.PreFillRegistrationForm=true
-     *
-     * submits the current user's email address, first and last name to the ORCID
-     * registration form to simplify registration. May be disabled for more data
-     * privacy.
-     *
-     * @param code the code
-     * @return url to request authorization code
-     */
-
-    private MCRContent handleCode(String code) {
-        try {
-            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse = MCRORCIDOAuthClient.getInstance()
-                .exchangeCode(code, MCRFrontendUtil.getBaseURL() + redirectURI);
-            final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
-            final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-            orcidUser.addCredential(accessTokenResponse.getORCID(), credential);
-            MCRUserManager.updateUser(orcidUser.getUser());
-            return marshalOAuthAccessTokenResponse(accessTokenResponse);
-        } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Cannot create response", e);
-        } catch (MCRORCIDRequestException e) {
-            throw new MCRORCIDException(
-                "Cannot exchange token. Response was: " + e.getResponse().readEntity(String.class), e);
-        }
-    }
-
-    private MCRContent handleError(String error, String errorDescription) {
-        LOGGER.error(error);
-        try {
-            return marshalOAuthErrorResponse(new MCRORCIDOAuthErrorResponse(error, errorDescription));
-        } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Cannot create response", e);
-        }
-    }
-
-    private MCRORCIDCredential accessTokenResponseToUserCredential(MCRORCIDOAuthAccessTokenResponse response) {
-        final MCRORCIDCredential credential = new MCRORCIDCredential(response.getAccessToken());
-        credential.setTokenType(response.getTokenType());
-        credential.setRefreshToken(response.getRefreshToken());
-        final LocalDate expireDate = LocalDateTime.now(ZoneId.systemDefault())
-            .plusSeconds(Integer.parseInt(response.getExpiresIn()))
-            .toLocalDate();
-        credential.setExpiration(expireDate);
-        credential.setScope(response.getScope());
-        return credential;
-    }
-
-    private static MCRContent marshalOAuthErrorResponse(MCRORCIDOAuthErrorResponse errorResponse) {
-        try {
-            return new MCRJAXBContent(JAXBContext.newInstance(MCRORCIDOAuthErrorResponse.class), errorResponse);
-        } catch (JAXBException e) {
-            throw new IllegalArgumentException("Invalid auth response");
-        }
-    }
-
-    private static MCRContent marshalOAuthAccessTokenResponse(MCRORCIDOAuthAccessTokenResponse tokenResponse) {
-        try {
-            return new MCRJAXBContent(JAXBContext.newInstance(MCRORCIDOAuthAccessTokenResponse.class), tokenResponse);
-        } catch (JAXBException e) {
-            throw new IllegalArgumentException("Invalid token response");
-        }
-    }
-
-    private URI buildRequestCodeURI(String scope, String state, String langCode) {
+    private URI buildRequestCodeURI(String scope, String state, String langCode, MCRUser user,
+        boolean prefillRegistration) {
         final UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
         builder.path("oauth/authorize");
         builder.queryParam("redirect_uri", MCRFrontendUtil.getBaseURL() + redirectURI);
@@ -226,8 +138,8 @@ public class MCRORCIDOAuthResource {
         builder.queryParam("prompt", "login");
         builder.queryParam("lang", langCode);
         builder.queryParam("state", state);
-        if (IS_PREFILL_REGISTRATION_FORM) {
-            preFillRegistrationForm(builder);
+        if (prefillRegistration) {
+            preFillRegistrationForm(builder, user);
         }
         return builder.build();
     }
@@ -237,10 +149,10 @@ public class MCRORCIDOAuthResource {
      * Adds current user's email address, first and last name as params to URIBuilder.
      *
      * @param builder the builder
+     * @param user the user
      * See <a href="https://members.orcid.org/api/resources/customize">ORCID documentation</a>
      */
-    private static void preFillRegistrationForm(UriBuilder builder) {
-        MCRUser user = MCRUserManager.getCurrentUser();
+    private static void preFillRegistrationForm(UriBuilder builder, MCRUser user) {
         String email = user.getEMailAddress();
         if (email != null) {
             builder.queryParam("email", email);
@@ -266,6 +178,130 @@ public class MCRORCIDOAuthResource {
         }
         if (lastName != null) {
             builder.queryParam("family_names", lastName);
+        }
+    }
+
+    /**
+     * Handles ORCID code request.
+     *
+     * @param code the code
+     * @param state the state
+     * @param error the error
+     * @param errorDescription the error description
+     * @return Response
+     * @throws BadRequestException if the request is invalid
+     * @throws InternalServerErrorException if an error occurs during processing the request
+     */
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response handleCodeRequest(@QueryParam("code") String code, @QueryParam("state") String state,
+        @QueryParam("error") String error, @QueryParam("error_description") String errorDescription) {
+        if (checkCurrentUserIsGuest() && !ALLOW_GUESTS_TO_AUTH) {
+            throw new ForbiddenException();
+        }
+        if (code != null) {
+            final String codeTrimmed = code.trim();
+            if (state == null || codeTrimmed.isEmpty()
+                || !Objects.equals(MCRORCIDUtils.hashString(MCRSessionMgr.getCurrentSessionID()), state)) {
+                throw new BadRequestException();
+            }
+            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse = MCRORCIDOAuthClient.getInstance()
+                .exchangeCode(codeTrimmed, MCRFrontendUtil.getBaseURL() + redirectURI);
+            final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
+            if (checkCurrentUserIsGuest()) {
+                handleLogin(accessTokenResponse.getORCID(), accessTokenResponse.getName(), credential, PERSIST_USER);
+                return Response.seeOther(URI.create(MCRFrontendUtil.getBaseURL())).build();
+            } else {
+                addCredentialToCurrentUser(accessTokenResponse.getORCID(), credential);
+                final MCRContent result = marshalOAuthAccessTokenResponse(accessTokenResponse);
+                try {
+                    return Response.ok(MCRJerseyUtil.transform(result.asXML(), req).getInputStream()).build();
+                } catch (Exception e) {
+                    throw new InternalServerErrorException(e);
+                }
+            }
+        } else if (error != null) {
+            if (checkCurrentUserIsGuest()) {
+                LogManager.getLogger().error(error);
+                return Response.seeOther(URI.create(MCRFrontendUtil.getBaseURL())).build();
+            } else {
+                final MCRContent result = handleError(error, errorDescription);
+                try {
+                    return Response.ok(MCRJerseyUtil.transform(result.asXML(), req).getInputStream()).build();
+                } catch (Exception e) {
+                    throw new InternalServerErrorException(e);
+                }
+            }
+        } else {
+            throw new BadRequestException();
+        }
+    }
+
+    private boolean checkCurrentUserIsGuest() {
+        return Objects.equals(MCRSystemUserInformation.getGuestInstance().getUserID(),
+            MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+    }
+
+    private void addCredentialToCurrentUser(String orcid, MCRORCIDCredential credential) {
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        orcidUser.addCredential(orcid, credential);
+        MCRUserManager.updateUser(orcidUser.getUser());
+    }
+
+    private void handleLogin(String orcid, String name, MCRORCIDCredential credential, boolean persistUser) {
+        MCRUserInformation userInformation;
+        final MCRUser user = MCRUserManager.getUser(orcid, MCRORCIDOAuthUserInformation.REALM_ID);
+        if (user != null) {
+            user.setLastLogin();
+            final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
+            orcidUser.addCredential(orcid, credential);
+            MCRUserManager.updateUser(user);
+            userInformation = user;
+        } else {
+            userInformation = new MCRORCIDOAuthUserInformation(orcid, name, credential);
+            if (persistUser) {
+                final MCRORCIDUser orcidUser = new MCRORCIDUser(new MCRTransientUser(userInformation));
+                orcidUser.addCredential(orcid, credential);
+                MCRUserManager.createUser(orcidUser.getUser());
+            }
+        }
+        MCRSessionMgr.getCurrentSession().setUserInformation(userInformation);
+    }
+
+    private MCRContent handleError(String error, String errorDescription) {
+        LOGGER.error(error);
+        try {
+            return marshalOAuthErrorResponse(new MCRORCIDOAuthErrorResponse(error, errorDescription));
+        } catch (IllegalArgumentException e) {
+            throw new MCRORCIDException("Cannot create response", e);
+        }
+    }
+
+    private MCRORCIDCredential accessTokenResponseToUserCredential(MCRORCIDOAuthAccessTokenResponse response) {
+        final MCRORCIDCredential credential = new MCRORCIDCredential(response.getAccessToken());
+        credential.setTokenType(response.getTokenType());
+        credential.setRefreshToken(response.getRefreshToken());
+        final LocalDate expireDate = LocalDateTime.now(ZoneId.systemDefault())
+            .plusSeconds(Integer.parseInt(response.getExpiresIn()))
+            .toLocalDate();
+        credential.setExpiration(expireDate);
+        credential.setScope(response.getScope());
+        return credential;
+    }
+
+    private static MCRContent marshalOAuthErrorResponse(MCRORCIDOAuthErrorResponse errorResponse) {
+        try {
+            return new MCRJAXBContent<>(JAXBContext.newInstance(MCRORCIDOAuthErrorResponse.class), errorResponse);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException("Invalid auth response");
+        }
+    }
+
+    private static MCRContent marshalOAuthAccessTokenResponse(MCRORCIDOAuthAccessTokenResponse tokenResponse) {
+        try {
+            return new MCRJAXBContent<>(JAXBContext.newInstance(MCRORCIDOAuthAccessTokenResponse.class), tokenResponse);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException("Invalid token response");
         }
     }
 
