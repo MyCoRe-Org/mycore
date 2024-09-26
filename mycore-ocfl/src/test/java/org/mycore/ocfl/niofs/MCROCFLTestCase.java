@@ -20,6 +20,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 @RunWith(Parameterized.class)
 public abstract class MCROCFLTestCase extends MCRTestCase {
@@ -29,10 +30,14 @@ public abstract class MCROCFLTestCase extends MCRTestCase {
      */
     protected static final String DERIVATE_1 = "junit_derivate_00000001";
 
+    protected static final String DERIVATE_1_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_1;
+
     /**
      * This ocfl object is not created on test startup.
      */
     protected static final String DERIVATE_2 = "junit_derivate_00000002";
+
+    protected static final String DERIVATE_2_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_2;
 
     protected MCROCFLRepository repository;
 
