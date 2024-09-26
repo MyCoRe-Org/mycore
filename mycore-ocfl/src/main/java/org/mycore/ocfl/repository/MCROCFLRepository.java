@@ -42,6 +42,7 @@ import io.ocfl.api.model.ValidationResults;
 import io.ocfl.api.model.VersionDetails;
 import io.ocfl.api.model.VersionInfo;
 import io.ocfl.api.model.VersionNum;
+import io.ocfl.core.util.PercentEscaper;
 
 /**
  * A wrapper class for an OCFL repository that adds custom functionality specific to MyCoRe.
@@ -56,6 +57,8 @@ public class MCROCFLRepository implements OcflRepository {
 
     private final OcflRepository base;
 
+    private final PercentEscaper percentEscaper;
+
     /**
      * Constructs a new {@code MCROCFLRepository}.
      *
@@ -65,6 +68,11 @@ public class MCROCFLRepository implements OcflRepository {
     public MCROCFLRepository(String id, OcflRepository repository) {
         this.id = id;
         this.base = repository;
+        this.percentEscaper = PercentEscaper.builderWithSafeAlphaNumeric()
+            .addSafeChars("-_")
+            .plusForSpace(false)
+            .useUppercase(false)
+            .build();
     }
 
     /**
@@ -244,8 +252,9 @@ public class MCROCFLRepository implements OcflRepository {
     }
 
     private String getStorageRelativePath(String fileRelativePath, String objectId, String version) {
-        String layoutConfigPath = fileRelativePath.substring(0, fileRelativePath.indexOf("/" + objectId));
-        return layoutConfigPath + "/" + objectId + "/" + version + "/" + OcflConstants.DEFAULT_CONTENT_DIRECTORY;
+        String encodedObjectId = this.percentEscaper.escape(objectId);
+        String layoutConfigPath = fileRelativePath.substring(0, fileRelativePath.indexOf("/" + encodedObjectId));
+        return layoutConfigPath + "/" + encodedObjectId + "/" + version + "/" + OcflConstants.DEFAULT_CONTENT_DIRECTORY;
     }
 
     /**

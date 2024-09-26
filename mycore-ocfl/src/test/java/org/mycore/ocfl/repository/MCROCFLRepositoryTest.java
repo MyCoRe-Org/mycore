@@ -26,52 +26,52 @@ public class MCROCFLRepositoryTest extends MCROCFLTestCase {
     @Test
     public void directoryChangeHistory() throws URISyntaxException, IOException {
         assertThrows(NotFoundException.class, () -> {
-            repository.directoryChangeHistory(DERIVATE_2, "/");
+            repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/");
         });
 
         loadObject(DERIVATE_2);
-        FileChangeHistory changeHistory = repository.directoryChangeHistory(DERIVATE_2, "/");
+        FileChangeHistory changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/");
         check(changeHistory, FileChangeType.UPDATE, 1);
 
         // adding a file should not change version history of directory
         write("file1");
-        changeHistory = repository.directoryChangeHistory(DERIVATE_2, "/");
+        changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/");
         check(changeHistory, FileChangeType.UPDATE, 1);
 
         // add subfolder: a/file1
         write("a/file1");
-        changeHistory = repository.directoryChangeHistory(DERIVATE_2, "/a");
+        changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/a");
         check(changeHistory, FileChangeType.UPDATE, 1);
 
         // add file: a/file2
         write("a/file2");
-        changeHistory = repository.directoryChangeHistory(DERIVATE_2, "/a");
+        changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/a");
         check(changeHistory, FileChangeType.UPDATE, 1);
 
         // rm a/file2
         remove("a/file2");
-        changeHistory = repository.directoryChangeHistory(DERIVATE_2, "/a");
+        changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/a");
         check(changeHistory, FileChangeType.UPDATE, 1);
 
         // rm a/file1
         remove("a/file1");
-        changeHistory = repository.directoryChangeHistory(DERIVATE_2, "/a");
+        changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/a");
         check(changeHistory, FileChangeType.REMOVE, 2);
 
         // add file: a/file3
         write("a/file3");
-        changeHistory = repository.directoryChangeHistory(DERIVATE_2, "/a");
+        changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/a");
         check(changeHistory, FileChangeType.UPDATE, 3);
     }
 
     private void write(String path) {
-        repository.updateObject(ObjectVersionId.head(DERIVATE_2), new VersionInfo(), updater -> {
+        repository.updateObject(ObjectVersionId.head(DERIVATE_2_OBJECT_ID), new VersionInfo(), updater -> {
             updater.writeFile(new ByteArrayInputStream(new byte[] { 1, 3, 3, 7 }), path);
         });
     }
 
     private void remove(String path) {
-        repository.updateObject(ObjectVersionId.head(DERIVATE_2), new VersionInfo(), updater -> {
+        repository.updateObject(ObjectVersionId.head(DERIVATE_2_OBJECT_ID), new VersionInfo(), updater -> {
             updater.removeFile(path);
         });
     }

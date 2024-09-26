@@ -52,7 +52,7 @@ public class MCROCFLReadableByteChannelTest extends MCROCFLTestCase {
         MCRTransactionHelper.beginTransaction();
         Files.write(MCRVersionedPath.head(DERIVATE_1, "file"), TEST_DATA.getBytes());
         MCRTransactionHelper.commitTransaction();
-        OcflObjectVersion ocflObject = this.repository.getObject(ObjectVersionId.head(DERIVATE_1));
+        OcflObjectVersion ocflObject = this.repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         channel = new MCROCFLReadableByteChannel(ocflObject.getFile("file"));
     }
 

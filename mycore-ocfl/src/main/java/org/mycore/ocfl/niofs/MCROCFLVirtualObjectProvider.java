@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
@@ -108,7 +109,7 @@ public class MCROCFLVirtualObjectProvider {
      * @throws NotFoundException if the object is not found.
      */
     public MCROCFLVirtualObject get(String owner, String version) throws NotFoundException {
-        return get(getId(owner, version));
+        return get(resolveObjectVersionId(owner, version));
     }
 
     /**
@@ -139,7 +140,7 @@ public class MCROCFLVirtualObjectProvider {
      * @return the writable virtual object.
      */
     public MCROCFLVirtualObject getWritable(String owner, String version) {
-        return getWritable(getId(owner, version));
+        return getWritable(resolveObjectVersionId(owner, version));
     }
 
     private MCROCFLVirtualObject get(ObjectVersionId id) throws NotFoundException {
@@ -173,7 +174,7 @@ public class MCROCFLVirtualObjectProvider {
      * @return {@code true} if the owner exists, {@code false} otherwise.
      */
     public boolean exists(String owner) {
-        ObjectVersionId head = ObjectVersionId.head(owner);
+        ObjectVersionId head = toObjectVersionId(owner, null);
         if (this.readMap.containsKey(head)) {
             return true;
         }
@@ -184,7 +185,7 @@ public class MCROCFLVirtualObjectProvider {
                 return headVirtualObject.isMarkedForCreate();
             }
         }
-        return repository.containsObject(owner);
+        return repository.containsObject(head.getObjectId());
     }
 
     /**
@@ -225,18 +226,27 @@ public class MCROCFLVirtualObjectProvider {
      * @param version the version of the object.
      */
     public void invalidate(String owner, String version) {
-        ObjectVersionId objectVersionId = ObjectVersionId.version(owner, version);
+        ObjectVersionId objectVersionId = toObjectVersionId(owner, version);
         this.readMap.remove(objectVersionId);
         this.readQueue.remove(objectVersionId);
     }
 
-    private ObjectVersionId getId(String owner, String version) {
+    private String toObjectId(String owner) {
+        return MCROCFLObjectIDPrefixHelper.toDerivateObjectId(owner);
+    }
+
+    private ObjectVersionId toObjectVersionId(String owner, String version) {
+        String objectId = toObjectId(owner);
+        return ObjectVersionId.version(objectId, version);
+    }
+
+    private ObjectVersionId resolveObjectVersionId(String owner, String version) {
         Objects.requireNonNull(owner);
         if (version != null) {
-            return ObjectVersionId.version(owner, version);
+            return toObjectVersionId(owner, version);
         }
         String headVersion = MCROCFLFileSystemProvider.get().getHeadVersion(owner);
-        return ObjectVersionId.version(owner, headVersion);
+        return toObjectVersionId(owner, headVersion);
     }
 
     private MCROCFLVirtualObject getOrCreateReadable(ObjectVersionId id) {

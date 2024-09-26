@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystem;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.OcflRepository;
 
@@ -124,9 +125,10 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
         // objects from repository
         OcflRepository repository = provider().getRepository();
         Stream<String> repositoryObjectStream = repository.listObjectIds()
+            .filter(MCROCFLObjectIDPrefixHelper::isDerivateObjectId)
+            .map(MCROCFLObjectIDPrefixHelper::fromDerivateObjectId)
             .filter(MCRObjectID::isValid)
             .map(MCRObjectID::getInstance)
-            .filter(id -> id.getTypeId().equals("derivate")) // TODO replace magic string
             .map(MCRObjectID::toString);
 
         return () -> Stream.concat(createdObjectStream, repositoryObjectStream)

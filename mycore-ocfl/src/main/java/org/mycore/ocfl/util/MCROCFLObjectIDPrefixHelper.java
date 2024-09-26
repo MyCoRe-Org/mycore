@@ -21,7 +21,8 @@ package org.mycore.ocfl.util;
 /**
  * Prefixes to map MyCoRe IDs to OCFL object IDs.
  */
-public class MCROCFLObjectIDPrefixHelper {
+public abstract class MCROCFLObjectIDPrefixHelper {
+
     public static final String MCROBJECT = "mcrobject:";
 
     public static final String MCRDERIVATE = "mcrderivate:";
@@ -33,4 +34,17 @@ public class MCROCFLObjectIDPrefixHelper {
     public static final String ACL = "mcracl:";
 
     public static final String WEB = "mcrweb:";
+
+    public static String toDerivateObjectId(String owner) {
+        return MCRDERIVATE + owner;
+    }
+
+    public static String fromDerivateObjectId(String objectId) {
+        return objectId.substring(MCRDERIVATE.length());
+    }
+
+    public static boolean isDerivateObjectId(String objectId) {
+        return objectId.startsWith(MCRDERIVATE);
+    }
+
 }

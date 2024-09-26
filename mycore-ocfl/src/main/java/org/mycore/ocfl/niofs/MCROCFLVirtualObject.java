@@ -61,6 +61,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.DigestAlgorithmRegistry;
 import io.ocfl.api.OcflObjectUpdater;
@@ -393,7 +394,7 @@ public abstract class MCROCFLVirtualObject {
      */
     protected OcflObjectVersionFile fromOcfl(MCRVersionedPath path) throws NoSuchFileException {
         if (objectVersion == null) {
-            throw new NoSuchFileException("'" + getOwner() + "' is not yet stored in the repository.");
+            throw new NoSuchFileException("'" + getObjectId() + "' is not yet stored in the repository.");
         }
         MCRVersionedPath ocflOriginalPath = this.fileTracker.findPath(path);
         String ocflFilePath = ocflOriginalPath.toRelativePath();
@@ -710,12 +711,12 @@ public abstract class MCROCFLVirtualObject {
             String logicalPath = resolvedPath.toRelativePath();
             if (versionNum != null) {
                 changeHistory = isDirectory
-                    ? getRepository().directoryChangeHistory(getOwner(), logicalPath, versionNum)
-                    : getRepository().fileChangeHistory(getOwner(), logicalPath, versionNum);
+                    ? getRepository().directoryChangeHistory(getObjectId(), logicalPath, versionNum)
+                    : getRepository().fileChangeHistory(getObjectId(), logicalPath, versionNum);
             } else {
                 changeHistory = isDirectory
-                    ? getRepository().directoryChangeHistory(getOwner(), logicalPath)
-                    : getRepository().fileChangeHistory(getOwner(), logicalPath);
+                    ? getRepository().directoryChangeHistory(getObjectId(), logicalPath)
+                    : getRepository().fileChangeHistory(getObjectId(), logicalPath);
             }
             this.changeHistoryCache.put(resolvedPath, changeHistory);
         }
@@ -959,6 +960,16 @@ public abstract class MCROCFLVirtualObject {
      * @return the owner of this virtual object.
      */
     public String getOwner() {
+        String objectId = this.objectVersionId.getObjectId();
+        return MCROCFLObjectIDPrefixHelper.fromDerivateObjectId(objectId);
+    }
+
+    /**
+     * Returns the ocfl objectId of this virtual object.
+     *
+     * @return the ocfl objectId of this virtual object.
+     */
+    public String getObjectId() {
         return this.objectVersionId.getObjectId();
     }
 

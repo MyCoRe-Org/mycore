@@ -68,7 +68,7 @@ public class MCROCFLFileSystemTransactionTest extends MCROCFLTestCase {
     }
 
     private void checkVersion(int version) {
-        OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1));
+        OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         Assert.assertEquals("derivate version is wrong", version, derivate1.getVersionNum().getVersionNum());
     }
 
