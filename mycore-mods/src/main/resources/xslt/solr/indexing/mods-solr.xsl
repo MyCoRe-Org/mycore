@@ -219,7 +219,7 @@
         <field name="mods.relatedItem">
           <xsl:value-of select="$relatedID" />
         </field>
-        <xsl:if test="fn:string-length($type) &gt; 0">
+        <xsl:if test="string-length($type) &gt; 0">
           <field name="mods.relatedItem.{$type}">
             <xsl:value-of select="$relatedID"/>
           </field>
