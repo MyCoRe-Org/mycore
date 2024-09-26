@@ -34,7 +34,7 @@ import jakarta.ws.rs.ApplicationPath;
 /**
  * ORCID API REST app.
  */
-@ApplicationPath("/api/orcid")
+@ApplicationPath("/api")
 public class MCRORCIDApp extends ResourceConfig {
 
     /**

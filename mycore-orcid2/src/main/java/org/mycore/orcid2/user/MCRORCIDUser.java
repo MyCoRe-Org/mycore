@@ -27,14 +27,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDConstants;
-import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.util.MCRIdentifier;
@@ -231,26 +225,6 @@ public class MCRORCIDUser {
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Credential is corrupt", e);
         }
-    }
-
-    /**
-     * Checks if user owns object by user by name identifiers.
-     *
-     * @param objectID objects id
-     * @return true is user owns object
-     * @throws MCRORCIDException if check fails
-     */
-    public boolean isMyPublication(MCRObjectID objectID) {
-        MCRObject object = null;
-        try {
-            object = MCRMetadataManager.retrieveMCRObject(objectID);
-        } catch (MCRPersistenceException e) {
-            throw new MCRORCIDException("Cannot check publication", e);
-        }
-        // TODO uniqueness of IDs
-        final Set<MCRIdentifier> nameIdentifiers = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object));
-        nameIdentifiers.retainAll(getTrustedIdentifiers());
-        return !nameIdentifiers.isEmpty();
     }
 
     /**
