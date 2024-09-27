@@ -415,8 +415,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         if (Files.isDirectory(file)) {
             try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file)) {
-                for (@SuppressWarnings("unused")
-                Path entry : directoryStream) {
+                if (directoryStream.iterator().hasNext()) {
                     return;
                 }
                 Files.delete(file);
