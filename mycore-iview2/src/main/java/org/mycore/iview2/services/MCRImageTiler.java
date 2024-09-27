@@ -212,7 +212,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                             }
                         }
                     }
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     LOGGER.error("Keep running while catching exceptions.", e);
                 }
             } // while(running)
