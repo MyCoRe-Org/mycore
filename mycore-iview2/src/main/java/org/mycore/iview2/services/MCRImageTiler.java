@@ -128,6 +128,7 @@ public class MCRImageTiler implements Runnable, Closeable {
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();
 
+                @SuppressWarnings("PMD.AvoidThreadGroup") //no method is called on tg
                 ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
 
                 public Thread newThread(Runnable r) {
