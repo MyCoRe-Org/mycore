@@ -124,104 +124,119 @@ public class MCRImageTiler implements Runnable, Closeable {
         registry.register(imageTilerCollection);
 
         if (activated) {
-            int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
-            ThreadFactory slaveFactory = new ThreadFactory() {
-                AtomicInteger tNum = new AtomicInteger();
-
-                @SuppressWarnings("PMD.AvoidThreadGroup") //no method is called on tg
-                ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
-
-                public Thread newThread(Runnable r) {
-                    return new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
-                }
-            };
-            final AtomicInteger activeThreads = new AtomicInteger();
-            final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
-            ThreadPoolExecutor baseExecutor = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1,
-                TimeUnit.DAYS, workQueue, slaveFactory) {
-
-                @Override
-                protected void afterExecute(Runnable r, Throwable t) {
-                    super.afterExecute(r, t);
-                    activeThreads.decrementAndGet();
-                }
-
-                @Override
-                protected void beforeExecute(Thread t, Runnable r) {
-                    super.beforeExecute(t, r);
-                    activeThreads.incrementAndGet();
-                }
-            };
-            this.tilingServe = MCRProcessableFactory.newPool(baseExecutor, imageTilerCollection);
-            imageTilerCollection.setProperty("running", running);
-            LOGGER.info("TilingMaster is started");
-            while (running) {
-                try {
-                    while (activeThreads.get() < tilingThreadCount) {
-                        runLock.lock();
-                        try {
-                            if (!running) {
-                                break;
-                            }
-                            EntityTransaction transaction = null;
-                            MCRTileJob job = null;
-                            try (EntityManager em = MCREntityManagerProvider.getCurrentEntityManager()) {
-                                transaction = em.getTransaction();
-                                transaction.begin();
-                                job = TQ.poll();
-                                imageTilerCollection.setProperty("queue",
-                                    TQ.stream().map(MCRTileJob::getPath).collect(Collectors.toList()));
-                                transaction.commit();
-                            } catch (PersistenceException e) {
-                                LOGGER.error("Error while getting next tiling job.", e);
-                                if (transaction != null) {
-                                    try {
-                                        transaction.rollback();
-                                    } catch (RuntimeException re) {
-                                        LOGGER.warn("Could not rollback transaction.", re);
-                                    }
-                                }
-                            }
-                            if (job != null && !tilingServe.getExecutor().isShutdown()) {
-                                LOGGER.info("Creating:{}", job.getPath());
-                                tilingServe.submit(getTilingAction(job));
-                            } else {
-                                try {
-                                    synchronized (TQ) {
-                                        if (running) {
-                                            LOGGER.debug("No Picture in TilingQueue going to sleep");
-                                            //fixes a race conditioned deadlock situation
-                                            //do not wait longer than 60 sec. for a new MCRTileJob
-                                            TQ.wait(60000);
-                                        }
-                                    }
-                                } catch (InterruptedException e) {
-                                    LOGGER.error("Image Tiling thread was interrupted.", e);
-                                }
-                            }
-                        } finally {
-                            runLock.unlock();
-                        }
-                    } // while(tilingServe.getActiveCount() < tilingServe.getCorePoolSize())
-                    if (activeThreads.get() < tilingThreadCount) {
-                        try {
-                            LOGGER.info("Waiting for a tiling job to finish");
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            if (running) {
-                                LOGGER.error("Image Tiling thread was interrupted.", e);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Keep running while catching exceptions.", e);
-                }
-            } // while(running)
-            imageTilerCollection.setProperty("running", false);
+            startTilingThreads(imageTilerCollection);
         }
         LOGGER.info("Tiling thread finished");
         MCRSessionMgr.releaseCurrentSession();
         waiter = null;
+    }
+
+    private void startTilingThreads(MCRProcessableDefaultCollection imageTilerCollection) {
+        final AtomicInteger activeThreads = new AtomicInteger();
+        int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
+        ThreadFactory slaveFactory = new ThreadFactory() {
+            AtomicInteger tNum = new AtomicInteger();
+
+            @SuppressWarnings("PMD.AvoidThreadGroup") //no method is called on tg
+            ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
+
+            public Thread newThread(Runnable r) {
+                return new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
+            }
+        };
+        this.tilingServe = getProcessableExecutor(imageTilerCollection, tilingThreadCount, slaveFactory, activeThreads);
+        imageTilerCollection.setProperty("running", running);
+        LOGGER.info("TilingMaster is started");
+        while (running) {
+            try {
+                while (activeThreads.get() < tilingThreadCount) {
+                    runLock.lock();
+                    try {
+                        if (!running) {
+                            break;
+                        }
+                        processNextTileJob(imageTilerCollection);
+                    } finally {
+                        runLock.unlock();
+                    }
+                } // while(tilingServe.getActiveCount() < tilingServe.getCorePoolSize())
+                if (activeThreads.get() < tilingThreadCount) {
+                    try {
+                        LOGGER.info("Waiting for a tiling job to finish");
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        if (running) {
+                            LOGGER.error("Image Tiling thread was interrupted.", e);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("Keep running while catching exceptions.", e);
+            }
+        } // while(running)
+        imageTilerCollection.setProperty("running", false);
+    }
+
+    private void processNextTileJob(MCRProcessableDefaultCollection imageTilerCollection) {
+        EntityTransaction transaction = null;
+        MCRTileJob job = null;
+        try (EntityManager em = MCREntityManagerProvider.getCurrentEntityManager()) {
+            transaction = em.getTransaction();
+            transaction.begin();
+            job = TQ.poll();
+            imageTilerCollection.setProperty("queue",
+                TQ.stream().map(MCRTileJob::getPath).collect(Collectors.toList()));
+            transaction.commit();
+        } catch (PersistenceException e) {
+            LOGGER.error("Error while getting next tiling job.", e);
+            if (transaction != null) {
+                try {
+                    transaction.rollback();
+                } catch (RuntimeException re) {
+                    LOGGER.warn("Could not rollback transaction.", re);
+                }
+            }
+        }
+        if (job != null && !tilingServe.getExecutor().isShutdown()) {
+            LOGGER.info("Creating:{}", job.getPath());
+            tilingServe.submit(getTilingAction(job));
+        } else {
+            try {
+                synchronized (TQ) {
+                    if (running) {
+                        LOGGER.debug("No Picture in TilingQueue going to sleep");
+                        //fixes a race conditioned deadlock situation
+                        //do not wait longer than 60 sec. for a new MCRTileJob
+                        TQ.wait(60000);
+                    }
+                }
+            } catch (InterruptedException e) {
+                LOGGER.error("Image Tiling thread was interrupted.", e);
+            }
+        }
+    }
+
+    private static MCRProcessableExecutor getProcessableExecutor(
+        MCRProcessableDefaultCollection imageTilerCollection, int tilingThreadCount, ThreadFactory slaveFactory,
+        AtomicInteger activeThreads) {
+        final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+        ThreadPoolExecutor baseExecutor = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1,
+            TimeUnit.DAYS, workQueue, slaveFactory) {
+
+            @Override
+            protected void afterExecute(Runnable r, Throwable t) {
+                super.afterExecute(r, t);
+                activeThreads.decrementAndGet();
+            }
+
+            @Override
+            protected void beforeExecute(Thread t, Runnable r) {
+                super.beforeExecute(t, r);
+                activeThreads.incrementAndGet();
+            }
+        };
+        MCRProcessableExecutor processableExecutor = MCRProcessableFactory.newPool(baseExecutor, imageTilerCollection);
+        return processableExecutor;
     }
 
     private MCRTilingAction getTilingAction(MCRTileJob job) {
