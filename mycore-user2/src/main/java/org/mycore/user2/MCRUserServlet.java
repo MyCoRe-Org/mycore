@@ -135,6 +135,32 @@ public class MCRUserServlet extends MCRServlet {
         return !MCRUserManager.exists(userName, realmID);
     }
 
+    private static void updateUserOwner(String userName, String realmID, MCRUser user) {
+        if (MCRUserManager.exists(userName, realmID)) {
+            MCRUserManager.updateUser(user);
+        } else {
+            MCRUserManager.createUser(user);
+        }
+    }
+
+    private static void updateUserRoles(Element u, MCRUser user, boolean hasAdminPermission, MCRUser currentUser) {
+        Element gs = u.getChild("roles");
+        if (gs != null) {
+            user.getSystemRoleIDs().clear();
+            user.getExternalRoleIDs().clear();
+            List<Element> groupList = gs.getChildren("role");
+            for (Element group : groupList) {
+                String groupName = group.getAttributeValue("name");
+                if (hasAdminPermission || currentUser.isUserInRole(groupName)) {
+                    user.assignRole(groupName);
+                } else {
+                    LOGGER.warn("Current user {} has not the permission to add user to group {}",
+                        currentUser.getUserID(), groupName);
+                }
+            }
+        }
+    }
+
     /**
      * Handles requests. The parameter 'action' selects what to do, possible
      * values are show, save, delete, password (with id as second parameter).
@@ -241,84 +267,32 @@ public class MCRUserServlet extends MCRServlet {
      */
     private void saveUser(HttpServletRequest req, HttpServletResponse res) throws Exception {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
-        Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
-        Element u = doc.getRootElement();
-        MCRUser user = getUserOrCreateNew(res, u, currentUser);
-
-        if (!checkUserIsNotNull(res, currentUser, null) || !checkPermissions(res) || user == null) {
+        if (!checkUserIsNotNull(res, currentUser, null)) {
             return;
         }
-
-        processPasswordHint(u, user);
-        updateBasicUserInfo(u, user);
-
-        if (MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)) {
-            updateAdminAttributes(u, user, res);
-        } else {
-            setCreatorAttributes(user, currentUser);
-        }
-
-        updateUserRoles(u, user, currentUser);
-
-        saveOrUpdateUser(user);
-
-        res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id="
-            + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
-    }
-
-    private boolean checkPermissions(HttpServletResponse res) throws IOException {
         boolean hasAdminPermission = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION);
         boolean allowed
             = hasAdminPermission || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION);
         if (!allowed) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noCreatePermission");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return false;
+            return;
         }
-        return true;
-    }
 
-    private MCRUser getUserOrCreateNew(HttpServletResponse res, Element u, MCRUser currentUser)
-        throws Exception {
+        Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
+        Element u = doc.getRootElement();
         String userName = u.getAttributeValue("name");
+
         String realmID = MCRRealmFactory.getLocalRealm().getID();
-        if (MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)) {
+        if (hasAdminPermission) {
             realmID = u.getAttributeValue("realm");
         }
 
-        boolean userExists = MCRUserManager.exists(userName, realmID);
-        if (!userExists) {
-            MCRUser user = new MCRUser(userName, realmID);
-            LOGGER.info("create new user {} {}", userName, realmID);
-
-            String pwd = u.getChildText("password");
-            if (isPasswordValid(pwd, user)) {
-                MCRUserManager.setUserPassword(user, pwd);
-            }
-            return user;
-        } else {
-            MCRUser user = MCRUserManager.getUser(userName, realmID);
-            if (!isUserAuthorized(res, currentUser, user)) {
-                return null;
-            }
-            return user;
+        MCRUser user = getUserOrCreateNew(userName, realmID, currentUser, res, u, hasAdminPermission);
+        if (user == null) {
+            return;
         }
-    }
 
-    private boolean isPasswordValid(String pwd, MCRUser user) {
-        return (pwd != null) && (pwd.trim().length() > 0) && user.getRealm().equals(MCRRealmFactory.getLocalRealm());
-    }
-
-    private boolean isUserAuthorized(HttpServletResponse res, MCRUser currentUser, MCRUser user) throws IOException {
-        boolean hasAdminPermission = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION);
-        if (!(hasAdminPermission || currentUser.equals(user) || currentUser.equals(user.getOwner()))) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return false;
-        }
-        return true;
-    }
-
-    private void processPasswordHint(Element u, MCRUser user) {
         XPathExpression<Attribute> hintPath = XPathFactory.instance().compile("password/@hint", Filters.attribute());
         Attribute hintAttr = hintPath.evaluateFirst(u);
         String hint = hintAttr == null ? null : hintAttr.getValue();
@@ -326,78 +300,81 @@ public class MCRUserServlet extends MCRServlet {
             hint = null;
         }
         user.setHint(hint);
-    }
 
-    private void updateAdminAttributes(Element u, MCRUser user, HttpServletResponse res) {
-        user.setLocked("true".equals(u.getAttributeValue("locked")));
-        user.setDisabled("true".equals(u.getAttributeValue("disabled")));
+        updateBasicUserInfo(u, user);
 
-        updateUserOwner(u, user, res);
-        updateValidUntil(u, user);
-    }
-
-    private void updateUserOwner(Element u, MCRUser user, HttpServletResponse res) {
-        Element o = u.getChild("owner");
-        if (o != null && !o.getAttributes().isEmpty()) {
-            String ownerName = o.getAttributeValue("name");
-            String ownerRealm = o.getAttributeValue("realm");
-            MCRUser owner = MCRUserManager.getUser(ownerName, ownerRealm);
-            if (!checkUserIsNotNull(res, owner, ownerName + "@" + ownerRealm)) {
-                return;
-            }
-            user.setOwner(owner);
-        } else {
-            user.setOwner(null);
+        if (updateUserRoles(res, hasAdminPermission, u, user, currentUser)) {
+            return;
         }
+        updateUserRoles(u, user, hasAdminPermission, currentUser);
+        updateUserOwner(userName, realmID, user);
+        res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id="
+            + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
     }
 
-    private void updateValidUntil(Element u, MCRUser user) {
-        String validUntilText = u.getChildTextTrim("validUntil");
-        if (validUntilText == null || validUntilText.isEmpty()) {
-            user.setValidUntil(null);
-        } else {
-            String dateInUTC;
-            try {
-                dateInUTC = validUntilText.length() == 10 ? convertToUTC(validUntilText, "yyyy-MM-dd") : validUntilText;
-            } catch (ParseException e) {
-                String message = "Failed to convert " + validUntilText + " to UTC";
-                throw new MCRException(message, e);
+    private MCRUser getUserOrCreateNew(String userName, String realmID, MCRUser currentUser, HttpServletResponse res,
+        Element u, boolean hasAdminPermission) throws Exception {
+        MCRUser user;
+        boolean userExists = MCRUserManager.exists(userName, realmID);
+        if (!userExists) {
+            user = new MCRUser(userName, realmID);
+            LOGGER.info("create new user {} {}", userName, realmID);
+
+            // For new local users, set password
+            String pwd = u.getChildText("password");
+            if ((pwd != null) && (pwd.trim().length() > 0) && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
+                MCRUserManager.setUserPassword(user, pwd);
+                return user;
             }
-            MCRISO8601Date date = new MCRISO8601Date(dateInUTC);
-            user.setValidUntil(date.getDate());
+        } else {
+            user = MCRUserManager.getUser(userName, realmID);
+            if (!(hasAdminPermission || currentUser.equals(user) || currentUser.equals(user.getOwner()))) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN);
+
+            }
         }
+        return null;
     }
 
-    private void setCreatorAttributes(MCRUser user, MCRUser currentUser) {
-        user.setRealm(MCRRealmFactory.getLocalRealm());
-        user.setOwner(currentUser);
-    }
+    private boolean updateUserRoles(HttpServletResponse res, boolean hasAdminPermission, Element u, MCRUser user,
+        MCRUser currentUser) throws ParseException {
+        if (hasAdminPermission) {
+            boolean locked = "true".equals(u.getAttributeValue("locked"));
+            user.setLocked(locked);
 
-    private void updateUserRoles(Element u, MCRUser user, MCRUser currentUser) {
-        Element gs = u.getChild("roles");
-        if (gs != null) {
-            user.getSystemRoleIDs().clear();
-            user.getExternalRoleIDs().clear();
-            List<Element> groupList = gs.getChildren("role");
-            for (Element group : groupList) {
-                String groupName = group.getAttributeValue("name");
-                if (MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
-                    || currentUser.isUserInRole(groupName)) {
-                    user.assignRole(groupName);
-                } else {
-                    LOGGER.warn("Current user {} has not the permission to add user to group {}",
-                        currentUser.getUserID(), groupName);
+            boolean disabled = "true".equals(u.getAttributeValue("disabled"));
+            user.setDisabled(disabled);
+
+            Element o = u.getChild("owner");
+            if (o != null && !o.getAttributes().isEmpty()) {
+                String ownerName = o.getAttributeValue("name");
+                String ownerRealm = o.getAttributeValue("realm");
+                MCRUser owner = MCRUserManager.getUser(ownerName, ownerRealm);
+                if (!checkUserIsNotNull(res, owner, ownerName + "@" + ownerRealm)) {
+                    return true;
                 }
+                user.setOwner(owner);
+            } else {
+                user.setOwner(null);
             }
-        }
-    }
+            String validUntilText = u.getChildTextTrim("validUntil");
+            if (validUntilText == null || validUntilText.length() == 0) {
+                user.setValidUntil(null);
+            } else {
 
-    private void saveOrUpdateUser(MCRUser user) {
-        if (MCRUserManager.exists(user.getUserID(), user.getRealm().getID())) {
-            MCRUserManager.updateUser(user);
-        } else {
-            MCRUserManager.createUser(user);
+                String dateInUTC = validUntilText;
+                if (validUntilText.length() == 10) {
+                    dateInUTC = convertToUTC(validUntilText, "yyyy-MM-dd");
+                }
+
+                MCRISO8601Date date = new MCRISO8601Date(dateInUTC);
+                user.setValidUntil(date.getDate());
+            }
+        } else { // save read user of creator
+            user.setRealm(MCRRealmFactory.getLocalRealm());
+            user.setOwner(currentUser);
         }
+        return false;
     }
 
     private String convertToUTC(String validUntilText, String format) throws ParseException {

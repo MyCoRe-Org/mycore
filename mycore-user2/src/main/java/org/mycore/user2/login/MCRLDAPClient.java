@@ -228,10 +228,16 @@ public class MCRLDAPClient {
     /**
      * Formats a user name into "lastname, firstname" syntax.
      */
-
     private String formatName(String name) {
-        return (name.replaceAll("\\s+", " ").trim()).contains(",") ? name : name.lastIndexOf(' ') == -1 ? name
-            : name.substring(name.lastIndexOf(' ') + 1) + ", " + name.substring(0, name.lastIndexOf(' '));
+        String trimmedName = name.replaceAll("\\s+", " ").trim();
+        if (trimmedName.contains(",")) {
+            return trimmedName;
+        }
+        int pos = name.lastIndexOf(' ');
+        if (pos == -1) {
+            return trimmedName;
+        }
+        return trimmedName.substring(pos + 1) + ", " + trimmedName.substring(0, pos);
     }
 
 }

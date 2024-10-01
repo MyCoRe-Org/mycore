@@ -111,13 +111,13 @@ public class MCRUserAttributeMapper {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public boolean mapAttributes(final Object object, final Map<String, ?> attributes) throws Exception {
         boolean changed = false;
-
         for (Object annotated : getAnnotated(object)) {
             MCRUserAttribute attrAnno = getMCRUserAttribute(annotated);
-            if (attrAnno == null) {
-                continue;
-            }
 
+
+            if (attrAnno == null) {
+                return changed;
+            }
             final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
             final List<Attribute> attribs = attributeMapping.get(name);
 
@@ -127,13 +127,12 @@ public class MCRUserAttributeMapper {
 
             for (Attribute attribute : attribs) {
                 if (!attributes.containsKey(attribute.mapping)) {
-                    continue;
+                    return changed;
                 }
 
                 Object value = attributes.get(attribute.mapping);
                 if (value == null) {
                     LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
-                    continue;
                 }
 
                 value = convertValue(annotated, attrAnno, attribute, value);
