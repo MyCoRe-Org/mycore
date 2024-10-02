@@ -25,14 +25,12 @@ import static org.junit.Assert.assertFalse;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.file.Files;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRTransactionHelper;
-import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.MCROCFLTestCase;
+import org.mycore.ocfl.MCROCFLTestCase;
+import org.mycore.ocfl.MCROCFLTestCaseHelper;
 
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
@@ -40,20 +38,15 @@ import io.ocfl.api.model.OcflObjectVersion;
 public class MCROCFLReadableByteChannelTest extends MCROCFLTestCase {
 
     private static final String TEST_DATA = "This is some test data for the OCFL readable byte channel.";
-    private MCROCFLReadableByteChannel channel;
 
-    public MCROCFLReadableByteChannelTest(boolean remote) {
-        super(remote);
-    }
+    private MCROCFLReadableByteChannel channel;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRTransactionHelper.beginTransaction();
-        Files.write(MCRVersionedPath.head(DERIVATE_1, "file"), TEST_DATA.getBytes());
-        MCRTransactionHelper.commitTransaction();
-        OcflObjectVersion ocflObject = this.repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
-        channel = new MCROCFLReadableByteChannel(ocflObject.getFile("file"));
+        ObjectVersionId channelTestId = MCROCFLTestCaseHelper.writeFile(repository, "channelTest", "file", TEST_DATA);
+        OcflObjectVersion channelTest = repository.getObject(channelTestId);
+        channel = new MCROCFLReadableByteChannel(channelTest.getFile("file"));
     }
 
     @Test
