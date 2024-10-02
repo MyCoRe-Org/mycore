@@ -34,7 +34,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 import io.ocfl.api.model.ObjectVersionId;
 
-public class MCROCFLFileSystemProviderTest extends MCROCFLTestCase {
+public class MCROCFLFileSystemProviderTest extends MCROCFLNioTestCase {
 
     public MCROCFLFileSystemProviderTest(boolean remote) {
         super(remote);
