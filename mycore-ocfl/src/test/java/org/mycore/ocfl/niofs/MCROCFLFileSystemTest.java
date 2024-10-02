@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
-public class MCROCFLFileSystemTest extends MCROCFLTestCase {
+public class MCROCFLFileSystemTest extends MCROCFLNioTestCase {
 
     public MCROCFLFileSystemTest(boolean remote) {
         super(remote);

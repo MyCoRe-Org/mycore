@@ -32,8 +32,6 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
  */
 public class MCROCFLEmptyDirectoryTracker {
 
-    protected final MCRVersionedPath rootPath;
-
     protected final Map<MCRVersionedPath, Boolean> original;
 
     protected final Map<MCRVersionedPath, Boolean> current;
@@ -41,11 +39,9 @@ public class MCROCFLEmptyDirectoryTracker {
     /**
      * Constructs a new {@code MCROCFLDirectoryTracker} with the specified original paths.
      *
-     * @param rootPath path to the root
      * @param originalPaths the original paths to be tracked.
      */
-    public MCROCFLEmptyDirectoryTracker(MCRVersionedPath rootPath, Map<MCRVersionedPath, Boolean> originalPaths) {
-        this.rootPath = rootPath;
+    public MCROCFLEmptyDirectoryTracker(Map<MCRVersionedPath, Boolean> originalPaths) {
         this.original = new HashMap<>();
         this.current = new HashMap<>();
         for (Map.Entry<MCRVersionedPath, Boolean> entry : originalPaths.entrySet()) {
@@ -57,13 +53,11 @@ public class MCROCFLEmptyDirectoryTracker {
     /**
      * Constructs a new {@code MCROCFLDirectoryTracker} with the specified original and current maps.
      *
-     * @param rootPath path to the root
      * @param original the original paths map.
      * @param current the current paths map.
      */
-    protected MCROCFLEmptyDirectoryTracker(MCRVersionedPath rootPath, Map<MCRVersionedPath, Boolean> original,
+    protected MCROCFLEmptyDirectoryTracker(Map<MCRVersionedPath, Boolean> original,
         Map<MCRVersionedPath, Boolean> current) {
-        this.rootPath = rootPath;
         this.original = original;
         this.current = current;
     }
@@ -94,7 +88,7 @@ public class MCROCFLEmptyDirectoryTracker {
      * @return {@code true} if the path exists, {@code false} otherwise.
      */
     public boolean exists(MCRVersionedPath path) {
-        return this.rootPath.equals(path) || this.current.containsKey(path);
+        return this.current.containsKey(path);
     }
 
     /**
@@ -165,7 +159,6 @@ public class MCROCFLEmptyDirectoryTracker {
 
     public void purge() {
         this.current.clear();
-        this.update(this.rootPath, true);
     }
 
     /**
@@ -192,7 +185,6 @@ public class MCROCFLEmptyDirectoryTracker {
      */
     public MCROCFLEmptyDirectoryTracker deepClone() {
         return new MCROCFLEmptyDirectoryTracker(
-            this.rootPath,
             new HashMap<>(this.original),
             new HashMap<>(this.current));
     }

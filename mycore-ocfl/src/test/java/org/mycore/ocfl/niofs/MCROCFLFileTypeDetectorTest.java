@@ -8,7 +8,7 @@ import java.nio.file.Files;
 
 import static org.junit.Assert.assertEquals;
 
-public class MCROCFLFileTypeDetectorTest extends MCROCFLTestCase {
+public class MCROCFLFileTypeDetectorTest extends MCROCFLNioTestCase {
 
     public MCROCFLFileTypeDetectorTest(boolean remote) {
         super(remote);

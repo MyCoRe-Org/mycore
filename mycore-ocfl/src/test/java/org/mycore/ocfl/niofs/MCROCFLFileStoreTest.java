@@ -8,7 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class MCROCFLFileStoreTest extends MCROCFLTestCase {
+public class MCROCFLFileStoreTest extends MCROCFLNioTestCase {
 
     public MCROCFLFileStoreTest(boolean remote) {
         super(remote);

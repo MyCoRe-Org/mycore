@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class MCROCFLVirtualObjectProviderTest extends MCROCFLTestCase {
+public class MCROCFLVirtualObjectProviderTest extends MCROCFLNioTestCase {
 
     public MCROCFLVirtualObjectProviderTest(boolean remote) {
         super(remote);

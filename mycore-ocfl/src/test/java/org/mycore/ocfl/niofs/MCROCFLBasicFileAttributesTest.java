@@ -19,7 +19,7 @@ import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 
-public class MCROCFLBasicFileAttributesTest extends MCROCFLTestCase {
+public class MCROCFLBasicFileAttributesTest extends MCROCFLNioTestCase {
 
     public MCROCFLBasicFileAttributesTest(boolean remote) {
         super(remote);
@@ -40,7 +40,7 @@ public class MCROCFLBasicFileAttributesTest extends MCROCFLTestCase {
             rootAttributes2.creationTime());
         assertTrue("modified time should be later",
             rootAttributes2.lastModifiedTime().toInstant().isAfter(rootAttributes.lastModifiedTime().toInstant()));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionHelper.commitTransaction(MCROCFLFileSystemTransaction.class);
     }
 
     @Test

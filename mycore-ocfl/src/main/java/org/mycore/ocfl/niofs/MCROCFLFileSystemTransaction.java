@@ -24,7 +24,7 @@ import java.nio.file.FileSystemNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,13 +41,13 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final AtomicInteger TRANSACTION_COUNTER = new AtomicInteger(0);
+    private static final AtomicLong TRANSACTION_COUNTER = new AtomicLong(0);
 
     private boolean active;
 
     private boolean rollback;
 
-    private Integer transactionId;
+    private Long transactionId;
 
     /**
      * Constructs a new {@code MCROCFLFileSystemTransaction} with initial inactive and non-rollback states.
@@ -63,7 +63,7 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
      *
      * @return the transaction ID, or {@code null} if the transaction is not active.
      */
-    public Integer getId() {
+    public Long getId() {
         return transactionId;
     }
 

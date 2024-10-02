@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
 
+import io.ocfl.api.exception.CorruptObjectException;
 import io.ocfl.api.model.OcflObjectVersionFile;
 import io.ocfl.api.model.SizeDigestAlgorithm;
 
@@ -141,6 +142,9 @@ public class MCROCFLReadableByteChannel implements SeekableByteChannel {
             throw new ClosedChannelException();
         }
         String sizeAsString = this.file.getFixity().get(new SizeDigestAlgorithm());
+        if (sizeAsString == null) {
+            throw new CorruptObjectException("Missing size digest fixity for '" + file.getStorageRelativePath() + "'");
+        }
         return Long.parseLong(sizeAsString);
     }
 
