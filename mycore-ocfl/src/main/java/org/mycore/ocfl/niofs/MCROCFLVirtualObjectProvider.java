@@ -35,6 +35,7 @@ import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.OcflObjectVersionFile;
 
 /**
  * Provides and manages virtual objects.
@@ -185,7 +186,13 @@ public class MCROCFLVirtualObjectProvider {
                 return headVirtualObject.isMarkedForCreate();
             }
         }
-        return repository.containsObject(head.getObjectId());
+        if (!repository.containsObject(head.getObjectId())) {
+            return false;
+        }
+        OcflObjectVersion object = repository.getObject(head);
+        return object.getFiles().stream()
+            .map(OcflObjectVersionFile::getPath)
+            .anyMatch(path -> path.startsWith(MCROCFLVirtualObject.FILES_DIRECTORY));
     }
 
     /**
