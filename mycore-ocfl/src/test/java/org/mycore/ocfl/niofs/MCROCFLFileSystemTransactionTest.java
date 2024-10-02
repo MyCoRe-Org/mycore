@@ -14,7 +14,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
-public class MCROCFLFileSystemTransactionTest extends MCROCFLTestCase {
+public class MCROCFLFileSystemTransactionTest extends MCROCFLNioTestCase {
 
     public MCROCFLFileSystemTransactionTest(boolean remote) {
         super(remote);
