@@ -12,9 +12,9 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.MCROCFLTestCase;
+import org.mycore.ocfl.niofs.MCROCFLNioTestCase;
 
-public abstract class MCROCFLStorageTestCase extends MCROCFLTestCase {
+public abstract class MCROCFLStorageTestCase extends MCROCFLNioTestCase {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
