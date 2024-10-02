@@ -7,7 +7,10 @@ import io.ocfl.api.model.FileChangeType;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.VersionInfo;
 import org.junit.Test;
-import org.mycore.ocfl.niofs.MCROCFLTestCase;
+import org.mycore.common.MCRTransactionHelper;
+import org.mycore.ocfl.MCROCFLTestCaseHelper;
+import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
+import org.mycore.ocfl.niofs.MCROCFLNioTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
-public class MCROCFLRepositoryTest extends MCROCFLTestCase {
+public class MCROCFLRepositoryTest extends MCROCFLNioTestCase {
 
     public MCROCFLRepositoryTest(boolean remote) {
         super(remote);
@@ -29,7 +32,10 @@ public class MCROCFLRepositoryTest extends MCROCFLTestCase {
             repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/");
         });
 
-        loadObject(DERIVATE_2);
+        MCRTransactionHelper.beginTransaction(MCROCFLFileSystemTransaction.class);
+        MCROCFLTestCaseHelper.loadDerivate(DERIVATE_2);
+        MCRTransactionHelper.commitTransaction(MCROCFLFileSystemTransaction.class);
+
         FileChangeHistory changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/");
         check(changeHistory, FileChangeType.UPDATE, 1);
 
