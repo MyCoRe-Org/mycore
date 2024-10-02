@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mycore.ocfl.niofs.MCROCFLVirtualObject.FILES_DIRECTORY;
 
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
@@ -24,7 +25,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
-public class MCRVirtualObjectTest extends MCROCFLTestCase {
+public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
 
     public MCRVirtualObjectTest(boolean remote) {
         super(remote);
@@ -223,7 +224,7 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
 
         OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
-        assertNotNull("should have a .keep file", derivate1.getFile(".keep"));
+        assertNotNull("should have a .keep file", derivate1.getFile(FILES_DIRECTORY + ".keep"));
 
         MCRTransactionHelper.beginTransaction();
         Files.write(whitePng, new byte[] { 1, 3, 3, 7 });
@@ -231,7 +232,7 @@ public class MCRVirtualObjectTest extends MCROCFLTestCase {
 
         derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
-        assertNotNull("should have a 'white.png' file", derivate1.getFile("white.png"));
+        assertNotNull("should have a 'white.png' file", derivate1.getFile(FILES_DIRECTORY + "white.png"));
     }
 
     @Test

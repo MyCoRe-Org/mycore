@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
-public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLTestCase {
+public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLNioTestCase {
 
     private MCROCFLEmptyDirectoryTracker directoryTracker;
 
@@ -21,12 +21,11 @@ public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRVersionedPath rootPath = MCRVersionedPath.getPath("der_1", "v1", "/");
         Map<MCRVersionedPath, Boolean> paths = new HashMap<>();
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path1"), false);
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path2"), false);
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path3"), true);
-        directoryTracker = new MCROCFLEmptyDirectoryTracker(rootPath, paths);
+        directoryTracker = new MCROCFLEmptyDirectoryTracker(paths);
     }
 
     @Test
