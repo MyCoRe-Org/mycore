@@ -112,7 +112,8 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
      */
     @Override
     public Iterable<Path> getRootDirectories() {
-        Collection<MCROCFLVirtualObject> writables = provider().virtualObjectProvider().collectWritables();
+        MCROCFLVirtualObjectProvider virtualObjectProvider = provider().virtualObjectProvider();
+        Collection<MCROCFLVirtualObject> writables = virtualObjectProvider.collectWritables();
         // created objects
         Stream<String> createdObjectStream = writables.stream()
             .filter(MCROCFLVirtualObject::isMarkedForCreate)
@@ -129,7 +130,8 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
             .map(MCROCFLObjectIDPrefixHelper::fromDerivateObjectId)
             .filter(MCRObjectID::isValid)
             .map(MCRObjectID::getInstance)
-            .map(MCRObjectID::toString);
+            .map(MCRObjectID::toString)
+            .filter(virtualObjectProvider::exists);
 
         return () -> Stream.concat(createdObjectStream, repositoryObjectStream)
             .filter(owner -> !deletedObjects.contains(owner))
