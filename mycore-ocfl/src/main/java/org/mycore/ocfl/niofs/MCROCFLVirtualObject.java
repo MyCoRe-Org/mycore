@@ -87,6 +87,8 @@ import io.ocfl.api.model.VersionNum;
  */
 public abstract class MCROCFLVirtualObject {
 
+    public static final String FILES_DIRECTORY = "files/";
+
     public static final String KEEP_FILE = ".keep";
 
     protected final MCROCFLRepository repository;
@@ -185,16 +187,20 @@ public abstract class MCROCFLVirtualObject {
      * Initializes the file and directory trackers.
      */
     protected void initTrackers() {
-        MCRVersionedPath rootPath = this.toMCRPath("/");
         if (this.objectVersion == null) {
             this.fileTracker = new MCROCFLFileTracker<>(new HashMap<>(), this::calculateDigest);
-            this.emptyDirectoryTracker = new MCROCFLEmptyDirectoryTracker(rootPath, new HashMap<>());
+            this.emptyDirectoryTracker = new MCROCFLEmptyDirectoryTracker(new HashMap<>());
             return;
         }
         Map<MCRVersionedPath, MCRDigest> filePaths = new HashMap<>();
         Map<MCRVersionedPath, Boolean> directoryPaths = new HashMap<>();
         for (OcflObjectVersionFile file : this.objectVersion.getFiles()) {
-            MCRVersionedPath filePath = toMCRPath(file.getPath());
+            String ocflFilesPath = file.getPath();
+            if (!ocflFilesPath.startsWith(FILES_DIRECTORY)) {
+                continue;
+            }
+            String ocflPath = fromOcflFilesPath(ocflFilesPath);
+            MCRVersionedPath filePath = toMCRPath(ocflPath);
             boolean hasKeepFile = filePath.getFileName().toString().equals(KEEP_FILE);
             if (!hasKeepFile) {
                 String sha512Digest = file.getFixity().get(DigestAlgorithmRegistry.sha512);
@@ -203,7 +209,7 @@ public abstract class MCROCFLVirtualObject {
             directoryPaths.put(filePath.getParent(), hasKeepFile);
         }
         this.fileTracker = new MCROCFLFileTracker<>(filePaths, this::calculateDigest);
-        this.emptyDirectoryTracker = new MCROCFLEmptyDirectoryTracker(rootPath, directoryPaths);
+        this.emptyDirectoryTracker = new MCROCFLEmptyDirectoryTracker(directoryPaths);
     }
 
     /**
@@ -245,9 +251,6 @@ public abstract class MCROCFLVirtualObject {
     public boolean exists(MCRVersionedPath path) {
         if (this.markForPurge) {
             return false;
-        }
-        if (path.toRelativePath().isEmpty()) {
-            return this.markForCreate || this.objectVersion != null;
         }
         return this.fileTracker.exists(path) || this.emptyDirectoryTracker.exists(path);
     }
@@ -397,12 +400,20 @@ public abstract class MCROCFLVirtualObject {
             throw new NoSuchFileException("'" + getObjectId() + "' is not yet stored in the repository.");
         }
         MCRVersionedPath ocflOriginalPath = this.fileTracker.findPath(path);
-        String ocflFilePath = ocflOriginalPath.toRelativePath();
+        String ocflFilePath = toOcflFilesPath(ocflOriginalPath.toRelativePath());
         OcflObjectVersionFile file = objectVersion.getFile(ocflFilePath);
         if (file == null) {
             throw new NoSuchFileException(ocflOriginalPath.toString());
         }
         return file;
+    }
+
+    protected String toOcflFilesPath(String ocflFile) {
+        return FILES_DIRECTORY + ocflFile;
+    }
+
+    protected String fromOcflFilesPath(String ocflFilesPath) {
+        return ocflFilesPath.substring(FILES_DIRECTORY.length());
     }
 
     /**
@@ -709,14 +720,15 @@ public abstract class MCROCFLVirtualObject {
         if (changeHistory == null) {
             VersionNum versionNum = this.objectVersionId.getVersionNum();
             String logicalPath = resolvedPath.toRelativePath();
+            String filesLogicalPath = toOcflFilesPath(logicalPath);
             if (versionNum != null) {
                 changeHistory = isDirectory
-                    ? getRepository().directoryChangeHistory(getObjectId(), logicalPath, versionNum)
-                    : getRepository().fileChangeHistory(getObjectId(), logicalPath, versionNum);
+                    ? getRepository().directoryChangeHistory(getObjectId(), filesLogicalPath, versionNum)
+                    : getRepository().fileChangeHistory(getObjectId(), filesLogicalPath, versionNum);
             } else {
                 changeHistory = isDirectory
-                    ? getRepository().directoryChangeHistory(getObjectId(), logicalPath)
-                    : getRepository().fileChangeHistory(getObjectId(), logicalPath);
+                    ? getRepository().directoryChangeHistory(getObjectId(), filesLogicalPath)
+                    : getRepository().fileChangeHistory(getObjectId(), filesLogicalPath);
             }
             this.changeHistoryCache.put(resolvedPath, changeHistory);
         }
@@ -733,16 +745,22 @@ public abstract class MCROCFLVirtualObject {
      *
      * @throws MCRReadOnlyIOException if the object is read-only.
      * @throws FileAlreadyExistsException if the object already exist
+     * @throws IOException if an I/O error occurs
      */
-    public void create() throws MCRReadOnlyIOException, FileAlreadyExistsException {
+    public void create() throws IOException {
         if (this.readonly) {
             throw new MCRReadOnlyIOException("Cannot create read-only object: " + this);
         }
-        if (this.objectVersion != null && !this.markForPurge) {
+        boolean hasFiles = !this.fileTracker.paths().isEmpty();
+        boolean hasDirectories = !this.emptyDirectoryTracker.paths().isEmpty();
+        if (hasFiles || hasDirectories) {
             throw new FileAlreadyExistsException("Cannot create already existing object: " + this);
         }
         this.markForPurge = false;
         this.markForCreate = true;
+        MCRVersionedPath rootDirectory = this.toMCRPath("/");
+        this.localStorage.createDirectories(rootDirectory);
+        this.emptyDirectoryTracker.update(rootDirectory, true);
     }
 
     /**
@@ -832,18 +850,20 @@ public abstract class MCROCFLVirtualObject {
         List<MCROCFLFileTracker.Change<MCRVersionedPath>> changes = this.fileTracker.changes();
         for (MCROCFLFileTracker.Change<MCRVersionedPath> change : changes) {
             String ocflSourcePath = change.source().toRelativePath();
+            String ocflFilesSourcePath = toOcflFilesPath(ocflSourcePath);
             switch (change.type()) {
                 case ADDED_OR_MODIFIED -> {
                     Path localSourcePath = this.localStorage.toPhysicalPath(change.source());
                     long size = Files.size(localSourcePath);
                     updater
-                        .addPath(localSourcePath, ocflSourcePath, OcflOption.OVERWRITE)
-                        .addFileFixity(ocflSourcePath, new SizeDigestAlgorithm(), String.valueOf(size));
+                        .addPath(localSourcePath, ocflFilesSourcePath, OcflOption.OVERWRITE)
+                        .addFileFixity(ocflFilesSourcePath, new SizeDigestAlgorithm(), String.valueOf(size));
                 }
-                case DELETED -> updater.removeFile(ocflSourcePath);
+                case DELETED -> updater.removeFile(ocflFilesSourcePath);
                 case RENAMED -> {
                     String ocflTargetPath = change.target().toRelativePath();
-                    updater.renameFile(ocflSourcePath, ocflTargetPath);
+                    String ocflFilesTargetPath = toOcflFilesPath(ocflTargetPath);
+                    updater.renameFile(ocflFilesSourcePath, ocflFilesTargetPath);
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + change.type());
             }
@@ -861,14 +881,15 @@ public abstract class MCROCFLVirtualObject {
         List<MCROCFLEmptyDirectoryTracker.Change> changes = this.emptyDirectoryTracker.changes();
         for (MCROCFLEmptyDirectoryTracker.Change change : changes) {
             String ocflKeepFile = change.keepFile().toRelativePath();
+            String ocflFilesKeepFile = toOcflFilesPath(ocflKeepFile);
             switch (change.type()) {
                 case ADD_KEEP -> {
                     updater
-                        .writeFile(InputStream.nullInputStream(), ocflKeepFile)
-                        .addFileFixity(ocflKeepFile, new SizeDigestAlgorithm(), "0");
+                        .writeFile(InputStream.nullInputStream(), ocflFilesKeepFile)
+                        .addFileFixity(ocflFilesKeepFile, new SizeDigestAlgorithm(), "0");
                 }
                 case REMOVE_KEEP -> {
-                    updater.removeFile(ocflKeepFile);
+                    updater.removeFile(ocflFilesKeepFile);
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + change.type());
             }
