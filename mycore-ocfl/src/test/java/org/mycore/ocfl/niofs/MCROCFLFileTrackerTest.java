@@ -130,7 +130,7 @@ public class MCROCFLFileTrackerTest {
         assertChange("new_path1", ChangeType.ADDED_OR_MODIFIED);
 
         // TODO this is not supported yet. We cannot recover to a rename.
-        fileTracker.write("new_path1", "1");
+        fileTracker.write("new_path1", DATA.get("path1"));
         // assertChanges(1);
         // assertChangeRename("path1", "new_path1");
     }

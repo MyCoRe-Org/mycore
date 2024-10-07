@@ -10,11 +10,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
-public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLNioTestCase {
+public class MCROCFLDirectoryTrackerTest extends MCROCFLNioTestCase {
 
-    private MCROCFLEmptyDirectoryTracker directoryTracker;
+    private MCROCFLDirectoryTracker directoryTracker;
 
-    public MCROCFLEmptyDirectoryTrackerTest(boolean remote) {
+    public MCROCFLDirectoryTrackerTest(boolean remote) {
         super(remote);
     }
 
@@ -25,7 +25,7 @@ public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLNioTestCase {
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path1"), false);
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path2"), false);
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path3"), true);
-        directoryTracker = new MCROCFLEmptyDirectoryTracker(paths);
+        directoryTracker = new MCROCFLDirectoryTracker(paths);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLNioTestCase {
         MCRVersionedPath path4 = MCRVersionedPath.getPath("der_1", "v1", "path4");
         directoryTracker.update(path4, true);
         assertChanges(1);
-        assertChange(path4, MCROCFLEmptyDirectoryTracker.ChangeType.ADD_KEEP);
+        assertChange(path4, MCROCFLDirectoryTracker.ChangeType.ADD_KEEP);
     }
 
     @Test
@@ -41,16 +41,16 @@ public class MCROCFLEmptyDirectoryTrackerTest extends MCROCFLNioTestCase {
         MCRVersionedPath path1 = MCRVersionedPath.getPath("der_1", "v1", "path1");
         directoryTracker.remove(path1);
         assertChanges(1);
-        assertChange(path1, MCROCFLEmptyDirectoryTracker.ChangeType.REMOVE_KEEP);
+        assertChange(path1, MCROCFLDirectoryTracker.ChangeType.REMOVE_KEEP);
     }
 
     private void assertChanges(int numberOfChanges) {
         assertEquals(numberOfChanges, directoryTracker.changes().size());
     }
 
-    private void assertChange(MCRVersionedPath path, MCROCFLEmptyDirectoryTracker.ChangeType changeType) {
-        List<MCROCFLEmptyDirectoryTracker.Change> changes = directoryTracker.changes();
-        for (MCROCFLEmptyDirectoryTracker.Change change : changes) {
+    private void assertChange(MCRVersionedPath path, MCROCFLDirectoryTracker.ChangeType changeType) {
+        List<MCROCFLDirectoryTracker.Change> changes = directoryTracker.changes();
+        for (MCROCFLDirectoryTracker.Change change : changes) {
             if (change.keepFile().equals(directoryTracker.toKeepFile(path)) && changeType.equals(change.type())) {
                 return;
             }
