@@ -98,7 +98,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
         OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage,
         boolean readonly,
         MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
-        MCROCFLEmptyDirectoryTracker directoryTracker) {
+        MCROCFLDirectoryTracker directoryTracker) {
         super(repository, versionId, objectVersion, localStorage, readonly, fileTracker, directoryTracker);
     }
 
@@ -107,18 +107,20 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      */
     @Override
     public void copy(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
-        checkPurged(source);
+        MCRVersionedPath lockedSource = lockVersion(source);
+        MCRVersionedPath lockedTarget = lockVersion(target);
+        checkPurged(lockedSource);
         checkReadOnly();
-        boolean targetExists = exists(target);
-        if (this.localStorage.exists(source)) {
-            this.localStorage.copy(source, target, options);
+        boolean targetExists = exists(lockedTarget);
+        if (this.localStorage.exists(lockedSource)) {
+            this.localStorage.copy(lockedSource, lockedTarget, options);
         } else {
-            Path localSourcePath = toPhysicalPath(source);
+            Path localSourcePath = toPhysicalPath(lockedSource);
             try (InputStream inputStream = Files.newInputStream(localSourcePath)) {
-                this.localStorage.copy(inputStream, target, options);
+                this.localStorage.copy(inputStream, lockedTarget, options);
             }
         }
-        trackFileWrite(target, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
+        trackFileWrite(lockedTarget, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
     }
 
     /**
@@ -127,10 +129,11 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
     @Override
     public void externalCopy(MCROCFLVirtualObject virtualTarget, MCRVersionedPath source,
         MCRVersionedPath target, CopyOption... options) throws IOException {
-        checkPurged(source);
+        MCRVersionedPath lockedSource = lockVersion(source);
+        checkPurged(lockedSource);
         virtualTarget.checkReadOnly();
         boolean targetExists = virtualTarget.exists(target);
-        Path localSourcePath = toPhysicalPath(source);
+        Path localSourcePath = toPhysicalPath(lockedSource);
         try (InputStream is = Files.newInputStream(localSourcePath)) {
             this.localStorage.copy(is, target, options);
         }
@@ -168,15 +171,17 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
 
     @Override
     public FileTime getModifiedTime(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        Path physicalPath = toPhysicalPath(path);
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        Path physicalPath = toPhysicalPath(lockedPath);
         return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastModifiedTime();
     }
 
     @Override
     public FileTime getAccessTime(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        Path physicalPath = toPhysicalPath(path);
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        Path physicalPath = toPhysicalPath(lockedPath);
         return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastAccessTime();
     }
 
@@ -184,11 +189,12 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      * {@inheritDoc}
      */
     public Path toPhysicalPath(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        if (this.localStorage.exists(path)) {
-            return this.localStorage.toPhysicalPath(path);
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        if (this.localStorage.exists(lockedPath)) {
+            return this.localStorage.toPhysicalPath(lockedPath);
         }
-        FileChangeHistory changeHistory = getChangeHistory(path);
+        FileChangeHistory changeHistory = getChangeHistory(lockedPath);
         String storageRelativePath = changeHistory.getMostRecent().getStorageRelativePath();
         return getLocalRepositoryPath().resolve(storageRelativePath);
     }
