@@ -96,7 +96,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
     protected MCROCFLRemoteVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
         OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage, boolean readonly,
         MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
-        MCROCFLEmptyDirectoryTracker directoryTracker) {
+        MCROCFLDirectoryTracker directoryTracker) {
         super(repository, versionId, objectVersion, localStorage, readonly, fileTracker, directoryTracker);
     }
 
@@ -154,12 +154,13 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      */
     @Override
     public FileTime getModifiedTime(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        if (this.localStorage.exists(path)) {
-            Path physicalPath = this.localStorage.toPhysicalPath(path);
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        if (this.localStorage.exists(lockedPath)) {
+            Path physicalPath = this.localStorage.toPhysicalPath(lockedPath);
             return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastModifiedTime();
         }
-        FileChangeHistory changeHistory = getChangeHistory(path);
+        FileChangeHistory changeHistory = getChangeHistory(lockedPath);
         return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
     }
 
@@ -168,12 +169,13 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      */
     @Override
     public FileTime getAccessTime(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        if (this.localStorage.exists(path)) {
-            Path physicalPath = this.localStorage.toPhysicalPath(path);
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        if (this.localStorage.exists(lockedPath)) {
+            Path physicalPath = this.localStorage.toPhysicalPath(lockedPath);
             return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastAccessTime();
         }
-        FileChangeHistory changeHistory = getChangeHistory(path);
+        FileChangeHistory changeHistory = getChangeHistory(lockedPath);
         return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
     }
 
@@ -182,12 +184,14 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      */
     @Override
     public void copy(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
-        checkPurged(source);
+        MCRVersionedPath lockedSource = lockVersion(source);
+        MCRVersionedPath lockedTarget = lockVersion(target);
+        checkPurged(lockedSource);
         checkReadOnly();
-        boolean targetExists = exists(target);
-        localCopy(source);
-        this.localStorage.copy(source, target, options);
-        trackFileWrite(target, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
+        boolean targetExists = exists(lockedTarget);
+        localCopy(lockedSource);
+        this.localStorage.copy(lockedSource, lockedTarget, options);
+        trackFileWrite(lockedTarget, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
     }
 
     /**
@@ -196,11 +200,12 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
     @Override
     public void externalCopy(MCROCFLVirtualObject virtualTarget, MCRVersionedPath source,
         MCRVersionedPath target, CopyOption... options) throws IOException {
-        checkPurged(source);
+        MCRVersionedPath lockedSource = lockVersion(source);
+        checkPurged(lockedSource);
         virtualTarget.checkReadOnly();
         boolean targetExists = virtualTarget.exists(target);
-        localCopy(source);
-        localStorage.copy(source, target, options);
+        localCopy(lockedSource);
+        localStorage.copy(lockedSource, target, options);
         virtualTarget.trackFileWrite(target, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
     }
 
@@ -211,9 +216,10 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      */
     @Override
     public Path toPhysicalPath(MCRVersionedPath path) throws IOException {
-        checkExists(path);
-        localCopy(path);
-        return this.localStorage.toPhysicalPath(path);
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        localCopy(lockedPath);
+        return this.localStorage.toPhysicalPath(lockedPath);
     }
 
     /**
