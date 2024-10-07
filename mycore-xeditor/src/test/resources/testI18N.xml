@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$key}" />
+      <xed:bind xpath="/document">
+        <input type="submit" value="{i18n:label.cancel}" />
+        <label>
+          <xed:output i18n="output.language" value="$CurrentLang" />
+        </label>
+        <label>
+          <xed:output i18n="output.title" value="title" />
+        </label>
+        <label>
+          <xed:multi-lang>
+            <xed:lang xml:lang="fr">There is only french text.</xed:lang>
+          </xed:multi-lang>
+        </label>
+        <label>
+          <xed:multi-lang>
+            <xed:lang xml:lang="de">Dies ist die deutsche Ausgabe.</xed:lang>
+            <xed:lang xml:lang="en">This is the english output.</xed:lang>
+          </xed:multi-lang>
+        </label>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <source id="testI18N">
+    <document>
+      <title>MyCoRe XEditor</title>
+    </document>
+  </source>
+  
+  <test label="I18N test for currentLang=de">
+
+    <param name="key">testI18N</param>
+    
+    <lang>de</lang>
+    
+    <transform />
+        
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <input type="submit" value="abbrechen" />
+        <label>Die aktuelle Sprache ist de.</label>
+        <label>Der Titel "MyCoRe XEditor" wird hier bearbeitet.</label>
+        <label>There is only french text.</label>
+        <label>Dies ist die deutsche Ausgabe.</label>
+        <div style="visibility:hidden">
+          <input value="testI18N" name="key" type="hidden" />
+          <input value="1-2" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+    
+    <lang>en</lang>
+    
+    <transform />
+    
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <input type="submit" value="cancel" />
+        <label>en is the current language.</label>
+        <label>The title "MyCoRe XEditor" is edited here.</label>
+        <label>There is only french text.</label>
+        <label>This is the english output.</label>
+        <div style="visibility:hidden">
+          <input value="testI18N" name="key" type="hidden" />
+          <input value="1-2" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+        
+  </test>
+
+</test>
