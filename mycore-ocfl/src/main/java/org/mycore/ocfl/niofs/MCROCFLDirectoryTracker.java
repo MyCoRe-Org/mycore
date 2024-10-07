@@ -28,9 +28,9 @@ import java.util.Set;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 /**
- * Class for tracking empty directories.
+ * Class for tracking directories.
  */
-public class MCROCFLEmptyDirectoryTracker {
+public class MCROCFLDirectoryTracker {
 
     protected final Map<MCRVersionedPath, Boolean> original;
 
@@ -41,7 +41,7 @@ public class MCROCFLEmptyDirectoryTracker {
      *
      * @param originalPaths the original paths to be tracked.
      */
-    public MCROCFLEmptyDirectoryTracker(Map<MCRVersionedPath, Boolean> originalPaths) {
+    public MCROCFLDirectoryTracker(Map<MCRVersionedPath, Boolean> originalPaths) {
         this.original = new HashMap<>();
         this.current = new HashMap<>();
         for (Map.Entry<MCRVersionedPath, Boolean> entry : originalPaths.entrySet()) {
@@ -56,7 +56,7 @@ public class MCROCFLEmptyDirectoryTracker {
      * @param original the original paths map.
      * @param current the current paths map.
      */
-    protected MCROCFLEmptyDirectoryTracker(Map<MCRVersionedPath, Boolean> original,
+    protected MCROCFLDirectoryTracker(Map<MCRVersionedPath, Boolean> original,
         Map<MCRVersionedPath, Boolean> current) {
         this.original = original;
         this.current = current;
@@ -183,8 +183,8 @@ public class MCROCFLEmptyDirectoryTracker {
      *
      * @return a deep clone of this directory tracker.
      */
-    public MCROCFLEmptyDirectoryTracker deepClone() {
-        return new MCROCFLEmptyDirectoryTracker(
+    public MCROCFLDirectoryTracker deepClone() {
+        return new MCROCFLDirectoryTracker(
             new HashMap<>(this.original),
             new HashMap<>(this.current));
     }
@@ -213,7 +213,7 @@ public class MCROCFLEmptyDirectoryTracker {
      * Enum representing the types of changes that can occur in the directory structure.
      */
     public enum ChangeType {
-        ADD_KEEP, REMOVE_KEEP;
+        ADD_KEEP, REMOVE_KEEP
     }
 
     /**
