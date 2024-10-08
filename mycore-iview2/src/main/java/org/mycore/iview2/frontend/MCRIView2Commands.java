@@ -20,6 +20,7 @@ package org.mycore.iview2.frontend;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -422,8 +423,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             Files.delete(file);
         }
         if (Files.isDirectory(file)) {
-            if (Files.list(file).findAny().isPresent()) {
-                return; //not an empty directory
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file)) {
+                if (directoryStream.iterator().hasNext()) {
+                    return;
+                }
             }
             Files.delete(file);
         }
