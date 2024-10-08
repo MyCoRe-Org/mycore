@@ -48,9 +48,11 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
 
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
-            switch (jsonReader.nextName()) {
-                case "from" -> ml.setFromString(jsonReader.nextString());
-                case "to" -> ml.setToString(jsonReader.nextString());
+            String name = jsonReader.nextName();
+            if (name.equals("from")) {
+                ml.setFromString(jsonReader.nextString());
+            } else if (name.equals("to")) {
+                ml.setToString(jsonReader.nextString());
             }
         }
         jsonReader.endObject();
@@ -58,6 +60,7 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         return ml;
     }
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected static class MCRMetsLinkPlaceholder extends MCRMetsLink {
         public static final String PLACEHOLDER_EXCEPTION_MESSAGE = "this is a placeholder class";
 
@@ -87,17 +90,17 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         }
 
         @Override
+        public void setTo(MCRMetsPage to) {
+            throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
+        }
+
+        @Override
         public MCRMetsSection getFrom() {
             throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
         }
 
         @Override
         public void setFrom(MCRMetsSection from) {
-            throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
-        }
-
-        @Override
-        public void setTo(MCRMetsPage to) {
             throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
         }
     }

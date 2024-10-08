@@ -113,7 +113,7 @@ public class MCRXMLSimpleModelConverter {
 
         current.getChildren()
             .stream()
-            .map(section -> MCRXMLSimpleModelConverter.buildSection(section, idSectionMap, metsSection, idFileMap))
+            .map(section -> buildSection(section, idSectionMap, metsSection, idFileMap))
             .forEachOrdered(metsSection::addSection);
 
         return metsSection;
