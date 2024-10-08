@@ -73,7 +73,7 @@ public class MCRIView2Tools {
     private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
         .orElse("");
 
-    private static Path TILE_DIR = Paths.get(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
+    private static Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
 
     private static Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
 
