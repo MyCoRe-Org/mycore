@@ -120,44 +120,10 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         checkTileFile(identifier, tileInfo, oTileFile.get());
         MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(oTileFile.get());
 
-        MCRIIIFImageTargetSize sourceSize = new MCRIIIFImageTargetSize(
-            region.x2() - region.x1(),
-            region.y2() - region.y1());
-
-        double rotatationRadians = Math.toRadians(rotation.degrees());
-        double sinRotation = Math.sin(rotatationRadians);
-        double cosRotation = Math.cos(rotatationRadians);
-
-        MCRIIIFImageTargetSize rotatedSize = new MCRIIIFImageTargetSize(
-            (int) (Math.abs(targetSize.width() * cosRotation) + Math.abs(targetSize.height() * sinRotation)),
-            (int) (Math.abs(targetSize.width() * sinRotation) + Math.abs(targetSize.height() * cosRotation)));
-        final int imageType = switch (imageQuality) {
-            case bitonal -> BufferedImage.TYPE_BYTE_BINARY;
-            case gray -> BufferedImage.TYPE_BYTE_GRAY;
-            //color is also default case
-            default -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR
-                : BufferedImage.TYPE_3BYTE_BGR;
-        };
-
-        // this value determines the zoom level!
-        double largestScaling = Math.max(
-            (double) targetSize.width() / sourceSize.width(),
-            (double) targetSize.height() / sourceSize.height());
-
-        // We always want to use the the best needed zoom level!
-        int sourceZoomLevel = (int) Math.min(
-            Math.max(0, Math.ceil(tiledPictureProps.getZoomlevel() - Math.log(largestScaling) / LOG_HALF)),
-            tiledPictureProps.getZoomlevel());
+        int sourceZoomLevel = getSourceZoomLevel(region, targetSize, tiledPictureProps);
 
         // largestScaling is the real scale which is needed! zoomLevelScale is the scale of the nearest zoom level!
         double zoomLevelScale = Math.min(1.0, Math.pow(0.5, tiledPictureProps.getZoomlevel() - sourceZoomLevel));
-
-        // absolute region in zoom level this nearest zoom level
-        MCRIIIFImageSourceRegion scaledRegion = new MCRIIIFImageSourceRegion(
-            (int) Math.round(region.x1() * zoomLevelScale),
-            (int) Math.round(region.y1() * zoomLevelScale),
-            (int) Math.round(region.x2() * zoomLevelScale),
-            (int) Math.round(region.y2() * zoomLevelScale));
 
         // now we detect the tiles to draw!
         double tileSizeFactor = zoomLevelScale / 256;
@@ -167,15 +133,16 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             (int) Math.ceil(region.x2() * tileSizeFactor),
             (int) Math.ceil(region.y2() * tileSizeFactor));
 
-        BufferedImage targetImage = new BufferedImage(rotatedSize.width(), rotatedSize.height(), imageType);
+        MCRIIIFImageTargetSize rotatedSize = getRotatedSize(targetSize, rotation);
+        BufferedImage targetImage = new BufferedImage(rotatedSize.width(), rotatedSize.height(),
+            getImageType(imageQuality, format));
         try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(oTileFile.get())) {
             Path rootPath = zipFileSystem.getPath("/");
 
             Graphics2D graphics = targetImage.createGraphics();
             try {
-                prepareGraphics2D(graphics, region, rotation, rotatedSize, targetSize, rotatationRadians,
-                    sourceZoomLevel, zoomLevelScale, scaledRegion);
-
+                applyRotation(graphics, rotation, rotatedSize, targetSize);
+                applyScale(graphics, region, targetSize, sourceZoomLevel, zoomLevelScale);
                 drawTiles(rootPath, sourceZoomLevel, sourceTiles, graphics);
             } finally {
                 graphics.dispose();
@@ -185,6 +152,52 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         }
 
         return targetImage;
+    }
+
+    private static int getSourceZoomLevel(MCRIIIFImageSourceRegion region, MCRIIIFImageTargetSize targetSize,
+        MCRTiledPictureProps tiledPictureProps) {
+        MCRIIIFImageTargetSize sourceSize = new MCRIIIFImageTargetSize(
+            region.x2() - region.x1(),
+            region.y2() - region.y1());
+
+        // this value determines the zoom level!
+        double largestScaling = Math.max(
+            (double) targetSize.width() / sourceSize.width(),
+            (double) targetSize.height() / sourceSize.height());
+
+        // We always want to use the the best needed zoom level!
+        return (int) Math.min(
+            Math.max(0, Math.ceil(tiledPictureProps.getZoomlevel() - Math.log(largestScaling) / LOG_HALF)),
+            tiledPictureProps.getZoomlevel());
+    }
+
+    private int getImageType(MCRIIIFImageQuality imageQuality, String format) {
+        final int imageType = switch (imageQuality) {
+            case bitonal -> BufferedImage.TYPE_BYTE_BINARY;
+            case gray -> BufferedImage.TYPE_BYTE_GRAY;
+            //color is also default case
+            default -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR
+                : BufferedImage.TYPE_3BYTE_BGR;
+        };
+        return imageType;
+    }
+
+    private static MCRIIIFImageTargetSize getRotatedSize(MCRIIIFImageTargetSize targetSize,
+        MCRIIIFImageTargetRotation rotation) {
+        if (rotation.degrees() % 180 == 0) {
+            return targetSize;
+        }
+        if (rotation.degrees() % 90 == 0) {
+            return new MCRIIIFImageTargetSize(targetSize.height(), targetSize.width());
+        }
+        double rotatationRadians = Math.toRadians(rotation.degrees());
+        double sinRotation = Math.sin(rotatationRadians);
+        double cosRotation = Math.cos(rotatationRadians);
+
+        MCRIIIFImageTargetSize rotatedSize = new MCRIIIFImageTargetSize(
+            (int) (Math.abs(targetSize.width() * cosRotation) + Math.abs(targetSize.height() * sinRotation)),
+            (int) (Math.abs(targetSize.width() * sinRotation) + Math.abs(targetSize.height() * cosRotation)));
+        return rotatedSize;
     }
 
     private void checkMaximumFileSize(MCRIIIFImageTargetSize targetSize, MCRIIIFImageQuality imageQuality)
@@ -211,31 +224,41 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         }
     }
 
-    private static void prepareGraphics2D(Graphics2D graphics, MCRIIIFImageSourceRegion region,
-        MCRIIIFImageTargetRotation rotation, MCRIIIFImageTargetSize rotatedSize, MCRIIIFImageTargetSize targetSize,
-        double rotatationRadians, int sourceZoomLevel, double zoomLevelScale, MCRIIIFImageSourceRegion scaledRegion) {
-        if (rotation.mirrored()) {
-            graphics.scale(-1, 1);
-            graphics.translate(-rotatedSize.width(), 0);
-        }
-
-        graphics.translate((rotatedSize.width() - targetSize.width()) / 2,
-            (rotatedSize.height() - targetSize.height()) / 2);
-        int xt = (int) ((targetSize.width() - 1) / 2);
-        int yt = (int) ((targetSize.height() - 1) / 2);
-        graphics.rotate(rotatationRadians, xt, yt);
-
+    private static void applyScale(Graphics2D graphics, MCRIIIFImageSourceRegion region,
+        MCRIIIFImageTargetSize targetSize, int sourceZoomLevel, double zoomLevelScale) {
+        // absolute region in zoom level this nearest zoom level
+        MCRIIIFImageSourceRegion scaledRegion = new MCRIIIFImageSourceRegion(
+            (int) Math.round(region.x1() * zoomLevelScale),
+            (int) Math.round(region.y1() * zoomLevelScale),
+            (int) Math.round(region.x2() * zoomLevelScale),
+            (int) Math.round(region.y2() * zoomLevelScale));
         // this is the scale which is needed from the nearest zoom level to the required size of image
-        double drawScaleX = ((double) targetSize.width() / ((region.x2() - region.x1()) * zoomLevelScale));
-        double drawScaleY = ((double) targetSize.height() / ((region.y2() - region.y1()) * zoomLevelScale));
+        int regionWidth = region.x2() - region.x1();
+        int regionHeight = region.y2() - region.y1();
+        double drawScaleX = targetSize.width() / (regionWidth * zoomLevelScale);
+        double drawScaleY = targetSize.height() / (regionHeight * zoomLevelScale);
         LOGGER.info(() -> String.format(Locale.ROOT, "Using zoom-level: %d and scales %s/%s!", sourceZoomLevel,
             drawScaleX, drawScaleY));
         graphics.scale(drawScaleX, drawScaleY);
         graphics.translate(-scaledRegion.x1(), -scaledRegion.y1());
 
         graphics.scale(zoomLevelScale, zoomLevelScale);
-        graphics.setClip(region.x1(), region.y1(), region.x2() - region.x1(), region.y2() - region.y1());
+        graphics.setClip(region.x1(), region.y1(), regionWidth, regionHeight);
         graphics.scale(1 / zoomLevelScale, 1 / zoomLevelScale);
+    }
+
+    private static void applyRotation(Graphics2D graphics, MCRIIIFImageTargetRotation rotation,
+        MCRIIIFImageTargetSize rotatedSize, MCRIIIFImageTargetSize targetSize) {
+        if (rotation.mirrored()) {
+            graphics.scale(-1, 1);
+            graphics.translate(-rotatedSize.width(), 0);
+        }
+
+        graphics.translate((rotatedSize.width() - targetSize.width()) / 2.0,
+            (rotatedSize.height() - targetSize.height()) / 2.0);
+        double xt = targetSize.width() / 2.0;
+        double yt = targetSize.height() / 2.0;
+        graphics.rotate(Math.toRadians(rotation.degrees()), xt, yt);
     }
 
     public MCRIIIFImageInformation getInformation(String identifier)
