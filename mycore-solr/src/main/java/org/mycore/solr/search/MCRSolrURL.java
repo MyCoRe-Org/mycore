@@ -51,9 +51,13 @@ public class MCRSolrURL {
 
     private HttpSolrClientBase solrClient;
 
-    private String urlQuery, q, sortOptions, wt;
+    private String urlQuery;
+    private String q;
+    private String sortOptions;
+    private String wt;
 
-    private int start, rows;
+    private int start;
+    private int rows;
 
     boolean returnScore;
 

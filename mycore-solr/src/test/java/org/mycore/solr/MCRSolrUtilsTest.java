@@ -36,7 +36,7 @@ public class MCRSolrUtilsTest {
         String restrictedChars = "+-&|!(){}[]^\"~:\\/";
         StringBuilder sb = new StringBuilder();
         for (char c : restrictedChars.toCharArray()) {
-            sb.append("\\");
+            sb.append('\\');
             sb.append(c);
         }
         String escapedChars = sb.toString();

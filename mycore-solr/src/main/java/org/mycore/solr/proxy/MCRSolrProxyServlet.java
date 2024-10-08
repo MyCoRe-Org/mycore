@@ -107,9 +107,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
             MCRSolrAuthenticationManager.getInstance();
 
-    private static int MAX_CONNECTIONS = MCRConfiguration2
-        .getOrThrow(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections", Integer::parseInt);
-
     private static Map<String, String> NEW_HTTP_RESPONSE_HEADER = MCRConfiguration2
         .getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader.");
 
@@ -223,7 +220,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         filterParams(solrParameter);
-        HttpRequest.Builder solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
+        HttpRequest.Builder solrHttpMethod = getSolrHttpMethod(queryHandlerPath, solrParameter,
             Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
 
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(solrHttpMethod, MCRSolrAuthenticationLevel.SEARCH);
