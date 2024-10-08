@@ -219,9 +219,11 @@
         <field name="mods.relatedItem">
           <xsl:value-of select="$relatedID" />
         </field>
-        <field name="mods.relatedItem.{$type}">
-          <xsl:value-of select="$relatedID" />
-        </field>
+        <xsl:if test="string-length($type) &gt; 0">
+          <field name="mods.relatedItem.{$type}">
+            <xsl:value-of select="$relatedID"/>
+          </field>
+        </xsl:if>
       </xsl:if>
       <!-- END MCR-888 -->
     </xsl:for-each>
