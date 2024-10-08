@@ -114,34 +114,32 @@ public class MCRUserAttributeMapper {
         for (Object annotated : getAnnotated(object)) {
             MCRUserAttribute attrAnno = getMCRUserAttribute(annotated);
 
+            if (attrAnno != null) {
 
-            if (attrAnno == null) {
-                return changed;
-            }
-            final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
-            final List<Attribute> attribs = attributeMapping.get(name);
+                final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
+                final List<Attribute> attribs = attributeMapping.get(name);
 
-            if (attributes == null) {
-                return changed;
-            }
+                if (attributes != null) {
 
-            for (Attribute attribute : attribs) {
-                if (!attributes.containsKey(attribute.mapping)) {
-                    return changed;
-                }
+                    for (Attribute attribute : attribs) {
+                        if (!attributes.containsKey(attribute.mapping)) {
+                            return changed;
+                        }
 
-                Object value = attributes.get(attribute.mapping);
-                if (value == null) {
-                    LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
-                }
+                        Object value = attributes.get(attribute.mapping);
+                        if (value == null) {
+                            LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
+                        }
 
-                value = convertValue(annotated, attrAnno, attribute, value);
-                if (!isValueValid(attrAnno, attribute, value)) {
-                    throw new IllegalArgumentException("A not nullable attribute \"" + name + "\" was null.");
-                }
+                        value = convertValue(annotated, attrAnno, attribute, value);
+                        if (!isValueValid(attrAnno, attribute, value)) {
+                            throw new IllegalArgumentException("A not nullable attribute \"" + name + "\" was null.");
+                        }
 
-                if (updateFieldOrMethod(object, annotated, attribute, value)) {
-                    changed = true;
+                        if (updateFieldOrMethod(object, annotated, attribute, value)) {
+                            changed = true;
+                        }
+                    }
                 }
             }
         }
