@@ -133,6 +133,11 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
                     exposedHeaders.stream().collect(Collectors.joining(",")));
             }
         }
+        setAccessControlAllowCredentials(responseHeaders);
+        LOGGER.debug("Response-Header: {}", responseHeaders);
+    }
+
+    private void setAccessControlAllowCredentials(MultivaluedMap<String, Object> responseHeaders) {
         if (!Objects.equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN), "*")) {
             String vary = Stream
                 .concat(Stream.of(ORIGIN),
@@ -145,7 +150,6 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
                 .collect(Collectors.joining(","));
             responseHeaders.putSingle(HttpHeaders.VARY, vary);
         }
-        LOGGER.debug("Response-Header: {}", responseHeaders);
     }
 
 }
