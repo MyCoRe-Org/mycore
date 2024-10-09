@@ -63,7 +63,7 @@ class MCRUnsupportedFieldTransformer extends MCRFieldTransformer {
 
     void buildField(BibtexAbstractValue value, Element parent) {
         MCRMessageLogger.logMessage("Field " + field + " is unsupported: " + value.toString().replaceAll("\\s+", " "));
-        String xPath = "mods:extension/field[@name='" + field + "']" + MCRFieldTransformer.AS_NEW_ELEMENT;
+        String xPath = "mods:extension/field[@name='" + field + "']" + AS_NEW_ELEMENT;
         String content = ((BibtexString) value).getContent();
         content = normalizeValue(content);
         buildElement(xPath, content, parent);

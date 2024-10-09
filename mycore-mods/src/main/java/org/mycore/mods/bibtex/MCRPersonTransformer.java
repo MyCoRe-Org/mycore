@@ -34,7 +34,7 @@ class MCRPersonTransformer extends MCRFieldTransformer {
     MCRPersonTransformer(String field, String role) {
         super(field);
         this.xPath = "mods:name[@type='personal'][mods:role/mods:roleTerm[@type='code'][@authority='marcrelator']='"
-            + role + "']" + MCRFieldTransformer.AS_NEW_ELEMENT;
+            + role + "']" + AS_NEW_ELEMENT;
     }
 
     void buildField(BibtexPerson person, Element parent) {

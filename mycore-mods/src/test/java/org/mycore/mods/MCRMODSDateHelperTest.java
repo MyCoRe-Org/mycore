@@ -99,7 +99,9 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
     @Test
     public void testDateFormatsWithoutTimezone() {
         // Christmas :-) 
-        int year = 2015, month = 12, day = 25;
+        int year = 2015;
+        int month = 12;
+        int day = 25;
 
         GregorianCalendar gIn = new GregorianCalendar(year, month - 1, day);
         Element element = new Element("date");

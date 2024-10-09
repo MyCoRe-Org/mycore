@@ -69,7 +69,7 @@ public class MCRMODSDateHelper {
                 return test;
             }
         }
-        throw new NullPointerException();
+        throw new IllegalArgumentException("All provided values are null.");
     }
 
     public static GregorianCalendar getCalendar(Element element) {

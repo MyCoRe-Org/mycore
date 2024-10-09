@@ -52,7 +52,7 @@ public class MCRMODSSorter implements URIResolver {
     public Source resolve(String href, String base) {
         String subHref = href.substring(href.indexOf(":") + 1);
         Element mods = MCRURIResolver.instance().resolve(subHref);
-        MCRMODSSorter.sort(mods);
+        sort(mods);
         return new JDOMSource(mods);
     }
 

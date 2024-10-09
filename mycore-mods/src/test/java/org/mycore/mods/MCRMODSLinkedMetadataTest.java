@@ -53,7 +53,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
 
-    MCRObjectID seriesID, bookID;
+    MCRObjectID seriesID;
+    MCRObjectID bookID;
 
     @Before
     public void setUp() throws Exception {
