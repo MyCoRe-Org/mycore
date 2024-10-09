@@ -51,14 +51,6 @@ public class ObjectFactory {
     private static final QName ADD_QNAME = new QName("", "add");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes 
-     * for package: org.mycore.solr.index.document.jaxb
-     * 
-     */
-    public ObjectFactory() {
-    }
-
-    /**
      * Create an instance of {@link MCRSolrInputDocumentList }
      * 
      */

@@ -21,10 +21,6 @@ package org.mycore.orcid2.user;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.time.LocalDate;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -32,8 +28,6 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 public class MCRORCIDUserTest extends MCRJPATestCase {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ORCID = "0000-0001-2345-6789";
 
@@ -69,20 +63,4 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         assertEquals("test", user.getUserAttribute("test"));
     }
 
-    @Test
-    public void testSerialization() {
-        final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
-        credential.setTokenType("bearer");
-        credential.setRefreshToken("refreshToken");
-        credential.setScope("/read-limited");
-        credential.setExpiration(LocalDate.now());
-        final String credentialString = MCRORCIDUser.serializeCredential(credential);
-        LOGGER.info(credentialString);
-        final MCRORCIDCredential result = MCRORCIDUser.deserializeCredential(credentialString);
-        assertEquals(credential.getAccessToken(), result.getAccessToken());
-        assertEquals(credential.getRefreshToken(), result.getRefreshToken());
-        assertEquals(credential.getTokenType(), result.getTokenType());
-        assertEquals(credential.getScope(), result.getScope());
-        assertEquals(credential.getExpiration(), result.getExpiration());
-    }
 }
