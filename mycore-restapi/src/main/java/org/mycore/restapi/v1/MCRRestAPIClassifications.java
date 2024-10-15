@@ -358,7 +358,8 @@ public class MCRRestAPIClassifications {
 
         } catch (Exception e) {
             LogManager.getLogger(this.getClass()).error("Error outputting classification", e);
-            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
+            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND,
+            // "Please specify parameters format and classid.");
 
             return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error outputting classification").build();
         }
