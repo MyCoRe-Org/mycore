@@ -38,9 +38,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
-
-    public static final String INDEX_ALL_CHILDREN_PROPERTY_NAME = "MCR.MODS.LinksEventHandler.IndexAllChildren";
-
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase
      * #handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
