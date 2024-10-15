@@ -122,22 +122,22 @@ public class MCRUserAttributeMapper {
                 if (attributes != null) {
 
                     for (Attribute attribute : attribs) {
-                        if (!attributes.containsKey(attribute.mapping)) {
-                            return changed;
-                        }
+                        if (attributes.containsKey(attribute.mapping)) {
 
-                        Object value = attributes.get(attribute.mapping);
-                        if (value == null) {
-                            LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
-                        }
+                            Object value = attributes.get(attribute.mapping);
+                            if (value == null) {
+                                LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
+                            }
 
-                        value = convertValue(annotated, attrAnno, attribute, value);
-                        if (!isValueValid(attrAnno, attribute, value)) {
-                            throw new IllegalArgumentException("A not nullable attribute \"" + name + "\" was null.");
-                        }
+                            value = convertValue(annotated, attrAnno, attribute, value);
+                            if (!isValueValid(attrAnno, attribute, value)) {
+                                throw new IllegalArgumentException(
+                                    "A not nullable attribute \"" + name + "\" was null.");
+                            }
 
-                        if (updateFieldOrMethod(object, annotated, attribute, value)) {
-                            changed = true;
+                            if (updateFieldOrMethod(object, annotated, attribute, value)) {
+                                changed = true;
+                            }
                         }
                     }
                 }
