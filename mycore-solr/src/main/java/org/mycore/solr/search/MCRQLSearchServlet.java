@@ -106,7 +106,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input)
         throws IOException {
         SolrQuery mergedSolrQuery = MCRSolrSearchUtils.getSolrQuery(query, input, req);
-        String selectProxyURL = MCRServlet.getServletBaseURL() + "SolrSelectProxy" + mergedSolrQuery.toQueryString()
+        String selectProxyURL = getServletBaseURL() + "SolrSelectProxy" + mergedSolrQuery.toQueryString()
             + getReservedParameterString(req.getParameterMap());
         res.sendRedirect(res.encodeRedirectURL(selectProxyURL));
     }
