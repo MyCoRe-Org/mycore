@@ -80,12 +80,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     protected static final String METADATA_SERVICE_PROPERTY_KEY = "MetadataService";
 
     protected static final String TRANSLATE_PREFIX = "component.pi.register.error.";
-
-    private String registrationServiceID;
-
-    private final String type;
-
     private static final ExecutorService REGISTER_POOL;
+    // generated identifier is already present in database
+    private static final int ERR_CODE_0_1 = 0x0001;
+    @SuppressWarnings("unused")
+    private static Logger LOGGER = LogManager.getLogger();
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRPIRegister-#%d")
@@ -93,22 +92,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         REGISTER_POOL = Executors.newFixedThreadPool(1, threadFactory);
     }
 
+    private final String type;
+    private String registrationServiceID;
     private Map<String, String> properties;
 
     public MCRPIService(String identifierType) {
         this.type = identifierType;
     }
-
-    @MCRPostConstruction
-    public void init(String prop) {
-        registrationServiceID = prop.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length());
-    }
-
-    // generated identifier is already present in database
-    private static final int ERR_CODE_0_1 = 0x0001;
-
-    @SuppressWarnings("unused")
-    private static Logger LOGGER = LogManager.getLogger();
 
     protected static Gson getGson() {
         return new GsonBuilder().registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
@@ -126,6 +116,89 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
                     return false;
                 }
             }).create();
+    }
+
+    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
+        String json = getGson().toJson(databaseEntry);
+        obj.getService().addFlag(PI_FLAG, json);
+    }
+
+    /**
+     * Removes a flag from a {@link MCRObject}
+     *
+     * @param obj           the object
+     * @param databaseEntry the database entry
+     * @return the remove entry parsed from json or null
+     */
+    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
+        int flagCount = flags.size();
+        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
+            String flag = flags.get(flagIndex);
+            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
+            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
+                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
+                pi.getService().equals(databaseEntry.getService()) &&
+                pi.getType().equals(databaseEntry.getType())) {
+                service.removeFlag(flagIndex);
+                return databaseEntry;
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasFlag(MCRObjectID id, String additional, MCRPIRegistrationInfo mcrpi) {
+        MCRBase obj = MCRMetadataManager.retrieve(id);
+        return hasFlag(obj, additional, mcrpi);
+    }
+
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIRegistrationInfo mcrpi) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream().anyMatch(_stringFlag -> {
+            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+            return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
+        });
+    }
+
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream().anyMatch(_stringFlag -> {
+            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+            return flag.getAdditional().equals(additional)
+                && Objects.equals(flag.getService(), piService.getServiceID());
+        });
+    }
+
+    public static void updateFlagsInDatabase(MCRBase obj) {
+        Gson gson = getGson();
+        obj.getService().getFlags(PI_FLAG).stream()
+            .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
+            .map(entry -> {
+                // disabled: Git does not provide a revision number as integer (see MCR-1393)
+                //           entry.setMcrRevision(MCRCoreVersion.getRevision());
+                entry.setMcrVersion(MCRCoreVersion.getVersion());
+                entry.setMycoreID(obj.getId().toString());
+                return entry;
+            })
+            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
+            .forEach(entry -> {
+                LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
+                MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
+            });
+    }
+
+    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
+        return MCRConfiguration2.getInstanceOfOrThrow(Predicate.class, predicateProperty);
+    }
+
+    @MCRPostConstruction
+    public void init(String prop) {
+        registrationServiceID = prop.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length());
     }
 
     public final String getServiceID() {
@@ -171,62 +244,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPIGenerator.class, generatorPropertyKey);
-    }
-
-    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
-        String json = getGson().toJson(databaseEntry);
-        obj.getService().addFlag(PI_FLAG, json);
-    }
-
-    /**
-     * Removes a flag from a {@link MCRObject}
-     *
-     * @param obj           the object
-     * @param databaseEntry the database entry
-     * @return the remove entry parsed from json or null
-     */
-    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
-        MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
-        int flagCount = flags.size();
-        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
-            String flag = flags.get(flagIndex);
-            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
-            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
-                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
-                pi.getService().equals(databaseEntry.getService()) &&
-                pi.getType().equals(databaseEntry.getType())) {
-                service.removeFlag(flagIndex);
-                return databaseEntry;
-            }
-        }
-        return null;
-    }
-
-    public static boolean hasFlag(MCRObjectID id, String additional, MCRPIRegistrationInfo mcrpi) {
-        MCRBase obj = MCRMetadataManager.retrieve(id);
-        return hasFlag(obj, additional, mcrpi);
-    }
-
-    public static boolean hasFlag(MCRBase obj, String additional, MCRPIRegistrationInfo mcrpi) {
-        MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
-        Gson gson = getGson();
-        return flags.stream().anyMatch(_stringFlag -> {
-            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
-            return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
-        });
-    }
-
-    public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
-        MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
-        Gson gson = getGson();
-        return flags.stream().anyMatch(_stringFlag -> {
-            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
-            return flag.getAdditional().equals(additional)
-                && Objects.equals(flag.getService(), piService.getServiceID());
-        });
     }
 
     protected void validatePermission(MCRBase obj, boolean writePermission) throws MCRAccessException {
@@ -355,24 +372,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return databaseEntry;
     }
 
-    public static void updateFlagsInDatabase(MCRBase obj) {
-        Gson gson = MCRPIService.getGson();
-        obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
-            .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
-            .map(entry -> {
-                // disabled: Git does not provide a revision number as integer (see MCR-1393)
-                //           entry.setMcrRevision(MCRCoreVersion.getRevision());
-                entry.setMcrVersion(MCRCoreVersion.getVersion());
-                entry.setMycoreID(obj.getId().toString());
-                return entry;
-            })
-            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
-            .forEach(entry -> {
-                LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
-                MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
-            });
-    }
-
     public final String getType() {
         return this.type;
     }
@@ -462,7 +461,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
         String stringFlag = flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
@@ -517,10 +516,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             return (o) -> true;
         }
         return getPredicateInstance(predicateProperty);
-    }
-
-    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
-        return MCRConfiguration2.getInstanceOfOrThrow(Predicate.class, predicateProperty);
     }
 
 }

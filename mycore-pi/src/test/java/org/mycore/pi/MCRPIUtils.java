@@ -74,8 +74,8 @@ public class MCRPIUtils {
         try {
             return new URI(url).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
-            LOGGER.error("Malformed URL: {}", url);
+            String message = "Malformed URL: " + url;
+            LOGGER.error(message, e);
         }
 
         return null;
@@ -86,6 +86,6 @@ public class MCRPIUtils {
     }
 
     public static MCRURNJsonBundle getBundle(MCRPIRegistrationInfo urnInfo) {
-        return MCRURNJsonBundle.instance(urnInfo, MCRPIUtils.getUrl(urnInfo));
+        return MCRURNJsonBundle.instance(urnInfo, getUrl(urnInfo));
     }
 }

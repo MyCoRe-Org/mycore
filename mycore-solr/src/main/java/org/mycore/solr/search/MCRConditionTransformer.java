@@ -285,7 +285,7 @@ public class MCRConditionTransformer {
 
     public static String getQueryString(@SuppressWarnings("rawtypes") MCRCondition condition) {
         Set<String> usedFields = new HashSet<>();
-        return MCRConditionTransformer.toSolrQueryString(condition, usedFields);
+        return toSolrQueryString(condition, usedFields);
     }
 
     public static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {

@@ -65,7 +65,7 @@ public final class MCRMODSClassificationSupport {
             final Element returns = document.createElementNS(source.getNamespaceURI(), source.getLocalName());
             MCRClassMapper.assignCategory(returns, categoryID);
             return returns.getChildNodes();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             LOGGER.warn("Error in Xalan Extension", e);
             return null;
         } finally {
@@ -89,7 +89,7 @@ public final class MCRMODSClassificationSupport {
             final Element returns = document.createElement("returns");
             returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:categId", category.toString());
             return returns.getChildNodes();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             LOGGER.warn("Error in Xalan Extension", e);
             return null;
         } finally {
