@@ -189,7 +189,7 @@
         <xsl:value-of select="@id" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="replace(@name,'\.','_')" />
+        <xsl:value-of select="translate(@name,'.','_')" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
