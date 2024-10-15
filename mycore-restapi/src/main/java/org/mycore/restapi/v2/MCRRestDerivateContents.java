@@ -48,6 +48,7 @@ import java.util.stream.StreamSupport;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
@@ -147,6 +148,7 @@ public class MCRRestDerivateContents {
     }
 
     private static void doWithinTransaction(IOOperation op) throws IOException {
+        MCRSessionMgr.getCurrentSession();
         try {
             MCRTransactionHelper.beginTransaction();
             op.run();

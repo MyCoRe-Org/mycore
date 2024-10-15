@@ -157,15 +157,14 @@ public class MCRRestAPIUploadHelper {
         String label, String classifications, boolean overwriteOnExisting) {
         MCRObjectID mcrObjIDObj = MCRObjectID.getInstance(mcrObjID);
         MCRObjectID derID = null;
-
         try {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjIDObj);
-            derID = findDerivateIDIfExists(mcrObj, label, classifications, overwriteOnExisting);
-
+            if (overwriteOnExisting) {
+                derID = findDerivateID(mcrObj, label, classifications);
+            }
             if (derID == null) {
                 derID = createNewDerivate(mcrObjIDObj, label, classifications);
             }
-
             return buildResponse(info, mcrObjIDObj, String.valueOf(derID));
 
         } catch (Exception e) {
@@ -174,37 +173,33 @@ public class MCRRestAPIUploadHelper {
         }
     }
 
-    private static MCRObjectID findDerivateIDIfExists(MCRObject mcrObj, String label, String classifications,
-        boolean overwriteOnExisting) throws MCRRestAPIException {
+    private static MCRObjectID findDerivateID(MCRObject mcrObj, String label, String classifications)
+        throws MCRRestAPIException {
         MCRObjectID derID = null;
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-
-        if (overwriteOnExisting) {
-            final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
-            derID = findDerivateByLabel(currentDerivates, label);
-
-            if (derID == null && classifications != null && !classifications.isEmpty()) {
-                derID = findDerivateByClassifications(currentDerivates, classifications, dao);
-            }
+        final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
+        if (label != null && !label.isEmpty()) {
+            derID = findDerIDByLabel(currentDerivates, label);
         }
-
+        if (derID == null && classifications != null && !classifications.isEmpty()) {
+            derID = filterDerivateIDByClassifications(currentDerivates, classifications, dao);
+        }
         return derID;
     }
 
-    private static MCRObjectID findDerivateByLabel(List<MCRMetaEnrichedLinkID> derivates, String label) {
-        if (label != null && !label.isEmpty()) {
-            for (MCRMetaLinkID derLink : derivates) {
-                if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
-                    return derLink.getXLinkHrefID();
-                }
+    private static MCRObjectID findDerIDByLabel(List<MCRMetaEnrichedLinkID> derivates, String label) {
+        for (MCRMetaLinkID derLink : derivates) {
+            if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
+                return derLink.getXLinkHrefID();
+
             }
         }
         return null;
     }
 
-    private static MCRObjectID findDerivateByClassifications(List<MCRMetaEnrichedLinkID> derivates,
-        String classifications,
-        MCRCategoryDAO dao) throws MCRRestAPIException {
+    private static MCRObjectID filterDerivateIDByClassifications(List<MCRMetaEnrichedLinkID> derivates,
+                                                                 String classifications,
+                                                                 MCRCategoryDAO dao) throws MCRRestAPIException {
         final List<MCRCategoryID> categories = Stream.of(classifications.split(" "))
             .map(MCRCategoryID::fromString)
             .collect(Collectors.toList());
@@ -231,7 +226,7 @@ public class MCRRestAPIUploadHelper {
     }
 
     private static MCRObjectID createNewDerivate(MCRObjectID mcrObjIDObj, String label, String classifications)
-            throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         MCRDerivate mcrDerivate = new MCRDerivate();
 
         if (label != null && !label.isEmpty()) {
@@ -245,9 +240,9 @@ public class MCRRestAPIUploadHelper {
         mcrDerivate.setSchema("datamodel-derivate.xsd");
         mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
         mcrDerivate.getDerivate().setInternals(new MCRMetaIFS("internal", null));
-
-        addClassificationsToDerivate(mcrDerivate, classifications);
-
+        if (classifications != null && !classifications.isEmpty()) {
+            addClassificationsToDerivate(mcrDerivate, classifications);
+        }
         MCRMetadataManager.create(mcrDerivate);
         MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
             MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate),
@@ -257,18 +252,15 @@ public class MCRRestAPIUploadHelper {
     }
 
     private static void addClassificationsToDerivate(MCRDerivate mcrDerivate, String classifications) {
-        if (classifications != null && !classifications.isEmpty()) {
-            final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-            final List<MCRMetaClassification> currentClassifications = mcrDerivate.getDerivate().getClassifications();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final List<MCRMetaClassification> currentClassifications = mcrDerivate.getDerivate().getClassifications();
 
-            Stream.of(classifications.split(" "))
-                .map(MCRCategoryID::fromString)
-                .filter(dao::exist)
-                .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID))
-                .forEach(currentClassifications::add);
-        }
+        Stream.of(classifications.split(" "))
+            .map(MCRCategoryID::fromString)
+            .filter(dao::exist)
+            .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID))
+            .forEach(currentClassifications::add);
     }
-
 
     /**
      * uploads a file into a given derivate

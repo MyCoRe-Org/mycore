@@ -132,7 +132,11 @@ public class MCRRestAPIClassifications {
             writer.beginObject();
             writer.name("ID").value(e.getAttributeValue("ID"));
             writer.name("labels").beginArray();
-            writeLabelJson(writer, lang, e);
+            for (Element eLabel : e.getChildren("label")) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                    writeElementAttributesToJson(writer, eLabel);
+                }
+            }
             writer.endArray();
 
             if (e.getChildren("category").size() > 0) {
@@ -143,18 +147,14 @@ public class MCRRestAPIClassifications {
         writer.endArray();
     }
 
-    private static void writeLabelJson(JsonWriter writer, String lang, Element e) throws IOException {
-        for (Element eLabel : e.getChildren("label")) {
-            if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                writer.beginObject();
-                writer.name("lang").value(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE));
-                writer.name("text").value(eLabel.getAttributeValue("text"));
-                if (eLabel.getAttributeValue("description") != null) {
-                    writer.name("description").value(eLabel.getAttributeValue("description"));
-                }
-                writer.endObject();
-            }
+    private static void writeElementAttributesToJson(JsonWriter writer, Element element) throws IOException {
+        writer.beginObject();
+        writer.name("lang").value(element.getAttributeValue("lang", Namespace.XML_NAMESPACE));
+        writer.name("text").value(element.getAttributeValue("text"));
+        if (element.getAttributeValue("description") != null) {
+            writer.name("description").value(element.getAttributeValue("description"));
         }
+        writer.endObject();
     }
 
     /**
@@ -358,8 +358,7 @@ public class MCRRestAPIClassifications {
 
         } catch (Exception e) {
             LogManager.getLogger(this.getClass()).error("Error outputting classification", e);
-           //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
-
+            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
 
             return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error outputting classification").build();
         }
@@ -478,7 +477,11 @@ public class MCRRestAPIClassifications {
             writer.name("ID").value(eRoot.getAttributeValue("ID"));
             writer.name("label");
             writer.beginArray();
-            writeLabelJson(writer, finalLang, eRoot);
+            for (Element eLabel : eRoot.getChildren("label")) {
+                if (finalLang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                    writeElementAttributesToJson(writer, eRoot);
+                }
+            }
             writer.endArray();
             if (eRoot.equals(eRoot.getDocument().getRootElement())) {
                 writeChildrenAsJSON(eRoot.getChild("categories"), writer, finalLang);
