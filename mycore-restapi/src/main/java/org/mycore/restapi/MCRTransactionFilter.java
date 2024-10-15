@@ -41,6 +41,7 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
         if (MCRSessionMgr.isLocked()) {
             return;
         }
+        MCRSessionMgr.getCurrentSession();
         if (MCRTransactionHelper.isTransactionActive()) {
             LOGGER.debug("Filter scoped JPA transaction is active.");
             if (MCRTransactionHelper.transactionRequiresRollback()) {
