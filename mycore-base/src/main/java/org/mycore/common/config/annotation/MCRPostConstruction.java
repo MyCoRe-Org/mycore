@@ -45,7 +45,7 @@ public @interface MCRPostConstruction {
     Value value() default Value.ACTUAL;
 
     /**
-     * @return the order in which the annotated methods are processed. The higher the value, the later the
+     * @return The order in which the annotated methods are processed. The higher the value, the later the
      * method is processed.
      */
     int order() default 0;

@@ -77,7 +77,7 @@ public class MCRSassCompilerManager {
         if (!isDeveloperMode() && fileCompiledContentMap.containsKey(file)) {
             return Optional.of(fileCompiledContentMap.get(file));
         } else {
-            return Optional.ofNullable(compile(file, servletContext));
+            return Optional.ofNullable(compile(file));
         }
     }
 
@@ -105,10 +105,10 @@ public class MCRSassCompilerManager {
      * @throws SassCompilationFailedException if compiling sass input fails
      * @throws IOException                    if communication with dart-sass or reading input fails
      */
-    private String compile(String name, ServletContext servletContext)
+    private String compile(String name)
         throws IOException, SassCompilationFailedException {
         String css;
-        try (MCRSassCompiler sassCompiler = new MCRSassCompiler(ConnectionFactory.bundled(), servletContext)) {
+        try (MCRSassCompiler sassCompiler = new MCRSassCompiler(ConnectionFactory.bundled())) {
             String realFileName = getRealFileName(name);
             var compileSuccess = sassCompiler.compile(realFileName);
             css = compileSuccess.getCss();

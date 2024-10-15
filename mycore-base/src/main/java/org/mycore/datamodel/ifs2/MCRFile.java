@@ -76,7 +76,7 @@ public class MCRFile extends MCRStoredNode {
     protected MCRFile(MCRDirectory parent, String name) throws IOException {
         super(parent, name, "file");
         Files.createFile(path);
-        writeData(e -> e.setAttribute("md5", MCRFile.MD5_OF_EMPTY_FILE));
+        writeData(e -> e.setAttribute("md5", MD5_OF_EMPTY_FILE));
         getRoot().saveAdditionalData();
     }
 

@@ -78,28 +78,27 @@ public class MCRXPathEvaluator {
     }
 
     public String replaceXPathOrI18n(String expression) {
-        expression = migrateLegacyI18nSyntaxToExtensionFunction(expression);
-        return evaluateXPath(expression);
+        return evaluateXPath(migrateLegacyI18nSyntaxToExtensionFunction(expression));
     }
 
     private String migrateLegacyI18nSyntaxToExtensionFunction(String expression) {
+        String updatedI18nExpression = expression;
         if (expression.startsWith("i18n:")) {
-            expression = expression.substring(5);
-            if (expression.contains(",")) {
-                int pos = expression.indexOf(",");
-                String key = expression.substring(0, pos);
-                String xPath = expression.substring(pos + 1);
-                expression = "i18n:translate('" + key + "'," + xPath + ")";
+            updatedI18nExpression = expression.substring(5);
+            if (updatedI18nExpression.contains(",")) {
+                int pos = updatedI18nExpression.indexOf(",");
+                String key = updatedI18nExpression.substring(0, pos);
+                String xPath = updatedI18nExpression.substring(pos + 1);
+                updatedI18nExpression = "i18n:translate('" + key + "'," + xPath + ")";
             } else {
-                expression = "i18n:translate('" + expression + "')";
+                updatedI18nExpression = "i18n:translate('" + updatedI18nExpression + "')";
             }
         }
-        return expression;
+        return updatedI18nExpression;
     }
 
     public String evaluateXPath(String xPathExpression) {
-        xPathExpression = "string(" + xPathExpression + ")";
-        Object result = evaluateFirst(xPathExpression);
+        Object result = evaluateFirst("string(" + xPathExpression + ")");
         return result == null ? "" : (String) result;
     }
 

@@ -18,6 +18,7 @@
 
 package org.mycore.solr.index.handlers.content;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateHttp2SolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -41,6 +43,7 @@ import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
+import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -106,24 +109,23 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                     updateResponse = req.process(destinationCore.getClient());
                     if (updateResponse != null && updateResponse.getStatus() != 0) {
                         LOGGER.error("Error while indexing document collection. Split and retry: {}",
-                                updateResponse.getResponse());
+                            updateResponse.getResponse());
                         splitup(List.of(destinationCore));
                     } else {
                         LOGGER.info("Sending {} documents was successful in {} ms.", totalCount,
-                                updateResponse.getElapsedTime());
+                            updateResponse.getElapsedTime());
                     }
-                } catch (Throwable e) {
+                } catch (SolrServerException | IOException e) {
                     LOGGER.warn("Error while indexing document collection. Split and retry.", e);
                     splitup(List.of(destinationCore));
                     return;
                 }
             }
-        } catch (Throwable e) {
+        } catch (SAXException | IOException e) {
             splitup(getDestinationCores());
         } finally {
             contentMap.clear();
         }
-
     }
 
     private void makeConcurrent(Iterator<SolrInputDocument> documents) {

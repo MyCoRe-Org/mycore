@@ -89,7 +89,8 @@ public class MCRContentInputStream extends FilterInputStream {
 
     public int consume() throws IOException {
         byte[] buffer = new byte[4096];
-        int numRead, totalRead = 0;
+        int numRead;
+        int totalRead = 0;
         do {
             numRead = read(buffer);
             if (numRead > 0) {
@@ -120,17 +121,18 @@ public class MCRContentInputStream extends FilterInputStream {
     @Override
     public int read(byte[] buf, int off, int len) throws IOException {
         // if current position is in header buffer, return bytes from there
+        int lenTemp;
         if (header.length > 0 && length < header.length) {
             int numAvail = header.length - (int) length;
-            len = Math.min(len, numAvail);
-            System.arraycopy(header, (int) length, buf, off, len);
+            lenTemp = Math.min(len, numAvail);
+            System.arraycopy(header, (int) length, buf, off, lenTemp);
         } else {
-            len = super.read(buf, off, len);
+            lenTemp = super.read(buf, off, len);
         }
-        if (len != -1) {
-            length += len;
+        if (lenTemp != -1) {
+            length += lenTemp;
         }
-        return len;
+        return lenTemp;
     }
 
     /**

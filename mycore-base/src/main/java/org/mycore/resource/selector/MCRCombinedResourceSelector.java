@@ -32,11 +32,28 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 
 /**
- * A {@link MCRCombinedResourceSelector} is a {@link MCRResourceSelector} that delegates to multiple other
- * {@link MCRResourceSelector}, one after another.
+ * {@link MCRCombinedResourceSelector} is an implementation of {@link MCRResourceSelector} that delegates to multiple
+ * other {@link MCRResourceSelector} instances, one after another.
+ * <p>
+ * The following configuration options are available, if configured automatically:
+ * <ul>
+ * <li> Selectors are configured as a list using the property suffix {@link MCRCombinedResourceSelector#SELECTORS_KEY}.
+ * </ul>
+ * Example:
+ * <pre>
+ * [...].Class=org.mycore.resource.selector.MCRCombinedResourceSelector
+ * [...].Providers.10.Class=foo.bar.FooSelector
+ * [...].Providers.10.Key1=Value1
+ * [...].Providers.10.Key2=Value2
+ * [...].Providers.20.Class=foo.bar.BarSelector
+ * [...].Providers.20.Key1=Value1
+ * [...].Providers.20.Key2=Value2
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceSelector.Factory.class)
 public final class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
+
+    public static final String SELECTORS_KEY = "Selectors";
 
     private final List<MCRResourceSelector> selectors;
 
@@ -71,7 +88,7 @@ public final class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceSelector> {
 
-        @MCRInstanceList(name = "Selectors", valueClass = MCRResourceSelector.class)
+        @MCRInstanceList(name = SELECTORS_KEY, valueClass = MCRResourceSelector.class)
         public List<MCRResourceSelector> selectors;
 
         @Override

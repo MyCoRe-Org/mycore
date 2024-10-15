@@ -88,7 +88,7 @@ public class MCRXMLHelperTest extends MCRTestCase {
         SAXBuilder b = new SAXBuilder();
         Document doc = b.build(new ByteArrayInputStream(formattedXML.getBytes(StandardCharsets.UTF_8)));
 
-        assertEquals("Elements should be equal", true, MCRXMLHelper.deepEqual(root, doc.getRootElement()));
+        assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(root, doc.getRootElement()));
     }
 
     @Test

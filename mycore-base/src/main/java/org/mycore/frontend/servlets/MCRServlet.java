@@ -56,7 +56,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServlet;
@@ -132,7 +131,7 @@ public class MCRServlet extends HttpServlet {
     /**
      * Initialisation of the static values for the base URL and servlet URL of the mycore system.
      */
-    private static synchronized void prepareBaseURLs(ServletContext context, HttpServletRequest req) {
+    private static synchronized void prepareBaseURLs(HttpServletRequest req) {
         String contextPath = req.getContextPath() + "/";
 
         String requestURL = req.getRequestURL().toString();
@@ -308,7 +307,7 @@ public class MCRServlet extends HttpServlet {
         initializeMCRSession(req, getServletName());
 
         if (SERVLET_URL == null) {
-            prepareBaseURLs(getServletContext(), req);
+            prepareBaseURLs(req);
         }
 
         MCRServletJob job = new MCRServletJob(req, res);
@@ -336,7 +335,7 @@ public class MCRServlet extends HttpServlet {
             if (isHandleExceptionComplete(req, ex)) {
                 return;
             }
-            throw new RuntimeException(ex);
+            throw new MCRException(ex);
         } finally {
             cleanupMCRSession(req, getServletName());
         }
@@ -404,10 +403,13 @@ public class MCRServlet extends HttpServlet {
 
     private static boolean isBrokenPipe(Throwable throwable) {
         String message = throwable.getMessage();
+        boolean result;
         if (message != null && throwable instanceof IOException && message.contains("Broken pipe")) {
-            return true;
+            result= true;
+        }else {
+            result = throwable.getCause() != null && isBrokenPipe(throwable.getCause());
         }
-        return throwable.getCause() != null && isBrokenPipe(throwable.getCause());
+        return result;
     }
 
     private void configureSession(MCRServletJob job) {

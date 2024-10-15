@@ -73,22 +73,37 @@ public class MCRPICommands {
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "add pi flags to object {0}", help = "see add pi flags to all objects!", order = 20)
+    @MCRCommand(syntax = "add pi flags to object {0}",
+        help = "recreates all pi flags for an object from PI service",
+        order = 20)
     public static void addFlagToObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
-        final List<MCRPIRegistrationInfo> pi = MCRPIManager.getInstance().getRegistered(base);
-
-        final boolean addedAFlag = pi.stream().anyMatch(registrationInfo -> {
+        final List<MCRPIRegistrationInfo> piRegistrationInfos = MCRPIManager.getInstance().getRegistered(base);
+        boolean addedAFlag = false;
+        for (MCRPIRegistrationInfo registrationInfo : piRegistrationInfos) {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
                 LOGGER.info("Add PI-Flag to " + mycoreIDString);
                 MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
-                return true;
+                addedAFlag = true;
             }
-            return false;
-        });
+        }
 
         if (addedAFlag) {
+            try {
+                MCRMetadataManager.update(base);
+            } catch (MCRAccessException e) {
+                throw new MCRException(e);
+            }
+        }
+    }
+
+    @MCRCommand(syntax = "remove pi flags from object {0}", help = "removes all pi flags from an object", order = 21)
+    public static void removeFlagsFromObject(String mycoreIDString) {
+        MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
+        MCRBase base = MCRMetadataManager.retrieve(objectID);
+        if (base.getService().getFlags(MCRPIService.PI_FLAG).size() > 0) {
+            base.getService().removeFlags(MCRPIService.PI_FLAG);
             try {
                 MCRMetadataManager.update(base);
             } catch (MCRAccessException e) {

@@ -31,8 +31,7 @@ public class MCRRuleMapping {
 
     private Date creationdate;
 
-    public MCRRuleMapping() {
-    }
+
 
     /**
      * returns MCRObjectID as string

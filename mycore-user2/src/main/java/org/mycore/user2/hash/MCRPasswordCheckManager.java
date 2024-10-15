@@ -27,12 +27,15 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
 
 import static org.mycore.common.config.MCRConfiguration2.splitValue;
 import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkConfigurationHasNoIncompatibleChange;
@@ -56,6 +59,7 @@ import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkSelectedS
  * The following configuration options are available, if configured automatically:
  * <ul>
  * <li> Strategies are configured as a map using the property suffix {@link MCRPasswordCheckManager#STRATEGIES_KEY}.
+ * <li> Each strategy can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
  * <li> The selected strategy is configured using the property suffix
  * {@link MCRPasswordCheckManager#SELECTED_STRATEGY_KEY}.
  * <li> The property suffix {@link MCRPasswordCheckManager#CONFIGURATION_CHECKS_KEY} can be used to enable or
@@ -68,9 +72,11 @@ import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkSelectedS
  * <pre>
  * MCR.User.PasswordCheck.Class=org.mycore.user2.hash.MCRPasswordCheckManager
  * MCR.User.PasswordCheck.Strategies.foo.Class=foo.bar.FooStrategy
+ * MCR.User.PasswordCheck.Strategies.foo.Enabled=true
  * MCR.User.PasswordCheck.Strategies.foo.Key1=Value1
  * MCR.User.PasswordCheck.Strategies.foo.Key2=Value2
  * MCR.User.PasswordCheck.Strategies.bar.Class=foo.bar.FooStrategy
+ * MCR.User.PasswordCheck.Strategies.bar.Enabled=false
  * MCR.User.PasswordCheck.Strategies.bar.Key1=Value1
  * MCR.User.PasswordCheck.Strategies.bar.Key2=Value2
  * MCR.User.PasswordCheck.SelectedStrategy=foo
@@ -79,6 +85,8 @@ import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkSelectedS
  */
 @MCRConfigurationProxy(proxyClass = MCRPasswordCheckManager.Factory.class)
 public final class MCRPasswordCheckManager {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRPasswordCheckManager INSTANCE = instantiate();
 
@@ -100,21 +108,28 @@ public final class MCRPasswordCheckManager {
 
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
         String selectedStrategyType, Set<ConfigurationCheck> configurationChecks) {
+
         this.random = Objects.requireNonNull(random, "Random must not be null");
         this.strategies = new HashMap<>(Objects.requireNonNull(strategies, "Strategies must not be null"));
         this.strategies.values().forEach(strategy -> Objects.requireNonNull(strategy, "Strategy must not be null"));
         this.selectedStrategyType = Objects.requireNonNull(selectedStrategyType, "Selected strategy must not be null");
         this.selectedStrategy = this.strategies.get(selectedStrategyType);
+
         if (this.selectedStrategy == null) {
             throw new IllegalArgumentException("Selected strategy " + selectedStrategyType + " unavailable, got: "
                 + String.join(", ", this.strategies.keySet()));
         }
+
         if (configurationChecks.contains(ConfigurationCheck.OUTDATED_STRATEGY)) {
             checkSelectedStrategyIsNotOutdated(selectedStrategyType, selectedStrategy);
         }
         if (configurationChecks.contains(ConfigurationCheck.INCOMPATIBLE_CHANGE)) {
             checkConfigurationHasNoIncompatibleChange(strategies);
         }
+
+        LOGGER.info("Working with strategies: " + String.join(", ", strategies.keySet()));
+        LOGGER.info("Creating new password hashes with strategy: " + selectedStrategyType);
+        
     }
 
     public static MCRPasswordCheckManager instance() {
@@ -149,7 +164,7 @@ public final class MCRPasswordCheckManager {
 
     public static class Factory implements Supplier<MCRPasswordCheckManager> {
 
-        @MCRInstanceMap(name = STRATEGIES_KEY, valueClass = MCRPasswordCheckStrategy.class)
+        @MCRInstanceMap(name = STRATEGIES_KEY, valueClass = MCRPasswordCheckStrategy.class, sentinel = @MCRSentinel)
         public Map<String, MCRPasswordCheckStrategy> strategies;
 
         @MCRProperty(name = SELECTED_STRATEGY_KEY)

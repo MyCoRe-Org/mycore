@@ -88,13 +88,13 @@ public class MCRCLIExceptionHandler {
     }
 
     private static void showCauseOf(Throwable ex) {
-        ex = ex.getCause();
-        if (ex == null) {
+        Throwable cause = ex.getCause();
+        if (cause == null) {
             return;
         }
 
         MCRCommandLineInterface.output("");
         MCRCommandLineInterface.output("This exception was caused by:");
-        handleException(ex);
+        handleException(cause);
     }
 }

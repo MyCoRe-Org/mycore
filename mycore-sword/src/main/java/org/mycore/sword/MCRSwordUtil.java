@@ -72,8 +72,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
@@ -178,7 +176,6 @@ public class MCRSwordUtil {
     }
 
     private static void addDirectoryToZip(ZipArchiveOutputStream zipOutputStream, Path directory) {
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory)) {
             paths.forEach(p -> {
@@ -223,25 +220,24 @@ public class MCRSwordUtil {
      */
     public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5)
         throws IOException {
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
         if (MCRTransactionHelper.isTransactionActive()) {
             MCRTransactionHelper.commitTransaction();
         }
 
         final Path zipTempFile = Files.createTempFile("swordv2_", fileName);
         MessageDigest md5Digest = null;
-
+        InputStream digestedInputStream=inputStream;
         if (checkMd5 != null) {
             try {
                 md5Digest = MessageDigest.getInstance("MD5");
-                inputStream = new DigestInputStream(inputStream, md5Digest);
+                digestedInputStream = new DigestInputStream(inputStream, md5Digest);
             } catch (NoSuchAlgorithmException e) {
                 MCRTransactionHelper.beginTransaction();
                 throw new MCRConfigurationException("No MD5 available!", e);
             }
         }
 
-        Files.copy(inputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(digestedInputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
 
         if (checkMd5 != null) {
             final String md5String = MCRUtils.toHexString(md5Digest.digest());
@@ -281,7 +277,6 @@ public class MCRSwordUtil {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                         throws IOException {
-                        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
                         LOGGER.info("Extracting: {}", file);
                         Path targetFilePath = target.resolve(sourcePath.relativize(file));
@@ -374,6 +369,10 @@ public class MCRSwordUtil {
     public static MCRObject getMcrObjectForDerivateID(String requestDerivateID) {
         final MCRObjectID objectID = MCRObjectID.getInstance(MCRXMLFunctions.getMCRObjectID(requestDerivateID));
         return (MCRObject) MCRMetadataManager.retrieve(objectID);
+    }
+
+    public interface MCRFileValidator {
+        MCRValidationResult validate(Path pathToFile);
     }
 
     public static class ParseLinkUtil {
@@ -550,7 +549,7 @@ public class MCRSwordUtil {
          * @param collectionIRI      IRI of the collection
          * @param collection         name of the collection
          * @param feed               the feed where the link will be inserted
-         * @param collectionProvider 
+         * @param collectionProvider
          * {@link MCRSwordCollectionProvider} of the collection (needed to count how much objects)
          * @throws SwordServerException when the {@link MCRSwordObjectIDSupplier} throws a exception.
          */
@@ -570,10 +569,6 @@ public class MCRSwordUtil {
         static void addEditMediaLinks(String collection, DepositReceipt depositReceipt, MCRObjectID derivateId) {
             getEditMediaFileIRIStream(collection, derivateId.toString()).forEach(depositReceipt::addEditMediaIRI);
         }
-    }
-
-    public interface MCRFileValidator {
-        MCRValidationResult validate(Path pathToFile);
     }
 
     public static class MCRValidationResult {

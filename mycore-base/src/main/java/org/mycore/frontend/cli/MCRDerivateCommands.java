@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -509,16 +510,16 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             // build JDOM
             xml = obj.createXML();
 
-        } catch (MCRException ex) {
+        } catch (IllegalArgumentException ex) {
             LOGGER.warn("Could not read {}, continue with next ID", nid);
             return;
         }
         File xmlOutput = new File(dir, derivateID + "." + extension);
         FileOutputStream out = new FileOutputStream(xmlOutput);
-        dir = new File(dir, derivateID.toString());
+        File directoryFile = new File(dir, derivateID.toString());
 
         if (trans != null) {
-            trans.setParameter("dirname", dir.getPath());
+            trans.setParameter("dirname", directoryFile.getPath());
             StreamResult sr = new StreamResult(out);
             trans.transform(new JDOMSource(xml), sr);
         } else {
@@ -530,13 +531,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info("Object {} stored under {}.", nid, xmlOutput);
 
         // store the derivate file under dirname
-        if (!dir.isDirectory()) {
-            dir.mkdir();
+        if (!directoryFile.isDirectory()) {
+            directoryFile.mkdir();
         }
         MCRPath rootPath = MCRPath.getPath(derivateID.toString(), "/");
-        Files.walkFileTree(rootPath, new MCRTreeCopier(rootPath, dir.toPath()));
+        Files.walkFileTree(rootPath, new MCRTreeCopier(rootPath, directoryFile.toPath()));
 
-        LOGGER.info("Derivate {} saved under {} and {}.", nid, dir, xmlOutput);
+        LOGGER.info("Derivate {} saved under {} and {}.", nid, directoryFile, xmlOutput);
     }
 
     /**
@@ -646,11 +647,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRObjectID objID = MCRObjectID.getInstance(objectId);
 
         if (!MCRMetadataManager.exists(objID)) {
-            throw new Exception("The object with id " + objID + " does not exist");
+            throw new NoSuchElementException("The object with id " + objID + " does not exist");
         }
 
         if (!MCRMetadataManager.exists(derID)) {
-            throw new Exception("The derivate with id " + derID + " does not exist");
+            throw new NoSuchElementException("The derivate with id " + derID + " does not exist");
         }
 
         MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(derID);

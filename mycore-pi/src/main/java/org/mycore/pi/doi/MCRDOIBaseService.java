@@ -78,8 +78,6 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         setPassword(requireNotEmptyProperty(CONFIG_PASSWORD));
         setTransformerID(requireNotEmptyProperty(CONFIG_TRANSFORMER));
 
-        final MCRContentTransformer transformer = getTransformer();
-
         final Map<String, String> properties = getProperties();
         final String schemaURLString = properties.getOrDefault(CONFIG_SCHEMA, getDefaultSchemaPath());
         setSchema(resolveSchema(schemaURLString));

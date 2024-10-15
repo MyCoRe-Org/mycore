@@ -93,18 +93,19 @@ public class MCRNodeBuilder {
     @SuppressWarnings("unchecked")
     private Object buildLocationPath(LocationPath locationPath, String value, Parent parent) throws JaxenException {
         Object existingNode = null;
+        Parent currentParent = parent;
         List<Step> steps = locationPath.getSteps();
-        int i, indexOfLastStep = steps.size() - 1;
+        int i;
+        int indexOfLastStep = steps.size() - 1;
 
         for (i = indexOfLastStep; i >= 0; i--) {
             String xPath = buildXPath(steps.subList(0, i + 1));
             existingNode = evaluateFirst(xPath, parent);
-
             if (existingNode instanceof Element existingElement) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("element already existing");
                 }
-                parent = existingElement;
+                currentParent = existingElement;
                 break;
             } else if (existingNode instanceof Attribute) {
                 if (LOGGER.isDebugEnabled()) {
@@ -119,7 +120,7 @@ public class MCRNodeBuilder {
         if (i == indexOfLastStep) {
             return existingNode;
         } else {
-            return buildLocationSteps(steps.subList(i + 1, steps.size()), value, parent);
+            return buildLocationSteps(steps.subList(i + 1, steps.size()), value, currentParent);
         }
     }
 
@@ -137,19 +138,17 @@ public class MCRNodeBuilder {
 
     private Object buildLocationSteps(List<Step> steps, String value, Parent parent) throws JaxenException {
         Object built = null;
-
+        Parent currentParent = parent;
         for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
             Step step = iterator.next();
-
-            built = buildStep(step, iterator.hasNext() ? null : value, parent);
+            built = buildStep(step, iterator.hasNext() ? null : value, currentParent);
             if (built == null) {
-                return parent;
+                return currentParent;
             } else if (firstNodeBuilt == null) {
                 firstNodeBuilt = built;
             }
-
             if (built instanceof Parent newParent) {
-                parent = newParent;
+                currentParent = newParent;
             }
         }
 
@@ -249,8 +248,8 @@ public class MCRNodeBuilder {
         if ((result instanceof Element) || (result instanceof Attribute)) {
             return result;
         } else {
-            xPath = simplify(expression.getText()) + "[9999]";
-            return buildNode(xPath, literal, parent);
+            String xPathSimplified = simplify(expression.getText()) + "[9999]";
+            return buildNode(xPathSimplified, literal, parent);
         }
     }
 

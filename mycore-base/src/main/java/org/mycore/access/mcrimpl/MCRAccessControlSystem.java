@@ -44,6 +44,8 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Heiko Helmbrecht
  */
 public class MCRAccessControlSystem extends MCRAccessBaseImpl {
+    private static MCRAccessControlSystem singleton;
+    private static final HashMap<String, Integer> NEXT_FREE_RULE_ID = new HashMap<>();
 
     public static final String SYSTEM_RULE_PREFIX = "SYSTEMRULE";
 
@@ -72,15 +74,12 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
         accessStore = MCRAccessStore.getInstance();
         ruleStore = MCRRuleStore.getInstance();
-
-        nextFreeRuleID = new HashMap<>();
-
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 
-    private static MCRAccessControlSystem singleton;
 
-    private static HashMap<String, Integer> nextFreeRuleID;
+
+
 
     // extended methods
     public static synchronized MCRRuleAccessInterface instance() {
@@ -332,14 +331,14 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     public synchronized String getNextFreeRuleID(String prefix) {
         int nextFreeID;
         String sNextFreeID;
-        if (nextFreeRuleID.containsKey(prefix)) {
-            nextFreeID = nextFreeRuleID.get(prefix);
+        if (NEXT_FREE_RULE_ID.containsKey(prefix)) {
+            nextFreeID = NEXT_FREE_RULE_ID.get(prefix);
         } else {
             nextFreeID = ruleStore.getNextFreeRuleID(prefix);
         }
         sNextFreeID = LEXICOGRAPHICAL_PATTERN + nextFreeID;
         sNextFreeID = sNextFreeID.substring(sNextFreeID.length() - LEXICOGRAPHICAL_PATTERN.length());
-        nextFreeRuleID.put(prefix, nextFreeID + 1);
+        NEXT_FREE_RULE_ID.put(prefix, nextFreeID + 1);
         return prefix + sNextFreeID;
     }
 

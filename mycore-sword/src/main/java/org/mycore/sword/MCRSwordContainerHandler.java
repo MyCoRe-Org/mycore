@@ -123,11 +123,12 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
                     }
                 });
             MCRMetadataManager.delete(object);
-        } catch (MCRActiveLinkException | MCRAccessException | MCRException e) {
+        } catch (MCRActiveLinkException | MCRAccessException e) {
+            throw new SwordServerException("Error while deleting Object.", e);
+        } catch (MCRException e) {
             Throwable ex = e;
-            if (e instanceof MCRException && Optional.ofNullable(e.getCause()).map(Object::getClass)
+            if (Optional.ofNullable(e.getCause()).map(Object::getClass)
                 .filter(MCRAccessException.class::isAssignableFrom).isPresent()) {
-                //unwrapp
                 ex = e.getCause();
             }
             throw new SwordServerException("Error while deleting Object.", ex);
@@ -141,6 +142,6 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
 
     @Override
     public void destroy() {
-
+        //intentionally empty, does nothing
     }
 }

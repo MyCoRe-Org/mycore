@@ -370,13 +370,12 @@ public class MCRViewerConfiguration {
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof MCRIViewClientResource rhs)) {
+            if (obj instanceof MCRIViewClientResource rhs) {
+                return this == obj
+                        || new EqualsBuilder().append(type, rhs.type).append(url, rhs.url).isEquals();
+            } else {
                 return false;
             }
-            if (obj == this) {
-                return true;
-            }
-            return new EqualsBuilder().append(type, rhs.type).append(url, rhs.url).isEquals();
         }
 
         @Override

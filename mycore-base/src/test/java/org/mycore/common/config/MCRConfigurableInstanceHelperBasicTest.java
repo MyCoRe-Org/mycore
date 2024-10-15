@@ -99,9 +99,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     public static class TestClassWithConstructor {
 
-        public TestClassWithConstructor() {
 
-        }
 
     }
 
@@ -146,9 +144,6 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     @SuppressWarnings({ "unused" })
     @MCRConfigurationProxy(proxyClass = TestClassWithConfigurationProxy.Factory.class)
     public static class TestClassWithConfigurationProxy {
-
-        public TestClassWithConfigurationProxy() {
-        }
 
         public static class Factory implements Supplier<TestClassWithConfigurationProxy> {
 

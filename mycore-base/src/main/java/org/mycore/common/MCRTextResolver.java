@@ -721,7 +721,7 @@ public class MCRTextResolver {
         @Override
         public String getMessage() {
             StringBuilder msg = new StringBuilder("A circular dependency exception occurred");
-            msg.append("\n").append("circular path: ");
+            msg.append('\n').append("circular path: ");
             for (String dep : dependencyList) {
                 msg.append(dep).append(" > ");
             }

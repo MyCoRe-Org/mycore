@@ -122,7 +122,7 @@ public class MCRRateLimitResolver implements URIResolver {
         }
 
         public static RateLimitBehavior fromValue(final String value) {
-            for (RateLimitBehavior behavior : RateLimitBehavior.values()) {
+            for (RateLimitBehavior behavior : values()) {
                 if (behavior.value.equals(value)) {
                     return behavior;
                 }

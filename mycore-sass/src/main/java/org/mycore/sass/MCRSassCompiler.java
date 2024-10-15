@@ -55,7 +55,6 @@ import de.larsgrefer.sass.embedded.importer.Importer;
 import de.larsgrefer.sass.embedded.logging.Log4jLoggingHandler;
 import de.larsgrefer.sass.embedded.logging.LoggingHandler;
 import de.larsgrefer.sass.embedded.util.ProtocolUtil;
-import jakarta.servlet.ServletContext;
 
 /**
  * A forked version of {@link de.larsgrefer.sass.embedded.SassCompiler} to support inputs from different artifacts.
@@ -64,7 +63,6 @@ import jakarta.servlet.ServletContext;
 class MCRSassCompiler implements Closeable {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ServletContext servletContext;
 
     private OutputStyle outputStyle;
 
@@ -90,7 +88,7 @@ class MCRSassCompiler implements Closeable {
 
     private LoggingHandler loggingHandler;
 
-    MCRSassCompiler(CompilerConnection connection, ServletContext servletContext) {
+    MCRSassCompiler(CompilerConnection connection) {
         this.outputStyle = OutputStyle.EXPANDED;
         this.generateSourceMaps = false;
         this.alertColor = false;
@@ -102,7 +100,7 @@ class MCRSassCompiler implements Closeable {
         this.customImporters = new HashMap<>();
         this.loggingHandler = new Log4jLoggingHandler(LOGGER);
         this.connection = connection;
-        this.servletContext = servletContext;
+
     }
 
     protected CompileRequest.Builder compileRequestBuilder() {
@@ -135,7 +133,7 @@ class MCRSassCompiler implements Closeable {
     public CompileSuccess compile(String realFileName, OutputStyle outputStyle)
         throws SassCompilationFailedException, IOException {
         String ourURL = MCRResourceImporter.SASS_URL_PREFIX + realFileName;
-        MCRResourceImporter importer = new MCRResourceImporter(servletContext);
+        MCRResourceImporter importer = new MCRResourceImporter();
         ImportSuccess importSuccess = importer.handleImport(ourURL);
         Syntax syntax = importSuccess.getSyntax();
         ByteString content = importSuccess.getContentsBytes();

@@ -97,6 +97,7 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
         return transformers.getLast().getFileExtension();
     }
 
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     @Override
     public MCRContent transform(MCRContent source, MCRParameterCollector parameter) throws IOException {
         for (MCRContentTransformer transformer : transformers) {

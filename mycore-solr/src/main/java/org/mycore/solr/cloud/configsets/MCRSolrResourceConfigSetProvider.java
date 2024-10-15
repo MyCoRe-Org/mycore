@@ -66,7 +66,7 @@ public class MCRSolrResourceConfigSetProvider extends MCRSolrConfigSetProvider {
     }
 
     @Override
-    protected Supplier<InputStream> getStreamSupplier() {
+    public Supplier<InputStream> getStreamSupplier() {
         return () -> {
             HashSet<String> createdDirs = new HashSet<>();
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

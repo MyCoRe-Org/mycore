@@ -79,13 +79,16 @@ public class MCRStoredMetadata {
      *                       {@link MCRMetadataStore} forces MCRContent to be XML
      */
     void create(MCRContent xml) throws IOException, JDOMException {
+        MCRContent ensuredXml;
         if (store.shouldForceXML()) {
-            xml = xml.ensureXML();
+            ensuredXml = xml.ensureXML();
+        } else {
+            ensuredXml = xml;
         }
         if (!Files.exists(path.getParent())) {
             Files.createDirectories(path.getParent());
         }
-        xml.sendTo(path);
+        ensuredXml.sendTo(path);
     }
 
     /**
@@ -101,10 +104,13 @@ public class MCRStoredMetadata {
             String msg = "You can not update a deleted data object";
             throw new MCRUsageException(msg);
         }
+        MCRContent ensuredXml;
         if (store.shouldForceXML()) {
-            xml = xml.ensureXML();
+            ensuredXml = xml.ensureXML();
+        } else {
+            ensuredXml = xml;
         }
-        xml.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
+        ensuredXml.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
     }
 
     /**

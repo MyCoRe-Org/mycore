@@ -149,7 +149,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
             }
             l2.add(id);
         }
-        assertTrue(l2.size() == 3);
+        assertEquals(3, l2.size());
         Collections.sort(l2);
         assertEquals(l1, l2);
     }
@@ -222,14 +222,14 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         col.repairMetadata();
         Document xml2 = col.getMetadata().clone();
         xml1 = col.getMetadata().clone();
-        assertTrue(equals(xml1, xml2));
+        assertTrue(hasEqualContent(xml1, xml2));
 
         MCRDirectory dir = col.createDir("foo");
         xml1 = col.getMetadata().clone();
-        assertFalse(equals(xml1, xml2));
+        assertFalse(hasEqualContent(xml1, xml2));
         dir.delete();
         xml1 = col.getMetadata().clone();
-        assertTrue(equals(xml1, xml2));
+        assertTrue(hasEqualContent(xml1, xml2));
 
         MCRDirectory dir2 = col.createDir("dir");
         MCRFile file1 = col.createFile("test1.txt");
@@ -246,7 +246,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(xml1, System.out);
         xout.output(xml2, System.out);
-        assertTrue(equals(xml1, xml2));
+        assertTrue(hasEqualContent(xml1, xml2));
 
         file3.clearLabels();
         xml2 = col.getMetadata().clone();
@@ -254,7 +254,8 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         Files.delete(col.path.resolve("mcrdata.xml"));
         col = getStore().retrieve(col.getID());
         xml1 = col.getMetadata().clone();
-        assertTrue(equals(xml1, xml2));
+        assertTrue(hasEqualContent(xml1, xml2));
+
 
         Files.delete(col.path.resolve("test1.txt"));
         Path tmp = col.path.resolve("test3.txt");
@@ -265,7 +266,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertTrue(xml3.contains("name=\"test3.txt\""));
     }
 
-    private boolean equals(Document a, Document b) throws Exception {
+    private boolean hasEqualContent(Document a, Document b) throws Exception {
         sortChildren(a.getRootElement());
         sortChildren(b.getRootElement());
         String sa = new MCRJDOMContent(a).asString();

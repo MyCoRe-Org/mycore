@@ -278,9 +278,9 @@ public abstract class MCRSolrClassificationUtil {
     protected static void solrDelete(MCRCategoryID id, MCRCategory parent) {
         try {
             // remove all descendants and itself
-            HttpSolrClientBase solrClient = MCRSolrClassificationUtil.getCore().getClient();
+            HttpSolrClientBase solrClient = getCore().getClient();
             List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
+                "ancestor:" + encodeCategoryId(id));
             toDelete.add(id.toString());
             UpdateRequest req = new UpdateRequest();
             req.deleteById(toDelete);
@@ -289,7 +289,7 @@ public abstract class MCRSolrClassificationUtil {
             req.process(solrClient);
             // reindex parent
             if (parent != null) {
-                MCRSolrClassificationUtil.reindex(parent);
+                reindex(parent);
             }
         } catch (Exception exc) {
             LOGGER.error("Solr: unable to delete categories of parent {}", id);
@@ -298,12 +298,12 @@ public abstract class MCRSolrClassificationUtil {
 
     protected static void solrMove(MCRCategoryID id, MCRCategoryID newParentID) {
         try {
-            SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+            SolrClient solrClient = getCore().getClient();
             List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
+                "ancestor:" + encodeCategoryId(id));
             reindexList.add(id.toString());
             reindexList.add(newParentID.toString());
-            MCRSolrClassificationUtil.reindex(MCRSolrClassificationUtil.fromString(reindexList));
+            reindex(fromString(reindexList));
         } catch (Exception exc) {
             LOGGER.error("Solr: unable to move categories of category {} to {}", id, newParentID);
         }

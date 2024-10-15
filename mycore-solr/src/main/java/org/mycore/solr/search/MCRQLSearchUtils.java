@@ -74,23 +74,23 @@ public class MCRQLSearchUtils {
             Element sortBy = root.getChild("sortBy");
             if (sortBy != null) {
                 for (Element field : sortBy.getChildren("field")) {
-                    if (field.getAttributeValue("name", "").length() == 0) {
+                    if (field.getAttributeValue("name", "").isEmpty()) {
                         empty.add(field);
                     }
                 }
+                if (sortBy.getChildren().isEmpty()) {
+                    sortBy.detach();
+                }
             }
 
-            for (int i = empty.size() - 1; i >= 0; i--) {
-                empty.get(i).detach();
-            }
-
-            if (sortBy != null && sortBy.getChildren().size() == 0) {
-                sortBy.detach();
+            // Remove collected empty elements
+            for (Element e : empty) {
+                e.detach();
             }
 
             // Remove empty returnFields
             Element returnFields = root.getChild("returnFields");
-            if (returnFields != null && returnFields.getText().length() == 0) {
+            if (returnFields != null && returnFields.getText().isEmpty()) {
                 returnFields.detach();
             }
         }
@@ -164,16 +164,12 @@ public class MCRQLSearchUtils {
 
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
             String name = names.nextElement();
-            if (name.endsWith(".operator")) {
-                continue;
-            }
-            if (name.contains(".sortField")) {
-                continue;
-            }
-            if (SEARCH_PARAMETER.contains(name)) {
-                continue;
-            }
-            if (name.startsWith("XSL.")) {
+
+            // Skip irrelevant parameters
+            if (name.endsWith(".operator")
+                    || name.contains(".sortField")
+                    || SEARCH_PARAMETER.contains(name)
+                    || name.startsWith("XSL.")) {
                 continue;
             }
 

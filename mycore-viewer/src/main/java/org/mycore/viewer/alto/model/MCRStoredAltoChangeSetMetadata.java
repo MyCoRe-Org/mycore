@@ -28,21 +28,6 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public class MCRStoredAltoChangeSetMetadata {
 
-    public MCRStoredAltoChangeSetMetadata() {
-        this.pid = UUID.randomUUID().toString();
-    }
-
-    public MCRStoredAltoChangeSetMetadata(String sessionID, String derivateID, String objectTitle, Date created,
-        Date applied, String user) {
-        this();
-        this.sessionID = sessionID;
-        this.derivateID = derivateID;
-        this.objectTitle = objectTitle;
-        this.created = created;
-        this.applied = applied;
-        this.user = user;
-    }
-
     @Column(nullable = false)
     private String sessionID;
 
@@ -62,6 +47,21 @@ public class MCRStoredAltoChangeSetMetadata {
 
     @Column(nullable = false, name = "username")
     private String user;
+
+    public MCRStoredAltoChangeSetMetadata() {
+        this.pid = UUID.randomUUID().toString();
+    }
+
+    public MCRStoredAltoChangeSetMetadata(String sessionID, String derivateID, String objectTitle, Date created,
+        Date applied, String user) {
+        this();
+        this.sessionID = sessionID;
+        this.derivateID = derivateID;
+        this.objectTitle = objectTitle;
+        this.created = created;
+        this.applied = applied;
+        this.user = user;
+    }
 
     public String getSessionID() {
         return sessionID;

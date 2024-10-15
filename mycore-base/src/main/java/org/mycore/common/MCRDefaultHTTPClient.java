@@ -44,11 +44,11 @@ import org.mycore.services.http.MCRHttpUtils;
 
 public class MCRDefaultHTTPClient implements MCRHTTPClient {
     private static Logger logger = LogManager.getLogger();
-
+    @SuppressWarnings("PMD.SingularField")
     private long maxObjectSize;
-
+    @SuppressWarnings("PMD.SingularField")
     private int maxCacheEntries;
-
+    @SuppressWarnings("PMD.SingularField")
     private int requestTimeout;
 
     private CloseableHttpClient restClient;

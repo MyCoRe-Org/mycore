@@ -48,21 +48,21 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static String storedrules = MCRConfiguration2.getString("MCR.Access.StorePermissions")
         .orElse("read,write,delete");
 
-    // get the standard read rule from config or it's the true rule
-    private static String strReadRule = MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-READ-RULE")
-        .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element readrule;
 
-    // get the standard edit rule from config or it's the true rule
-    private static String strEditRule = MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-EDIT-RULE")
-        .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element editrule;
     static {
         try {
-            readrule = new MCRStringContent(strReadRule).asXML().getRootElement().detach();
-            editrule = new MCRStringContent(strEditRule).asXML().getRootElement().detach();
+            // get the standard read rule from config or it's the true rule
+            readrule = new MCRStringContent(MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-READ-RULE")
+                    .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>"))
+                    .asXML().getRootElement().detach();
+            // get the standard edit rule from config or it's the true rule
+            editrule = new MCRStringContent(MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-EDIT-RULE")
+                    .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>"))
+                    .asXML().getRootElement().detach();
         } catch (RuntimeException rte) {
             throw rte;
         } catch (Exception e) {
