@@ -20,6 +20,7 @@ package org.mycore.mets.model.simple;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MCRMetsPage {
     private String id;
@@ -39,16 +40,16 @@ public class MCRMetsPage {
         this.contentIds = contentIds;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public MCRMetsPage() {
+        this.fileList = new ArrayList<>();
     }
 
     public String getId() {
         return id;
     }
 
-    public MCRMetsPage() {
-        this.fileList = new ArrayList<>();
+    public void setId(String id) {
+        this.id = id;
     }
 
     public List<MCRMetsFile> getFileList() {
@@ -60,10 +61,7 @@ public class MCRMetsPage {
     }
 
     public void setOrderLabel(String orderLabel) {
-        if (orderLabel == "") {
-            orderLabel = null;
-        }
-        this.orderLabel = orderLabel;
+        this.orderLabel = Objects.equals(orderLabel, "") ? null : orderLabel;
     }
 
     public String getContentIds() {
@@ -71,10 +69,8 @@ public class MCRMetsPage {
     }
 
     public void setContentIds(String contentIds) {
-        if (contentIds == "") {
-            contentIds = null;
-        }
-        this.contentIds = contentIds;
+        this.contentIds = Objects.equals(contentIds, "") ? null : contentIds;
+
     }
 
     public Boolean isHidden() {

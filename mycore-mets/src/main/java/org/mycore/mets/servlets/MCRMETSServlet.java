@@ -157,10 +157,8 @@ public class MCRMETSServlet extends MCRServlet {
 
     private boolean useExistingMets(HttpServletRequest request) {
         String useExistingMetsParam = request.getParameter("useExistingMets");
-        if (useExistingMetsParam == null) {
-            return true;
-        }
-        return Boolean.parseBoolean(useExistingMetsParam);
+        return useExistingMetsParam == null
+                ||Boolean.parseBoolean(useExistingMetsParam);
     }
 
     public static String getOwnerID(String pathInfo) {

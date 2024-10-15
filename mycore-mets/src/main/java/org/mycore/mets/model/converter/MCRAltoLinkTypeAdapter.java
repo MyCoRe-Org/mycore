@@ -56,8 +56,12 @@ public class MCRAltoLinkTypeAdapter extends TypeAdapter<MCRMetsAltoLink> {
                 case "altoFile" -> fileID = jsonReader.nextString();
                 case "begin" -> begin = jsonReader.nextString();
                 case "end" -> end = jsonReader.nextString();
+                default -> {
+                    continue;
+                }
             }
             //CSON: InnerAssignment
+
         }
         jsonReader.endObject();
 
