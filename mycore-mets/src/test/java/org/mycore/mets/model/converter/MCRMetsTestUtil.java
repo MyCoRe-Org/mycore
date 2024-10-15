@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -59,7 +60,8 @@ public class MCRMetsTestUtil {
             try {
                 PROPERTIES.load(MCRMetsTestUtil.class.getClassLoader().getResourceAsStream("mets.properties"));
             } catch (IOException e) {
-                throw new RuntimeException("could not load application properties!", e);
+                throw new UncheckedIOException("Failed to load 'mets.properties'. " +
+                        "Please check if the file exists and is accessible.", e);
             }
         }
 

@@ -30,29 +30,15 @@ async function orcidOAuth(scope) {
     window.open(uri, '_blank', `toolbar=no, width=${width}, height=${height}, top=${top}, left=${left}`);
 }
 
-async function revokeORCID(orcid, redirect_uri) {
-    const jwt = await fetchJWT();
-    const revokeURI = `${webApplicationBaseURL}api/orcid/v1/revoke/${orcid}`;
+async function revokeOrcidOAuth(orcid, redirectUri) {
+    const revokeURI = `${webApplicationBaseURL}rsc/orcid/oauth/${orcid}`;
     const revoke = await fetch(revokeURI, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${jwt}`}
+        method: 'DELETE',
     });
     if (!revoke.ok) {
         throw new Error("Revoke failed");
     }
-    if (redirect_uri) {
-        window.location.replace(redirect_uri);
+    if (redirectUri) {
+        window.location.replace(redirectUri);
     }
-}
-
-async function fetchJWT() {
-    const response = await fetch(`${webApplicationBaseURL}rsc/jwt`);
-    if (!response.ok) {
-        throw new Error(`Cannot fetch JWT: ${response.status}`);
-    }
-    const result = await response.json();
-    if (!result.login_success) {
-        throw new Error("Login failed");
-    }
-    return result.access_token;
 }

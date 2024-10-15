@@ -89,7 +89,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
                         MCRSolrAuthenticationLevel.INDEX);
                 updateRequest.add(documents);
                 updateResponse = updateRequest.process(client);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 LOGGER.warn("Error while indexing document collection. Split and retry.");
                 splitDocuments();
                 return;

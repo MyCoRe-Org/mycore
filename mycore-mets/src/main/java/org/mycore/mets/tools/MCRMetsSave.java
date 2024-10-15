@@ -176,9 +176,9 @@ public class MCRMetsSave {
             LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
-        mets = MCRMetsSave.updateOnFileAdd(mets, file);
+        mets = updateOnFileAdd(mets, file);
         if (mets != null) {
-            MCRMetsSave.saveMets(mets, derivateID);
+            saveMets(mets, derivateID);
         }
 
     }
@@ -479,9 +479,9 @@ public class MCRMetsSave {
             LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
-        mets = MCRMetsSave.updateOnFileDelete(mets, file);
+        mets = updateOnFileDelete(mets, file);
         if (mets != null) {
-            MCRMetsSave.saveMets(mets, derivateID);
+            saveMets(mets, derivateID);
         }
     }
 
@@ -659,7 +659,7 @@ public class MCRMetsSave {
 
         //no files associated to the parent of the log div
         LogicalDiv logicalDiv = ((LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE)).getDivContainer();
-        if (parent.getParent() == logicalDiv) {
+        if (parent.getParent().equals(logicalDiv)) {
             //the parent the log div container itself, thus we quit here and remove the log div
             logicalDiv.remove(parent);
         } else {
@@ -691,7 +691,7 @@ public class MCRMetsSave {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (!file.getFileName().toString().equals(MCRMetsSave.getMetsFileName())) {
+                    if (!file.getFileName().toString().equals(getMetsFileName())) {
                         MCRPath mcrPath = MCRPath.toMCRPath(file);
                         String path;
                         try {
@@ -798,49 +798,55 @@ public class MCRMetsSave {
 
         // add files
         addedFiles.forEach(href -> {
-            MCRPath filePath = (MCRPath) derivatePath.resolve(href);
-            String fileBase = getFileBase(href);
-            try {
-                String fileGroupUse = MCRMetsSave.getFileGroupUse(filePath);
-                // build file
-                String mimeType = MCRContentTypes.probeContentType(filePath);
-                String fileId = fileGroupUse.toLowerCase(Locale.ROOT) + "_" + fileBase;
-                File file = new File(fileId, mimeType);
-                file.setFLocat(new FLocat(LOCTYPE.URL, href));
-
-                // fileSec
-                FileGrp fileGroup = mets.getFileSec().getFileGroup(fileGroupUse);
-                if (fileGroup == null) {
-                    fileGroup = new FileGrp(fileGroupUse);
-                    mets.getFileSec().addFileGrp(fileGroup);
-                }
-                fileGroup.addFile(file);
-
-                // structMap physical
-                String existingFileID = mets.getFileSec().getFileGroups().stream()
-                    .filter(grp -> !grp.getUse().equals(fileGroupUse))
-                    .flatMap(grp -> grp.getFileList().stream()).filter(brotherFile -> fileBase
-                        .equals(getFileBase(brotherFile.getFLocat().getHref())))
-                    .map(File::getId).findAny()
-                    .orElse(null);
-                PhysicalSubDiv physicalSubDiv;
-                if (existingFileID != null) {
-                    // there is a file (e.g. img or alto) which the same file base -> add the file to this mets:div
-                    physicalSubDiv = physicalDiv.byFileId(existingFileID);
-                    physicalSubDiv.add(new Fptr(file.getId()));
-                } else {
-                    // there is no mets:div with this file
-                    physicalSubDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase,
-                        PhysicalSubDiv.TYPE_PAGE);
-                    physicalSubDiv.add(new Fptr(file.getId()));
-                    physicalDiv.add(physicalSubDiv);
-                }
-                // add to struct link
-                structLink.addSmLink(new SmLink(lastLogicalDiv.getId(), physicalSubDiv.getId()));
-            } catch (Exception exc) {
-                LOGGER.error("Unable to add file {} to mets.xml of {}", href, derivatePath.getOwner(), exc);
-            }
+            addFileToMets(mets, derivatePath, href, physicalDiv, structLink, lastLogicalDiv);
         });
+    }
+
+    private static void addFileToMets(Mets mets, MCRPath derivatePath, String href,
+                                      PhysicalDiv physicalDiv, StructLink structLink, LogicalDiv lastLogicalDiv) {
+        String fileBase = getFileBase(href);
+        MCRPath filePath = (MCRPath) derivatePath.resolve(href);
+
+        try {
+            String fileGroupUse = getFileGroupUse(filePath);
+            // build file
+            String mimeType = MCRContentTypes.probeContentType(filePath);
+            String fileId = fileGroupUse.toLowerCase(Locale.ROOT) + "_" + fileBase;
+            File file = new File(fileId, mimeType);
+            file.setFLocat(new FLocat(LOCTYPE.URL, href));
+
+            // fileSec
+            FileGrp fileGroup = mets.getFileSec().getFileGroup(fileGroupUse);
+            if (fileGroup == null) {
+                fileGroup = new FileGrp(fileGroupUse);
+                mets.getFileSec().addFileGrp(fileGroup);
+            }
+            fileGroup.addFile(file);
+
+            // structMap physical
+            String existingFileID = mets.getFileSec().getFileGroups().stream()
+                .filter(grp -> !grp.getUse().equals(fileGroupUse))
+                .flatMap(grp -> grp.getFileList().stream()).filter(brotherFile -> fileBase
+                    .equals(getFileBase(brotherFile.getFLocat().getHref())))
+                .map(File::getId).findAny()
+                .orElse(null);
+            PhysicalSubDiv physicalSubDiv;
+            if (existingFileID != null) {
+                // there is a file (e.g. img or alto) which the same file base -> add the file to this mets:div
+                physicalSubDiv = physicalDiv.byFileId(existingFileID);
+                physicalSubDiv.add(new Fptr(file.getId()));
+            } else {
+                // there is no mets:div with this file
+                physicalSubDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase,
+                    PhysicalSubDiv.TYPE_PAGE);
+                physicalSubDiv.add(new Fptr(file.getId()));
+                physicalDiv.add(physicalSubDiv);
+            }
+            // add to struct link
+            structLink.addSmLink(new SmLink(lastLogicalDiv.getId(), physicalSubDiv.getId()));
+        } catch (Exception exc) {
+            LOGGER.error("Unable to add file {} to mets.xml of {}", href, derivatePath.getOwner(), exc);
+        }
     }
 
     /**
