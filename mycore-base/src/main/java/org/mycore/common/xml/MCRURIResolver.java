@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1026,7 +1027,7 @@ public final class MCRURIResolver implements URIResolver {
                 }
             } catch (Exception ex) {
                 LOGGER.info("MCRNotNullResolver caught exception: {}", ex.getLocalizedMessage());
-                LOGGER.debug(ex.getStackTrace());
+                LOGGER.debug(Arrays.toString(ex.getStackTrace()));
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
                 return new JDOMSource(new Element("null"));
             }
