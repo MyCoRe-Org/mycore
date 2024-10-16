@@ -252,12 +252,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     public void runAsJobUser(PIRunnable task) throws MCRPersistentIdentifierException {
         final boolean jobUserPresent = isJobUserPresent();
-        final String jobUser = getJobUser();
-        MCRSession session = null;
+        MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRUserInformation savedUserInformation = null;
-        session = MCRSessionMgr.getCurrentSession();
 
         if (jobUserPresent) {
+            final String jobUser = getJobUser();
             savedUserInformation = session.getUserInformation();
             MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(jobUser);
 
@@ -295,7 +294,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     private String getJobUser() {
         String jobApiUser = this.getProperties().get(JOB_API_USER_PROPERTY);
         // try to remain compatible with values configured before MCR-3033
-        if (!jobApiUser.contains(":")) {
+        if (jobApiUser != null && !jobApiUser.contains(":")) {
             String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user";
             String userProviderClass = "org.mycore.user2.MCRUserProvider";
             if (this.getProperties().get(userProviderKey).equals(userProviderClass)) {
