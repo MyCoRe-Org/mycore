@@ -112,7 +112,7 @@ public class MCRUserAttributeMapper {
     public boolean mapAttributes(final Object object, final Map<String, ?> attributes) throws Exception {
         boolean changed = false;
         for (Object annotated : getAnnotated(object)) {
-            MCRUserAttribute attrAnno = getMCRUserAttribute(annotated);
+            MCRUserAttribute attrAnno = retrieveMCRUserAttribute(annotated);
 
             if (attrAnno != null) {
 
@@ -146,7 +146,7 @@ public class MCRUserAttributeMapper {
         return changed;
     }
 
-    private MCRUserAttribute getMCRUserAttribute(Object annotated) {
+    private MCRUserAttribute retrieveMCRUserAttribute(Object annotated) {
         if (annotated instanceof Field field) {
             return field.getAnnotation(MCRUserAttribute.class);
         } else if (annotated instanceof Method method) {

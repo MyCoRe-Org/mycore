@@ -135,7 +135,7 @@ public class MCRUserServlet extends MCRServlet {
         return !MCRUserManager.exists(userName, realmID);
     }
 
-    private static void updateUserOwner(String userName, String realmID, MCRUser user) {
+    private static void updateUser(String userName, String realmID, MCRUser user) {
         if (MCRUserManager.exists(userName, realmID)) {
             MCRUserManager.updateUser(user);
         } else {
@@ -303,11 +303,11 @@ public class MCRUserServlet extends MCRServlet {
 
         updateBasicUserInfo(u, user);
 
-        if (updateUserRoles(res, hasAdminPermission, u, user, currentUser)) {
+        if (updateUserPermissionsAndDetails(res, hasAdminPermission, u, user, currentUser)) {
             return;
         }
         updateUserRoles(u, user, hasAdminPermission, currentUser);
-        updateUserOwner(userName, realmID, user);
+        updateUser(userName, realmID, user);
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id="
             + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
     }
@@ -330,13 +330,15 @@ public class MCRUserServlet extends MCRServlet {
             user = MCRUserManager.getUser(userName, realmID);
             if (!(hasAdminPermission || currentUser.equals(user) || currentUser.equals(user.getOwner()))) {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN);
-
+                return null;
             }
+            return user;
         }
         return null;
     }
 
-    private boolean updateUserRoles(HttpServletResponse res, boolean hasAdminPermission, Element u, MCRUser user,
+    private boolean updateUserPermissionsAndDetails(HttpServletResponse res, boolean hasAdminPermission, Element u,
+        MCRUser user,
         MCRUser currentUser) throws ParseException {
         if (hasAdminPermission) {
             boolean locked = "true".equals(u.getAttributeValue("locked"));
