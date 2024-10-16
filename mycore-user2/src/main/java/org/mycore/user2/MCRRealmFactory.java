@@ -158,6 +158,9 @@ public class MCRRealmFactory {
             }
         }
         realmsDocument = root.getDocument();
+        MCRRealmFactory.realmsMap = realmsMap;
+        MCRRealmFactory.realmsList = realmsList;
+        MCRRealmFactory.attributeMapper = attributeMapper;
     }
 
     private static Document getRealms() throws JDOMException, TransformerException, IOException {
