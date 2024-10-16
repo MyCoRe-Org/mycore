@@ -58,4 +58,10 @@ public class MCREntityTransaction implements MCRPersistenceTransaction {
     public boolean isActive() {
         return MCREntityManagerProvider.getCurrentEntityManager().getTransaction().isActive();
     }
+
+    @Override
+    public int getPriority() {
+        return 4000;
+    }
+
 }

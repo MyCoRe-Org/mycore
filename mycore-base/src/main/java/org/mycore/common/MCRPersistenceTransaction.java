@@ -48,27 +48,7 @@ public interface MCRPersistenceTransaction {
      */
     void rollback();
 
-    /**
-     * Determine whether the current transaction has been
-     * marked for rollback.
-     * @return boolean indicating whether the transaction has been
-     *         marked for rollback
-     * @throws IllegalStateException if <code>isActive()</code> is false
-     */
-    boolean getRollbackOnly();
+    // TODO javadoc
+    int getPriority();
 
-    /**
-     * Mark the current resource transaction so that the only possible outcome of the transaction is for the
-     * transaction to be rolled back.
-     *
-     * @throws IllegalStateException if <code>isActive()</code> is false
-     */
-    void setRollbackOnly() throws IllegalStateException;
-
-    /**
-     * Indicate whether a transaction is in progress.
-     * @return boolean indicating whether transaction is
-     *         in progress
-     */
-    boolean isActive();
 }

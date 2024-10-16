@@ -200,4 +200,9 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         }
     }
 
+    @Override
+    public int getPriority() {
+        return 6000;
+    }
+
 }
