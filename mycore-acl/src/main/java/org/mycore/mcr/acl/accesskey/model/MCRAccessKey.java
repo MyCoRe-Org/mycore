@@ -60,6 +60,25 @@ import jakarta.persistence.Transient;
     @NamedQuery(name = "MCRAccessKey.clear",
         query = "DELETE"
             + "  FROM MCRAccessKey k"),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE,
+        query = "SELECT k FROM MCRAccessKey k WHERE k.reference = :" + MCRAccessKeyNamedQueries.PARAM_REFERENCE
+            + " ORDER BY k.lastModified ASC"),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_FIND_BY_UUID,
+        query = "SELECT k FROM MCRAccessKey k WHERE k.uuid = :" + MCRAccessKeyNamedQueries.PARAM_UUID),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE_AND_VALUE,
+        query = "SELECT k FROM MCRAccessKey k WHERE k.value = :" + MCRAccessKeyNamedQueries.PARAM_VALUE
+            + " AND k.reference = :" + MCRAccessKeyNamedQueries.PARAM_REFERENCE),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_FIND_BY_REFERENCE_AND_PERMISSION,
+        query = "SELECT k FROM MCRAccessKey k  WHERE k.permission = :" + MCRAccessKeyNamedQueries.PARAM_PERMISSION
+            + " AND k.reference = :" + MCRAccessKeyNamedQueries.PARAM_REFERENCE),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_FIND_BY_PERMISSION,
+        query = "SELECT k FROM MCRAccessKey k  WHERE k.permission = :" + MCRAccessKeyNamedQueries.PARAM_PERMISSION),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_DELETE_BY_REFERENCE,
+        query = "DELETE FROM MCRAccessKey k WHERE k.reference = :" + MCRAccessKeyNamedQueries.PARAM_REFERENCE),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_DELETE_ALL,
+        query = "DELETE FROM MCRAccessKey k"),
+    @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_FIND_ALL,
+        query = "SELECT k FROM MCRAccessKey k"),
 })
 
 /**
