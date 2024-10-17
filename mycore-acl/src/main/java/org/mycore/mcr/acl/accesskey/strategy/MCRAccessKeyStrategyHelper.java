@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+@Deprecated
 public class MCRAccessKeyStrategyHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -54,6 +55,7 @@ public class MCRAccessKeyStrategyHelper {
      * @param accessKey the {@link MCRAccessKey}
      * @return true if valid, otherwise false
      */
+    @Deprecated
     public static boolean verifyAccessKey(final String permission, final MCRAccessKey accessKey) {
         final String sanitizedPermission = sanitizePermission(permission);
         if (PERMISSION_READ.equals(sanitizedPermission) || PERMISSION_WRITE.equals(sanitizedPermission)) {

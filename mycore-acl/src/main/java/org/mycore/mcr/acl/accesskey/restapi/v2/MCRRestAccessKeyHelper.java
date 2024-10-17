@@ -24,14 +24,16 @@ import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
+import org.mycore.mcr.acl.accesskey.dto.util.MCRNullable;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
 import org.mycore.restapi.v2.MCRErrorResponse;
 
@@ -58,70 +60,72 @@ public class MCRRestAccessKeyHelper {
             .toException();
     }
 
-    protected static Response doCreateAccessKey(final MCRObjectID objectId, final String accessKeyJson,
-        final UriInfo uriInfo) {
-        final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
+    protected static Response doCreateAccessKey(MCRObjectID objectId, MCRAccessKeyDto accessKeyDto, UriInfo uriInfo) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        MCRAccessKeyManager.createAccessKey(objectId, accessKey);
-        final String encodedSecret = URLEncoder.encode(accessKey.getSecret(), UTF_8);
+        accessKeyDto.setReference(objectId.toString());
+        final MCRAccessKeyDto createdAccessKey
+            = MCRAccessKeyServiceFactory.getAccessKeyService().addAccessKey(accessKeyDto);
+        final String encodedSecret = URLEncoder.encode(createdAccessKey.getValue(), UTF_8);
         return Response.created(uriInfo.getAbsolutePathBuilder().path(encodedSecret).build()).build();
     }
 
-    protected static Response doGetAccessKey(final MCRObjectID objectId, final String secret,
-        final String secretEncoding) {
+    protected static MCRAccessKeyDto doGetAccessKey(MCRObjectID objectId, String value, String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        MCRAccessKey accessKey = null;
-        if (secretEncoding != null) {
-            accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, decode(secret, secretEncoding));
-        } else {
-            accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        }
-        if (accessKey != null) {
-            return Response.ok(accessKey).build();
-        }
-        throw new MCRAccessKeyNotFoundException("Key does not exist.");
+        final MCRAccessKeyDto accessKeyDto = (secretEncoding != null)
+            ? MCRAccessKeyServiceFactory.getAccessKeyService()
+                .findAccessKeyByReferenceAndValue(objectId.toString(), decode(value, secretEncoding))
+            : MCRAccessKeyServiceFactory.getAccessKeyService()
+                .findAccessKeyByReferenceAndValue(objectId.toString(), value);
+        return Optional.ofNullable(accessKeyDto)
+            .orElseThrow(() -> new MCRAccessKeyNotFoundException("Key does not exist"));
     }
 
-    protected static Response doListAccessKeys(final MCRObjectID objectId, final int offset, final int limit) {
+    protected static MCRAccessKeyInformation doListAccessKeys(MCRObjectID objectId, int offset, int limit) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.listAccessKeys(objectId);
-        final List<MCRAccessKey> accessKeysResult = accessKeys.stream()
-            .skip(offset)
-            .limit(limit)
+        final List<MCRAccessKeyDto> accessKeyDtos = MCRAccessKeyServiceFactory.getAccessKeyService()
+            .findAccessKeysByReference(objectId.toString());
+        final List<MCRAccessKeyDto> accessKeyDtosResult = accessKeyDtos.stream().skip(offset).limit(limit)
             .collect(Collectors.toList());
-        return Response.ok(new MCRAccessKeyInformation(accessKeysResult, accessKeys.size())).build();
+        return new MCRAccessKeyInformation(accessKeyDtosResult, accessKeyDtos.size());
     }
 
-    protected static Response doRemoveAccessKey(final MCRObjectID objectId, final String secret,
-        final String secretEncoding) {
+    protected static Response doRemoveAccessKey(MCRObjectID objectId, String value, String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        if (secretEncoding != null) {
-            MCRAccessKeyManager.removeAccessKey(objectId, decode(secret, secretEncoding));
-        } else {
-            MCRAccessKeyManager.removeAccessKey(objectId, secret);
+        final MCRAccessKeyDto accessKeyDto = (secretEncoding != null)
+            ? MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeyByReferenceAndValue(objectId.toString(),
+                decode(value, secretEncoding))
+            : MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeyByReferenceAndValue(objectId.toString(),
+                value);
+        if (accessKeyDto == null) {
+            throw new MCRAccessKeyNotFoundException("Key does not exist");
         }
+        MCRAccessKeyServiceFactory.getAccessKeyService().removeAccessKey(accessKeyDto.getId());
         return Response.noContent().build();
     }
 
-    protected static Response doUpdateAccessKey(final MCRObjectID objectId, final String secret,
-        final String accessKeyJson, final String secretEncoding) {
+    protected static Response doUpdateAccessKey(MCRObjectID objectId, String value,
+        MCRAccessKeyPartialUpdateDto updatesAccessKeyDto, String secretEncoding) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
-        if (secretEncoding != null) {
-            MCRAccessKeyManager.updateAccessKey(objectId, decode(secret, secretEncoding), accessKey);
-        } else {
-            MCRAccessKeyManager.updateAccessKey(objectId, secret, accessKey);
-        }
+        // prevent reference and value update to be compatible with AccessKeyManager
+        updatesAccessKeyDto.setReference(new MCRNullable<>());
+        updatesAccessKeyDto.setValue(new MCRNullable<>());
+        final MCRAccessKeyDto accessKeyDto = (secretEncoding != null)
+            ? MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeyByReferenceAndValue(objectId.toString(),
+                decode(value, secretEncoding))
+            : MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeyByReferenceAndValue(objectId.toString(),
+                value);
+        MCRAccessKeyServiceFactory.getAccessKeyService().partialUpdateAccessKey(accessKeyDto.getId(),
+            updatesAccessKeyDto);
         return Response.noContent().build();
     }
 

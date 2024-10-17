@@ -37,6 +37,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+@Deprecated
 public class MCRAccessKeyTransformerTest extends MCRTestCase {
 
     private static final String OBJECT_ID = "mcr_test_00000001";
@@ -70,7 +71,7 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
         final List<MCRAccessKey> transAccessKeys = MCRAccessKeyTransformer.accessKeysFromJson(json);
         final MCRAccessKey transAccessKey = transAccessKeys.getFirst();
         assertNull(transAccessKey.getObjectId());
-        assertEquals(transAccessKey.getId(), 0);
+        assertNull(transAccessKey.getId());
         assertEquals(accessKey.getSecret(), transAccessKey.getSecret());
         assertEquals(accessKey.getType(), transAccessKey.getType());
     }
