@@ -32,7 +32,7 @@ import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
-import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
+import org.mycore.mcr.acl.accesskey.restapi.v2.dto.MCRRestAccessKeyInfoDto;
 import org.mycore.restapi.v2.MCRErrorResponse;
 
 import jakarta.ws.rs.WebApplicationException;
@@ -95,7 +95,7 @@ public class MCRRestAccessKeyHelper {
             .skip(offset)
             .limit(limit)
             .collect(Collectors.toList());
-        return Response.ok(new MCRAccessKeyInformation(accessKeysResult, accessKeys.size())).build();
+        return Response.ok(new MCRRestAccessKeyInfoDto(accessKeysResult, accessKeys.size())).build();
     }
 
     protected static Response doRemoveAccessKey(final MCRObjectID objectId, final String secret,
