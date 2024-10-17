@@ -70,7 +70,7 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
         final List<MCRAccessKey> transAccessKeys = MCRAccessKeyTransformer.accessKeysFromJson(json);
         final MCRAccessKey transAccessKey = transAccessKeys.getFirst();
         assertNull(transAccessKey.getObjectId());
-        assertEquals(transAccessKey.getId(), 0);
+        assertNull(transAccessKey.getId());
         assertEquals(accessKey.getSecret(), transAccessKey.getSecret());
         assertEquals(accessKey.getType(), transAccessKey.getType());
     }
