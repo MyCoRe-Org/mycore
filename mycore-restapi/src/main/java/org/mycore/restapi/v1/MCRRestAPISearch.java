@@ -31,16 +31,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.solr.MCRSolrCoreManager;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 
 /**
  * Rest API methods that cover SOLR searches.
@@ -50,47 +47,31 @@ import jakarta.ws.rs.core.UriInfo;
  */
 @Path("/search")
 public class MCRRestAPISearch {
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
-
     public static final String FORMAT_JSON = "json";
-
     public static final String FORMAT_XML = "xml";
-
     public static final String FORMAT_CSV = "csv";
+    private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
     /**
      * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters
      *
-     * @param info - the injected Jersey URIInfo object
-     * @param request - the injected HTTPServletRequest object
-     *
-     * @param query
-     *      the Query in SOLR Query syntax
-     * @param sort
-     *      the sort parameter - syntax as defined by SOLR
-     * @param wt
-     *      the format parameter - syntax as defined by SOLR
-     * @param start
-     *      the start parameter (number) - syntax as defined by SOLR      
-     * @param rows
-     *      the rows parameter (number) - syntax as defined by SOLR
-     * @param fq
-     *      the filter query parameter - syntax as defined by SOLR
-     * @param fl
-     *      the list of fields to be returned - syntax as defined by SOLR
-     * @param facet
-     *      the facet parameter (true to return facets)  - syntax as defined by SOLR
-     * @param facetFields
-     *      the list of facetFields to be returned - syntax as defined by SOLR
-     * @param jsonWrf
-     *      the name of the JSONP callback function - syntax as defined by SOLR 
-     *
+     * @param query       the Query in SOLR Query syntax
+     * @param sort        the sort parameter - syntax as defined by SOLR
+     * @param wt          the format parameter - syntax as defined by SOLR
+     * @param start       the start parameter (number) - syntax as defined by SOLR
+     * @param rows        the rows parameter (number) - syntax as defined by SOLR
+     * @param fq          the filter query parameter - syntax as defined by SOLR
+     * @param fl          the list of fields to be returned - syntax as defined by SOLR
+     * @param facet       the facet parameter (true to return facets)  - syntax as defined by SOLR
+     * @param facetFields the list of facetFields to be returned - syntax as defined by SOLR
+     * @param jsonWrf     the name of the JSONP callback function - syntax as defined by SOLR
      * @return a Jersey Response Object
      */
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response search(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("q") String query,
+    public Response search(@QueryParam("q") String query,
         @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
         @QueryParam("start") String start, @QueryParam("rows") String rows,
         @QueryParam("fq") List<String> fq, @QueryParam("fl") List<String> fl,
@@ -101,69 +82,69 @@ public class MCRRestAPISearch {
         StringBuilder url = new StringBuilder(MCRSolrCoreManager.getMainSolrCore().getV1CoreURL());
         url.append("/select?");
 
-        if (query != null) {
-            url.append("&q=").append(URLEncoder.encode(query, StandardCharsets.UTF_8));
+        // Append query parameters using helper methods
+        appendQueryParam(url, "q", query);
+        appendQueryParam(url, "sort", sort);
+        appendQueryParam(url, "wt", wt);
+        appendQueryParam(url, "start", start);
+        appendQueryParam(url, "rows", rows);
+
+        appendListQueryParam(url, "fq", fq);
+        appendListQueryParam(url, "fl", fl);
+
+        appendQueryParam(url, "facet", facet);
+        appendQueryParam(url, "facet.sort", facetSort);
+        appendQueryParam(url, "facet.limit", facetLimit);
+        appendQueryParam(url, "facet.mincount", facetMinCount);
+        appendListQueryParam(url, "facet.field", facetFields);
+        appendQueryParam(url, "json.wrf", jsonWrf);
+
+        return executeSolrQuery(url.toString(), wt);
+    }
+
+    // Helper method to append single query parameters
+    private void appendQueryParam(StringBuilder url, String param, String value) {
+        if (value != null) {
+            url.append('&').append(param).append('=')
+                .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
         }
-        if (sort != null) {
-            url.append("&sort=").append(URLEncoder.encode(sort, StandardCharsets.UTF_8));
-        }
-        if (wt != null) {
-            url.append("&wt=").append(wt);
-        }
-        if (start != null) {
-            url.append("&start=").append(start);
-        }
-        if (rows != null) {
-            url.append("&rows=").append(rows);
-        }
-        if (fq != null) {
-            for (String fqItem : fq) {
-                url.append("&fq=").append(URLEncoder.encode(fqItem, StandardCharsets.UTF_8));
+    }
+
+    // Helper method to append list-based query parameters
+    private void appendListQueryParam(StringBuilder url, String param, List<String> values) {
+        if (values != null) {
+            for (String value : values) {
+                appendQueryParam(url, param, value);
             }
         }
-        if (fl != null) {
-            for (String flItem : fl) {
-                url.append("&fl=").append(URLEncoder.encode(flItem, StandardCharsets.UTF_8));
-            }
-        }
-        if (facet != null) {
-            url.append("&facet=").append(URLEncoder.encode(facet, StandardCharsets.UTF_8));
-        }
-        for (String ff : facetFields) {
-            url.append("&facet.field=").append(URLEncoder.encode(ff, StandardCharsets.UTF_8));
-        }
-        if (facetSort != null) {
-            url.append("&facet.sort=").append(facetSort);
-        }
-        if (facetLimit != null) {
-            url.append("&facet.limit=").append(facetLimit);
-        }
-        if (facetMinCount != null) {
-            url.append("&facet.mincount=").append(facetMinCount);
-        }
-        if (jsonWrf != null) {
-            url.append("&json.wrf=").append(jsonWrf);
-        }
+    }
 
-        try (InputStream is = new URI(url.toString()).toURL().openStream()) {
-            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
-                String text = scanner.useDelimiter("\\A").next();
+    // Method to execute the Solr query and handle response
+    private Response executeSolrQuery(String url, String wt) {
+        try (InputStream is = new URI(url).toURL().openStream();
+            Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
 
-                String contentType = switch (wt) {
-                    case FORMAT_XML -> "application/xml; charset=UTF-8";
-                    case FORMAT_JSON -> "application/json; charset=UTF-8";
-                    case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
-                    default -> "text";
-                };
-                return Response.ok(text)
-                    .type(contentType)
-                    .build();
+            String text = scanner.useDelimiter("\\A").next();
+            String contentType = getContentType(wt);
 
-            }
+            return Response.ok(text)
+                .type(contentType)
+                .build();
+
         } catch (IOException | URISyntaxException e) {
             LOGGER.error(e);
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
-
-        return Response.status(Response.Status.BAD_REQUEST).build();
     }
+
+    // Helper method to determine content type based on 'wt'
+    private String getContentType(String wt) {
+        return switch (wt) {
+            case FORMAT_XML -> "application/xml; charset=UTF-8";
+            case FORMAT_JSON -> "application/json; charset=UTF-8";
+            case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
+            default -> "text";
+        };
+    }
+
 }

@@ -20,7 +20,6 @@ package org.mycore.restapi;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
 
@@ -42,7 +41,7 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
         if (MCRSessionMgr.isLocked()) {
             return;
         }
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        MCRSessionMgr.getCurrentSession();
         if (MCRTransactionHelper.isTransactionActive()) {
             LOGGER.debug("Filter scoped JPA transaction is active.");
             if (MCRTransactionHelper.transactionRequiresRollback()) {
