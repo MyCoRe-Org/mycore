@@ -157,7 +157,7 @@ public class MCRRealmFactory {
                 localRealm = realm;
             }
         }
-        MCRRealmFactory.realmsDocument = root.getDocument();
+        realmsDocument = root.getDocument();
         MCRRealmFactory.realmsMap = realmsMap;
         MCRRealmFactory.realmsList = realmsList;
         MCRRealmFactory.attributeMapper = attributeMapper;
