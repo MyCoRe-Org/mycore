@@ -18,12 +18,14 @@
 
 package org.mycore.common;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,20 +40,19 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         // check calling begin transaction multiple times
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 0);
         assertThrows("beginning two times should fail", MCRTransactionException.class,
             MCRTransactionManager::beginTransactions);
-        assertTrue("WorkingTransaction should still be active",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 0);
         MCRTransactionManager.commitTransactions();
+        resetCounter();
 
         // check fail on begin
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
             WorkingTransaction.class, FailOnBeginTransaction.class));
         assertThrows("Should fail because FailOnBeginTransaction is included", MCRTransactionException.class,
             MCRTransactionManager::beginTransactions);
-        assertFalse("WorkingTransaction should not be active",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 1);
     }
 
     @Test
@@ -59,64 +60,95 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         // check calling begin transaction multiple times
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
         MCRTransactionManager.beginTransactions(WorkingTransaction.class);
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 0);
         assertThrows("beginning two times should fail", MCRTransactionException.class,
             () -> MCRTransactionManager.beginTransactions(WorkingTransaction.class));
-        assertTrue("WorkingTransaction should still be active",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 0);
         MCRTransactionManager.commitTransactions();
+        resetCounter();
 
         // check fail on begin
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
-            WorkingTransaction.class, FailOnBeginTransaction.class));
+        MCRTransactionManager.setTransactionLoader(
+            new TransactionLoaderMock(WorkingTransaction.class, FailOnBeginTransaction.class));
         assertThrows("Should fail because FailOnBeginTransaction is included", MCRTransactionException.class,
             () -> MCRTransactionManager.beginTransactions(WorkingTransaction.class, FailOnBeginTransaction.class));
-        assertFalse("WorkingTransaction should not be active",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 1);
     }
 
     @Test
     public void requireTransactions() {
+        // check calling require transaction multiple times
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
-
-        // require WorkingTransaction only
         MCRTransactionManager.requireTransactions();
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
-
-        // require WorkingTransaction only again
+        checkCounter(1, 0, 0);
         MCRTransactionManager.requireTransactions();
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 0);
+        MCRTransactionManager.commitTransactions();
+        resetCounter();
 
-        // add FailOnBeginTransaction
+        // check fail on begin
         MCRTransactionManager.setTransactionLoader(
             new TransactionLoaderMock(WorkingTransaction.class, FailOnBeginTransaction.class));
-
-        // require WorkingTransaction and FailOnBeginTransaction
         assertThrows("Should fail because FailOnBeginTransaction fails on begin",
             MCRTransactionException.class, MCRTransactionManager::requireTransactions);
-        assertFalse("WorkingTransaction should not be active after rollback",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 1);
     }
 
     @Test
     public void requireTransactionsWithSpecificClasses() {
+        // check calling require transaction multiple times
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
             WorkingTransaction.class, FailOnBeginTransaction.class));
-
-        // require WorkingTransaction only
         MCRTransactionManager.requireTransactions(WorkingTransaction.class);
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
-
-        // require WorkingTransaction only again
+        checkCounter(1, 0, 0);
         MCRTransactionManager.requireTransactions(WorkingTransaction.class);
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 0);
+        MCRTransactionManager.commitTransactions();
+        resetCounter();
 
-        // require WorkingTransaction and FailOnBeginTransaction
+        // check fail on begin
         assertThrows("Should fail because FailOnBeginTransaction fails on begin",
             MCRTransactionException.class,
             () -> MCRTransactionManager.requireTransactions(WorkingTransaction.class, FailOnBeginTransaction.class));
-        assertFalse("WorkingTransaction should not be active after rollback",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 1);
+    }
+
+    @Test
+    public void commitTransactions() {
+        // single transaction
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.beginTransactions();
+        MCRTransactionManager.commitTransactions();
+        checkCounter(1, 1, 0);
+        resetCounter();
+
+        // commit fail transaction
+        MCRTransactionManager
+            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnCommitTransaction.class));
+        MCRTransactionManager.beginTransactions();
+        assertThrows("Should fail because FailOnCommitTransaction fails on commit",
+            MCRTransactionException.class, MCRTransactionManager::commitTransactions);
+        checkCounter(2, 1, 1);
+    }
+
+    @Test
+    public void commitTransactionsWithSpecificClasses() {
+        // single transaction
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.beginTransactions();
+        MCRTransactionManager.commitTransactions(WorkingTransaction.class);
+        checkCounter(1, 1, 0);
+        resetCounter();
+
+        // commit fail transaction
+        MCRTransactionManager
+            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnCommitTransaction.class));
+        MCRTransactionManager.beginTransactions();
+        assertThrows("Should fail because FailOnCommitTransaction fails on commit",
+            MCRTransactionException.class, () -> {
+                MCRTransactionManager.commitTransactions(WorkingTransaction.class, FailOnCommitTransaction.class);
+            });
+        checkCounter(2, 1, 1);
     }
 
     @Test
@@ -124,24 +156,17 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         // rollback single transaction
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
         MCRTransactionManager.rollbackTransactions();
-        assertFalse("WorkingTransaction should not be active",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 1);
+        resetCounter();
 
         // rollback error
         MCRTransactionManager
             .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnRollbackTransaction.class));
         MCRTransactionManager.beginTransactions();
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
-        assertTrue("FailOnRollbackTransaction should be active",
-            MCRTransactionManager.isActive(FailOnRollbackTransaction.class));
         MCRTransactionException exception = assertThrows("Rollback should fail due to FailOnRollbackTransaction",
             MCRTransactionException.class, MCRTransactionManager::rollbackTransactions);
-        assertFalse("WorkingTransaction should not be active after rollback",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
-        assertFalse("FailOnRollbackTransaction should not be active after rollback",
-            MCRTransactionManager.isActive(FailOnRollbackTransaction.class));
+        checkCounter(2, 0, 1);
 
         // check suppressed exceptions
         Throwable[] suppressed = exception.getSuppressed();
@@ -153,29 +178,67 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         // rollback single transaction
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
         MCRTransactionManager.rollbackTransactions(WorkingTransaction.class);
-        assertFalse("WorkingTransaction should not be active",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
+        checkCounter(1, 0, 1);
+        resetCounter();
 
         // rollback error
         MCRTransactionManager
             .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnRollbackTransaction.class));
         MCRTransactionManager.beginTransactions();
-        assertTrue("WorkingTransaction should be active", MCRTransactionManager.isActive(WorkingTransaction.class));
-        assertTrue("FailOnRollbackTransaction should be active",
-            MCRTransactionManager.isActive(FailOnRollbackTransaction.class));
         MCRTransactionException exception = assertThrows("Rollback should fail due to FailOnRollbackTransaction",
             MCRTransactionException.class, () -> MCRTransactionManager.rollbackTransactions(WorkingTransaction.class,
                 FailOnRollbackTransaction.class));
-        assertFalse("WorkingTransaction should not be active after rollback",
-            MCRTransactionManager.isActive(WorkingTransaction.class));
-        assertFalse("FailOnRollbackTransaction should not be active after rollback",
-            MCRTransactionManager.isActive(FailOnRollbackTransaction.class));
+        checkCounter(2, 0, 1);
 
         // check suppressed exceptions
         Throwable[] suppressed = exception.getSuppressed();
         assertTrue("There should be a suppressed exception", suppressed.length > 0);
+    }
+
+    @Test
+    public void isActive() {
+        // test commit
+        MCRTransactionManager
+            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, AnotherWorkingTransaction.class));
+        MCRTransactionManager.beginTransactions();
+        assertTrue("WorkingTransaction should be active after begin",
+            MCRTransactionManager.isActive(WorkingTransaction.class));
+        assertTrue("AnotherWorkingTransaction should be active after begin",
+            MCRTransactionManager.isActive(AnotherWorkingTransaction.class));
+        MCRTransactionManager.commitTransactions(WorkingTransaction.class);
+        assertFalse("WorkingTransaction should not be active after commit",
+            MCRTransactionManager.isActive(WorkingTransaction.class));
+        assertTrue("AnotherWorkingTransaction should still be active after commit of WorkingTransaction",
+            MCRTransactionManager.isActive(AnotherWorkingTransaction.class));
+
+        // test rollback
+        MCRTransactionManager.rollbackTransactions(AnotherWorkingTransaction.class);
+        assertFalse("AnotherWorkingTransaction should not be active after rollback",
+            MCRTransactionManager.isActive(AnotherWorkingTransaction.class));
+
+        // Verify that both transactions are active again after begin
+        MCRTransactionManager.beginTransactions();
+        assertTrue("WorkingTransaction should be active after second begin",
+            MCRTransactionManager.isActive(WorkingTransaction.class));
+        assertTrue("AnotherWorkingTransaction should be active after second begin",
+            MCRTransactionManager.isActive(AnotherWorkingTransaction.class));
+
+        // Rollback all transactions
+        MCRTransactionManager.rollbackTransactions();
+        assertFalse("WorkingTransaction should not be active after rollback",
+            MCRTransactionManager.isActive(WorkingTransaction.class));
+        assertFalse("AnotherWorkingTransaction should not be active after rollback",
+            MCRTransactionManager.isActive(AnotherWorkingTransaction.class));
+    }
+
+    @Test
+    public void isReady() {
+        MCRTransactionManager
+            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, NotReadyTransaction.class));
+        assertTrue("WorkingTransaction should be ready", MCRTransactionManager.isReady(WorkingTransaction.class));
+        assertFalse("NotReadyTransaction should not be ready",
+            MCRTransactionManager.isReady(NotReadyTransaction.class));
     }
 
     @Before
@@ -186,6 +249,8 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         MCRTransactionManager.rollbackTransactions();
         // Store the original transaction loader to restore it after the test
         originalTransactionLoader = MCRTransactionManager.getTransactionLoader();
+        // reset counter
+        BaseTransaction.resetCounter();
     }
 
     @After
@@ -193,6 +258,16 @@ public class MCRTransactionManagerTest extends MCRTestCase {
     public void tearDown() throws Exception {
         MCRTransactionManager.setTransactionLoader(originalTransactionLoader);
         super.tearDown();
+    }
+
+    private static void checkCounter(int begin, int commit, int rollback) {
+        assertEquals("begin counter should be equals", begin, BaseTransaction.BEGIN_COUNTER.get());
+        assertEquals("commit counter should be equals", commit, BaseTransaction.COMMIT_COUNTER.get());
+        assertEquals("rollback counter should be equals", rollback, BaseTransaction.ROLLBACK_COUNTER.get());
+    }
+
+    private static void resetCounter() {
+        BaseTransaction.resetCounter();
     }
 
     private static class TransactionLoaderMock implements MCRTransactionManager.TransactionLoader {
@@ -223,37 +298,34 @@ public class MCRTransactionManagerTest extends MCRTestCase {
 
     private abstract static class BaseTransaction implements MCRPersistenceTransaction {
 
-        private boolean rollbackOnly = false;
-        private boolean active = false;
+        public static final AtomicInteger BEGIN_COUNTER = new AtomicInteger(0);
+        public static final AtomicInteger COMMIT_COUNTER = new AtomicInteger(0);
+        public static final AtomicInteger ROLLBACK_COUNTER = new AtomicInteger(0);
 
         @Override
         public void begin() {
-            active = true;
+            BEGIN_COUNTER.incrementAndGet();
         }
 
         @Override
         public void commit() {
-            active = false;
+            COMMIT_COUNTER.incrementAndGet();
         }
 
         @Override
         public void rollback() {
-            active = false;
+            ROLLBACK_COUNTER.incrementAndGet();
         }
 
         @Override
-        public boolean getRollbackOnly() {
-            return rollbackOnly;
+        public boolean isReady() {
+            return true;
         }
 
-        @Override
-        public void setRollbackOnly() {
-            rollbackOnly = true;
-        }
-
-        @Override
-        public boolean isActive() {
-            return active;
+        public static void resetCounter() {
+            BEGIN_COUNTER.set(0);
+            COMMIT_COUNTER.set(0);
+            ROLLBACK_COUNTER.set(0);
         }
 
         @Override
@@ -261,13 +333,24 @@ public class MCRTransactionManagerTest extends MCRTestCase {
             return 0;
         }
 
-        @Override
-        public boolean isReady() {
-            return true;
-        }
     }
 
     private static class WorkingTransaction extends BaseTransaction {
+
+        @Override
+        public int getPriority() {
+            return 5;
+        }
+
+    }
+
+    private static class AnotherWorkingTransaction extends BaseTransaction {
+
+        @Override
+        public int getPriority() {
+            return 4;
+        }
+
     }
 
     private static class NotReadyTransaction extends BaseTransaction {

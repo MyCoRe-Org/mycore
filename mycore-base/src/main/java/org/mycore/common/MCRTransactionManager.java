@@ -43,7 +43,8 @@ import org.mycore.util.concurrent.MCRPool;
  * <p>This class is designed to be used in a multi-threaded environment where each thread
  * may have its own set of active transactions.</p>
  *
- * TODO: rm active & rollbackonly from MCRPersistenceTransaction, add MCRPersistenceTransaction#failAllOnError
+ * TODO: MCRPersistenceTransaction#failAllOnError
+ * TODO: priority
  * TODO: equals vs isInstance?
  */
 public abstract class MCRTransactionManager {
@@ -105,8 +106,8 @@ public abstract class MCRTransactionManager {
         }
         try {
             availableTransactions.forEach(transaction -> {
-                activeTransactions.add(transaction);
                 transaction.begin();
+                activeTransactions.add(transaction);
             });
         } catch (Exception e) {
             throwAndRollback(new MCRTransactionException("Error while beginTransaction", e));
@@ -225,8 +226,8 @@ public abstract class MCRTransactionManager {
                     .findFirst()
                     .orElseThrow(() -> new MCRTransactionException(
                         "No available transaction of type " + transactionClass.getName()));
-                activeTransactions.add(transaction);
                 transaction.begin();
+                activeTransactions.add(transaction);
             }
         } catch (Exception e) {
             throwAndRollback(new MCRTransactionException("Error while beginTransaction: " + transactionClasses, e));
@@ -294,6 +295,16 @@ public abstract class MCRTransactionManager {
         }
     }
 
+    /**
+     * Commits the given list of active transactions.
+     *
+     * <p>This method iterates over the active transactions, checking if any of them are marked
+     * as rollback-only. If any transaction is marked as rollback-only, an exception is thrown.
+     * Otherwise, the transactions are committed and removed from the active list.</p>
+     *
+     * @param activeTransactions the list of transactions to commit
+     * @throws MCRTransactionException if any transaction is marked as rollback-only
+     */
     private static void commitTransactions(List<? extends MCRPersistenceTransaction> activeTransactions) {
         try {
             activeTransactions.forEach(transaction -> {
@@ -313,8 +324,8 @@ public abstract class MCRTransactionManager {
      * Rolls back all active {@link MCRPersistenceTransaction} instances.
      *
      * <p>This method iterates over all active transactions in the current thread, attempts to roll back each one,
-     * and then clears the active transactions list. If exceptions occur during the rollback process, they are collected,
-     * and a {@link MCRTransactionException} is thrown at the end with all suppressed exceptions.</p>
+     * and then clears the active transactions list. If exceptions occur during the rollback process, they are
+     * collected, and a {@link MCRTransactionException} is thrown at the end with all suppressed exceptions.</p>
      *
      * @throws MCRTransactionException if any errors occur during the rollback process
      */
@@ -340,6 +351,15 @@ public abstract class MCRTransactionManager {
         rollbackTransactions(transactionsToRollback);
     }
 
+    /**
+     * Rolls back the given list of active transactions.
+     *
+     * <p>This method attempts to roll back each transaction in the provided list. If any exception occurs during
+     * the rollback process, it is collected and added as a suppressed exception in the thrown
+     * {@link MCRTransactionException}.</p>
+     *
+     * @param transactionsToRollback the list of transactions to roll back
+     */
     private static void rollbackTransactions(List<? extends MCRPersistenceTransaction> transactionsToRollback) {
         List<Exception> exceptionsOnRollback = rollback(transactionsToRollback);
         if (!exceptionsOnRollback.isEmpty()) {
@@ -454,6 +474,15 @@ public abstract class MCRTransactionManager {
         throw transactionException;
     }
 
+    /**
+     * Helper method that performs rollback on a list of transactions.
+     *
+     * <p>This method iterates over the given list of transactions, attempting to roll them back.
+     * If any exception occurs during the rollback, it is added to the list of exceptions.</p>
+     *
+     * @param transactionsToRollback the list of transactions to roll back
+     * @return a list of exceptions that occurred during rollback, or an empty list if no exceptions occurred
+     */
     private static List<Exception> rollback(List<? extends MCRPersistenceTransaction> transactionsToRollback) {
         List<Exception> exceptionsOnRollback = new ArrayList<>();
         for (MCRPersistenceTransaction transaction : transactionsToRollback) {
@@ -502,14 +531,38 @@ public abstract class MCRTransactionManager {
         return requestedTransactions;
     }
 
+    /**
+     * Checks if there are any active transactions in the current thread.
+     *
+     * <p>This method verifies whether there are any transactions currently marked
+     * as active for the current thread.</p>
+     *
+     * @return {@code true} if there are active transactions, {@code false} otherwise
+     */
     public static boolean hasActiveTransactions() {
         return !ACTIVE_TRANSACTIONS.get().isEmpty();
     }
 
+    /**
+     * Retrieves the list of transactions that are marked as rollback-only.
+     *
+     * <p>This method returns the list of transactions that have been marked as rollback-only
+     * in the current thread.</p>
+     *
+     * @return a list of rollback-only transactions
+     */
     private static List<MCRPersistenceTransaction> getRollbackOnlyTransactions() {
         return ROLLBACK_ONLY_TRANSACTIONS.get();
     }
 
+    /**
+     * Checks if there are any transactions marked as rollback-only in the current thread.
+     *
+     * <p>This method verifies whether there are any transactions that have been
+     * marked as rollback-only for the current thread.</p>
+     *
+     * @return {@code true} if there are rollback-only transactions, {@code false} otherwise
+     */
     public static boolean hasRollbackOnlyTransactions() {
         return !ROLLBACK_ONLY_TRANSACTIONS.get().isEmpty();
     }
@@ -553,8 +606,9 @@ public abstract class MCRTransactionManager {
          * Performs an operation using a {@link ServiceLoader} instance from the internal pool.
          *
          * <p>This method acquires a {@link ServiceLoader} from the {@link #SERVICE_LOADER_POOL}, applies the given
-         * function to it, and then releases the {@link ServiceLoader} back to the pool. If an {@link InterruptedException}
-         * occurs while acquiring the {@link ServiceLoader}, the provided default value is returned.</p>
+         * function to it, and then releases the {@link ServiceLoader} back to the pool. If an
+         * {@link InterruptedException} occurs while acquiring the {@link ServiceLoader}, the provided default value is
+         * returned.</p>
          *
          * @param f the function to apply to the acquired {@link ServiceLoader}
          * @param defaultValue the value to return if the {@link ServiceLoader} could not be acquired

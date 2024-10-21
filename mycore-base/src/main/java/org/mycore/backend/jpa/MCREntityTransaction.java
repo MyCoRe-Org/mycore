@@ -45,21 +45,6 @@ public class MCREntityTransaction implements MCRPersistenceTransaction {
     }
 
     @Override
-    public boolean getRollbackOnly() {
-        return MCREntityManagerProvider.getCurrentEntityManager().getTransaction().getRollbackOnly();
-    }
-
-    @Override
-    public void setRollbackOnly() throws IllegalStateException {
-        MCREntityManagerProvider.getCurrentEntityManager().getTransaction().setRollbackOnly();
-    }
-
-    @Override
-    public boolean isActive() {
-        return MCREntityManagerProvider.getCurrentEntityManager().getTransaction().isActive();
-    }
-
-    @Override
     public int getPriority() {
         return 4000;
     }
