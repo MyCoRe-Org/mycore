@@ -258,10 +258,10 @@
       <work:credit-name>
         <xsl:choose>
           <xsl:when test="mods:namePart[@type='given'] and mods:namePart[@type='family']">
-            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], ' ', mods:namePart[@type='family']))" />
+            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'][1], ' ', mods:namePart[@type='family'][1]))" />
           </xsl:when>
           <xsl:when test="mods:namePart[@type='given'] or mods:namePart[@type='family']">
-            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'], mods:namePart[@type='family']))" />
+            <xsl:value-of select="normalize-space(concat(mods:namePart[@type='given'][1], mods:namePart[@type='family'][1]))" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="normalize-space(mods:namePart)" />
