@@ -329,7 +329,7 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         }
 
         @Override
-        public int getPriority() {
+        public int getCommitPriority() {
             return 0;
         }
 
@@ -338,7 +338,7 @@ public class MCRTransactionManagerTest extends MCRTestCase {
     private static class WorkingTransaction extends BaseTransaction {
 
         @Override
-        public int getPriority() {
+        public int getCommitPriority() {
             return 5;
         }
 
@@ -347,7 +347,7 @@ public class MCRTransactionManagerTest extends MCRTestCase {
     private static class AnotherWorkingTransaction extends BaseTransaction {
 
         @Override
-        public int getPriority() {
+        public int getCommitPriority() {
             return 4;
         }
 

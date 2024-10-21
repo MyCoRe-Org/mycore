@@ -49,6 +49,6 @@ public interface MCRPersistenceTransaction {
     void rollback();
 
     // TODO javadoc
-    int getPriority();
+    int getCommitPriority();
 
 }

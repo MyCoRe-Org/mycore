@@ -20,6 +20,7 @@ package org.mycore.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -44,7 +45,6 @@ import org.mycore.util.concurrent.MCRPool;
  * may have its own set of active transactions.</p>
  *
  * TODO: MCRPersistenceTransaction#failAllOnError
- * TODO: priority
  * TODO: equals vs isInstance?
  */
 public abstract class MCRTransactionManager {
@@ -105,10 +105,10 @@ public abstract class MCRTransactionManager {
             throw new MCRTransactionException("Error while loading persistence transactions", e);
         }
         try {
-            availableTransactions.forEach(transaction -> {
+            for (MCRPersistenceTransaction transaction : availableTransactions) {
                 transaction.begin();
                 activeTransactions.add(transaction);
-            });
+            }
         } catch (Exception e) {
             throwAndRollback(new MCRTransactionException("Error while beginTransaction", e));
         }
@@ -306,15 +306,16 @@ public abstract class MCRTransactionManager {
      * @throws MCRTransactionException if any transaction is marked as rollback-only
      */
     private static void commitTransactions(List<? extends MCRPersistenceTransaction> activeTransactions) {
+        activeTransactions.sort(Comparator.comparingInt(MCRPersistenceTransaction::getCommitPriority).reversed());
         try {
-            activeTransactions.forEach(transaction -> {
+            for (MCRPersistenceTransaction transaction : activeTransactions) {
                 if (isRollbackOnly(transaction)) {
                     throw new MCRTransactionException(
                         "Transaction " + transaction + " marked as rollback-only. Cannot commit.");
                 }
                 transaction.commit();
                 getActiveTransactions().remove(transaction);
-            });
+            }
         } catch (Exception e) {
             throwAndRollback(new MCRTransactionException("Error while commitTransaction.", e));
         }
@@ -388,8 +389,9 @@ public abstract class MCRTransactionManager {
      */
     @SafeVarargs
     public static void setRollbackOnly(Class<? extends MCRPersistenceTransaction>... transactionClasses) {
-        getActiveTransactions(transactionClasses)
-            .forEach(transaction -> getRollbackOnlyTransactions().add(transaction));
+        List<? extends MCRPersistenceTransaction> activeTransactions = getActiveTransactions(transactionClasses);
+        List<MCRPersistenceTransaction> rollbackOnlyTransactions = getRollbackOnlyTransactions();
+        rollbackOnlyTransactions.addAll(activeTransactions);
     }
 
     /**

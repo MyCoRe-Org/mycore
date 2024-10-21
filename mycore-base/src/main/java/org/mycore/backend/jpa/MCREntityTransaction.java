@@ -45,7 +45,7 @@ public class MCREntityTransaction implements MCRPersistenceTransaction {
     }
 
     @Override
-    public int getPriority() {
+    public int getCommitPriority() {
         return 4000;
     }
 
