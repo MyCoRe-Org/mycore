@@ -218,7 +218,7 @@ public class MCRSolrConfigReloader {
      * @throws UnsupportedEncodingException if command encoding is not supported
      */
     private static void executeSolrCommand(String coreURL, JsonObject command) throws UnsupportedEncodingException {
-        HttpRequest.Builder requestBuilder = MCRHttpUtils.getRequestBuilder()
+        HttpRequest.Builder requestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config"))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(command.toString()));
@@ -264,7 +264,7 @@ public class MCRSolrConfigReloader {
      * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
-        HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+        HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config"));
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
             MCRSolrAuthenticationLevel.ADMIN);
@@ -277,7 +277,7 @@ public class MCRSolrConfigReloader {
      * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
-        HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+        HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config/overlay"));
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
             MCRSolrAuthenticationLevel.ADMIN);

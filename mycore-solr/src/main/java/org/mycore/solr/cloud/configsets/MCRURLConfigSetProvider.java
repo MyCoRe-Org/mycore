@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.services.http.MCRHttpUtils;
+import org.mycore.solr.MCRSolrUtils;
 
 /**
  * A zipped Solr config set file that is fetched from a web-based resource.
@@ -58,7 +59,7 @@ public class MCRURLConfigSetProvider extends MCRSolrConfigSetProvider {
     public Supplier<InputStream> getStreamSupplier() {
         return () -> {
             try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-                HttpRequest request = MCRHttpUtils.getRequestBuilder().uri(uri).build();
+                HttpRequest request = MCRSolrUtils.getRequestBuilder().uri(uri).build();
                 HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
                 return new ByteArrayInputStream(response.body());
             } catch (InterruptedException | IOException e) {

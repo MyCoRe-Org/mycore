@@ -32,6 +32,7 @@ import org.mycore.services.http.MCRHttpUtils;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mycore.solr.MCRSolrUtils;
 
 /**
  * A simple HTTP client to communicate with a Tika server.
@@ -49,7 +50,7 @@ public class MCRTikaHttpClient {
 
     public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<TreeNode, T> responseConsumer)
         throws IOException, T {
-        HttpRequest httpPut = MCRHttpUtils.getRequestBuilder()
+        HttpRequest httpPut = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(url + "tika/text"))
             .setHeader("Accept", "application/json")
             .PUT(HttpRequest.BodyPublishers.ofInputStream(() -> is))
