@@ -61,7 +61,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         // create derivate
         create();
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // execute threads
         MCRSystemUserInformation systemUser = MCRSystemUserInformation.getSystemUserInstance();

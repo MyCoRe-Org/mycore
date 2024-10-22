@@ -1,5 +1,9 @@
 package org.mycore.common.events;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -16,16 +20,12 @@ import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Map;
 
 public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
@@ -51,7 +51,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testXMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 
@@ -123,7 +123,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 

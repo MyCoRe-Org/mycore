@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 
@@ -89,12 +89,12 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
         if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             try {
-                if (MCRTransactionHelper.isTransactionActive()) {
+                if (MCRTransactionManager.hasActiveTransactions()) {
                     LOGGER.debug("Active MCRSession and JPA-Transaction found. Clearing up");
-                    if (MCRTransactionHelper.transactionRequiresRollback()) {
-                        MCRTransactionHelper.rollbackTransaction();
+                    if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+                        MCRTransactionManager.rollbackTransactions();
                     } else {
-                        MCRTransactionHelper.commitTransaction();
+                        MCRTransactionManager.commitTransactions();
                     }
                 } else {
                     LOGGER.debug("Active MCRSession found. Clearing up");

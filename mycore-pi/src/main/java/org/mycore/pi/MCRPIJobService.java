@@ -31,7 +31,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.MCRConfigurationException;
@@ -270,15 +270,15 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
         }
 
-        boolean transactionActive = !MCRTransactionHelper.isTransactionActive();
+        boolean transactionActive = !MCRTransactionManager.hasActiveTransactions();
         try {
             if (transactionActive) {
-                MCRTransactionHelper.beginTransaction();
+                MCRTransactionManager.beginTransactions();
             }
             task.run();
         } finally {
-            if (transactionActive && MCRTransactionHelper.isTransactionActive()) {
-                MCRTransactionHelper.commitTransaction();
+            if (transactionActive && MCRTransactionManager.hasActiveTransactions()) {
+                MCRTransactionManager.commitTransactions();
             }
 
             if (jobUserPresent) {

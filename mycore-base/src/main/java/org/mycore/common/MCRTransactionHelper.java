@@ -18,6 +18,11 @@
 
 package org.mycore.common;
 
+/**
+ * @deprecated This class is deprecated and should not be used for managing transactions.
+ * Use {@link MCRTransactionManager} instead.
+ */
+@Deprecated
 public abstract class MCRTransactionHelper {
 
     /**
