@@ -283,7 +283,7 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         private final List<Class<? extends MCRPersistenceTransaction>> transactionClasses;
 
         @SafeVarargs
-        public TransactionLoaderMock(Class<? extends MCRPersistenceTransaction>... transactionClasses) {
+        TransactionLoaderMock(Class<? extends MCRPersistenceTransaction>... transactionClasses) {
             this.transactionClasses = Arrays.stream(transactionClasses).toList();
         }
 
@@ -299,7 +299,7 @@ public class MCRTransactionManagerTest extends MCRTestCase {
             try {
                 return clazz.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to instantiate transaction: " + clazz.getName(), e);
+                throw new MCRTransactionException("Failed to instantiate transaction: " + clazz.getName(), e);
             }
         }
     }
