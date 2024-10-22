@@ -38,135 +38,142 @@ public class MCRTransactionManagerTest extends MCRTestCase {
     @Test
     public void beginTransactions() {
         // check calling begin transaction multiple times
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
-        checkCounter(1, 0, 0);
+        checkCounter(2, 0, 0);
         assertThrows("beginning two times should fail", MCRTransactionException.class,
             MCRTransactionManager::beginTransactions);
-        checkCounter(1, 0, 0);
+        checkCounter(2, 0, 0);
         MCRTransactionManager.commitTransactions();
         resetCounter();
 
         // check fail on begin
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
-            WorkingTransaction.class, FailOnBeginTransaction.class));
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnBeginTransaction.class));
         assertThrows("Should fail because FailOnBeginTransaction is included", MCRTransactionException.class,
             MCRTransactionManager::beginTransactions);
-        checkCounter(1, 0, 1);
+        checkCounter(2, 0, 2);
     }
 
     @Test
     public void beginTransactionsWithSpecificClasses() {
         // check calling begin transaction multiple times
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
-        MCRTransactionManager.beginTransactions(WorkingTransaction.class);
-        checkCounter(1, 0, 0);
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
+        MCRTransactionManager.beginTransactions(WorkingTransaction.class, AnotherWorkingTransaction.class);
+        checkCounter(2, 0, 0);
         assertThrows("beginning two times should fail", MCRTransactionException.class,
             () -> MCRTransactionManager.beginTransactions(WorkingTransaction.class));
-        checkCounter(1, 0, 0);
+        checkCounter(2, 0, 0);
         MCRTransactionManager.commitTransactions();
         resetCounter();
 
         // check fail on begin
-        MCRTransactionManager.setTransactionLoader(
-            new TransactionLoaderMock(WorkingTransaction.class, FailOnBeginTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnBeginTransaction.class));
         assertThrows("Should fail because FailOnBeginTransaction is included", MCRTransactionException.class,
-            () -> MCRTransactionManager.beginTransactions(WorkingTransaction.class, FailOnBeginTransaction.class));
-        checkCounter(1, 0, 1);
+            () -> MCRTransactionManager.beginTransactions(WorkingTransaction.class, AnotherWorkingTransaction.class,
+                FailOnBeginTransaction.class));
+        checkCounter(2, 0, 2);
     }
 
     @Test
     public void requireTransactions() {
         // check calling require transaction multiple times
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
         MCRTransactionManager.requireTransactions();
-        checkCounter(1, 0, 0);
+        checkCounter(2, 0, 0);
         MCRTransactionManager.requireTransactions();
-        checkCounter(1, 0, 0);
+        checkCounter(2, 0, 0);
         MCRTransactionManager.commitTransactions();
         resetCounter();
 
         // check fail on begin
-        MCRTransactionManager.setTransactionLoader(
-            new TransactionLoaderMock(WorkingTransaction.class, FailOnBeginTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnBeginTransaction.class));
         assertThrows("Should fail because FailOnBeginTransaction fails on begin",
             MCRTransactionException.class, MCRTransactionManager::requireTransactions);
-        checkCounter(1, 0, 1);
+        checkCounter(2, 0, 2);
     }
 
     @Test
     public void requireTransactionsWithSpecificClasses() {
-        // check calling require transaction multiple times
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
-            WorkingTransaction.class, FailOnBeginTransaction.class));
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnBeginTransaction.class));
+        // check calling require transaction multiple times
         MCRTransactionManager.requireTransactions(WorkingTransaction.class);
         checkCounter(1, 0, 0);
-        MCRTransactionManager.requireTransactions(WorkingTransaction.class);
-        checkCounter(1, 0, 0);
+        MCRTransactionManager.requireTransactions(WorkingTransaction.class, AnotherWorkingTransaction.class);
+        checkCounter(2, 0, 0);
         MCRTransactionManager.commitTransactions();
         resetCounter();
 
         // check fail on begin
         assertThrows("Should fail because FailOnBeginTransaction fails on begin",
             MCRTransactionException.class,
-            () -> MCRTransactionManager.requireTransactions(WorkingTransaction.class, FailOnBeginTransaction.class));
-        checkCounter(1, 0, 1);
+            () -> MCRTransactionManager.requireTransactions(WorkingTransaction.class, AnotherWorkingTransaction.class,
+                FailOnBeginTransaction.class));
+        checkCounter(2, 0, 2);
     }
 
     @Test
     public void commitTransactions() {
         // single transaction
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
         MCRTransactionManager.commitTransactions();
-        checkCounter(1, 1, 0);
+        checkCounter(2, 2, 0);
         resetCounter();
 
         // commit fail transaction
-        MCRTransactionManager
-            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnCommitTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnCommitTransaction.class));
         MCRTransactionManager.beginTransactions();
         assertThrows("Should fail because FailOnCommitTransaction fails on commit",
             MCRTransactionException.class, MCRTransactionManager::commitTransactions);
-        checkCounter(2, 1, 1);
+        checkCounter(3, 2, 1);
     }
 
     @Test
     public void commitTransactionsWithSpecificClasses() {
         // single transaction
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
-        MCRTransactionManager.commitTransactions(WorkingTransaction.class);
-        checkCounter(1, 1, 0);
+        MCRTransactionManager.commitTransactions(WorkingTransaction.class, AnotherWorkingTransaction.class);
+        checkCounter(2, 2, 0);
         resetCounter();
 
         // commit fail transaction
-        MCRTransactionManager
-            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnCommitTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnCommitTransaction.class));
         MCRTransactionManager.beginTransactions();
         assertThrows("Should fail because FailOnCommitTransaction fails on commit",
-            MCRTransactionException.class, () -> {
-                MCRTransactionManager.commitTransactions(WorkingTransaction.class, FailOnCommitTransaction.class);
-            });
-        checkCounter(2, 1, 1);
+            MCRTransactionException.class, () -> MCRTransactionManager.commitTransactions(
+                WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnCommitTransaction.class));
+        checkCounter(3, 2, 1);
     }
 
     @Test
     public void rollbackTransactions() {
         // rollback single transaction
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
         MCRTransactionManager.rollbackTransactions();
-        checkCounter(1, 0, 1);
+        checkCounter(2, 0, 2);
         resetCounter();
 
         // rollback error
-        MCRTransactionManager
-            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnRollbackTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+                WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnRollbackTransaction.class));
         MCRTransactionManager.beginTransactions();
         MCRTransactionException exception = assertThrows("Rollback should fail due to FailOnRollbackTransaction",
             MCRTransactionException.class, MCRTransactionManager::rollbackTransactions);
-        checkCounter(2, 0, 1);
+        checkCounter(3, 0, 2);
 
         // check suppressed exceptions
         Throwable[] suppressed = exception.getSuppressed();
@@ -176,20 +183,21 @@ public class MCRTransactionManagerTest extends MCRTestCase {
     @Test
     public void rollbackTransactionsWithSpecificClasses() {
         // rollback single transaction
-        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
         MCRTransactionManager.beginTransactions();
-        MCRTransactionManager.rollbackTransactions(WorkingTransaction.class);
-        checkCounter(1, 0, 1);
+        MCRTransactionManager.rollbackTransactions(WorkingTransaction.class, AnotherWorkingTransaction.class);
+        checkCounter(2, 0, 2);
         resetCounter();
 
         // rollback error
-        MCRTransactionManager
-            .setTransactionLoader(new TransactionLoaderMock(WorkingTransaction.class, FailOnRollbackTransaction.class));
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+                WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnRollbackTransaction.class));
         MCRTransactionManager.beginTransactions();
         MCRTransactionException exception = assertThrows("Rollback should fail due to FailOnRollbackTransaction",
-            MCRTransactionException.class, () -> MCRTransactionManager.rollbackTransactions(WorkingTransaction.class,
-                FailOnRollbackTransaction.class));
-        checkCounter(2, 0, 1);
+            MCRTransactionException.class, () -> MCRTransactionManager.rollbackTransactions(
+                WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnRollbackTransaction.class));
+        checkCounter(3, 0, 2);
 
         // check suppressed exceptions
         Throwable[] suppressed = exception.getSuppressed();

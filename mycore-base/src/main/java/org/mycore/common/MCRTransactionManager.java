@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,20 +31,56 @@ import org.mycore.util.concurrent.MCRPool;
 /**
  * Manages transactions for multiple persistence backends in a thread-safe manner.
  *
- * <p>The {@code MCRTransactionManager} class provides methods to begin, commit, and rollback
- * transactions involving implementations of {@link MCRPersistenceTransaction}. Transactions
- * are managed per thread using a {@link ThreadLocal} to keep track of active transactions.</p>
+ * <p>The {@code MCRTransactionManager} class is responsible for handling the lifecycle of transactions across
+ * multiple persistence backends, which implement {@link MCRPersistenceTransaction}. It ensures that transactions
+ * can be started, committed, and rolled back in a multi-threaded environment, where each thread has its own set of
+ * active transactions tracked using {@link ThreadLocal} storage.</p>
  *
- * <p>Transactions are loaded using a {@link TransactionLoader}, allowing for flexible addition
- * of persistence backends. The class handles exceptions during transaction operations by
- * attempting to rollback any partially completed transactions and collecting rollback
- * failures as suppressed exceptions.</p>
+ * <h3>Key Features:</h3>
+ * <ul>
+ *     <li>Supports multiple transaction backends: Transactions can be initiated, committed, or rolled back across
+ *     different backends in a single unified process.</li>
+ *     <li>Thread-safe operation: Transactions are managed per thread, ensuring isolation between threads.</li>
+ *     <li>Centralized error handling: When an error occurs during a transaction operation, a rollback is
+ *     attempted for any successfully started transactions before the error, with suppressed exceptions recorded.</li>
+ *     <li>Priority-based commit: Transactions can be committed in a specific order based on their priority.</li>
+ *     <li>Flexible transaction loading: Transactions are loaded using a {@link TransactionLoader}, which allows
+ *     custom implementations to load persistence transactions dynamically from different sources.</li>
+ * </ul>
  *
- * <p>This class is designed to be used in a multi-threaded environment where each thread
- * may have its own set of active transactions.</p>
+ * <h3>Transaction Lifecycle:</h3>
+ * <ul>
+ *     <li><strong>Starting Transactions:</strong> Transactions can be started using {@link #beginTransactions()}
+ *     or {@link #requireTransactions()} to ensure specific transactions are active.</li>
+ *     <li><strong>Commit and Rollback:</strong> Active transactions can be committed with {@link #commitTransactions()}
+ *     or rolled back using {@link #rollbackTransactions()}. The class also supports rollback-only operations
+ *     to enforce that certain transactions cannot be committed.</li>
+ * </ul>
  *
- * TODO: MCRPersistenceTransaction#failAllOnError
- * TODO: equals vs isInstance?
+ * <h3>Thread Safety:</h3>
+ * <p>The class is designed for multi-threaded environments, with active transactions and rollback-only transactions
+ * being managed separately for each thread. This ensures that operations in one thread do not interfere with
+ * transactions in another thread.</p>
+ *
+ * <h3>Exception Handling:</h3>
+ * <p>When an error occurs during the begin, commit, or rollback process, the class handles these exceptions centrally
+ * by attempting to rollback any partially completed transactions and collecting rollback failures as suppressed
+ * exceptions in a thrown {@link MCRTransactionException}. This prevents the system from being left in an
+ * inconsistent state after an error.</p>
+ *
+ * <h3>Usage:</h3>
+ * <pre>
+ * {@code
+ * // Begin transactions for all persistence backends
+ * MCRTransactionManager.beginTransactions();
+ *
+ * // Commit all active transactions
+ * MCRTransactionManager.commitTransactions();
+ *
+ * // Rollback transactions in case of failure
+ * MCRTransactionManager.rollbackTransactions();
+ * }
+ * </pre>
  */
 public abstract class MCRTransactionManager {
 
@@ -156,12 +191,12 @@ public abstract class MCRTransactionManager {
     public static void requireTransactions() {
         List<MCRPersistenceTransaction> activeTransactions = getActiveTransactions();
         List<MCRPersistenceTransaction> loadedTransactions = transactionLoader.load();
-        Set<Class<? extends MCRPersistenceTransaction>> activeTransactionClasses = activeTransactions.stream()
-            .map(MCRPersistenceTransaction::getClass)
-            .collect(Collectors.toSet());
         try {
             for (MCRPersistenceTransaction transaction : loadedTransactions) {
-                if (!activeTransactionClasses.contains(transaction.getClass())) {
+                boolean isAlreadyActive = activeTransactions.stream()
+                    .anyMatch(
+                        activeTransaction -> transaction.getClass().isAssignableFrom(activeTransaction.getClass()));
+                if (!isAlreadyActive) {
                     transaction.begin();
                     activeTransactions.add(transaction);
                 }
@@ -308,8 +343,9 @@ public abstract class MCRTransactionManager {
     private static void commitTransactions(List<? extends MCRPersistenceTransaction> activeTransactions) {
         activeTransactions.sort(Comparator.comparingInt(MCRPersistenceTransaction::getCommitPriority).reversed());
         try {
+            List<MCRPersistenceTransaction> rollbackOnlyTransactions = getRollbackOnlyTransactions();
             for (MCRPersistenceTransaction transaction : activeTransactions) {
-                if (isRollbackOnly(transaction)) {
+                if (rollbackOnlyTransactions.contains(transaction)) {
                     throw new MCRTransactionException(
                         "Transaction " + transaction + " marked as rollback-only. Cannot commit.");
                 }
@@ -436,24 +472,6 @@ public abstract class MCRTransactionManager {
      */
     public static boolean isRollbackOnly(Class<? extends MCRPersistenceTransaction> transactionClass) {
         return getRollbackOnlyTransactions().stream().anyMatch(transactionClass::isInstance);
-    }
-
-    /**
-     * Checks if the specified transaction is marked for rollback-only.
-     *
-     * <p>This method determines if a particular transaction has been marked
-     * as rollback-only, meaning that any attempt to commit transactions of this type
-     * will result in a rollback.</p>
-     *
-     * <p>The rollback-only state is centrally managed by the {@link MCRTransactionManager}
-     * and can be set via the {@link #setRollbackOnly(Class[])} method.</p>
-     *
-     * @param transaction the class of the transaction to check
-     * @return {@code true} if the transaction class is marked for rollback-only,
-     *         {@code false} otherwise
-     */
-    private static boolean isRollbackOnly(MCRPersistenceTransaction transaction) {
-        return getRollbackOnlyTransactions().contains(transaction);
     }
 
     /**
