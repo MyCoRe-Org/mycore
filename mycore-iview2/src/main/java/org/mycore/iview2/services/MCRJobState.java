@@ -18,6 +18,7 @@
 
 package org.mycore.iview2.services;
 
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -43,10 +44,9 @@ public enum MCRJobState {
      */
     ERROR('e');
 
-    private static final Set<MCRJobState> NOT_COMPLETE_STATES = Set.of(MCRJobState.ERROR, MCRJobState.PROCESSING,
-        MCRJobState.NEW);
+    private static final Set<MCRJobState> NOT_COMPLETE_STATES = EnumSet.of(ERROR, PROCESSING, NEW);
 
-    private static final Set<MCRJobState> COMPLETE_STATES = Set.of(MCRJobState.FINISHED);
+    private static final Set<MCRJobState> COMPLETE_STATES = EnumSet.of(FINISHED);
 
     private final char status;
 

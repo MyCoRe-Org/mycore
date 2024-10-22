@@ -44,12 +44,11 @@ import jakarta.persistence.TypedQuery;
 
 public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
     private static MCRTilingQueue instance = new MCRTilingQueue();
+    private static Logger LOGGER = LogManager.getLogger();
 
-    private static Queue<MCRTileJob> preFetch;
+    private final Queue<MCRTileJob> preFetch;
 
-    private static ScheduledExecutorService StalledJobScheduler;
-
-    private static Logger LOGGER = LogManager.getLogger(MCRTilingQueue.class);
+    private final ScheduledExecutorService stalledJobScheduler;
 
     private final ReentrantLock pollLock;
 
@@ -58,8 +57,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     private MCRTilingQueue() {
         // periodische Ausführung von runProcess
         int waitTime = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset")) * 60;
-        StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
-        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
+        stalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
+        stalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
             TimeUnit.SECONDS);
         preFetch = new ConcurrentLinkedQueue<>();
         running = true;
@@ -365,13 +364,13 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
      * Shuts down {@link MCRStalledJobResetter} and does not alter any job anymore.
      */
     public void prepareClose() {
-        StalledJobScheduler.shutdownNow();
+        stalledJobScheduler.shutdownNow();
         running = false;
         try {
-            StalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
+            stalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             LOGGER.info("Could not wait for 60 seconds...");
-            StalledJobScheduler.shutdownNow();
+            stalledJobScheduler.shutdownNow();
         }
     }
 

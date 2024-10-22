@@ -222,22 +222,8 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     public static void checkImage(String derivate, String absoluteImagePath) throws IOException {
         Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         //file checks
-        if (!Files.exists(iviewFile)) {
-            LOGGER.warn("IView2 file does not exist: {}", iviewFile);
-            tileImage(derivate, absoluteImagePath);
-            return;
-        }
-        MCRTiledPictureProps props;
-        try {
-            props = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
-        } catch (Exception e) {
-            LOGGER.warn("Error while reading image metadata. Recreating tiles.", e);
-            tileImage(derivate, absoluteImagePath);
-            return;
-        }
+        MCRTiledPictureProps props = getTiledPictureProperties(derivate, absoluteImagePath, iviewFile);
         if (props == null) {
-            LOGGER.warn("Could not get tile metadata");
-            tileImage(derivate, absoluteImagePath);
             return;
         }
         ZipFile iviewImage;
@@ -282,6 +268,29 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 tileImage(derivate, absoluteImagePath);
             }
         }
+    }
+
+    private static MCRTiledPictureProps getTiledPictureProperties(String derivate, String absoluteImagePath,
+        Path iviewFile) {
+        if (!Files.exists(iviewFile)) {
+            LOGGER.warn("IView2 file does not exist: {}", iviewFile);
+            tileImage(derivate, absoluteImagePath);
+            return null;
+        }
+        MCRTiledPictureProps props;
+        try {
+            props = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
+        } catch (Exception e) {
+            LOGGER.warn("Error while reading image metadata. Recreating tiles.", e);
+            tileImage(derivate, absoluteImagePath);
+            return null;
+        }
+        if (props == null) {
+            LOGGER.warn("Could not get tile metadata");
+            tileImage(derivate, absoluteImagePath);
+            return null;
+        }
+        return props;
     }
 
     private static void validateZipFile(ZipFile iviewImage) throws IOException {
@@ -415,12 +424,11 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         if (Files.isDirectory(file)) {
             try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file)) {
-                for (@SuppressWarnings("unused")
-                Path entry : directoryStream) {
+                if (directoryStream.iterator().hasNext()) {
                     return;
                 }
-                Files.delete(file);
             }
+            Files.delete(file);
         }
         Path parent = file.getParent();
         if (parent != null && parent.getNameCount() > 0) {
