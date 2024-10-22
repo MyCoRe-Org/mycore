@@ -48,7 +48,20 @@ public interface MCRPersistenceTransaction {
      */
     void rollback();
 
-    // TODO javadoc
+    /**
+     * Returns the commit priority of this transaction.
+     *
+     * <p>This priority determines the order in which transactions are committed
+     * when multiple transactions are active. Transactions with higher priority
+     * values will be committed before those with lower values.</p>
+     *
+     * <p>The commit priority can be useful when managing transactions across
+     * multiple backends, ensuring that more critical transactions are finalized
+     * first to maintain data consistency and integrity.</p>
+     *
+     * @return an integer representing the commit priority of the transaction,
+     *         where higher values indicate higher priority.
+     */
     int getCommitPriority();
 
 }
