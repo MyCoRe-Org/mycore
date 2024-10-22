@@ -30,7 +30,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.mycore.common.MCRException;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.results.ValidationResult;
 import org.verapdf.pdfa.validation.profiles.RuleId;
@@ -68,10 +67,10 @@ public class MCRPDFAFunctions {
      *
      * @param dir      The path to the directory containing the PDF files to validate.
      * @param objectId An identifier for the validation process or target.
-     * @return A Document object representing an XML structure containing validation results.
+     * @return A Document object representing an XML structure containing validation results, including
+     * both successful validations and errors encountered.
      * @throws ParserConfigurationException If a DocumentBuilder cannot be created.
      * @throws IOException                  If an I/O error occurs while processing the files.
-     * @throws MCRException                 If there is an issue with PDF validation or file processing.
      */
     public static Document getResults(Path dir, String objectId) throws ParserConfigurationException, IOException {
         Map<String, ValidationResult> results = new HashMap<>();
@@ -82,7 +81,8 @@ public class MCRPDFAFunctions {
                     try {
                         results.put(dir.relativize(file).toString(), PDF_A_VALIDATOR.validate(file));
                     } catch (MCRPDFAValidationException e) {
-                        throw new MCRException(e);
+                        results.put(dir.relativize(file).toString(), new ValidationErrorResult());
+
                     }
                 }
                 return FileVisitResult.CONTINUE;
