@@ -35,7 +35,9 @@ import org.xml.sax.SAXParseException;
 
 /**
  * SAX Error handler for validating TEI XML
+ * @deprecated use the {@link org.mycore.datamodel.metadata.validator.MCREditorOutValidator} instead
  */
+@Deprecated
 public class MCRTEIValidator implements ErrorHandler {
 
     /**
