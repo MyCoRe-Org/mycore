@@ -62,6 +62,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.xml.sax.SAXException;
@@ -302,7 +303,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         String type) {
         String serverURL = MCRSolrCoreManager.get(type).get().getV1CoreURL();
 
-        return MCRHttpUtils.getRequestBuilder()
+        return MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(serverURL + queryHandlerPath + params.toQueryString()));
     }
 

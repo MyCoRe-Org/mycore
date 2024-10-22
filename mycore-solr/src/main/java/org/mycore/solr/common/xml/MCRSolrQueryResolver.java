@@ -40,6 +40,7 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.search.MCRSolrURL;
@@ -120,7 +121,7 @@ public class MCRSolrQueryResolver implements URIResolver {
                     throw new IllegalArgumentException("Could not create URI from " + solrURL.getUrl(), e);
                 }
 
-                HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder().uri(solrRequestURI);
+                HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder().uri(solrRequestURI);
 
                 MCRSolrAuthenticationManager.getInstance()
                     .applyAuthentication(solrRequestBuilder, MCRSolrAuthenticationLevel.SEARCH);

@@ -19,6 +19,7 @@
 package org.mycore.solr;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrUtils.USE_HTTP_1_1_PROPERTY;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -158,6 +159,13 @@ public class MCRSolrCore {
         int socketTimeout) {
         HttpSolrClientBuilderBase baseBuilder = useJettyHttpClient() ? new Http2SolrClient.Builder(baseSolrUrl)
             : new HttpJdkSolrClient.Builder(baseSolrUrl);
+
+        MCRConfiguration2.getBoolean(USE_HTTP_1_1_PROPERTY)
+                .filter(useHttp1_1 -> useHttp1_1)
+                .ifPresent(useHttp1_1 -> {
+                    baseBuilder.useHttp1_1(true);
+                });
+
         return baseBuilder
             .withConnectionTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
             .withIdleTimeout(socketTimeout, TimeUnit.MILLISECONDS)

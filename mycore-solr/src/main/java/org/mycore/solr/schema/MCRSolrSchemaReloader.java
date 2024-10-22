@@ -197,7 +197,7 @@ public class MCRSolrSchemaReloader {
                     LOGGER.debug(e);
                     String command = e.toString();
 
-                    HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+                    HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
                         .uri(URI.create(solrCore.getV1CoreURL() + "/schema"))
                         .header("Content-type", "application/json")
                         .POST(HttpRequest.BodyPublishers.ofString(command));
