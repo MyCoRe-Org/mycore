@@ -290,6 +290,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         LOGGER.debug("ResponseFilter start");
         try {
             MCRSessionMgr.unlock();
+            MCRSessionMgr.getCurrentSession();
             if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode()
                 && isUnAuthorized(requestContext)) {
                 LOGGER.debug("Guest detected, change response from FORBIDDEN to UNAUTHORIZED.");
