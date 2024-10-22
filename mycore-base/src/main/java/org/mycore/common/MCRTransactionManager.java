@@ -36,7 +36,7 @@ import org.mycore.util.concurrent.MCRPool;
  * can be started, committed, and rolled back in a multi-threaded environment, where each thread has its own set of
  * active transactions tracked using {@link ThreadLocal} storage.</p>
  *
- * <h3>Key Features:</h3>
+ * <h2>Key Features:</h2>
  * <ul>
  *     <li>Supports multiple transaction backends: Transactions can be initiated, committed, or rolled back across
  *     different backends in a single unified process.</li>
@@ -48,7 +48,7 @@ import org.mycore.util.concurrent.MCRPool;
  *     custom implementations to load persistence transactions dynamically from different sources.</li>
  * </ul>
  *
- * <h3>Transaction Lifecycle:</h3>
+ * <h2>Transaction Lifecycle:</h2>
  * <ul>
  *     <li><strong>Starting Transactions:</strong> Transactions can be started using {@link #beginTransactions()}
  *     or {@link #requireTransactions()} to ensure specific transactions are active.</li>
@@ -57,18 +57,18 @@ import org.mycore.util.concurrent.MCRPool;
  *     to enforce that certain transactions cannot be committed.</li>
  * </ul>
  *
- * <h3>Thread Safety:</h3>
+ * <h2>Thread Safety:</h2>
  * <p>The class is designed for multi-threaded environments, with active transactions and rollback-only transactions
  * being managed separately for each thread. This ensures that operations in one thread do not interfere with
  * transactions in another thread.</p>
  *
- * <h3>Exception Handling:</h3>
+ * <h2>Exception Handling:</h2>
  * <p>When an error occurs during the begin, commit, or rollback process, the class handles these exceptions centrally
  * by attempting to rollback any partially completed transactions and collecting rollback failures as suppressed
  * exceptions in a thrown {@link MCRTransactionException}. This prevents the system from being left in an
  * inconsistent state after an error.</p>
  *
- * <h3>Usage:</h3>
+ * <h2>Usage:</h2>
  * <pre>
  * {@code
  * // Begin transactions for all persistence backends
