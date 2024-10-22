@@ -34,7 +34,7 @@ import org.mycore.services.http.MCRHttpUtils;
  */
 public class MCRSolrUtils {
 
-    public static final String USE_HTTP_1_1_PROPERTY = "MCR.Solr.UseHttp1.1";
+    public static final String USE_HTTP_1_1_PROPERTY = "MCR.Solr.UseHttp_1_1";
 
     /**
      * Escapes characters in search values that need to be escaped for SOLR.
