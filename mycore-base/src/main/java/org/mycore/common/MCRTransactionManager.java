@@ -119,13 +119,11 @@ public abstract class MCRTransactionManager {
     /**
      * Begins all available {@link MCRPersistenceTransaction} instances that are active.
      *
-     * <p>It throws an exception if there are already active transactions in the current thread.</p>
-     *
      * <p>If an exception occurs during the transaction begin process, a rollback is attempted
      * for any transactions that were successfully started before the exception.</p>
      *
-     * @throws MCRTransactionException if there are already active transactions, or if an
-     * error occurs while loading or beginning transactions.
+     * @throws MCRTransactionException if there are already active transactions in the current thread, or if an
+     * error occurs while beginning transactions.
      */
     public static void beginTransactions() {
         List<MCRPersistenceTransaction> activeTransactions = getActiveTransactions();
@@ -151,10 +149,6 @@ public abstract class MCRTransactionManager {
 
     /**
      * Begins the specified types of {@link MCRPersistenceTransaction} transactions.
-     *
-     * <p>This method checks whether the specified transactions are already active. If any of the
-     * requested transactions are active, an {@link MCRTransactionException} is thrown. Otherwise,
-     * the transactions are loaded and begun.</p>
      *
      * <p>If an exception occurs during the transaction begin process, a rollback is attempted
      * for any transactions that were successfully started before the exception.
@@ -233,10 +227,6 @@ public abstract class MCRTransactionManager {
     /**
      * Begins the specified list of {@link MCRPersistenceTransaction} transaction classes.
      *
-     * <p>This method first loads all available transactions and attempts to start each of the specified
-     * transaction types. If a transaction of the requested type is not available or cannot be started,
-     * an {@link MCRTransactionException} is thrown.</p>
-     *
      * <p>If an exception occurs during the begin process, the method attempts to rollback all successfully
      * started transactions and collects any rollback failures as suppressed exceptions in the thrown
      * {@link MCRTransactionException}.</p>
@@ -248,19 +238,24 @@ public abstract class MCRTransactionManager {
     private static void beginTransactions(List<Class<? extends MCRPersistenceTransaction>> transactionClasses) {
         List<MCRPersistenceTransaction> activeTransactions;
         List<MCRPersistenceTransaction> availableTransactions;
+        // load transactions
         try {
             activeTransactions = getActiveTransactions();
             availableTransactions = transactionLoader.load();
         } catch (Exception e) {
             throw new MCRTransactionException("Error while beginTransactions " + transactionClasses, e);
         }
+        // check if available
+        List<MCRPersistenceTransaction> transactionsToStart = transactionClasses.stream()
+            .map(transactionClass -> availableTransactions.stream()
+                .filter(transactionClass::isInstance)
+                .findFirst()
+                .orElseThrow(() -> new MCRTransactionException(
+                    "No available transaction of type " + transactionClass.getName())))
+            .toList();
+        // begin
         try {
-            for (Class<? extends MCRPersistenceTransaction> transactionClass : transactionClasses) {
-                MCRPersistenceTransaction transaction = availableTransactions.stream()
-                    .filter(transactionClass::isInstance)
-                    .findFirst()
-                    .orElseThrow(() -> new MCRTransactionException(
-                        "No available transaction of type " + transactionClass.getName()));
+            for (MCRPersistenceTransaction transaction : transactionsToStart) {
                 transaction.begin();
                 activeTransactions.add(transaction);
             }
@@ -341,14 +336,23 @@ public abstract class MCRTransactionManager {
      * @throws MCRTransactionException if any transaction is marked as rollback-only
      */
     private static void commitTransactions(List<? extends MCRPersistenceTransaction> activeTransactions) {
+        // order by priority
         activeTransactions.sort(Comparator.comparingInt(MCRPersistenceTransaction::getCommitPriority).reversed());
+        // check roll back only
+        List<? extends MCRPersistenceTransaction> rollbackOnlyTransactions = getRollbackOnlyTransactions();
+        List<? extends MCRPersistenceTransaction> activeRollbackOnlyTransaction = activeTransactions.stream()
+            .filter(rollbackOnlyTransactions::contains)
+            .toList();
+        if (!activeRollbackOnlyTransaction.isEmpty()) {
+            throwAndRollback(new MCRTransactionException("Error while commitTransaction. Some active transactions are "
+                + "set to rollback only: " + activeRollbackOnlyTransaction.stream()
+                    .map(MCRPersistenceTransaction::getClass)
+                    .map(Class::getSimpleName)
+                    .collect(Collectors.joining(", "))));
+        }
+        // commit
         try {
-            List<MCRPersistenceTransaction> rollbackOnlyTransactions = getRollbackOnlyTransactions();
             for (MCRPersistenceTransaction transaction : activeTransactions) {
-                if (rollbackOnlyTransactions.contains(transaction)) {
-                    throw new MCRTransactionException(
-                        "Transaction " + transaction + " marked as rollback-only. Cannot commit.");
-                }
                 transaction.commit();
                 getActiveTransactions().remove(transaction);
             }

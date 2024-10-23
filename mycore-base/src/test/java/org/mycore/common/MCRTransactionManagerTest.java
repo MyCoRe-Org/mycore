@@ -158,6 +158,28 @@ public class MCRTransactionManagerTest extends MCRTestCase {
     }
 
     @Test
+    public void commitTransactionsWithRollbackOnly() {
+        // Set up the transaction loader with two working transactions
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
+
+        // Begin transactions
+        MCRTransactionManager.beginTransactions();
+        checkCounter(2, 0, 0);
+
+        // Mark one transaction as rollback-only
+        MCRTransactionManager.setRollbackOnly(WorkingTransaction.class);
+
+        // Attempt to commit transactions and expect an exception
+        assertThrows("Commit should fail because WorkingTransaction is marked as rollback-only",
+            MCRTransactionException.class,
+            MCRTransactionManager::commitTransactions);
+
+        // Check that no transactions were committed
+        checkCounter(2, 0, 2);
+    }
+
+    @Test
     public void rollbackTransactions() {
         // rollback single transaction
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
