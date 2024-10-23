@@ -98,7 +98,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         checkable.ifPresent(id -> LogManager.getLogger().info("Checking " + permission + " access on " + id));
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         boolean allowed = checkable
-            .map(id -> aclProvider.checkPermission(id, permission.toString()))
+            .map(id -> aclProvider.checkPermission(id, permission))
             .orElse(true);
         if (allowed) {
             return;
