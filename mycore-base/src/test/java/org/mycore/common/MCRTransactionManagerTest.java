@@ -169,7 +169,7 @@ public class MCRTransactionManagerTest extends MCRTestCase {
 
         // rollback error
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
-                WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnRollbackTransaction.class));
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnRollbackTransaction.class));
         MCRTransactionManager.beginTransactions();
         MCRTransactionException exception = assertThrows("Rollback should fail due to FailOnRollbackTransaction",
             MCRTransactionException.class, MCRTransactionManager::rollbackTransactions);
@@ -192,7 +192,7 @@ public class MCRTransactionManagerTest extends MCRTestCase {
 
         // rollback error
         MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
-                WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnRollbackTransaction.class));
+            WorkingTransaction.class, AnotherWorkingTransaction.class, FailOnRollbackTransaction.class));
         MCRTransactionManager.beginTransactions();
         MCRTransactionException exception = assertThrows("Rollback should fail due to FailOnRollbackTransaction",
             MCRTransactionException.class, () -> MCRTransactionManager.rollbackTransactions(
@@ -247,6 +247,57 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         assertTrue("WorkingTransaction should be ready", MCRTransactionManager.isReady(WorkingTransaction.class));
         assertFalse("NotReadyTransaction should not be ready",
             MCRTransactionManager.isReady(NotReadyTransaction.class));
+    }
+
+    @Test
+    public void listActiveTransactions() {
+        // Set up the transaction loader with two working transactions
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
+
+        // Begin transactions
+        MCRTransactionManager.beginTransactions();
+
+        // Get the list of active transactions
+        List<Class<? extends MCRPersistenceTransaction>> activeTransactions
+            = MCRTransactionManager.listActiveTransactions();
+
+        // Verify that both transactions are in the list
+        assertEquals("There should be two active transactions", 2, activeTransactions.size());
+        assertTrue("Active transactions should contain WorkingTransaction",
+            activeTransactions.contains(WorkingTransaction.class));
+        assertTrue("Active transactions should contain AnotherWorkingTransaction",
+            activeTransactions.contains(AnotherWorkingTransaction.class));
+
+        // Commit transactions
+        MCRTransactionManager.commitTransactions();
+    }
+
+    @Test
+    public void listRollbackOnlyTransactions() {
+        // Set up the transaction loader with two working transactions
+        MCRTransactionManager.setTransactionLoader(new TransactionLoaderMock(
+            WorkingTransaction.class, AnotherWorkingTransaction.class));
+
+        // Begin transactions
+        MCRTransactionManager.beginTransactions();
+
+        // Mark one transaction as rollback-only
+        MCRTransactionManager.setRollbackOnly(WorkingTransaction.class);
+
+        // Get the list of rollback-only transactions
+        List<Class<? extends MCRPersistenceTransaction>> rollbackOnlyTransactions
+            = MCRTransactionManager.listRollbackOnlyTransactions();
+
+        // Verify that only the marked transaction is in the list
+        assertEquals("There should be one rollback-only transaction", 1, rollbackOnlyTransactions.size());
+        assertTrue("Rollback-only transactions should contain WorkingTransaction",
+            rollbackOnlyTransactions.contains(WorkingTransaction.class));
+        assertFalse("Rollback-only transactions should not contain AnotherWorkingTransaction",
+            rollbackOnlyTransactions.contains(AnotherWorkingTransaction.class));
+
+        // Rollback transactions
+        MCRTransactionManager.rollbackTransactions();
     }
 
     @Before

@@ -444,6 +444,30 @@ public abstract class MCRTransactionManager {
     }
 
     /**
+     * Checks if there are any active transactions in the current thread.
+     *
+     * <p>This method verifies whether there are any transactions currently marked
+     * as active for the current thread.</p>
+     *
+     * @return {@code true} if there are active transactions, {@code false} otherwise
+     */
+    public static boolean hasActiveTransactions() {
+        return !getActiveTransactions().isEmpty();
+    }
+
+    /**
+     * Retrieves a list of classes for all active transactions in the current thread. Active transactions
+     * have been started and are pending commit or rollback.
+     *
+     * @return a list of {@link Class} objects representing the active transaction types
+     */
+    public static List<Class<? extends MCRPersistenceTransaction>> listActiveTransactions() {
+        return getActiveTransactions().stream()
+            .map(MCRPersistenceTransaction::getClass)
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Checks if a {@link MCRPersistenceTransaction} of the specified type is active.
      *
      * <p>This method checks the list of active transactions in the current thread to determine if any of them
@@ -454,6 +478,29 @@ public abstract class MCRTransactionManager {
      */
     public static boolean isActive(Class<? extends MCRPersistenceTransaction> transactionClass) {
         return getActiveTransactions().stream().anyMatch(transactionClass::isInstance);
+    }
+
+    /**
+     * Checks if there are any transactions marked as rollback-only in the current thread.
+     *
+     * <p>This method verifies whether there are any transactions that have been
+     * marked as rollback-only for the current thread.</p>
+     *
+     * @return {@code true} if there are rollback-only transactions, {@code false} otherwise
+     */
+    public static boolean hasRollbackOnlyTransactions() {
+        return !getRollbackOnlyTransactions().isEmpty();
+    }
+
+    /**
+     * Retrieves a list of classes for all transactions currently marked as rollback-only.
+     *
+     * @return a list of {@link Class} objects representing the transaction types marked as rollback-only
+     */
+    public static List<Class<? extends MCRPersistenceTransaction>> listRollbackOnlyTransactions() {
+        return getRollbackOnlyTransactions().stream()
+            .map(MCRPersistenceTransaction::getClass)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -552,18 +599,6 @@ public abstract class MCRTransactionManager {
     }
 
     /**
-     * Checks if there are any active transactions in the current thread.
-     *
-     * <p>This method verifies whether there are any transactions currently marked
-     * as active for the current thread.</p>
-     *
-     * @return {@code true} if there are active transactions, {@code false} otherwise
-     */
-    public static boolean hasActiveTransactions() {
-        return !ACTIVE_TRANSACTIONS.get().isEmpty();
-    }
-
-    /**
      * Retrieves the list of transactions that are marked as rollback-only.
      *
      * <p>This method returns the list of transactions that have been marked as rollback-only
@@ -573,18 +608,6 @@ public abstract class MCRTransactionManager {
      */
     private static List<MCRPersistenceTransaction> getRollbackOnlyTransactions() {
         return ROLLBACK_ONLY_TRANSACTIONS.get();
-    }
-
-    /**
-     * Checks if there are any transactions marked as rollback-only in the current thread.
-     *
-     * <p>This method verifies whether there are any transactions that have been
-     * marked as rollback-only for the current thread.</p>
-     *
-     * @return {@code true} if there are rollback-only transactions, {@code false} otherwise
-     */
-    public static boolean hasRollbackOnlyTransactions() {
-        return !ROLLBACK_ONLY_TRANSACTIONS.get().isEmpty();
     }
 
     /**
