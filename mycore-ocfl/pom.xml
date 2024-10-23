@@ -74,9 +74,7 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-base</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
+      <artifactId>mycore-user2</artifactId>
     </dependency>
   </dependencies>
 </project>
