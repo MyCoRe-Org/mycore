@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:classification displayLabel="foo" authority="sdnb">x</mods:classification>
+  <mods:classification displayLabel="foo" authority="sdnb2">x-1</mods:classification>
+  <mods:classification displayLabel="foo" authority="sdnb3">x-1-1</mods:classification>
+  <mods:classification displayLabel="foo" authority="sdnb">y</mods:classification>
+</mods:mods>
