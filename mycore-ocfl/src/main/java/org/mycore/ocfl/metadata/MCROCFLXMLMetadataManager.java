@@ -18,6 +18,11 @@
 
 package org.mycore.ocfl.metadata;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -26,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -84,25 +88,7 @@ import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationL
  */
 public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
-    private static final String MESSAGE_CREATED = "Created";
-
-    private static final String MESSAGE_UPDATED = "Updated";
-
-    private static final String MESSAGE_DELETED = "Deleted";
-
-    private static final Map<String, Character> MESSAGE_TYPE_MAPPING = Collections.unmodifiableMap(Map.ofEntries(
-        Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
-        Map.entry(MESSAGE_UPDATED, MCROCFLMetadataVersion.UPDATED),
-        Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED)));
-
     private String repositoryKey = "Default";
-
-    private static char convertMessageToType(String message) throws MCRPersistenceException {
-        if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
-            throw new MCRPersistenceException("Cannot identify version type from message '" + message + "'");
-        }
-        return MESSAGE_TYPE_MAPPING.get(message);
-    }
 
     public OcflRepository getRepository() {
         return MCROCFLRepositoryProvider.getRepository(getRepositoryKey());

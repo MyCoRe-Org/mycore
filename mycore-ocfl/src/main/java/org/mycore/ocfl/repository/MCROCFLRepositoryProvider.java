@@ -18,10 +18,19 @@
 
 package org.mycore.ocfl.repository;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 
 import io.ocfl.api.OcflRepository;
+import io.ocfl.core.OcflRepositoryBuilder;
 import io.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.core.storage.OcflStorageBuilder;
 
 /**
  * Base Class to provide a {@link OcflRepository}. A {@link MCROCFLRepositoryProvider} will be loaded from the property
@@ -31,12 +40,63 @@ public abstract class MCROCFLRepositoryProvider {
 
     public static final String REPOSITORY_PROPERTY_PREFIX = "MCR.OCFL.Repository.";
 
-    public static OcflRepository getRepository(String id) {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCROCFLRepositoryProvider.class, REPOSITORY_PROPERTY_PREFIX + id).getRepository();
+    protected Path repositoryRoot;
+
+    protected Path workDir;
+
+    protected MCROCFLRepository repository;
+
+    @MCRPostConstruction
+    public void init(String prop) throws IOException {
+        Files.createDirectories(workDir);
+        Files.createDirectories(repositoryRoot);
+        OcflRepositoryBuilder builder = new OcflRepositoryBuilder()
+            .defaultLayoutConfig(getExtensionConfig())
+            .storage(this::getStorage)
+            .workDir(workDir);
+        String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
+        this.repository = new MCROCFLRepository(id, builder.build());
     }
 
-    public abstract OcflRepository getRepository();
+    public MCROCFLRepository getRepository() {
+        return repository;
+    }
+
+    public Path getRepositoryRoot() {
+        return repositoryRoot;
+    }
+
+    public Path getWorkDir() {
+        return workDir;
+    }
+
+    @MCRProperty(name = "RepositoryRoot")
+    public MCROCFLRepositoryProvider setRepositoryRoot(String repositoryRoot) {
+        this.repositoryRoot = Paths.get(repositoryRoot);
+        return this;
+    }
+
+    @MCRProperty(name = "WorkDir")
+    public MCROCFLRepositoryProvider setWorkDir(String workDir) {
+        this.workDir = Paths.get(workDir);
+        return this;
+    }
+
+    public String getConfigurationPrefix() {
+        return REPOSITORY_PROPERTY_PREFIX + repository.getId() + ".";
+    }
+
+    public static MCROCFLRepository getRepository(String id) {
+        return getProvider(id).getRepository();
+    }
+
+    public static MCROCFLRepositoryProvider getProvider(String id) {
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCROCFLRepositoryProvider.class, REPOSITORY_PROPERTY_PREFIX + id);
+    }
 
     public abstract OcflExtensionConfig getExtensionConfig();
+
+    public abstract OcflStorageBuilder getStorage(OcflStorageBuilder storageBuilder);
+
 }
