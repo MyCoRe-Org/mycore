@@ -73,7 +73,6 @@ public class MCRHttpUtils {
      * Hop-by-hop headers are specific to a single transport-level connection and must not be forwarded
      * by intermediaries such as proxies or gateways. This method removes these headers, returning a new
      * {@link HttpHeaders} instance without them.
-     * </p>
      * <p>
      * The hop-by-hop headers are defined in the HTTP specification and include:
      * <ul>
@@ -86,7 +85,6 @@ public class MCRHttpUtils {
      *     <li>Transfer-Encoding</li>
      *     <li>Upgrade</li>
      * </ul>
-     * </p>
      *
      * @param headers The original {@link HttpHeaders} object containing the full set of headers.
      * @return A new {@link HttpHeaders} instance with all hop-by-hop headers removed.
