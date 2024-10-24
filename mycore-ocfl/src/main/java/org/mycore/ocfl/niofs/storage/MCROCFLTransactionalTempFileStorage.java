@@ -19,6 +19,7 @@
 package org.mycore.ocfl.niofs.storage;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
@@ -49,6 +50,18 @@ public interface MCROCFLTransactionalTempFileStorage extends MCROCFLTempFileStor
      */
     default Path toPhysicalPath(MCROCFLFileSystemTransaction transaction) {
         return this.getRoot().resolve(transaction.getId().toString());
+    }
+
+    /**
+     * Clears the transactional directory.
+     *
+     * @throws IOException if an I/O error occurs during the purge.
+     */
+    default void clearTransactional() throws IOException {
+        Path root = getRoot();
+        if (Files.isDirectory(root)) {
+            FileUtils.cleanDirectory(root.toFile());
+        }
     }
 
 }
