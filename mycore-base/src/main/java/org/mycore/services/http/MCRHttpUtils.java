@@ -19,16 +19,28 @@
 package org.mycore.services.http;
 
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Executors;
 
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRHttpUtils {
+    private static final Set<String> HOP_BY_HOP_HEADERS;
+    static {
+        Set<String> hopHeaders = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        hopHeaders.addAll(Set.of(
+            "Connection", "Proxy-Connection", "Keep-Alive", "Proxy-Authenticate", "Proxy-Authorization",
+            "TE", "Trailers", "Transfer-Encoding", "Upgrade"));
+        HOP_BY_HOP_HEADERS = Collections.unmodifiableSet(hopHeaders);
+    }
 
     public static HttpClient getHttpClient() {
         //setup http client
@@ -53,5 +65,34 @@ public class MCRHttpUtils {
     // Utility method to map status codes to reason phrases
     public static Optional<String> getReasonPhrase(int statusCode) {
         return MCRHttpStatus.resolve(statusCode).map(MCRHttpStatus::getReasonPhrase);
+    }
+
+    /**
+     * Filters out hop-by-hop HTTP headers from the provided {@link HttpHeaders} object.
+     * <p>
+     * Hop-by-hop headers are specific to a single transport-level connection and must not be forwarded
+     * by intermediaries such as proxies or gateways. This method removes these headers, returning a new
+     * {@link HttpHeaders} instance without them.
+     * </p>
+     * <p>
+     * The hop-by-hop headers are defined in the HTTP specification and include:
+     * <ul>
+     *     <li>Connection</li>
+     *     <li>Keep-Alive</li>
+     *     <li>Proxy-Authenticate</li>
+     *     <li>Proxy-Authorization</li>
+     *     <li>TE</li>
+     *     <li>Trailer</li>
+     *     <li>Transfer-Encoding</li>
+     *     <li>Upgrade</li>
+     * </ul>
+     * </p>
+     *
+     * @param headers The original {@link HttpHeaders} object containing the full set of headers.
+     * @return A new {@link HttpHeaders} instance with all hop-by-hop headers removed.
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.connection">RFC 9110: Connection Header Field</a>
+     */
+    public static HttpHeaders filterHopByHop(HttpHeaders headers) {
+        return HttpHeaders.of(headers.map(), (name, value) -> !HOP_BY_HOP_HEADERS.contains(name));
     }
 }
