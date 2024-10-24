@@ -18,27 +18,26 @@
 
 package org.mycore.ocfl.commands;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import io.ocfl.api.OcflRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
 import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
-import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
+
+import io.ocfl.api.OcflRepository;
 
 /**
  * All OCFL commands utilizing RegEx for bulk operations
@@ -204,7 +203,7 @@ public class MCROCFLRegexCommands {
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                MCROCFLXMLClassificationManager.MESSAGE_DELETED))
+                MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .filter(obj -> obj.matches(regex))
             .map(id -> buildPurgeCommand("classification", id))
@@ -218,7 +217,7 @@ public class MCROCFLRegexCommands {
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                MCROCFLXMLUserManager.MESSAGE_DELETED))
+                MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .filter(obj -> obj.matches(regex))
             .map(id -> buildPurgeCommand("user", id))
@@ -263,7 +262,7 @@ public class MCROCFLRegexCommands {
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                MCROCFLXMLClassificationManager.MESSAGE_DELETED))
+                MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .filter(obj -> obj.matches(regex))
             .map(id -> buildRestoreCommand("classification", id,
@@ -278,7 +277,7 @@ public class MCROCFLRegexCommands {
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                MCROCFLXMLUserManager.MESSAGE_DELETED))
+                MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .filter(obj -> obj.matches(regex))
             .map(id -> buildRestoreCommand("user", id,

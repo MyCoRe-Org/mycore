@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl.commands;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -391,7 +393,7 @@ public class MCROCFLCommands {
         repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                MCROCFLXMLClassificationManager.MESSAGE_DELETED))
+                MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .forEach(cId -> manager.purge(MCRCategoryID.fromString(cId)));
         confirmPurgeMarked = false;
@@ -411,7 +413,7 @@ public class MCROCFLCommands {
         repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                MCROCFLXMLUserManager.MESSAGE_DELETED))
+                MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .forEach(u -> new MCROCFLXMLUserManager().purgeUser(u));
         confirmPurgeMarked = false;
@@ -519,7 +521,7 @@ public class MCROCFLCommands {
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(
                 obj -> !Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                    MCROCFLXMLClassificationManager.MESSAGE_DELETED))
+                    MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .filter(Predicate.not(classDAOList::contains))
             .collect(Collectors.toList());
@@ -535,7 +537,7 @@ public class MCROCFLCommands {
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
             .filter(
                 obj -> !Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
-                    MCROCFLXMLUserManager.MESSAGE_DELETED))
+                    MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .filter(Predicate.not(userEMList::contains))
             .collect(Collectors.toList());
