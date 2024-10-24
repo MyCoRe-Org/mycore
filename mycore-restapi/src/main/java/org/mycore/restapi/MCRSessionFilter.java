@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -155,12 +155,12 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             try {
-                if (MCRTransactionHelper.isTransactionActive()) {
+                if (MCRTransactionManager.hasActiveTransactions()) {
                     LOGGER.debug("Active MCRSession and JPA-Transaction found. Clearing up");
-                    if (MCRTransactionHelper.transactionRequiresRollback()) {
-                        MCRTransactionHelper.rollbackTransaction();
+                    if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+                        MCRTransactionManager.rollbackTransactions();
                     } else {
-                        MCRTransactionHelper.commitTransaction();
+                        MCRTransactionManager.commitTransactions();
                     }
                 } else {
                     LOGGER.debug("Active MCRSession found. Clearing up");
@@ -183,7 +183,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         MCRSessionMgr.unlock();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession(); //bind to this request
         currentSession.setCurrentIP(MCRFrontendUtil.getRemoteAddr(httpServletRequest));
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         //3 cases for authentication
         String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         //1. no authentication

@@ -407,7 +407,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
      */
     @Deprecated
     public void beginTransaction() {
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
     }
 
     /**
@@ -416,7 +416,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
      */
     @Deprecated
     public boolean transactionRequiresRollback() {
-        return MCRTransactionHelper.transactionRequiresRollback();
+        return MCRTransactionManager.hasRollbackOnlyTransactions();
     }
 
     /**
@@ -424,7 +424,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
      */
     @Deprecated
     public void commitTransaction() {
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 
     /**
@@ -433,7 +433,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
      */
     @Deprecated
     public void rollbackTransaction() {
-        MCRTransactionHelper.rollbackTransaction();
+        MCRTransactionManager.rollbackTransactions();
     }
 
     /**
@@ -443,7 +443,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
      */
     @Deprecated
     public boolean isTransactionActive() {
-        return MCRTransactionHelper.isTransactionActive();
+        return MCRTransactionManager.hasActiveTransactions();
     }
 
     public StackTraceElement[] getConstructingStackTrace() {

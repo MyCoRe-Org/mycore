@@ -35,7 +35,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
@@ -218,16 +218,16 @@ public class MCRErrorServlet extends HttpServlet {
             try {
                 MCRSessionMgr.unlock();
                 session = MCRSessionMgr.getCurrentSession();
-                boolean openTransaction = MCRTransactionHelper.isTransactionActive();
+                boolean openTransaction = MCRTransactionManager.hasActiveTransactions();
                 if (!openTransaction) {
-                    MCRTransactionHelper.beginTransaction();
+                    MCRTransactionManager.beginTransactions();
                 }
                 try {
                     setWebAppBaseURL(session, request);
                     LAYOUT_SERVICE.doLayout(request, response, new MCRJDOMContent(errorDoc));
                 } finally {
                     if (!openTransaction) {
-                        MCRTransactionHelper.commitTransaction();
+                        MCRTransactionManager.commitTransactions();
                     }
                 }
             } finally {

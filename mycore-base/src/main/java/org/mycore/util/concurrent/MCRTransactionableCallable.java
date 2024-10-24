@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 /**
  * Encapsulates a {@link Callable} with a mycore session and a database transaction.
@@ -80,15 +80,15 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
         SessionType type = typedSession.type();
         onBeforeTransaction(session, type);
         try {
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
             return this.callable.call();
         } finally {
             try {
-                MCRTransactionHelper.commitTransaction();
+                MCRTransactionManager.commitTransactions();
             } catch (Exception commitException) {
                 LOGGER.error("Error while committing transaction.", commitException);
                 try {
-                    MCRTransactionHelper.rollbackTransaction();
+                    MCRTransactionManager.rollbackTransactions();
                 } catch (Exception rollbackException) {
                     LOGGER.error("Error while rolling back transaction.", rollbackException);
                 }

@@ -37,7 +37,7 @@ import java.util.Iterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSeekableChannelContent;
 
@@ -309,7 +309,7 @@ final class ContentUtils {
      */
     static void endCurrentTransaction() {
         if (!MCRSessionMgr.isLocked() && MCRSessionMgr.hasCurrentSession()) {
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
         }
     }
 

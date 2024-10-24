@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 
@@ -49,12 +49,12 @@ public class MCRSwordServlet extends HttpServlet {
             session.getUserInformation().getUserID());
         MCRFrontendUtil.configureSession(session, req, resp);
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
     }
 
     protected void afterRequest(HttpServletRequest req, HttpServletResponse resp) {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         MCRSessionMgr.releaseCurrentSession();
     }
 

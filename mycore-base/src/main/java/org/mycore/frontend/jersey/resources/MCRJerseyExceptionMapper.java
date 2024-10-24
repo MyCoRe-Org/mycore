@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.frontend.servlets.MCRErrorServlet;
@@ -77,12 +77,12 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         } else {
             LOGGER.warn(() -> "Error while processing request " + uriInfo.getRequestUri(), exc);
         }
-        MCRTransactionHelper.setRollbackOnly();
+        MCRTransactionManager.setRollbackOnly();
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
-            if (!MCRSessionMgr.isLocked() && !MCRTransactionHelper.isTransactionActive()) {
+            if (!MCRSessionMgr.isLocked() && !MCRTransactionManager.hasActiveTransactions()) {
                 MCRSessionMgr.getCurrentSession();
-                MCRTransactionHelper.beginTransaction();
+                MCRTransactionManager.beginTransactions();
             }
             try {
                 int status = response.getStatus();
@@ -99,7 +99,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
                 return Response.status(Status.INTERNAL_SERVER_ERROR).entity(transformException).build();
             } finally {
                 if (!MCRSessionMgr.isLocked()) {
-                    MCRTransactionHelper.commitTransaction();
+                    MCRTransactionManager.commitTransactions();
                 }
             }
         }

@@ -21,7 +21,7 @@ package org.mycore.restapi;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -42,20 +42,20 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
             return;
         }
         MCRSessionMgr.getCurrentSession();
-        if (MCRTransactionHelper.isTransactionActive()) {
+        if (MCRTransactionManager.hasActiveTransactions()) {
             LOGGER.debug("Filter scoped JPA transaction is active.");
-            if (MCRTransactionHelper.transactionRequiresRollback()) {
+            if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
                 try {
-                    MCRTransactionHelper.rollbackTransaction();
+                    MCRTransactionManager.rollbackTransactions();
                 } finally {
                     throw new InternalServerErrorException("Transaction rollback was required.");
                 }
             }
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
         }
         if (Boolean.TRUE.equals(requestContext.getProperty(PROP_REQUIRE_TRANSACTION))) {
             LOGGER.debug("Starting user JPA transaction.");
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
         }
     }
 }

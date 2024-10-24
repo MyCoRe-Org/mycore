@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -188,7 +188,7 @@ public class MCRMETSServlet extends MCRServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRPath metsPath = MCRPath.getPath(ownerID, "/mets.xml");
         try {
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
             try {
                 if (Files.exists(metsPath)) {
                     return Files.getLastModifiedTime(metsPath).toMillis();
@@ -200,7 +200,7 @@ public class MCRMETSServlet extends MCRServlet {
             }
             return -1L;
         } finally {
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
             MCRSessionMgr.releaseCurrentSession();
             session.close(); // just created session for db transaction
         }

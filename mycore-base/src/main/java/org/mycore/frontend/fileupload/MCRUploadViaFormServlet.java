@@ -28,7 +28,7 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
@@ -91,7 +91,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         int numFiles = (int) files.stream().map(Part::getSubmittedFileName).filter(Objects::nonNull).count();
         LOGGER.info("UploadHandler uploading {} file(s)", numFiles);
         handler.startUpload(numFiles);
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         for (Part file : files) {
             try {
@@ -101,7 +101,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
             }
         }
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
     }
 
     private void handleUploadedFile(MCRUploadHandler handler, Part file) throws Exception {

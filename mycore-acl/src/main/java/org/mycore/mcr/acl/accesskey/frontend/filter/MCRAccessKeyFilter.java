@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -71,7 +71,7 @@ public class MCRAccessKeyFilter implements Filter {
                         MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, value);
                     } catch (Exception e) {
                         LOGGER.debug("Cannot set access key to session", e);
-                        MCRTransactionHelper.rollbackTransaction();
+                        MCRTransactionManager.rollbackTransactions();
                     } finally {
                         MCRServlet.cleanupMCRSession(httpServletRequest, getFilterName());
                         httpServletRequest.removeAttribute(MCRServlet.CURRENT_THREAD_NAME_KEY);

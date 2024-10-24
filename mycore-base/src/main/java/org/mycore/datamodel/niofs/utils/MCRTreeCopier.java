@@ -34,7 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityTransaction;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 /**
  * Simple {@link FileVisitor} that recursive copies a directory
@@ -105,8 +105,8 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 newTarget= target;
             }
             if (restartDatabaseTransaction && MCRSessionMgr.hasCurrentSession()) {
-                MCRTransactionHelper.commitTransaction(MCREntityTransaction.class);
-                MCRTransactionHelper.beginTransaction(MCREntityTransaction.class);
+                MCRTransactionManager.commitTransactions(MCREntityTransaction.class);
+                MCRTransactionManager.beginTransactions(MCREntityTransaction.class);
             }
             Files.copy(source, newTarget, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {
