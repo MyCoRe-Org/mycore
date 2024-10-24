@@ -167,6 +167,39 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
+    public void testIsAdded() {
+        // test existing
+        assertFalse(fileTracker.isAdded("path1"));
+        // test new
+        fileTracker.write("path5");
+        assertTrue(fileTracker.isAdded("path5"));
+        // test delete
+        fileTracker.delete("path2");
+        assertFalse(fileTracker.isAdded("path2"));
+        // test add deleted again
+        fileTracker.write("path2");
+        assertFalse(fileTracker.isAdded("path2"));
+    }
+
+    @Test
+    public void testIsAddedOrModified() {
+        // Test for added path
+        fileTracker.write("path5");
+        assertTrue(fileTracker.isAddedOrModified("path5"));
+        // Test for modified path (existing path with different digest)
+        fileTracker.write("path1", "new_digest");
+        assertTrue(fileTracker.isAddedOrModified("path1"));
+        // Test for unchanged path (existing path with same digest)
+        assertFalse(fileTracker.isAddedOrModified("path2"));
+        // Test for deleted path (should return false as it's not added or modified)
+        fileTracker.delete("path2");
+        assertFalse(fileTracker.isAddedOrModified("path2"));
+        // Test add deleted again
+        fileTracker.write("path2", "new_digest");
+        assertFalse(fileTracker.isAddedOrModified(DATA.get("path2")));
+    }
+
+    @Test
     public void testDigest() {
         // existing path
         assertEquals(DATA.get("path1"), fileTracker.getDigest("path1"));
