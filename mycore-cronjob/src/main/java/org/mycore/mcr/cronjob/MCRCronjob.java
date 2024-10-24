@@ -75,10 +75,14 @@ public abstract class MCRCronjob implements Runnable {
     @MCRPostConstruction
     public void checkConfiguration(String property) {
         setID(property.substring(MCRCronjobManager.JOBS_CONFIG_PREFIX.length()));
-        this.processable = new MCRAbstractProcessable();
+        this.processable = new CronJobProcessable();
         this.processable.setStatus(MCRProcessableStatus.created);
         this.processable.setName(getClass().getSimpleName() + " - " + getDescription());
         this.processable.setProgressText("Wait for " + getCronDescription() + "..");
+        this.processable.getProperties().put("Cron", this.cron.asString());
+        this.processable.getProperties().put("Enabled", this.enabled);
+        this.processable.getProperties().put("Contexts", this.contexts);
+        this.processable.getProperties().put("CronType", this.cronType);
     }
 
     /**
@@ -190,11 +194,11 @@ public abstract class MCRCronjob implements Runnable {
     public abstract String getDescription();
 
     public enum Context {
-
         WEBAPP,
-
         CLI
+    }
 
+    private static class CronJobProcessable extends MCRAbstractProcessable {
     }
 
 }

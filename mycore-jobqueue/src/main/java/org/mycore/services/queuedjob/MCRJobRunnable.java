@@ -72,6 +72,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
         MCRJobConfig config,
         List<MCRJobStatusListener> additionalListeners,
         MCRJobAction actionInstance) {
+        super();
         this.job = job;
         this.config = config;
         this.actionInstance = actionInstance;
@@ -79,9 +80,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
             config.jobStatusListeners(job.getAction()))
             .flatMap(List::stream).toList();
         setName(this.job.getId() + " - " + this.job.getAction().getSimpleName());
-        setStatus(MCRProcessableStatus.created);
         job.getParameters().forEach((k, v) -> this.getProperties().put(k, v));
-
     }
 
     public void run() {

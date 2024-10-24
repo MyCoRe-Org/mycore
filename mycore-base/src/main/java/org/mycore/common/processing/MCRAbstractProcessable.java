@@ -40,7 +40,7 @@ import org.mycore.common.MCRSessionMgr;
  * 
  * @author Matthias Eichner
  */
-public class MCRAbstractProcessable extends MCRAbstractProgressable implements MCRProcessable {
+public abstract class MCRAbstractProcessable extends MCRAbstractProgressable implements MCRProcessable {
 
     protected String name;
 
@@ -62,35 +62,31 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
 
     public MCRAbstractProcessable() {
         super();
-        this.name = null;
         if (MCRSessionMgr.hasCurrentSession()) {
             // do not create a new session! (getCurrentSession() is wrong named!)
             this.userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         }
         this.status = MCRProcessableStatus.created;
-        this.error = null;
-
         this.createTime = Instant.now();
-        this.startTime = null;
-        this.endTime = null;
-
         this.properties = new HashMap<>();
-
         this.statusListener = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
-     * Sets the name for this process.
-     * 
-     * @param name human readable name
+     * Returns the human-readable name for this process.
      */
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @Override
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Sets the name for this process.
+     *
+     * @param name human-readable name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

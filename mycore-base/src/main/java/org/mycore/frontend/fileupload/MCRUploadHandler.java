@@ -49,10 +49,10 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
 
     /** Creates a new upload handler and registers it at the handler manager * */
     protected MCRUploadHandler() {
+        super();
         if (MCRWebsiteWriteProtection.isActive()) {
             throw new MCRException("System is currently in read-only mode");
         }
-
         uploadID = Long.toString(System.currentTimeMillis(), 36);
         MCRUploadHandlerManager.register(this);
         this.setName(uploadID);
