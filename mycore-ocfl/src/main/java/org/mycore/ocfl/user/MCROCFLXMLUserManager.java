@@ -18,11 +18,16 @@
 
 package org.mycore.ocfl.user;
 
-import io.ocfl.api.OcflOption;
-import io.ocfl.api.OcflRepository;
-import io.ocfl.api.exception.OverwriteException;
-import io.ocfl.api.model.ObjectVersionId;
-import io.ocfl.api.model.VersionInfo;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -41,11 +46,11 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.utils.MCRUserTransformer;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Optional;
+import io.ocfl.api.OcflOption;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.api.exception.OverwriteException;
+import io.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.model.VersionInfo;
 
 /**
  * XML Manager to handle MCRUsers in a MyCoRe OCFL Repository
@@ -55,12 +60,6 @@ import java.util.Optional;
 public class MCROCFLXMLUserManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    public static final String MESSAGE_CREATED = "Created";
-
-    public static final String MESSAGE_UPDATED = "Updated";
-
-    public static final String MESSAGE_DELETED = "Deleted";
 
     private static final String IGNORING_TRANSIENT_USER = "Got TransientUser, ignoring...";
 
