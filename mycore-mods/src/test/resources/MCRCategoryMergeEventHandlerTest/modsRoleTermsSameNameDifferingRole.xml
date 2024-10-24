@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <mods:name type="personal" xlink:type="simple">
+    <mods:role>
+      <mods:roleTerm authority="marcrelator" type="code">x</mods:roleTerm>
+    </mods:role>
+    <mods:role>
+      <mods:roleTerm authority="marcrelator" type="code">x-1</mods:roleTerm>
+    </mods:role>
+    <mods:role>
+      <mods:roleTerm authority="marcrelator" type="code">x-1-1</mods:roleTerm>
+    </mods:role>
+    <mods:role>
+      <mods:roleTerm authority="marcrelator" type="code">y</mods:roleTerm>
+    </mods:role>
+    <mods:displayForm>foo</mods:displayForm>
+  </mods:name>
+</mods:mods>
