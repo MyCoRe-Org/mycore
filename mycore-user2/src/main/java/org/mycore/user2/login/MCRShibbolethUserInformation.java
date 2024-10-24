@@ -82,7 +82,7 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     @Override
     public String getUserAttribute(String attribute) {
         return switch (attribute) {
-            case MCRUserInformation.ATT_REAL_NAME -> this.realName;
+            case ATT_REAL_NAME -> this.realName;
             case MCRRealm.USER_INFORMATION_ATTR -> this.realmId;
             default -> Optional.ofNullable(attributes.get(attribute))
                 .map(Object::toString)
