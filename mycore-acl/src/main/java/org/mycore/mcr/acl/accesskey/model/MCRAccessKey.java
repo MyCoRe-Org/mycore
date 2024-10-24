@@ -19,6 +19,7 @@
 package org.mycore.mcr.acl.accesskey.model;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -47,11 +48,11 @@ import jakarta.persistence.Transient;
     @NamedQuery(name = "MCRAccessKey.getWithSecret",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.secret = :secret AND k.reference = :objectId"),
+            + "  WHERE k.value = :secret AND k.reference = :objectId"),
     @NamedQuery(name = "MCRAccessKey.getWithType",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.type = :type AND k.reference = :objectId"),
+            + "  WHERE k.permission = :type AND k.reference = :objectId"),
     @NamedQuery(name = "MCRAccessKey.clearWithObjectId",
         query = "DELETE"
             + "  FROM MCRAccessKey k"
@@ -78,10 +79,10 @@ public class MCRAccessKey {
     private String reference;
 
     /** The secret */
-    private String secret;
+    private String value;
 
     /** The permission type */
-    private String type;
+    private String permission;
 
     /** The status */
     private Boolean isActive;
@@ -106,7 +107,7 @@ public class MCRAccessKey {
 
     private UUID uuid;
 
-    protected MCRAccessKey() {
+    public MCRAccessKey() {
     }
 
     /**
@@ -117,8 +118,21 @@ public class MCRAccessKey {
      */
     public MCRAccessKey(final String secret, final String type) {
         this();
-        setSecret(secret);
-        setType(type);
+        setValue(secret);
+        setPermission(type);
+    }
+
+    /**
+     * Constructs an access key with reference, permission and value.
+     *
+     * @param reference the reference
+     * @param permission the permission
+     * @param value the value
+     */
+    public MCRAccessKey(String reference, String permission, String value) {
+        setReference(reference);
+        setPermission(permission);
+        setValue(value);
     }
 
     /**
@@ -197,8 +211,7 @@ public class MCRAccessKey {
     @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "accesskey_id",
-        nullable = false)
+    @Column(name = "accesskey_id", nullable = false)
     public Long getId() {
         return id;
     }
@@ -213,40 +226,78 @@ public class MCRAccessKey {
     /**
      * @return the key secret
      */
-    @Column(name = "secret",
-        nullable = false)
+    @Transient
     public String getSecret() {
-        return secret;
+        return value;
     }
 
     /**
      * @param secret key secret
      */
-    public void setSecret(final String secret) {
-        this.secret = secret;
+    public void setSecret(String secret) {
+        value = secret;
+    }
+
+    /**
+     * Returns the value.
+     *
+     * @return the value
+     */
+    @Column(name = "secret", nullable = false)
+    @JsonIgnore
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Sets the value.
+     *
+     * @param value the value
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 
     /**
      * @return permission type
      */
-    @Column(name = "type",
-        nullable = false)
+
+    @Transient
     public String getType() {
-        return type;
+        return permission;
     }
 
     /**
      * @param type permission type
      */
     public void setType(String type) {
-        this.type = type;
+        permission = type;
+    }
+
+    /**
+     * Returns the permission.
+     *
+     * @return the permission
+     */
+    @Column(name = "type", nullable = false)
+    @JsonIgnore
+    public String getPermission() {
+        return permission;
+    }
+
+    /**
+     * Sets the permission.
+     *
+     * @param permission the permission
+     */
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 
     /**
      * @return active or not
      */
-    @Column(name = "isActive",
-        nullable = false)
+    @Column(name = "isActive", nullable = false)
     public Boolean getIsActive() {
         return isActive;
     }
@@ -351,6 +402,11 @@ public class MCRAccessKey {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(id, value, reference);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -358,8 +414,8 @@ public class MCRAccessKey {
         if (!(o instanceof MCRAccessKey other)) {
             return false;
         }
-        return id.equals(other.getId()) && this.type.equals(other.getType())
-            && secret.equals(other.getSecret());
+        return id.equals(other.getId()) && reference.equals(other.getReference())
+            && value.equals(other.getValue());
     }
 
 }
