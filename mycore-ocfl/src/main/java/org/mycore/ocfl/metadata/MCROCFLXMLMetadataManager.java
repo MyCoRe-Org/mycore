@@ -18,18 +18,30 @@
 
 package org.mycore.ocfl.metadata;
 
-import io.ocfl.api.OcflOption;
-import io.ocfl.api.OcflRepository;
-import io.ocfl.api.exception.NotFoundException;
-import io.ocfl.api.exception.OverwriteException;
-import io.ocfl.api.model.ObjectVersionId;
-import io.ocfl.api.model.OcflObjectVersion;
-import io.ocfl.api.model.VersionDetails;
-import io.ocfl.api.model.VersionInfo;
-import io.ocfl.api.model.VersionNum;
-import io.ocfl.core.extension.OcflExtensionConfig;
-import io.ocfl.core.extension.storage.layout.HashedNTupleIdEncapsulationLayoutExtension;
-import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.ZoneOffset;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
@@ -57,25 +69,18 @@ import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.ZoneOffset;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import io.ocfl.api.OcflOption;
+import io.ocfl.api.OcflRepository;
+import io.ocfl.api.exception.NotFoundException;
+import io.ocfl.api.exception.OverwriteException;
+import io.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.VersionDetails;
+import io.ocfl.api.model.VersionInfo;
+import io.ocfl.api.model.VersionNum;
+import io.ocfl.core.extension.OcflExtensionConfig;
+import io.ocfl.core.extension.storage.layout.HashedNTupleIdEncapsulationLayoutExtension;
+import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata. Provides
@@ -83,25 +88,7 @@ import java.util.stream.Stream;
  */
 public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
-    private static final String MESSAGE_CREATED = "Created";
-
-    private static final String MESSAGE_UPDATED = "Updated";
-
-    private static final String MESSAGE_DELETED = "Deleted";
-
-    private static final Map<String, Character> MESSAGE_TYPE_MAPPING = Collections.unmodifiableMap(Map.ofEntries(
-        Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
-        Map.entry(MESSAGE_UPDATED, MCROCFLMetadataVersion.UPDATED),
-        Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED)));
-
     private String repositoryKey = "Default";
-
-    private static char convertMessageToType(String message) throws MCRPersistenceException {
-        if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
-            throw new MCRPersistenceException("Cannot identify version type from message '" + message + "'");
-        }
-        return MESSAGE_TYPE_MAPPING.get(message);
-    }
 
     public OcflRepository getRepository() {
         return MCROCFLRepositoryProvider.getRepository(getRepositoryKey());

@@ -162,7 +162,16 @@ public class MCROCFLFileTracker<P, D> {
         return findPath(path) != null;
     }
 
-    // TODO javadoc & junit tests
+    /**
+     * Checks if a path has been newly added to the tracker.
+     * <p>
+     * A path is considered added if it exists in the current state of the tracker but
+     * was not part of the original tracked paths.
+     * </p>
+     *
+     * @param path the path to check.
+     * @return {@code true} if the path was added, {@code false} otherwise.
+     */
     public boolean isAdded(P path) {
         boolean existsNow = exists(path);
         boolean existsInOriginal = this.originalPaths.containsKey(path);
