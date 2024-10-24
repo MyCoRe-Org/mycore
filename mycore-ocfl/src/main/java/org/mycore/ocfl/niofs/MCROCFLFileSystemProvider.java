@@ -98,6 +98,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
             this.localStorage = MCRConfiguration2
                 .getSingleInstanceOfOrThrow(MCROCFLTransactionalTempFileStorage.class, tempFileClassProperty);
             Files.createDirectories(this.localStorage.getRoot());
+            this.localStorage.clearTransactional();
             boolean remote = MCRConfiguration2.getBoolean(configurationPrefix + "FS.Remote")
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(configurationPrefix + "FS.Remote"));
             this.virtualObjectProvider

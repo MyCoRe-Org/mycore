@@ -222,6 +222,14 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      * {@inheritDoc}
      */
     @Override
+    public void clearTransactional() throws IOException {
+        this.transactionalStorage.clearTransactional();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void create(String owner, String version) throws IOException {
         if (MCROCFLFileSystemTransaction.get().isActive()) {
             this.transactionalStorage.create(owner, version);

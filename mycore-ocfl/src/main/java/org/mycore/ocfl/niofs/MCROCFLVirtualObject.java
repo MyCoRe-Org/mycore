@@ -18,6 +18,9 @@
 
 package org.mycore.ocfl.niofs;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -848,8 +851,7 @@ public abstract class MCROCFLVirtualObject {
             return true;
         }
         // persist
-        // TODO org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager#MESSAGE_CREATED
-        String type = this.objectVersion == null ? "Created" : "Updated";
+        String type = this.objectVersion == null ? MESSAGE_CREATED : MESSAGE_UPDATED;
         AtomicBoolean updatedFiles = new AtomicBoolean(false);
         AtomicBoolean updatedDirectories = new AtomicBoolean(false);
         // TODO property?
