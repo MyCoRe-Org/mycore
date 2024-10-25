@@ -100,7 +100,7 @@ import jakarta.ws.rs.core.UriInfo;
 public class MCRRestAPIObjectsHelper {
     private enum Mode {
         MCROBJECT, MCRDERIVATE
-    };
+    }
 
     private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
 
