@@ -430,7 +430,7 @@ public class MCRRestAPIClassifications {
         if (FORMAT_XML.equals(format)) {
             String xml;
             try {
-                xml = writeXML(rootElement, style);
+                xml = writeXML(rootElement, lang);
             } catch (IOException e) {
                 throw new XMLParseException("failed to create xml response");
             }
