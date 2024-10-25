@@ -134,7 +134,7 @@ public class MCRRestAPIClassifications {
             writer.name("labels").beginArray();
             for (Element eLabel : e.getChildren("label")) {
                 if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writeCategoryAttributesToJson(writer, eLabel);
+                    writeLabelAttributesToJson(writer, eLabel);
                 }
             }
             writer.endArray();
@@ -147,7 +147,7 @@ public class MCRRestAPIClassifications {
         writer.endArray();
     }
 
-    private static void writeCategoryAttributesToJson(JsonWriter writer, Element element) throws IOException {
+    private static void writeLabelAttributesToJson(JsonWriter writer, Element element) throws IOException {
         writer.beginObject();
         writer.name("lang").value(element.getAttributeValue("lang", Namespace.XML_NAMESPACE));
         writer.name("text").value(element.getAttributeValue("text"));
@@ -480,7 +480,7 @@ public class MCRRestAPIClassifications {
             writer.beginArray();
             for (Element eLabel : eRoot.getChildren("label")) {
                 if (lang==null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writeCategoryAttributesToJson(writer, eRoot);
+                    writeLabelAttributesToJson(writer, eRoot);
                 }
             }
             writer.endArray();
