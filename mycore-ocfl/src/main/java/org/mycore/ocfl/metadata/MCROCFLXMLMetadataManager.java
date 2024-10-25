@@ -502,12 +502,12 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
         try {
             return ids.stream()
+                .map(this::getOCFLObjectID)
                 .filter(this::isMetadata)
                 .filter(this::isNotDeleted)
-                .map(this::removePrefix)
-                .map(id -> {
+                .map(ocflId -> {
                     try {
-                        return new MCRObjectIDDateImpl(new Date(getLastModified(getOCFLObjectID(id))), id);
+                        return new MCRObjectIDDateImpl(new Date(getLastModified(ocflId)), removePrefix(ocflId));
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
