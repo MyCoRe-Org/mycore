@@ -566,10 +566,14 @@ public class MCRRestAPIObjectsHelper {
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
                     writer.name("metadata").value(der.getDerivate().getMetaLink().getXLinkHref());
                     if (!der.getDerivate().getClassifications().isEmpty()) {
-                        String classifications = der.getDerivate().getClassifications().stream()
+                        List<String> classifications = der.getDerivate().getClassifications().stream()
                             .map(cl -> cl.getClassId() + ":" + cl.getCategId())
-                            .collect(Collectors.joining(" "));
-                        writer.name("classifications").value(classifications);
+                            .collect(Collectors.toList());
+                        writer.name("classifications").beginArray();
+                        for (String c : classifications) {
+                            writer.value(c);
+                        }
+                        writer.endArray();
                     }
                 }
                 writer.endObject();
