@@ -134,7 +134,7 @@ public class MCRRestAPIClassifications {
             writer.name("labels").beginArray();
             for (Element eLabel : e.getChildren("label")) {
                 if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writeElementAttributesToJson(writer, eLabel);
+                    writeCategoryAttributesToJson(writer, eLabel);
                 }
             }
             writer.endArray();
@@ -147,7 +147,7 @@ public class MCRRestAPIClassifications {
         writer.endArray();
     }
 
-    private static void writeElementAttributesToJson(JsonWriter writer, Element element) throws IOException {
+    private static void writeCategoryAttributesToJson(JsonWriter writer, Element element) throws IOException {
         writer.beginObject();
         writer.name("lang").value(element.getAttributeValue("lang", Namespace.XML_NAMESPACE));
         writer.name("text").value(element.getAttributeValue("text"));
@@ -453,12 +453,12 @@ public class MCRRestAPIClassifications {
     private String writeJSON(Element eRoot, String lang, String style) throws IOException {
         StringWriter sw = new StringWriter();
         JsonWriter writer = new JsonWriter(sw);
-        String finalLang = (lang != null) ? lang : "de";
 
         writer.setIndent("  ");
 
         Element categoriesElement = eRoot.getChild("categories");
         if (style.contains("checkboxtree")) {
+            String finalLang = (lang != null) ? lang : "de";
             writer.beginObject();
             writer.name("identifier").value(eRoot.getAttributeValue("ID"));
             for (Element eLabel : eRoot.getChildren("label")) {
@@ -470,24 +470,24 @@ public class MCRRestAPIClassifications {
             writeChildrenAsJSONCBTree(categoriesElement, writer, finalLang, style.contains("checked"));
             writer.endObject();
         } else if (style.contains("jstree")) {
+            String finalLang = (lang != null) ? lang : "de";
             writeChildrenAsJSONJSTree(categoriesElement, writer, finalLang, style.contains("opened"),
                 style.contains("disabled"), style.contains("selected"));
-
         } else {
             writer.beginObject(); // {
             writer.name("ID").value(eRoot.getAttributeValue("ID"));
             writer.name("label");
             writer.beginArray();
             for (Element eLabel : eRoot.getChildren("label")) {
-                if (finalLang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writeElementAttributesToJson(writer, eRoot);
+                if (lang==null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                    writeCategoryAttributesToJson(writer, eRoot);
                 }
             }
             writer.endArray();
             if (eRoot.equals(eRoot.getDocument().getRootElement())) {
-                writeChildrenAsJSON(eRoot.getChild("categories"), writer, finalLang);
+                writeChildrenAsJSON(eRoot.getChild("categories"), writer, lang);
             } else {
-                writeChildrenAsJSON(eRoot, writer, finalLang);
+                writeChildrenAsJSON(eRoot, writer, lang);
             }
 
             writer.endObject();
