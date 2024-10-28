@@ -395,7 +395,7 @@ public class MCRSolrIndexer {
                 LOGGER.error("Error creating index thread for object {}", id, ex);
             }
         }
-        long durationInMilliSeconds = swatch.getTime();
+        long durationInMilliSeconds = swatch.getDuration().toMillis();
         if (statistic != null) {
             statistic.addTime(durationInMilliSeconds);
         }
