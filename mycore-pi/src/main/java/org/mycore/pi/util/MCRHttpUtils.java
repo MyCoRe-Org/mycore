@@ -25,10 +25,9 @@ import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.ssl.SSLContexts;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -50,16 +49,13 @@ public class MCRHttpUtils {
                             .setConnectTimeout(timeout, TimeUnit.SECONDS)
                             .setSocketTimeout(timeout, TimeUnit.SECONDS)
                             .build())
-                    .setSSLSocketFactory(
-                        SSLConnectionSocketFactoryBuilder.create()
-                            .setSslContext(SSLContexts.createSystemDefault())
-                            .build())
+                    .setTlsSocketStrategy(DefaultClientTlsStrategy.createSystemDefault())
                     .build());
     }
 
     public static HttpClientResponseHandler<MCRContent> getMCRContentResponseHandler(URI requestURI) {
         return response -> {
-            if (response.getCode() == HttpStatus.SC_OK){
+            if (response.getCode() == HttpStatus.SC_OK) {
                 return new MCRStreamContent(response.getEntity().getContent(), requestURI.toString()).getReusableCopy();
             } else {
                 throw new MCRException("HTTP Response Code: " + response.getCode());
