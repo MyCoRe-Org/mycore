@@ -128,8 +128,8 @@ public class MCRRestAPISearch {
         HttpRequest.Builder reqBuilder = MCRSolrUtils.getRequestBuilder().uri(URI.create(url));
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(reqBuilder, MCRSolrAuthenticationLevel.SEARCH);
         HttpRequest request = reqBuilder.build();
-        HttpClient client = MCRHttpUtils.getHttpClient();
-        try {
+
+        try(HttpClient client = MCRHttpUtils.getHttpClient()) {
             HttpResponse<String> resp
                 = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             return Response.ok(resp.body())
