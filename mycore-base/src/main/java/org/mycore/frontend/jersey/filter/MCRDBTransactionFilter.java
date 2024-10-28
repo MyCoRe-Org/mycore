@@ -18,9 +18,8 @@
 
 package org.mycore.frontend.jersey.filter;
 
-
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -31,17 +30,17 @@ public class MCRDBTransactionFilter implements ContainerRequestFilter, Container
 
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
-        if (MCRTransactionHelper.transactionRequiresRollback()) {
-            MCRTransactionHelper.rollbackTransaction();
+        if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+            MCRTransactionManager.rollbackTransactions();
         } else {
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
         }
     }
 
     @Override
     public void filter(ContainerRequestContext request) {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
     }
 
 }

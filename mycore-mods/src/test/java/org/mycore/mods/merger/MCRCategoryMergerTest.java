@@ -30,7 +30,7 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -46,7 +46,7 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
         super.setUp();
 
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         loadCategory("institutes.xml");
         loadCategory("genre.xml");
         loadCategory("oa.xml");
