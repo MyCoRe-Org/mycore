@@ -19,17 +19,19 @@
 package org.mycore.restapi.v1;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrUtils;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -38,6 +40,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Rest API methods that cover SOLR searches.
@@ -121,18 +125,18 @@ public class MCRRestAPISearch {
 
     // Method to execute the Solr query and handle response
     private Response executeSolrQuery(String url, String wt) {
-        try (InputStream is = new URI(url).toURL().openStream();
-            Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
-
-            String text = scanner.useDelimiter("\\A").next();
-            String contentType = getContentType(wt);
-
-            return Response.ok(text)
-                .type(contentType)
+        HttpRequest.Builder reqBuilder = MCRSolrUtils.getRequestBuilder().uri(URI.create(url));
+        MCRSolrAuthenticationManager.getInstance().applyAuthentication(reqBuilder, MCRSolrAuthenticationLevel.SEARCH);
+        HttpRequest request = reqBuilder.build();
+        HttpClient client = MCRHttpUtils.getHttpClient();
+        try {
+            HttpResponse<String> resp
+                = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            return Response.ok(resp.body())
+                .type(getContentType(wt))
                 .build();
-
-        } catch (IOException | URISyntaxException e) {
-            LOGGER.error(e);
+        } catch (InterruptedException | IOException e) {
+            LOGGER.error("Error while executing Solr query", e);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
