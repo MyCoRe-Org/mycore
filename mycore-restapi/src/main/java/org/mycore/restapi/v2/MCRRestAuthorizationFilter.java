@@ -90,9 +90,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
     private void checkBaseAccess(ContainerRequestContext requestContext, String permission, String path)
         throws ForbiddenException {
-        final MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
-        final String objectId = pathParameters.getFirst(PARAM_MCRID);
-        final String derId = pathParameters.getFirst(PARAM_DERID);
+        MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
+        String objectId = pathParameters.getFirst(PARAM_MCRID);
+        String derId = pathParameters.getFirst(PARAM_DERID);
         LogManager.getLogger().debug("Permission: {}, Object: {}, Derivate: {}, Path: {}", permission, objectId, derId,
             path);
         Optional<String> checkable = Optional.ofNullable(derId)
@@ -104,7 +104,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         checkable.ifPresent(id -> LogManager.getLogger().info("Checking " + permission + " access on " + id));
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         boolean allowed = checkable
-            .map(id -> aclProvider.checkPermission(id, permission.toString()))
+            .map(id -> aclProvider.checkPermission(id, permission))
             .orElse(true);
         if (allowed) {
             return;
@@ -147,10 +147,11 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         final String permission
             = Optional.ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class))
                 .map(MCRRestRequiredPermission::value).orElseGet(() -> getPermissionFromHttpMethod(method));
-        Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class)).map(Path::value)
+        Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
+            .map(Path::value)
             .ifPresent(path -> {
                 checkRestAPIAccess(requestContext, permission, path);
-                final MCRRestAccessCheck accessCheckAnnotation
+                MCRRestAccessCheck accessCheckAnnotation
                     = resourceInfo.getResourceMethod().getAnnotation(MCRRestAccessCheck.class);
                 if (accessCheckAnnotation != null) {
                     final MCRRestAccessCheckStrategy strategy = resolveAccessCheckStrategy(accessCheckAnnotation);
