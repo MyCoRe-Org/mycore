@@ -98,6 +98,9 @@ import jakarta.ws.rs.core.UriInfo;
  * 
  */
 public class MCRRestAPIObjectsHelper {
+    private enum Mode {
+        MCROBJECT, MCRDERIVATE
+    }
 
     private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
 
@@ -322,7 +325,7 @@ public class MCRRestAPIObjectsHelper {
         if (sortObj != null) {
             objIdDates.sort(new MCRRestAPISortObjectComparator(sortObj));
         }
-        return formatResponse(format, objIdDates, info);
+        return createListResponse(format, Mode.MCROBJECT, objIdDates, info);
     }
 
     private static FilterParams parseFilterParams(String filter, List<MCRRestAPIError> errors) {
@@ -400,12 +403,12 @@ public class MCRRestAPIObjectsHelper {
         return objIdDates;
     }
 
-    private static Response formatResponse(String format, List<MCRObjectIDDate> objIdDates, UriInfo info)
+    private static Response createListResponse(String format, Mode mode, List<MCRObjectIDDate> objIdDates, UriInfo info)
         throws MCRRestAPIException {
         if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
-            return createXmlResponse(info, objIdDates);
+            return createXmlListResponse(mode, info, objIdDates);
         } else if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-            return createJsonResponse(info, objIdDates);
+            return createJsonListResponse(mode, info, objIdDates);
 
         }
         throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -435,9 +438,9 @@ public class MCRRestAPIObjectsHelper {
         }
 
         MCRObjectID mcrObjId = retrieveMCRObjectID(paramMcrObjID);
-        List<MCRObjectIDDate> objIdDates = getObjectIDDates(mcrObjId, sortObj);
+        List<MCRObjectIDDate> objIdDates = getDerivateObjectIDDates(mcrObjId, sortObj);
 
-        return formatResponse(format, objIdDates, info);
+        return createListResponse(format, Mode.MCRDERIVATE, objIdDates, info);
     }
 
     protected static MCRRestAPISortObject createSortObjectOrHandleError(String sort, List<MCRRestAPIError> errors) {
@@ -456,7 +459,8 @@ public class MCRRestAPIObjectsHelper {
         }
     }
 
-    protected static List<MCRObjectIDDate> getObjectIDDates(MCRObjectID mcrObjId, MCRRestAPISortObject sortObj) {
+    protected static List<MCRObjectIDDate> getDerivateObjectIDDates(MCRObjectID mcrObjId,
+        MCRRestAPISortObject sortObj) {
         return MCRMetadataManager.retrieveMCRObject(mcrObjId)
             .getStructure().getDerivates().stream()
             .map(MCRMetaLinkID::getXLinkHrefID)
@@ -491,37 +495,43 @@ public class MCRRestAPIObjectsHelper {
         };
     }
 
-    protected static Response createXmlResponse(UriInfo info, List<MCRObjectIDDate> objIdDates)
+    protected static Response createXmlListResponse(Mode mode, UriInfo info, List<MCRObjectIDDate> objIdDates)
         throws MCRRestAPIException {
-        Element eDerObjects = new Element("derobjects");
-        Document docOut = new Document(eDerObjects);
-        eDerObjects.setAttribute("numFound", Integer.toString(objIdDates.size()));
+        Element elem = switch (mode) {
+            case MCROBJECT -> new Element("mycoreobjects");
+            case MCRDERIVATE -> new Element("derobjects");
+        };
+        elem.setAttribute("numFound", Integer.toString(objIdDates.size()));
 
         for (MCRObjectIDDate oid : objIdDates) {
-            Element eDerObject = createXmlElement(info, oid);
-            eDerObjects.addContent(eDerObject);
+            elem.addContent(createXmlListElement(mode, info, oid));
         }
 
-        return buildXmlResponse(docOut);
+        return buildXmlResponse(new Document(elem));
     }
 
-    private static Element createXmlElement(UriInfo info, MCRObjectIDDate oid) {
-        Element eDerObject = new Element("derobject");
-        eDerObject.setAttribute("ID", oid.getId());
-        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
-        eDerObject.setAttribute("metadata", der.getDerivate().getMetaLink().getXLinkHref());
+    private static Element createXmlListElement(Mode mode, UriInfo info, MCRObjectIDDate oid) {
+        Element elem = switch (mode) {
+            case MCROBJECT -> new Element("mycoreobject");
+            case MCRDERIVATE -> new Element("derobject");
+        };
 
-        if (!der.getDerivate().getClassifications().isEmpty()) {
-            String classifications = der.getDerivate().getClassifications().stream()
-                .map(cl -> cl.getClassId() + ":" + cl.getCategId())
-                .collect(Collectors.joining(" "));
-            eDerObject.setAttribute("classifications", classifications);
+        elem.setAttribute("ID", oid.getId());
+        elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
+        elem.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
+
+        if (mode == Mode.MCRDERIVATE) {
+            MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
+            elem.setAttribute("metadata", der.getDerivate().getMetaLink().getXLinkHref());
+
+            if (!der.getDerivate().getClassifications().isEmpty()) {
+                String classifications = der.getDerivate().getClassifications().stream()
+                    .map(cl -> cl.getClassId() + ":" + cl.getCategId())
+                    .collect(Collectors.joining(" "));
+                elem.setAttribute("classifications", classifications);
+            }
         }
-
-        eDerObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
-        eDerObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
-
-        return eDerObject;
+        return elem;
     }
 
     private static Response buildXmlResponse(Document docOut) throws MCRRestAPIException {
@@ -536,21 +546,36 @@ public class MCRRestAPIObjectsHelper {
         }
     }
 
-    public static Response createJsonResponse(UriInfo info, List<MCRObjectIDDate> objIdDates)
+    public static Response createJsonListResponse(Mode mode, UriInfo info, List<MCRObjectIDDate> objIdDates)
         throws MCRRestAPIException {
         try (StringWriter sw = new StringWriter(); JsonWriter writer = new JsonWriter(sw)) {
             writer.setIndent("    ");
             writer.beginObject();
             writer.name("numFound").value(objIdDates.size());
-            writer.name("mycoreobjects").beginArray();
-
+            switch (mode) {
+                case MCROBJECT -> writer.name("mycoreobjects");
+                case MCRDERIVATE -> writer.name("derobjects");
+            }
+            writer.beginArray();
             for (MCRObjectIDDate oid : objIdDates) {
                 writer.beginObject();
                 writer.name("ID").value(oid.getId());
-                MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
-                writer.name("metadata").value(der.getDerivate().getMetaLink().getXLinkHref());
                 writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
                 writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
+                if (mode == Mode.MCRDERIVATE) {
+                    MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
+                    writer.name("metadata").value(der.getDerivate().getMetaLink().getXLinkHref());
+                    if (!der.getDerivate().getClassifications().isEmpty()) {
+                        List<String> classifications = der.getDerivate().getClassifications().stream()
+                            .map(cl -> cl.getClassId() + ":" + cl.getCategId())
+                            .collect(Collectors.toList());
+                        writer.name("classifications").beginArray();
+                        for (String c : classifications) {
+                            writer.value(c);
+                        }
+                        writer.endArray();
+                    }
+                }
                 writer.endObject();
             }
 
@@ -609,8 +634,8 @@ public class MCRRestAPIObjectsHelper {
                                 e.getMessage()));
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
-                        String result = listDerivateContentAsJson(derObj, path, depth, info, app);
-                        return response(result, "application/json", lastModified);
+                    String result = listDerivateContentAsJson(derObj, path, depth, info, app);
+                    return response(result, "application/json", lastModified);
                 default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                         new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
