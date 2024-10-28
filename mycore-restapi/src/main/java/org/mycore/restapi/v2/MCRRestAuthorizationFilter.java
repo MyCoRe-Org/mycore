@@ -168,15 +168,12 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     }
 
     private MCRRestAccessCheckStrategy resolveAccessCheckStrategy(MCRRestAccessCheck annotation) {
-        final Class<? extends MCRRestAccessCheckStrategy> clazz = annotation.strategy();
-        if (clazz != null) {
-            try {
-                return clazz.getDeclaredConstructor().newInstance();
-            } catch (Exception e) {
-                throw new InternalServerErrorException(e);
-            }
+        final Class<? extends MCRRestAccessCheckStrategy> strategyClass = annotation.strategy();
+        try {
+            return strategyClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e);
         }
-        throw new InternalServerErrorException();
     }
 
     private static String getPermissionFromHttpMethod(String httpMethod) {
