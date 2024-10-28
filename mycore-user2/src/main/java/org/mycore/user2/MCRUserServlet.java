@@ -75,92 +75,6 @@ public class MCRUserServlet extends MCRServlet {
     /** The logger */
     private static final Logger LOGGER = LogManager.getLogger(MCRUserServlet.class);
 
-    private static boolean checkUserIsNotNull(HttpServletResponse res, MCRUser currentUser, String userID) {
-        if (currentUser == null) {
-            String uid = userID == null ? MCRSessionMgr.getCurrentSession().getUserInformation().getUserID() : userID;
-            String msg = MCRTranslation.translate("component.user2.UserServlet.currentUserUnknown", uid);
-            try {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            } catch (IOException e) {
-                throw new MCRException("Error sending error", e);
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean checkUserIsLocked(HttpServletResponse res, MCRUser currentUser) throws IOException {
-        if (currentUser.isLocked()) {
-            String userName = currentUser.getUserID();
-            String msg = MCRTranslation.translate("component.user2.UserServlet.isLocked", userName);
-            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean checkUserIsDisabled(HttpServletResponse res, MCRUser currentUser) throws IOException {
-        if (currentUser.isDisabled()) {
-            String userName = currentUser.getUserID();
-            String msg = MCRTranslation.translate("component.user2.UserServlet.isDisabled", userName);
-            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean forbidIfGuest(HttpServletResponse res) throws IOException {
-        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
-            String msg = MCRTranslation.translate("component.user2.UserServlet.noGuestAction");
-            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Invoked by editor form user-editor.xed to check for a valid
-     * login user name.
-     */
-    public static boolean checkUserName(String userName) {
-        String realmID = MCRRealmFactory.getLocalRealm().getID();
-
-        // Check for required fields is done in the editor form itself, not here
-        if ((userName == null) || (realmID == null)) {
-            return true;
-        }
-
-        // In all other cases, combination of userName and realm must not exist
-        return !MCRUserManager.exists(userName, realmID);
-    }
-
-    private static void updateUser(String userName, String realmID, MCRUser user) {
-        if (MCRUserManager.exists(userName, realmID)) {
-            MCRUserManager.updateUser(user);
-        } else {
-            MCRUserManager.createUser(user);
-        }
-    }
-
-    private static void updateUserRoles(Element u, MCRUser user, boolean hasAdminPermission, MCRUser currentUser) {
-        Element gs = u.getChild("roles");
-        if (gs != null) {
-            user.getSystemRoleIDs().clear();
-            user.getExternalRoleIDs().clear();
-            List<Element> groupList = gs.getChildren("role");
-            for (Element group : groupList) {
-                String groupName = group.getAttributeValue("name");
-                if (hasAdminPermission || currentUser.isUserInRole(groupName)) {
-                    user.assignRole(groupName);
-                } else {
-                    LOGGER.warn("Current user {} has not the permission to add user to group {}",
-                        currentUser.getUserID(), groupName);
-                }
-            }
-        }
-    }
-
     /**
      * Handles requests. The parameter 'action' selects what to do, possible
      * values are show, save, delete, password (with id as second parameter).
@@ -216,6 +130,49 @@ public class MCRUserServlet extends MCRServlet {
             res.sendRedirect(url);
         }
     }
+    private static boolean checkUserIsNotNull(HttpServletResponse res, MCRUser currentUser, String userID) {
+        if (currentUser == null) {
+            String uid = userID == null ? MCRSessionMgr.getCurrentSession().getUserInformation().getUserID() : userID;
+            String msg = MCRTranslation.translate("component.user2.UserServlet.currentUserUnknown", uid);
+            try {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            } catch (IOException e) {
+                throw new MCRException("Error sending error", e);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean checkUserIsLocked(HttpServletResponse res, MCRUser currentUser) throws IOException {
+        if (currentUser.isLocked()) {
+            String userName = currentUser.getUserID();
+            String msg = MCRTranslation.translate("component.user2.UserServlet.isLocked", userName);
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean checkUserIsDisabled(HttpServletResponse res, MCRUser currentUser) throws IOException {
+        if (currentUser.isDisabled()) {
+            String userName = currentUser.getUserID();
+            String msg = MCRTranslation.translate("component.user2.UserServlet.isDisabled", userName);
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean forbidIfGuest(HttpServletResponse res) throws IOException {
+        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+            .equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+            String msg = MCRTranslation.translate("component.user2.UserServlet.noGuestAction");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Handles MCRUserServlet?action=show&id={userID}.
@@ -238,6 +195,47 @@ public class MCRUserServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, getContent(user));
     }
 
+    /**
+     * Invoked by editor form user-editor.xed to check for a valid
+     * login user name.
+     */
+    public static boolean checkUserName(String userName) {
+        String realmID = MCRRealmFactory.getLocalRealm().getID();
+
+        // Check for required fields is done in the editor form itself, not here
+        if ((userName == null) || (realmID == null)) {
+            return true;
+        }
+
+        // In all other cases, combination of userName and realm must not exist
+        return !MCRUserManager.exists(userName, realmID);
+    }
+
+    private static void updateUser(String userName, String realmID, MCRUser user) {
+        if (MCRUserManager.exists(userName, realmID)) {
+            MCRUserManager.updateUser(user);
+        } else {
+            MCRUserManager.createUser(user);
+        }
+    }
+
+    private static void updateUserRoles(Element u, MCRUser user, boolean hasAdminPermission, MCRUser currentUser) {
+        Element gs = u.getChild("roles");
+        if (gs != null) {
+            user.getSystemRoleIDs().clear();
+            user.getExternalRoleIDs().clear();
+            List<Element> groupList = gs.getChildren("role");
+            for (Element group : groupList) {
+                String groupName = group.getAttributeValue("name");
+                if (hasAdminPermission || currentUser.isUserInRole(groupName)) {
+                    user.assignRole(groupName);
+                } else {
+                    LOGGER.warn("Current user {} has not the permission to add user to group {}",
+                            currentUser.getUserID(), groupName);
+                }
+            }
+        }
+    }
     private void saveCurrentUser(HttpServletRequest req, HttpServletResponse res) throws IOException {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         if (!checkUserIsNotNull(res, currentUser, null)) {
@@ -271,8 +269,8 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
         boolean hasAdminPermission = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION);
-        boolean allowed
-            = hasAdminPermission || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION);
+        boolean allowed = hasAdminPermission
+            || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION);
         if (!allowed) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noCreatePermission");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
