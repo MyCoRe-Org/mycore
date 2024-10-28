@@ -31,12 +31,15 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
+import org.mycore.restapi.v2.access.MCRRestAccessCheckStrategy;
 import org.mycore.restapi.v2.access.MCRRestAccessManager;
+import org.mycore.restapi.v2.annotation.MCRRestAccessCheck;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -85,8 +88,11 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .toException();
     }
 
-    private void checkBaseAccess(ContainerRequestContext requestContext, String permission, String objectId,
-        String derId, String path) throws ForbiddenException {
+    private void checkBaseAccess(ContainerRequestContext requestContext, String permission, String path)
+        throws ForbiddenException {
+        MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
+        String objectId = pathParameters.getFirst(PARAM_MCRID);
+        String derId = pathParameters.getFirst(PARAM_DERID);
         LogManager.getLogger().debug("Permission: {}, Object: {}, Derivate: {}, Path: {}", permission, objectId, derId,
             path);
         Optional<String> checkable = Optional.ofNullable(derId)
@@ -145,9 +151,14 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .map(Path::value)
             .ifPresent(path -> {
                 checkRestAPIAccess(requestContext, permission, path);
-                MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
-                checkBaseAccess(requestContext, permission, pathParameters.getFirst(PARAM_MCRID),
-                    pathParameters.getFirst(PARAM_DERID), pathParameters.getFirst(PARAM_DER_PATH));
+                MCRRestAccessCheck accessCheckAnnotation
+                    = resourceInfo.getResourceMethod().getAnnotation(MCRRestAccessCheck.class);
+                if (accessCheckAnnotation != null) {
+                    final MCRRestAccessCheckStrategy strategy = resolveAccessCheckStrategy(accessCheckAnnotation);
+                    strategy.checkPermission(resourceInfo, requestContext);
+                } else {
+                    checkBaseAccess(requestContext, permission, path);
+                }
             });
         checkDetailLevel(requestContext,
             requestContext.getAcceptableMediaTypes()
@@ -155,6 +166,15 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
                 .filter(Objects::nonNull)
                 .toArray(String[]::new));
+    }
+
+    private MCRRestAccessCheckStrategy resolveAccessCheckStrategy(MCRRestAccessCheck annotation) {
+        final Class<? extends MCRRestAccessCheckStrategy> strategyClass = annotation.strategy();
+        try {
+            return strategyClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e);
+        }
     }
 
     private static String getPermissionFromHttpMethod(String httpMethod) {
