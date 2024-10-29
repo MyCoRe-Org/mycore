@@ -1,24 +1,25 @@
 package org.mycore.ocfl.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import org.junit.Test;
+import org.mycore.common.MCRTransactionManager;
+import org.mycore.ocfl.MCROCFLTestCaseHelper;
+import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
+import org.mycore.ocfl.niofs.MCROCFLNioTestCase;
+
 import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.FileChange;
 import io.ocfl.api.model.FileChangeHistory;
 import io.ocfl.api.model.FileChangeType;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.VersionInfo;
-import org.junit.Test;
-import org.mycore.common.MCRTransactionHelper;
-import org.mycore.ocfl.MCROCFLTestCaseHelper;
-import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
-import org.mycore.ocfl.niofs.MCROCFLNioTestCase;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 
 public class MCROCFLRepositoryTest extends MCROCFLNioTestCase {
 
@@ -32,9 +33,9 @@ public class MCROCFLRepositoryTest extends MCROCFLNioTestCase {
             repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/");
         });
 
-        MCRTransactionHelper.beginTransaction(MCROCFLFileSystemTransaction.class);
+        MCRTransactionManager.beginTransactions(MCROCFLFileSystemTransaction.class);
         MCROCFLTestCaseHelper.loadDerivate(DERIVATE_2);
-        MCRTransactionHelper.commitTransaction(MCROCFLFileSystemTransaction.class);
+        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
 
         FileChangeHistory changeHistory = repository.directoryChangeHistory(DERIVATE_2_OBJECT_ID, "/");
         check(changeHistory, FileChangeType.UPDATE, 1);
