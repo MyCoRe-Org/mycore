@@ -17,25 +17,25 @@
  */
 
 
-import {TouchSession} from "./TouchSession";
+import { TouchSession } from "./TouchSession";
 
 export interface TouchInputListener {
-    touchStart(session: TouchSession): void;
+  touchStart(session: TouchSession): void;
 
-    touchMove(session: TouchSession): void;
+  touchMove(session: TouchSession): void;
 
-    touchEnd(session: TouchSession): void;
+  touchEnd(session: TouchSession): void;
 }
 
 export abstract class TouchInputAdapter implements TouchInputListener {
-    touchStart(session: TouchSession): void {
-    }
+  touchStart(session: TouchSession): void {
+  }
 
-    touchMove(session: TouchSession): void {
-    }
+  touchMove(session: TouchSession): void {
+  }
 
-    touchEnd(session: TouchSession): void {
-    }
+  touchEnd(session: TouchSession): void {
+  }
 }
 
 

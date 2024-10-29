@@ -16,9 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
 
 export interface TEISettings extends MyCoReViewerSettings {
-    teiStylesheet: string;
+  teiStylesheet: string;
 }
 

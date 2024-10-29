@@ -16,100 +16,100 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ChangeDetectorRef, Component, ViewEncapsulation} from '@angular/core';
+import { ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
 
-import {ProcessingService} from './../service/processing.service';
-import {Settings} from './../settings';
-import {Collection, Registry} from '../model/model';
+import { ProcessingService } from './../service/processing.service';
+import { Settings } from './../settings';
+import { Collection, Registry } from '../model/model';
 
 @Component({
-    selector: 'processing',
-    templateUrl: 'html/app.html',
-    styleUrls: ['css/app.css'],
-    encapsulation: ViewEncapsulation.None,
-    providers: [ProcessingService]
+  selector: 'processing',
+  templateUrl: 'html/app.html',
+  styleUrls: ['css/app.css'],
+  encapsulation: ViewEncapsulation.None,
+  providers: [ProcessingService]
 })
 export class AppComponent {
 
-    public errorCode: number;
+  public errorCode: number;
 
-    public registry: Registry;
+  public registry: Registry;
 
-    private dirty: boolean;
+  private dirty: boolean;
 
-    constructor(private processingService: ProcessingService, private changeDetector: ChangeDetectorRef) {
-        this.dirty = false;
-        this.connect();
-        this.changeDetector.detach();
+  constructor(private processingService: ProcessingService, private changeDetector: ChangeDetectorRef) {
+    this.dirty = false;
+    this.connect();
+    this.changeDetector.detach();
+  }
+
+  public connect() {
+    this.processingService.connect();
+    this.processingService.observable.subscribe(
+      (me: MessageEvent) => this.handleSubscription(me),
+      (error: any) => this.handleError(error),
+      () => this.handleDone()
+    );
+  }
+
+  protected handleSubscription(messageEvent: MessageEvent) {
+    this.handleMessage(JSON.parse(messageEvent.data));
+  }
+
+  protected handleError(error: any) {
+    console.error(error);
+  }
+
+  protected handleDone() {
+    this.connect();
+  }
+
+  private triggerDelayedUpdate() {
+    if (this.dirty) {
+      return;
     }
+    this.dirty = true;
+    window.requestAnimationFrame(() => {
+      this.changeDetector.detectChanges();
+      this.dirty = false;
+    });
+  }
 
-    public connect() {
-        this.processingService.connect();
-        this.processingService.observable.subscribe(
-            (me: MessageEvent) => this.handleSubscription(me),
-            (error: any) => this.handleError(error),
-            () => this.handleDone()
-        );
-    }
-
-    protected handleSubscription(messageEvent: MessageEvent) {
-        this.handleMessage(JSON.parse(messageEvent.data));
-    }
-
-    protected handleError(error: any) {
-        console.error(error);
-    }
-
-    protected handleDone() {
-        this.connect();
-    }
-
-    private triggerDelayedUpdate() {
-        if (this.dirty) {
-            return;
+  protected handleMessage(data: any) {
+    switch (data.type) {
+      case 'error':
+        this.errorCode = parseInt(data.error);
+        this.changeDetector.detectChanges();
+        break;
+      case 'registry':
+        this.errorCode = null;
+        this.registry = new Registry();
+        this.changeDetector.detectChanges();
+        break;
+      case 'addCollection':
+        this.registry.addCollection(data);
+        this.changeDetector.detectChanges();
+        break;
+      case 'updateProcessable':
+        this.registry.updateProcessable(data);
+        this.triggerDelayedUpdate();
+        break;
+      case 'updateCollectionProperty':
+        const collection: Collection = this.registry.getCollection(data.id);
+        if (collection == null) {
+          console.warn('Unable to find collection with id ' + data.id);
+          return;
         }
-        this.dirty = true;
-        window.requestAnimationFrame(() =>{
-            this.changeDetector.detectChanges();
-            this.dirty = false;
-        });
+        collection.setProperty(data.propertyName, data.propertyValue);
+        this.triggerDelayedUpdate();
+        break;
+      default:
+        console.warn('Unable to handle data type: ' + data.type);
     }
+  }
 
-    protected handleMessage(data: any) {
-        switch (data.type) {
-            case 'error':
-                this.errorCode = parseInt(data.error);
-                this.changeDetector.detectChanges();
-                break;
-            case 'registry':
-                this.errorCode = null;
-                this.registry = new Registry();
-                this.changeDetector.detectChanges();
-                break;
-            case 'addCollection':
-                this.registry.addCollection(data);
-                this.changeDetector.detectChanges();
-                break;
-            case 'updateProcessable':
-                this.registry.updateProcessable(data);
-                this.triggerDelayedUpdate();
-                break;
-            case 'updateCollectionProperty':
-                const collection: Collection = this.registry.getCollection(data.id);
-                if (collection == null) {
-                    console.warn('Unable to find collection with id ' + data.id);
-                    return;
-                }
-                collection.setProperty(data.propertyName, data.propertyValue);
-                this.triggerDelayedUpdate();
-                break;
-            default:
-                console.warn('Unable to handle data type: ' + data.type);
-        }
-    }
-
-    public settings(): Settings {
-        return Settings;
-    }
+  public settings(): Settings {
+    return Settings;
+  }
 
 }

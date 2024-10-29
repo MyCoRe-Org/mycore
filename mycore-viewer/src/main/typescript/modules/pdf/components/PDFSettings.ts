@@ -19,6 +19,6 @@
 import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
 
 export interface PDFSettings extends MyCoReViewerSettings {
-    pdfProviderURL: string;
-    pdfWorkerURL: string;
+  pdfProviderURL: string;
+  pdfWorkerURL: string;
 }

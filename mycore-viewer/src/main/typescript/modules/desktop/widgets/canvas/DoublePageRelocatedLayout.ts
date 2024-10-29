@@ -16,18 +16,18 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DoublePageLayout} from "./DoublePageLayout";
+import { DoublePageLayout } from "./DoublePageLayout";
 
 
 export class DoublePageRelocatedLayout extends DoublePageLayout {
 
-    public get relocated(): boolean {
-        return true;
-    }
+  public get relocated(): boolean {
+    return true;
+  }
 
-    public getLabelKey(): string {
-        return "doublePageRelocatedLayout";
-    }
+  public getLabelKey(): string {
+    return "doublePageRelocatedLayout";
+  }
 
 }
 

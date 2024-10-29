@@ -17,16 +17,16 @@
  */
 
 
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
 
 export class UpdateURLEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent) {
-        super(component, UpdateURLEvent.TYPE);
-    }
+  constructor(component: ViewerComponent) {
+    super(component, UpdateURLEvent.TYPE);
+  }
 
-    public static TYPE: string = "UpdateURLEvent";
+  public static TYPE: string = "UpdateURLEvent";
 
 }
 

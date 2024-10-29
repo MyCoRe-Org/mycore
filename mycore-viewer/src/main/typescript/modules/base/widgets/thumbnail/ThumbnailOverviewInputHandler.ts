@@ -17,5 +17,5 @@
  */
 
 export interface ThumbnailOverviewInputHandler {
-    addedThumbnail(id: string, element: JQuery): void;
+  addedThumbnail(id: string, element: JQuery): void;
 }

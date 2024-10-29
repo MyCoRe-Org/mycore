@@ -18,9 +18,9 @@
 
 
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReIIIFComponent} from "./components/MyCoReIIIFComponent";
-import {MyCoReIIIFPageProviderComponent} from "./components/MyCoReIIIFPageProviderComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReIIIFComponent } from "./components/MyCoReIIIFComponent";
+import { MyCoReIIIFPageProviderComponent } from "./components/MyCoReIIIFPageProviderComponent";
 
 addViewerComponent(MyCoReIIIFComponent);
 addViewerComponent(MyCoReIIIFPageProviderComponent);

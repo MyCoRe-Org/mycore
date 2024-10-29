@@ -16,28 +16,28 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ViewerComponent} from "../../base/components/ViewerComponent";
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
-import {ProvideViewerSearcherEvent} from "./events/ProvideViewerSearcherEvent";
-import {MyCoReLocalIndexSearcher} from "./model/MyCoReLocalIndexSearcher";
+import { ViewerComponent } from "../../base/components/ViewerComponent";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
+import { ProvideViewerSearcherEvent } from "./events/ProvideViewerSearcherEvent";
+import { MyCoReLocalIndexSearcher } from "./model/MyCoReLocalIndexSearcher";
 
 
 export class MyCoReLocalViewerIndexSearcherProvider extends ViewerComponent {
 
-    constructor(private _settings: MyCoReViewerSettings) {
-        super();
-    }
+  constructor(private _settings: MyCoReViewerSettings) {
+    super();
+  }
 
-    public get handlesEvents(): string[] {
-        return [];
-    }
+  public get handlesEvents(): string[] {
+    return [];
+  }
 
-    public init() {
-        if (this._settings.doctype == "pdf") {
-            this.trigger(new ProvideViewerSearcherEvent(
-                this, new MyCoReLocalIndexSearcher()));
-        }
+  public init() {
+    if (this._settings.doctype == "pdf") {
+      this.trigger(new ProvideViewerSearcherEvent(
+        this, new MyCoReLocalIndexSearcher()));
     }
+  }
 }
 
 

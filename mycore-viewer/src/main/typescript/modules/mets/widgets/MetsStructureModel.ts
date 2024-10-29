@@ -16,24 +16,24 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {StructureModel} from "../../base/components/model/StructureModel";
-import {MyCoReMap} from "../../base/Utils";
-import {StructureChapter} from "../../base/components/model/StructureChapter";
-import {StructureImage} from "../../base/components/model/StructureImage";
+import { StructureModel } from "../../base/components/model/StructureModel";
+import { MyCoReMap } from "../../base/Utils";
+import { StructureChapter } from "../../base/components/model/StructureChapter";
+import { StructureImage } from "../../base/components/model/StructureImage";
 
 
 export class MetsStructureModel extends StructureModel {
 
-    constructor(
-        public smLinkMap: MyCoReMap<string, Array<string>>,
-        _rootChapter: StructureChapter,
-        _imageList: Array<StructureImage>,
-        _chapterToImageMap: MyCoReMap<string, StructureImage>,
-        _imageToChapterMap: MyCoReMap<string, StructureChapter>,
-        _imageHrefImageMap: MyCoReMap<string, StructureImage>,
-        private altoPresent: boolean) {
-        super(_rootChapter, _imageList, _chapterToImageMap, _imageToChapterMap, _imageHrefImageMap, altoPresent);
-    }
+  constructor(
+    public smLinkMap: MyCoReMap<string, Array<string>>,
+    _rootChapter: StructureChapter,
+    _imageList: Array<StructureImage>,
+    _chapterToImageMap: MyCoReMap<string, StructureImage>,
+    _imageToChapterMap: MyCoReMap<string, StructureChapter>,
+    _imageHrefImageMap: MyCoReMap<string, StructureImage>,
+    private altoPresent: boolean) {
+    super(_rootChapter, _imageList, _chapterToImageMap, _imageToChapterMap, _imageHrefImageMap, altoPresent);
+  }
 
 }
 

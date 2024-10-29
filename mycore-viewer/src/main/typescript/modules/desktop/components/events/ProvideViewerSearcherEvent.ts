@@ -16,20 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReImageViewerEvent} from "../../../base/components/events/MyCoReImageViewerEvent";
-import {MyCoReViewerSearcher} from "../model/MyCoReViewerSearcher";
-import {ViewerComponent} from "../../../base/components/ViewerComponent";
+import { MyCoReImageViewerEvent } from "../../../base/components/events/MyCoReImageViewerEvent";
+import { MyCoReViewerSearcher } from "../model/MyCoReViewerSearcher";
+import { ViewerComponent } from "../../../base/components/ViewerComponent";
 
 export class ProvideViewerSearcherEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, private _searcher: MyCoReViewerSearcher) {
-        super(component, ProvideViewerSearcherEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, private _searcher: MyCoReViewerSearcher) {
+    super(component, ProvideViewerSearcherEvent.TYPE);
+  }
 
-    public get searcher() {
-        return this._searcher;
-    }
+  public get searcher() {
+    return this._searcher;
+  }
 
-    public static TYPE: string = "ProvideViewerSearcherEvent";
+  public static TYPE: string = "ProvideViewerSearcherEvent";
 
 }
 

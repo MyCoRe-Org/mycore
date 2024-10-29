@@ -18,11 +18,11 @@
 
 
 export interface Layer {
-    getLabel(): string;
+  getLabel(): string;
 
-    getId(): string;
+  getId(): string;
 
-    resolveLayer(pageHref: string, callback: (success: boolean, content?: JQuery) => void): void;
+  resolveLayer(pageHref: string, callback: (success: boolean, content?: JQuery) => void): void;
 }
 
 

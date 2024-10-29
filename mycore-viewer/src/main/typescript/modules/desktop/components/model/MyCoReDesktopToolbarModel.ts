@@ -17,76 +17,76 @@
  */
 
 
-import {MyCoReBasicToolbarModel} from "../../../base/components/model/MyCoReBasicToolbarModel";
-import {ToolbarGroup} from "../../../base/widgets/toolbar/model/ToolbarGroup";
+import { MyCoReBasicToolbarModel } from "../../../base/components/model/MyCoReBasicToolbarModel";
+import { ToolbarGroup } from "../../../base/widgets/toolbar/model/ToolbarGroup";
 import {
-    ToolbarDropdownButton,
-    ToolbarDropdownButtonChild
+  ToolbarDropdownButton,
+  ToolbarDropdownButtonChild
 } from "../../../base/widgets/toolbar/model/ToolbarDropdownButton";
-import {ToolbarButton} from "../../../base/widgets/toolbar/model/ToolbarButton";
-import {LanguageModel} from "../../../base/components/model/LanguageModel";
+import { ToolbarButton } from "../../../base/widgets/toolbar/model/ToolbarButton";
+import { LanguageModel } from "../../../base/components/model/LanguageModel";
 
 export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
 
-    constructor(name = "MyCoReDesktopToolbar") {
-        super(name);
+  constructor(name = "MyCoReDesktopToolbar") {
+    super(name);
+  }
+
+  public _languageModel: LanguageModel;
+  public _viewSelectGroup: ToolbarGroup;
+  public viewSelectChilds: Array<ToolbarDropdownButtonChild>;
+  public viewSelect: ToolbarDropdownButton;
+
+
+  public selectionSwitchButton: ToolbarButton;
+
+  public addComponents(): void {
+    this._viewSelectGroup = new ToolbarGroup("viewSelectGroup", 40);
+
+    this.addGroup(this._sidebarControllGroup);
+    this.addGroup(this._zoomControllGroup);
+    this.addGroup(this._layoutControllGroup);
+    this.addGroup(this._viewSelectGroup);
+    this.addGroup(this._imageChangeControllGroup);
+    this.addGroup(this._actionControllGroup);
+    this.addGroup(this._searchGroup);
+    this.addGroup(this._closeViewerGroup);
+  }
+
+
+  public addViewSelectButton(): void {
+    this.viewSelectChilds = new Array<ToolbarDropdownButtonChild>();
+
+    this.viewSelectChilds.push({
+      id: "imageView",
+      label: "imageView"
+    });
+
+    this.viewSelectChilds.push({
+      id: "mixedView",
+      label: "mixedView"
+    });
+
+    this.viewSelectChilds.push({
+      id: "textView",
+      label: "textView"
+    });
+
+    this.viewSelect = new ToolbarDropdownButton('viewSelect', 'viewSelect', this.viewSelectChilds, 'eye');
+    if (this._viewSelectGroup != null && typeof this._viewSelectGroup != "undefined") {
+      this._viewSelectGroup.addComponent(this.viewSelect);
     }
+  }
 
-    public _languageModel:LanguageModel;
-    public _viewSelectGroup: ToolbarGroup;
-    public viewSelectChilds: Array<ToolbarDropdownButtonChild>;
-    public viewSelect: ToolbarDropdownButton;
+  public addSelectionSwitchButton(): void {
+    this.selectionSwitchButton = new ToolbarButton("selectionSwitchButton", "", "text-select", "text-width");
+    this.selectionSwitchButton.tooltip = this._languageModel.getTranslation('toolbar.textSelect');
 
+    //this._actionControllGroup.addComponent(this.selectionSwitchButton);
+  }
 
-    public selectionSwitchButton: ToolbarButton;
-
-    public addComponents(): void {
-        this._viewSelectGroup = new ToolbarGroup("viewSelectGroup", 40);
-
-        this.addGroup(this._sidebarControllGroup);
-        this.addGroup(this._zoomControllGroup);
-        this.addGroup(this._layoutControllGroup);
-        this.addGroup(this._viewSelectGroup);
-        this.addGroup(this._imageChangeControllGroup);
-        this.addGroup(this._actionControllGroup);
-        this.addGroup(this._searchGroup);
-        this.addGroup(this._closeViewerGroup);
-    }
-
-
-    public addViewSelectButton(): void {
-        this.viewSelectChilds = new Array<ToolbarDropdownButtonChild>();
-
-        this.viewSelectChilds.push({
-            id: "imageView",
-            label: "imageView"
-        });
-
-        this.viewSelectChilds.push({
-            id: "mixedView",
-            label: "mixedView"
-        });
-
-        this.viewSelectChilds.push({
-            id: "textView",
-            label: "textView"
-        });
-
-        this.viewSelect = new ToolbarDropdownButton('viewSelect', 'viewSelect', this.viewSelectChilds, 'eye');
-        if (this._viewSelectGroup != null && typeof this._viewSelectGroup != "undefined") {
-            this._viewSelectGroup.addComponent(this.viewSelect);
-        }
-    }
-
-    public addSelectionSwitchButton(): void {
-        this.selectionSwitchButton = new ToolbarButton("selectionSwitchButton", "", "text-select", "text-width");
-        this.selectionSwitchButton.tooltip = this._languageModel.getTranslation('toolbar.textSelect');
-
-        //this._actionControllGroup.addComponent(this.selectionSwitchButton);
-    }
-
-    public i18n(model: LanguageModel) {
-        this._languageModel = model;
-    }
+  public i18n(model: LanguageModel) {
+    this._languageModel = model;
+  }
 }
 

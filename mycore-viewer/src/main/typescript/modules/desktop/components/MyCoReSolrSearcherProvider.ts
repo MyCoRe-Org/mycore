@@ -20,32 +20,32 @@
 /// <reference path="events/ProvideViewerSearcherEvent.ts" />
 
 
-import {ViewerComponent} from "../../base/components/ViewerComponent";
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
-import {ProvideViewerSearcherEvent} from "./events/ProvideViewerSearcherEvent";
-import {MyCoReSolrSearcher} from "./model/MyCoReSolrSearcher";
+import { ViewerComponent } from "../../base/components/ViewerComponent";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
+import { ProvideViewerSearcherEvent } from "./events/ProvideViewerSearcherEvent";
+import { MyCoReSolrSearcher } from "./model/MyCoReSolrSearcher";
 
 export class MyCoReSolrSearcherProvider extends ViewerComponent {
 
-    constructor(private _settings: SolrSearcherSettings) {
-        super();
-        this._settings.solrHandlerURL = this._settings.webApplicationBaseURL + "/rsc/alto/highlight";
-    }
+  constructor(private _settings: SolrSearcherSettings) {
+    super();
+    this._settings.solrHandlerURL = this._settings.webApplicationBaseURL + "/rsc/alto/highlight";
+  }
 
-    public get handlesEvents(): string[] {
-        return [];
-    }
+  public get handlesEvents(): string[] {
+    return [];
+  }
 
-    public init() {
-        if (this._settings.doctype == "mets") {
-            this.trigger(new ProvideViewerSearcherEvent(
-                this, new MyCoReSolrSearcher(this._settings.solrHandlerURL, this._settings.derivate)));
-        }
+  public init() {
+    if (this._settings.doctype == "mets") {
+      this.trigger(new ProvideViewerSearcherEvent(
+        this, new MyCoReSolrSearcher(this._settings.solrHandlerURL, this._settings.derivate)));
     }
+  }
 }
 
 export class SolrSearcherSettings extends MyCoReViewerSettings {
-    solrHandlerURL: string;
+  solrHandlerURL: string;
 }
 
 

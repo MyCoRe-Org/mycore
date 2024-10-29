@@ -17,91 +17,91 @@
  */
 
 
-import {ViewerComponent} from "../../base/components/ViewerComponent";
-import {TEISettings} from "./TEISettings";
-import {StructureModel} from "../../base/components/model/StructureModel";
-import {WaitForEvent} from "../../base/components/events/WaitForEvent";
-import {StructureModelLoadedEvent} from "../../base/components/events/StructureModelLoadedEvent";
-import {ViewerEvent} from "../../base/widgets/events/ViewerEvent";
-import {MyCoReMap} from "../../base/Utils";
-import {ProvideLayerEvent} from "../../base/components/events/ProvideLayerEvent";
-import {TEILayer} from "../widgets/TEILayer";
+import { ViewerComponent } from "../../base/components/ViewerComponent";
+import { TEISettings } from "./TEISettings";
+import { StructureModel } from "../../base/components/model/StructureModel";
+import { WaitForEvent } from "../../base/components/events/WaitForEvent";
+import { StructureModelLoadedEvent } from "../../base/components/events/StructureModelLoadedEvent";
+import { ViewerEvent } from "../../base/widgets/events/ViewerEvent";
+import { MyCoReMap } from "../../base/Utils";
+import { ProvideLayerEvent } from "../../base/components/events/ProvideLayerEvent";
+import { TEILayer } from "../widgets/TEILayer";
 
 export class MyCoReTEILayerProvider extends ViewerComponent {
 
-    constructor(private _settings: TEISettings) {
-        super();
-        this.contentLocation = this._settings.webApplicationBaseURL + "/servlets/MCRDerivateContentTransformerServlet/" + this._settings.derivate + "/";
+  constructor(private _settings: TEISettings) {
+    super();
+    this.contentLocation = this._settings.webApplicationBaseURL + "/servlets/MCRDerivateContentTransformerServlet/" + this._settings.derivate + "/";
+  }
+
+  private _model: StructureModel = null;
+  private contentLocation = null;
+
+  public init() {
+    if (this._settings.doctype == "mets") {
+      this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
     }
-
-    private _model: StructureModel = null;
-    private contentLocation = null;
-
-    public init() {
-        if (this._settings.doctype == "mets") {
-            this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
-        }
-    }
+  }
 
 
-    public handle(e: ViewerEvent): void {
-        if (e.type == StructureModelLoadedEvent.TYPE) {
-            const smle = e as StructureModelLoadedEvent;
-            this._model = smle.structureModel;
+  public handle(e: ViewerEvent): void {
+    if (e.type == StructureModelLoadedEvent.TYPE) {
+      const smle = e as StructureModelLoadedEvent;
+      this._model = smle.structureModel;
 
-            const transcriptions = new MyCoReMap<string, string>();
-            const translations = new MyCoReMap<string, MyCoReMap<string, string>>();
-            const languages = new Array<string>();
+      const transcriptions = new MyCoReMap<string, string>();
+      const translations = new MyCoReMap<string, MyCoReMap<string, string>>();
+      const languages = new Array<string>();
 
-            smle.structureModel._imageList.forEach((image) => {
-                const additionalHrefs = image.additionalHrefs;
-                additionalHrefs.forEach((name, href) => {
-                    if (name.indexOf("TEI.") == 0) {
-                        const language = name.substr("TEI.".length).toLocaleLowerCase();
-                        if (!translations.has(language)) {
-                            translations.set(language, new MyCoReMap<string, string>());
-                        }
-
-                        const idHrefTranslationMap = translations.get(language);
-                        idHrefTranslationMap.set(image.href, href);
-
-                        if (languages.indexOf(language) == -1) {
-                            languages.push(language);
-                        }
-                    }
-                });
-
-            });
-
-            if (!transcriptions.isEmpty()) {
-                this.trigger(new ProvideLayerEvent(this, new TEILayer("transcription", "layer.transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
+      smle.structureModel._imageList.forEach((image) => {
+        const additionalHrefs = image.additionalHrefs;
+        additionalHrefs.forEach((name, href) => {
+          if (name.indexOf("TEI.") == 0) {
+            const language = name.substr("TEI.".length).toLocaleLowerCase();
+            if (!translations.has(language)) {
+              translations.set(language, new MyCoReMap<string, string>());
             }
 
-            const order = ["de", "en"];
+            const idHrefTranslationMap = translations.get(language);
+            idHrefTranslationMap.set(image.href, href);
 
-            if (languages.length != 0) {
-                languages
-                    .sort((l1, l2) => {
-                        const l1Order = order.indexOf(l1);
-                        const l2Order = order.indexOf(l2);
-
-                        return l1Order - l2Order;
-                    })
-                    .forEach((language) => {
-                        const translationMap = translations.get(language);
-                        this.trigger(new ProvideLayerEvent(this, new TEILayer(language, "layer." + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
-                    });
+            if (languages.indexOf(language) == -1) {
+              languages.push(language);
             }
+          }
+        });
 
-            return;
-        }
-    }
+      });
 
-    public get handlesEvents(): string[] {
-        if (this._settings.doctype == "mets") {
-            return [StructureModelLoadedEvent.TYPE];
-        } else {
-            return [];
-        }
+      if (!transcriptions.isEmpty()) {
+        this.trigger(new ProvideLayerEvent(this, new TEILayer("transcription", "layer.transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
+      }
+
+      const order = ["de", "en"];
+
+      if (languages.length != 0) {
+        languages
+          .sort((l1, l2) => {
+            const l1Order = order.indexOf(l1);
+            const l2Order = order.indexOf(l2);
+
+            return l1Order - l2Order;
+          })
+          .forEach((language) => {
+            const translationMap = translations.get(language);
+            this.trigger(new ProvideLayerEvent(this, new TEILayer(language, "layer." + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
+          });
+      }
+
+      return;
     }
+  }
+
+  public get handlesEvents(): string[] {
+    if (this._settings.doctype == "mets") {
+      return [StructureModelLoadedEvent.TYPE];
+    } else {
+      return [];
+    }
+  }
 }

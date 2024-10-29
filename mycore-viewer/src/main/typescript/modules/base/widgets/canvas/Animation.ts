@@ -17,6 +17,6 @@
  */
 
 export interface Animation {
-    updateAnimation(elapsedTime: number): boolean;
+  updateAnimation(elapsedTime: number): boolean;
 }
 

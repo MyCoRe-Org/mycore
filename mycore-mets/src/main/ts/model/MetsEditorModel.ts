@@ -21,39 +21,39 @@
 ///<reference path="simple/MCRMetsSimpleModel.ts"/>
 
 namespace org.mycore.mets.model {
-    export class MetsEditorModel {
+  export class MetsEditorModel {
 
-        public mode: EditorMode = EditorMode.Pagination;
-        public dataLoaded: boolean = false;
-        public metsModel: simple.MCRMetsSimpleModel;
-        public metsId: string;
-        public middleView: ViewOptions = ViewOptions.SectionTree;
-        public pageSelection: { from: number, to: number, lastExpand: 'top'|'bottom' } = {
-            from : null,
-            to : null,
-            lastExpand : 'top'
-        };
-        public targetServlet: string;
-        public lockURL: string;
-        public unLockURL: string;
-        public locked: boolean = false;
-        public stateEngine: org.mycore.mets.model.state.StateEngine = new org.mycore.mets.model.state.StateEngine();
+    public mode: EditorMode = EditorMode.Pagination;
+    public dataLoaded: boolean = false;
+    public metsModel: simple.MCRMetsSimpleModel;
+    public metsId: string;
+    public middleView: ViewOptions = ViewOptions.SectionTree;
+    public pageSelection: { from: number, to: number, lastExpand: 'top' | 'bottom' } = {
+      from: null,
+      to: null,
+      lastExpand: 'top'
+    };
+    public targetServlet: string;
+    public lockURL: string;
+    public unLockURL: string;
+    public locked: boolean = false;
+    public stateEngine: org.mycore.mets.model.state.StateEngine = new org.mycore.mets.model.state.StateEngine();
 
-        constructor(public configuration: MetsEditorConfiguration) {
-        }
-
-        public onModelLoad(metsSimpleModel: simple.MCRMetsSimpleModel) {
-            this.metsModel = metsSimpleModel;
-            this.dataLoaded = true;
-        }
-
+    constructor(public configuration: MetsEditorConfiguration) {
     }
 
-    export enum EditorMode {
-        Pagination = 'pagination', Structuring = 'structuring', Association = 'association'
+    public onModelLoad(metsSimpleModel: simple.MCRMetsSimpleModel) {
+      this.metsModel = metsSimpleModel;
+      this.dataLoaded = true;
     }
 
-    export enum ViewOptions {
-        SectionTree = 'sectionTree', Pages = 'pages'
-    }
+  }
+
+  export enum EditorMode {
+    Pagination = 'pagination', Structuring = 'structuring', Association = 'association'
+  }
+
+  export enum ViewOptions {
+    SectionTree = 'sectionTree', Pages = 'pages'
+  }
 }

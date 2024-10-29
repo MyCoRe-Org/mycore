@@ -17,169 +17,169 @@
  */
 
 
-import {MoveVector, MyCoReMap, Position2D, Size2D} from "../../Utils";
+import { MoveVector, MyCoReMap, Position2D, Size2D } from "../../Utils";
 import {
-    ThumbnailOverviewResizeHandler,
-    ThumbnailOverviewScrollHandler,
-    ThumbnailOverviewView
+  ThumbnailOverviewResizeHandler,
+  ThumbnailOverviewScrollHandler,
+  ThumbnailOverviewView
 } from "./ThumbnailOverviewView";
-import {ThumbnailOverviewSettings} from "./ThumbnailOverviewSettings";
-import {ThumbnailOverviewModel} from "./ThumbnailOverviewModel";
-import {ThumbnailOverviewThumbnail} from "./ThumbnailOverviewThumbnail";
+import { ThumbnailOverviewSettings } from "./ThumbnailOverviewSettings";
+import { ThumbnailOverviewModel } from "./ThumbnailOverviewModel";
+import { ThumbnailOverviewThumbnail } from "./ThumbnailOverviewThumbnail";
 
 export class IviewThumbnailOverview implements ThumbnailOverviewScrollHandler, ThumbnailOverviewResizeHandler {
 
-    constructor(private _settings: ThumbnailOverviewSettings) {
-        this._model = new ThumbnailOverviewModel(this._settings.thumbnails);
-        this._view = new ThumbnailOverviewView(this._settings.container, this, this, this._settings.inputHandler);
-        this._settings.container.css({
-            "min-width": this._settings.maxThumbnailSize.width + "px",
-            "min-height": this._settings.maxThumbnailSize.height + "px"
-        });
-        this.update(true);
+  constructor(private _settings: ThumbnailOverviewSettings) {
+    this._model = new ThumbnailOverviewModel(this._settings.thumbnails);
+    this._view = new ThumbnailOverviewView(this._settings.container, this, this, this._settings.inputHandler);
+    this._settings.container.css({
+      "min-width": this._settings.maxThumbnailSize.width + "px",
+      "min-height": this._settings.maxThumbnailSize.height + "px"
+    });
+    this.update(true);
 
+  }
+
+  private _view: ThumbnailOverviewView;
+  private _model: ThumbnailOverviewModel;
+
+  public setThumbnailSelected(id: string) {
+    if (typeof this._model.selectedThumbnail !== "undefined" && this._model.selectedThumbnail != null) {
+      this._view.setThumnailSelected(this._model.selectedThumbnail.id, false);
+    }
+    this._model.selectedThumbnail = this._model.getThumbnailById(id) || null;
+    this._view.setThumnailSelected(id, true);
+  }
+
+  public jumpToThumbnail(id: string) {
+    const vpSize = this._view.getViewportSize();
+    const maxTileSize = this._settings.maxThumbnailSize;
+    const scrollPos = this._model.currentPosition;
+    const tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
+    const thumb = this._model.getThumbnailById(id);
+    const pos = (<Array<ThumbnailOverviewThumbnail>>this._model.thumbnails).indexOf(thumb);
+    const verticalLinePos = Math.floor(pos / tilesHorizontal);
+    let verticalPos = verticalLinePos * this._settings.maxThumbnailSize.height;
+
+    const isOver = this._model.currentPosition.y > verticalPos;
+    const isUnder = this._model.currentPosition.y + this._view.getViewportSize().height < verticalPos + this._settings.maxThumbnailSize.height;
+    if (isOver) {
+    } else if (isUnder) {
+      verticalPos = verticalPos - this._view.getViewportSize().height + this._settings.maxThumbnailSize.height;
+    } else {
+      return;
     }
 
-    private _view: ThumbnailOverviewView;
-    private _model: ThumbnailOverviewModel;
+    this._model.currentPosition.move(new MoveVector(0, verticalPos - scrollPos.y));
+    this.update();
+    this._view.jumpToThumbnail(verticalPos);
 
-    public setThumbnailSelected(id: string) {
-        if (typeof this._model.selectedThumbnail !== "undefined" && this._model.selectedThumbnail != null) {
-            this._view.setThumnailSelected(this._model.selectedThumbnail.id, false);
+  }
+
+
+  public update(resize: boolean = false): void {
+    const vpSize = this._view.getViewportSize();
+
+    const sizeOfOther = ((childs: JQuery) => {
+      let height = 0;
+      childs.each((i, e: Element) => {
+        if (this._settings.container[0] != e && jQuery(e).css("position") != "absolute") {
+          height += jQuery(e).outerHeight();
         }
-        this._model.selectedThumbnail = this._model.getThumbnailById(id) || null;
-        this._view.setThumnailSelected(id, true);
+      });
+      return height;
+    })(this._settings.container.parent().children());
+
+
+    this._settings.container.css({ "height": this._settings.container.parent().height() - sizeOfOther });
+    if (vpSize.width == 0 || vpSize.height == 0) {
+      return;
     }
 
-    public jumpToThumbnail(id: string) {
-        const vpSize = this._view.getViewportSize();
-        const maxTileSize = this._settings.maxThumbnailSize;
-        const scrollPos = this._model.currentPosition;
-        const tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
-        const thumb = this._model.getThumbnailById(id);
-        const pos = (<Array<ThumbnailOverviewThumbnail>>this._model.thumbnails).indexOf(thumb);
-        const verticalLinePos = Math.floor(pos / tilesHorizontal);
-        let verticalPos = verticalLinePos * this._settings.maxThumbnailSize.height;
+    const gap = (vpSize.width % this._settings.maxThumbnailSize.width) / 2;
+    this._view.gap = gap;
 
-        const isOver = this._model.currentPosition.y > verticalPos;
-        const isUnder = this._model.currentPosition.y + this._view.getViewportSize().height < verticalPos + this._settings.maxThumbnailSize.height;
-        if (isOver) {
-        } else if (isUnder) {
-            verticalPos = verticalPos - this._view.getViewportSize().height + this._settings.maxThumbnailSize.height;
-        } else {
-            return;
-        }
+    const maxTileSize = this._settings.maxThumbnailSize;
+    const pos = this._model.currentPosition;
 
-        this._model.currentPosition.move(new MoveVector(0, verticalPos - scrollPos.y));
-        this.update();
-        this._view.jumpToThumbnail(verticalPos);
+    // Container Size
+    const tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
+    const tilesVertical = Math.ceil(vpSize.height / maxTileSize.height);
 
+    if (resize) {
+      this._view.setContainerSize(new Size2D(vpSize.width,
+        Math.ceil(this._model.thumbnails.length / Math.max(tilesHorizontal, 1)) * maxTileSize.height));
+      this.updateThumbnails(0, Math.ceil(this._model.thumbnails.length / tilesHorizontal), resize);
     }
 
+    const startLine = Math.floor(pos.y / maxTileSize.height);
+    const endLine = Math.ceil((pos.y / maxTileSize.height) + tilesVertical);
+    this.updateThumbnails(startLine, endLine, false);
+  }
 
-    public update(resize: boolean = false): void {
-        const vpSize = this._view.getViewportSize();
+  private updateThumbnails(startLine: number, endLine: number, positionOnly: boolean) {
+    const vpSize = this._view.getViewportSize();
+    const maxTileSize = this._settings.maxThumbnailSize;
+    const tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
+    const dontRemoveMap = new MyCoReMap<string, boolean>();
+    const that = this;
 
-        const sizeOfOther = ((childs: JQuery) => {
-            let height = 0;
-            childs.each((i, e: Element) => {
-                if (this._settings.container[0] != e && jQuery(e).css("position") != "absolute") {
-                    height += jQuery(e).outerHeight();
-                }
-            });
-            return height;
-        })(this._settings.container.parent().children());
+    for (let tileY = startLine || 0; tileY < endLine; tileY++) {
+      for (let tileX = 0; tileX < tilesHorizontal; tileX++) {
+        const tileNumber = (tileY * tilesHorizontal) + tileX;
+        const tilePosition = new Position2D(tileX * maxTileSize.width, tileY * maxTileSize.height);
 
+        const tile = this._model.thumbnails[tileNumber];
+        const tileExists = typeof tile != "undefined";
 
-        this._settings.container.css({"height": this._settings.container.parent().height() - sizeOfOther});
-        if (vpSize.width == 0 || vpSize.height == 0) {
-            return;
-        }
-
-        const gap = (vpSize.width % this._settings.maxThumbnailSize.width) / 2;
-        this._view.gap = gap;
-
-        const maxTileSize = this._settings.maxThumbnailSize;
-        const pos = this._model.currentPosition;
-
-        // Container Size
-        const tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
-        const tilesVertical = Math.ceil(vpSize.height / maxTileSize.height);
-
-        if (resize) {
-            this._view.setContainerSize(new Size2D(vpSize.width,
-                Math.ceil(this._model.thumbnails.length / Math.max(tilesHorizontal, 1)) * maxTileSize.height));
-            this.updateThumbnails(0, Math.ceil(this._model.thumbnails.length / tilesHorizontal), resize);
-        }
-
-        const startLine = Math.floor(pos.y / maxTileSize.height);
-        const endLine = Math.ceil((pos.y / maxTileSize.height) + tilesVertical);
-        this.updateThumbnails(startLine, endLine, false);
-    }
-
-    private updateThumbnails(startLine: number, endLine: number, positionOnly: boolean) {
-        const vpSize = this._view.getViewportSize();
-        const maxTileSize = this._settings.maxThumbnailSize;
-        const tilesHorizontal = Math.floor(vpSize.width / maxTileSize.width);
-        const dontRemoveMap = new MyCoReMap<string, boolean>();
-        const that = this;
-
-        for (let tileY = startLine || 0; tileY < endLine; tileY++) {
-            for (let tileX = 0; tileX < tilesHorizontal; tileX++) {
-                const tileNumber = (tileY * tilesHorizontal) + tileX;
-                const tilePosition = new Position2D(tileX * maxTileSize.width, tileY * maxTileSize.height);
-
-                const tile = this._model.thumbnails[tileNumber];
-                const tileExists = typeof tile != "undefined";
-
-                if (tileExists) {
-                    const tileInserted = this._model.tilesInsertedMap.get(tile.id);
-                    if (!tileInserted && !positionOnly) {
-                        this._model.tilesInsertedMap.set(tile.id, true)
-                        this._view.injectTile(tile.id, tilePosition, tile.label);
-                        tile.requestImgdataUrl(((id) => (href: string) => {
-                            that._view.updateTileHref(id, href);
-                        })(tile.id));
-                        if (this._model.selectedThumbnail != null && this._model.selectedThumbnail.id === tile.id) {
-                            this.setThumbnailSelected(tile.id);
-                        }
-                    } else {
-                        if (tileInserted) {
-                            this._view.updateTilePosition(tile.id, tilePosition);
-                        }
-                    }
-                    dontRemoveMap.set(tile.id, false);
-                }
-
+        if (tileExists) {
+          const tileInserted = this._model.tilesInsertedMap.get(tile.id);
+          if (!tileInserted && !positionOnly) {
+            this._model.tilesInsertedMap.set(tile.id, true)
+            this._view.injectTile(tile.id, tilePosition, tile.label);
+            tile.requestImgdataUrl(((id) => (href: string) => {
+              that._view.updateTileHref(id, href);
+            })(tile.id));
+            if (this._model.selectedThumbnail != null && this._model.selectedThumbnail.id === tile.id) {
+              this.setThumbnailSelected(tile.id);
             }
-        }
-
-        this._model.tilesInsertedMap.forEach(function (k, v) {
-            if (!dontRemoveMap.has(k) && dontRemoveMap.get(k) != false) {
-                that.removeThumbnail(k);
+          } else {
+            if (tileInserted) {
+              this._view.updateTilePosition(tile.id, tilePosition);
             }
-        });
-
-
-    }
-
-    private removeThumbnail(tileId: string) {
-        this._model.tilesInsertedMap.remove(tileId);
-        this._view.removeTile(tileId);
-
-    }
-
-    scrolled(newPosition: Position2D): void {
-        this._model.currentPosition = newPosition;
-        this.update(false);
-    }
-
-    resized(newViewPort: Size2D): void {
-        this.update(true);
-        if (this._model.selectedThumbnail != null) {
-            this.jumpToThumbnail(this._model.selectedThumbnail.id);
+          }
+          dontRemoveMap.set(tile.id, false);
         }
+
+      }
     }
+
+    this._model.tilesInsertedMap.forEach(function(k, v) {
+      if (!dontRemoveMap.has(k) && dontRemoveMap.get(k) != false) {
+        that.removeThumbnail(k);
+      }
+    });
+
+
+  }
+
+  private removeThumbnail(tileId: string) {
+    this._model.tilesInsertedMap.remove(tileId);
+    this._view.removeTile(tileId);
+
+  }
+
+  scrolled(newPosition: Position2D): void {
+    this._model.currentPosition = newPosition;
+    this.update(false);
+  }
+
+  resized(newViewPort: Size2D): void {
+    this.update(true);
+    if (this._model.selectedThumbnail != null) {
+      this.jumpToThumbnail(this._model.selectedThumbnail.id);
+    }
+  }
 
 }
 

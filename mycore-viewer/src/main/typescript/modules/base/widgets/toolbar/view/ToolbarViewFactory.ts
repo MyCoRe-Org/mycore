@@ -16,30 +16,30 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ToolbarView} from "./ToolbarView";
-import {TextView} from "./text/TextView";
-import {ImageView} from "./image/ImageView";
-import {GroupView} from "./group/GroupView";
-import {DropdownView} from "./dropdown/DropdownView";
-import {ButtonView} from "./button/ButtonView";
-import {TextInputView} from "./input/TextInputView";
+import { ToolbarView } from "./ToolbarView";
+import { TextView } from "./text/TextView";
+import { ImageView } from "./image/ImageView";
+import { GroupView } from "./group/GroupView";
+import { DropdownView } from "./dropdown/DropdownView";
+import { ButtonView } from "./button/ButtonView";
+import { TextInputView } from "./input/TextInputView";
 
 export interface ToolbarViewFactory {
-    createToolbarView(): ToolbarView;
+  createToolbarView(): ToolbarView;
 
-    createTextView(id: string): TextView;
+  createTextView(id: string): TextView;
 
-    createImageView(id: string): ImageView;
+  createImageView(id: string): ImageView;
 
-    createGroupView(id: string, order: number, align: string): GroupView;
+  createGroupView(id: string, order: number, align: string): GroupView;
 
-    createDropdownView(id: string): DropdownView;
+  createDropdownView(id: string): DropdownView;
 
-    createLargeDropdownView(id: string): DropdownView;
+  createLargeDropdownView(id: string): DropdownView;
 
-    createButtonView(id: string): ButtonView;
+  createButtonView(id: string): ButtonView;
 
-    createTextInputView(id: string): TextInputView;
+  createTextInputView(id: string): TextInputView;
 }
 
 

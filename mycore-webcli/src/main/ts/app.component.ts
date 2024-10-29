@@ -16,14 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, ViewChild} from '@angular/core';
-import {WebCliCommandsComponent} from './commands/commands.component';
-import {WebCliCommandInputComponent} from './command-input/command-input.component';
-import {WebCliLogComponent} from './log/log.component';
-import {WebCliQueueComponent} from './queue/queue.component';
-import {WebCliSettingsComponent} from './settings/settings.component';
-import {CommunicationService} from './service/communication.service';
-import {RESTService} from './service/rest.service';
+import { Component, ViewChild } from '@angular/core';
+import { WebCliCommandsComponent } from './commands/commands.component';
+import { WebCliCommandInputComponent } from './command-input/command-input.component';
+import { WebCliLogComponent } from './log/log.component';
+import { WebCliQueueComponent } from './queue/queue.component';
+import { WebCliSettingsComponent } from './settings/settings.component';
+import { CommunicationService } from './service/communication.service';
+import { RESTService } from './service/rest.service';
 
 declare var $: any;
 
@@ -43,19 +43,19 @@ export class AppComponent {
   webCliLogComponent: WebCliLogComponent;
 
   constructor(private _restService: RESTService,
-              private _communicationService: CommunicationService){
+    private _communicationService: CommunicationService) {
     this._restService.currentCommand.subscribe(
       command => {
-          this.currentCommand = command;
+        this.currentCommand = command;
       });
 
     this._restService.currentQueueLength.subscribe(
       queueLength => {
-          this.currentQueueLength = queueLength;
-          if (queueLength < 1) {
-            (<HTMLElement>document.getElementsByClassName('logTab')[0]).click();
-            // this.webCliLogComponent.scrollLog();
-          }
+        this.currentQueueLength = queueLength;
+        if (queueLength < 1) {
+          (<HTMLElement>document.getElementsByClassName('logTab')[0]).click();
+          // this.webCliLogComponent.scrollLog();
+        }
       });
     this._communicationService.commandHistory.subscribe(
       value => {
@@ -73,17 +73,17 @@ export class AppComponent {
     // }
   }
 
-  clearLog(){
+  clearLog() {
     this.webCliLogComponent.clearLog();
   }
 
-  clearCommandList(){
+  clearCommandList() {
     this._restService.clearCommandList();
   }
 
-  setRefresh(refresh: boolean){
+  setRefresh(refresh: boolean) {
     this.refreshRunning = refresh;
-    if (refresh){
+    if (refresh) {
       this._restService.startLogging();
     }
     else {

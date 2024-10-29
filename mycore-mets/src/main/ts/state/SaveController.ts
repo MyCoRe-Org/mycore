@@ -20,35 +20,35 @@
 ///<reference path="../model/MetsEditorModel.ts"/>
 namespace org.mycore.mets.model.state {
 
-    import MetsModelSave = org.mycore.mets.model.MetsModelSave;
+  import MetsModelSave = org.mycore.mets.model.MetsModelSave;
 
-    export class SaveController {
+  export class SaveController {
 
-        private metsEditorModel: MetsEditorModel;
+    private metsEditorModel: MetsEditorModel;
 
-        constructor(public i18nModel: any, private saveService: MetsModelSave) {
-
-        }
-
-        public init(editorModel: MetsEditorModel) {
-            this.metsEditorModel = editorModel;
-        }
-
-        public canSave() {
-            return !this.metsEditorModel.stateEngine.isServerState();
-        }
-
-        public saveClicked() {
-            this.saveService.save(this.metsEditorModel.targetServlet, this.metsEditorModel.metsModel,
-                (success: boolean) => {
-                    if (success) {
-                        this.metsEditorModel.stateEngine.markServerState();
-                        alert(this.i18nModel.get('save.success'));
-                    } else {
-                        alert(this.i18nModel.get('save.fail'));
-                    }
-                });
-        }
+    constructor(public i18nModel: any, private saveService: MetsModelSave) {
 
     }
+
+    public init(editorModel: MetsEditorModel) {
+      this.metsEditorModel = editorModel;
+    }
+
+    public canSave() {
+      return !this.metsEditorModel.stateEngine.isServerState();
+    }
+
+    public saveClicked() {
+      this.saveService.save(this.metsEditorModel.targetServlet, this.metsEditorModel.metsModel,
+        (success: boolean) => {
+          if (success) {
+            this.metsEditorModel.stateEngine.markServerState();
+            alert(this.i18nModel.get('save.success'));
+          } else {
+            alert(this.i18nModel.get('save.fail'));
+          }
+        });
+    }
+
+  }
 }

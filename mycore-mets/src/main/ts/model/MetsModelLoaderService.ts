@@ -18,25 +18,25 @@
 
 namespace org.mycore.mets.model {
 
-    import MetsModel = org.mycore.mets.model.simple.MCRMetsSimpleModel;
+  import MetsModel = org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
-    /**
-     * This is the service which loads the mets file and parses it into simple model.
-     */
-    export class MetsModelLoader {
-        constructor(private httpService: any) {
-        }
-
-        public load(url: string, callBack: (model: MetsModel) => void) {
-            const promise = this.httpService.get(url);
-
-            promise.then((data) => {
-                callBack(MetsModel.fromJson(data.data));
-            }, () => {
-                // TODO: ERROR HANDLING
-            });
-
-
-        }
+  /**
+   * This is the service which loads the mets file and parses it into simple model.
+   */
+  export class MetsModelLoader {
+    constructor(private httpService: any) {
     }
+
+    public load(url: string, callBack: (model: MetsModel) => void) {
+      const promise = this.httpService.get(url);
+
+      promise.then((data) => {
+        callBack(MetsModel.fromJson(data.data));
+      }, () => {
+        // TODO: ERROR HANDLING
+      });
+
+
+    }
+  }
 }

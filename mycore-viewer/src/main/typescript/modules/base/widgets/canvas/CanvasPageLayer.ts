@@ -17,10 +17,10 @@
  */
 
 
-import {Size2D} from "../../Utils";
+import { Size2D } from "../../Utils";
 
 export interface CanvasPageLayer {
-    draw(ctx: CanvasRenderingContext2D, id: string, pageSize: Size2D, drawOnHtml: boolean): void;
+  draw(ctx: CanvasRenderingContext2D, id: string, pageSize: Size2D, drawOnHtml: boolean): void;
 }
 
 

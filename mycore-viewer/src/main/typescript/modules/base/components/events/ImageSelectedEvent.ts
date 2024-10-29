@@ -17,18 +17,18 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {StructureImage} from "../model/StructureImage";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { StructureImage } from "../model/StructureImage";
 
 export class ImageSelectedEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, private _image: StructureImage) {
-        super(component, ImageSelectedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, private _image: StructureImage) {
+    super(component, ImageSelectedEvent.TYPE);
+  }
 
-    public get image() {
-        return this._image;
-    }
+  public get image() {
+    return this._image;
+  }
 
-    public static TYPE: string = "ImageSelectedEvent";
+  public static TYPE: string = "ImageSelectedEvent";
 }

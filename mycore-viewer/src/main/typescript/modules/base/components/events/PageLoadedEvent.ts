@@ -17,16 +17,16 @@
  */
 
 
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {AbstractPage} from "../model/AbstractPage";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { AbstractPage } from "../model/AbstractPage";
 
 export class PageLoadedEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public _pageId: string, public abstractPage: AbstractPage) {
-        super(component, PageLoadedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public _pageId: string, public abstractPage: AbstractPage) {
+    super(component, PageLoadedEvent.TYPE);
+  }
 
-    public static TYPE: string = "PageLoadedEvent";
+  public static TYPE: string = "PageLoadedEvent";
 
 }
 

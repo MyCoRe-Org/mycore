@@ -16,15 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ViewerComponent} from "../ViewerComponent";
-import {DesktopInputListener} from "../../widgets/canvas/input/DesktopInputListener";
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { DesktopInputListener } from "../../widgets/canvas/input/DesktopInputListener";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
 
 export class RequestDesktopInputEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public listener: DesktopInputListener) {
-        super(component, RequestDesktopInputEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public listener: DesktopInputListener) {
+    super(component, RequestDesktopInputEvent.TYPE);
+  }
 
-    public static TYPE: string = "RequestDesktopInputEvent";
+  public static TYPE: string = "RequestDesktopInputEvent";
 }
 

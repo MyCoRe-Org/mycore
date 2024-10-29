@@ -16,19 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ButtonPressedEvent} from "./ButtonPressedEvent";
-import {ToolbarDropdownButton} from "../model/ToolbarDropdownButton";
+import { ButtonPressedEvent } from "./ButtonPressedEvent";
+import { ToolbarDropdownButton } from "../model/ToolbarDropdownButton";
 
 export class DropdownButtonPressedEvent extends ButtonPressedEvent {
-    constructor(button: ToolbarDropdownButton, private _childId: string) {
-        super(button, DropdownButtonPressedEvent.TYPE);
-    }
+  constructor(button: ToolbarDropdownButton, private _childId: string) {
+    super(button, DropdownButtonPressedEvent.TYPE);
+  }
 
-    public get childId() {
-        return this._childId;
-    }
+  public get childId() {
+    return this._childId;
+  }
 
-    public static TYPE: string = "DropdownButtonPressedEvent";
+  public static TYPE: string = "DropdownButtonPressedEvent";
 
 }
 

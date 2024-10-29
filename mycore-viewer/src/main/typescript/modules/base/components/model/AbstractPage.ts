@@ -17,15 +17,15 @@
  */
 
 
-import {Rect, Size2D} from "../../Utils";
+import { Rect, Size2D } from "../../Utils";
 
 export interface AbstractPage {
-        id:string;
-        size: Size2D;
-        draw(ctx:CanvasRenderingContext2D, rect:Rect, sourceScale, preview?:boolean, infoScale?:number): void;
-        refreshCallback: () => void;
-        clear(): void;
-        toString(): string;
-    }
+  id: string;
+  size: Size2D;
+  draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, preview?: boolean, infoScale?: number): void;
+  refreshCallback: () => void;
+  clear(): void;
+  toString(): string;
+}
 
 

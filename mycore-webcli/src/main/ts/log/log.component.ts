@@ -16,10 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {Settings} from '../settings/settings';
-import {RESTService} from '../service/rest.service';
-import {CommunicationService} from '../service/communication.service';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Settings } from '../settings/settings';
+import { RESTService } from '../service/rest.service';
+import { CommunicationService } from '../service/communication.service';
 
 @Component({
   selector: '[web-cli-log]',
@@ -31,13 +31,13 @@ export class WebCliLogComponent implements AfterViewInit, OnInit {
   webCLILogElement: HTMLElement;
 
   constructor(private _restService: RESTService,
-              private _comunicationService: CommunicationService) {
+    private _comunicationService: CommunicationService) {
     this.settings = new Settings(500, 10, true, false);
   }
 
   ngOnInit() {
     this._comunicationService.settings.subscribe(
-      settings =>{
+      settings => {
         this.settings = settings;
       }
     );
@@ -48,15 +48,15 @@ export class WebCliLogComponent implements AfterViewInit, OnInit {
           var text = document.createTextNode(log.logLevel + ": " + log.message);
           node.appendChild(text);
           this.webCLILogElement.appendChild(node);
-          if(log.exception != undefined) {
+          if (log.exception != undefined) {
             var nodeEx = document.createElement("pre");
             var textEx = document.createTextNode(log.exception);
             nodeEx.appendChild(textEx);
             this.webCLILogElement.appendChild(nodeEx);
           }
           for (let removeNodes = this.webCLILogElement.childNodes.length - this.settings.historySize;
-               removeNodes > 0;
-               removeNodes--) {
+            removeNodes > 0;
+            removeNodes--) {
             (<HTMLElement>this.webCLILogElement.childNodes[0]).remove();
           }
         }
@@ -65,7 +65,7 @@ export class WebCliLogComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit() {
-    this.webCLILogElement = <HTMLElement> document.getElementsByClassName('web-cli-log')[0];
+    this.webCLILogElement = <HTMLElement>document.getElementsByClassName('web-cli-log')[0];
   }
 
   public clearLog() {
@@ -74,7 +74,7 @@ export class WebCliLogComponent implements AfterViewInit, OnInit {
 
   scrollLog() {
     if (this.settings.autoscroll) {
-        this.webCLILogElement.scrollTop = this.webCLILogElement.scrollHeight;
+      this.webCLILogElement.scrollTop = this.webCLILogElement.scrollHeight;
     }
   }
 }

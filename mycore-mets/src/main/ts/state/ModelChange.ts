@@ -17,33 +17,33 @@
  */
 
 namespace org.mycore.mets.model.state {
-    export class ModelChange {
-        private id: string;
-        private date: Date;
+  export class ModelChange {
+    private id: string;
+    private date: Date;
 
-        constructor() {
-            this.id = this.createRandomId();
-            this.date = new Date();
-        }
-
-        public doChange(): void {
-            throw new Error('doChange is not implemened!');
-        }
-
-        public unDoChange(): void {
-            throw new Error('unDoChange is not implemened!');
-        }
-
-        public getDescription(messages: any): string {
-            throw new Error('getDescription is not implemened!');
-        }
-
-        public getDate() {
-            return this.date;
-        }
-
-        private createRandomId() {
-            return 'nnnnnn-nnnn-nnnn-nnnnnnnn'.split('n').map((n) => n + Math.ceil(15 * Math.random()).toString(36)).join('');
-        }
+    constructor() {
+      this.id = this.createRandomId();
+      this.date = new Date();
     }
+
+    public doChange(): void {
+      throw new Error('doChange is not implemened!');
+    }
+
+    public unDoChange(): void {
+      throw new Error('unDoChange is not implemened!');
+    }
+
+    public getDescription(messages: any): string {
+      throw new Error('getDescription is not implemened!');
+    }
+
+    public getDate() {
+      return this.date;
+    }
+
+    private createRandomId() {
+      return 'nnnnnn-nnnn-nnnn-nnnnnnnn'.split('n').map((n) => n + Math.ceil(15 * Math.random()).toString(36)).join('');
+    }
+  }
 }

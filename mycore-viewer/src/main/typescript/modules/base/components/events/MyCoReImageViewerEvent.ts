@@ -16,13 +16,13 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DefaultViewerEvent} from "../../widgets/events/ViewerEvent";
+import { DefaultViewerEvent } from "../../widgets/events/ViewerEvent";
 
 export class MyCoReImageViewerEvent extends DefaultViewerEvent {
 
-    constructor(public component: any, type: string) {
-        super(type);
-    }
+  constructor(public component: any, type: string) {
+    super(type);
+  }
 
 }
 

@@ -16,11 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
 
 export interface IIIFSettings extends MyCoReViewerSettings {
-    manifestURL: string;
-    imageAPIURL: string;
-    pageRange: number;
+  manifestURL: string;
+  imageAPIURL: string;
+  pageRange: number;
 }
 

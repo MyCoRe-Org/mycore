@@ -16,13 +16,13 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class HtmlService {
 
-    public keys(object: {}) {
-        return Object.keys(object);
-    }
+  public keys(object: {}) {
+    return Object.keys(object);
+  }
 
 }

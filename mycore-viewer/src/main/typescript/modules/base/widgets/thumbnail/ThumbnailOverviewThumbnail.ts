@@ -17,7 +17,7 @@
  */
 
 export interface ThumbnailOverviewThumbnail {
-    id: string;
-    label: string;
-    requestImgdataUrl: (callback: (imgdata: string) => void) => void;
+  id: string;
+  label: string;
+  requestImgdataUrl: (callback: (imgdata: string) => void) => void;
 }
