@@ -18,15 +18,15 @@
 
 package org.mycore.common.content.streams;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+import java.io.ByteArrayInputStream;
+
 import org.junit.Test;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.ifs2.MCRFile;
-
-import java.io.ByteArrayInputStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author Frank Lützenkirchen

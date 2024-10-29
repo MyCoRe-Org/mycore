@@ -18,6 +18,8 @@
 
 package org.mycore.services.queuedjob;
 
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -37,8 +39,6 @@ import org.mycore.common.config.annotation.MCRProperty;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 /**
  * A {@link MCRSimpleJobSelector} is a {@link MCRJobSelector} that combines multiple simple but commonly required

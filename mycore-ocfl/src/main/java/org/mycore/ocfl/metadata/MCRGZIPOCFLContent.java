@@ -18,11 +18,11 @@
 
 package org.mycore.ocfl.metadata;
 
-import io.ocfl.api.OcflRepository;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
+
+import io.ocfl.api.OcflRepository;
 
 public class MCRGZIPOCFLContent extends MCROCFLContent {
 

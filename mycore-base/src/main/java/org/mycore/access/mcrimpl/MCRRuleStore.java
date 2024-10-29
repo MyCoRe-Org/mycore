@@ -19,6 +19,7 @@
 package org.mycore.access.mcrimpl;
 
 import java.util.Collection;
+
 import org.mycore.common.config.MCRConfiguration2;
 
 /**

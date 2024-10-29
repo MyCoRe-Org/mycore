@@ -18,6 +18,9 @@
 
 package org.mycore.user2.hash.bouncycastle;
 
+import static com.google.common.primitives.Chars.max;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -31,9 +34,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
-
-import static com.google.common.primitives.Chars.max;
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
  * {@link MCRBCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the BCrypt algorithm.

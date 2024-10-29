@@ -18,6 +18,8 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
+
 import java.io.File;
 import java.util.List;
 import java.util.function.Supplier;
@@ -25,8 +27,6 @@ import java.util.function.Supplier;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 /**
  * {@link MCRDeveloperOverrideResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up

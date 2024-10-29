@@ -38,13 +38,13 @@ import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRJPABootstrapper;
+import org.mycore.backend.jpa.MCRPersistenceProvider;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
 import jakarta.persistence.RollbackException;
-import org.mycore.backend.jpa.MCRPersistenceProvider;
 
 public class MCRJPATestCase extends MCRTestCase {
 

@@ -18,8 +18,13 @@
 
 package org.mycore.common.xml;
 
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.ConsumptionProbe;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -27,11 +32,8 @@ import org.mycore.common.MCRRateLimitBuckets;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
-import javax.xml.transform.stream.StreamSource;
-import java.util.concurrent.TimeUnit;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.ConsumptionProbe;
 
 /**
  * URI-Resolver that can limit the processing of downstream URI-Resolver operations.

@@ -18,17 +18,18 @@
 
 package org.mycore.common;
 
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.local.LocalBucketBuilder;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
-
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.local.LocalBucketBuilder;
 
 /**
  * Manages the {@link Bucket Buckets} for different configurations.

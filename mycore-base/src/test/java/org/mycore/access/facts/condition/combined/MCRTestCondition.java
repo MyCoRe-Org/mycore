@@ -18,10 +18,10 @@
 
 package org.mycore.access.facts.condition.combined;
 
+import java.util.function.Supplier;
+
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.condition.MCRAbstractCondition;
-
-import java.util.function.Supplier;
 
 class MCRTestCondition extends MCRAbstractCondition {
     Supplier<Boolean> match;
