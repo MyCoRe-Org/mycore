@@ -72,7 +72,7 @@ import jakarta.persistence.Transient;
 public class MCRAccessKey {
 
     /** The unique and internal information id */
-    private Long id;
+    private Integer id;
 
     /** The access key information */
     private String reference;
@@ -199,14 +199,14 @@ public class MCRAccessKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "accesskey_id",
         nullable = false)
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
     /**
      * @param id internal id
      */
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
