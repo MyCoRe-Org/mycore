@@ -30,9 +30,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -76,8 +79,8 @@ public class MCRUserServlet extends MCRServlet {
 
     /**
      * Handles requests. The parameter 'action' selects what to do, possible
-     * values are show, save, delete, password (with id as second parameter). 
-     * The default is to search and list users. 
+     * values are show, save, delete, password (with id as second parameter).
+     * The default is to search and list users.
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
@@ -89,7 +92,7 @@ public class MCRUserServlet extends MCRServlet {
         String uid = req.getParameter("id");
         MCRUser user;
 
-        if ((uid == null) || (uid.trim().length() == 0)) {
+        if (uid == null || uid.isBlank()) {
             user = MCRUserManager.getCurrentUser();
             uid = user != null ? String.valueOf(user.getUserID()) : null;
             if (!(user instanceof MCRTransientUser)) {
@@ -104,7 +107,7 @@ public class MCRUserServlet extends MCRServlet {
             case "show" -> showUser(req, res, user, uid);
             case "save" -> saveUser(req, res);
             case "saveCurrentUser" -> saveCurrentUser(req, res);
-            case "changeMyPassword" -> redirectToPasswordChangePage(req, res);
+            case "changeMyPassword" -> redirectToPasswordChangePage(res);
             case "password" -> changePassword(req, res, user, uid);
             case "delete" -> deleteUser(req, res, user);
             case "listUsers" -> listUsers(req, res);
@@ -112,7 +115,7 @@ public class MCRUserServlet extends MCRServlet {
         }
     }
 
-    private void redirectToPasswordChangePage(HttpServletRequest req, HttpServletResponse res) throws Exception {
+    private void redirectToPasswordChangePage(HttpServletResponse res) throws Exception {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         if (!checkUserIsNotNull(res, currentUser, null)) {
             return;
@@ -249,7 +252,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
+        Document doc = (Document) req.getAttribute("MCRXEditorSubmission");
         Element u = doc.getRootElement();
         String userName = u.getAttributeValue("name");
 
@@ -258,95 +261,136 @@ public class MCRUserServlet extends MCRServlet {
             realmID = u.getAttributeValue("realm");
         }
 
-        MCRUser user;
-        boolean userExists = MCRUserManager.exists(userName, realmID);
-        if (!userExists) {
-            user = new MCRUser(userName, realmID);
-            LOGGER.info("create new user {} {}", userName, realmID);
-
-            // For new local users, set password
-            String pwd = u.getChildText("password");
-            if ((pwd != null) && (pwd.trim().length() > 0) && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
-                MCRUserManager.setUserPassword(user, pwd);
-            }
-        } else {
-            user = MCRUserManager.getUser(userName, realmID);
-            if (!(hasAdminPermission || currentUser.equals(user) || currentUser.equals(user.getOwner()))) {
-                res.sendError(HttpServletResponse.SC_FORBIDDEN);
-                return;
-            }
+        MCRUser user = getUserIfAllowed(userName, realmID,
+            u.getChildText("password"),
+            testUser -> hasAdminPermission || currentUser.equals(testUser) || currentUser.equals(testUser.getOwner()),
+            res);
+        if (user == null) {
+            return;
         }
 
-        XPathExpression<Attribute> hintPath = XPathFactory.instance().compile("password/@hint", Filters.attribute());
-        Attribute hintAttr = hintPath.evaluateFirst(u);
-        String hint = hintAttr == null ? null : hintAttr.getValue();
-        if ((hint != null) && (hint.trim().length() == 0)) {
-            hint = null;
-        }
-        user.setHint(hint);
+        user.setHint(getPasswordHint(u));
 
         updateBasicUserInfo(u, user);
 
         if (hasAdminPermission) {
-            boolean locked = "true".equals(u.getAttributeValue("locked"));
-            user.setLocked(locked);
-
-            boolean disabled = "true".equals(u.getAttributeValue("disabled"));
-            user.setDisabled(disabled);
-
-            Element o = u.getChild("owner");
-            if (o != null && !o.getAttributes().isEmpty()) {
-                String ownerName = o.getAttributeValue("name");
-                String ownerRealm = o.getAttributeValue("realm");
-                MCRUser owner = MCRUserManager.getUser(ownerName, ownerRealm);
-                if (!checkUserIsNotNull(res, owner, ownerName + "@" + ownerRealm)) {
-                    return;
-                }
-                user.setOwner(owner);
-            } else {
-                user.setOwner(null);
-            }
-            String validUntilText = u.getChildTextTrim("validUntil");
-            if (validUntilText == null || validUntilText.length() == 0) {
-                user.setValidUntil(null);
-            } else {
-
-                String dateInUTC = validUntilText;
-                if (validUntilText.length() == 10) {
-                    dateInUTC = convertToUTC(validUntilText, "yyyy-MM-dd");
-                }
-
-                MCRISO8601Date date = new MCRISO8601Date(dateInUTC);
-                user.setValidUntil(date.getDate());
+            if (!applyAdminUpdates(user, u, res)) {
+                return;
             }
         } else { // save read user of creator
             user.setRealm(MCRRealmFactory.getLocalRealm());
             user.setOwner(currentUser);
         }
-        Element gs = u.getChild("roles");
-        if (gs != null) {
-            user.getSystemRoleIDs().clear();
-            user.getExternalRoleIDs().clear();
-            List<Element> groupList = gs.getChildren("role");
-            for (Element group : groupList) {
-                String groupName = group.getAttributeValue("name");
-                if (hasAdminPermission || currentUser.isUserInRole(groupName)) {
-                    user.assignRole(groupName);
-                } else {
-                    LOGGER.warn("Current user {} has not the permission to add user to group {}",
-                        currentUser.getUserID(), groupName);
-                }
-            }
-        }
 
-        if (userExists) {
-            MCRUserManager.updateUser(user);
-        } else {
-            MCRUserManager.createUser(user);
-        }
+        assignRolesToUser(getRoles(u), user,
+            role -> hasAdminPermission || currentUser.isUserInRole(role),
+            role -> LOGGER.warn("Current user {} has not the permission to add user to group {}",
+                currentUser.getUserID(), role));
+
+        MCRUserManager.updateUser(user); //also creates user
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id="
             + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
+    }
+
+    private static MCRUser getUserIfAllowed(String userName, String realmID, String pwd, Predicate<MCRUser> allowUpdate,
+        HttpServletResponse res) throws IOException {
+        MCRUser user;
+        boolean userExists = MCRUserManager.exists(userName, realmID);
+        if (!userExists) {
+            user = createUser(userName, realmID, pwd);
+        } else {
+            user = MCRUserManager.getUser(userName, realmID);
+            if (!allowUpdate.test(user)) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return null;
+            }
+        }
+        return user;
+    }
+
+    private static String getPasswordHint(Element u) {
+        XPathExpression<Attribute> hintPath = XPathFactory.instance().compile("password/@hint", Filters.attribute());
+        Attribute hintAttr = hintPath.evaluateFirst(u);
+        String hint = hintAttr == null ? null : hintAttr.getValue();
+        if ((hint != null) && (hint.isBlank())) {
+            hint = null;
+        }
+        return hint;
+    }
+
+    private boolean applyAdminUpdates(MCRUser user, Element u, HttpServletResponse res)
+        throws IOException, ParseException {
+        boolean locked = "true".equals(u.getAttributeValue("locked"));
+        user.setLocked(locked);
+
+        boolean disabled = "true".equals(u.getAttributeValue("disabled"));
+        user.setDisabled(disabled);
+
+        Element o = u.getChild("owner");
+        if (o != null && !o.getAttributes().isEmpty()) {
+            String ownerName = o.getAttributeValue("name");
+            String ownerRealm = o.getAttributeValue("realm");
+            MCRUser owner = MCRUserManager.getUser(ownerName, ownerRealm);
+            if (!checkUserIsNotNull(res, owner, ownerName + "@" + ownerRealm)) {
+                return false;
+            }
+            user.setOwner(owner);
+        } else {
+            user.setOwner(null);
+        }
+        String validUntilText = u.getChildTextTrim("validUntil");
+        if (validUntilText == null || validUntilText.isEmpty()) {
+            user.setValidUntil(null);
+        } else {
+            String dateInUTC = validUntilText;
+            if (validUntilText.length() == 10) {
+                dateInUTC = convertToUTC(validUntilText, "yyyy-MM-dd");
+            }
+
+            MCRISO8601Date date = new MCRISO8601Date(dateInUTC);
+            user.setValidUntil(date.getDate());
+        }
+        return true;
+    }
+
+    private static void assignRolesToUser(List<String> roles, MCRUser user, Predicate<String> permission,
+        Consumer<String> failedAssignment) {
+        if (roles == null) {
+            return;
+        }
+        user.getSystemRoleIDs().clear();
+        user.getExternalRoleIDs().clear();
+        for (String role : roles) {
+            if (permission.test(role)) {
+                user.assignRole(role);
+            } else {
+                failedAssignment.accept(role);
+            }
+        }
+    }
+
+    private List<String> getRoles(Element user) {
+        Element gs = user.getChild("roles");
+        if (gs == null) {
+            return null;
+        }
+        return gs.getChildren("role").stream()
+            .map(group -> group.getAttributeValue("name"))
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    private static MCRUser createUser(String userName, String realmID, String pwd) {
+        MCRUser user;
+        user = new MCRUser(userName, realmID);
+        LOGGER.info("create new user {} {}", userName, realmID);
+
+        // For new local users, set password
+        if ((pwd != null) && (pwd.isBlank()) && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
+            MCRUserManager.setUserPassword(user, pwd);
+        }
+        return user;
     }
 
     private String convertToUTC(String validUntilText, String format) throws ParseException {
@@ -361,13 +405,13 @@ public class MCRUserServlet extends MCRServlet {
 
     private void updateBasicUserInfo(Element u, MCRUser user) {
         String name = u.getChildText("realName");
-        if ((name != null) && (name.trim().length() == 0)) {
+        if (name != null && name.isBlank()) {
             name = null;
         }
         user.setRealName(name);
 
         String eMail = u.getChildText("eMail");
-        if ((eMail != null) && (eMail.trim().length() == 0)) {
+        if (eMail != null && eMail.isBlank()) {
             eMail = null;
         }
         user.setEMail(eMail);
@@ -505,7 +549,7 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     private void addString(Element parent, String name, String value) {
-        if ((value != null) && (value.trim().length() > 0)) {
+        if (value != null && value.isBlank()) {
             parent.addContent(new Element(name).setText(value.trim()));
         }
     }

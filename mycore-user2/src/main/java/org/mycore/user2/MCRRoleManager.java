@@ -237,7 +237,7 @@ public class MCRRoleManager {
      * This method will fail if any objects (e.g. users) are linked to it.
      */
     public static void deleteRole(String roleID) {
-        MCRRole role = MCRRoleManager.getRole(roleID);
+        MCRRole role = getRole(roleID);
         if (role == null) {
             //unknown role
             return;
