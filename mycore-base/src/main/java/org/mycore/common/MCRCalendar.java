@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,14 +38,6 @@ import com.ibm.icu.util.IslamicCalendar;
 import com.ibm.icu.util.JapaneseCalendar;
 import com.ibm.icu.util.ULocale;
 
-/**
- * This class implements all methods for handling calendars in MyCoRe objects
- * and data models. It is licensed by <a href="http://source.icu-project.org/repos/icu/icu/trunk/license.html">ICU License</a>.
- *
- * @author Jens Kupferschmidt
- * @author Thomas Junge
- * @see <a href="http://site.icu-project.org/home">http://site.icu-project.org/home</a>
- */
 public class MCRCalendar {
 
     /**
