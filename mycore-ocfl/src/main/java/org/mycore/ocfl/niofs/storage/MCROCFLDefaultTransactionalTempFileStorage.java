@@ -76,8 +76,11 @@ public class MCROCFLDefaultTransactionalTempFileStorage implements MCROCFLTransa
      */
     @Override
     public Path toPhysicalPath(String owner, String version) {
-        MCROCFLFileSystemTransaction transaction = MCROCFLFileSystemTransaction.getActive();
-        return toPhysicalPath(transaction, owner, version);
+        if (!MCROCFLFileSystemTransaction.isActive()) {
+            throw new MCROCFLInactiveTransactionException("Transaction is not active!");
+        }
+        Long transactionId = MCROCFLFileSystemTransaction.getTransactionId();
+        return toPhysicalPath(transactionId, owner, version);
     }
 
     /**
@@ -85,36 +88,39 @@ public class MCROCFLDefaultTransactionalTempFileStorage implements MCROCFLTransa
      */
     @Override
     public Path toPhysicalPath(MCRVersionedPath path) throws MCROCFLInactiveTransactionException {
-        MCROCFLFileSystemTransaction transaction = MCROCFLFileSystemTransaction.getActive();
-        return toPhysicalPath(transaction, path);
+        if (!MCROCFLFileSystemTransaction.isActive()) {
+            throw new MCROCFLInactiveTransactionException("Transaction is not active!");
+        }
+        Long transactionId = MCROCFLFileSystemTransaction.getTransactionId();
+        return toPhysicalPath(transactionId, path);
     }
 
     /**
      * Converts the specified versioned path to a physical path within the context of the specified transaction.
      *
-     * @param transaction the active transaction.
+     * @param transactionId the transaction id.
      * @param path the versioned path to convert.
      * @return the physical path corresponding to the versioned path within the transaction.
      */
-    private Path toPhysicalPath(MCROCFLFileSystemTransaction transaction, MCRVersionedPath path) {
+    private Path toPhysicalPath(Long transactionId, MCRVersionedPath path) {
         String owner = path.getOwner();
         String version = resolveVersion(path);
         String relativePath = path.getOwnerRelativePath().substring(1);
-        return toPhysicalPath(transaction, owner, version).resolve(relativePath);
+        return toPhysicalPath(transactionId, owner, version).resolve(relativePath);
     }
 
     /**
      * Converts the specified owner and version to a physical path within the context of the specified transaction.
      *
-     * @param transaction the active transaction.
+     * @param transactionId the transaction id.
      * @param owner the owner of the path.
      * @param version the version of the path.
      * @return the physical path corresponding to the owner and version within the transaction.
      */
-    public Path toPhysicalPath(MCROCFLFileSystemTransaction transaction, String owner, String version) {
-        Objects.requireNonNull(transaction);
+    public Path toPhysicalPath(Long transactionId, String owner, String version) {
+        Objects.requireNonNull(transactionId);
         Objects.requireNonNull(owner);
-        Path transactionOwnerPath = toPhysicalPath(transaction).resolve(owner);
+        Path transactionOwnerPath = toPhysicalPath(transactionId).resolve(owner);
         return transactionOwnerPath.resolve(version != null ? version : firstVersionFolder());
     }
 

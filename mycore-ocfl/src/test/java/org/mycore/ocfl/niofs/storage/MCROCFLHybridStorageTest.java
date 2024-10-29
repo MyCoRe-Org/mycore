@@ -8,7 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.ocfl.niofs.MCROCFLInactiveTransactionException;
 
 public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
@@ -36,9 +36,9 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         assertFalse("'path1' should not exist before any operation", storage.exists(path1));
         write(path1);
         assertTrue("'path1' should exist after write operation", storage.exists(path1));
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertTrue("'path1' should exist after transaction start", storage.exists(path1));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 
     @Test
@@ -46,15 +46,15 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         String rollingDirectory = "/" + MCROCFLHybridStorage.ROLLING_DIRECTORY + "/";
         String transactionDirectory = "/" + MCROCFLHybridStorage.TRANSACTION_DIRECTORY + "/";
         assertTrue("should access rolling store", storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertTrue("should access transactional store",
             storage.toPhysicalPath(path1).toString().contains(transactionDirectory));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertTrue("should access rolling store", storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertTrue("should access transactional store",
             storage.toPhysicalPath(path1).toString().contains(transactionDirectory));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 
     @Test
@@ -62,12 +62,12 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         storage.copy(new ByteArrayInputStream(new byte[] { 1 }), path1);
         assertTrue("'path1' should exist", storage.exists(path1));
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertTrue("'path1' should exist", storage.exists(path1));
         storage.copy(new ByteArrayInputStream(new byte[] { 2 }), path1);
         assertTrue("'path1' should exist", storage.exists(path1));
         assertArrayEquals("'path1' should have the content of the transactional store", new byte[] { 2 }, read(path1));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         assertArrayEquals("'path1' should have the content of the rollover store", new byte[] { 1 }, read(path1));
     }
@@ -84,7 +84,7 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         assertArrayEquals("'path1' should have the content of the rollover store", path1Data, read(path1));
         assertArrayEquals("'path2' should have the content of the rollover store", path1Data, read(path2));
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertArrayEquals("'path1' should have the content of the rollover store", path1Data, read(path1));
         assertArrayEquals("'path2' should have the content of the rollover store", path1Data, read(path2));
         storage.copy(path1, path3);
@@ -92,7 +92,7 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         write(path3, path3Data);
         storage.copy(path3, path2);
         assertArrayEquals("'path2' should have the content of the transactional store", path3Data, read(path2));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 
     @Test
@@ -101,10 +101,10 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         storage.move(path1, path2);
         assertTrue("'path2' should exist after move", storage.exists(path2));
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         storage.move(path2, path3);
         assertTrue("'path3' should exist after move", storage.exists(path3));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 
     @Test
@@ -114,12 +114,12 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         storage.deleteIfExists(path1);
         assertFalse("'path1' should not exist after deletion", storage.exists(path1));
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         write(path1);
         assertTrue("'path1' should exist before deletion", storage.exists(path1));
         storage.deleteIfExists(path1);
         assertFalse("'path1' should not exist after deletion", storage.exists(path1));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 
 }
