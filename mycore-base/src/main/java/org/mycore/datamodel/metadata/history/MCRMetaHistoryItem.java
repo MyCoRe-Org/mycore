@@ -21,12 +21,12 @@ package org.mycore.datamodel.metadata.history;
 import java.io.Serializable;
 import java.time.Instant;
 
-import jakarta.persistence.Basic;
 import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;

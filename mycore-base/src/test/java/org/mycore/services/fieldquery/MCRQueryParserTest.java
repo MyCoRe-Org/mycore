@@ -20,12 +20,9 @@ package org.mycore.services.fieldquery;
 
 import static org.junit.Assert.assertEquals;
 
-
 import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-
 import org.mycore.parsers.bool.MCRCondition;
 
 

@@ -18,6 +18,9 @@
 
 package org.mycore.user2.hash;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,9 +32,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", empty = true)

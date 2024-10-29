@@ -18,7 +18,11 @@
 
 package org.mycore.common.xml;
 
-import io.github.bucket4j.Bucket;
+import static org.junit.Assert.assertTrue;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
@@ -30,10 +34,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-
-import static org.junit.Assert.assertTrue;
+import io.github.bucket4j.Bucket;
 
 public class MCRRateLimitResolverTest extends MCRTestCase {
 

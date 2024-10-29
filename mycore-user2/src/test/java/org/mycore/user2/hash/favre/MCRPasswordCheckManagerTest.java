@@ -18,6 +18,9 @@
 
 package org.mycore.user2.hash.favre;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
@@ -25,9 +28,6 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.user2.hash.MCRPasswordCheckData;
 import org.mycore.user2.hash.MCRPasswordCheckManager;
 import org.mycore.user2.hash.bouncycastle.MCRBCryptStrategy;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", empty = true)

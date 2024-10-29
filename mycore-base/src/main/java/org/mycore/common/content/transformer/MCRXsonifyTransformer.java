@@ -18,10 +18,29 @@
 
 package org.mycore.common.content.transformer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.inject.Singleton;
+import static org.mycore.xsonify.serialize.SerializerSettings.AdditionalNamespaceDeclarationStrategy;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ADDITIONAL_NAMESPACE_DECLARATION_STRATEGY;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ATTRIBUTE_PREFIX_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ELEMENT_PREFIX_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_JSON_STRUCTURE;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_MIXED_CONTENT_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NAMESPACE_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NORMALIZE_TEXT;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_OMIT_ROOT_ELEMENT;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_PLAIN_TEXT_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_XS_ANY_NAMESPACE_STRATEGY;
+import static org.mycore.xsonify.serialize.SerializerSettings.JsonStructure;
+import static org.mycore.xsonify.serialize.SerializerSettings.MixedContentHandling;
+import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceDeclaration;
+import static org.mycore.xsonify.serialize.SerializerSettings.PlainTextHandling;
+import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
+import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
+
+import java.io.IOException;
+import java.util.Locale;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRPostConstruction;
@@ -45,27 +64,11 @@ import org.mycore.xsonify.xsd.XsdParseException;
 import org.mycore.xsonify.xsd.XsdParser;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.Locale;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.mycore.xsonify.serialize.SerializerSettings.AdditionalNamespaceDeclarationStrategy;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ADDITIONAL_NAMESPACE_DECLARATION_STRATEGY;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ATTRIBUTE_PREFIX_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ELEMENT_PREFIX_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_JSON_STRUCTURE;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_MIXED_CONTENT_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NAMESPACE_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NORMALIZE_TEXT;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_OMIT_ROOT_ELEMENT;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_PLAIN_TEXT_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_XS_ANY_NAMESPACE_STRATEGY;
-import static org.mycore.xsonify.serialize.SerializerSettings.JsonStructure;
-import static org.mycore.xsonify.serialize.SerializerSettings.MixedContentHandling;
-import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceDeclaration;
-import static org.mycore.xsonify.serialize.SerializerSettings.PlainTextHandling;
-import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
-import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
+import jakarta.inject.Singleton;
 
 /**
  * <p>Content Transformer to convert XML to JSON and vice versa.

@@ -18,15 +18,16 @@
 
 package org.mycore.datamodel.language;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
-import org.mycore.tools.MCRLanguageOrientationHelper;
+import java.util.Map.Entry;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
-import java.util.Map.Entry;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
+import org.mycore.tools.MCRLanguageOrientationHelper;
 
 /**
  * Resolves languages by code. Syntax: language:{ISOCode}

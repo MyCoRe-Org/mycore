@@ -18,12 +18,12 @@
 
 package org.mycore.resource;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Optional;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class MCRResourcePathTest extends MCRTestCase {

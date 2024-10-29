@@ -36,10 +36,10 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.mycore.resource.MCRResourceHelper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

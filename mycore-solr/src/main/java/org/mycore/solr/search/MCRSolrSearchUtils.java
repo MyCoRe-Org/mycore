@@ -44,8 +44,8 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 import jakarta.servlet.http.HttpServletRequest;
 

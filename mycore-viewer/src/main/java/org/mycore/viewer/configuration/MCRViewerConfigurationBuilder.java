@@ -18,11 +18,13 @@
 
 package org.mycore.viewer.configuration;
 
-import com.google.common.collect.Multimap;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Map;
+
 import org.mycore.viewer.configuration.MCRViewerConfiguration.ResourceType;
 
-import java.util.Map;
+import com.google.common.collect.Multimap;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Use this class to build your {@link MCRViewerConfiguration}.

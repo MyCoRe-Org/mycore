@@ -18,10 +18,10 @@
 
 package org.mycore.ocfl.metadata.migration;
 
-import org.jdom2.JDOMException;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.jdom2.JDOMException;
 
 /**
  * Prunes a list of revisions to remove any that are not needed.

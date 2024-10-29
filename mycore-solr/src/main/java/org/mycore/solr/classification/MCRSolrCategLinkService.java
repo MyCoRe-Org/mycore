@@ -31,11 +31,11 @@ import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Solr extension of the category link service. Updates the solr index on set and delete

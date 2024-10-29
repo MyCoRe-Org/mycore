@@ -66,9 +66,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.resource.MCRResourceHelper;
-
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.resource.MCRResourceHelper;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

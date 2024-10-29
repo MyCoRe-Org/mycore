@@ -18,11 +18,11 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.Objects;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-
-import java.util.Objects;
 
 public class MCRFieldBaseValue {
 

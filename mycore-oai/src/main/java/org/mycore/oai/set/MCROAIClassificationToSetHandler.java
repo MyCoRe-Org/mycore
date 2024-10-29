@@ -35,8 +35,8 @@ import org.mycore.oai.MCROAIUtils;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Classification set handler.

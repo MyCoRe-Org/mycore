@@ -27,11 +27,11 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 
 public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler {

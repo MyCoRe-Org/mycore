@@ -18,12 +18,12 @@
 
 package org.mycore.backend.jpa;
 
-import org.mycore.common.config.MCRConfiguration2;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Adds simpler and name conforming property configuration on top of {@link MCRPersistenceUnitDescriptor}

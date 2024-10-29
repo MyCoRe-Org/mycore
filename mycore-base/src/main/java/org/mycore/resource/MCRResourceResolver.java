@@ -18,6 +18,14 @@
 
 package org.mycore.resource;
 
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -33,14 +41,6 @@ import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
-
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * A {@link MCRResourceResolver} is a component that uses a {@link MCRResourceProvider} instance to lookup resources.

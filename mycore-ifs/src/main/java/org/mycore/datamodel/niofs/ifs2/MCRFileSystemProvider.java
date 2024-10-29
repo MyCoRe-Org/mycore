@@ -18,20 +18,6 @@
 
 package org.mycore.datamodel.niofs.ifs2;
 
-import com.google.common.collect.Sets;
-import org.mycore.common.events.MCRPathEventHelper;
-import org.mycore.datamodel.ifs2.MCRDirectory;
-import org.mycore.datamodel.ifs2.MCRFile;
-import org.mycore.datamodel.ifs2.MCRFileCollection;
-import org.mycore.datamodel.ifs2.MCRStoredNode;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
-import org.mycore.datamodel.niofs.MCRAbstractFileSystemProvider;
-import org.mycore.datamodel.niofs.MCRBasicFileAttributeViewProperties;
-import org.mycore.datamodel.niofs.MCRFileAttributes;
-import org.mycore.datamodel.niofs.MCRDigestAttributeView;
-import org.mycore.datamodel.niofs.MCRPath;
-
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
@@ -60,6 +46,21 @@ import java.nio.file.attribute.FileAttributeView;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.mycore.common.events.MCRPathEventHelper;
+import org.mycore.datamodel.ifs2.MCRDirectory;
+import org.mycore.datamodel.ifs2.MCRFile;
+import org.mycore.datamodel.ifs2.MCRFileCollection;
+import org.mycore.datamodel.ifs2.MCRStoredNode;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystemProvider;
+import org.mycore.datamodel.niofs.MCRBasicFileAttributeViewProperties;
+import org.mycore.datamodel.niofs.MCRDigestAttributeView;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
+import org.mycore.datamodel.niofs.MCRPath;
+
+import com.google.common.collect.Sets;
 
 /**
  * MyCoRe IFS2 FileSystemProvider implementation

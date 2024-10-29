@@ -18,17 +18,17 @@
 
 package org.mycore.datamodel.language;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+
+import javax.xml.transform.TransformerException;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-import javax.xml.transform.TransformerException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 
 public class MCRLanguageResolverTest extends MCRTestCase {
 

@@ -20,7 +20,11 @@ package org.mycore.backend.jpa;
 
 import static org.mycore.backend.jpa.MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME;
 
-import jakarta.servlet.ServletContext;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,11 +34,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRInstanceName;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import jakarta.servlet.ServletContext;
 
 public class MCRJPAConfigurationCheck implements AutoExecutable {
 

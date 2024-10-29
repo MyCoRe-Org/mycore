@@ -36,8 +36,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.Set;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Fires <code>{OAIPrefix}.Sets.{SetID}.Query</code> and limits results to the <code>id</code>s of the

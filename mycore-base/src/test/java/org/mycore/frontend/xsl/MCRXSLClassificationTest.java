@@ -18,19 +18,19 @@
 
 package org.mycore.frontend.xsl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mycore.common.util.MCRTestCaseXSLTUtil.prepareTestDocument;
+import static org.mycore.common.util.MCRTestCaseXSLTUtil.transform;
+
+import java.util.Map;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.util.MCRTestCaseClassificationUtil;
-
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mycore.common.util.MCRTestCaseXSLTUtil.prepareTestDocument;
-import static org.mycore.common.util.MCRTestCaseXSLTUtil.transform;
 
 public class MCRXSLClassificationTest extends MCRJPATestCase {
     private static final String XSL = "/xslt/functions/classificationTest.xsl";
