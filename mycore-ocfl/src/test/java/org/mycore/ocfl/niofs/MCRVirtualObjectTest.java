@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 import io.ocfl.api.model.ObjectVersionId;
@@ -39,11 +39,11 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
         assertNotNull(getVirtualObject().toPhysicalPath(source));
         assertThrows(NoSuchFileException.class, () -> getVirtualObject().toPhysicalPath(target));
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.move(source, target);
         assertThrows(NoSuchFileException.class, () -> getVirtualObject().toPhysicalPath(source));
         assertNotNull(getVirtualObject().toPhysicalPath(target));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         assertThrows(NoSuchFileException.class, () -> getVirtualObject().toPhysicalPath(source));
         assertNotNull(getVirtualObject().toPhysicalPath(target));
@@ -61,50 +61,50 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
         MCRVersionedPath emptyDir = MCRVersionedPath.head(DERIVATE_1, "empty");
 
         // Create initial directory structures for testing
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.createDirectory(existingDir);
         Files.createDirectory(notEmptyDir);
         Files.write(fileInNotEmptyDir, new byte[] { 1, 2, 3, 4 });
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // Test 1: Directory must exist
         assertFalse("nonExistentDir should not exist", getVirtualObject().exists(nonExistentDir));
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertThrows("Renaming should fail if the directory does not exist", NoSuchFileException.class, () -> {
             Files.move(nonExistentDir, nonExistentDir2);
         });
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // Test 2: Directory must be empty
         assertTrue("notEmptyDir should exist", getVirtualObject().exists(notEmptyDir));
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertThrows("Renaming should fail if the directory is not empty", DirectoryNotEmptyException.class, () -> {
             Files.move(notEmptyDir, nonExistentDir);
         });
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // Test 3: New directory name must be available
         assertTrue("existingDir should exist", getVirtualObject().exists(existingDir));
         assertFalse("newDir should not exist yet", getVirtualObject().exists(newDir));
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.createDirectory(newDir);
         assertThrows("Renaming should fail if the new directory name is already taken",
             FileAlreadyExistsException.class, () -> {
                 Files.move(existingDir, newDir);
             });
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // Test 4: Directory should not be the root directory
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertThrows("Renaming should fail if trying to rename the root directory", IOException.class, () -> {
             Files.move(rootDir, nonExistentDir);
         });
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // Test 5: Successfully move an empty directory
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.move(emptyDir, nonExistentDir);
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertFalse("empty dir should not exist", getVirtualObject().exists(emptyDir));
         assertTrue("nonExistentDir should exist", getVirtualObject().exists(nonExistentDir));
     }
@@ -119,17 +119,17 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
         assertFalse("'white.png' should not be added", getVirtualObject().isAdded(whitePng));
         assertFalse("'testFile' should not be added", getVirtualObject().isAdded(testFile));
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.write(testFile, new byte[] { 1 });
         assertTrue("'testFile' should be added", getVirtualObject().isAdded(testFile));
         root.getFileSystem().removeRoot(DERIVATE_1);
         assertFalse("'testFile' should not be added", getVirtualObject().isAdded(testFile));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         root.getFileSystem().createRoot(DERIVATE_1);
         assertTrue("'root' should be added", getVirtualObject().isAdded(root));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 
     @Test
@@ -138,22 +138,22 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
         MCRVersionedPath subFile = MCRVersionedPath.head(DERIVATE_1, "testDir/subFile.txt");
 
         // Create initial directory and file for testing
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.createDirectory(directory);
         Files.write(subFile, new byte[] { 1, 2, 3, 4 });
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // Ensure the initial state
         assertTrue("Directory should exist", getVirtualObject().exists(directory));
         assertTrue("Sub-file should exist", getVirtualObject().exists(subFile));
 
         // Delete the sub-file
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.delete(subFile);
         // Verify the sub-file has been deleted and the directory still exists
         assertFalse("Sub-file should no longer exist", getVirtualObject().exists(subFile));
         assertTrue("Directory should still exist", getVirtualObject().exists(directory));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // Verify the sub-file has been deleted and the directory still exists
         assertFalse("Sub-file should no longer exist", getVirtualObject().exists(subFile));
@@ -188,11 +188,11 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
         assertEquals("empty should contain exactly 0 items", 0, emptyDirectoryListing.size());
 
         // Add a new file to empty directory
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.write(newFile, new byte[] { 127, 127, 127 });
         emptyDirectoryListing = listDirectory(emptyDir);
         assertEquals("empty should contain exactly 1 item", 1, emptyDirectoryListing.size());
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         emptyDirectoryListing = listDirectory(emptyDir);
         assertEquals("empty should contain exactly 1 item", 1, emptyDirectoryListing.size());
         rootDirectoryListing = listDirectory(rootDir);
@@ -213,22 +213,22 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
     public void purge() throws IOException {
         MCRVersionedPath whitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertTrue("white.png should exist", getVirtualObject().exists(whitePng));
         getVirtualObject().purge();
         assertFalse("white.png should not exist", getVirtualObject().exists(whitePng));
         getVirtualObject().create();
         assertFalse("white.png should not exist", getVirtualObject().exists(whitePng));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertFalse("white.png should not exist", getVirtualObject().exists(whitePng));
 
         OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
         assertNotNull("should have a .keep file", derivate1.getFile(FILES_DIRECTORY + ".keep"));
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.write(whitePng, new byte[] { 1, 3, 3, 7 });
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
@@ -241,10 +241,10 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
         assertEquals("original white.png should have 554 bytes", 554, Files.size(headWhitePng));
 
         // write 4 bytes
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         Files.write(headWhitePng, new byte[] { 5, 6, 7, 8 });
         assertEquals("written white.png should have 4 bytes", 4, Files.size(headWhitePng));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // check v1
         MCRVersionedPath v1WhitePng = MCRVersionedPath.getPath(DERIVATE_1, "v1", "white.png");

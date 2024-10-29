@@ -19,7 +19,7 @@
 package org.mycore.ocfl.niofs;
 
 import org.junit.Test;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -31,8 +31,8 @@ public class MCROCFLDerivateTest extends MCROCFLMetadataTestCase {
     @Override
     public void tearDown() throws Exception {
         MCROCFLFileSystemProvider.get().clearCache();
-        if (MCRTransactionHelper.isTransactionActive(MCROCFLFileSystemTransaction.class)) {
-            MCRTransactionHelper.rollbackTransaction(MCROCFLFileSystemTransaction.class);
+        if (MCRTransactionManager.isActive(MCROCFLFileSystemTransaction.class)) {
+            MCRTransactionManager.rollbackTransactions(MCROCFLFileSystemTransaction.class);
         }
         MCROCFLFileSystemTransaction.resetTransactionCounter();
         super.tearDown();
@@ -44,10 +44,10 @@ public class MCROCFLDerivateTest extends MCROCFLMetadataTestCase {
         MCRDerivate derivate = createDerivate(object.getId().toString(), "junit_derivate_00000001");
         MCRMetadataManager.create(object);
 
-        MCRTransactionHelper.requireTransaction(MCROCFLFileSystemTransaction.class);
+        MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
         MCRMetadataManager.create(derivate);
         MCROCFLTestCaseHelper.loadDerivate(derivate.getId().toString());
-        MCRTransactionHelper.commitTransaction(MCROCFLFileSystemTransaction.class);
+        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
     }
 
 }

@@ -1,14 +1,14 @@
 package org.mycore.ocfl.niofs;
 
-import org.junit.Test;
-import org.mycore.common.MCRTransactionHelper;
-import org.mycore.datamodel.niofs.MCRPath;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.mycore.common.MCRTransactionManager;
+import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCROCFLVirtualObjectProviderTest extends MCROCFLNioTestCase {
 
@@ -30,12 +30,12 @@ public class MCROCFLVirtualObjectProviderTest extends MCROCFLNioTestCase {
         assertFalse(virtualObjectProvider.exists(DERIVATE_2));
 
         // check after write map is filled
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         assertFalse(Files.exists(MCRPath.getPath(DERIVATE_2, "/")));
         assertFalse(virtualObjectProvider.exists(DERIVATE_2));
         fs.createRoot(DERIVATE_2);
         assertTrue(virtualObjectProvider.exists(DERIVATE_2));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertTrue(virtualObjectProvider.exists(DERIVATE_2));
     }
 

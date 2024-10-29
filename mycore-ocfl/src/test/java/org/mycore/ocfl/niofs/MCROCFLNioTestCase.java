@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.ocfl.MCROCFLTestCase;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -50,15 +50,15 @@ public abstract class MCROCFLNioTestCase extends MCROCFLTestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCROCFLFileSystemProvider.get().init();
-        MCRTransactionHelper.beginTransaction(MCROCFLFileSystemTransaction.class);
+        MCRTransactionManager.beginTransactions(MCROCFLFileSystemTransaction.class);
         MCROCFLTestCaseHelper.loadDerivate(DERIVATE_1);
-        MCRTransactionHelper.commitTransaction(MCROCFLFileSystemTransaction.class);
+        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
     }
 
     @Override
     public void tearDown() throws Exception {
         MCROCFLFileSystemProvider.get().clearCache();
-        MCRTransactionHelper.rollbackTransaction();
+        MCRTransactionManager.rollbackTransactions();
         MCROCFLFileSystemTransaction.resetTransactionCounter();
         super.tearDown();
     }

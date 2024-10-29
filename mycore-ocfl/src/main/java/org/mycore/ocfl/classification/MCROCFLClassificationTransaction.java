@@ -155,7 +155,7 @@ public class MCROCFLClassificationTransaction implements MCRPersistenceTransacti
 
     @Override
     public int getCommitPriority() {
-        return 6000;
+        return 3000;
     }
 
 }

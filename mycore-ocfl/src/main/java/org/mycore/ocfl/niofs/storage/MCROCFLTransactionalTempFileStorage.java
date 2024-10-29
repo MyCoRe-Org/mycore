@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
-import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
 
 /**
  * Interface for temporary file storage with transaction support, extending the
@@ -35,21 +34,21 @@ public interface MCROCFLTransactionalTempFileStorage extends MCROCFLTempFileStor
     /**
      * Purges all files associated with the specified transaction.
      *
-     * @param transaction the transaction whose associated files are to be purged.
+     * @param transactionId the transaction id
      * @throws IOException if an I/O error occurs during the purge.
      */
-    default void purge(MCROCFLFileSystemTransaction transaction) throws IOException {
-        FileUtils.deleteDirectory(toPhysicalPath(transaction).toFile());
+    default void purge(Long transactionId) throws IOException {
+        FileUtils.deleteDirectory(toPhysicalPath(transactionId).toFile());
     }
 
     /**
      * Converts the specified transaction to a physical path.
      *
-     * @param transaction the transaction to be converted.
+     * @param transactionId the transaction id
      * @return the physical path corresponding to the transaction.
      */
-    default Path toPhysicalPath(MCROCFLFileSystemTransaction transaction) {
-        return this.getRoot().resolve(transaction.getId().toString());
+    default Path toPhysicalPath(Long transactionId) {
+        return this.getRoot().resolve(transactionId.toString());
     }
 
     /**

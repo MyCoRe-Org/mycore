@@ -54,7 +54,7 @@ public class MCROCFLVirtualObjectProvider {
 
     private final Queue<ObjectVersionId> readQueue;
 
-    private final Map<MCROCFLFileSystemTransaction, Map<ObjectVersionId, MCROCFLVirtualObject>> writeMap;
+    private final Map<Long, Map<ObjectVersionId, MCROCFLVirtualObject>> writeMap;
 
     private final MCROCFLRepository repository;
 
@@ -145,18 +145,22 @@ public class MCROCFLVirtualObjectProvider {
     }
 
     private MCROCFLVirtualObject get(ObjectVersionId id) throws NotFoundException {
-        MCROCFLFileSystemTransaction transaction = MCROCFLFileSystemTransaction.get();
+        boolean isActive = MCROCFLFileSystemTransaction.isActive();
         boolean isHeadVersion = MCROCFLFileSystemProvider.get().isHeadVersion(id);
-        if (transaction == null || !transaction.isActive() || !isHeadVersion) {
+        if (!isActive || !isHeadVersion) {
             return getOrCreateReadable(id);
         }
         return getWritable(id);
     }
 
     private MCROCFLVirtualObject getWritable(ObjectVersionId id) {
-        MCROCFLFileSystemTransaction transaction = MCROCFLFileSystemTransaction.getActive();
+        boolean isActive = MCROCFLFileSystemTransaction.isActive();
+        if (!isActive) {
+            throw new MCROCFLInactiveTransactionException("OCFL transaction is not active!");
+        }
+        Long transactionId = MCROCFLFileSystemTransaction.getTransactionId();
         return writeMap
-            .computeIfAbsent(transaction, (key) -> new HashMap<>())
+            .computeIfAbsent(transactionId, (key) -> new HashMap<>())
             .computeIfAbsent(id, (key) -> {
                 try {
                     MCROCFLVirtualObject readableVirtualObject = getOrCreateReadable(id);
@@ -179,9 +183,10 @@ public class MCROCFLVirtualObjectProvider {
         if (this.readMap.containsKey(head)) {
             return true;
         }
-        MCROCFLFileSystemTransaction transaction = MCROCFLFileSystemTransaction.get();
-        if (transaction.isActive() && this.writeMap.containsKey(transaction)) {
-            MCROCFLVirtualObject headVirtualObject = this.writeMap.get(transaction).get(head);
+        boolean isActive = MCROCFLFileSystemTransaction.isActive();
+        Long transactionId = MCROCFLFileSystemTransaction.getTransactionId();
+        if (isActive && this.writeMap.containsKey(transactionId)) {
+            MCROCFLVirtualObject headVirtualObject = this.writeMap.get(transactionId).get(head);
             if (headVirtualObject != null) {
                 return headVirtualObject.isMarkedForCreate();
             }
@@ -205,25 +210,25 @@ public class MCROCFLVirtualObjectProvider {
     }
 
     /**
-     * Collects all virtual objects associated with the specified transaction.
+     * Collects all virtual objects associated with the specified transactionId.
      *
-     * @param transaction the file system transaction.
+     * @param transactionId the file system transactionId.
      * @return a collection of virtual objects.
      */
-    public Collection<MCROCFLVirtualObject> collect(MCROCFLFileSystemTransaction transaction) {
-        if (!this.writeMap.containsKey(transaction)) {
+    public Collection<MCROCFLVirtualObject> collect(Long transactionId) {
+        if (!this.writeMap.containsKey(transactionId)) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableCollection(this.writeMap.get(transaction).values());
+        return Collections.unmodifiableCollection(this.writeMap.get(transactionId).values());
     }
 
     /**
-     * Removes all virtual objects associated with the specified transaction.
+     * Removes all virtual objects associated with the specified transactionId.
      *
-     * @param transaction the file system transaction.
+     * @param transactionId the file system transactionId.
      */
-    public void remove(MCROCFLFileSystemTransaction transaction) {
-        this.writeMap.remove(transaction);
+    public void remove(Long transactionId) {
+        this.writeMap.remove(transactionId);
     }
 
     /**
@@ -283,11 +288,12 @@ public class MCROCFLVirtualObjectProvider {
      * @return a collection of writable virtual objects.
      */
     public Collection<MCROCFLVirtualObject> collectWritables() {
-        MCROCFLFileSystemTransaction transaction = MCROCFLFileSystemTransaction.get();
-        if (!transaction.isActive()) {
+        boolean isActive = MCROCFLFileSystemTransaction.isActive();
+        if (!isActive) {
             return Collections.emptyList();
         }
-        Map<ObjectVersionId, MCROCFLVirtualObject> writeableMap = this.writeMap.get(transaction);
+        Long transactionId = MCROCFLFileSystemTransaction.getTransactionId();
+        Map<ObjectVersionId, MCROCFLVirtualObject> writeableMap = this.writeMap.get(transactionId);
         if (writeableMap == null) {
             return Collections.emptyList();
         }
