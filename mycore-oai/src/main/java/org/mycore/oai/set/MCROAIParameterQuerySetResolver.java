@@ -21,6 +21,7 @@ package org.mycore.oai.set;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ class MCROAIParameterQuerySetResolver extends MCROAISetResolver<String, SolrDocu
             .orElseGet(Collections::emptySet)
             .stream()
             .map(getSetMap()::get)
+            .filter(Objects::nonNull)
             .collect(Collectors.toSet());
     }
 
