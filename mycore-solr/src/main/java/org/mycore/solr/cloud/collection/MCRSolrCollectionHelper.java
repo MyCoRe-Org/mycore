@@ -35,7 +35,6 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCRSolrCollectionHelper {
 
-
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static void createCollection(MCRSolrCore core) throws SolrServerException, IOException {
@@ -46,26 +45,25 @@ public class MCRSolrCollectionHelper {
         CollectionAdminResponse collectionAdminResponse = collectionCreateRequest
             .process(core.getBaseClient());
 
-        if(!collectionAdminResponse.isSuccess()){
+        if (!collectionAdminResponse.isSuccess()) {
             throw new MCRException("Error creating collection " + core.getName() + ": " +
-                    collectionAdminResponse.getErrorMessages());
+                collectionAdminResponse.getErrorMessages());
         }
 
         LOGGER.info("Collection {} created.", core.getName());
     }
 
     public static void removeCollection(MCRSolrCore core) throws SolrServerException,
-            IOException {
+        IOException {
         CollectionAdminRequest.Delete collectionDeleteReq = CollectionAdminRequest.deleteCollection(core.getName());
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(collectionDeleteReq,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionDeleteReq
             .process(core.getBaseClient());
 
-
-        if(!collectionAdminResponse.isSuccess()){
+        if (!collectionAdminResponse.isSuccess()) {
             throw new MCRException("Error creating collection " + core.getName() + ": " +
-                    collectionAdminResponse.getErrorMessages());
+                collectionAdminResponse.getErrorMessages());
         }
 
         LOGGER.info("Collection {} deleted.", core.getName());

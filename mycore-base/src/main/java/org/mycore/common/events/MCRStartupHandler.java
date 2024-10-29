@@ -98,7 +98,7 @@ public class MCRStartupHandler {
             .toList();
         LOGGER.info(executableTable.logMessage("Detected auto executables:"));
         executables.forEach(autoExecutable -> startExecutable(servletContext, autoExecutable));
-        
+
         //initialize MCRURIResolver
         MCRURIResolver.init(servletContext);
     }
@@ -179,6 +179,6 @@ public class MCRStartupHandler {
         default int compareTo(AutoExecutable other) {
             return Integer.compare(other.getPriority(), getPriority());
         }
-        
+
     }
 }

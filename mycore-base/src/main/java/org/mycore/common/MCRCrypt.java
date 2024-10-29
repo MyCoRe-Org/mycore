@@ -82,7 +82,7 @@ public class MCRCrypt {
      * @return A 2-character salt.
      */
     public static String getSalt(SecureRandom random) {
-        return new String(new char[]{getRandomCharacter(random), getRandomCharacter(random)});
+        return new String(new char[] { getRandomCharacter(random), getRandomCharacter(random) });
     }
 
     private static char getRandomCharacter(SecureRandom random) {

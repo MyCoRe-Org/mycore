@@ -312,12 +312,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     @Override
     public boolean equals(Object in) {
-        boolean result=false;
+        boolean result = false;
         if (in instanceof MCRObjectID objectID) {
-            result= equals(objectID);
+            result = equals(objectID);
         }
-       return result;
+        return result;
     }
+
     @Override
     public int compareTo(MCRObjectID o) {
         return COMPARATOR_FOR_MCR_OBJECT_ID.compare(this, o);

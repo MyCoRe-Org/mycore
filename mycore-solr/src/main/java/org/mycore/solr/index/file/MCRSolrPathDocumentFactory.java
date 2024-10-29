@@ -80,8 +80,8 @@ public class MCRSolrPathDocumentFactory {
 
                 }
             })
-                .filter(MCRSolrFileIndexAccumulator::isEnabled)
-                .collect(Collectors.toList());
+            .filter(MCRSolrFileIndexAccumulator::isEnabled)
+            .collect(Collectors.toList());
     }
 
     public static MCRSolrPathDocumentFactory getInstance() {

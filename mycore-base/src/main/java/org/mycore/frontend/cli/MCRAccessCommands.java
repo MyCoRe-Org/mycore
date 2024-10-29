@@ -108,7 +108,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         Element permissions = getPermissionsFromUri(permissionsUri);
 
-        if(permissions != null) {
+        if (permissions != null) {
             for (Element permission : permissions.getChildren("mcrpermission")) {
                 String permissionName = permission.getAttributeValue("name").trim();
                 String ruleDescription = permission.getAttributeValue("ruledescription");

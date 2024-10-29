@@ -79,5 +79,4 @@ public class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceP
 
     }
 
-
 }

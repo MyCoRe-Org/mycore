@@ -227,8 +227,8 @@ public class MCRSolrConfigReloader {
             MCRSolrAuthenticationLevel.ADMIN);
         String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
         try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            HttpResponse<String> response
-                = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response =
+                httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 LOGGER.debug(() -> "SOLR config " + commandprefix + " command was successful \n" + response.body());
             } else {

@@ -240,16 +240,15 @@ public class MCRMetaLinkID extends MCRMetaLink {
     public boolean equals(Object obj) {
         boolean result;
         MCRMetaLinkID other = (MCRMetaLinkID) obj;
-        if (!super.equals(obj)||(!Objects.equals(from, other.from)
-                ||!Objects.equals(href, other.href)
-                ||!Objects.equals(label, other.label)
-                ||!Objects.equals(linktype, other.linktype)
-                ||!Objects.equals(title, other.title)
-                ||!Objects.equals(role, other.role))
-        ){
-            result= false;
+        if (!super.equals(obj) || (!Objects.equals(from, other.from)
+            || !Objects.equals(href, other.href)
+            || !Objects.equals(label, other.label)
+            || !Objects.equals(linktype, other.linktype)
+            || !Objects.equals(title, other.title)
+            || !Objects.equals(role, other.role))) {
+            result = false;
         } else {
-            result= Objects.equals(to, other.to);
+            result = Objects.equals(to, other.to);
         }
         return result;
     }

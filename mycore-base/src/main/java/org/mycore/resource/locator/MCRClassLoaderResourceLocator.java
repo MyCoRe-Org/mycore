@@ -75,8 +75,7 @@ public class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
     public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
         return Stream.concat(
             Stream.of(JarUrlPrefixStripper.INSTANCE),
-            hints.get(MCRResourceHintKeys.CLASS_LOADER).map(ClassLoaderPrefixStripper::new).stream()
-        );
+            hints.get(MCRResourceHintKeys.CLASS_LOADER).map(ClassLoaderPrefixStripper::new).stream());
     }
 
     public static class Factory implements Supplier<MCRClassLoaderResourceLocator> {

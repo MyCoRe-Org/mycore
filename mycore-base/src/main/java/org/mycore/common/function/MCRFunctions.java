@@ -176,7 +176,7 @@ public class MCRFunctions {
         if (nextPos == globPattern.length()) {
             throw new PatternSyntaxException("No character left to escape.", globPattern, nextPos - 1);
         }
-        final char next = globPattern.charAt(nextPos+1);
+        final char next = globPattern.charAt(nextPos + 1);
         if (isGlobReserved(next) || isRegexReserved(next)) {
             regex.append('\\');
         }
@@ -188,7 +188,7 @@ public class MCRFunctions {
         if (nextCharAt(globPattern, nextPos) == '*') {
             //The ** characters matches zero or more characters crossing directory boundaries.
             regex.append(".*");
-            return nextPos+1;
+            return nextPos + 1;
         } else {
             //The * character matches zero or more characters of a name component without crossing directory boundaries
             regex.append("[^/]*");

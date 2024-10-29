@@ -295,7 +295,7 @@ public class MCRLoginServlet extends MCRServlet {
      * successful login, the browser is redirected to that url.
      */
     private void storeURL(String url) {
-        String storedUrl=url;
+        String storedUrl = url;
         if ((url == null) || (url.trim().length() == 0)) {
             storedUrl = MCRFrontendUtil.getBaseURL();
         } else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
@@ -305,7 +305,6 @@ public class MCRLoginServlet extends MCRServlet {
         LOGGER.info("Storing redirect URL to session: {}", storedUrl);
         MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, storedUrl);
     }
-
 
     private String encodePath(String path) {
         StringBuilder result = new StringBuilder();

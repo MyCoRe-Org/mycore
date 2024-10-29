@@ -26,7 +26,6 @@ import io.ocfl.api.OcflRepository;
 
 public class MCRGZIPOCFLContent extends MCROCFLContent {
 
-
     public MCRGZIPOCFLContent(OcflRepository repository, String objectid, String fileName, String version) {
         super(repository, objectid, fileName, version);
     }

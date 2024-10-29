@@ -43,8 +43,7 @@ public class MCRJPAConfigurationCheck implements AutoExecutable {
     private static final String MYCORE_JPA_DOCUMENTATION_URL =
         "https://www.mycore.de/documentation/getting_started/gs_jpa/?mark=datenbank";
 
-    public static final String PERFORM_CONFIGURATION_CHECK_PROPERTY
-        = "MCR.JPA.PerformConfigurationCheck";
+    public static final String PERFORM_CONFIGURATION_CHECK_PROPERTY = "MCR.JPA.PerformConfigurationCheck";
 
     @Override
     public String getName() {

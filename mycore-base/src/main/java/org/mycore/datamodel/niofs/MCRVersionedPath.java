@@ -108,8 +108,7 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     @Override
     public boolean equals(Object obj) {
-        return
-            obj instanceof MCRVersionedPath that &&
+        return obj instanceof MCRVersionedPath that &&
             getFileSystem().equals(that.getFileSystem()) &&
             this.path.equals(that.path) &&
             this.getOwner().equals(that.getOwner()) &&

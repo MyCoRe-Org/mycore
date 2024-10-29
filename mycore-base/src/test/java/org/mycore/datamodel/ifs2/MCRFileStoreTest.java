@@ -256,7 +256,6 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         xml1 = col.getMetadata().clone();
         assertTrue(hasEqualContent(xml1, xml2));
 
-
         Files.delete(col.path.resolve("test1.txt"));
         Path tmp = col.path.resolve("test3.txt");
         new MCRStringContent("Hallo Welt!").sendTo(tmp);

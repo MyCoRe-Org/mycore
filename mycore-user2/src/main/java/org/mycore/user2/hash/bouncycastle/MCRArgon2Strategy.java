@@ -94,7 +94,6 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
 
     private final int iterations;
 
-
     public MCRArgon2Strategy(int saltSizeBytes, int hashSizeBytes,
         int parallelism, int memoryLimitKilobytes, int iterations) {
         if (saltSizeBytes < 1) {

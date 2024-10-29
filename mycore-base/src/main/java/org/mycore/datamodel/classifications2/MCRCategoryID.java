@@ -158,7 +158,7 @@ public class MCRCategoryID implements Serializable {
      */
     @Deprecated
     @Transient
-    public String getID(){
+    public String getID() {
         return getId();
     }
 

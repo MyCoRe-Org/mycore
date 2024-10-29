@@ -343,7 +343,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     static MCRCategoryImpl wrapCategory(MCRCategory category, MCRCategory parent, MCRCategory root) {
-        MCRCategory rootCategory=root;
+        MCRCategory rootCategory = root;
         if (category.getParent() != null && !category.getParent().equals(parent)) {
             throw new MCRException("MCRCategory is already attached to a different parent.");
         }
@@ -498,17 +498,17 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @Override
     public boolean equals(Object obj) {
         boolean result;
-        if (obj == null||getClass() != obj.getClass()) {
-            result= false;
+        if (obj == null || getClass() != obj.getClass()) {
+            result = false;
         } else if (this == obj) {
             result = true;
         } else {
-        MCRCategoryImpl other = (MCRCategoryImpl) obj;
-        result= internalID == other.internalID && left == other.left && level == other.level && right == other.right;
+            MCRCategoryImpl other = (MCRCategoryImpl) obj;
+            result =
+                internalID == other.internalID && left == other.left && level == other.level && right == other.right;
         }
         return result;
     }
-
 
     @Transient
     public String getRootID() {

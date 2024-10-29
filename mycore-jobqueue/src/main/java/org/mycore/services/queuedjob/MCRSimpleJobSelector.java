@@ -99,7 +99,7 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
     private final int ageDays;
 
     public MCRSimpleJobSelector(List<Class<? extends MCRJobAction>> actions, Mode actionMode,
-                                List<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
+        List<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
         this.actions = new ArrayList<>(Objects.requireNonNull(actions, "Actions must not be null"));
         this.actions.forEach(obj -> Objects.requireNonNull(obj, "Action must not be null"));
         this.actionMode = Objects.requireNonNull(actionMode, "Action mode must not be null");

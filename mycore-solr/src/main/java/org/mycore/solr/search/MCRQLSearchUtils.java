@@ -167,9 +167,9 @@ public class MCRQLSearchUtils {
 
             // Skip irrelevant parameters
             if (name.endsWith(".operator")
-                    || name.contains(".sortField")
-                    || SEARCH_PARAMETER.contains(name)
-                    || name.startsWith("XSL.")) {
+                || name.contains(".sortField")
+                || SEARCH_PARAMETER.contains(name)
+                || name.startsWith("XSL.")) {
                 continue;
             }
 

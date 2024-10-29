@@ -99,7 +99,7 @@ class MCRCategoryChildList extends ArrayList<MCRCategory> {
     @Override
     public MCRCategory set(int index, MCRCategory element) {
         MCRCategory category = super.set(index, element);
-        if (!Objects.equals(category,element)) {
+        if (!Objects.equals(category, element)) {
             removeAncestorReferences(category);
         }
         return category;

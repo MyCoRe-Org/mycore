@@ -96,8 +96,8 @@ public final class MCRUserInformationResolver {
     }
 
     public MCRUserInformation getOrThrow(String specification) {
-        return get(specification).orElseThrow(() ->
-            new MCRException("Unable to resolve user information for: " + specification));
+        return get(specification)
+            .orElseThrow(() -> new MCRException("Unable to resolve user information for: " + specification));
     }
 
     public Optional<MCRUserInformation> get(String schema, String userId) {

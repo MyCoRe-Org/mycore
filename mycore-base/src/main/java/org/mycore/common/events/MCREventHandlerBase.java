@@ -75,7 +75,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 
     }
 
-
     /** This method does nothing. It is very useful for debugging events. */
     public void doNothing(MCREvent evt, Object obj) {
         logger.debug("{} does nothing on {} {} {}", getClass().getName(), evt.getEventType(), evt.getObjectType(),
@@ -457,7 +456,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case REPAIR -> handleObjectRepaired(evt, obj);
                 case INDEX -> handleObjectIndex(evt, obj);
                 default -> logger
-                        .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
+                    .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
             }
             return;
         }
@@ -480,7 +479,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case REPAIR -> handleDerivateRepaired(evt, der);
                 case INDEX -> updateDerivateFileIndex(evt, der);
                 default -> logger
-                        .warn("Can't find method for a derivate data handler for event type {}", evt.getEventType());
+                    .warn("Can't find method for a derivate data handler for event type {}", evt.getEventType());
             }
             return;
         }
@@ -515,7 +514,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case REPAIR -> handlePathRepaired(evt, path, attrs);
                 case INDEX -> updatePathIndex(evt, path, attrs);
                 default -> logger.warn("Can't find method for Path data handler for event type {}",
-                        evt.getEventType());
+                    evt.getEventType());
             }
             return;
         }
@@ -537,12 +536,13 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case DELETE -> handleClassificationDeleted(evt, cl);
                 case REPAIR -> handleClassificationRepaired(evt, cl);
                 default -> logger.warn("Can't find method for a classification data handler for event type {}",
-                        evt.getEventType());
+                    evt.getEventType());
             }
             return;
         }
         logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
     }
+
     /**
      * Handles undo operations for MCRObject events.
      *
@@ -558,7 +558,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case DELETE -> undoObjectDeleted(evt, obj);
                 case REPAIR -> undoObjectRepaired(evt, obj);
                 default -> logger
-                        .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
+                    .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
             }
             return;
         }
@@ -580,8 +580,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case DELETE -> undoDerivateDeleted(evt, der);
                 case REPAIR -> undoDerivateRepaired(evt, der);
                 default -> logger
-                        .warn("Can't find method for a derivate data handler for event type {}",
-                                evt.getEventType());
+                    .warn("Can't find method for a derivate data handler for event type {}",
+                        evt.getEventType());
             }
             return;
         }
@@ -615,12 +615,13 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case DELETE -> undoPathDeleted(evt, path, attrs);
                 case REPAIR -> undoPathRepaired(evt, path, attrs);
                 default -> logger.warn("Can't find method for Path data handler for event type {}",
-                        evt.getEventType());
+                    evt.getEventType());
             }
             return;
         }
         logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
     }
+
     /**
      * Handles undo operations for MCRCategory events.
      *
@@ -636,7 +637,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case DELETE -> undoClassificationDeleted(evt, obj);
                 case REPAIR -> undoClassificationRepaired(evt, obj);
                 default -> logger.warn("Can't find method for an classification data handler for event type {}",
-                        evt.getEventType());
+                    evt.getEventType());
             }
             return;
         }

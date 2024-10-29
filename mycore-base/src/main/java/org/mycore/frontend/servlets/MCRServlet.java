@@ -405,8 +405,8 @@ public class MCRServlet extends HttpServlet {
         String message = throwable.getMessage();
         boolean result;
         if (message != null && throwable instanceof IOException && message.contains("Broken pipe")) {
-            result= true;
-        }else {
+            result = true;
+        } else {
             result = throwable.getCause() != null && isBrokenPipe(throwable.getCause());
         }
         return result;

@@ -281,8 +281,8 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         MCRTransactionManager.beginTransactions();
 
         // Get the list of active transactions
-        List<Class<? extends MCRPersistenceTransaction>> activeTransactions
-            = MCRTransactionManager.listActiveTransactions();
+        List<Class<? extends MCRPersistenceTransaction>> activeTransactions =
+            MCRTransactionManager.listActiveTransactions();
 
         // Verify that both transactions are in the list
         assertEquals("There should be two active transactions", 2, activeTransactions.size());
@@ -308,8 +308,8 @@ public class MCRTransactionManagerTest extends MCRTestCase {
         MCRTransactionManager.setRollbackOnly(WorkingTransaction.class);
 
         // Get the list of rollback-only transactions
-        List<Class<? extends MCRPersistenceTransaction>> rollbackOnlyTransactions
-            = MCRTransactionManager.listRollbackOnlyTransactions();
+        List<Class<? extends MCRPersistenceTransaction>> rollbackOnlyTransactions =
+            MCRTransactionManager.listRollbackOnlyTransactions();
 
         // Verify that only the marked transaction is in the list
         assertEquals("There should be one rollback-only transaction", 1, rollbackOnlyTransactions.size());

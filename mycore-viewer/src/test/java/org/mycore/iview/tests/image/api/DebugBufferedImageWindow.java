@@ -23,7 +23,6 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
-
 public class DebugBufferedImageWindow extends JFrame {
 
     private static final long serialVersionUID = 1L;

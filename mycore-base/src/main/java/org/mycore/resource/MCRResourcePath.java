@@ -74,7 +74,8 @@ public abstract class MCRResourcePath {
     /**
      * Returns a path beginning with <code>/META-INF/resources</code> as a {@link String} without that prefix
      * and without a leading slash.
-     */    public Optional<String> asRelativeWebPath() {
+     */
+    public Optional<String> asRelativeWebPath() {
         return asAbsoluteWebPath().map(this::removeLeadingSlash);
     }
 

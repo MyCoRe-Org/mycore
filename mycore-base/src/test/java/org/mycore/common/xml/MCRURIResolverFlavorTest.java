@@ -43,7 +43,6 @@ public class MCRURIResolverFlavorTest extends MCRTestCase {
 
     }
 
-
     @Test
     public void testXalanFlavor() {
 

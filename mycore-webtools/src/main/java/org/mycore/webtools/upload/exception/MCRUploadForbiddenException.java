@@ -22,8 +22,6 @@ public class MCRUploadForbiddenException extends MCRUploadException {
 
     private static final long serialVersionUID = 1L;
 
-
-
     public MCRUploadForbiddenException(String reason) {
         super("component.webtools.upload.forbidden", reason);
     }

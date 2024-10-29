@@ -89,7 +89,7 @@ public class MCRJPABootstrapper implements AutoExecutable {
 
     public static void initializeJPA(String persistenceUnitName, Map<?, ?> properties) {
         String unitName = Optional.ofNullable(persistenceUnitName)
-                .orElseGet(() -> MCRConfiguration2.getStringOrThrow("MCR.JPA.PersistenceUnitName"));
+            .orElseGet(() -> MCRConfiguration2.getStringOrThrow("MCR.JPA.PersistenceUnitName"));
 
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(unitName, properties);
 

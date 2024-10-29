@@ -61,7 +61,7 @@ import jakarta.persistence.Transient;
         @Index(name = "MCRJob_finished", columnList = "finished"),
         @Index(name = "MCRJob_action", columnList = "action"),
         @Index(name = "MCRJob_tries", columnList = "tries")
-})
+    })
 public class MCRJob implements Cloneable {
     private Long id;
 
@@ -245,7 +245,7 @@ public class MCRJob implements Cloneable {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "MCRJobParameter", joinColumns = @JoinColumn(name = "jobID"))
     @MapKeyColumn(name = "paramKey", length = 128)
-    @Column(name="paramValue", length = 16384)
+    @Column(name = "paramValue", length = 16384)
     public Map<String, String> getParameters() {
         return parameters;
     }

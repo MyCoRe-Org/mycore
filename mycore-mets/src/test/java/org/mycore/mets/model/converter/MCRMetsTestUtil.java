@@ -61,7 +61,7 @@ public class MCRMetsTestUtil {
                 PROPERTIES.load(MCRMetsTestUtil.class.getClassLoader().getResourceAsStream("mets.properties"));
             } catch (IOException e) {
                 throw new UncheckedIOException("Failed to load 'mets.properties'. " +
-                        "Please check if the file exists and is accessible.", e);
+                    "Please check if the file exists and is accessible.", e);
             }
         }
 

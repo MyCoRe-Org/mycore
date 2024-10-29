@@ -189,8 +189,8 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
         MCRBasketEntry entry = get(id);
         boolean result;
         if (entry == null) {
-            result= false;
-        }else {
+            result = false;
+        } else {
             result = remove(entry);
         }
         return result;

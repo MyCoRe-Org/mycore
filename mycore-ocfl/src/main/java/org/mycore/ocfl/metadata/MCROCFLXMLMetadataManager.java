@@ -315,7 +315,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     protected MCROCFLContent getContent(MCRObjectID id, String ocflObjectID, VersionNum key) {
         return new MCROCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
-                key.toString());
+            key.toString());
     }
 
     private boolean isMetadata(String id) {

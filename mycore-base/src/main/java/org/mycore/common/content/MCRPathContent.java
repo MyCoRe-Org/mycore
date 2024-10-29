@@ -42,7 +42,6 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
  */
 public class MCRPathContent extends MCRContent implements MCRSeekableChannelContent {
 
-
     private Path path;
 
     private BasicFileAttributes attrs;

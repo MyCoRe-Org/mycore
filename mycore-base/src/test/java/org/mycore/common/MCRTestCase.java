@@ -49,8 +49,8 @@ public class MCRTestCase {
     public static TemporaryFolder junitFolder = new TemporaryFolder();
 
     @Rule
-    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher
-        = new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
+    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher =
+        new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
 
     @BeforeClass
     public static void initBaseDir() throws IOException {

@@ -37,13 +37,12 @@ public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
     protected InputStream getContentStream(MCRContent xml) throws IOException {
         InputStream contentStream = super.getContentStream(xml);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try(GZIPOutputStream out = new GZIPOutputStream(baos)){
+        try (GZIPOutputStream out = new GZIPOutputStream(baos)) {
             contentStream.transferTo(out);
         }
         byte[] byteArray = baos.toByteArray();
         return new ByteArrayInputStream(byteArray);
     }
-
 
     @Override
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
@@ -54,7 +53,7 @@ public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
     @Override
     protected MCROCFLContent getContent(MCRObjectID id, String ocflObjectID, VersionNum key) {
         return new MCRGZIPOCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
-                key.toString());
+            key.toString());
     }
 
     @Override

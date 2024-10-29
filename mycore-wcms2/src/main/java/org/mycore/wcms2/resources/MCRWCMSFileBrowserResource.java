@@ -141,7 +141,7 @@ public class MCRWCMSFileBrowserResource {
 
     @DELETE
     @Path("/folder")
-    public Response deleteFolder(@QueryParam("path") String path)  {
+    public Response deleteFolder(@QueryParam("path") String path) {
         File wcmsDir = resolveDirWCMS(path);
         if (FileUtils.deleteQuietly(wcmsDir)) {
             return Response.ok().build();
@@ -196,7 +196,7 @@ public class MCRWCMSFileBrowserResource {
     }
 
     @DELETE
-    public Response deleteFile(@QueryParam("path") String path)  {
+    public Response deleteFile(@QueryParam("path") String path) {
         File wcmsDir = MCRUtils.safeResolve(MCRWCMSUtil.getWCMSDataDirPath(), removeLeadingSlash(path)).toFile();
         if (delete(wcmsDir)) {
             return Response.ok().build();

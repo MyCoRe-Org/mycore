@@ -31,8 +31,8 @@ import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.util.MCRHttpUtils;
 
 public class MCRDNBPIDefProvider {
-    private static final String RESOLVING_URL_TEMPLATE
-        = "https://nbn-resolving.org/resolver?identifier={urn}&verb=full&xml=on";
+    private static final String RESOLVING_URL_TEMPLATE =
+        "https://nbn-resolving.org/resolver?identifier={urn}&verb=full&xml=on";
 
     public static Document get(MCRDNBURN urn) throws MCRIdentifierUnresolvableException {
         return get(urn.asString());

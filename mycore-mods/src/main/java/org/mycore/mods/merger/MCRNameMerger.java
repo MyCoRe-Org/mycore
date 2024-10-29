@@ -46,7 +46,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private Set<String> allNames = new HashSet<>();
 
-    private Map<String,Set<String>> nameIds = new HashMap<String,Set<String>>();
+    private Map<String, Set<String>> nameIds = new HashMap<String, Set<String>>();
 
     public void setElement(Element element) {
         super.setElement(element);
@@ -195,9 +195,9 @@ public class MCRNameMerger extends MCRMerger {
         boolean foundContradictingNameIds = false;
         for (String type : a.keySet()) {
             intersection = new HashSet<>(a.get(type));
-            if(b.get(type) != null) {
+            if (b.get(type) != null) {
                 intersection.retainAll(b.get(type));
-                if(!intersection.isEmpty()) {
+                if (!intersection.isEmpty()) {
                     return false;
                 } else {
                     foundContradictingNameIds = true;
@@ -213,7 +213,7 @@ public class MCRNameMerger extends MCRMerger {
             String id = nameId.getText();
 
             Set<String> ids = null;
-            if(nameIds.containsKey(type)) {
+            if (nameIds.containsKey(type)) {
                 ids = nameIds.get(type);
             } else {
                 ids = new HashSet<String>();

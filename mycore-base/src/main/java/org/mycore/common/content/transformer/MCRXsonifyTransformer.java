@@ -296,8 +296,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 PlainTextHandling.valueOf(plainTextHandling),
                 MixedContentHandling.valueOf(mixedContentHandling),
                 AdditionalNamespaceDeclarationStrategy.valueOf(additionalNamespaceDeclarationStrategy),
-                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy)
-            );
+                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy));
         }
 
     }
@@ -333,8 +332,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 textKey,
                 mixedContentKey,
                 mixedContentElementNameKey,
-                indexKey
-            );
+                indexKey);
         }
 
     }

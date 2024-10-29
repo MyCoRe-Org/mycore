@@ -86,10 +86,9 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
         maxFileSize = MCRConfiguration2.getLong(TIKA_MAPPER_MAX_FILE_SIZE).orElseThrow(
             () -> MCRConfiguration2.createConfigurationException(TIKA_MAPPER_MAX_FILE_SIZE));
 
-
         this.tikaClients = MCRConfiguration2.splitValue(serverList.orElse(""))
-                .map(MCRTikaHttpClient::new)
-                .collect(Collectors.toSet());
+            .map(MCRTikaHttpClient::new)
+            .collect(Collectors.toSet());
         enabled = !tikaClients.isEmpty();
     }
 

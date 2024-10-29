@@ -86,11 +86,11 @@ public final class MCRGoogleSitemapCommon {
 
     private static final Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
 
-    private static final String SITEINDEX_SCHEMA
-        = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
+    private static final String SITEINDEX_SCHEMA =
+        "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
 
-    private static final String SITEMAP_SCHEMA
-        = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
+    private static final String SITEMAP_SCHEMA =
+        "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
 
     /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
     private static final String CDIR = MCRConfiguration2.getString("MCR.GoogleSitemap.Directory").orElse("");
@@ -108,8 +108,8 @@ public final class MCRGoogleSitemapCommon {
     /** The filter query for selecting objects to present in google sitemap */
     private static final String SOLR_QUERY = MCRConfiguration2.getStringOrThrow("MCR.GoogleSitemap.SolrQuery");
 
-    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
-            = MCRSolrAuthenticationManager.getInstance();
+    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
+        MCRSolrAuthenticationManager.getInstance();
 
     /** The logger */
     private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());

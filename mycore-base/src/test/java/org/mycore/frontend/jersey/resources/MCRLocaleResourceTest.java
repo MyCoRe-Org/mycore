@@ -85,6 +85,7 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         String hello = jersey.target("locale/translate/junit.hello").request().get(String.class);
         assertEquals("Hallo Welt", hello);
     }
+
     @Test
     public void translateToLocale() {
         String hello = jersey.target("locale/translate/en/junit.hello").request(MediaType.TEXT_PLAIN).get(String.class);

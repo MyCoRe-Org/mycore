@@ -139,8 +139,8 @@ public class MCRDataciteClient {
         HttpGet httpGet = new HttpGet(requestURI);
 
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            MCRResultOrException<List<Map.Entry<String, URI>>, MCRPersistentIdentifierException> result
-                = httpClient.execute(httpGet, response -> {
+            MCRResultOrException<List<Map.Entry<String, URI>>, MCRPersistentIdentifierException> result =
+                httpClient.execute(httpGet, response -> {
                     return switch (response.getCode()) {
                         case HttpStatus.SC_OK -> {
                             try (InputStream content = response.getEntity().getContent();
@@ -245,8 +245,8 @@ public class MCRDataciteClient {
 
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            MCRResultOrException<List<MCRDigitalObjectIdentifier>, MCRPersistentIdentifierException> result
-                = httpClient.execute(get, response -> {
+            MCRResultOrException<List<MCRDigitalObjectIdentifier>, MCRPersistentIdentifierException> result =
+                httpClient.execute(get, response -> {
                     HttpEntity entity = response.getEntity();
                     return switch (response.getCode()) {
                         case HttpStatus.SC_OK -> {

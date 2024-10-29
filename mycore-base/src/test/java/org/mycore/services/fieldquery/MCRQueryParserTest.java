@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.parsers.bool.MCRCondition;
 
-
 /**
  * This class is a JUnit test case for org.mycore.MCRBooleanClausParser.
  * 
@@ -35,7 +34,6 @@ import org.mycore.parsers.bool.MCRCondition;
 public class MCRQueryParserTest extends MCRTestCase {
 
     private final MCRQueryParser queryParser = new MCRQueryParser();
-
 
     /**
      * Test method for

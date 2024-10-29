@@ -291,8 +291,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             String path = getFilePath();
             String dir = getDirectory();
             @SuppressWarnings("unchecked")
-            Collection<SVNLogEntry> log = repository.log(new String[]{dir},
-                    null, lastPresentRevision, lastPresentRevision, true, true);
+            Collection<SVNLogEntry> log = repository.log(new String[] { dir },
+                null, lastPresentRevision, lastPresentRevision, true, true);
             for (SVNLogEntry logEntry : log) {
                 SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {

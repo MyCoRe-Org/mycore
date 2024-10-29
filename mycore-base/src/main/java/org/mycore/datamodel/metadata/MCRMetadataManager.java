@@ -276,8 +276,8 @@ public final class MCRMetadataManager {
     }
 
     private static void processDerivate(MCRDerivate mcrDerivate, MCRObjectID objectId,
-                                        byte[] objectBackup) {
-        MCRObjectID derivateId= mcrDerivate.getId();
+        byte[] objectBackup) {
+        MCRObjectID derivateId = mcrDerivate.getId();
         if (mcrDerivate.getDerivate().getInternals() != null) {
             MCRPath rootPath = MCRPath.getPath(derivateId.toString(), "/");
             if (mcrDerivate.getDerivate().getInternals().getSourcePath() == null) {
@@ -315,6 +315,7 @@ public final class MCRMetadataManager {
             throw new MCRPersistenceException("The" + typeName + " " + id + " already exists, nothing done.");
         }
     }
+
     private static void deleteDerivate(String derivateID) throws MCRPersistenceException {
         try {
             MCRPath rootPath = MCRPath.getPath(derivateID, "/");
@@ -583,7 +584,6 @@ public final class MCRMetadataManager {
         MCRMarkManager.instance().remove(id);
     }
 
-
     /**
      * Helper method to remove the <code>mcrObject</code> of the given parent. This does just
      * remove the linking between both objects.
@@ -844,8 +844,6 @@ public final class MCRMetadataManager {
         addLinkToMetadata(mcrDerivate);
     }
 
-
-
     private static Path handleFileSourceDirectory(MCRDerivate mcrDerivate) {
         MCRMetaIFS internals = mcrDerivate.getDerivate().getInternals();
         if (internals != null && internals.getSourcePath() != null) {
@@ -904,12 +902,11 @@ public final class MCRMetadataManager {
     }
 
     private static void addLinkToMetadata(MCRDerivate mcrDerivate) throws MCRPersistenceException {
-        final MCRMetaEnrichedLinkID derivateLink
-            = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        final MCRMetaEnrichedLinkID derivateLink =
+            MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
         MCRObjectID newMetadataObjectID = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
         addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink, mcrDerivate.isImportMode());
     }
-
 
     /**
      * Updates the object or creates it if it does not exist yet.

@@ -79,8 +79,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
-
-
 /**
  *
  * Xalan extention for navigation.xsl
@@ -104,7 +102,6 @@ public class MCRLayoutUtilities {
     private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
-
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
         .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);

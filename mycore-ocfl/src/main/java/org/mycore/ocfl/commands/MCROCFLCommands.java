@@ -78,7 +78,6 @@ public class MCROCFLCommands {
 
     private static boolean confirmPurgeMarked = false;
 
-
     protected static void migrateWithPrunersAndRepositoryKeyOrMetadataManager(String repository,
         String metadataManagerConfigKey,
         String prunersStringList) throws Exception {
@@ -94,11 +93,11 @@ public class MCROCFLCommands {
 
         MCROCFLMigration migration = null;
         if (metadataManagerConfigKey != null && !metadataManagerConfigKey.isEmpty()) {
-            MCROCFLXMLMetadataManager metadataManager
-                = MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
+            MCROCFLXMLMetadataManager metadataManager =
+                MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
                     .orElseThrow(() -> MCRConfiguration2.createConfigurationException(metadataManagerConfigKey));
             migration = new MCROCFLMigration(null, prunerList, metadataManager);
-        } else if(repository != null && !repository.isEmpty()) {
+        } else if (repository != null && !repository.isEmpty()) {
             migration = new MCROCFLMigration(repository, prunerList);
         } else {
             throw new MCRUsageException("Either a repository or a metadata manager must be specified");

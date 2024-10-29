@@ -80,7 +80,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
 
     static {
 
-        char[] base64Alphabet = new char[]{
+        char[] base64Alphabet = new char[] {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -90,7 +90,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
             '=',
         };
 
-        char[] radix64Alphabet = new char[]{
+        char[] radix64Alphabet = new char[] {
             '.', '/',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',

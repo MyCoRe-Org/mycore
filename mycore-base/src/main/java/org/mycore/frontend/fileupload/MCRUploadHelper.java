@@ -241,7 +241,7 @@ public abstract class MCRUploadHelper {
 
         //sort files by name
         ArrayList<Path> paths = visitor.getPaths();
-        if(paths.isEmpty()) {
+        if (paths.isEmpty()) {
             return Optional.empty();
         }
         paths.sort(Comparator.comparing(Path::getNameCount)

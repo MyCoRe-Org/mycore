@@ -60,7 +60,6 @@ public class MCRRequestDebugFilter implements Filter {
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
 
-
     /* (non-Javadoc)
      * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)
      */

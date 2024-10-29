@@ -84,7 +84,6 @@ public class MCRTitleInfoMergerTest extends MCRTestCase {
         MCRMergerTest.test(a, b, e);
     }
 
-
     @Test
     public void testMergingHtmlVariants() throws JaxenException, IOException {
         // from importing 10.1002/cplu.202200022
@@ -97,7 +96,7 @@ public class MCRTitleInfoMergerTest extends MCRTestCase {
         String c = "[mods:titleInfo[mods:title='The Dynamic Covalent Chemistry of Amidoboronates: " +
             "Tuning the rac5/rac6 Ratio " +
             "via the B‑N and B‐O Dynamic Covalent Bonds']]";
-        MCRMergerTest.test(new String[]{a, b, c}, b);
+        MCRMergerTest.test(new String[] { a, b, c }, b);
     }
-    
+
 }

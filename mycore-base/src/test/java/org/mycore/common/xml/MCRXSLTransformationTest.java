@@ -56,7 +56,7 @@ public class MCRXSLTransformationTest extends MCRTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
         Optional.ofNullable(stylesheet)
-                .ifPresent(File::delete);
+            .ifPresent(File::delete);
     }
 
     /**

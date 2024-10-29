@@ -112,10 +112,10 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
         }
 
         long allJobCount = getAllJobs(dao, job1.getAction()).stream().count();
-        long finishedJobCount
-            = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count();
-        long errorJobCount
-            = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
+        long finishedJobCount =
+            getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count();
+        long errorJobCount =
+            getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
 
         getAllJobs(dao, job1.getAction())
             .forEach(j -> LOGGER.info("Job in queue: {}", j));

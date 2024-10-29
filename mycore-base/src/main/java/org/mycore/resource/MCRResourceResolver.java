@@ -249,8 +249,7 @@ public final class MCRResourceResolver {
         if (LOGGER.isDebugEnabled()) {
             resourceUrl.ifPresentOrElse(
                 url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url),
-                () -> LOGGER.debug("Unable to resolve resource URL for path {}", path)
-            );
+                () -> LOGGER.debug("Unable to resolve resource URL for path {}", path));
         }
         return resourceUrl;
     }
@@ -263,8 +262,7 @@ public final class MCRResourceResolver {
                 LOGGER.debug("Unable to resolve resource URL for path {}", path);
             } else {
                 resourceUrls.forEach(
-                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url)
-                );
+                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url));
             }
         }
         return resourceUrls;

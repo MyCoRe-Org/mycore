@@ -77,7 +77,7 @@ public class MCRViewerConfigurationBuilder {
         for (Map.Entry<ResourceType, String> resource : resources.entries()) {
             if (ResourceType.script.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), false);
-            }else if (ResourceType.module.equals(resource.getKey())) {
+            } else if (ResourceType.module.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), true);
             } else if (ResourceType.css.equals(resource.getKey())) {
                 conf1.addCSS(resource.getValue());

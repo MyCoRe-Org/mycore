@@ -228,7 +228,7 @@ public abstract class MCRSolrClassificationUtil {
             UpdateRequest commitRequest = new UpdateRequest();
             commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
             MCRSolrAuthenticationManager.getInstance().applyAuthentication(commitRequest,
-                    MCRSolrAuthenticationLevel.INDEX);
+                MCRSolrAuthenticationLevel.INDEX);
             commitRequest.process(solrClient);
         } catch (Exception exc) {
             LOGGER.error("Unable to commit reindexed categories", exc);

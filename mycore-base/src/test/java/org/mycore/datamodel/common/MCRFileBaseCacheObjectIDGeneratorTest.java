@@ -59,7 +59,6 @@ public class MCRFileBaseCacheObjectIDGeneratorTest extends MCRTestCase {
                 generatedIds.add(id);
             });
 
-
         // check if all ids are unique
         assertEquals(TEST_IDS, generatedIds.size());
         assertEquals(TEST_IDS, generatedIds.stream().distinct().count());
@@ -68,7 +67,7 @@ public class MCRFileBaseCacheObjectIDGeneratorTest extends MCRTestCase {
         var sortedIds = new ArrayList<>(generatedIds);
         Collections.sort(sortedIds);
         for (int i = 0; i < sortedIds.size() - 1; i++) {
-            assertEquals(i+1, sortedIds.get(i).getNumberAsInteger());
+            assertEquals(i + 1, sortedIds.get(i).getNumberAsInteger());
         }
 
     }

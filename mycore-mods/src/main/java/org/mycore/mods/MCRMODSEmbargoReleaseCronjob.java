@@ -48,7 +48,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
     private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-            MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.getInstance();
 
     @Override
     public String getDescription() {

@@ -117,7 +117,6 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         LOGGER.debug("Response-Header: {}", responseHeaders);
     }
 
-
     private void addExposedHeadersToResponseHeaders(ContainerRequestContext requestContext, MultivaluedMap<String,
         Object> responseHeaders, boolean authenticatedRequest) {
         ArrayList<String> exposedHeaders = new ArrayList<>();

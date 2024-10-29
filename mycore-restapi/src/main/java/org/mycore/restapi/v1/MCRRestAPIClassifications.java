@@ -479,7 +479,7 @@ public class MCRRestAPIClassifications {
             writer.name("label");
             writer.beginArray();
             for (Element eLabel : eRoot.getChildren("label")) {
-                if (lang==null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
                     writeLabelAttributesToJson(writer, eRoot);
                 }
             }

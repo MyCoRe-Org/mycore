@@ -31,8 +31,6 @@ import org.junit.Test;
 
 public class MCRStreamUtilsTest {
 
-
-
     @Test
     public void test() {
         //see https://commons.wikimedia.org/wiki/File%3ASorted_binary_tree_preorder.svg for tree image
