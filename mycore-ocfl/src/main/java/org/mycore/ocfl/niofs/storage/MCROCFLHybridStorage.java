@@ -30,6 +30,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -107,7 +108,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public boolean exists(MCRVersionedPath path) {
-        if (MCROCFLFileSystemTransaction.get().isActive()) {
+        if (MCRTransactionManager.isActive(MCROCFLFileSystemTransaction.class)) {
             return this.transactionalStorage.exists(path) || this.rollingStorage.exists(path);
         }
         return this.rollingStorage.exists(path);
@@ -119,7 +120,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
     @Override
     public SeekableByteChannel newByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes) throws IOException {
-        boolean transactionNotActive = !MCROCFLFileSystemTransaction.get().isActive();
+        boolean transactionNotActive = !MCROCFLFileSystemTransaction.isActive();
         boolean read = options.isEmpty() || options.contains(StandardOpenOption.READ);
         boolean doesNotExistInTransactionalStore = !this.transactionalStorage.exists(path);
         if (transactionNotActive || (doesNotExistInTransactionalStore && read)) {
@@ -133,7 +134,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public void copy(InputStream stream, MCRVersionedPath target, CopyOption... options) throws IOException {
-        if (MCROCFLFileSystemTransaction.get().isActive()) {
+        if (MCROCFLFileSystemTransaction.isActive()) {
             this.transactionalStorage.copy(stream, target, options);
         } else {
             this.rollingStorage.copy(stream, target, options);
@@ -145,7 +146,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public void copy(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
-        if (MCROCFLFileSystemTransaction.get().isActive()) {
+        if (MCROCFLFileSystemTransaction.isActive()) {
             if (this.transactionalStorage.exists(source)) {
                 this.transactionalStorage.copy(source, target, options);
             } else {
@@ -164,7 +165,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public void move(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
-        if (MCROCFLFileSystemTransaction.get().isActive()) {
+        if (MCROCFLFileSystemTransaction.isActive()) {
             if (this.transactionalStorage.exists(source)) {
                 this.transactionalStorage.move(source, target, options);
             } else {
@@ -183,7 +184,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public void deleteIfExists(MCRVersionedPath path) throws IOException {
-        if (MCROCFLFileSystemTransaction.get().isActive()) {
+        if (MCROCFLFileSystemTransaction.isActive()) {
             this.transactionalStorage.deleteIfExists(path);
         }
         this.rollingStorage.deleteIfExists(path);
@@ -194,7 +195,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public void createDirectories(MCRVersionedPath directoryPath, FileAttribute<?>... attrs) throws IOException {
-        if (MCROCFLFileSystemTransaction.get().isActive()) {
+        if (MCROCFLFileSystemTransaction.isActive()) {
             this.transactionalStorage.createDirectories(directoryPath, attrs);
         }
         this.rollingStorage.createDirectories(directoryPath, attrs);
@@ -204,8 +205,8 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      * {@inheritDoc}
      */
     @Override
-    public void purge(MCROCFLFileSystemTransaction transaction) throws IOException {
-        this.transactionalStorage.purge(transaction);
+    public void purge(Long transactionId) throws IOException {
+        this.transactionalStorage.purge(transactionId);
     }
 
     /**
@@ -231,7 +232,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public void create(String owner, String version) throws IOException {
-        if (MCROCFLFileSystemTransaction.get().isActive()) {
+        if (MCROCFLFileSystemTransaction.isActive()) {
             this.transactionalStorage.create(owner, version);
         }
         this.rollingStorage.create(owner, version);
@@ -242,7 +243,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public Path toPhysicalPath(String owner, String version) {
-        return MCROCFLFileSystemTransaction.get().isActive() ? this.transactionalStorage.toPhysicalPath(owner, version)
+        return MCROCFLFileSystemTransaction.isActive() ? this.transactionalStorage.toPhysicalPath(owner, version)
             : this.rollingStorage.toPhysicalPath(owner, version);
     }
 
