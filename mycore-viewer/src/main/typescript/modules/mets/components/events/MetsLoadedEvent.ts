@@ -18,15 +18,15 @@
 
 
 import { MyCoReImageViewerEvent } from "../../../base/components/events/MyCoReImageViewerEvent";
-import {ViewerComponent} from "../../../base/components/ViewerComponent";
-import {StructureModel} from "../../../base/components/model/StructureModel";
+import { ViewerComponent } from "../../../base/components/ViewerComponent";
+import { StructureModel } from "../../../base/components/model/StructureModel";
 
 export class MetsLoadedEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public mets: { model: StructureModel; document: Document }) {
-        super(component, MetsLoadedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public mets: { model: StructureModel; document: Document }) {
+    super(component, MetsLoadedEvent.TYPE);
+  }
 
-    public static TYPE: string = "MetsLoadedEvent";
+  public static TYPE: string = "MetsLoadedEvent";
 }
 

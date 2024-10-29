@@ -16,15 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component} from '@angular/core';
-import {RESTService} from '../service/rest.service';
+import { Component } from '@angular/core';
+import { RESTService } from '../service/rest.service';
 
 @Component({
   selector: '[web-cli-queue]',
   templateUrl: 'app/queue/queue.html'
 })
 export class WebCliQueueComponent {
-  constructor(private _restService: RESTService){
+  constructor(private _restService: RESTService) {
     this._restService.currentQueue.subscribe(
       queue => {
         let ellipsis = "";

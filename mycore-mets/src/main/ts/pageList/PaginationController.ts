@@ -24,59 +24,59 @@
 
 namespace org.mycore.mets.controller {
 
-    import MetsEditorModel = org.mycore.mets.model.MetsEditorModel;
-    import PaginationMethod = org.mycore.mets.model.pagination.PaginationMethod;
+  import MetsEditorModel = org.mycore.mets.model.MetsEditorModel;
+  import PaginationMethod = org.mycore.mets.model.pagination.PaginationMethod;
 
-    export class PaginationController {
+  export class PaginationController {
 
-        private metsEditorModel: MetsEditorModel;
-        private changeListModalInstance: any;
+    private metsEditorModel: MetsEditorModel;
+    private changeListModalInstance: any;
 
-        constructor(private $modal: any, private i18nModel: any, hotkeys: any) {
-            hotkeys.add({
-                combo : 'ctrl+p',
-                description : '',
-                callback : () => {
-                    this.paginationClicked();
-                }
-            });
+    constructor(private $modal: any, private i18nModel: any, hotkeys: any) {
+      hotkeys.add({
+        combo: 'ctrl+p',
+        description: '',
+        callback: () => {
+          this.paginationClicked();
         }
+      });
+    }
 
-        public init(metsEditorModel: MetsEditorModel) {
-            this.metsEditorModel = metsEditorModel;
-        }
+    public init(metsEditorModel: MetsEditorModel) {
+      this.metsEditorModel = metsEditorModel;
+    }
 
-        public paginationClicked() {
-            this.openPaginationModal();
-        }
+    public paginationClicked() {
+      this.openPaginationModal();
+    }
 
-        public openPaginationModal(begin: number = 0, method: PaginationMethod
-            = mets.model.pagination.paginationMethods[ 0 ], value: string = '') {
-            const options = {
-                templateUrl : 'pageList/paginationModal.html',
-                controller : 'PaginationModalController',
-                size : 'lg'
-            };
+    public openPaginationModal(begin: number = 0, method: PaginationMethod
+      = mets.model.pagination.paginationMethods[0], value: string = '') {
+      const options = {
+        templateUrl: 'pageList/paginationModal.html',
+        controller: 'PaginationModalController',
+        size: 'lg'
+      };
 
-            this.changeListModalInstance = this.$modal.open(options);
-            this.changeListModalInstance.model = new org.mycore.mets.model.PaginationModalModel(this.i18nModel.messages,
-                this.metsEditorModel.metsModel.metsPageList.filter((t, index) => {
-                    return (this.metsEditorModel.pageSelection.from !== null) ?
-                        index >= this.metsEditorModel.pageSelection.from && index <= this.metsEditorModel.pageSelection.to :
-                        true;
-                }),
-                this.metsEditorModel.pageSelection.from,
-                begin,
-                method,
-                value);
+      this.changeListModalInstance = this.$modal.open(options);
+      this.changeListModalInstance.model = new org.mycore.mets.model.PaginationModalModel(this.i18nModel.messages,
+        this.metsEditorModel.metsModel.metsPageList.filter((t, index) => {
+          return (this.metsEditorModel.pageSelection.from !== null) ?
+            index >= this.metsEditorModel.pageSelection.from && index <= this.metsEditorModel.pageSelection.to :
+            true;
+        }),
+        this.metsEditorModel.pageSelection.from,
+        begin,
+        method,
+        value);
 
-            this.changeListModalInstance.result.then((lChanges: org.mycore.mets.model.state.PageLabelChange[]) => {
-                this.metsEditorModel.stateEngine.changeModel(new org.mycore.mets.model.state.BatchChange(lChanges));
-            }, () => {
-                // Dismiss
-            });
-
-        }
+      this.changeListModalInstance.result.then((lChanges: org.mycore.mets.model.state.PageLabelChange[]) => {
+        this.metsEditorModel.stateEngine.changeModel(new org.mycore.mets.model.state.BatchChange(lChanges));
+      }, () => {
+        // Dismiss
+      });
 
     }
+
+  }
 }

@@ -17,6 +17,6 @@
  */
 
 export interface UploadSettings {
-    webAppBaseURL: string;
+  webAppBaseURL: string;
 }
 

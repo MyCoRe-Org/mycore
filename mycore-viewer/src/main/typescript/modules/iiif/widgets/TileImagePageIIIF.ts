@@ -17,65 +17,65 @@
  */
 
 
-import {TileImagePage} from "../../base/widgets/canvas/TileImagePage";
-import {Position3D, Utils, ViewerFormatString} from "../../base/Utils";
+import { TileImagePage } from "../../base/widgets/canvas/TileImagePage";
+import { Position3D, Utils, ViewerFormatString } from "../../base/Utils";
 
 export class TileImagePageIIIF extends TileImagePage {
 
-    protected loadTile(tilePos: Position3D) {
-        const iiifPos = this.tilePosToIIIFPos(tilePos);
-        if (this.vTiles.has(tilePos)) {
-            return this.vTiles.get(tilePos);
-        } else {
-            if (!this.vLoadingTiles.has(tilePos)) {
-                this._loadTileIIIF(tilePos, iiifPos, (img: HTMLImageElement) => {
-                    this.vTiles.set(tilePos, img);
-                    if (typeof this.refreshCallback !== 'undefined' && this.refreshCallback !== null) {
-                        this.vImgPreviewLoaded = true;
-                        this.vImgNotPreviewLoaded = true;
-                        this.refreshCallback();
-                    }
-                }, () => {
-                    console.error('Could not load tile : ' + tilePos.toString());
-                });
-            }
+  protected loadTile(tilePos: Position3D) {
+    const iiifPos = this.tilePosToIIIFPos(tilePos);
+    if (this.vTiles.has(tilePos)) {
+      return this.vTiles.get(tilePos);
+    } else {
+      if (!this.vLoadingTiles.has(tilePos)) {
+        this._loadTileIIIF(tilePos, iiifPos, (img: HTMLImageElement) => {
+          this.vTiles.set(tilePos, img);
+          if (typeof this.refreshCallback !== 'undefined' && this.refreshCallback !== null) {
+            this.vImgPreviewLoaded = true;
+            this.vImgNotPreviewLoaded = true;
+            this.refreshCallback();
+          }
+        }, () => {
+          console.error('Could not load tile : ' + tilePos.toString());
+        });
+      }
 
-        }
-
-        return null;
     }
 
-    private tilePosToIIIFPos(tilePos: Position3D) {
-        let iiifPos: any;
-        iiifPos = tilePos;
-        iiifPos.x = iiifPos.x * 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
-        iiifPos.w = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
-        iiifPos.y = iiifPos.y * 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
-        iiifPos.h = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
-        iiifPos.tx = ((iiifPos.x + iiifPos.w) > this.width) ? Math.ceil((this.width - iiifPos.x)
-            / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
-        iiifPos.ty = ((iiifPos.y + iiifPos.h) > this.height) ? Math.ceil((this.height - iiifPos.y)
-            / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
-        return iiifPos;
-    }
+    return null;
+  }
 
-    private _loadTileIIIF(tilePos: Position3D, iiifPos: any,
-                          okCallback: (image: HTMLImageElement) => void, errorCallback: () => void): void {
-        const pathSelect = Utils.hash(tilePos.toString()) % this.vTilePath.length;
+  private tilePosToIIIFPos(tilePos: Position3D) {
+    let iiifPos: any;
+    iiifPos = tilePos;
+    iiifPos.x = iiifPos.x * 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
+    iiifPos.w = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
+    iiifPos.y = iiifPos.y * 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
+    iiifPos.h = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
+    iiifPos.tx = ((iiifPos.x + iiifPos.w) > this.width) ? Math.ceil((this.width - iiifPos.x)
+      / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
+    iiifPos.ty = ((iiifPos.y + iiifPos.h) > this.height) ? Math.ceil((this.height - iiifPos.y)
+      / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
+    return iiifPos;
+  }
 
-        const path = this.vTilePath[pathSelect];
-        const image = new Image();
+  private _loadTileIIIF(tilePos: Position3D, iiifPos: any,
+    okCallback: (image: HTMLImageElement) => void, errorCallback: () => void): void {
+    const pathSelect = Utils.hash(tilePos.toString()) % this.vTilePath.length;
 
-        image.onload = () => {
-            this.vLoadingTiles.remove(tilePos);
-            okCallback(image);
-        };
+    const path = this.vTilePath[pathSelect];
+    const image = new Image();
 
-        image.onerror = () => {
-            errorCallback();
-        };
-        image.src = ViewerFormatString(path, iiifPos);
-        this.vLoadingTiles.set(tilePos, image);
-    }
+    image.onload = () => {
+      this.vLoadingTiles.remove(tilePos);
+      okCallback(image);
+    };
+
+    image.onerror = () => {
+      errorCallback();
+    };
+    image.src = ViewerFormatString(path, iiifPos);
+    this.vLoadingTiles.set(tilePos, image);
+  }
 }
 

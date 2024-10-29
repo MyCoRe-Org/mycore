@@ -17,17 +17,17 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReBasicToolbarModel} from "../model/MyCoReBasicToolbarModel";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReBasicToolbarModel } from "../model/MyCoReBasicToolbarModel";
 
 export class ProvideToolbarModelEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public model: MyCoReBasicToolbarModel) {
-        super(component, ProvideToolbarModelEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public model: MyCoReBasicToolbarModel) {
+    super(component, ProvideToolbarModelEvent.TYPE);
+  }
 
-    public static TYPE = "ProvideToolbarModelEvent";
+  public static TYPE = "ProvideToolbarModelEvent";
 
 }
 

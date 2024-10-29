@@ -16,15 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
 
 export class RedrawEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent) {
-        super(component, RedrawEvent.TYPE);
-    }
+  constructor(component: ViewerComponent) {
+    super(component, RedrawEvent.TYPE);
+  }
 
-    public static TYPE: string = "RedrawEvent";
+  public static TYPE: string = "RedrawEvent";
 
 }
 

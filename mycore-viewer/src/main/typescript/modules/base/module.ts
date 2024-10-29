@@ -16,17 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReViewer} from "./MyCoReViewer";
-import {addViewerComponent} from "./Utils";
-import {MyCoReViewerContainerComponent} from "./components/MyCoReViewerContainerComponent";
-import {MyCoReI18NComponent} from "./components/MyCoReI18NComponent";
-import {MyCoReImageOverviewComponent} from "./components/MyCoReImageOverviewComponent";
-import {MyCoReToolbarComponent} from "./components/MyCoReToolbarComponent";
-import {MyCoReImageScrollComponent} from "./components/MyCoReImageScrollComponent";
-import {MyCoReChapterComponent} from "./components/MyCoReChapterComponent";
-import {MyCoRePermalinkComponent} from "./components/MyCoRePermalinkComponent";
-import {MyCoReLayerComponent} from "./components/MyCoReLayerComponent";
-import {MyCoReButtonChangeComponent} from "./components/MyCoReButtonChangeComponent";
+import { MyCoReViewer } from "./MyCoReViewer";
+import { addViewerComponent } from "./Utils";
+import { MyCoReViewerContainerComponent } from "./components/MyCoReViewerContainerComponent";
+import { MyCoReI18NComponent } from "./components/MyCoReI18NComponent";
+import { MyCoReImageOverviewComponent } from "./components/MyCoReImageOverviewComponent";
+import { MyCoReToolbarComponent } from "./components/MyCoReToolbarComponent";
+import { MyCoReImageScrollComponent } from "./components/MyCoReImageScrollComponent";
+import { MyCoReChapterComponent } from "./components/MyCoReChapterComponent";
+import { MyCoRePermalinkComponent } from "./components/MyCoRePermalinkComponent";
+import { MyCoReLayerComponent } from "./components/MyCoReLayerComponent";
+import { MyCoReButtonChangeComponent } from "./components/MyCoReButtonChangeComponent";
 
 addViewerComponent(MyCoReViewerContainerComponent);
 addViewerComponent(MyCoReI18NComponent);
@@ -40,4 +40,4 @@ addViewerComponent(MyCoRePermalinkComponent);
 addViewerComponent(MyCoReLayerComponent);
 addViewerComponent(MyCoReButtonChangeComponent);
 
-export {MyCoReViewer}
+export { MyCoReViewer }

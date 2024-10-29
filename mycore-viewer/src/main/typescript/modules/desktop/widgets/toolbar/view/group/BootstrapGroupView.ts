@@ -18,31 +18,31 @@
 
 export class BootstrapGroupView {
 
-    private _element: JQuery;
+  private _element: JQuery;
 
-    constructor(id: string, order: number, align: string) {
-        this._element = jQuery('<div></div>');
-        this._element.attr('data-id', id);
-        this._element.addClass('btn-group');
+  constructor(id: string, order: number, align: string) {
+    this._element = jQuery('<div></div>');
+    this._element.attr('data-id', id);
+    this._element.addClass('btn-group');
 
-        if (align !== null && align === 'right') {
-            this._element.addClass('right');
-        }
-
-        this._element.attr('data-tb-order', order);
-
+    if (align !== null && align === 'right') {
+      this._element.addClass('right');
     }
 
-    public addChild(child: JQuery): void {
-        this._element.append(child);
-    }
+    this._element.attr('data-tb-order', order);
 
-    public removeChild(child: JQuery): void {
-        child.remove();
-    }
+  }
 
-    public getElement(): JQuery {
-        return this._element;
-    }
+  public addChild(child: JQuery): void {
+    this._element.append(child);
+  }
+
+  public removeChild(child: JQuery): void {
+    child.remove();
+  }
+
+  public getElement(): JQuery {
+    return this._element;
+  }
 }
 

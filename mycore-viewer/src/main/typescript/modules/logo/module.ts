@@ -17,7 +17,7 @@
  */
 
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReLogoComponent} from "./components/MyCoReLogoComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReLogoComponent } from "./components/MyCoReLogoComponent";
 
 addViewerComponent(MyCoReLogoComponent);

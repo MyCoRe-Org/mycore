@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReEpubDisplayComponent} from "./components/MyCoReEpubDisplayComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReEpubDisplayComponent } from "./components/MyCoReEpubDisplayComponent";
 
 addViewerComponent(MyCoReEpubDisplayComponent);

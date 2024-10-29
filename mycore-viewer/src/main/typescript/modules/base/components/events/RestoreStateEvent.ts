@@ -17,16 +17,16 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReMap} from "../../Utils";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReMap } from "../../Utils";
 
 export class RestoreStateEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public restoredState: MyCoReMap<string, string>) {
-        super(component, RestoreStateEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public restoredState: MyCoReMap<string, string>) {
+    super(component, RestoreStateEvent.TYPE);
+  }
 
-    public static TYPE: string = "RestoreStateEvent";
+  public static TYPE: string = "RestoreStateEvent";
 
 }
 

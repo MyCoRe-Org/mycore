@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReToolbarExtenderComponent} from "./components/MyCoReToolbarComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReToolbarExtenderComponent } from "./components/MyCoReToolbarComponent";
 
 addViewerComponent(MyCoReToolbarExtenderComponent);

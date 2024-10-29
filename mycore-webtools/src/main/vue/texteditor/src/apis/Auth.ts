@@ -17,20 +17,20 @@
  */
 
 export interface JWTResponse {
-    login_success: boolean;
-    access_token: string;
-    token_type: string;
+  login_success: boolean;
+  access_token: string;
+  token_type: string;
 }
 
 export const getAuthorizationHeader = async (mcrApplicationBaseURL: string) => {
-    if (import.meta.env.DEV) {
-        return "Basic " + btoa('administrator:alleswirdgut');
-    } else {
-        const response = await fetch(`${mcrApplicationBaseURL}rsc/jwt`);
-        const jwt = await response.json() as JWTResponse;
-        if (!jwt.login_success) {
-            throw new Error("Login failed");
-        }
-        return `${jwt.token_type} ${jwt.access_token}`;
+  if (import.meta.env.DEV) {
+    return "Basic " + btoa('administrator:alleswirdgut');
+  } else {
+    const response = await fetch(`${mcrApplicationBaseURL}rsc/jwt`);
+    const jwt = await response.json() as JWTResponse;
+    if (!jwt.login_success) {
+      throw new Error("Login failed");
     }
+    return `${jwt.token_type} ${jwt.access_token}`;
+  }
 }

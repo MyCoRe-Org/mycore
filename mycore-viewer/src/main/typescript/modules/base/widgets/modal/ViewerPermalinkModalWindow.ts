@@ -17,26 +17,26 @@
  */
 
 
-import {ViewerModalWindow} from "./ViewerModalWindow";
+import { ViewerModalWindow } from "./ViewerModalWindow";
 
 export class ViewerPermalinkModalWindow extends ViewerModalWindow {
-    constructor(_mobile: boolean) {
-        super(_mobile, "Permalink");
+  constructor(_mobile: boolean) {
+    super(_mobile, "Permalink");
 
-        this._textArea = jQuery("<textarea></textarea>");
-        this._textArea.addClass("form-control");
-        this._textArea.appendTo(this.modalBody);
-        this._textArea.on("click", () => {
-            this._textArea.select();
-        });
+    this._textArea = jQuery("<textarea></textarea>");
+    this._textArea.addClass("form-control");
+    this._textArea.appendTo(this.modalBody);
+    this._textArea.on("click", () => {
+      this._textArea.select();
+    });
 
-    }
+  }
 
-    private _textArea: JQuery;
+  private _textArea: JQuery;
 
-    public set permalink(link: string) {
-        this._textArea.text(link);
-    }
+  public set permalink(link: string) {
+    this._textArea.text(link);
+  }
 
 
 }

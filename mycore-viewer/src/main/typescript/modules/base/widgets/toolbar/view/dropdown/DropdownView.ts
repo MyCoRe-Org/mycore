@@ -16,12 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ButtonView} from "../button/ButtonView";
+import { ButtonView } from "../button/ButtonView";
 
 export interface DropdownView extends ButtonView {
-    updateChilds(childs: Array<{
-        id: string; label: string; icon: string
-    }>): void;
+  updateChilds(childs: Array<{
+    id: string; label: string; icon: string
+  }>): void;
 
-    getChildElement(id: string): JQuery;
+  getChildElement(id: string): JQuery;
 }

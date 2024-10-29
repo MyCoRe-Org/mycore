@@ -18,15 +18,15 @@
 
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
 
 export class CanvasTapedEvent extends MyCoReImageViewerEvent {
-        constructor(component:ViewerComponent) {
-            super(component, CanvasTapedEvent.TYPE);
-        }
+  constructor(component: ViewerComponent) {
+    super(component, CanvasTapedEvent.TYPE);
+  }
 
-        public static TYPE:string = "CanvasTapedEvent";
+  public static TYPE: string = "CanvasTapedEvent";
 
-    }
+}
 

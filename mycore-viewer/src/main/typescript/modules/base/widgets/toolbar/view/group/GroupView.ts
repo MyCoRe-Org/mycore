@@ -18,9 +18,9 @@
 
 
 export interface GroupView {
-    addChild(child: JQuery): void;
+  addChild(child: JQuery): void;
 
-    removeChild(child: JQuery): void;
+  removeChild(child: JQuery): void;
 
-    getElement(): JQuery;
+  getElement(): JQuery;
 }

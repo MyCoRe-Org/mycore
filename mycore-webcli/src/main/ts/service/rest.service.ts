@@ -16,11 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
-import {Commands} from '../commands/commands';
-import {Log} from '../log/log';
-import {Subject} from 'rxjs/Subject';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Commands } from '../commands/commands';
+import { Log } from '../log/log';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class RESTService {
@@ -44,7 +44,7 @@ export class RESTService {
   constructor(private http: Http) {
     var loc = window.location;
     var protocol = "ws://";
-    if (location.protocol == "https:"){
+    if (location.protocol == "https:") {
       protocol = "wss://";
     }
     this.socketURL = protocol + loc.host + this.getBasePath(loc.pathname) + this.socketURL;
@@ -125,7 +125,7 @@ export class RESTService {
   private openSocketConnection() {
     this.socket = new WebSocket(this.socketURL);
     this.socket.onmessage = event => {
-      if (event.data == "noPermission"){
+      if (event.data == "noPermission") {
         console.log("You don't have permission to use the MyCoRe WebCLI!");
         alert("You don't have permission to use the MyCoRe WebCLI!");
         this.retryCounter = 5;
@@ -134,20 +134,20 @@ export class RESTService {
       var message = JSON.parse(event.data);
       switch (message.type) {
         case "log":
-          this._currentLog.next(<Log> message.return);
+          this._currentLog.next(<Log>message.return);
           break;
         case "commandQueue":
-          this._currentQueue.next(<String[]> message.return);
+          this._currentQueue.next(<String[]>message.return);
           this._currentQueueLength.next(message.size);
           break;
         case "currentCommand":
           this._currentCommand.next(message.return);
           break;
         case "getKnownCommands":
-          this._currentCommandList.next(<Commands[]> message.return.commands);
+          this._currentCommandList.next(<Commands[]>message.return.commands);
           break;
         case "continueIfOneFails":
-          if(message.value != undefined) {
+          if (message.value != undefined) {
             this._continueIfOneFails.next(message.value);
           }
           break;

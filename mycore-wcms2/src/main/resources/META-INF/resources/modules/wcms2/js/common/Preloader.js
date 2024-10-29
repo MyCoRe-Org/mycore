@@ -37,62 +37,62 @@ wcms.common = wcms.common || {};
  * -finished							-> when the whole preload process is finished
  */
 wcms.common.Preloader = function() {
-	this.preloadList = [];
-	this.eventHandler = new wcms.common.EventHandler(this);
+  this.preloadList = [];
+  this.eventHandler = new wcms.common.EventHandler(this);
 };
 
-( function() {
+(function() {
 
-	function preload() {
-		var size = this.preloadList.length;
-		this.eventHandler.notify({"type" : "started", "size" : size});
+  function preload() {
+    var size = this.preloadList.length;
+    this.eventHandler.notify({ "type": "started", "size": size });
 
-		// calculate weight
-		var totalWeight = 0;
-		for(var i = 0; i < size; i++) {
-			var preloadableObject = this.preloadList[i];
-			if(!preloadableObject.getPreloadWeight) {
-				console.log("Warning: no preload weight defined for:" );
-				console.log(preloadableObject);
-				continue;
-			}
-			totalWeight +=  preloadableObject.getPreloadWeight();
-		}
+    // calculate weight
+    var totalWeight = 0;
+    for (var i = 0; i < size; i++) {
+      var preloadableObject = this.preloadList[i];
+      if (!preloadableObject.getPreloadWeight) {
+        console.log("Warning: no preload weight defined for:");
+        console.log(preloadableObject);
+        continue;
+      }
+      totalWeight += preloadableObject.getPreloadWeight();
+    }
 
-		// preload
-		var currentWeight = 0;
-		for(var i = 0; i < size; i++) {
-			var preloadableObject = this.preloadList[i];
-			var loadingName = undefined;
-			if(preloadableObject.getPreloadName) {
-				loadingName = preloadableObject.getPreloadName();
-			} else {
-				loadingName = "undefined";
-				console.log("Warning: no preload name defined for:");
-				console.log(preloadableObject);
-			}
-			this.eventHandler.notify({
-				"type" : "preloadObject",
-				"name" : loadingName
-			});
-			if(preloadableObject.preload) {
-				preloadableObject.preload();
-			} else {
-				console.log("Error: Object is not preloadable:");
-				console.log(preloadableObject);
-				continue;
-			}
-			if(preloadableObject.getPreloadWeight)
-				currentWeight += preloadableObject.getPreloadWeight();
-			this.eventHandler.notify({
-				"type" : "preloadObjectFinished",
-				"name" : loadingName,
-				"progress" : ((currentWeight / totalWeight) * 100)
-			});
-		}
-		this.eventHandler.notify({"type" : "finished"});
-	}
+    // preload
+    var currentWeight = 0;
+    for (var i = 0; i < size; i++) {
+      var preloadableObject = this.preloadList[i];
+      var loadingName = undefined;
+      if (preloadableObject.getPreloadName) {
+        loadingName = preloadableObject.getPreloadName();
+      } else {
+        loadingName = "undefined";
+        console.log("Warning: no preload name defined for:");
+        console.log(preloadableObject);
+      }
+      this.eventHandler.notify({
+        "type": "preloadObject",
+        "name": loadingName
+      });
+      if (preloadableObject.preload) {
+        preloadableObject.preload();
+      } else {
+        console.log("Error: Object is not preloadable:");
+        console.log(preloadableObject);
+        continue;
+      }
+      if (preloadableObject.getPreloadWeight)
+        currentWeight += preloadableObject.getPreloadWeight();
+      this.eventHandler.notify({
+        "type": "preloadObjectFinished",
+        "name": loadingName,
+        "progress": ((currentWeight / totalWeight) * 100)
+      });
+    }
+    this.eventHandler.notify({ "type": "finished" });
+  }
 
-	wcms.common.Preloader.prototype.preload = preload;
-	
+  wcms.common.Preloader.prototype.preload = preload;
+
 })();

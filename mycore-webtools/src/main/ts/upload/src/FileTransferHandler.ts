@@ -16,8 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {FileTransfer} from "./FileTransfer";
+import { FileTransfer } from "./FileTransfer";
 
 export interface FileTransferHandler {
-    (fileTransfer: FileTransfer): void;
+  (fileTransfer: FileTransfer): void;
 }

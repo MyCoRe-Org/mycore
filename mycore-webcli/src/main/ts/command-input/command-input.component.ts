@@ -16,9 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, ElementRef} from '@angular/core';
-import {RESTService} from '../service/rest.service';
-import {CommunicationService} from '../service/communication.service';
+import { Component, ElementRef } from '@angular/core';
+import { RESTService } from '../service/rest.service';
+import { CommunicationService } from '../service/communication.service';
 
 @Component({
   selector: 'web-cli-command-input',
@@ -32,8 +32,8 @@ export class WebCliCommandInputComponent {
   recentCommandsMaxLength: number = 10;
 
   constructor(private _restService: RESTService,
-              private _comunicationService: CommunicationService,
-              private _elementRef: ElementRef){
+    private _comunicationService: CommunicationService,
+    private _elementRef: ElementRef) {
     this._comunicationService.currentCommand.subscribe(
       command => {
         this.command = command;
@@ -71,7 +71,7 @@ export class WebCliCommandInputComponent {
 
   addCommandToRecentCommands(command: string) {
     if (this.recentCommands.length == 0 || command != this.recentCommands[this.recentCommands.length - 1]) {
-      if (this.recentCommands.length + 1  > this.recentCommandsMaxLength){
+      if (this.recentCommands.length + 1 > this.recentCommandsMaxLength) {
         this.recentCommands.shift();
       }
       this.recentCommands.push(command);

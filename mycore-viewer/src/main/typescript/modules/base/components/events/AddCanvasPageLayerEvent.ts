@@ -17,16 +17,16 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {CanvasPageLayer} from "../../widgets/canvas/CanvasPageLayer";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { CanvasPageLayer } from "../../widgets/canvas/CanvasPageLayer";
 
 export class AddCanvasPageLayerEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public zIndex: number, public canvasPageLayer: CanvasPageLayer) {
-        super(component, AddCanvasPageLayerEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public zIndex: number, public canvasPageLayer: CanvasPageLayer) {
+    super(component, AddCanvasPageLayerEvent.TYPE);
+  }
 
-    public static TYPE: string = "AddCanvasPageLayerEvent";
+  public static TYPE: string = "AddCanvasPageLayerEvent";
 
 }
 

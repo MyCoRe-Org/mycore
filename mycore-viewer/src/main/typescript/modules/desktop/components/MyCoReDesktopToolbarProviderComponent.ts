@@ -18,27 +18,27 @@
 
 /// <reference path="model/MyCoReDesktopToolbarModel.ts" />
 
-import {ViewerComponent} from "../../base/components/ViewerComponent";
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
-import {ProvideToolbarModelEvent} from "../../base/components/events/ProvideToolbarModelEvent";
-import {MyCoReDesktopToolbarModel} from "./model/MyCoReDesktopToolbarModel";
+import { ViewerComponent } from "../../base/components/ViewerComponent";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
+import { ProvideToolbarModelEvent } from "../../base/components/events/ProvideToolbarModelEvent";
+import { MyCoReDesktopToolbarModel } from "./model/MyCoReDesktopToolbarModel";
 
 
-    export class MyCoReDesktopToolbarProviderComponent extends ViewerComponent {
+export class MyCoReDesktopToolbarProviderComponent extends ViewerComponent {
 
-        constructor(private _settings:MyCoReViewerSettings) {
-            super();
-        }
+  constructor(private _settings: MyCoReViewerSettings) {
+    super();
+  }
 
-        public get handlesEvents():string[] {
-            return [];
-        }
+  public get handlesEvents(): string[] {
+    return [];
+  }
 
-        public init() {
-            this.trigger(new ProvideToolbarModelEvent(
-                this, new MyCoReDesktopToolbarModel()));
-        }
-    }
+  public init() {
+    this.trigger(new ProvideToolbarModelEvent(
+      this, new MyCoReDesktopToolbarModel()));
+  }
+}
 
 
 

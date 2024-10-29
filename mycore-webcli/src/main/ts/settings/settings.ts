@@ -22,7 +22,7 @@ export class Settings {
   public autoscroll: boolean;
   public continueIfOneFails: boolean;
 
-  constructor(hS: number, cHS: number, aS: boolean, c: boolean){
+  constructor(hS: number, cHS: number, aS: boolean, c: boolean) {
     this.historySize = hS;
     this.comHistorySize = cHS;
     this.autoscroll = aS;

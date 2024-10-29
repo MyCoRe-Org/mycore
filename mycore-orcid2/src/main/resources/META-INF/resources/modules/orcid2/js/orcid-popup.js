@@ -17,5 +17,5 @@
  */
 
 window.onunload = function() {
-    window.opener.location.reload();
+  window.opener.location.reload();
 }

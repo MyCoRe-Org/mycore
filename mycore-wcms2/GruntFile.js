@@ -16,53 +16,53 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = function (grunt) {
-    grunt.loadNpmTasks('grunt-maven');
-    grunt.loadNpmTasks('grunt-contrib-copy');
+module.exports = function(grunt) {
+  grunt.loadNpmTasks('grunt-maven');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt
-        .initConfig({
-            pkg: grunt.file.readJSON('package.json'),
-            copy: {
-                main: {
-                    files: [
-                        {
-                            expand: true,
-                            cwd: './node_modules/tinymce',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/tinymce',
-                            src: [
-                                '**'
-                            ]
-                        },
-                        {
-                            expand: true,
-                            cwd: './node_modules/tinymce-i18n/langs7',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/tinymce/langs',
-                            src: [
-                                '**'
-                            ]
-                        },
-                        {
-                            expand: true,
-                            cwd: './node_modules/dojo',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/dojo',
-                            src: [
-                                '**'
-                            ]
-                        },
-                        {
-                            expand: true,
-                            cwd: './node_modules/dijit',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/dijit',
-                            src: [
-                                '**'
-                            ]
-                        }
-                    ]
-                }
+  grunt
+    .initConfig({
+      pkg: grunt.file.readJSON('package.json'),
+      copy: {
+        main: {
+          files: [
+            {
+              expand: true,
+              cwd: './node_modules/tinymce',
+              dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/tinymce',
+              src: [
+                '**'
+              ]
+            },
+            {
+              expand: true,
+              cwd: './node_modules/tinymce-i18n/langs7',
+              dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/tinymce/langs',
+              src: [
+                '**'
+              ]
+            },
+            {
+              expand: true,
+              cwd: './node_modules/dojo',
+              dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/dojo',
+              src: [
+                '**'
+              ]
+            },
+            {
+              expand: true,
+              cwd: './node_modules/dijit',
+              dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/dijit',
+              src: [
+                '**'
+              ]
             }
-        });
+          ]
+        }
+      }
+    });
 
-    grunt.registerTask('default', ['copy']);
+  grunt.registerTask('default', ['copy']);
 
 };

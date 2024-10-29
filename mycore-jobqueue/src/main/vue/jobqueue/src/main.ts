@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createApp} from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 

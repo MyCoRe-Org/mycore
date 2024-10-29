@@ -17,15 +17,15 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
 
 
 export class WaitForEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public eventType: string) {
-        super(component, WaitForEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public eventType: string) {
+    super(component, WaitForEvent.TYPE);
+  }
 
-    public static TYPE = "WaitForEvent";
+  public static TYPE = "WaitForEvent";
 
 }

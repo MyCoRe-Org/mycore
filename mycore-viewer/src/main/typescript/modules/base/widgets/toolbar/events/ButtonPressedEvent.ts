@@ -16,19 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DefaultViewerEvent} from "../../events/ViewerEvent";
-import {ToolbarButton} from "../model/ToolbarButton";
+import { DefaultViewerEvent } from "../../events/ViewerEvent";
+import { ToolbarButton } from "../model/ToolbarButton";
 
 export class ButtonPressedEvent extends DefaultViewerEvent {
-    constructor(private _button: ToolbarButton, type = ButtonPressedEvent.TYPE) {
-        super(type);
-    }
+  constructor(private _button: ToolbarButton, type = ButtonPressedEvent.TYPE) {
+    super(type);
+  }
 
-    public static TYPE: string = "ButtonPressedEvent";
+  public static TYPE: string = "ButtonPressedEvent";
 
-    public get button() {
-        return this._button;
-    }
+  public get button() {
+    return this._button;
+  }
 }
 
 

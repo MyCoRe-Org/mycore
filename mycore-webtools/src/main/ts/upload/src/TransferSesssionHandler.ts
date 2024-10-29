@@ -16,8 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TransferSession} from "./TransferSession";
+import { TransferSession } from "./TransferSession";
 
 export interface TransferSesssionHandler {
-    (transferSession: TransferSession, message?: string): void;
+  (transferSession: TransferSession, message?: string): void;
 }

@@ -16,36 +16,36 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ViewerComponent} from "../../base/components/ViewerComponent";
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
-import {SinglePageLayout} from "../../base/widgets/canvas/SinglePageLayout";
-import {DoublePageLayout} from "../widgets/canvas/DoublePageLayout";
-import {DoublePageRelocatedLayout} from "../widgets/canvas/DoublePageRelocatedLayout";
-import {ProvidePageLayoutEvent} from "../../base/components/events/ProvidePageLayoutEvent";
+import { ViewerComponent } from "../../base/components/ViewerComponent";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
+import { SinglePageLayout } from "../../base/widgets/canvas/SinglePageLayout";
+import { DoublePageLayout } from "../widgets/canvas/DoublePageLayout";
+import { DoublePageRelocatedLayout } from "../widgets/canvas/DoublePageRelocatedLayout";
+import { ProvidePageLayoutEvent } from "../../base/components/events/ProvidePageLayoutEvent";
 
 
 export class MyCoRePageDesktopLayoutProviderComponent extends ViewerComponent {
 
-    constructor(private _settings: MyCoReViewerSettings) {
-        super();
-    }
+  constructor(private _settings: MyCoReViewerSettings) {
+    super();
+  }
 
-    public get handlesEvents(): string[] {
-        return [];
-    }
+  public get handlesEvents(): string[] {
+    return [];
+  }
 
-    public init() {
-        const singlePageLayout = new SinglePageLayout();
-        const doublePageLayout = new DoublePageLayout();
-        const doublePageRelocatedLayout = new DoublePageRelocatedLayout();
+  public init() {
+    const singlePageLayout = new SinglePageLayout();
+    const doublePageLayout = new DoublePageLayout();
+    const doublePageRelocatedLayout = new DoublePageRelocatedLayout();
 
-        singlePageLayout.maximalPageScale = doublePageLayout.maximalPageScale =
-            doublePageRelocatedLayout.maximalPageScale = parseInt(this._settings.maximalPageScale, 10) || 4;
+    singlePageLayout.maximalPageScale = doublePageLayout.maximalPageScale =
+      doublePageRelocatedLayout.maximalPageScale = parseInt(this._settings.maximalPageScale, 10) || 4;
 
-        this.trigger(new ProvidePageLayoutEvent(this, singlePageLayout, true));
-        this.trigger(new ProvidePageLayoutEvent(this, doublePageLayout));
-        this.trigger(new ProvidePageLayoutEvent(this, doublePageRelocatedLayout));
-    }
+    this.trigger(new ProvidePageLayoutEvent(this, singlePageLayout, true));
+    this.trigger(new ProvidePageLayoutEvent(this, doublePageLayout));
+    this.trigger(new ProvidePageLayoutEvent(this, doublePageRelocatedLayout));
+  }
 }
 
 

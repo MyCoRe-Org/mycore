@@ -19,27 +19,27 @@
 const path = require('path');
 
 module.exports = {
-    entry: {
-        "upload-api" :'./src/upload-api.ts',
-        "upload-gui" : {
-            dependOn: 'upload-api',
-            import: './src/upload-gui.ts'
-        },
+  entry: {
+    "upload-api": './src/upload-api.ts',
+    "upload-gui": {
+      dependOn: 'upload-api',
+      import: './src/upload-gui.ts'
     },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            },
-        ],
-    },
-    resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
-    },
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, '../../../../target/classes/META-INF/resources/modules/webtools/upload/js'),
-    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, '../../../../target/classes/META-INF/resources/modules/webtools/upload/js'),
+  },
 };

@@ -16,202 +16,202 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = function (grunt) {
-    grunt.loadNpmTasks('grunt-ts');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-npmcopy');
+module.exports = function(grunt) {
+  grunt.loadNpmTasks('grunt-ts');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-npmcopy');
 
-    var globalConfig = {
-        projectBase: grunt.option('projectBase') || ''
-    };
+  var globalConfig = {
+    projectBase: grunt.option('projectBase') || ''
+  };
 
-    grunt
-        .initConfig({
-            globalConfig: globalConfig,
-            pkg: grunt.file.readJSON('package.json'),
-            npmcopy: {
-                deps: {
-                    options: {
-                        destPrefix: '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/'
-                    },
-                    files: {
-                        'js/lib/epubjs': 'epubjs/dist',
-                        'js/lib/jszip': 'jszip/dist',
-                        'js/lib/es6-promise': 'es6-promise/dist',
-						'js/lib/manifesto': 'manifesto.js/dist/client',
-                        'cmaps': 'pdfjs-dist/cmaps',
-                        'js/lib/': ['pdfjs-dist/build', 'jquery/dist']
-                    }
-                }
-            },
-            uglify: {
-                viewer: {
-                    mangle: true,
-                    files: {
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-frame.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-frame.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js",
-						"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.js"
+  grunt
+    .initConfig({
+      globalConfig: globalConfig,
+      pkg: grunt.file.readJSON('package.json'),
+      npmcopy: {
+        deps: {
+          options: {
+            destPrefix: '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/'
+          },
+          files: {
+            'js/lib/epubjs': 'epubjs/dist',
+            'js/lib/jszip': 'jszip/dist',
+            'js/lib/es6-promise': 'es6-promise/dist',
+            'js/lib/manifesto': 'manifesto.js/dist/client',
+            'cmaps': 'pdfjs-dist/cmaps',
+            'js/lib/': ['pdfjs-dist/build', 'jquery/dist']
+          }
+        }
+      },
+      uglify: {
+        viewer: {
+          mangle: true,
+          files: {
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-frame.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-frame.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.js",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.min.js": "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.js"
 
-                    }
-                },
-                jszip: {
-                    mangle: false,
-                    files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/jszip/jszip.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/jszip/jszip.js'
-                    }
-                },
-				manifesto: {
-					mangle: false,
-					files: {
-						'<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/manifesto/manifesto.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/manifesto/manifesto.js'
-					}
-				}
-            },
-            watch: {
-                /*ts: {
-                 files: [ '<%= globalConfig.projectBase %>src/main/typescript/*.ts' ],
-                 tasks: 'default',
-                 options: {
-                 forever: false,
-                 livereload: true
-                 }
-                 }*/
-            },
-            less: {
-                development: {
-                    files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/css/default.css': "<%= globalConfig.projectBase %>src/main/less/templates/default/Iview.less",
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/css/mobile.css': "<%= globalConfig.projectBase %>src/main/less/templates/mobile/Iview.less",
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/css/tei.css': "<%= globalConfig.projectBase %>src/main/less/tei.less"
-                    }
-                }
-            },
-            ts: {
-                viewer_base: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.js",
-                    src:"<%= globalConfig.projectBase %>src/main/typescript/modules/base/module.ts",
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_desktop: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/desktop/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_frame: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-frame.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/frame/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_logo: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/logo/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_metadata: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/metadata/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_mets: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/mets/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-				viewerIiif: {
-					out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.js",
-					src:["<%= globalConfig.projectBase %>src/main/typescript/modules/iiif/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-					options: {
-						declaration: true,
-						sourceMap: false
-					}
-				},
-                viewer_mobile: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/mobile/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_pdf: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/pdf/module.ts",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                epub: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.js",
-                    src:["<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts",
-                        "<%= globalConfig.projectBase %>src/main/typescript/modules/epub/module.ts"
-                        ],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_piwik: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/piwik/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                viewer_toolbar_extender: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/toolbar-extender/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                },
-                tei: {
-                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.js",
-                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/tei/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
-                    options: {
-                        declaration: true,
-                        sourceMap: false
-                    }
-                }
-            }
-        });
+          }
+        },
+        jszip: {
+          mangle: false,
+          files: {
+            '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/jszip/jszip.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/jszip/jszip.js'
+          }
+        },
+        manifesto: {
+          mangle: false,
+          files: {
+            '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/manifesto/manifesto.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/manifesto/manifesto.js'
+          }
+        }
+      },
+      watch: {
+        /*ts: {
+         files: [ '<%= globalConfig.projectBase %>src/main/typescript/*.ts' ],
+         tasks: 'default',
+         options: {
+         forever: false,
+         livereload: true
+         }
+         }*/
+      },
+      less: {
+        development: {
+          files: {
+            '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/css/default.css': "<%= globalConfig.projectBase %>src/main/less/templates/default/Iview.less",
+            '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/css/mobile.css': "<%= globalConfig.projectBase %>src/main/less/templates/mobile/Iview.less",
+            '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/css/tei.css': "<%= globalConfig.projectBase %>src/main/less/tei.less"
+          }
+        }
+      },
+      ts: {
+        viewer_base: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.js",
+          src: "<%= globalConfig.projectBase %>src/main/typescript/modules/base/module.ts",
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_desktop: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/desktop/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_frame: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-frame.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/frame/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_logo: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/logo/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_metadata: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/metadata/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_mets: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/mets/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewerIiif: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/iiif/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_mobile: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/mobile/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_pdf: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/pdf/module.ts",
+            "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        epub: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.js",
+          src: ["<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts",
+            "<%= globalConfig.projectBase %>src/main/typescript/modules/epub/module.ts"
+          ],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_piwik: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/piwik/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        viewer_toolbar_extender: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/toolbar-extender/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        },
+        tei: {
+          out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.js",
+          src: ["<%= globalConfig.projectBase %>src/main/typescript/modules/tei/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+          options: {
+            declaration: true,
+            sourceMap: false
+          }
+        }
+      }
+    });
 
 
-    grunt.registerTask('default', ['npmcopy', 'ts', 'less', 'uglify']);
+  grunt.registerTask('default', ['npmcopy', 'ts', 'less', 'uglify']);
 
 };
 

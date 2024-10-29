@@ -17,7 +17,7 @@
  */
 
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoRePiwikComponent} from "./components/MyCoRePiwikComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoRePiwikComponent } from "./components/MyCoRePiwikComponent";
 
 addViewerComponent(MyCoRePiwikComponent);

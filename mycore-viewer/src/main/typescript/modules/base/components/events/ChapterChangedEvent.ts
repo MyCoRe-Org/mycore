@@ -17,19 +17,19 @@
  */
 
 
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {StructureChapter} from "../model/StructureChapter";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { StructureChapter } from "../model/StructureChapter";
 
 export class ChapterChangedEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, private _chapter: StructureChapter) {
-        super(component, ChapterChangedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, private _chapter: StructureChapter) {
+    super(component, ChapterChangedEvent.TYPE);
+  }
 
-    public get chapter() {
-        return this._chapter;
-    }
+  public get chapter() {
+    return this._chapter;
+  }
 
-    public static TYPE: string = "ChapterChangedEvent";
+  public static TYPE: string = "ChapterChangedEvent";
 }
 

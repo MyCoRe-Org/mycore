@@ -18,38 +18,38 @@
  */
 
 export interface JobQueueList {
-    queue: Array<JobQueueBase>;
+  queue: Array<JobQueueBase>;
 }
 
 export interface JobQueueBase {
-    name: string;
+  name: string;
 }
 
 
 export interface JobQueueDetailed {
-    name: string;
-    job: Array<Job>;
+  name: string;
+  job: Array<Job>;
 }
 
 export interface Job {
-    id: number;
-    status: "FINISHED" | "NEW" | "RUNNING" | "ERROR" | "MAX_TRIES";
+  id: number;
+  status: "FINISHED" | "NEW" | "RUNNING" | "ERROR" | "MAX_TRIES";
 
-    date:  Array<JobDate>
+  date: Array<JobDate>
 
-    parameter: Array<JobParameter>
+  parameter: Array<JobParameter>
 
-    tries?: number;
+  tries?: number;
 
-    exception?: string;
+  exception?: string;
 }
 
 export interface JobDate {
-    type: "added" | "start" | "finished",
-    value: number
+  type: "added" | "start" | "finished",
+  value: number
 }
 
 export interface JobParameter {
-    name: string;
-    value: string;
+  name: string;
+  value: string;
 }
