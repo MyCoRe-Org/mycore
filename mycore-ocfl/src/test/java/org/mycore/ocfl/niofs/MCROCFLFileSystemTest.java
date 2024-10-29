@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import org.junit.Test;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 public class MCROCFLFileSystemTest extends MCROCFLNioTestCase {
@@ -33,12 +33,12 @@ public class MCROCFLFileSystemTest extends MCROCFLNioTestCase {
             MCROCFLInactiveTransactionException.class, () -> fs.createRoot(DERIVATE_2));
 
         // begin transaction
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         fs.createRoot(DERIVATE_2);
         assertTrue(DERIVATE_2 + " should exist", Files.exists(MCRVersionedPath.head(DERIVATE_2, "/")));
         assertThrows("root should already exists " + DERIVATE_2,
             FileAlreadyExistsException.class, () -> fs.createRoot(DERIVATE_2));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertTrue(DERIVATE_2 + " should exist after commiting",
             Files.exists(MCRVersionedPath.head(DERIVATE_2, "/")));
     }
@@ -51,10 +51,10 @@ public class MCROCFLFileSystemTest extends MCROCFLNioTestCase {
             MCROCFLInactiveTransactionException.class, () -> fs.removeRoot(DERIVATE_1));
         fs.removeRoot(DERIVATE_2);
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         fs.removeRoot(DERIVATE_1);
         assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")));
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")));
     }
 
@@ -64,23 +64,23 @@ public class MCROCFLFileSystemTest extends MCROCFLNioTestCase {
         assertEquals(1, getRootDirectoryList(fs).size());
 
         // add
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         fs.createRoot(DERIVATE_2);
         assertEquals(2, getRootDirectoryList(fs).size());
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertEquals(2, getRootDirectoryList(fs).size());
 
         // rm
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         fs.removeRoot(DERIVATE_2);
         assertEquals(1, getRootDirectoryList(fs).size());
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertEquals(1, getRootDirectoryList(fs).size());
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         fs.removeRoot(DERIVATE_1);
         assertEquals(0, getRootDirectoryList(fs).size());
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         assertEquals(0, getRootDirectoryList(fs).size());
     }
 
