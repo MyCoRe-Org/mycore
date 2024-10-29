@@ -28,9 +28,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceTransaction;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
 
 /**
@@ -43,20 +42,7 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
 
     private static final AtomicLong TRANSACTION_COUNTER = new AtomicLong(0);
 
-    private boolean active;
-
-    private boolean rollback;
-
-    private Long transactionId;
-
-    /**
-     * Constructs a new {@code MCROCFLFileSystemTransaction} with initial inactive and non-rollback states.
-     */
-    public MCROCFLFileSystemTransaction() {
-        this.active = false;
-        this.rollback = false;
-        this.transactionId = null;
-    }
+    private static final ThreadLocal<Long> TRANSACTION_ID = new ThreadLocal<>();
 
     /**
      * Gets the ID of the transaction.
@@ -64,7 +50,7 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
      * @return the transaction ID, or {@code null} if the transaction is not active.
      */
     public Long getId() {
-        return transactionId;
+        return TRANSACTION_ID.get();
     }
 
     /**
@@ -90,14 +76,7 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
      */
     @Override
     public void begin() {
-        if (this.active) {
-            throw new IllegalStateException("OCFL File Transaction is already active.");
-        }
-        if (this.rollback) {
-            throw new IllegalStateException("OCFL File Transaction is already marked to be rolled back.");
-        }
-        this.transactionId = TRANSACTION_COUNTER.incrementAndGet();
-        this.active = true;
+        TRANSACTION_ID.set(TRANSACTION_COUNTER.getAndIncrement());
     }
 
     /**
@@ -107,15 +86,10 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
      */
     @Override
     public void commit() {
-        if (!this.active) {
-            throw new IllegalStateException("OCFL File Transaction is not active.");
-        }
-        if (this.rollback) {
-            throw new IllegalStateException("OCFL File Transaction is already marked to be rolled back.");
-        }
         MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
         try {
-            Collection<MCROCFLVirtualObject> virtualObjects = virtualObjectProvider.collect(this);
+            Long transactionId = getTransactionId();
+            Collection<MCROCFLVirtualObject> virtualObjects = virtualObjectProvider.collect(transactionId);
             if (virtualObjects.isEmpty()) {
                 return;
             }
@@ -134,7 +108,6 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
             }
         } finally {
             clean();
-            this.active = false;
         }
     }
 
@@ -145,82 +118,40 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
      */
     @Override
     public void rollback() {
-        if (!this.active) {
-            throw new IllegalStateException("OCFL File Transaction is not active.");
-        }
         clean();
-        this.active = false;
     }
 
     /**
      * Cleans up the transaction, removing it from the virtual object provider and purging local storage.
      */
     private void clean() {
+        Long transactionId = getTransactionId();
+
         MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
         MCROCFLTransactionalTempFileStorage localStorage = MCROCFLFileSystemProvider.get().localStorage();
-        virtualObjectProvider.remove(this);
+        virtualObjectProvider.remove(transactionId);
         try {
-            localStorage.purge(this);
+            localStorage.purge(transactionId);
         } catch (IOException ioExc) {
-            LOGGER.error("Unable to clean local storage for transaction '{}'.", this.transactionId, ioExc);
+            LOGGER.error("Unable to clean local storage for transaction '{}'.", transactionId, ioExc);
         }
+        TRANSACTION_ID.remove();
     }
 
     /**
-     * Checks if the transaction is marked for rollback.
-     *
-     * @return {@code true} if the transaction is marked for rollback, {@code false} otherwise.
+     * {@inheritDoc}
      */
     @Override
-    public boolean getRollbackOnly() {
-        return rollback;
+    public int getCommitPriority() {
+        return 5000;
     }
 
-    /**
-     * Marks the transaction for rollback.
-     *
-     * @throws IllegalStateException if the transaction is not active.
-     */
-    @Override
-    public void setRollbackOnly() throws IllegalStateException {
-        this.rollback = true;
+    public static Long getTransactionId() {
+        return TRANSACTION_ID.get();
     }
 
-    /**
-     * Checks if the transaction is active.
-     *
-     * @return {@code true} if the transaction is active, {@code false} otherwise.
-     */
-    @Override
-    public boolean isActive() {
-        return active;
-    }
-
-    /**
-     * Gets the current OCFL file system transaction.
-     *
-     * @return the current {@link MCROCFLFileSystemTransaction}.
-     */
-    public static MCROCFLFileSystemTransaction get() {
-        return MCRTransactionHelper.get(MCROCFLFileSystemTransaction.class);
-    }
-
-    /**
-     * Gets the current active OCFL file system transaction.
-     *
-     * @return the current active {@link MCROCFLFileSystemTransaction}.
-     * @throws MCRException if there is no current transaction.
-     * @throws MCROCFLInactiveTransactionException if the current transaction is not active.
-     */
-    public static MCROCFLFileSystemTransaction getActive() {
-        MCROCFLFileSystemTransaction transaction = get();
-        if (transaction == null) {
-            throw new MCRException("Unable to create MCROCFLFileSystemTransaction.");
-        }
-        if (!transaction.isActive()) {
-            throw new MCROCFLInactiveTransactionException("OCFL transaction is not active!");
-        }
-        return transaction;
+    public static boolean isActive() {
+        return MCRTransactionManager.isActive(MCROCFLFileSystemTransaction.class);
     }
 
     /**
