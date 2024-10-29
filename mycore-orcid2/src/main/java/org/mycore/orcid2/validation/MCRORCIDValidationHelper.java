@@ -48,10 +48,7 @@ public class MCRORCIDValidationHelper {
         }
         final char checkDigit = orcid.charAt(orcid.length() - 1);
         final String rawORCID = orcid.substring(0, orcid.length() - 1).replaceAll("\\D+", "");
-        if (rawORCID.length() != 15) {
-            return false;
-        }
-        return checkDigit == generateCheckDigit(rawORCID);
+        return rawORCID.length() == 15 && checkDigit == generateCheckDigit(rawORCID);
     }
 
     /**

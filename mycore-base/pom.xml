@@ -29,9 +29,6 @@
   </parent>
   <artifactId>mycore-base</artifactId>
   <name>MyCoRe Base Components</name>
-  <properties>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
-  </properties>
   <build>
     <plugins>
       <plugin>

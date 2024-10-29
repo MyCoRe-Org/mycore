@@ -29,9 +29,6 @@
   </parent>
   <artifactId>mycore-sword</artifactId>
   <name>MyCoRe SWORD Interface</name>
-  <properties>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>com.fasterxml.woodstox</groupId>

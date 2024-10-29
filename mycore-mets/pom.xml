@@ -34,7 +34,6 @@
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
     <failsafe.arg />
     <manifest.priority>45</manifest.priority>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

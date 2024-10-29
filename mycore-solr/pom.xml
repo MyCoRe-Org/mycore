@@ -31,7 +31,6 @@
   <name>MyCoRe Solr Support</name>
   <properties>
     <manifest.priority>10</manifest.priority>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

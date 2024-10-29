@@ -55,26 +55,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     private static Logger LOGGER = LogManager.getLogger(MCRAccessCommands.class.getName());
 
     /**
-     * Check the file name
-     * 
-     * @param filename
-     *            the filename of the user data input
-     * @return true if the file name is okay
-     */
-    private static boolean checkFilename(String filename) {
-        if (!filename.endsWith(".xml")) {
-            LOGGER.warn("{} ignored, does not end with *.xml", filename);
-            return false;
-        }
-
-        if (!new File(filename).isFile()) {
-            LOGGER.warn("{} ignored, is not a file.", filename);
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * This method deletes the old permissions (if given any) and sets the new
      * permissions given in a certain file
      * 

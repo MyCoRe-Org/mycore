@@ -33,7 +33,6 @@
     <enforcer.skip>true</enforcer.skip>
     <manifest.priority>54</manifest.priority>
     <orcidModelVersion>3.0.12</orcidModelVersion>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>
