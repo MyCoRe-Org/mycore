@@ -150,9 +150,13 @@ div.web-cli-queue>pre {
 }
 
 /*Override Bootstrap*/
-.nav-tabs .nav-item.active .nav-link, .nav-tabs .nav-item.active .nav-link:focus, .nav-tabs .nav-item.active .nav-link.hover,
-  .nav-tabs .nav-item.open .nav-link, .nav-tabs .nav-item.open .nav-link:focus, .nav-tabs .nav-item.open .nav-link:hover,
-  .nav-tabs .nav-link:hover {
+.nav-tabs .nav-link:hover, 
+.nav-tabs .nav-item.active .nav-link,
+.nav-tabs .nav-item.active .nav-link:focus,
+.nav-tabs .nav-item.active .nav-link.hover,
+.nav-tabs .nav-item.open .nav-link,
+.nav-tabs .nav-item.open .nav-link:focus,
+.nav-tabs .nav-item.open .nav-link:hover {
   color: #373a3c;
   border-bottom: solid 2px #373a3c;
 }
