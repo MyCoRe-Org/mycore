@@ -129,9 +129,9 @@ public class MCRRestAPISearch {
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(reqBuilder, MCRSolrAuthenticationLevel.SEARCH);
         HttpRequest request = reqBuilder.build();
 
-        try(HttpClient client = MCRHttpUtils.getHttpClient()) {
-            HttpResponse<String> resp
-                = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        try (HttpClient client = MCRHttpUtils.getHttpClient()) {
+            HttpResponse<String> resp =
+                client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             return Response.ok(resp.body())
                 .type(getContentType(wt))
                 .build();

@@ -423,11 +423,11 @@ public class MCRRestDerivates {
                 MCRMetadataManager.update(derivate);
             } catch (MCRAccessException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                        .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
-                        .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
-                        .withDetail(e.getMessage())
-                        .withCause(e)
-                        .toException();
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                    .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
             }
         }
 
@@ -451,25 +451,25 @@ public class MCRRestDerivates {
 
         // Check if the 'classifications' field has been updated
         List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
-                .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
-                .collect(Collectors.toList());
+            .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
+            .collect(Collectors.toList());
         if (!der.getClassifications().isEmpty()
-                && (oldClassifications.size() != der.getClassifications().size()
+            && (oldClassifications.size() != der.getClassifications().size()
                 || !oldClassifications.containsAll(der.getClassifications()))) {
             modified = true;
             derivate.getDerivate().getClassifications().clear();
             derivate.getDerivate().getClassifications()
-                    .addAll(der.getClassifications().stream()
-                            .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
-                            .collect(Collectors.toList()));
+                .addAll(der.getClassifications().stream()
+                    .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                    .collect(Collectors.toList()));
         }
 
         // Check if the 'titles' field has been updated
         List<MCRMetaLangText> newTitles = der.getTitles().stream()
-                .map(DerivateTitle::toMetaLangText)
-                .collect(Collectors.toList());
+            .map(DerivateTitle::toMetaLangText)
+            .collect(Collectors.toList());
         if (!newTitles.isEmpty()
-                && (derivate.getDerivate().getTitleSize() != newTitles.size()
+            && (derivate.getDerivate().getTitleSize() != newTitles.size()
                 || !derivate.getDerivate().getTitles().containsAll(newTitles))) {
             modified = true;
             derivate.getDerivate().getTitles().clear();

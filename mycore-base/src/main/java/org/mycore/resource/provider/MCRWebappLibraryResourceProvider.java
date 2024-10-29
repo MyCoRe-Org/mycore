@@ -68,13 +68,10 @@ public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvid
             new MCRClassLoaderResourceLocator(),
             new MCRCombinedResourceFilter(
                 new MCRLibraryResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-                new MCRWebappLibraryResourceFilter(mode)
-            ),
+                new MCRWebappLibraryResourceFilter(mode)),
             new MCRCombinedResourceSelector(
                 new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstLibraryJarResourceSelector()
-            )
-        );
+                new MCRFirstLibraryJarResourceSelector()));
         this.mode = mode;
     }
 

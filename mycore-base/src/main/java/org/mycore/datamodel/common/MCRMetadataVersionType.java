@@ -33,8 +33,8 @@ public enum MCRMetadataVersionType {
 
     public static MCRMetadataVersionType fromValue(char a) {
         return Stream.of(values()).filter(t -> t.charValue == a)
-                .findAny()
-                .orElseThrow(IllegalArgumentException::new);
+            .findAny()
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     final char getCharValue() {

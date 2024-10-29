@@ -185,7 +185,7 @@ public class MCRXMLHelper {
             return MCRURIResolver.instance().resolve(schemaURI, null);
         } catch (TransformerException e) {
             Throwable cause = e.getCause();
-            switch(cause) {
+            switch (cause) {
                 case IOException ioe -> throw ioe;
                 case SAXException se -> throw se;
                 default -> throw new IOException(e);
@@ -271,7 +271,6 @@ public class MCRXMLHelper {
     }
 
     private static class JDOMEquivalent {
-
 
         public static boolean equivalent(Element e1, Element e2) {
             return equivalentName(e1, e2) && equivalentAttributes(e1, e2)

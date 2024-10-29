@@ -46,7 +46,7 @@ public class MCRFieldBaseValue {
     }
 
     public void setFieldName(String fieldName) {
-        Objects.requireNonNull(fieldName,"field name cannot be null.");
+        Objects.requireNonNull(fieldName, "field name cannot be null.");
         this.fieldName = fieldName;
     }
 

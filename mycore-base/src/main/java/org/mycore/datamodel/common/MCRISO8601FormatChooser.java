@@ -142,7 +142,6 @@ public final class MCRISO8601FormatChooser {
         }
     }
 
-
     /**
      * returns a String that has not more than 3 digits representing "fractions of a second". If isoString has no or not
      * more than 3 digits this method simply returns isoString.

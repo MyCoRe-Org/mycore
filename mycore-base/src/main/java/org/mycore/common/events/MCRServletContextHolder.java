@@ -23,7 +23,6 @@ import java.util.Optional;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextListener;
 
-
 public class MCRServletContextHolder implements ServletContextListener {
 
     private static final MCRServletContextHolder SINGLETON = new MCRServletContextHolder();

@@ -169,7 +169,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public boolean isMyCoReBaseComponent() {
         return type == Type.base;
     }
-    
+
     /**
      * Returns true, if this component is a MyCoRe component
      */

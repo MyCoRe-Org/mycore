@@ -147,7 +147,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     }
 
-
     @Test
     public void testExcludeNothingWithMediumAge() {
 
@@ -183,7 +182,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         assertEquals(0, remainingJobs.size());
 
     }
-
 
     @Test
     public void testIncludeOneJobType() {

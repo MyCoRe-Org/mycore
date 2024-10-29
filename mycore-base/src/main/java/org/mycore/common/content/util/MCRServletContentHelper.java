@@ -130,8 +130,8 @@ public abstract class MCRServletContentHelper {
     private static void prepareAndSetupResponse(MCRContent content, HttpServletRequest request,
         HttpServletResponse httpServletResponse, Config config, boolean serveContent, boolean isError,
         String contentType, long contentLength) throws IOException {
-        HttpServletResponse response
-            = configureResponseHeaders(content, serveContent, request, httpServletResponse, config);
+        HttpServletResponse response =
+            configureResponseHeaders(content, serveContent, request, httpServletResponse, config);
         try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {
             if (serveContent) {
                 response.setBufferSize(config.outputBufferSize);

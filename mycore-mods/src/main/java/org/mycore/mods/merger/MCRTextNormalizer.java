@@ -67,10 +67,10 @@ public class MCRTextNormalizer {
 
         String normalizedText = text;
 
-        if(MCRXMLFunctions.isHtml(normalizedText)) {
+        if (MCRXMLFunctions.isHtml(normalizedText)) {
             normalizedText = MCRXMLFunctions.stripHtml(normalizedText);
         }
-        
+
         // make lowercase
         normalizedText = normalizedText.toLowerCase(Locale.getDefault());
 

@@ -71,7 +71,6 @@ public abstract class MCRAbstractMetadataVersion<T> {
     @XmlAttribute()
     protected MCRMetadataVersionType type;
 
-
     /**
      * A version that was created in store
      */

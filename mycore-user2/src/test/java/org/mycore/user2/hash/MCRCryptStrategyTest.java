@@ -40,8 +40,7 @@ public class MCRCryptStrategyTest extends MCRTestCase {
 
         MCRPasswordCheckStrategy strategy = new MCRCryptStrategy();
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
-        
-        
+
         System.out.println(data);
 
         assertEquals(TYPE, data.type());

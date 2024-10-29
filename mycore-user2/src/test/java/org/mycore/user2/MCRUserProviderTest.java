@@ -44,7 +44,6 @@ public class MCRUserProviderTest extends MCRUserTestCase {
         MCRUserManager.createUser(userWithRealm);
     }
 
-
     @Test
     public final void testGetUserWithoutRealm() {
         assertEquals(Optional.of(userWithoutRealm), get("hugo"));

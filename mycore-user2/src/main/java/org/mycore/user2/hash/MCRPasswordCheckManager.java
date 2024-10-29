@@ -129,7 +129,7 @@ public final class MCRPasswordCheckManager {
 
         LOGGER.info("Working with strategies: " + String.join(", ", strategies.keySet()));
         LOGGER.info("Creating new password hashes with strategy: " + selectedStrategyType);
-        
+
     }
 
     public static MCRPasswordCheckManager instance() {

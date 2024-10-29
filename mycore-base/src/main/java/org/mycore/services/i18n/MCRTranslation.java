@@ -321,8 +321,8 @@ public class MCRTranslation {
             // Java doesn't work with id
             adjustedLanguage = "in";
             LOGGER.debug("Translation for current locale: {}", adjustedLanguage);
-        }else {
-            adjustedLanguage= language;
+        } else {
+            adjustedLanguage = language;
         }
         return Locale.forLanguageTag(adjustedLanguage);
     }

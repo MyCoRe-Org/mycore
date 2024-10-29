@@ -78,8 +78,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     public static final String XPATH_GENERATOR_NAME = "xpathmapping";
 
     /** This configuration lists all eligible classifications for x-path-mapping */
-    private static final String X_PATH_MAPPING_CLASSIFICATIONS
-        = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
+    private static final String X_PATH_MAPPING_CLASSIFICATIONS =
+        MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
 
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 

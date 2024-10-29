@@ -101,8 +101,8 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                     newName = prefixString + nameTry++ + suffixString;
                     newTarget = parent.resolve(newName);
                 } while (Files.exists(newTarget));
-            }else{
-                newTarget= target;
+            } else {
+                newTarget = target;
             }
             if (restartDatabaseTransaction && MCRSessionMgr.hasCurrentSession()) {
                 MCRTransactionManager.commitTransactions(MCREntityTransaction.class);

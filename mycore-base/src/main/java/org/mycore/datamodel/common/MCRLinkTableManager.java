@@ -144,11 +144,10 @@ public class MCRLinkTableManager {
         String attrTrimmed = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
 
         LOGGER.debug("Link in table {} add for {}<-->{} with {} and {}",
-                typeTrimmed, fromTrimmed, toTrimmed, typeTrimmed, attrTrimmed);
+            typeTrimmed, fromTrimmed, toTrimmed, typeTrimmed, attrTrimmed);
 
         try {
-            linkTableInstance.
-                    create(fromTrimmed, toTrimmed, typeTrimmed, attrTrimmed);
+            linkTableInstance.create(fromTrimmed, toTrimmed, typeTrimmed, attrTrimmed);
         } catch (Exception e) {
             LOGGER.warn("An error occured while adding a dataset from the reference link table, adding not succesful.",
                 e);

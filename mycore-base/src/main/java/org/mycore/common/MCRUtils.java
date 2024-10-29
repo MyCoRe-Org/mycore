@@ -341,7 +341,7 @@ public class MCRUtils {
     private static String getHash(int iterations, byte[] salt, String text, String algorithm)
         throws NoSuchAlgorithmException {
         MessageDigest digest;
-        int currentIndex= iterations;
+        int currentIndex = iterations;
         if (--currentIndex < 0) {
             currentIndex = 0;
         }

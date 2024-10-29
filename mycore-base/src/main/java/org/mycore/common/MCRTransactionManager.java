@@ -86,11 +86,11 @@ public abstract class MCRTransactionManager {
 
     private static TransactionLoader transactionLoader = new PooledSystemTransactionLoader();
 
-    private static final ThreadLocal<List<MCRPersistenceTransaction>> ACTIVE_TRANSACTIONS
-        = ThreadLocal.withInitial(ArrayList::new);
+    private static final ThreadLocal<List<MCRPersistenceTransaction>> ACTIVE_TRANSACTIONS =
+        ThreadLocal.withInitial(ArrayList::new);
 
-    private static final ThreadLocal<List<MCRPersistenceTransaction>> ROLLBACK_ONLY_TRANSACTIONS
-        = ThreadLocal.withInitial(ArrayList::new);
+    private static final ThreadLocal<List<MCRPersistenceTransaction>> ROLLBACK_ONLY_TRANSACTIONS =
+        ThreadLocal.withInitial(ArrayList::new);
 
     /**
      * Sets the {@link TransactionLoader} to be used by the {@link MCRTransactionManager}.
@@ -404,8 +404,8 @@ public abstract class MCRTransactionManager {
     private static void rollbackTransactions(List<? extends MCRPersistenceTransaction> transactionsToRollback) {
         List<Exception> exceptionsOnRollback = rollback(transactionsToRollback);
         if (!exceptionsOnRollback.isEmpty()) {
-            MCRTransactionException rollbackException
-                = new MCRTransactionException("Errors occurred during rollbackTransactions.");
+            MCRTransactionException rollbackException =
+                new MCRTransactionException("Errors occurred during rollbackTransactions.");
             exceptionsOnRollback.forEach(rollbackException::addSuppressed);
             throw rollbackException;
         }

@@ -46,7 +46,6 @@ public class MCRFileSystemPromoter implements AutoExecutable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRFileSystemPromoter.class);
 
-
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#getName()
      */

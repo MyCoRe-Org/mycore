@@ -117,8 +117,8 @@ public class MCRLanguageFactory {
         String languageCode;
         if ((!languageByCode.containsKey(code)) && code.contains("-") && !code.startsWith("x-")) {
             languageCode = code.split("-")[0];
-        }else{
-            languageCode=code;
+        } else {
+            languageCode = code;
         }
         if (!languageByCode.containsKey(languageCode)) {
             LOGGER.warn("Unknown language: {}", languageCode);

@@ -28,7 +28,6 @@ import jakarta.servlet.ServletContext;
 
 public class MCRServletContextResourceHint implements MCRHint<ServletContext> {
 
-
     @Override
     public MCRHintKey<ServletContext> key() {
         return MCRResourceHintKeys.SERVLET_CONTEXT;

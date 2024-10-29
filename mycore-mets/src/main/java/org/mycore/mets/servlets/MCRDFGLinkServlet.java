@@ -164,7 +164,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
         if (linkList.isEmpty()) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.format(Locale.ENGLISH,
-                    "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));
+                "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));
             return;
         }
 
@@ -177,8 +177,6 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         handleRedirectOrError(imageNumber, filePath, response, encodedMetsURL);
     }
-
-
 
     private int getImageNumber(String filePath, MCRPath rootPath, MCRServletJob job, HttpServletRequest request,
         String derivateID) throws Exception {

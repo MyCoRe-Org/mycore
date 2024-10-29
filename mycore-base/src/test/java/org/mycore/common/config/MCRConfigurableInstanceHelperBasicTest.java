@@ -99,8 +99,6 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     public static class TestClassWithConstructor {
 
-
-
     }
 
     @SuppressWarnings("InstantiationOfUtilityClass")

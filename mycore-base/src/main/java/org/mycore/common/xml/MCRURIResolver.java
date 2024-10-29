@@ -114,8 +114,6 @@ import org.xml.sax.XMLReader;
 
 import jakarta.servlet.ServletContext;
 
-
-
 /**
  * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
  * usages, xsl:include usages and MyCoRe Editor include declarations. DTDs and Schema files are read from the CLASSPATH
@@ -170,6 +168,7 @@ public final class MCRURIResolver implements URIResolver {
                 }
             }).orElse(HashMap::new);
     }
+
     private static void findAndThrowTransformerException(Exception e) throws TransformerException {
         Throwable cause = e.getCause();
         while (cause != null) {
@@ -315,7 +314,7 @@ public final class MCRURIResolver implements URIResolver {
         URIResolver uriResolver = SUPPORTED_SCHEMES.get(scheme);
         if (uriResolver != null) {
             Source resolved = uriResolver.resolve(href, base);
-            if (resolved == null){
+            if (resolved == null) {
                 LOGGER.warn("Could not resolve URI for {} from {}", href, base);
                 return null;
             }
@@ -764,7 +763,7 @@ public final class MCRURIResolver implements URIResolver {
             }
 
             Element container = new Element("servacls").setAttribute("class", "MCRMetaAccessRule");
-            if(MCRAccessManager.implementsRulesInterface()) {
+            if (MCRAccessManager.implementsRulesInterface()) {
                 if (action.equals("all")) {
                     for (String permission : MCRAccessManager.getPermissionsForID(objId)) {
                         // one pool Element under access per defined AccessRule in pool for (Object-)ID
@@ -1063,7 +1062,7 @@ public final class MCRURIResolver implements URIResolver {
                 String factoryClassProperty = PREFIX + flavorName + ".TransformerFactoryClass";
                 Class<? extends TransformerFactory> factoryClass = MCRConfiguration2
                     .<TransformerFactory>getClass(factoryClassProperty)
-                    .orElseThrow(()->MCRConfiguration2.createConfigurationException(factoryClassProperty));
+                    .orElseThrow(() -> MCRConfiguration2.createConfigurationException(factoryClassProperty));
 
                 String xslFolderProperty = PREFIX + flavorName + ".XSLFolder";
                 String xslFolder = MCRConfiguration2.getStringOrThrow(xslFolderProperty);
@@ -1153,7 +1152,7 @@ public final class MCRURIResolver implements URIResolver {
                 return transformer.transform(content, parameterCollector).getSource();
 
             } catch (IOException e) {
-                findAndThrowTransformerException( e);
+                findAndThrowTransformerException(e);
                 throw new TransformerException(e);
             }
 
@@ -1165,7 +1164,9 @@ public final class MCRURIResolver implements URIResolver {
             }
             return stylesheets;
         }
-        private record Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {}
+
+        private record Flavor(Class<? extends TransformerFactory> transformerFactory, String xslFolder) {
+        }
     }
 
     /**

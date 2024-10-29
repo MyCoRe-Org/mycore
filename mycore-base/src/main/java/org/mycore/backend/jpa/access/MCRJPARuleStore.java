@@ -51,8 +51,8 @@ public class MCRJPARuleStore extends MCRRuleStore {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static LoadingCache<String, MCRAccessRule> ruleCache = CacheBuilder
-            .newBuilder()
-            .maximumSize(MCRConfiguration2.getInt("MCR.AccessPool.CacheSize").orElse(2048))
+        .newBuilder()
+        .maximumSize(MCRConfiguration2.getInt("MCR.AccessPool.CacheSize").orElse(2048))
         .build(new CacheLoader<>() {
             @Override
             public MCRAccessRule load(String ruleid) {

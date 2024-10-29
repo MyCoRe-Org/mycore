@@ -73,7 +73,6 @@ class MCRAccessCacheManager {
         return new MCRCache<>(CAPACITY, "Access rights,MCRSession=" + suffix);
     }
 
-
     public Boolean isPermitted(String id, String permission) {
         MCRPermissionHandle handle = new MCRPermissionHandle(id, permission);
         MCRCache<MCRPermissionHandle, Boolean> permissionCache = getSessionPermissionCache();

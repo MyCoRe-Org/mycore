@@ -111,7 +111,7 @@ public class MCRBasketEntry {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof MCRBasketEntry basketEntry&& basketEntry.id.equals(id);
+        return obj instanceof MCRBasketEntry basketEntry && basketEntry.id.equals(id);
     }
 
     @Override

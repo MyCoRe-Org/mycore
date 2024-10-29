@@ -178,7 +178,7 @@ public class MCRErrorServlet extends HttpServlet {
         if (source != null) {
             root.setAttribute("source", source);
         }
-        Throwable throwableException= ex;
+        Throwable throwableException = ex;
         while (throwableException != null) {
             Element exception = new Element("exception");
             exception.setAttribute("type", throwableException.getClass().getName());

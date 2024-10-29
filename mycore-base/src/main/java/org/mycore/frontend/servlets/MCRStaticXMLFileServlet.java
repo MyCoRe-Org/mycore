@@ -81,7 +81,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
             MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
             if (REDIRECT_GUESTS && currentUser.equals(MCRSystemUserInformation.getGuestInstance())) {
                 String contextPath = job.getRequest().getContextPath();
-                String redirectTarget =  contextPath + "/servlets/MCRLoginServlet?url="
+                String redirectTarget = contextPath + "/servlets/MCRLoginServlet?url="
                     + URLEncoder.encode(contextPath + webpageID, StandardCharsets.UTF_8);
                 if (!REDIRECT_GUESTS_XSL_STATUS_MESSAGE.isEmpty() && !REDIRECT_GUESTS_XSL_STATUS_STYLE.isEmpty()) {
                     redirectTarget += "&XSL.Status.Message=" + REDIRECT_GUESTS_XSL_STATUS_MESSAGE;

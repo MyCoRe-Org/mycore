@@ -30,7 +30,6 @@ import org.junit.Test;
 
 public class MCRISO8601DateTest {
 
-
     @Test
     public void getDate() {
         MCRISO8601Date ts = new MCRISO8601Date();

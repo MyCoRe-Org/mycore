@@ -452,7 +452,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      */
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
         return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? MCRAbstractFileSystem.getInstance(SCHEME)
-                                                                : FILE_SYSTEM_INSTANCE);
+            : FILE_SYSTEM_INSTANCE);
     }
 
     static abstract class BaseBasicFileAttributeView extends MCRBasicFileAttributeViewImpl {
@@ -525,8 +525,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
 
         private static final Set<String> ALLOWED_ATTRIBUTES = Sets.union(
             MCRBasicFileAttributeViewProperties.ALLOWED_ATTRIBUTES,
-            Sets.newHashSet(MD5_NAME)
-        );
+            Sets.newHashSet(MD5_NAME));
 
         MD5FileAttributeViewProperties(MD5FileAttributeViewImpl view) {
             super(view);

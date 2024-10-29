@@ -32,7 +32,7 @@ public class MCRSimpleConfigPersistenceUnitDescriptor extends MCRPersistenceUnit
 
     static Map<String, String> map = new HashMap<>();
 
-    public MCRSimpleConfigPersistenceUnitDescriptor(){
+    public MCRSimpleConfigPersistenceUnitDescriptor() {
         super();
 
         map.put("jakarta.persistence.jdbc.driver", "MCR.JPA.Driver");
@@ -45,7 +45,7 @@ public class MCRSimpleConfigPersistenceUnitDescriptor extends MCRPersistenceUnit
         map.put("hibernate.cache.region.factory_class", "MCR.JPA.Cache.RegionFactoryClass");
 
         map.put("hibernate.globally_quoted_identifiers_skip_column_definitions",
-                "MCR.JPA.GloballyQuotedIdentifiers.SkipColumnDefinitions");
+            "MCR.JPA.GloballyQuotedIdentifiers.SkipColumnDefinitions");
         map.put("hibernate.globally_quoted_identifiers", "MCR.JPA.GloballyQuotedIdentifiers");
         map.put("hibernate.show_sql", "MCR.JPA.ShowSql");
         map.put("hibernate.hbm2ddl.auto", "MCR.JPA.Hbm2ddlAuto");
@@ -67,7 +67,6 @@ public class MCRSimpleConfigPersistenceUnitDescriptor extends MCRPersistenceUnit
         map.forEach((k, v) -> putSimpleProperty(properties, v, k));
         return properties;
     }
-
 
     private void putSimpleProperty(Properties properties, String mcrSimplePropertyName, String jpaPropertyName) {
         if (!properties.contains(jpaPropertyName)) {

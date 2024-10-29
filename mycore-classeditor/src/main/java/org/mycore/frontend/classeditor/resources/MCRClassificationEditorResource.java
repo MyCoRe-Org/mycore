@@ -111,8 +111,8 @@ public class MCRClassificationEditorResource {
 
     private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
-    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
-            = MCRSolrAuthenticationManager.getInstance();
+    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
+        MCRSolrAuthenticationManager.getInstance();
 
     @Context
     UriInfo uriInfo;

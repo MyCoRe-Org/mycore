@@ -63,7 +63,6 @@ import de.larsgrefer.sass.embedded.util.ProtocolUtil;
 class MCRSassCompiler implements Closeable {
     private static final Logger LOGGER = LogManager.getLogger();
 
-
     private OutputStyle outputStyle;
 
     private boolean generateSourceMaps;

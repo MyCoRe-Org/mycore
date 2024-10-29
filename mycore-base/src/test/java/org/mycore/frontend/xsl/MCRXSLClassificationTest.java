@@ -72,7 +72,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
         Element result = transform(testDoc, XSL,
             Map.of(
                 "classid", "TestClassification",
-                "categid", "junit_1")).getRootElement();
+                "categid", "junit_1"))
+            .getRootElement();
         assertEquals(1, result.getChildren("label").size());
         assertEquals("de", result.getChild("label").getAttributeValue("lang", Namespace.XML_NAMESPACE));
         assertEquals("junit_1 (de)", result.getChild("label").getAttributeValue("text"));
@@ -82,7 +83,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
             Map.of(
                 "classid", "TestClassification",
                 "categid", "junit_1",
-                "CurrentLang", "ar")).getRootElement();
+                "CurrentLang", "ar"))
+            .getRootElement();
         assertEquals("en", result.getChild("label").getAttributeValue("lang", Namespace.XML_NAMESPACE));
         assertEquals("junit_1 (en)", result.getChild("label").getAttributeValue("text"));
 
@@ -92,7 +94,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
                 "classid", "TestClassification",
                 "categid", "junit_1",
                 "CurrentLang", "ar",
-                "DefaultLang", "es")).getRootElement();
+                "DefaultLang", "es"))
+            .getRootElement();
         assertEquals("de", result.getChild("label").getAttributeValue("lang", Namespace.XML_NAMESPACE));
         assertEquals("junit_1 (de)", result.getChild("label").getAttributeValue("text"));
 
@@ -111,7 +114,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
             Map.of(
                 "classid", "TestClassification",
                 "categid", "junit_1",
-                "lang", "x-xxx")).getRootElement();
+                "lang", "x-xxx"))
+            .getRootElement();
         assertEquals(1, result.getChildren("label").size());
         assertEquals("x-xxx", result.getChild("label").getAttributeValue("lang", Namespace.XML_NAMESPACE));
         assertEquals("abc", result.getChild("label").getAttributeValue("text"));
@@ -122,7 +126,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
                 "classid", "TestClassification",
                 "categid", "junit_1",
                 "CurrentLang", "en",
-                "lang", "es")).getRootElement();
+                "lang", "es"))
+            .getRootElement();
         assertEquals(1, result.getChildren("label").size());
         assertEquals("en", result.getChild("label").getAttributeValue("lang", Namespace.XML_NAMESPACE));
         assertEquals("junit_1 (en)", result.getChild("label").getAttributeValue("text"));
@@ -134,7 +139,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
                 "categid", "junit_1",
                 "CurrentLang", "ar",
                 "DefaultLang", "it",
-                "lang", "es")).getRootElement();
+                "lang", "es"))
+            .getRootElement();
         assertEquals(1, result.getChildren("label").size());
         assertEquals("de", result.getChild("label").getAttributeValue("lang", Namespace.XML_NAMESPACE));
         assertEquals("junit_1 (de)", result.getChild("label").getAttributeValue("text"));
@@ -148,28 +154,32 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
         Element result = transform(testDoc, XSL,
             Map.of(
                 "classid", "TestClassification",
-                "categid", "junit_1")).getRootElement();
+                "categid", "junit_1"))
+            .getRootElement();
         assertEquals("junit_1 (de)", result.getText());
 
         result = transform(testDoc, XSL,
             Map.of(
                 "classid", "TestClassification",
                 "categid", "junit_1",
-                "CurrentLang", "en")).getRootElement();
+                "CurrentLang", "en"))
+            .getRootElement();
         assertEquals("junit_1 (en)", result.getText());
 
         // we do not have a current lang label (de) entry, but default lang label (en) entry
         result = transform(testDoc, XSL,
             Map.of(
                 "classid", "TestClassification",
-                "categid", "junit_2")).getRootElement();
+                "categid", "junit_2"))
+            .getRootElement();
         assertEquals("junit_2 (en)", result.getText());
 
         // we neither have current lang nor default lang label
         result = transform(testDoc, XSL,
             Map.of(
                 "classid", "TestClassification",
-                "categid", "junit_3")).getRootElement();
+                "categid", "junit_3"))
+            .getRootElement();
         assertEquals("??junit_3@de??", result.getText());
     }
 
@@ -182,7 +192,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
             Map.of(
                 "classid", "TestClassification",
                 "categid", "junit_1",
-                "lang", "x-xxx")).getRootElement();
+                "lang", "x-xxx"))
+            .getRootElement();
         assertEquals("abc", result.getText());
 
         // not existing language: return current lange entry
@@ -190,7 +201,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
             Map.of(
                 "classid", "TestClassification",
                 "categid", "junit_1",
-                "lang", "ar")).getRootElement();
+                "lang", "ar"))
+            .getRootElement();
         assertEquals("junit_1 (de)", result.getText());
 
         // not existing language, not existing current and default lang: return first label
@@ -200,7 +212,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
                 "categid", "junit_2",
                 "CurrentLang", "ar",
                 "DefaultLang", "it",
-                "lang", "es")).getRootElement();
+                "lang", "es"))
+            .getRootElement();
         assertEquals("junit_2 (en)", result.getText());
     }
 

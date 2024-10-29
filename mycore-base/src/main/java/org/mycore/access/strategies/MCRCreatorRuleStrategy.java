@@ -91,7 +91,6 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
 
     private static final MCRObjectTypeStrategy BASE_STRATEGY = new MCRObjectTypeStrategy();
 
-
     /*
      * (non-Javadoc)
      *

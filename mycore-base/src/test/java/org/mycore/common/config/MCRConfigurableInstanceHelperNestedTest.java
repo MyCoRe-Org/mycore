@@ -126,7 +126,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
-
     @Test
     @MCRTestConfiguration(
         properties = {
@@ -421,7 +420,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
-
     @Test
     @MCRTestConfiguration(
         properties = {
@@ -463,7 +461,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
         assertEquals("23", instance.list.get(0).string);
         assertEquals("42", instance.list.get(1).string);
-
 
     }
 
@@ -633,7 +630,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         public Map<String, Entry> map2;
 
     }
-
 
     public static class TestClassWithNestedMapWithPrefixAndSentinel {
 

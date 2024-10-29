@@ -78,7 +78,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return countLinksForType(parent, null, childrenOnly);
     }
 
-
     @Override
     public Map<MCRCategoryID, Number> countLinksForType(MCRCategory parent, String type, boolean childrenOnly) {
         boolean restrictedByType = type != null;
@@ -100,7 +99,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private void setQueryParametersForLinkCount(String classID, TypedQuery<Object[]> query, MCRCategory parent,
-                                                boolean childrenOnly, boolean restrictedByType, String type) {
+        boolean childrenOnly, boolean restrictedByType, String type) {
         query.setParameter("classID", classID);
         if (childrenOnly) {
             query.setParameter("parentID", ((MCRCategoryImpl) parent).getInternalID());
@@ -143,8 +142,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return countLinks;
     }
 
-    private void populateCountLinkMap
-            (Map<MCRCategoryID, Number> countLinks, TypedQuery<Object[]> query, String classID) {
+    private void populateCountLinkMap(Map<MCRCategoryID, Number> countLinks, TypedQuery<Object[]> query,
+        String classID) {
         List<Object[]> result = query.getResultList();
         for (Object[] streamResult : result) {
             MCRCategoryID key = new MCRCategoryID(classID, streamResult[0].toString());
@@ -337,10 +336,10 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
         Path<Integer> internalId = li.get(MCRCategoryLinkImpl_.category).get(MCRCategoryImpl_.internalID);
         List<Number> result = em
-                .createQuery(
-                        query.select(internalId)
-                                .orderBy(cb.desc(internalId)))
-                .getResultList();
+            .createQuery(
+                query.select(internalId)
+                    .orderBy(cb.desc(internalId)))
+            .getResultList();
 
         int maxSize = result.size() == 0 ? 1 : result.getFirst().intValue() + 1;
         BitSet linkSet = new BitSet(maxSize);

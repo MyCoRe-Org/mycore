@@ -49,7 +49,7 @@ import org.mycore.solr.schema.MCRSolrConfigReloader;
 import org.mycore.solr.schema.MCRSolrSchemaReloader;
 
 @MCRCommandGroup(
-        name = "SOLR Core Admin Commands")
+    name = "SOLR Core Admin Commands")
 public class MCRSolrCoreAdminCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -148,7 +148,7 @@ public class MCRSolrCoreAdminCommands {
             MCRSolrCore core = entry.getValue();
             solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_NAME_SUFFIX, core.getName());
 
-            if(!DEFAULT_SOLR_SERVER_URL.equals(core.getServerURL())) {
+            if (!DEFAULT_SOLR_SERVER_URL.equals(core.getServerURL())) {
                 solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_SERVER_SUFFIX, core.getServerURL());
             }
 
@@ -196,23 +196,23 @@ public class MCRSolrCoreAdminCommands {
     }
 
     @MCRCommand(
-            syntax = "export solr configset {0} to folder {1}",
-            help = "exports a solr configset to a folder",
-            order = 80)
+        syntax = "export solr configset {0} to folder {1}",
+        help = "exports a solr configset to a folder",
+        order = 80)
     public static void exportSolrConfigSet(String configSet, String folder) {
         Path exportFolder = Paths.get(folder);
-        if(Files.notExists(exportFolder)) {
+        if (Files.notExists(exportFolder)) {
             LOGGER.error("Folder {} does not exist", exportFolder);
             return;
         }
 
-        if(!Files.isDirectory(exportFolder)){
+        if (!Files.isDirectory(exportFolder)) {
             LOGGER.error("Folder {} is not a directory", exportFolder);
             return;
         }
 
         Map<String, MCRSolrConfigSetProvider> configSets = MCRSolrConfigSetHelper.getLocalConfigSets();
-        if(!configSets.containsKey(configSet)) {
+        if (!configSets.containsKey(configSet)) {
             LOGGER.error("ConfigSet {} not found", configSet);
             return;
         }

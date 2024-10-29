@@ -195,7 +195,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                 DELAY_IN_MS,
                 new MCRTransactionableRunnable(
                     () -> MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
-                            mainSolrCores, MCRSolrIndexer.HIGH_PRIORITY))));
+                        mainSolrCores, MCRSolrIndexer.HIGH_PRIORITY))));
         });
     }
 

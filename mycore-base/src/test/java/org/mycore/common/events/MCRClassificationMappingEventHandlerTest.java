@@ -84,44 +84,40 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 
-        String expression1
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='diniPublType' and @categid='article']";
+        String expression1 =
+            "//mappings[@class='MCRMetaClassification']/mapping[@classid='diniPublType' and @categid='article']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression1, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for diniPublType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression2
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='schemaOrg' "
-                + "and @categid='Article']";
+        String expression2 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='schemaOrg' "
+            + "and @categid='Article']";
         expressionObject = XPathFactory.instance()
             .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for schemaOrg should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression3
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
-                + "and @categid='journal-article']";
+        String expression3 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
+            + "and @categid='journal-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression4
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
-                + "and @categid='dummy-article']";
+        String expression4 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+            + "and @categid='dummy-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression4, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression5
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
-                + "and @categid='dummy-placeholder']";
+        String expression5 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+            + "and @categid='dummy-placeholder']";
         expressionObject = XPathFactory.instance()
             .compile(expression5, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped placeholder classification should be in the MyCoReObject now!",
@@ -155,18 +151,16 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 
-        String expression1
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
-                + "and @categid='journal-article']";
+        String expression1 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
+            + "and @categid='journal-article']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression1, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression2
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
-                + "and @categid='dummy-article']";
+        String expression2 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+            + "and @categid='dummy-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",

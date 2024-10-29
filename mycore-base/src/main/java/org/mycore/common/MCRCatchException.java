@@ -72,8 +72,6 @@ public class MCRCatchException extends Exception {
         return MCRException.getStackTraceAsString(this);
     }
 
-
-
     /**
      * Returns a String representation of this exception and all its properties
      * 

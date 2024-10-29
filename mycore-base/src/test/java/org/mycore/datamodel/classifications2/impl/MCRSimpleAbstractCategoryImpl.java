@@ -17,8 +17,8 @@
  */
 
 package org.mycore.datamodel.classifications2.impl;
-import java.util.TreeSet;
 
+import java.util.TreeSet;
 
 final class MCRSimpleAbstractCategoryImpl extends MCRAbstractCategoryImpl {
     {

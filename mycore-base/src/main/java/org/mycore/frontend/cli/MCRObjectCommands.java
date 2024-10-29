@@ -119,8 +119,8 @@ import jakarta.persistence.TypedQuery;
 @MCRCommandGroup(name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
 
-    private static final String EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND
-        = "export object {0} to directory {1} with stylesheet {2}";
+    private static final String EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND =
+        "export object {0} to directory {1} with stylesheet {2}";
 
     /** The logger */
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
@@ -1397,7 +1397,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info("Creating cache for base {}", id);
             int highestStoredID = metadataManager.getHighestStoredID(id);
             MCRFileBaseCacheObjectIDGenerator gen = new MCRFileBaseCacheObjectIDGenerator();
-            gen.setNextFreeId(id, highestStoredID+1);
+            gen.setNextFreeId(id, highestStoredID + 1);
         });
     }
 

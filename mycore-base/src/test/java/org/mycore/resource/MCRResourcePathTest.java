@@ -92,7 +92,6 @@ public class MCRResourcePathTest extends MCRTestCase {
         assertEquals(path1, path2);
     }
 
-
     @Test(expected = MCRResourceException.class)
     public void resourceCanNotHaveClassExtension() {
         MCRResourcePath.ofWebPath("/foo/bar/baz.class");

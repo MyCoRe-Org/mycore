@@ -114,7 +114,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * @return the first name
      */
     public String getFirstName() {
-        if(firstname != null && !firstname.isEmpty()) {
+        if (firstname != null && !firstname.isEmpty()) {
             return firstname;
         }
         return callname;
@@ -133,7 +133,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * @return the call name
      */
     public String getCallName() {
-        if(callname != null && !callname.isEmpty()) {
+        if (callname != null && !callname.isEmpty()) {
             return callname;
         }
         return firstname;
@@ -168,7 +168,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * @return the full name
      */
     public String getFullName() {
-        if(fullname != null && !fullname.isEmpty()) {
+        if (fullname != null && !fullname.isEmpty()) {
             return fullname;
         }
         String sb = getAcademic() + " " + getPeerage() + " " + getFirstName() + " " + getPrefix() + " " + getSurName();

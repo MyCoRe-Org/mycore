@@ -174,11 +174,11 @@ public class MCRLayoutService {
 
     private void transform(HttpServletResponse response, MCRContentTransformer transformer, MCRContent source,
         MCRParameterCollector parameter, String filename) throws IOException, TransformerException, SAXException {
-        String fullFilename= filename;
+        String fullFilename = filename;
         try {
             String fileExtension = transformer.getFileExtension();
             if (fileExtension != null && fileExtension.length() > 0) {
-                fullFilename =filename+ "." + fileExtension;
+                fullFilename = filename + "." + fileExtension;
             }
             response.setHeader("Content-Disposition",
                 transformer.getContentDisposition() + ";filename=\"" + fullFilename + "\"");

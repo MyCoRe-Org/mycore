@@ -96,8 +96,8 @@ import jakarta.ws.rs.core.Response;
 @Path("/alto/highlight")
 public class MCRAltoHighlightResource {
 
-    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
-            = MCRSolrAuthenticationManager.getInstance();
+    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
+        MCRSolrAuthenticationManager.getInstance();
 
     @GET
     @Path("{derivateId}")

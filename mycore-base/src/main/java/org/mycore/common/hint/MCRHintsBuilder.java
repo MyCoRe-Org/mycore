@@ -49,6 +49,7 @@ public final class MCRHintsBuilder {
         hintValue.ifPresent(value -> add(hintKey, value));
         return this;
     }
+
     public <T> MCRHintsBuilder add(MCRHint<T> supplier) {
         return add(supplier.key(), supplier.value());
     }

@@ -57,6 +57,7 @@ public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         handleAddOrModify(der);
     }
+
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         handleAddOrModify(der);
@@ -66,7 +67,6 @@ public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         handleDelete(der);
     }
-
 
     private void handleAddOrModify(MCRBase base) {
         long start = System.currentTimeMillis();

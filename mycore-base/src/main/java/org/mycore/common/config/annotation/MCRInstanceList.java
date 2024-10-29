@@ -66,5 +66,4 @@ public @interface MCRInstanceList {
      */
     int order() default 0;
 
-
 }

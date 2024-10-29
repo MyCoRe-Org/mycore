@@ -45,9 +45,7 @@ public final class MCRLibraryResourceProvider extends MCRLFSResourceProvider {
             new MCRLibraryResourceFilter(MCRResourceFilterMode.MUST_MATCH),
             new MCRCombinedResourceSelector(
                 new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstLibraryJarResourceSelector()
-            )
-        );
+                new MCRFirstLibraryJarResourceSelector()));
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.function.Function;
  *
  * @param <T> The type for values used in conjunction with this key.
  */
-public final class MCRHintKey<T> implements Comparable<MCRHintKey<?>>{
+public final class MCRHintKey<T> implements Comparable<MCRHintKey<?>> {
 
     private final String name;
 

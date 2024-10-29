@@ -226,7 +226,7 @@ public class MCRSwordUtil {
 
         final Path zipTempFile = Files.createTempFile("swordv2_", fileName);
         MessageDigest md5Digest = null;
-        InputStream digestedInputStream=inputStream;
+        InputStream digestedInputStream = inputStream;
         if (checkMd5 != null) {
             try {
                 md5Digest = MessageDigest.getInstance("MD5");

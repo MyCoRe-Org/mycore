@@ -71,8 +71,8 @@ public class MCRMODSCSLTest extends MCRStoreTestCase {
 
     protected MCRContent loadContent(String id) throws IOException {
 
-        try (InputStream is
-            = MCRMODSCSLTest.class.getClassLoader().getResourceAsStream("MCRMODSCSLTest/" + id + ".xml")) {
+        try (InputStream is =
+            MCRMODSCSLTest.class.getClassLoader().getResourceAsStream("MCRMODSCSLTest/" + id + ".xml")) {
             byte[] bytes = is.readAllBytes();
             return new MCRByteContent(bytes);
         }

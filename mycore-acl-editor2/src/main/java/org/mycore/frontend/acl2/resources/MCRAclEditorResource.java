@@ -352,5 +352,5 @@ public class MCRAclEditorResource {
     private InputStream getAclEditorGuiResource(String filename) {
         return MCRResourceHelper.getWebResourceAsStream("/modules/acl-editor2/gui/" + filename);
     }
-    
+
 }
