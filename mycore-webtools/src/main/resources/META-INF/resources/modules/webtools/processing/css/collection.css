@@ -1,32 +1,31 @@
 @CHARSET "UTF-8";
 
 h1 {
-	font-size: 1rem;
-	color: #888;
-	text-transform: uppercase;
+  font-size: 1rem;
+  color: #888;
+  text-transform: uppercase;
 }
 
 .header {
-	font-weight: bold;
-	margin-top: 6px;
-	margin-bottom: 4px;
+  font-weight: bold;
+  margin-top: 6px;
+  margin-bottom: 4px;
 }
 
-
 .collection-content {
-	margin-top: 15px;
-	min-height: 150px;
+  margin-top: 15px;
+  min-height: 150px;
 }
 
 .content {
-	min-height: 50px;
+  min-height: 50px;
 }
 
 .noActiveProcess {
-	color: #555;
+  color: #555;
 }
 
 .badge {
-	margin-left: 6px;
-	font-size: 0.7rem;
+  margin-left: 6px;
+  font-size: 0.7rem;
 }

@@ -1,44 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<link href="filebrowser/gui/css/filebrowser.css" rel="stylesheet" type="text/css">
-<title>MyCore File Browser</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="filebrowser/gui/css/filebrowser.css" rel="stylesheet" type="text/css">
+  <title>MyCore File Browser</title>
 </head>
 <body>
-	<div id="filebrowser">
-		<div id="folder-list-div" class="well">
-			<h2 id="folder-label"></h2>
-			<ul id="folder-list-ul"></ul>
-			<div id="bottom-buttons">			
-				<div id="add-folder"><span class="glyphicon glyphicon-plus-sign"></span></div>
-				<div id="delete-folder"><span class="glyphicon glyphicon-minus-sign"></span></div>
-			</div>
+  <div id="filebrowser">
+    <div id="folder-list-div" class="well">
+      <h2 id="folder-label"></h2>
+      <ul id="folder-list-ul"></ul>
+      <div id="bottom-buttons">
+        <div id="add-folder">
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </div>
+        <div id="delete-folder">
+          <span class="glyphicon glyphicon-minus-sign"></span>
+        </div>
+      </div>
 
-		</div>
-		<div id="file-view" class="well" ondragover="return false">
-			<div id="drop-area">
-				<form class="upload-drop-form">
-					<p>Dateien hochladen mit Drag-and-Drop.</p>
-					<input type="file" id="upload-file-input" multiple accept="image/*" onchange="wcms2FileBrowser.uploadFiles(this.files)">
-					<label class="button" for="upload-file-input">Select</label>
-					<progress id="upload-progress-bar" max=100 value=0></progress>
-				</form>
-			</div>
-			<div id="files"></div>
-		</div>
-	</div>
+    </div>
+    <div id="file-view" class="well" ondragover="return false">
+      <div id="drop-area">
+        <form class="upload-drop-form">
+          <p>Dateien hochladen mit Drag-and-Drop.</p>
+          <input type="file" id="upload-file-input" multiple accept="image/*"
+            onchange="wcms2FileBrowser.uploadFiles(this.files)">
+            <label class="button" for="upload-file-input">Select</label>
+          <progress id="upload-progress-bar" max=100 value=0></progress>
+        </form>
+      </div>
+      <div id="files"></div>
+    </div>
+  </div>
 
-	<div id="wcms2-lightbox">
-		<span id="wcms2-lightbox-close" class="glyphicon glyphicon-remove"
-			aria-hidden="true"></span>
-		<div id="wcms2-lightbox-content">
-			<img src="" id="wcms2-lightbox-img"></img>
-		</div>
-	</div>
+  <div id="wcms2-lightbox">
+    <span id="wcms2-lightbox-close" class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    <div id="wcms2-lightbox-content">
+      <img src="" id="wcms2-lightbox-img"></img>
+    </div>
+  </div>
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
- 	<script src="filebrowser/gui/js/filebrowser.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="filebrowser/gui/js/filebrowser.js"></script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 <table class="table table-striped">
-    <tbody>
+  <tbody>
     <tr ng-repeat="change in ctrl.changes">
-        <td>{{change.getDate().toLocaleTimeString()}}</td>
-        <td>{{change.getDescription(ctrl.i18nModel.messages)}}</td>
+      <td>{{change.getDate().toLocaleTimeString()}}</td>
+      <td>{{change.getDescription(ctrl.i18nModel.messages)}}</td>
     </tr>
-    </tbody>
+  </tbody>
 </table>

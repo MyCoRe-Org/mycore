@@ -3,9 +3,7 @@ body {
   padding: 0;
 }
 
-*,
-*::after,
-*::before {
+*, *::after, *::before {
   box-sizing: border-box;
 }
 
@@ -16,7 +14,6 @@ body {
 
 .graph-container {
   --panel-height: 50px;
-  
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   position: relative;
@@ -91,7 +88,6 @@ body {
   margin: 0;
 }
 
-
 .graph-container .graph-metadata-list {
   column-gap: 20px;
   display: grid;
@@ -106,7 +102,7 @@ body {
   margin: 0;
 }
 
-@media (min-width: 768px) {
+@media ( min-width : 768px) {
   .graph-container .graph-metadata-list {
     display: grid;
     grid-template-columns: max-content 1fr;
