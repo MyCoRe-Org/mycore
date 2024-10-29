@@ -228,7 +228,7 @@ public class MCRCategoryTransformer {
             }
 
             root = new Element("items");
-            root.setAttribute("ID", cl.getId().getRootID().toString());
+            root.setAttribute("ID", cl.getId().getRootID());
             for (MCRCategory category : cl.getChildren()) {
                 addChildren(root, category);
             }

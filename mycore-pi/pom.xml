@@ -30,7 +30,6 @@
   <name>MyCoRe Persistent Identifier</name>
   <properties>
     <argLine>-Djdk.attach.allowAttachSelf</argLine>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

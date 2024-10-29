@@ -31,9 +31,7 @@
   <packaging>jar</packaging>
   <name>MyCoRe MediaInfo</name>
   <properties>
-    <forbiddenapis.skip>true</forbiddenapis.skip>
     <maven.compiler.arg />
-    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>

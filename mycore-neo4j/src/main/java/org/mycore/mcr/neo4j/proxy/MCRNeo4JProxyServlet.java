@@ -86,27 +86,13 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
             return;
         }
 
-        final String currentLanguage = MCRServlet.getSession(request).getCurrentLanguage();
+        final String currentLanguage = getSession(request).getCurrentLanguage();
         final String defaultLanguage = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse("de");
         final String language = currentLanguage != null ? currentLanguage : defaultLanguage;
         final String id = request.getParameter("id");
         final String limit = request.getParameter("limit");
         final String q = request.getParameter("q");
-        final StringBuilder queryStringBuilder = new StringBuilder();
-        String query = q;
-
-        if (id != null) {
-            queryStringBuilder.append("MATCH p=({id:\"");
-            queryStringBuilder.append(id);
-            queryStringBuilder.append("\"})-[*0..1]-(m)");
-
-            if (limit != null) {
-                queryStringBuilder.append(" WITH p,m LIMIT ");
-                queryStringBuilder.append(limit);
-            }
-            queryStringBuilder.append(" OPTIONAL MATCH (m)-[r]-() RETURN p,r");
-            query = queryStringBuilder.toString();
-        }
+        final String query = getQuery(q, id, limit);
 
         MCRNeo4JDatabaseDriver.getInstance().createConnection(SERVER_URL,
             MCRConfiguration2.getStringOrThrow(NEO4J_CONFIG_PREFIX + "user"),
@@ -124,6 +110,25 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
 
         response.setContentType("application/json");
         response.getWriter().write(finalResult);
+    }
+
+    private static String getQuery(String q, String id, String limit) {
+        final StringBuilder queryStringBuilder = new StringBuilder();
+        String query = q;
+
+        if (id != null) {
+            queryStringBuilder.append("MATCH p=({id:\"");
+            queryStringBuilder.append(id);
+            queryStringBuilder.append("\"})-[*0..1]-(m)");
+
+            if (limit != null) {
+                queryStringBuilder.append(" WITH p,m LIMIT ");
+                queryStringBuilder.append(limit);
+            }
+            queryStringBuilder.append(" OPTIONAL MATCH (m)-[r]-() RETURN p,r");
+            query = queryStringBuilder.toString();
+        }
+        return query;
     }
 
     private String transformPath(List<Map<String, String>> result, String lang) throws JsonProcessingException {

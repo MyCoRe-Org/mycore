@@ -31,7 +31,6 @@
   <name>MyCoRe Neo4J</name>
   <properties>
     <manifest.priority>57</manifest.priority>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>
