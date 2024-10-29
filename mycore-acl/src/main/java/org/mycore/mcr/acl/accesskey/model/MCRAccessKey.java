@@ -139,6 +139,7 @@ public class MCRAccessKey {
      * @return the UUID or null
      */
     @JsonIgnore
+    @Column(name = "uuid", nullable = true)
     public UUID getUuid() {
         return uuid;
     }
@@ -148,7 +149,6 @@ public class MCRAccessKey {
      *
      * @param uuid the uuid to set
      */
-    @Column(name = "uuid", nullable = false)
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
