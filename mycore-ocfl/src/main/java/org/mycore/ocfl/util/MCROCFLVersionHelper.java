@@ -27,7 +27,6 @@ import org.mycore.common.MCRPersistenceException;
  * <p>
  * This class provides utilities for mapping versioning messages (e.g., "Created", "Updated", "Deleted")
  * to their corresponding version types in the OCFL metadata.
- * </p>
  */
 public class MCROCFLVersionHelper {
 

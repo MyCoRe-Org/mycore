@@ -33,8 +33,12 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
 
 /**
- * Manages transactions for the OCFL file system, implementing {@link MCRPersistenceTransaction}.
- * Provides methods to begin, commit, rollback, and check the status of transactions.
+ * Manages transactions for the OCFL (Oxford Common File Layout) file system within MyCoRe,
+ * implementing {@link MCRPersistenceTransaction}. This class coordinates the lifecycle of a transaction,
+ * including beginning, committing, and rolling back changes, ensuring data consistency in the OCFL file system.
+ * <p>
+ * Each transaction is uniquely identified by an ID, tracked in a thread-local variable for
+ * thread-safe operations.
  */
 public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
 
@@ -146,10 +150,20 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
         return 5000;
     }
 
+    /**
+     * Retrieves the current transaction ID, if any.
+     *
+     * @return the transaction ID, or {@code null} if no transaction is active.
+     */
     public static Long getTransactionId() {
         return TRANSACTION_ID.get();
     }
 
+    /**
+     * Checks if a transaction is currently active.
+     *
+     * @return {@code true} if a transaction is active, {@code false} otherwise.
+     */
     public static boolean isActive() {
         return MCRTransactionManager.isActive(MCROCFLFileSystemTransaction.class);
     }
