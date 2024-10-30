@@ -18,14 +18,6 @@
 
 package org.mycore.common;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.mycore.common.config.MCRConfigurationException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -40,6 +32,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.mycore.common.config.MCRConfigurationException;
+
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })
@@ -49,8 +49,8 @@ public class MCRTestCase {
     public static TemporaryFolder junitFolder = new TemporaryFolder();
 
     @Rule
-    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher
-        = new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
+    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher =
+        new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
 
     @BeforeClass
     public static void initBaseDir() throws IOException {

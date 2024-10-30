@@ -72,9 +72,9 @@ public class MCRLanguageDetector {
     private static int buildScore(String text, String lang, String wordList, String endings) {
         String cleanedText = text.toLowerCase(Locale.ROOT).trim();
         cleanedText = cleanedText
-                .replace(',', ' ')
-                .replace('-', ' ')
-                .replace('/', ' ');
+            .replace(',', ' ')
+            .replace('-', ' ')
+            .replace('/', ' ');
         cleanedText = " " + cleanedText + " ";
 
         int score = 0;

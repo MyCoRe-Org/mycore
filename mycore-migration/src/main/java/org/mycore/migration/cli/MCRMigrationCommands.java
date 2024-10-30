@@ -219,7 +219,7 @@ public class MCRMigrationCommands {
     }
 
     private static boolean tryRawPath(MCRObjectID objectID, Element derivateLinkElement,
-                                      MCRMetaDerivateLink link, String owner) {
+        MCRMetaDerivateLink link, String owner) {
         String rawPath = link.getRawPath();
         MCRPath mcrPath = MCRPath.getPath(owner, rawPath);
         if (Files.exists(mcrPath)) {

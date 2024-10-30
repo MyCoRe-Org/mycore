@@ -148,7 +148,6 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
         return callable;
     }
 
-
     protected enum SessionType {
 
         PROVIDED,
@@ -162,6 +161,5 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
     private record TypedSession(MCRSession session, SessionType type) {
 
     }
-
 
 }

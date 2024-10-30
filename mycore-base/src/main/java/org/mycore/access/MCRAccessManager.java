@@ -429,7 +429,7 @@ public class MCRAccessManager {
         }
         return getAccessImpl();
     }
-    
+
     public static boolean implementsRulesInterface() {
         return getAccessImpl() instanceof MCRRuleAccessInterface;
     }

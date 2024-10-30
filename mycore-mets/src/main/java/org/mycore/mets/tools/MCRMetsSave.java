@@ -803,7 +803,7 @@ public class MCRMetsSave {
     }
 
     private static void addFileToMets(Mets mets, MCRPath derivatePath, String href,
-                                      PhysicalDiv physicalDiv, StructLink structLink, LogicalDiv lastLogicalDiv) {
+        PhysicalDiv physicalDiv, StructLink structLink, LogicalDiv lastLogicalDiv) {
         String fileBase = getFileBase(href);
         MCRPath filePath = (MCRPath) derivatePath.resolve(href);
 

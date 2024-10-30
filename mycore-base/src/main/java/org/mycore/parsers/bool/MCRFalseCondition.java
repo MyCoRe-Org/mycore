@@ -27,7 +27,6 @@ import org.jdom2.Element;
  */
 public class MCRFalseCondition<T> implements MCRCondition<T> {
 
-
     public boolean evaluate(T o) {
         return false;
     }

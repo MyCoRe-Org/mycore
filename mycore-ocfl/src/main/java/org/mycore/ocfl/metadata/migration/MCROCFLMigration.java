@@ -116,7 +116,6 @@ public class MCROCFLMigration {
 
     }
 
-
     private void migrateID(String id) {
         List<? extends MCRAbstractMetadataVersion<?>> revisions;
         MCRObjectID objectID = MCRObjectID.getInstance(id);
@@ -151,7 +150,6 @@ public class MCROCFLMigration {
                 return;
             }
         }
-
 
         if (originalStepsSize > 0) {
             // try version migration
@@ -196,9 +194,9 @@ public class MCROCFLMigration {
 
     private void writeRevision(MCROCFLRevision step, MCRObjectID objectID) throws IOException {
         switch (step.type()) {
-        case CREATED -> target.create(objectID, step.contentSupplier().get(), step.date());
-        case MODIFIED -> target.update(objectID, step.contentSupplier().get(), step.date());
-        case DELETED -> target.delete(objectID, step.date(), step.user());
+            case CREATED -> target.create(objectID, step.contentSupplier().get(), step.date());
+            case MODIFIED -> target.update(objectID, step.contentSupplier().get(), step.date());
+            case DELETED -> target.delete(objectID, step.date(), step.user());
         }
     }
 
@@ -207,7 +205,6 @@ public class MCROCFLMigration {
         String user = rev.getUser();
         Date date = rev.getDate();
         LOGGER.info("Migrate revision {} of {}", rev.getRevision(), objectID);
-
 
         MCRMetadataVersionType type = MCRMetadataVersionType.fromValue(rev.getType());
         ContentSupplier supplier = type == MCRMetadataVersionType.DELETED ? null : () -> retriveActualContent(rev);

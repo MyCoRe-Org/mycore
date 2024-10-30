@@ -36,9 +36,9 @@ import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.common.MCRUtils;
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.wcms2.MCRWCMSUtil;
 import org.mycore.wcms2.access.MCRWCMSPermission;
 import org.w3c.dom.Document;
@@ -141,7 +141,7 @@ public class MCRWCMSFileBrowserResource {
 
     @DELETE
     @Path("/folder")
-    public Response deleteFolder(@QueryParam("path") String path)  {
+    public Response deleteFolder(@QueryParam("path") String path) {
         File wcmsDir = resolveDirWCMS(path);
         if (FileUtils.deleteQuietly(wcmsDir)) {
             return Response.ok().build();
@@ -196,7 +196,7 @@ public class MCRWCMSFileBrowserResource {
     }
 
     @DELETE
-    public Response deleteFile(@QueryParam("path") String path)  {
+    public Response deleteFile(@QueryParam("path") String path) {
         File wcmsDir = MCRUtils.safeResolve(MCRWCMSUtil.getWCMSDataDirPath(), removeLeadingSlash(path)).toFile();
         if (delete(wcmsDir)) {
             return Response.ok().build();

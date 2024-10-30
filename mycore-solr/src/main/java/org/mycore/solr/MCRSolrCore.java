@@ -89,8 +89,8 @@ public class MCRSolrCore {
     @Deprecated
     public MCRSolrCore(String serverURL, String name) {
 
-        setup(serverURL, name, null, DEFAULT_SHARD_COUNT, name.equals("classification") ?
-                Set.of(MCRSolrCoreType.CLASSIFICATION) : Set.of(MCRSolrCoreType.MAIN));
+        setup(serverURL, name, null, DEFAULT_SHARD_COUNT,
+            name.equals("classification") ? Set.of(MCRSolrCoreType.CLASSIFICATION) : Set.of(MCRSolrCoreType.MAIN));
     }
 
     /**
@@ -106,12 +106,12 @@ public class MCRSolrCore {
      *            number of shards
      */
     public MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount,
-                       Set<MCRSolrCoreType> types) {
+        Set<MCRSolrCoreType> types) {
         setup(serverURL, name, configSet, shardCount, types);
     }
 
     protected void setup(String serverURL, String name, String configSet,
-                         Integer shardCount, Set<MCRSolrCoreType> types) {
+        Integer shardCount, Set<MCRSolrCoreType> types) {
 
         this.serverURL = serverURL.endsWith("/") ? serverURL : serverURL + "/";
         this.name = name;
@@ -161,10 +161,10 @@ public class MCRSolrCore {
             : new HttpJdkSolrClient.Builder(baseSolrUrl);
 
         MCRConfiguration2.getBoolean(USE_HTTP_1_1_PROPERTY)
-                .filter(useHttp1_1 -> useHttp1_1)
-                .ifPresent(useHttp1_1 -> {
-                    baseBuilder.useHttp1_1(true);
-                });
+            .filter(useHttp1_1 -> useHttp1_1)
+            .ifPresent(useHttp1_1 -> {
+                baseBuilder.useHttp1_1(true);
+            });
 
         return baseBuilder
             .withConnectionTimeout(connectionTimeout, TimeUnit.MILLISECONDS)

@@ -41,7 +41,7 @@ public class MCRArgon2StrategyTest extends MCRTestCase {
 
         int saltSizeBytes = 32;
         int hashSizeBytes = 64;
-        
+
         MCRPasswordCheckStrategy strategy = new MCRArgon2Strategy(saltSizeBytes, hashSizeBytes, 8, 65536, 1);
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
 

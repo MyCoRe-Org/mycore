@@ -18,6 +18,10 @@
 
 package org.mycore.user2.hash;
 
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
+import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkConfigurationHasNoIncompatibleChange;
+import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkSelectedStrategyIsNotOutdated;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -36,10 +40,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
-
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
-import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkConfigurationHasNoIncompatibleChange;
-import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkSelectedStrategyIsNotOutdated;
 
 /**
  * A {@link MCRPasswordCheckManager} can be used to create password hashes and to verify an existing hash
@@ -129,7 +129,7 @@ public final class MCRPasswordCheckManager {
 
         LOGGER.info("Working with strategies: " + String.join(", ", strategies.keySet()));
         LOGGER.info("Creating new password hashes with strategy: " + selectedStrategyType);
-        
+
     }
 
     public static MCRPasswordCheckManager instance() {

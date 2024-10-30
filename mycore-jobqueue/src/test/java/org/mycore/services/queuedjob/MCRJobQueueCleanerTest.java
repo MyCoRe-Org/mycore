@@ -18,6 +18,10 @@
 
 package org.mycore.services.queuedjob;
 
+import static org.junit.Assert.assertEquals;
+import static org.mycore.services.queuedjob.MCRSimpleJobSelector.Mode.EXCLUDE;
+import static org.mycore.services.queuedjob.MCRSimpleJobSelector.Mode.INCLUDE;
+
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
@@ -36,10 +40,6 @@ import org.mycore.services.queuedjob.action.MCRTestJobAction4;
 import org.mycore.services.queuedjob.action.MCRTestJobAction5;
 
 import jakarta.persistence.EntityManager;
-
-import static org.junit.Assert.assertEquals;
-import static org.mycore.services.queuedjob.MCRSimpleJobSelector.Mode.EXCLUDE;
-import static org.mycore.services.queuedjob.MCRSimpleJobSelector.Mode.INCLUDE;
 
 public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
@@ -147,7 +147,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     }
 
-
     @Test
     public void testExcludeNothingWithMediumAge() {
 
@@ -183,7 +182,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         assertEquals(0, remainingJobs.size());
 
     }
-
 
     @Test
     public void testIncludeOneJobType() {

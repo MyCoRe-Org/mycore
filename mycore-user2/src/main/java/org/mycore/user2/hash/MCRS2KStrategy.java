@@ -18,6 +18,9 @@
 
 package org.mycore.user2.hash;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -30,9 +33,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 import com.google.common.primitives.Bytes;
-
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
 
 /**
  * {@link MCRS2KStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the iterated and

@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 
-
 /**
  * Reads MCRContent from a String's text.
  * 

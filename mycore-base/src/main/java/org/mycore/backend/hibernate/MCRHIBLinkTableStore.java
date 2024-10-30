@@ -50,7 +50,6 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      * The constructor for the class MCRHIBLinkTableStore.
      */
 
-
     /**
      * The method create a new item in the datastore.
      *

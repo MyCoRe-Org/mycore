@@ -18,14 +18,14 @@
 
 package org.mycore.user2.hash;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.security.SecureRandom;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class MCRCryptStrategyTest extends MCRTestCase {
 
@@ -40,8 +40,7 @@ public class MCRCryptStrategyTest extends MCRTestCase {
 
         MCRPasswordCheckStrategy strategy = new MCRCryptStrategy();
         MCRPasswordCheckData data = strategy.create(new SecureRandom(), TYPE, PASSWORD);
-        
-        
+
         System.out.println(data);
 
         assertEquals(TYPE, data.type());

@@ -237,6 +237,6 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     private static List<MCRSolrCore> getCoreList(String coreIDs) {
         return Stream.of(coreIDs.split("[, ]")).map(MCRSolrCommands::getCore)
-                .toList();
+            .toList();
     }
 }

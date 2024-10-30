@@ -20,14 +20,10 @@ package org.mycore.services.fieldquery;
 
 import static org.junit.Assert.assertEquals;
 
-
 import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-
 import org.mycore.parsers.bool.MCRCondition;
-
 
 /**
  * This class is a JUnit test case for org.mycore.MCRBooleanClausParser.
@@ -38,7 +34,6 @@ import org.mycore.parsers.bool.MCRCondition;
 public class MCRQueryParserTest extends MCRTestCase {
 
     private final MCRQueryParser queryParser = new MCRQueryParser();
-
 
     /**
      * Test method for

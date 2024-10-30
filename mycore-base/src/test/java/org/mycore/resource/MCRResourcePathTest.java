@@ -18,12 +18,12 @@
 
 package org.mycore.resource;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Optional;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class MCRResourcePathTest extends MCRTestCase {
@@ -91,7 +91,6 @@ public class MCRResourcePathTest extends MCRTestCase {
         MCRResourcePath path1 = MCRResourcePath.ofWebPath("/foo/bar/baz").get();
         assertEquals(path1, path2);
     }
-
 
     @Test(expected = MCRResourceException.class)
     public void resourceCanNotHaveClassExtension() {

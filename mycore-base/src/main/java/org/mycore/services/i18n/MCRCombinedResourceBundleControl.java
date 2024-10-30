@@ -59,8 +59,8 @@ public class MCRCombinedResourceBundleControl extends Control {
         if (locale.equals(Locale.ROOT)) {
             //MCR-1064 fallback should be default language, if property key does not exist
             resolvedLocale = defaultLocale;
-        }else{
-            resolvedLocale= locale;
+        } else {
+            resolvedLocale = locale;
         }
         String bundleName = baseName.substring(baseName.indexOf(':') + 1);
         String filename = CONTROL_HELPER.toBundleName(bundleName, resolvedLocale) + ".properties";

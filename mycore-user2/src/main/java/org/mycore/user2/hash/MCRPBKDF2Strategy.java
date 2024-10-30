@@ -18,6 +18,9 @@
 
 package org.mycore.user2.hash;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeSecretKeyAlgorithm;
+
 import java.security.SecureRandom;
 import java.util.HexFormat;
 import java.util.Objects;
@@ -28,9 +31,6 @@ import javax.crypto.spec.PBEKeySpec;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeSecretKeyAlgorithm;
 
 /**
  * {@link MCRPBKDF2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the PBKDF2 algorithm.

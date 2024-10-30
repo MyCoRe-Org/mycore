@@ -108,17 +108,15 @@ public class MCRACCESSRULE {
             return false;
         }
         return timestampsAreEqual(creationdate, other.getCreationdate()) &&
-                stringsAreEqual(creator, other.getCreator()) &&
-                stringsAreEqual(description, other.getDescription()) &&
-                stringsAreEqual(rid, other.getRid()) &&
-                stringsAreEqual(rule, other.getRule());
+            stringsAreEqual(creator, other.getCreator()) &&
+            stringsAreEqual(description, other.getDescription()) &&
+            stringsAreEqual(rid, other.getRid()) &&
+            stringsAreEqual(rule, other.getRule());
     }
-
-
 
     private boolean timestampsAreEqual(Timestamp timestamp, Timestamp otherTimestamp) {
         return (!((timestamp == null && otherTimestamp != null)
-                || !Objects.equals(timestamp, otherTimestamp) &&
+            || !Objects.equals(timestamp, otherTimestamp) &&
                 !Objects.equals(timestamp.getTime() / 1000, otherTimestamp.getTime() / 1000)));
     }
 

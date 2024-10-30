@@ -49,7 +49,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
     Supplier<SolrInputDocument> documentSupplier;
 
     public MCRSolrInputDocumentHandler(Supplier<SolrInputDocument> documentSupplier, String id,
-                                       MCRSolrCoreType coreType) {
+        MCRSolrCoreType coreType) {
         this.documentSupplier = documentSupplier;
         this.id = id;
         this.setCoreType(coreType);

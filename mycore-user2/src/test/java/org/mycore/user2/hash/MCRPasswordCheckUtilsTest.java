@@ -18,11 +18,11 @@
 
 package org.mycore.user2.hash;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 
 public class MCRPasswordCheckUtilsTest extends MCRTestCase {
 
@@ -54,8 +54,8 @@ public class MCRPasswordCheckUtilsTest extends MCRTestCase {
     @Test
     public final void testByteArrayEquals() {
 
-        byte[] foo = new byte[]{0, 1, 2};
-        byte[] bar = new byte[]{2, 1, 1};
+        byte[] foo = new byte[] { 0, 1, 2 };
+        byte[] bar = new byte[] { 2, 1, 1 };
 
         assertTrue(MCRPasswordCheckUtils.fixedEffortEquals((byte[]) null, (byte[]) null));
         assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(foo, null));

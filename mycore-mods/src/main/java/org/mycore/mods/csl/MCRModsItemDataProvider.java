@@ -241,23 +241,23 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         String genreType = getGenreType(genres);
 
         switch (genreType) {
-            case "article"-> idb.type(handleArticleType(parentGenres));
-            case "conference"-> idb.type(CSLType.PAPER_CONFERENCE);
-            case "book"-> idb.type(CSLType.BOOK);
-            case "interview"-> idb.type(CSLType.INTERVIEW);
-            case "research_data"-> idb.type(CSLType.DATASET);
-            case "patent"-> idb.type(CSLType.PATENT);
-            case "chapter"-> idb.type(CSLType.CHAPTER);
-            case "entry"-> idb.type(CSLType.ENTRY_ENCYCLOPEDIA);
-            case "preface"-> idb.type(CSLType.ARTICLE);
-            case "speech"-> idb.type(CSLType.SPEECH);
-            case "video"-> idb.type(CSLType.MOTION_PICTURE);
-            case "broadcasting"-> idb.type(CSLType.BROADCAST);
-            case "picture"-> idb.type(CSLType.GRAPHIC);
-            case "review"-> idb.type(parentGenres.contains("book") ? CSLType.REVIEW_BOOK : CSLType.REVIEW);
-            case "thesis"-> idb.type(CSLType.THESIS);
-            case "report"-> idb.type(CSLType.REPORT);
-            default-> idb.type(CSLType.ARTICLE);
+            case "article" -> idb.type(handleArticleType(parentGenres));
+            case "conference" -> idb.type(CSLType.PAPER_CONFERENCE);
+            case "book" -> idb.type(CSLType.BOOK);
+            case "interview" -> idb.type(CSLType.INTERVIEW);
+            case "research_data" -> idb.type(CSLType.DATASET);
+            case "patent" -> idb.type(CSLType.PATENT);
+            case "chapter" -> idb.type(CSLType.CHAPTER);
+            case "entry" -> idb.type(CSLType.ENTRY_ENCYCLOPEDIA);
+            case "preface" -> idb.type(CSLType.ARTICLE);
+            case "speech" -> idb.type(CSLType.SPEECH);
+            case "video" -> idb.type(CSLType.MOTION_PICTURE);
+            case "broadcasting" -> idb.type(CSLType.BROADCAST);
+            case "picture" -> idb.type(CSLType.GRAPHIC);
+            case "review" -> idb.type(parentGenres.contains("book") ? CSLType.REVIEW_BOOK : CSLType.REVIEW);
+            case "thesis" -> idb.type(CSLType.THESIS);
+            case "report" -> idb.type(CSLType.REPORT);
+            default -> idb.type(CSLType.ARTICLE);
         }
     }
 

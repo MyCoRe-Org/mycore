@@ -83,7 +83,7 @@ public final class MCRSolrCoreManager {
             + MCRSolrConstants.SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX;
 
         final String shardCountKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID
-                + MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
+            + MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
 
         String coreName = MCRConfiguration2.getString(coreNameKey)
             .orElseThrow(() -> new MCRConfigurationException("Missing property " + coreNameKey));
@@ -97,9 +97,8 @@ public final class MCRSolrCoreManager {
 
         String coreTypeKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_TYPE_SUFFIX;
         Set<MCRSolrCoreType> coreTypes = MCRConfiguration2.getOrThrow(coreTypeKey, MCRConfiguration2::splitValue)
-                .map(MCRSolrCoreType::new)
-                .collect(Collectors.toSet());
-
+            .map(MCRSolrCoreType::new)
+            .collect(Collectors.toSet());
 
         return new MCRSolrCore(coreServer, coreName, configSetTemplate, shardCount, coreTypes);
     }

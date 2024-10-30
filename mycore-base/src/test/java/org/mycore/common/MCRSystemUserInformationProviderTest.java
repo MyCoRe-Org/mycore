@@ -18,11 +18,11 @@
 
 package org.mycore.common;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Optional;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class MCRSystemUserInformationProviderTest extends MCRTestCase {
 
@@ -60,7 +60,7 @@ public class MCRSystemUserInformationProviderTest extends MCRTestCase {
             Optional.empty(),
             get("UNKNOWN"));
     }
-    
+
     private Optional<MCRUserInformation> get(String userId) {
         return MCRUserInformationResolver.instance().get("system", userId);
     }

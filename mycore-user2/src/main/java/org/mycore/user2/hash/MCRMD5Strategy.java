@@ -18,14 +18,14 @@
 
 package org.mycore.user2.hash;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
+
 import java.util.function.Supplier;
 
 import org.mycore.common.MCRUtils;
 import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeHashAlgorithm;
 
 /**
  * {@link MCRMD5Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the MD5 algorithm.

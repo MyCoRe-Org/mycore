@@ -92,8 +92,8 @@ public class MCRORCIDWorkSummaryUtils {
      */
     protected static void updateWorkInfoFromSummaries(Set<MCRIdentifier> identifiers, List<WorkSummary> summaries,
         MCRORCIDPutCodeInfo workInfo) {
-        final Supplier<Stream<WorkSummary>> matchingWorksSupplier
-            = () -> findMatchingSummariesByIdentifiers(identifiers, summaries);
+        final Supplier<Stream<WorkSummary>> matchingWorksSupplier =
+            () -> findMatchingSummariesByIdentifiers(identifiers, summaries);
         long ownPutCode = workInfo.getOwnPutCode();
         if (ownPutCode > 0 && !checkPutCodeExistsInSummaries(summaries, ownPutCode)) {
             // ownPutCode is outdated because if does not exist in summaries anymore

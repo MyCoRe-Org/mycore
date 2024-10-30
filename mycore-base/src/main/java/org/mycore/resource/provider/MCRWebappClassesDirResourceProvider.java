@@ -60,8 +60,7 @@ public final class MCRWebappClassesDirResourceProvider extends MCRLFSResourcePro
             coverage,
             new MCRClassLoaderResourceLocator(),
             new MCRWebappClassesDirResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-            new MCRCombinedResourceSelector()
-        );
+            new MCRCombinedResourceSelector());
     }
 
     @Override

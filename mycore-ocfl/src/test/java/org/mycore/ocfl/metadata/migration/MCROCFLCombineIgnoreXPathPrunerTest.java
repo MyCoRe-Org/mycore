@@ -80,32 +80,27 @@ public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
         MCRObjectID objectID = MCRObjectID.getInstance(JUNIT_TEST_00000001);
         Date baseDate = new Date();
 
-        MCROCFLRevision r1
-            = new MCROCFLRevision(MCRMetadataVersionType.CREATED, CONTENT_1, AUTOR_1, baseDate, objectID);
+        MCROCFLRevision r1 =
+            new MCROCFLRevision(MCRMetadataVersionType.CREATED, CONTENT_1, AUTOR_1, baseDate, objectID);
 
-        MCROCFLRevision r2
-            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_2, AUTOR_2,
-                new Date(baseDate.getTime() + 1000), objectID);
+        MCROCFLRevision r2 = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_2, AUTOR_2,
+            new Date(baseDate.getTime() + 1000), objectID);
 
-        MCROCFLRevision r3
-            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_3, AUTOR_3,
-                new Date(baseDate.getTime() + 2000), objectID);
+        MCROCFLRevision r3 = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_3, AUTOR_3,
+            new Date(baseDate.getTime() + 2000), objectID);
 
-        MCROCFLRevision r4
-            = new MCROCFLRevision(MCRMetadataVersionType.DELETED, null, AUTOR_3, new Date(baseDate.getTime() + 3000),
+        MCROCFLRevision r4 =
+            new MCROCFLRevision(MCRMetadataVersionType.DELETED, null, AUTOR_3, new Date(baseDate.getTime() + 3000),
                 objectID);
 
-        MCROCFLRevision r5
-            = new MCROCFLRevision(MCRMetadataVersionType.CREATED, CONTENT_1, AUTOR_1,
-                new Date(baseDate.getTime() + 4000), objectID);
+        MCROCFLRevision r5 = new MCROCFLRevision(MCRMetadataVersionType.CREATED, CONTENT_1, AUTOR_1,
+            new Date(baseDate.getTime() + 4000), objectID);
 
-        MCROCFLRevision r6
-            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_2, AUTOR_2,
-                new Date(baseDate.getTime() + 5000), objectID);
+        MCROCFLRevision r6 = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_2, AUTOR_2,
+            new Date(baseDate.getTime() + 5000), objectID);
 
-        MCROCFLRevision r7
-            = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_1, AUTOR_3,
-                new Date(baseDate.getTime() + 6000), objectID);
+        MCROCFLRevision r7 = new MCROCFLRevision(MCRMetadataVersionType.MODIFIED, CONTENT_1, AUTOR_3,
+            new Date(baseDate.getTime() + 6000), objectID);
 
         List<MCROCFLRevision> prune = xPathPruner.prune(List.of(r1, r2, r3, r4, r5, r6, r7));
 

@@ -27,17 +27,17 @@ class MCRAndConditionTest {
 
     @Test
     void matches() {
-        MCRAndCondition xor=new MCRAndCondition();
-        xor.add(new MCRTestCondition(()->false));
+        MCRAndCondition xor = new MCRAndCondition();
+        xor.add(new MCRTestCondition(() -> false));
         assertFalse(xor.matches(null));
-        xor.add(new MCRTestCondition(()->false));
+        xor.add(new MCRTestCondition(() -> false));
         assertFalse(xor.matches(null));
         xor.getChildConditions().clear();
-        xor.add(new MCRTestCondition(()->true));
+        xor.add(new MCRTestCondition(() -> true));
         assertTrue(xor.matches(null));
-        xor.add(new MCRTestCondition(()->true));
+        xor.add(new MCRTestCondition(() -> true));
         assertTrue(xor.matches(null));
-        xor.add(new MCRTestCondition(()->false));
+        xor.add(new MCRTestCondition(() -> false));
         assertFalse(xor.matches(null));
         xor.add(new MCRTestCondition(() -> {
             throw new UnsupportedOperationException("Should not be checked");

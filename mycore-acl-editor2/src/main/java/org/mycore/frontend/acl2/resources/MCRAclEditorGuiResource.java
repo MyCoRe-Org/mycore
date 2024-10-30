@@ -20,8 +20,8 @@ package org.mycore.frontend.acl2.resources;
 
 import java.io.InputStream;
 
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.jersey.MCRStaticContent;
+import org.mycore.resource.MCRResourceHelper;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.GET;

@@ -71,7 +71,7 @@ public abstract class MCRObjectUtils {
      */
     public static List<MCRObject> getAncestors(MCRObject mcrObject) {
         List<MCRObject> ancestorList = new ArrayList<>();
-        MCRObject currentAncestor= mcrObject;
+        MCRObject currentAncestor = mcrObject;
         while (currentAncestor.hasParent()) {
             MCRObjectID parentID = currentAncestor.getStructure().getParentID();
             MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);

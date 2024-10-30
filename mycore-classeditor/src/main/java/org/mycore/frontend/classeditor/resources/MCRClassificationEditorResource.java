@@ -58,9 +58,9 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -111,8 +111,8 @@ public class MCRClassificationEditorResource {
 
     private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
-    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
-            = MCRSolrAuthenticationManager.getInstance();
+    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
+        MCRSolrAuthenticationManager.getInstance();
 
     @Context
     UriInfo uriInfo;

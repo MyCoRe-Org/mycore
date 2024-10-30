@@ -84,6 +84,7 @@ public class MCRSourceContent extends MCRWrappedContent {
             }
         }
     }
+
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     //false positive, is used
     private static MCRByteContent getBaseContent(JAXBSource source) {
@@ -97,6 +98,7 @@ public class MCRSourceContent extends MCRWrappedContent {
             throw new MCRException("Error while resolving JAXBSource", e);
         }
     }
+
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     //false positive, is used
     private static MCRJDOMContent getBaseContent(JDOMSource src) {
@@ -108,7 +110,7 @@ public class MCRSourceContent extends MCRWrappedContent {
             .filter(Parent.class::isInstance) //only Element or Document matter
             .map(Parent.class::cast)
             .findFirst()
-            .map(p -> switch (p){
+            .map(p -> switch (p) {
                 case Element element when element.isRootElement() -> new MCRJDOMContent(element.getDocument());
                 case Element element when element.getParent() == null -> new MCRJDOMContent(element);
                 case Element element -> new MCRJDOMContent(element.clone());

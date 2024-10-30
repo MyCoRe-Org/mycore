@@ -494,7 +494,7 @@ public abstract class MCRStore {
                 toNativePath = s -> s;
             } else {
                 toNativePath = s -> {
-                    if (s.contains("/")&&(s.contains(separator))) {
+                    if (s.contains("/") && (s.contains(separator))) {
                         if (s.contains(separator)) {
                             throw new IllegalArgumentException(
                                 s + " may not contain both '/' and '" + separator + "'.");

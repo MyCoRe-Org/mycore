@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +36,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
-
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
@@ -70,8 +68,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
     private static final String WORLD_CLASS2_RESOURCE_NAME = "/worldclass2.xml";
 
-    static final String CATEGORY_MAPPING_RESOURCE_NAME
-        = "/org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml";
+    static final String CATEGORY_MAPPING_RESOURCE_NAME =
+        "/org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml";
 
     static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 

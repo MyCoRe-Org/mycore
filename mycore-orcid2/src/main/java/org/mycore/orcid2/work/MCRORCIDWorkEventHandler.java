@@ -69,7 +69,6 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-
     private static final String WORK_EVENT_HANDLER_PROPERTY_PREFIX = "MCR.ORCID2.WorkEventHandler.";
 
     private static final boolean COLLECT_EXTERNAL_PUT_CODES = MCRConfiguration2

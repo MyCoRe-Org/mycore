@@ -34,7 +34,7 @@ public class MCRJerseyResourceConfig extends ResourceConfig {
         super();
         LogManager.getLogger().info("Loading jersey resource config...");
         MCRJerseyConfiguration configuration = MCRConfiguration2.getInstanceOfOrThrow(
-                MCRJerseyDefaultConfiguration.class, "MCR.Jersey.Configuration");
+            MCRJerseyDefaultConfiguration.class, "MCR.Jersey.Configuration");
         try {
             configuration.configure(this);
         } catch (Exception exc) {

@@ -100,9 +100,9 @@ public abstract class MCRSolrIndexHandlerFactory {
             /* extract metadata with tika */
             indexHandler = new MCRSolrFileIndexHandler(file, attrs);
         } else {
-            indexHandler = new MCRSolrInputDocumentHandler(() ->
-                    MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs), file.toString(),
-                    MCRSolrCoreType.MAIN);
+            indexHandler = new MCRSolrInputDocumentHandler(
+                () -> MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs), file.toString(),
+                MCRSolrCoreType.MAIN);
             indexHandler.setCoreType(MCRSolrCoreType.MAIN);
         }
         long end = System.currentTimeMillis();

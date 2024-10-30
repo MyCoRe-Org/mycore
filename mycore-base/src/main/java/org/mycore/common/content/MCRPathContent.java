@@ -32,6 +32,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
+
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 /**
@@ -40,7 +41,6 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRPathContent extends MCRContent implements MCRSeekableChannelContent {
-
 
     private Path path;
 

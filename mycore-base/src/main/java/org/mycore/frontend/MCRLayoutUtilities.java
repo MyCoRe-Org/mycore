@@ -66,9 +66,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.resource.MCRResourceHelper;
-
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.resource.MCRResourceHelper;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -79,8 +78,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
-
-
 
 /**
  *
@@ -105,7 +102,6 @@ public class MCRLayoutUtilities {
     private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
-
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
         .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);

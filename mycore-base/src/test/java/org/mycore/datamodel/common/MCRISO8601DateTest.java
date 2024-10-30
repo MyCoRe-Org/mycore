@@ -25,10 +25,10 @@ import static org.junit.Assert.assertNull;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import org.junit.Test;
 
 public class MCRISO8601DateTest {
-
 
     @Test
     public void getDate() {

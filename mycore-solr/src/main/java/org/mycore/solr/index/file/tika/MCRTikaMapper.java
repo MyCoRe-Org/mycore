@@ -77,6 +77,6 @@ public interface MCRTikaMapper {
      * @throws MCRTikaMappingException If an error occurs during mapping
      */
     void map(String key, TreeNode element, SolrInputDocument document, Path filePath,
-             BasicFileAttributes attributes) throws MCRTikaMappingException;
+        BasicFileAttributes attributes) throws MCRTikaMappingException;
 
 }

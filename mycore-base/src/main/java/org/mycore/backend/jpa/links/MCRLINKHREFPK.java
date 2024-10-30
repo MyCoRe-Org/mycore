@@ -145,8 +145,8 @@ public class MCRLINKHREFPK implements Serializable {
         }
         MCRLINKHREFPK other = (MCRLINKHREFPK) obj;
         return !stringsAreEqual(mcrfrom, other.mcrfrom) &&
-                !stringsAreEqual(mcrto, other.mcrto) &&
-                !stringsAreEqual(mcrtype, other.mcrtype);
+            !stringsAreEqual(mcrto, other.mcrto) &&
+            !stringsAreEqual(mcrtype, other.mcrtype);
     }
 
     //TODO: SHOW second

@@ -27,14 +27,13 @@ import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.mycore.common.MCRException;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Provides helper methods for working with Solr collections (cores).
  */
 public class MCRSolrCollectionHelper {
-
 
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -46,26 +45,25 @@ public class MCRSolrCollectionHelper {
         CollectionAdminResponse collectionAdminResponse = collectionCreateRequest
             .process(core.getBaseClient());
 
-        if(!collectionAdminResponse.isSuccess()){
+        if (!collectionAdminResponse.isSuccess()) {
             throw new MCRException("Error creating collection " + core.getName() + ": " +
-                    collectionAdminResponse.getErrorMessages());
+                collectionAdminResponse.getErrorMessages());
         }
 
         LOGGER.info("Collection {} created.", core.getName());
     }
 
     public static void removeCollection(MCRSolrCore core) throws SolrServerException,
-            IOException {
+        IOException {
         CollectionAdminRequest.Delete collectionDeleteReq = CollectionAdminRequest.deleteCollection(core.getName());
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(collectionDeleteReq,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionDeleteReq
             .process(core.getBaseClient());
 
-
-        if(!collectionAdminResponse.isSuccess()){
+        if (!collectionAdminResponse.isSuccess()) {
             throw new MCRException("Error creating collection " + core.getName() + ": " +
-                    collectionAdminResponse.getErrorMessages());
+                collectionAdminResponse.getErrorMessages());
         }
 
         LOGGER.info("Collection {} deleted.", core.getName());

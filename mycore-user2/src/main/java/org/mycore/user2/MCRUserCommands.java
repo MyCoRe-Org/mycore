@@ -653,7 +653,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static void setUserAttribute(String name, String userID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
-            user.getAttributes().removeIf(a->a.getName().equals(name));
+            user.getAttributes().removeIf(a -> a.getName().equals(name));
             MCRUserManager.updateUser(user);
         } catch (Exception e) {
             throw new MCRException("Error while removing attribute " + name +

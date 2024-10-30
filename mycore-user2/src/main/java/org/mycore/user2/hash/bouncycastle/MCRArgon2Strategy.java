@@ -18,6 +18,8 @@
 
 package org.mycore.user2.hash.bouncycastle;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.HexFormat;
@@ -29,8 +31,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
-
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
  * {@link MCRArgon2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the Argon2 algorithm.
@@ -93,7 +93,6 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
     private final int memoryLimitKilobytes;
 
     private final int iterations;
-
 
     public MCRArgon2Strategy(int saltSizeBytes, int hashSizeBytes,
         int parallelism, int memoryLimitKilobytes, int iterations) {

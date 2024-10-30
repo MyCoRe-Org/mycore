@@ -28,11 +28,11 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 import org.mycore.services.http.MCRHttpUtils;
+import org.mycore.solr.MCRSolrUtils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mycore.solr.MCRSolrUtils;
 
 /**
  * A simple HTTP client to communicate with a Tika server.

@@ -72,7 +72,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public List<MCRSolrIndexHandler> getSubHandlers() {
         MCRSolrIndexHandler mcrSolrIndexHandler = new MCRSolrInputDocumentHandler(() -> document, id.toString(),
-                this.getCoreType());
+            this.getCoreType());
         mcrSolrIndexHandler.setCommitWithin(getCommitWithin());
         return Collections.singletonList(mcrSolrIndexHandler);
     }

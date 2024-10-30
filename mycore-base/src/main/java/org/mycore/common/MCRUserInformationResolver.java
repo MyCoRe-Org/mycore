@@ -18,17 +18,17 @@
 
 package org.mycore.common;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRSentinel;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * A {@link MCRUserInformationResolver} can be used to obtain {@link MCRUserInformation}, without knowledge
@@ -96,8 +96,8 @@ public final class MCRUserInformationResolver {
     }
 
     public MCRUserInformation getOrThrow(String specification) {
-        return get(specification).orElseThrow(() ->
-            new MCRException("Unable to resolve user information for: " + specification));
+        return get(specification)
+            .orElseThrow(() -> new MCRException("Unable to resolve user information for: " + specification));
     }
 
     public Optional<MCRUserInformation> get(String schema, String userId) {

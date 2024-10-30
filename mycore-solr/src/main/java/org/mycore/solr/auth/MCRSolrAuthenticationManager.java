@@ -45,9 +45,8 @@ public interface MCRSolrAuthenticationManager {
      */
     void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level);
 
-
-     static MCRSolrAuthenticationManager getInstance() {
-         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationManager.class,
-                 MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Manager.Class");
-     }
+    static MCRSolrAuthenticationManager getInstance() {
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationManager.class,
+            MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Manager.Class");
+    }
 }

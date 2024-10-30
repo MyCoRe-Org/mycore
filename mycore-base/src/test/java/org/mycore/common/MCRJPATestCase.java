@@ -38,13 +38,13 @@ import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRJPABootstrapper;
+import org.mycore.backend.jpa.MCRPersistenceProvider;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
 import jakarta.persistence.RollbackException;
-import org.mycore.backend.jpa.MCRPersistenceProvider;
 
 public class MCRJPATestCase extends MCRTestCase {
 
@@ -92,7 +92,7 @@ public class MCRJPATestCase extends MCRTestCase {
         testProperties.put(emPropertyPrefix + ".Class", "org.mycore.backend.jpa.MCRPersistenceUnitDescriptor");
 
         testProperties.put(emPropertyPrefix + ".Properties.jakarta.persistence.jdbc.url", "jdbc:h2:mem:" +
-                getCurrentComponentName());
+            getCurrentComponentName());
 
         testProperties.put(emPropertyPrefix + ".Properties.jakarta.persistence.jdbc.driver", "org.h2.Driver");
 
@@ -159,18 +159,18 @@ public class MCRJPATestCase extends MCRTestCase {
 
     protected static Optional<String> getDefaultSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-                .getEntityManagerFactory()
-                .getProperties()
-                .get("hibernate.default_schema"))
+            .getEntityManagerFactory()
+            .getProperties()
+            .get("hibernate.default_schema"))
             .map(Object::toString)
             .map(schema -> quoteSchema() ? '"' + schema + '"' : schema);
     }
 
     protected static boolean quoteSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
-                .getEntityManagerFactory()
-                .getProperties()
-                .get("hibernate.globally_quoted_identifiers"))
+            .getEntityManagerFactory()
+            .getProperties()
+            .get("hibernate.globally_quoted_identifiers"))
             .map(Object::toString)
             .map(Boolean::parseBoolean)
             .orElse(Boolean.FALSE);
@@ -180,8 +180,6 @@ public class MCRJPATestCase extends MCRTestCase {
         exportSchema("drop");
         doSchemaOperation(schema -> "drop schema " + schema);
     }
-
-
 
     @After
     public void tearDown() throws Exception {

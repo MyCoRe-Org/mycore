@@ -59,7 +59,7 @@ public class MCRSolrBasicPropertyAuthentication implements MCRSolrAuthentication
     public void applyAuthentication(HttpRequest.Builder request) {
         String authString = username + ":" + password;
         request.header("Authorization", "Basic " +
-                Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8)));
+            Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8)));
     }
 
     public String getPassword() {

@@ -144,15 +144,15 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         if (HttpMethod.OPTIONS.equals(method)) {
             return;
         }
-        final String permission
-            = Optional.ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class))
+        final String permission =
+            Optional.ofNullable(resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class))
                 .map(MCRRestRequiredPermission::value).orElseGet(() -> getPermissionFromHttpMethod(method));
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
                 checkRestAPIAccess(requestContext, permission, path);
-                MCRRestAccessCheck accessCheckAnnotation
-                    = resourceInfo.getResourceMethod().getAnnotation(MCRRestAccessCheck.class);
+                MCRRestAccessCheck accessCheckAnnotation =
+                    resourceInfo.getResourceMethod().getAnnotation(MCRRestAccessCheck.class);
                 if (accessCheckAnnotation != null) {
                     final MCRRestAccessCheckStrategy strategy = resolveAccessCheckStrategy(accessCheckAnnotation);
                     strategy.checkPermission(resourceInfo, requestContext);

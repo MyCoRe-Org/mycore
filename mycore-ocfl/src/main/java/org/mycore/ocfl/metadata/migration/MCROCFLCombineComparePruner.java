@@ -64,7 +64,7 @@ public abstract class MCROCFLCombineComparePruner implements MCROCFLRevisionPrun
                 MCRContent nextContent = next.contentSupplier().get();
                 Document nextDocument = nextContent.asXML();
 
-                if (comparator.shouldMerge(last, currentDocument, next,nextDocument)) {
+                if (comparator.shouldMerge(last, currentDocument, next, nextDocument)) {
                     LOGGER.info("Merging revisions {} and {}", last, next);
                     last = buildMergedRevision(last, next, currentDocument, nextDocument);
                     continue;
@@ -108,4 +108,3 @@ public abstract class MCROCFLCombineComparePruner implements MCROCFLRevisionPrun
     }
 
 }
-

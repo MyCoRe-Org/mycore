@@ -77,10 +77,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 
-
-
-
-
     // extended methods
     public static synchronized MCRRuleAccessInterface instance() {
         if (singleton == null) {

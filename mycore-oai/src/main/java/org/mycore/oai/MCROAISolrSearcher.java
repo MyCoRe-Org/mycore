@@ -52,8 +52,8 @@ import org.mycore.oai.set.MCROAISolrSetHandler;
 import org.mycore.oai.set.MCRSet;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Solr searcher implementation. Uses cursors.

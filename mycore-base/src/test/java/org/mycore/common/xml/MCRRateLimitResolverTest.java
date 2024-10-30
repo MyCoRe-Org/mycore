@@ -18,7 +18,11 @@
 
 package org.mycore.common.xml;
 
-import io.github.bucket4j.Bucket;
+import static org.junit.Assert.assertTrue;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
@@ -30,10 +34,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-
-import static org.junit.Assert.assertTrue;
+import io.github.bucket4j.Bucket;
 
 public class MCRRateLimitResolverTest extends MCRTestCase {
 
@@ -124,16 +125,16 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         // Test negative value for token amount
         MCRConfiguration2.set("MCR.RateLimitResolver.Test2.Behavior", "block");
         MCRConfiguration2.set("MCR.RateLimitResolver.Test2.Limits", "-10/s");
-        IllegalArgumentException illegalArgumentException
-            = Assert.assertThrows(IllegalArgumentException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test2"));
+        IllegalArgumentException illegalArgumentException =
+            Assert.assertThrows(IllegalArgumentException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test2"));
         assertTrue(illegalArgumentException.getMessage().contains("-10"));
         assertTrue(illegalArgumentException.getMessage().contains("capacity should be positive"));
 
         // Test non-number value for token amount
         MCRConfiguration2.set("MCR.RateLimitResolver.Test3.Behavior", "block");
         MCRConfiguration2.set("MCR.RateLimitResolver.Test3.Limits", "abc/s");
-        NumberFormatException numberFormatException
-            = Assert.assertThrows(NumberFormatException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test3"));
+        NumberFormatException numberFormatException =
+            Assert.assertThrows(NumberFormatException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test3"));
         assertTrue(numberFormatException.getMessage().contains("abc"));
 
         // Test missing config

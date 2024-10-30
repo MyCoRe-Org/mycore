@@ -126,7 +126,7 @@ public abstract class MCRCipher {
     private boolean checkPermission(String action) {
         boolean result;
         if (aclEnabled) {
-            result= MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
+            result = MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
         } else {
             result = true;
         }

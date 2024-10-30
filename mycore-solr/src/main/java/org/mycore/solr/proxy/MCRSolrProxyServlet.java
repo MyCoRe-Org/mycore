@@ -236,8 +236,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
         try {
             solrRequest = solrHttpMethod.build();
             LOGGER.info("Sending Request: {}", solrRequest.uri());
-            HttpResponse<InputStream> response
-                = httpClient.send(solrRequest, HttpResponse.BodyHandlers.ofInputStream());
+            HttpResponse<InputStream> response =
+                httpClient.send(solrRequest, HttpResponse.BodyHandlers.ofInputStream());
             int statusCode = response.statusCode();
 
             // set status code

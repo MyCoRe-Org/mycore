@@ -32,6 +32,8 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -40,8 +42,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Rest API methods that cover SOLR searches.
@@ -129,9 +129,9 @@ public class MCRRestAPISearch {
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(reqBuilder, MCRSolrAuthenticationLevel.SEARCH);
         HttpRequest request = reqBuilder.build();
 
-        try(HttpClient client = MCRHttpUtils.getHttpClient()) {
-            HttpResponse<String> resp
-                = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        try (HttpClient client = MCRHttpUtils.getHttpClient()) {
+            HttpResponse<String> resp =
+                client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             return Response.ok(resp.body())
                 .type(getContentType(wt))
                 .build();

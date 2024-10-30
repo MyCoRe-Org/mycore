@@ -48,7 +48,6 @@ import org.mycore.resource.selector.MCRResourceSelector;
  * till available, the first candidate is chosen.
  */
 
-
 /**
  * {@link MCRLFSResourceProvider} is an implementation of {@link MCRResourceProvider} that splits the lookup
  * strategy in three phases: <em>locate</em>, <em>filter</em>, <em>select</em> (LFS).
@@ -101,7 +100,7 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     private final MCRResourceSelector selector;
 
     public MCRLFSResourceProvider(String coverage, MCRResourceLocator locator, MCRResourceFilter filter,
-                                  MCRResourceSelector selector) {
+        MCRResourceSelector selector) {
         super(coverage);
         this.locator = Objects.requireNonNull(locator);
         this.filter = Objects.requireNonNull(filter);

@@ -53,13 +53,10 @@ public final class MCRConfigDirLibraryResourceProvider extends MCRLFSResourcePro
             new MCRClassLoaderResourceLocator(),
             new MCRCombinedResourceFilter(
                 new MCRLibraryResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-                new MCRConfigDirLibraryResourceFilter(mode)
-            ),
+                new MCRConfigDirLibraryResourceFilter(mode)),
             new MCRCombinedResourceSelector(
                 new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstLibraryJarResourceSelector()
-            )
-        );
+                new MCRFirstLibraryJarResourceSelector()));
         this.mode = mode;
     }
 
