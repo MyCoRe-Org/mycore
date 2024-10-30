@@ -17,14 +17,14 @@
  */
 
 export interface TextInputView {
-    updateValue(value: string): void;
+  updateValue(value: string): void;
 
-    updatePlaceholder(placeHolder: string): void;
+  updatePlaceholder(placeHolder: string): void;
 
-    getValue(): string;
+  getValue(): string;
 
-    getElement(): JQuery;
+  getElement(): JQuery;
 
-    onChange: () => void;
+  onChange: () => void;
 }
 

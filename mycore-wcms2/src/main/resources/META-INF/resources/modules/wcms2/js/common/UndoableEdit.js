@@ -29,22 +29,22 @@ wcms.common = wcms.common || {};
 wcms.common.UndoableEdit = function() {
 };
 
-( function() {
+(function() {
 
-	function getLabel() {
-		return "no label defined";
-	}
+  function getLabel() {
+    return "no label defined";
+  }
 
-	function undo() {
-		// overwrite this method!
-	}
+  function undo() {
+    // overwrite this method!
+  }
 
-	function redo() {
-		// overwrite this method!
-	}
+  function redo() {
+    // overwrite this method!
+  }
 
-	wcms.common.UndoableEdit.prototype.getLabel = getLabel;
-	wcms.common.UndoableEdit.prototype.undo = undo;
-	wcms.common.UndoableEdit.prototype.redo = redo;
+  wcms.common.UndoableEdit.prototype.getLabel = getLabel;
+  wcms.common.UndoableEdit.prototype.undo = undo;
+  wcms.common.UndoableEdit.prototype.redo = redo;
 
 })();

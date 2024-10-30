@@ -17,20 +17,20 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {LanguageModel} from "../model/LanguageModel";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { LanguageModel } from "../model/LanguageModel";
 
 export class LanguageModelLoadedEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, private _languageModel: LanguageModel) {
-        super(component, LanguageModelLoadedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, private _languageModel: LanguageModel) {
+    super(component, LanguageModelLoadedEvent.TYPE);
+  }
 
-    public get languageModel(): LanguageModel {
-        return this._languageModel;
-    }
+  public get languageModel(): LanguageModel {
+    return this._languageModel;
+  }
 
-    public static TYPE: string = "LanguageModelLoadedEvent";
+  public static TYPE: string = "LanguageModelLoadedEvent";
 
 
 }

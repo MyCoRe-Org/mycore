@@ -16,17 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {AbstractPage} from "../model/AbstractPage";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { AbstractPage } from "../model/AbstractPage";
 
 
 export class RequestPageEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public _pageId: string, public _onResolve: (pageId: string, abstractPage: AbstractPage) => void, public textContentURL: string = null) {
-        super(component, RequestPageEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public _pageId: string, public _onResolve: (pageId: string, abstractPage: AbstractPage) => void, public textContentURL: string = null) {
+    super(component, RequestPageEvent.TYPE);
+  }
 
-    public static TYPE: string = "RequestPageEvent";
+  public static TYPE: string = "RequestPageEvent";
 
 }
 

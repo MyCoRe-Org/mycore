@@ -21,7 +21,7 @@ import _Vue from 'vue';
 export default new class MCRLocalePlugin {
   /* eslint-disable */
   public async install(Vue: typeof _Vue, dict: Record<string, string>) {
-    Vue.prototype.$t = function (key: string, ...args: string[]) {
+    Vue.prototype.$t = function(key: string, ...args: string[]) {
       let str = dict[key];
       if (str != null) {
         for (let i = 0; i < args.length; i++) {

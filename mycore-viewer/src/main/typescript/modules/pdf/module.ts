@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoRePDFViewerComponent} from "./components/MyCoRePDFViewerComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoRePDFViewerComponent } from "./components/MyCoRePDFViewerComponent";
 
 addViewerComponent(MyCoRePDFViewerComponent);

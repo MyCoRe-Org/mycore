@@ -16,14 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
 
 export class TextEditEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public edit: boolean = true) {
-        super(component, TextEditEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public edit: boolean = true) {
+    super(component, TextEditEvent.TYPE);
+  }
 
-    public static TYPE: string = "TextEditEvent";
+  public static TYPE: string = "TextEditEvent";
 
 }

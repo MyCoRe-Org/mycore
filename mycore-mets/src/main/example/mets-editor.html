@@ -1,48 +1,47 @@
 <!doctype html>
 <html lang="de">
 <head>
-    <meta charset="utf-8">
-    <title>Mets-Editor</title>
-    <link rel="stylesheet" href="../../../shared/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="../css/mets-editor.css">
-    <link rel="stylesheet" href="../../../shared/angular-borderlayout2/dist/borderLayout.css">
-    <link rel="stylesheet" href="../../../shared/angular-hotkeys/build/hotkeys.min.css">
-    <script src="../../../shared/jquery/dist/jquery.js"></script>
-    <script src="../../../shared/angular/angular.js"></script>
-    <script src="../../../shared/angular-resource/angular-resource.js"></script>
-    <script src="../../../shared/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="../../../shared/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="../../../shared/ngDraggable/0.1.8/ngDraggable.js"></script>
-    <script src="../../../shared/angular-borderlayout2/dist/borderLayout.js"></script>
-    <script src="../../../shared/angular-hotkeys/build/hotkeys.min.js"></script>
-    <script src="../../../shared/angular-lazy-image/release/lazy-image.js"></script>
-    <script src="../lib/ng-image-zoom.js"></script>
-    <script src="../js/MetsEditor.js"></script>
-    <script src="../js/MetsEditor-templates.js"></script>
-    <meta charset="utf-8">
-    <script>
-        // Global Configuration tells the editor where to find i18n stuff and resources
-        angular.module('MetsEditorConfiguration', []).factory("MetsEditorConfiguration", function () {
-            return {
-                i18URL: "../json/i18n_de.json",
-                resources: "../",
-                imageLocationPattern: "./{derivate}/{quality}/{image}"
-            };
-        });
+  <meta charset="utf-8">
+  <title>Mets-Editor</title>
+  <link rel="stylesheet" href="../../../shared/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="../css/mets-editor.css">
+  <link rel="stylesheet" href="../../../shared/angular-borderlayout2/dist/borderLayout.css">
+  <link rel="stylesheet" href="../../../shared/angular-hotkeys/build/hotkeys.min.css">
+  <script src="../../../shared/jquery/dist/jquery.js"></script>
+  <script src="../../../shared/angular/angular.js"></script>
+  <script src="../../../shared/angular-resource/angular-resource.js"></script>
+  <script src="../../../shared/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <script src="../../../shared/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="../../../shared/ngDraggable/0.1.8/ngDraggable.js"></script>
+  <script src="../../../shared/angular-borderlayout2/dist/borderLayout.js"></script>
+  <script src="../../../shared/angular-hotkeys/build/hotkeys.min.js"></script>
+  <script src="../../../shared/angular-lazy-image/release/lazy-image.js"></script>
+  <script src="../lib/ng-image-zoom.js"></script>
+  <script src="../js/MetsEditor.js"></script>
+  <script src="../js/MetsEditor-templates.js"></script>
+  <meta charset="utf-8">
+  <script>
+    // Global Configuration tells the editor where to find i18n stuff and resources
+    angular.module('MetsEditorConfiguration', []).factory("MetsEditorConfiguration", function() {
+      return {
+        i18URL : "../json/i18n_de.json",
+        resources : "../",
+        imageLocationPattern : "./{derivate}/{quality}/{image}"
+      };
+    });
 
-        window.onload = function () {
-            angular.bootstrap(document.getElementById("instance2"), ["MetsEditorApp"]);
-        };
-
-    </script>
+    window.onload = function() {
+      angular.bootstrap(document.getElementById("instance2"), [ "MetsEditorApp" ]);
+    };
+  </script>
 </head>
 <body>
-<div id="instance2">
+  <div id="instance2">
     <div ng-controller="MetsEditorController as metsEditorCtrl"
-         ng-init="metsEditorCtrl.init({sourceMetsURL: '../json/mets2.json',metsId: 'mets2.json', targetServletURL: 'http://target.servlet.de/'});"
-         ng-include="'mets-editor-main.html'">
+      ng-init="metsEditorCtrl.init({sourceMetsURL: '../json/mets2.json',metsId: 'mets2.json', targetServletURL: 'http://target.servlet.de/'});"
+      ng-include="'mets-editor-main.html'">
     </div>
-</div>
+  </div>
 
 </body>
 </html>

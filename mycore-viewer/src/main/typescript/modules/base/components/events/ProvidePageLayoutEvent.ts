@@ -17,19 +17,19 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {PageLayout} from "../../widgets/canvas/PageLayout";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { PageLayout } from "../../widgets/canvas/PageLayout";
 
 /**
  * Used to provide a PageLayout wich can be used by the MyCoReImageScrollComponent.
  */
 export class ProvidePageLayoutEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public pageLayout: PageLayout, public isDefault = false) {
-        super(component, ProvidePageLayoutEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public pageLayout: PageLayout, public isDefault = false) {
+    super(component, ProvidePageLayoutEvent.TYPE);
+  }
 
-    public static TYPE = "ProvidePageLayoutEvent";
+  public static TYPE = "ProvidePageLayoutEvent";
 
 }

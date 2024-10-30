@@ -4,50 +4,51 @@
 /* BOOTSTRAP OVERWRITES                      */
 /*********************************************/
 .mcr-processing .modal-header {
-    box-sizing: content-box;
+  box-sizing: content-box;
 }
-.mcr-processing .nav > li > a {
-    padding: 5px 15px;
+
+.mcr-processing .nav>li>a {
+  padding: 5px 15px;
 }
 
 /*********************************************/
 /* PIPE STYLES                               */
 /*********************************************/
 .mcr-processing .json-string-row {
-    margin-left: 4px;
+  margin-left: 4px;
 }
 
 .mcr-processing .json-string-object-property-name {
-    font-weight: bold;
-    color: #337ab7;
+  font-weight: bold;
+  color: #337ab7;
 }
 
 .mcr-processing .json-string-object-property-value {
-    color: olivedrab;
+  color: olivedrab;
 }
 
 /*********************************************/
 /* PROPERTY DIALOG                           */
 /*********************************************/
 .mcr-processing .modal-dialog .properties-header {
-    font-weight: bold;
-    border-bottom: 1px solid #f3f3f3;
-    margin-bottom: 6px;
+  font-weight: bold;
+  border-bottom: 1px solid #f3f3f3;
+  margin-bottom: 6px;
 }
 
 .mcr-processing .modal-dialog .properties-content {
-    margin-bottom: 3px;
+  margin-bottom: 3px;
 }
 
 .mcr-processing .modal-dialog .properties-content .propertyKey {
-    font-weight: bold;
-    color: #337ab7;
+  font-weight: bold;
+  color: #337ab7;
 }
 
 /*********************************************/
 /* GENERAL SETTINGS                          */
 /*********************************************/
 .mcr-processing a {
-    color: #337ab7;
-    font-size: 0.8rem;
+  color: #337ab7;
+  font-size: 0.8rem;
 }

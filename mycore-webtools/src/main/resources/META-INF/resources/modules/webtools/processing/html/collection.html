@@ -1,100 +1,106 @@
 <div class="collection">
-	<h1>
-		{{model.name}} <a href="javascript:void(0)" (click)="propertiesModal.show()">(properties)</a>
-	</h1>
+  <h1>
+    {{model.name}} <a href="javascript:void(0)" (click)="propertiesModal.show()">(properties)</a>
+  </h1>
 
-	<div class="collection-content">
-		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation" class="nav-item">
-				<a class="nav-link active" href="#processing_{{model.id}}" aria-controls="processing" role="tab" data-toggle="tab">
-					<span>Processing</span>
-					<span class="badge badge-pill badge-primary">{{model.processingProcessables?.length}}</span>
-				</a>
-			</li>
-			<li role="presentation" class="nav-item">
-				<a class="nav-link" href="#created_{{model.id}}" aria-controls="created" role="tab" data-toggle="tab">
-					<span>Waiting</span>
-					<span class="badge badge-pill badge-primary">{{model.createdProcessables?.length}}</span>
-				</a>
-			</li>
-			<li role="presentation" class="nav-item">
-				<a class="nav-link" href="#finished_{{model.id}}" aria-controls="finished" role="tab" data-toggle="tab">
-					<span>Finished</span>
-					<span class="badge badge-pill badge-primary">{{model.finishedProcessables?.length}}</span>
-				</a>
-			</li>
-		</ul>
-		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane active" id="processing_{{model.id}}">
-				<div class="row header">
-					<div class="col-md-5">Name</div>
-					<div class="col-md-2">User</div>
-					<div class="col-md-2">Create Date</div>
-					<div class="col-md-3">Progress</div>
-				</div>
-				<div class="content">
-					<div class="noActiveProcess" *ngIf="model.processingProcessables?.length == 0">no active process</div>
-					<div *ngFor="let processable of model.processingProcessables" processable [model]="processable"></div>
-				</div>
-			</div>
-			<div role="tabpanel" class="tab-pane" id="created_{{model.id}}">
-				<div class="row header">
-					<div class="col-md-5">Name</div>
-					<div class="col-md-2">User</div>
-					<div class="col-md-2">Create Date</div>
-					<div class="col-md-3">Progress</div>
-				</div>
-				<div class="content">
-					<div class="noActiveProcess" *ngIf="model.createdProcessables?.length == 0">no wating process</div>
-					<div *ngFor="let processable of model.getCreatedProcessables(showAll ? model.createdProcessables.length : 10)" processable [model]="processable"></div>
-					<div *ngIf="model.createdProcessables?.length > 10">
-						<div *ngIf="!showAll">
-							<a href="javascript:void(0);" (click)="showCreatedProcessables()">show all ({{model.createdProcessables.length}})</a>
-						</div>
-						<div *ngIf="showAll">
-							<a href="javascript:void(0);" (click)="hideCreatedProcessables()">close</a>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div role="tabpanel" class="tab-pane" id="finished_{{model.id}}">
-				<div class="row header">
-					<div class="col-md-5">Name</div>
-					<div class="col-md-2">User</div>
-					<div class="col-md-2">Create Date</div>
-					<div class="col-md-3">Progress</div>
-				</div>
-				<div class="content">
-					<div class="noActiveProcess" *ngIf="model.finishedProcessables?.length == 0">no finished process</div>
-					<div *ngFor="let processable of model.finishedProcessables" processable [model]="processable"></div>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="collection-content">
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="#processing_{{model.id}}"
+           aria-controls="processing" role="tab" data-toggle="tab">
+          <span>Processing</span>
+          <span class="badge badge-pill badge-primary">{{model.processingProcessables?.length}}</span>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#created_{{model.id}}"
+           aria-controls="created" role="tab" data-toggle="tab">
+           <span>Waiting</span>
+           <span class="badge badge-pill badge-primary">{{model.createdProcessables?.length}}</span>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#finished_{{model.id}}"
+          aria-controls="finished" role="tab" data-toggle="tab">
+          <span>Finished</span>
+          <span class="badge badge-pill badge-primary">{{model.finishedProcessables?.length}}</span>
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="processing_{{model.id}}">
+        <div class="row header">
+          <div class="col-md-5">Name</div>
+          <div class="col-md-2">User</div>
+          <div class="col-md-2">Create Date</div>
+          <div class="col-md-3">Progress</div>
+        </div>
+        <div class="content">
+          <div class="noActiveProcess" *ngIf="model.processingProcessables?.length == 0">no active process</div>
+          <div *ngFor="let processable of model.processingProcessables" processable [model]="processable"></div>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="created_{{model.id}}">
+        <div class="row header">
+          <div class="col-md-5">Name</div>
+          <div class="col-md-2">User</div>
+          <div class="col-md-2">Create Date</div>
+          <div class="col-md-3">Progress</div>
+        </div>
+        <div class="content">
+          <div class="noActiveProcess" *ngIf="model.createdProcessables?.length == 0">no wating process</div>
+          <div *ngFor="let processable of model.getCreatedProcessables(showAll ? model.createdProcessables.length : 10)"
+            processable [model]="processable"></div>
+          <div *ngIf="model.createdProcessables?.length > 10">
+            <div *ngIf="!showAll">
+              <a href="javascript:void(0);" (click)="showCreatedProcessables()">show all
+                ({{model.createdProcessables.length}})</a>
+            </div>
+            <div *ngIf="showAll">
+              <a href="javascript:void(0);" (click)="hideCreatedProcessables()">close</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="finished_{{model.id}}">
+        <div class="row header">
+          <div class="col-md-5">Name</div>
+          <div class="col-md-2">User</div>
+          <div class="col-md-2">Create Date</div>
+          <div class="col-md-3">Progress</div>
+        </div>
+        <div class="content">
+          <div class="noActiveProcess" *ngIf="model.finishedProcessables?.length == 0">no finished process</div>
+          <div *ngFor="let processable of model.finishedProcessables" processable [model]="processable"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	<div bsModal #propertiesModal="bs-modal" class="modal fade propertiesModal" tabindex="-1" role="dialog" aria-labelledby="propertiesModal" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title pull-left">Properties</h4>
-					<button type="button" class="close pull-right" (click)="propertiesModal.hide()" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="properties-header row">
-						<div class="col-md-2">Name</div>
-						<div class="col-md-10">Value</div>
-					</div>
-					<div *ngIf="model.propertyKeys.length === 0" class="properties-content row">
-						<div class="col-md-12">no properties set</div>
-					</div>
-					<div *ngFor="let i of model.propertyKeys" class="properties-content row">
-						<div class="col-md-2 propertyKey">{{i}}</div>
-						<div class="col-md-10 propertyValue" [innerHTML]="model.properties[i] | jsonString"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div bsModal #propertiesModal="bs-modal" class="modal fade propertiesModal" tabindex="-1" role="dialog"
+    aria-labelledby="propertiesModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title pull-left">Properties</h4>
+          <button type="button" class="close pull-right" (click)="propertiesModal.hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="properties-header row">
+            <div class="col-md-2">Name</div>
+            <div class="col-md-10">Value</div>
+          </div>
+          <div *ngIf="model.propertyKeys.length === 0" class="properties-content row">
+            <div class="col-md-12">no properties set</div>
+          </div>
+          <div *ngFor="let i of model.propertyKeys" class="properties-content row">
+            <div class="col-md-2 propertyKey">{{i}}</div>
+            <div class="col-md-10 propertyValue" [innerHTML]="model.properties[i] | jsonString"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

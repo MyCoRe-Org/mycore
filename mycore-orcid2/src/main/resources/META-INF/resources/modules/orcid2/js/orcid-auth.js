@@ -18,27 +18,27 @@
 
 // Forced logout from ORCID is handled via prompt=login parameter already
 async function orcidOAuth(scope) {
-    let uri = `${webApplicationBaseURL}rsc/orcid/oauth/init`;
-    if (scope) {
-        uri += `?scope=${scope}`;
-    }
-    // Open ORCID login in popup window
-    const width = 540;
-    const height = 750;
-    const left = window.top.outerWidth/2 + window.top.screenX - (width/2);
-    const top = window.top.outerHeight/2 + window.top.screenY - (height/2);
-    window.open(uri, '_blank', `toolbar=no, width=${width}, height=${height}, top=${top}, left=${left}`);
+  let uri = `${webApplicationBaseURL}rsc/orcid/oauth/init`;
+  if (scope) {
+    uri += `?scope=${scope}`;
+  }
+  // Open ORCID login in popup window
+  const width = 540;
+  const height = 750;
+  const left = window.top.outerWidth / 2 + window.top.screenX - (width / 2);
+  const top = window.top.outerHeight / 2 + window.top.screenY - (height / 2);
+  window.open(uri, '_blank', `toolbar=no, width=${width}, height=${height}, top=${top}, left=${left}`);
 }
 
 async function revokeOrcidOAuth(orcid, redirectUri) {
-    const revokeURI = `${webApplicationBaseURL}rsc/orcid/oauth/${orcid}`;
-    const revoke = await fetch(revokeURI, {
-        method: 'DELETE',
-    });
-    if (!revoke.ok) {
-        throw new Error("Revoke failed");
-    }
-    if (redirectUri) {
-        window.location.replace(redirectUri);
-    }
+  const revokeURI = `${webApplicationBaseURL}rsc/orcid/oauth/${orcid}`;
+  const revoke = await fetch(revokeURI, {
+    method: 'DELETE',
+  });
+  if (!revoke.ok) {
+    throw new Error("Revoke failed");
+  }
+  if (redirectUri) {
+    window.location.replace(redirectUri);
+  }
 }

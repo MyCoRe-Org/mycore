@@ -17,7 +17,7 @@
  */
 
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReMetadataComponent} from "./components/MyCoReMetadataComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReMetadataComponent } from "./components/MyCoReMetadataComponent";
 
 addViewerComponent(MyCoReMetadataComponent);

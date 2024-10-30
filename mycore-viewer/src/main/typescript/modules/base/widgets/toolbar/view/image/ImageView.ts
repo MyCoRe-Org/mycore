@@ -17,8 +17,8 @@
  */
 
 export interface ImageView {
-    updateHref(href: string): void;
+  updateHref(href: string): void;
 
-    getElement(): JQuery;
+  getElement(): JQuery;
 }
 

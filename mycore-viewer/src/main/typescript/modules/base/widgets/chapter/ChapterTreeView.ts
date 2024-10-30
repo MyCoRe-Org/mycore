@@ -17,12 +17,12 @@
  */
 
 export interface ChapterTreeView {
-    addNode(parentId: string, id: string, label: string, childLabel: string, expandable: boolean);
+  addNode(parentId: string, id: string, label: string, childLabel: string, expandable: boolean);
 
-    setOpened(id: string, opened: boolean);
+  setOpened(id: string, opened: boolean);
 
-    setSelected(id: string, selected: boolean);
+  setSelected(id: string, selected: boolean);
 
-    jumpTo(id: string);
+  jumpTo(id: string);
 }
 

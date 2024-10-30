@@ -17,15 +17,15 @@
  */
 
 
-import {UploadSettings} from "./UploadSettings";
+import { UploadSettings } from "./UploadSettings";
 
 export class Utils {
-    static getUploadSettings(): UploadSettings {
-        const uploadSettingsName = "mycoreUploadSettings";
+  static getUploadSettings(): UploadSettings {
+    const uploadSettingsName = "mycoreUploadSettings";
 
-        if (!(uploadSettingsName in window)) {
-            throw new Error(uploadSettingsName + " is not defined in Window!");
-        }
-        return <UploadSettings>window[uploadSettingsName];
+    if (!(uploadSettingsName in window)) {
+      throw new Error(uploadSettingsName + " is not defined in Window!");
     }
+    return <UploadSettings>window[uploadSettingsName];
+  }
 }

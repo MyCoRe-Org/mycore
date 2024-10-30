@@ -17,101 +17,101 @@
  */
 
 
-import {ButtonView} from "../../../../../base/widgets/toolbar/view/button/ButtonView";
+import { ButtonView } from "../../../../../base/widgets/toolbar/view/button/ButtonView";
 
 export class BootstrapButtonView implements ButtonView {
 
-    constructor(id: string) {
-        this._buttonElement = jQuery("<button></button>");
-        this._buttonElement.attr("data-id", id);
-        this._buttonElement.addClass("btn btn-secondary navbar-btn");
+  constructor(id: string) {
+    this._buttonElement = jQuery("<button></button>");
+    this._buttonElement.attr("data-id", id);
+    this._buttonElement.addClass("btn btn-secondary navbar-btn");
 
-        this._buttonLabel = jQuery("<span></span>");
-        this._buttonLabel.appendTo(this._buttonElement);
+    this._buttonLabel = jQuery("<span></span>");
+    this._buttonLabel.appendTo(this._buttonElement);
 
-        this._icon = jQuery("<i></i>");
-        this._attached = false;
-        this._lastIconClass = "";
-        this._lastButtonClass = null;
+    this._icon = jQuery("<i></i>");
+    this._attached = false;
+    this._lastIconClass = "";
+    this._lastButtonClass = null;
+  }
+
+  public _buttonElement: JQuery;
+  private _icon: JQuery;
+  private _attached: boolean;
+  private _buttonLabel: JQuery;
+  private _lastIconClass: string;
+  private _lastButtonClass: string;
+
+  public updateButtonLabel(label: string): void {
+    this._buttonLabel.text(label);
+    if (label.length > 0) {
+      this._icon.addClass("textpresent");
+    } else {
+      this._icon.removeClass("textpresent");
+    }
+  }
+
+  public updateButtonTooltip(tooltip: string): void {
+    this._buttonElement.attr("title", tooltip);
+  }
+
+  public updateButtonIcon(icon: string): void {
+    if (!this._attached && icon != null) {
+      this._icon.prependTo(this._buttonElement);
+      this._attached = true;
+    } else if (this._attached && icon == null) {
+      this._icon.remove();
+      this._attached = false;
+      return;
     }
 
-    public _buttonElement: JQuery;
-    private _icon: JQuery;
-    private _attached: boolean;
-    private _buttonLabel: JQuery;
-    private _lastIconClass: string;
-    private _lastButtonClass: string;
+    this._icon.removeClass(`fa-${this._lastIconClass}`);
+    this._icon.removeClass(this._lastIconClass);
+    this._icon.removeClass(`icon-${this._lastIconClass}`);
 
-    public updateButtonLabel(label: string): void {
-        this._buttonLabel.text(label);
-        if (label.length > 0) {
-            this._icon.addClass("textpresent");
-        } else {
-            this._icon.removeClass("textpresent");
-        }
+    this._icon.addClass('fas');
+    this._icon.addClass(`fa-${icon}`);
+
+    this._lastIconClass = icon;
+  }
+
+  updateButtonClass(buttonClass: string): void {
+    if (this._lastButtonClass != null) {
+      this._buttonElement.removeClass("btn-" + this._lastButtonClass);
     }
 
-    public updateButtonTooltip(tooltip: string): void {
-        this._buttonElement.attr("title", tooltip);
+    this._buttonElement.addClass("btn-" + buttonClass);
+    this._lastButtonClass = buttonClass;
+  }
+
+  updateButtonActive(active: boolean): void {
+    const isActive = this._buttonElement.hasClass("active");
+
+    if (active && !isActive) {
+      this._buttonElement.addClass("active");
     }
 
-    public updateButtonIcon(icon: string): void {
-        if (!this._attached && icon != null) {
-            this._icon.prependTo(this._buttonElement);
-            this._attached = true;
-        } else if (this._attached && icon == null) {
-            this._icon.remove();
-            this._attached = false;
-            return;
-        }
+    if (!active && isActive) {
+      this._buttonElement.removeClass("active");
+    }
+  }
 
-        this._icon.removeClass(`fa-${this._lastIconClass}`);
-        this._icon.removeClass(this._lastIconClass);
-        this._icon.removeClass(`icon-${this._lastIconClass}`);
+  updateButtonDisabled(disabled: boolean): void {
+    const isDisabled = this._buttonElement.attr("disabled") == "disabled";
 
-        this._icon.addClass('fas');
-        this._icon.addClass(`fa-${icon}`);
-
-        this._lastIconClass = icon;
+    if (disabled && !isDisabled) {
+      this._buttonElement.attr("disabled", "disabled");
     }
 
-    updateButtonClass(buttonClass: string): void {
-        if (this._lastButtonClass != null) {
-            this._buttonElement.removeClass("btn-" + this._lastButtonClass);
-        }
-
-        this._buttonElement.addClass("btn-" + buttonClass);
-        this._lastButtonClass = buttonClass;
+    if (!disabled && isDisabled) {
+      this._buttonElement.removeAttr("disabled");
     }
-
-    updateButtonActive(active: boolean): void {
-        const isActive = this._buttonElement.hasClass("active");
-
-        if (active && !isActive) {
-            this._buttonElement.addClass("active");
-        }
-
-        if (!active && isActive) {
-            this._buttonElement.removeClass("active");
-        }
-    }
-
-    updateButtonDisabled(disabled: boolean): void {
-        const isDisabled = this._buttonElement.attr("disabled") == "disabled";
-
-        if (disabled && !isDisabled) {
-            this._buttonElement.attr("disabled", "disabled");
-        }
-
-        if (!disabled && isDisabled) {
-            this._buttonElement.removeAttr("disabled");
-        }
-    }
+  }
 
 
-    public getElement(): JQuery {
-        return this._buttonElement;
-    }
+  public getElement(): JQuery {
+    return this._buttonElement;
+  }
 }
 
 

@@ -17,85 +17,85 @@
  */
 
 
-import {MyCoReMap, VIEWER_COMPONENTS, ViewerFormatString} from "./Utils";
-import {MyCoReViewerSettings} from "./MyCoReViewerSettings";
-import {ViewerComponent} from "./components/ViewerComponent";
-import {ViewerEvent} from "./widgets/events/ViewerEvent";
-import {WaitForEvent} from "./components/events/WaitForEvent";
+import { MyCoReMap, VIEWER_COMPONENTS, ViewerFormatString } from "./Utils";
+import { MyCoReViewerSettings } from "./MyCoReViewerSettings";
+import { ViewerComponent } from "./components/ViewerComponent";
+import { ViewerEvent } from "./widgets/events/ViewerEvent";
+import { WaitForEvent } from "./components/events/WaitForEvent";
 
 
 export class MyCoReViewer {
 
-    constructor(private _container: JQuery, private _settings: MyCoReViewerSettings) {
-        this._eventHandlerMap = new MyCoReMap<string, Array<ViewerComponent>>();
-        this._components = new Array<ViewerComponent>();
-        this._initializingEvents = new Array<ViewerEvent>();
+  constructor(private _container: JQuery, private _settings: MyCoReViewerSettings) {
+    this._eventHandlerMap = new MyCoReMap<string, Array<ViewerComponent>>();
+    this._components = new Array<ViewerComponent>();
+    this._initializingEvents = new Array<ViewerEvent>();
 
-        this.initialize();
-    }
+    this.initialize();
+  }
 
 
-    private _eventHandlerMap: MyCoReMap<string, Array<ViewerComponent>>;
-    private _initializing: boolean = false;
-    private _initializingEvents: Array<ViewerEvent>;
-    private _components: Array<ViewerComponent>;
+  private _eventHandlerMap: MyCoReMap<string, Array<ViewerComponent>>;
+  private _initializing: boolean = false;
+  private _initializingEvents: Array<ViewerEvent>;
+  private _components: Array<ViewerComponent>;
 
-    public get container() {
-        return this._container;
-    }
+  public get container() {
+    return this._container;
+  }
 
-    public addComponent(ic: ViewerComponent) {
-        ic.bind((event: ViewerEvent) => {
-            this.eventTriggered(event);
-        });
+  public addComponent(ic: ViewerComponent) {
+    ic.bind((event: ViewerEvent) => {
+      this.eventTriggered(event);
+    });
 
-        const events = ic.handlesEvents;
+    const events = ic.handlesEvents;
 
-        if (typeof events != "undefined" && events != null && events instanceof Array) {
-            events.push(WaitForEvent.TYPE)
+    if (typeof events != "undefined" && events != null && events instanceof Array) {
+      events.push(WaitForEvent.TYPE)
 
-            for (const eIndex in events) {
-                const e = events[eIndex];
-                // initialize the array for the event first
-                if (!this._eventHandlerMap.has(e)) {
-                    this._eventHandlerMap.set(e, new Array<ViewerComponent>());
-                }
-
-                this._eventHandlerMap.get(e).push(ic);
-            }
-        } else {
-            console.log(ViewerFormatString("The component {comp} doesnt have a valid handlesEvents!", {comp: ic}))
+      for (const eIndex in events) {
+        const e = events[eIndex];
+        // initialize the array for the event first
+        if (!this._eventHandlerMap.has(e)) {
+          this._eventHandlerMap.set(e, new Array<ViewerComponent>());
         }
 
-        this._components.push(ic);
-        ic.init();
+        this._eventHandlerMap.get(e).push(ic);
+      }
+    } else {
+      console.log(ViewerFormatString("The component {comp} doesnt have a valid handlesEvents!", { comp: ic }))
     }
 
-    private eventTriggered(e: ViewerEvent) {
-        if (this._eventHandlerMap.has(e.type)) {
-            const handlers = this._eventHandlerMap.get(e.type);
-            for (const component of handlers) {
-                component._handle(e);
-            }
-        }
+    this._components.push(ic);
+    ic.init();
+  }
+
+  private eventTriggered(e: ViewerEvent) {
+    if (this._eventHandlerMap.has(e.type)) {
+      const handlers = this._eventHandlerMap.get(e.type);
+      for (const component of handlers) {
+        component._handle(e);
+      }
+    }
+  }
+
+  private initialize(): void {
+    this._settings = MyCoReViewerSettings.normalize(this._settings);
+    if (!this._container.hasClass("mycoreViewer")) {
+      this._container.addClass("mycoreViewer");
     }
 
-    private initialize(): void {
-        this._settings = MyCoReViewerSettings.normalize(this._settings);
-        if (!this._container.hasClass("mycoreViewer")) {
-            this._container.addClass("mycoreViewer");
-        }
-
-        for (const ic of VIEWER_COMPONENTS) {
-            try {
-                this.addComponent(new ic(this._settings, this._container));
-            } catch (e) {
-                console.log("Unable to add component");
-                console.log(e);
-            }
-        }
-
+    for (const ic of VIEWER_COMPONENTS) {
+      try {
+        this.addComponent(new ic(this._settings, this._container));
+      } catch (e) {
+        console.log("Unable to add component");
+        console.log(e);
+      }
     }
+
+  }
 
 }
 

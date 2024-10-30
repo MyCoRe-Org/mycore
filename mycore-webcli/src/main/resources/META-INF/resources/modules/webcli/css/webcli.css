@@ -1,4 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
+
 html, body {
   font-family: 'Roboto', sans-serif;
   overflow: hidden;
@@ -29,14 +30,14 @@ html, body {
   border-radius: 0;
   border: 0;
   margin-left: 20px;
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
   color: #eceeef;
   background-color: #373a3c;
 }
 
 .navbar {
   border-radius: 0;
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
 .nav-item {
@@ -48,7 +49,7 @@ html, body {
   height: 100%;
 }
 
-div.web-cli-log{
+div.web-cli-log {
   height: calc(100% - 232px);
   overflow: auto;
   padding-right: 0;
@@ -56,7 +57,7 @@ div.web-cli-log{
   padding-top: 10px;
 }
 
-div.web-cli-log > pre{
+div.web-cli-log>pre {
   overflow: visible;
   margin-bottom: 0;
 }
@@ -66,7 +67,7 @@ div.web-cli-queue {
   padding-right: 0;
 }
 
-div.web-cli-queue > pre{
+div.web-cli-queue>pre {
   height: calc(100% - 232px);
   overflow: auto;
   padding-right: 0;
@@ -81,7 +82,6 @@ div.web-cli-queue > pre{
   padding-right: 15px;
   height: 100%;
 }*/
-
 .row {
   width: 100%;
   margin: 0;
@@ -100,7 +100,7 @@ div.web-cli-queue > pre{
   background-color: #fff;
 }
 
-.loader:before{
+.loader:before {
   display: block;
   position: absolute;
   content: "";
@@ -109,25 +109,25 @@ div.web-cli-queue > pre{
   height: 4px;
   background-color: #373a3c;
   -webkit-animation: loading 5s linear infinite;
-          animation: loading 5s linear infinite;
+  animation: loading 5s linear infinite;
 }
 
 @-webkit-keyframes loading {
-    from {left: -30%; width: 30%;}
-    50% {width: 30%;}
-    70% {width: 70%;}
-    80% {left: 50%;}
-    95% {left: 120%;}
-    to {left: 100%;}
+  from {left: -30%; width: 30%;}
+  50% {width: 30%;}
+  70% {width: 70%;}
+  80% {left: 50%;}
+  95% {left: 120%;}
+  to {left: 100%;}
 }
 
 @keyframes loading {
-    from {left: -30%; width: 30%;}
-    50% {width: 30%;}
-    70% {width: 70%;}
-    80% {left: 50%;}
-    95% {left: 120%;}
-    to {left: 100%;}
+  from {left: -30%; width: 30%;}
+  50% {width: 30%;}
+  70% {width: 70%;}
+  80% {left: 50%;}
+  95% {left: 120%;}
+  to {left: 100%;}
 }
 
 .loader-no-animation {
@@ -150,8 +150,13 @@ div.web-cli-queue > pre{
 }
 
 /*Override Bootstrap*/
-
-.nav-tabs .nav-item.active .nav-link, .nav-tabs .nav-item.active .nav-link:focus, .nav-tabs .nav-item.active .nav-link.hover, .nav-tabs .nav-item.open .nav-link, .nav-tabs .nav-item.open .nav-link:focus, .nav-tabs .nav-item.open .nav-link:hover, .nav-tabs .nav-link:hover {
+.nav-tabs .nav-link:hover, 
+.nav-tabs .nav-item.active .nav-link,
+.nav-tabs .nav-item.open .nav-link,
+.nav-tabs .nav-item.active .nav-link:focus,
+.nav-tabs .nav-item.open .nav-link:focus,
+.nav-tabs .nav-item.active .nav-link.hover,
+.nav-tabs .nav-item.open .nav-link:hover {
   color: #373a3c;
   border-bottom: solid 2px #373a3c;
 }
@@ -165,7 +170,7 @@ div.web-cli-queue > pre{
   color: #999999;
 }
 
-.nav-tabs .nav-item + .nav-item {
+.nav-tabs .nav-item+.nav-item {
   margin: 0;
 }
 
@@ -174,73 +179,72 @@ div.web-cli-queue > pre{
 }
 
 .bg-inverse label {
-  color: rgba(255,255,255,.5);
+  color: rgba(255, 255, 255, .5);
 }
 
 /*multiDropDown*/
-
 div.dropdown-menu {
-    max-height: 90vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+  max-height: 90vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .dropdown-submenu>.dropdown-menu {
-    top: 0;
-    left:0;
-    margin-top: -6px;
-    margin-left: -1px;
-    -webkit-border-radius: 0 6px 6px 6px;
-    -moz-border-radius: 0 6px 6px;
-    border-radius: 0 6px 6px 6px;
-    overflow-x: auto;
-    position: fixed;
+  top: 0;
+  left: 0;
+  margin-top: -6px;
+  margin-left: -1px;
+  -webkit-border-radius: 0 6px 6px 6px;
+  -moz-border-radius: 0 6px 6px;
+  border-radius: 0 6px 6px 6px;
+  overflow-x: auto;
+  position: fixed;
 }
 
 .dropdown-submenu:hover>.dropdown-menu {
-    display: block;
+  display: block;
 }
 
 .dropdown-submenu>a:after {
-    display: block;
-    content: " ";
-    float: right;
-    width: 0;
-    height: 0;
-    border-color: transparent;
-    border-style: solid;
-    border-width: 5px 0 5px 5px;
-    border-left-color: #ccc;
-    margin-top: 5px;
-    margin-right: -10px;
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #ccc;
+  margin-top: 5px;
+  margin-right: -10px;
 }
 
 .dropdown-submenu:hover>a:after {
-    border-left-color: #fff;
+  border-left-color: #fff;
 }
 
 .dropdown-submenu.pull-left {
-    float: none;
+  float: none;
 }
 
 .dropdown-submenu.pull-left>.dropdown-menu {
-    left: -100%;
-    margin-left: 10px;
-    -webkit-border-radius: 6px 0 6px 6px;
-    -moz-border-radius: 6px 0 6px 6px;
-    border-radius: 6px 0 6px 6px;
+  left: -100%;
+  margin-left: 10px;
+  -webkit-border-radius: 6px 0 6px 6px;
+  -moz-border-radius: 6px 0 6px 6px;
+  border-radius: 6px 0 6px 6px;
 }
 
 .comHistoryDeleteButton {
-    color: rgba(255,255,255,.5);
-    font-size: 20px;
-    cursor: pointer;
-    padding-top: 7px;
+  color: rgba(255, 255, 255, .5);
+  font-size: 20px;
+  cursor: pointer;
+  padding-top: 7px;
 }
 
 .comHistoryList {
-    height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-right: 10px;
+  height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 10px;
 }

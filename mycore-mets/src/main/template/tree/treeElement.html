@@ -7,18 +7,18 @@
      ng-drag="true"
      ng-drag-data="element">
 
-    <div class="tree-element">
-        <!-- Display folder icon -->
-        <div ng-if="treeCtrl.getChildrenCount(element)>0"
-              ng-cancel-drag
-              ng-click="treeCtrl.clickFolder(element, $event)"
-              class="tree-folder glyphicon glyphicon-triangle-{{treeCtrl.treeModel.getElementOpen(element)?'bottom':'right'}}"></div>
+  <div class="tree-element">
+      <!-- Display folder icon -->
+      <div ng-if="treeCtrl.getChildrenCount(element)>0"
+           ng-cancel-drag
+           ng-click="treeCtrl.clickFolder(element, $event)"
+           class="tree-folder glyphicon glyphicon-triangle-{{treeCtrl.treeModel.getElementOpen(element)?'bottom':'right'}}"></div>
 
-        <!-- Display placeholder instead of folder icon-->
-        <div ng-if="treeCtrl.getChildrenCount(element)==0" class="icon-placeholder"></div>
+      <!-- Display placeholder instead of folder icon-->
+      <div ng-if="treeCtrl.getChildrenCount(element)==0" class="icon-placeholder"></div>
 
-        <div class="element-content" ng-include="'tree/section.html'"/>
-    </div>
+      <div class="element-content" ng-include="'tree/section.html'"/>
+  </div>
 
 </div>
 

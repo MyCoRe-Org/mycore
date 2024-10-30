@@ -17,16 +17,16 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
 
 export class RequestPermalinkEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public callback: (permalink: string) => void) {
-        super(component, RequestPermalinkEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public callback: (permalink: string) => void) {
+    super(component, RequestPermalinkEvent.TYPE);
+  }
 
-    public static TYPE: string = "RequestPermalinkEvent";
+  public static TYPE: string = "RequestPermalinkEvent";
 
 }
 

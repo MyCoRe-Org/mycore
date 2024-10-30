@@ -19,19 +19,19 @@
 ///<reference path="ErrorModalModel.ts" />
 
 namespace org.mycore.mets.controller {
-    import I18nModel = org.mycore.mets.model.I18nModel;
+  import I18nModel = org.mycore.mets.model.I18nModel;
 
-    export class ErrorModalController {
-        public errorModel: org.mycore.mets.model.ErrorModalModel;
+  export class ErrorModalController {
+    public errorModel: org.mycore.mets.model.ErrorModalModel;
 
-        constructor($scope: any, private $modalInstance: any, public i18nModel: I18nModel) {
-            $scope.ctrl = this;
-            this.errorModel = $modalInstance.errorModel;
-        }
-
-        public okayClicked(event: JQueryMouseEventObject) {
-            this.$modalInstance.close({});
-        }
-
+    constructor($scope: any, private $modalInstance: any, public i18nModel: I18nModel) {
+      $scope.ctrl = this;
+      this.errorModel = $modalInstance.errorModel;
     }
+
+    public okayClicked(event: JQueryMouseEventObject) {
+      this.$modalInstance.close({});
+    }
+
+  }
 }

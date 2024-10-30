@@ -4,21 +4,25 @@
 * Overwrite some dojo css
 ****************************************/
 .classeditor .dijitSplitterCover {
-	/*by default on 3, but causes white overlay on dragging*/
-	z-index: 1 !important;
+  /*by default on 3, but causes white overlay on dragging*/
+  z-index: 1 !important;
 }
-.classeditor > .dijitContainer {
-	width: 100%;
-	height: 100%;
+
+.classeditor>.dijitContainer {
+  width: 100%;
+  height: 100%;
 }
+
 .claro .classeditor .dijitDialogCloseIcon {
-	height: 22px;
-	background-position: left;
+  height: 22px;
+  background-position: left;
 }
+
 .claro .classeditor .dijitDialogCloseIconHover {
-	height: 22px;
-	background-position: -21px center;
+  height: 22px;
+  background-position: -21px center;
 }
+
 .classeditor .dijitReset.fa {
   display: inline-block;
   font-family: FontAwesome;
@@ -33,276 +37,322 @@
 * Overwrite some bootstrap css
 ****************************************/
 .classeditor *, *:before, *:after {
-	-webkit-box-sizing: content-box;
-	-moz-box-sizing: content-box;
-	box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
 
 /****************************************
 * general settings
 ****************************************/
-
 #classificationEditorWrapper {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .classeditor .align-right {
-	float: right !important;
+  float: right !important;
 }
+
 .classeditor .align-left {
-	float: left !important;
+  float: left !important;
 }
 
 .classeditorDialog {
-	width: 1120px;
+  width: 1120px;
 }
+
 .classeditorDialog .dijitDialogPaneContent {
-	padding: 0;
+  padding: 0;
 }
 
 .claro .dijitDialogUnderlay {
-	background-color: black;
+  background-color: black;
 }
 
 .classeditor.mainDialog {
-	height: 700px;
-	background-color: white;
-	width: 100%;
+  height: 700px;
+  background-color: white;
+  width: 100%;
 }
 
 .classeditor.dijitContentPane {
-	padding: 0;
+  padding: 0;
 }
 
 .classeditor .treeContentPane {
-	width: 30%;
+  width: 30%;
 }
 
-.classeditor .treePane > .dijitContainer {
-	width: 100%;
-	height: 100%;
-	position: relative;
+.classeditor .treePane>.dijitContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
-.classeditor .treePane > .dijitContainer > .dijitContentPane {
-	padding: 0;
+.classeditor .treePane>.dijitContainer>.dijitContentPane {
+  padding: 0;
 }
 
-.classeditor .treePane > .dijitContainer > .dijitToolbar {
-	border: 1px solid #cccccc;
-	margin-top: 5px;
+.classeditor .treePane>.dijitContainer>.dijitToolbar {
+  border: 1px solid #cccccc;
+  margin-top: 5px;
 }
 
 .classeditor .categoryEditorMainTable {
-	padding: 5px;
-	width: 100%;
+  padding: 5px;
+  width: 100%;
 }
 
 .classeditor .categoryEditorMainTable .dijitTextBox {
-	width: 98%;
+  width: 98%;
 }
 
 .classeditor .categoryEditorMainTable .dijitTextArea {
-	/*it's odd, the textarea does not inherit from .classeditor*/
-    font-family: inherit;
-    font-size: inherit;
+  /*it's odd, the textarea does not inherit from .classeditor*/
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .classeditor .categoryEditorMainTable .dijitSelect {
-	width: 98%;
+  width: 98%;
 }
+
 .classeditor .categoryEditorMainTable .dijitSelect .dijitButtonContents {
-	width: 100%;
+  width: 100%;
 }
 
 .classeditor .categoryEditorDescription {
-	padding-top: 4px;
-	width: 100px;
-	vertical-align: top;
-	text-align: left;
-	font-weight: bold;
+  padding-top: 4px;
+  width: 100px;
+  vertical-align: top;
+  text-align: left;
+  font-weight: bold;
 }
 
 .classeditor .mycoreRepeater .i18nRow .language {
-	padding-top: 2px;
+  padding-top: 2px;
 }
+
 .classeditor .mycoreRepeater .plain-icon {
-	color: black;
+  color: black;
 }
+
 .classeditor .labelEditorTable {
-	text-align: center;
-	width: 100%;
+  text-align: center;
+  width: 100%;
 }
 
 .classeditor .labelEditorTable th {
-	font-weight: normal;
+  font-weight: normal;
 }
+
 .classeditor .labelEditorTable td {
-	vertical-align: top;
+  vertical-align: top;
 }
+
 .classeditor .labelEditorTable .button {
-	text-align: right;
-	width: 32px;
+  text-align: right;
+  width: 32px;
 }
 /*******************************************************
 * Dialogs
 ********************************************************/
 .classeditor .dijitDialogTitleBar .dijitDialogTitle:before {
-    background-image: url("../img/sprites_16.png");
-    background-repeat: no-repeat;
-    content: "";
-    height: 16px;
-    left: 9px;
-    position: absolute;
-    top: 7px;
-    width: 16px;
+  background-image: url("../img/sprites_16.png");
+  background-repeat: no-repeat;
+  content: "";
+  height: 16px;
+  left: 9px;
+  position: absolute;
+  top: 7px;
+  width: 16px;
 }
+
 .classeditor.settingsDialog {
-	width: 450px;
+  width: 450px;
 }
+
 .classeditor.settingsDialog .dijitDialogTitle {
-    padding: 0 0 0 22px;
+  padding: 0 0 0 22px;
 }
+
 .classeditor.settingsDialog .dijitDialogTitle:before {
-    background-position: -240px 0;
+  background-position: -240px 0;
 }
+
 .classeditor.settingsDialog h1 {
-	font-size: 14px;
+  font-size: 14px;
 }
+
 .classeditor.settingsDialog .dijitTextBox {
-	width: 332px;
+  width: 332px;
 }
+
 .classeditor.settingsDialog label {
-	padding-left: 5px;
+  padding-left: 5px;
 }
+
 .confirmImportDialog {
-	width: 600px;
-	font-size: 110%;
+  width: 600px;
+  font-size: 110%;
 }
+
 .classeditor.exportDialog .dijitDialogTitle {
-    padding: 0 0 0 22px;
+  padding: 0 0 0 22px;
 }
+
 .classeditor.exportDialog .dijitDialogTitle:before {
-    background-position: -32px 0;
+  background-position: -32px 0;
 }
+
 .classeditor.exportDialog .content .classTextArea {
-	width: 600px;
-	height: 400px;
+  width: 600px;
+  height: 400px;
 }
+
 .classeditor.exportDialog .content .exportButton {
-	display: block;
+  display: block;
 }
 
 .classeditor.linkDialog .dijitDialogPaneContent {
-	width: 600px;
-	height: 500px;
+  width: 600px;
+  height: 500px;
 }
+
 .classeditor.linkDialog .dijitBorderContainer {
-	height: 100%;
+  height: 100%;
 }
+
 .classeditor.linkDialog .dijitDialogTitle:before {
-	height: 0;
+  height: 0;
 }
+
 .classeditor.linkDialog table {
-	width: 100%;
+  width: 100%;
 }
+
 .classeditor.linkDialog .infoPane {
-	text-align: center;
+  text-align: center;
 }
 
 /*******************************************************
 * Icons
 ********************************************************/
 .classeditor .toolbarFontButton {
-	font-size: 18px;
-	vertical-align: bottom;
+  font-size: 18px;
+  vertical-align: bottom;
 }
+
 .classeditor .dijitIcon {
-	color: #333;
+  color: #333;
 }
+
 .classeditor .dijitButtonDisabled .dijitIcon {
-	color: #AAA;
+  color: #AAA;
 }
 
 .classeditor .icon16 {
-	background-image: url(../img/sprites_16.png);
-	background-repeat: no-repeat;
-	width: 16px;
-	height: 16px;
+  background-image: url(../img/sprites_16.png);
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
 }
+
 .classeditor .icon22 {
-	background-image: url(../img/sprites_22.png);
-	background-repeat: no-repeat;
-	width: 22px;
-	height: 22px;
+  background-image: url(../img/sprites_22.png);
+  background-repeat: no-repeat;
+  width: 22px;
+  height: 22px;
 }
+
 .classeditor .addIcon {
-	background-position: 0 0;
+  background-position: 0 0;
 }
+
 .classeditor .addDisabledIcon {
-	background-position: -16px 0;
+  background-position: -16px 0;
 }
+
 .classeditor .exportClassIcon {
-	background-position: -32px 0;
+  background-position: -32px 0;
 }
+
 .classeditor .exportClassDisabledIcon {
-	background-position: -48px 0;
+  background-position: -48px 0;
 }
+
 .classeditor .folder {
-	background-position: -64px 0;
+  background-position: -64px 0;
 }
+
 .classeditor .fullscreenIcon {
-	background-position: -80px 0;
+  background-position: -80px 0;
 }
+
 .classeditor .fullscreenDisabledIcon {
-	background-position: -96px 0;
+  background-position: -96px 0;
 }
+
 .classeditor .minimizeIcon {
-	background-position: -112px 0;
+  background-position: -112px 0;
 }
+
 .classeditor .minimizeDisabledIcon {
-	background-position: -128px 0;
+  background-position: -128px 0;
 }
+
 .classeditor .refreshIcon {
-	background-position: -144px 0;
+  background-position: -144px 0;
 }
+
 .classeditor .refreshDisabledIcon {
-	background-position: -160px 0;
+  background-position: -160px 0;
 }
+
 .classeditor .removeIcon {
-	background-position: -176px 0;
+  background-position: -176px 0;
 }
+
 .classeditor .removeDisabledIcon {
-	background-position: -192px 0;
+  background-position: -192px 0;
 }
+
 .classeditor .saveIcon {
-	background-position: -208px 0;
+  background-position: -208px 0;
 }
+
 .classeditor .saveDisabledIcon {
-	background-position: -224px 0;
+  background-position: -224px 0;
 }
+
 .classeditor .settingsIcon {
-	background-position: -240px 0;
+  background-position: -240px 0;
 }
+
 .classeditor .settingsDisabledIcon {
-	background-position: -256px 0;
+  background-position: -256px 0;
 }
+
 .classeditor .root {
-	background-position: 0 0;
+  background-position: 0 0;
 }
+
 .classeditor .classification {
-	background-position: 0 0;
+  background-position: 0 0;
 }
+
 .classeditor .internalNode {
-	background-position: -22px 0;
+  background-position: -22px 0;
 }
+
 .classeditor .leafNode {
-	background-position: -44px 0;
+  background-position: -44px 0;
 }
+
 .classeditor .loading {
-	backgroundImage: url(../img/loading.gif);
-	backgroundPosition: center center;
-	backgroundRepeat: no-repeat;
-	height: 100%;
+  backgroundImage: url(../img/loading.gif);
+  backgroundPosition: center center;
+  backgroundRepeat: no-repeat;
+  height: 100%;
 }

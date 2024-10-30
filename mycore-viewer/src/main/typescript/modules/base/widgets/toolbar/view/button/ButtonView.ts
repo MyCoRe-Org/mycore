@@ -18,19 +18,19 @@
 
 
 export interface ButtonView {
-    updateButtonLabel(label: string): void;
+  updateButtonLabel(label: string): void;
 
-    updateButtonTooltip(tooltip: string): void;
+  updateButtonTooltip(tooltip: string): void;
 
-    updateButtonIcon(icon: string): void;
+  updateButtonIcon(icon: string): void;
 
-    updateButtonClass(buttonClass: string): void;
+  updateButtonClass(buttonClass: string): void;
 
-    updateButtonActive(active: boolean): void;
+  updateButtonActive(active: boolean): void;
 
-    updateButtonDisabled(disabled: boolean): void;
+  updateButtonDisabled(disabled: boolean): void;
 
-    getElement(): JQuery;
+  getElement(): JQuery;
 }
 
 

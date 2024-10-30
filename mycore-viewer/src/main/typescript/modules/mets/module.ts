@@ -16,13 +16,13 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReMetsComponent} from "./components/MyCoReMetsComponent";
-import {MyCoReAltoModelProvider} from "./components/MyCoReAltoModelProvider";
-import {MyCoReMetsPageProviderComponent} from "./components/MyCoReMetsPageProviderComponent";
-import {MyCoRePrintComponent} from "./components/MyCoRePrintComponent";
-import {MyCoReHighlightAltoComponent} from "./components/MyCoReHighlightAltoComponent";
-import {MyCoReAltoEditorComponent} from "./components/MyCoReAltoEditorComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReMetsComponent } from "./components/MyCoReMetsComponent";
+import { MyCoReAltoModelProvider } from "./components/MyCoReAltoModelProvider";
+import { MyCoReMetsPageProviderComponent } from "./components/MyCoReMetsPageProviderComponent";
+import { MyCoRePrintComponent } from "./components/MyCoRePrintComponent";
+import { MyCoReHighlightAltoComponent } from "./components/MyCoReHighlightAltoComponent";
+import { MyCoReAltoEditorComponent } from "./components/MyCoReAltoEditorComponent";
 
 addViewerComponent(MyCoReMetsComponent);
 addViewerComponent(MyCoReAltoModelProvider)

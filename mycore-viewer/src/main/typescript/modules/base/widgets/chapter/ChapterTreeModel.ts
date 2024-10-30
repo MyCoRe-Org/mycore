@@ -16,29 +16,29 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ChapterTreeChapter} from "./ChapterTreeChapter";
-import {MyCoReMap} from "../../Utils";
+import { ChapterTreeChapter } from "./ChapterTreeChapter";
+import { MyCoReMap } from "../../Utils";
 
 
 export class ChapterTreeModel {
 
-    constructor(public root: ChapterTreeChapter, public chapterLabelMap: MyCoReMap<string, string>) {
-        this.chapterVisible = new MyCoReMap<string, boolean>();
-        this.idElementMap = new MyCoReMap<string, ChapterTreeChapter>();
-        this.initChapter(this.root);
-        this.selected = null;
-    }
+  constructor(public root: ChapterTreeChapter, public chapterLabelMap: MyCoReMap<string, string>) {
+    this.chapterVisible = new MyCoReMap<string, boolean>();
+    this.idElementMap = new MyCoReMap<string, ChapterTreeChapter>();
+    this.initChapter(this.root);
+    this.selected = null;
+  }
 
-    private initChapter(chapter: ChapterTreeChapter): void {
-        this.idElementMap.set(chapter.id, chapter);
-        this.chapterVisible.set(chapter.id, true);
-        for (const current of chapter.chapter) {
-            this.initChapter(current);
-        }
+  private initChapter(chapter: ChapterTreeChapter): void {
+    this.idElementMap.set(chapter.id, chapter);
+    this.chapterVisible.set(chapter.id, true);
+    for (const current of chapter.chapter) {
+      this.initChapter(current);
     }
+  }
 
-    public chapterVisible: MyCoReMap<string, boolean>;
-    public idElementMap: MyCoReMap<string, ChapterTreeChapter>;
-    public selected: ChapterTreeChapter;
+  public chapterVisible: MyCoReMap<string, boolean>;
+  public idElementMap: MyCoReMap<string, ChapterTreeChapter>;
+  public selected: ChapterTreeChapter;
 }
 

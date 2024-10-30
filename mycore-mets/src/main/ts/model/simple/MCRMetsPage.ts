@@ -19,20 +19,20 @@
 ///<reference path="MCRMetsFile.ts"/>
 
 namespace org.mycore.mets.model.simple {
-    export class MCRMetsPage {
+  export class MCRMetsPage {
 
-        constructor(public id: string,
-                    public orderLabel: string,
-                    public contentIds: string,
-                    public hidden: boolean,
-                    public fileList: MCRMetsFile[] = []) {
-        }
-
-        public static copy(page: MCRMetsPage) {
-            return new MCRMetsPage(page.id, page.orderLabel, page.contentIds, page.hidden, page.fileList.slice()
-                .map((file: MCRMetsFile) => {
-                    return MCRMetsFile.copy(file);
-                }));
-        }
+    constructor(public id: string,
+      public orderLabel: string,
+      public contentIds: string,
+      public hidden: boolean,
+      public fileList: MCRMetsFile[] = []) {
     }
+
+    public static copy(page: MCRMetsPage) {
+      return new MCRMetsPage(page.id, page.orderLabel, page.contentIds, page.hidden, page.fileList.slice()
+        .map((file: MCRMetsFile) => {
+          return MCRMetsFile.copy(file);
+        }));
+    }
+  }
 }

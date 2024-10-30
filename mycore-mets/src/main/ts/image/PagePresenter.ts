@@ -21,32 +21,32 @@
 ///<reference path="../model/simple/MCRMetsFile.ts"/>
 
 namespace org.mycore.mets.controller {
-    import MCRMetsPage = org.mycore.mets.model.simple.MCRMetsPage;
-    import MetsEditorModel = org.mycore.mets.model.MetsEditorModel;
-    import MCRMetsFile = org.mycore.mets.model.simple.MCRMetsFile;
+  import MCRMetsPage = org.mycore.mets.model.simple.MCRMetsPage;
+  import MetsEditorModel = org.mycore.mets.model.MetsEditorModel;
+  import MCRMetsFile = org.mycore.mets.model.simple.MCRMetsFile;
 
-    export interface PagePresenter {
+  export interface PagePresenter {
 
+  }
+
+  export class DefaultPagePresenter implements PagePresenter {
+
+    public currentPage: MCRMetsPage = null;
+    private urlPattern: string = null;
+
+    public init(metsEditorModel: MetsEditorModel) {
+      this.urlPattern = metsEditorModel.configuration.imageLocationPattern.replace('{derivate}', metsEditorModel.metsId);
     }
 
-    export class DefaultPagePresenter implements PagePresenter {
-
-        public currentPage: MCRMetsPage = null;
-        private urlPattern: string = null;
-
-        public init(metsEditorModel: MetsEditorModel) {
-            this.urlPattern = metsEditorModel.configuration.imageLocationPattern.replace('{derivate}', metsEditorModel.metsId);
-        }
-
-        public getPreviewURL(fileList: MCRMetsFile[]) {
-            const href = fileList.filter((f) => f.use === 'MASTER')[ 0 ].href;
-            return this.urlPattern.replace('{image}', href).replace('{quality}', 'MID');
-        }
-
-        public getImageURL(fileList: MCRMetsFile[]) {
-            const href = fileList.filter((f) => f.use === 'MASTER')[ 0 ].href;
-            return this.urlPattern.replace('{image}', href).replace('{quality}', 'MAX');
-        }
+    public getPreviewURL(fileList: MCRMetsFile[]) {
+      const href = fileList.filter((f) => f.use === 'MASTER')[0].href;
+      return this.urlPattern.replace('{image}', href).replace('{quality}', 'MID');
     }
+
+    public getImageURL(fileList: MCRMetsFile[]) {
+      const href = fileList.filter((f) => f.use === 'MASTER')[0].href;
+      return this.urlPattern.replace('{image}', href).replace('{quality}', 'MAX');
+    }
+  }
 
 }

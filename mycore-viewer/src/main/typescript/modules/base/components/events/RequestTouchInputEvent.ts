@@ -17,15 +17,15 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {TouchInputListener} from "../../widgets/canvas/input/TouchInputListener";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { TouchInputListener } from "../../widgets/canvas/input/TouchInputListener";
 
 export class RequestTouchInputEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public listener: TouchInputListener) {
-        super(component, RequestTouchInputEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public listener: TouchInputListener) {
+    super(component, RequestTouchInputEvent.TYPE);
+  }
 
-    public static TYPE: string = "RequestTouchInputEvent";
+  public static TYPE: string = "RequestTouchInputEvent";
 }
 

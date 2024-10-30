@@ -17,7 +17,7 @@
  */
 
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReTEILayerProvider} from "./components/MyCoReTEILayerProvider";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReTEILayerProvider } from "./components/MyCoReTEILayerProvider";
 
 addViewerComponent(MyCoReTEILayerProvider);

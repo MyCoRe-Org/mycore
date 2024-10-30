@@ -16,46 +16,46 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Layer} from "../../components/model/Layer";
+import { Layer } from "../../components/model/Layer";
 
 
 export class LayerDisplayModel {
 
-    constructor() {
+  constructor() {
+  }
+
+  public onLayerAdd = Array<LayerCallback>();
+  public onLayerRemove = Array<LayerCallback>();
+  public currentPage: string = null;
+
+  public addLayer(layer: Layer) {
+    if (this.layerList.indexOf(layer) != -1) {
+      throw `the layer ${layer.getId()} is already in model!`;
     }
 
-    public onLayerAdd = Array<LayerCallback>();
-    public onLayerRemove = Array<LayerCallback>();
-    public currentPage: string = null;
+    this.layerList.push(layer);
+    this.onLayerAdd.forEach((callback) => callback(layer));
+  }
 
-    public addLayer(layer: Layer) {
-        if (this.layerList.indexOf(layer) != -1) {
-            throw `the layer ${layer.getId()} is already in model!`;
-        }
+  public removeLayer(layer: Layer) {
+    const layerIndex = this.layerList.indexOf(layer);
 
-        this.layerList.push(layer);
-        this.onLayerAdd.forEach((callback) => callback(layer));
+    if (layerIndex == -1) {
+      throw `the layer ${layer.getId()} is not present in model!`;
     }
 
-    public removeLayer(layer: Layer) {
-        const layerIndex = this.layerList.indexOf(layer);
+    this.layerList.splice(layerIndex, 1);
+    this.onLayerRemove.forEach((callback) => callback(layer));
+  }
 
-        if (layerIndex == -1) {
-            throw `the layer ${layer.getId()} is not present in model!`;
-        }
+  public getLayerList() {
+    return this.layerList.slice(0);
+  }
 
-        this.layerList.splice(layerIndex, 1);
-        this.onLayerRemove.forEach((callback) => callback(layer));
-    }
-
-    public getLayerList() {
-        return this.layerList.slice(0);
-    }
-
-    private layerList = new Array<Layer>();
+  private layerList = new Array<Layer>();
 }
 
 export interface LayerCallback {
-    (layer: Layer): void;
+  (layer: Layer): void;
 }
 
