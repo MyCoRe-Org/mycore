@@ -387,7 +387,7 @@ public class MCRUserServlet extends MCRServlet {
         LOGGER.info("create new user {} {}", userName, realmID);
 
         // For new local users, set password
-        if ((pwd != null) && (pwd.isBlank()) && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
+        if ((pwd != null) && !pwd.isBlank() && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
             MCRUserManager.setUserPassword(user, pwd);
         }
         return user;
@@ -549,7 +549,7 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     private void addString(Element parent, String name, String value) {
-        if (value != null && value.isBlank()) {
+        if (value != null && !value.isBlank()) {
             parent.addContent(new Element(name).setText(value.trim()));
         }
     }
