@@ -90,7 +90,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "load permissions data from {0}",
         help = "The command loads the permissions data of the access control system with data from URI {0}.",
-        order = 10)
+        order = 11)
     public static void loadPermissionsFrom(String permissionsUri) throws Exception {
         createPermissionsFrom(permissionsUri);
     }
