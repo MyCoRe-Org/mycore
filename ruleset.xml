@@ -8,11 +8,11 @@
   </description>
 
   <!-- ECMA Script Rules (Include entire ruleset) -->
-  <rule ref="category/ecmascript/codestyle.xml" />
+  <rule ref="category/ecmascript/codestyle.xml"/>
   <!-- XML Error Prone Rules (Include entire ruleset) -->
-  <rule ref="category/xml/errorprone.xml" />
+  <rule ref="category/xml/errorprone.xml"/>
   <!-- XSL Code Style Rules -->
-  <rule ref="category/xsl/codestyle.xml/UseConcatOnce" />
+  <rule ref="category/xsl/codestyle.xml/UseConcatOnce"/>
 
   <!-- Best Practices Rules -->
   <!-- TODO: Create PR to fix this rule -->
@@ -322,7 +322,7 @@
   <rule ref="category/java/errorprone.xml/MissingSerialVersionUID"/>
   -->
   <rule ref="category/java/errorprone.xml/MissingStaticMethodInNonInstantiatableClass"/>
-  <rule ref="category/java/errorprone.xml/MoreThanOneLogger" />
+  <rule ref="category/java/errorprone.xml/MoreThanOneLogger"/>
   <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitch"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
