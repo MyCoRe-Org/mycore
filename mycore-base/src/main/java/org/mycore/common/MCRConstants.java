@@ -119,6 +119,8 @@ public final class MCRConstants {
 
     public static final Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
+    public static final Namespace TEI_NAMESPACE = Namespace.getNamespace("tei", "http://www.tei-c.org/ns/1.0");
+
     private static final HashMap<String, Namespace> NAMESPACES_BY_PREFIX;
 
     static {

@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.mycore.tei.MCRTEIValidator;
 import org.xml.sax.SAXException;
 
+@Deprecated
 public class MCRTEIValidatorTest {
 
     @Test
