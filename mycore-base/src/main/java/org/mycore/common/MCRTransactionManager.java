@@ -82,7 +82,7 @@ import org.mycore.util.concurrent.MCRPool;
  * }
  * </pre>
  */
-public abstract class MCRTransactionManager {
+public final class MCRTransactionManager {
 
     private static TransactionLoader transactionLoader = new PooledSystemTransactionLoader();
 
@@ -91,6 +91,9 @@ public abstract class MCRTransactionManager {
 
     private static final ThreadLocal<List<MCRPersistenceTransaction>> ROLLBACK_ONLY_TRANSACTIONS =
         ThreadLocal.withInitial(ArrayList::new);
+
+    private MCRTransactionManager() {
+    }
 
     /**
      * Sets the {@link TransactionLoader} to be used by the {@link MCRTransactionManager}.

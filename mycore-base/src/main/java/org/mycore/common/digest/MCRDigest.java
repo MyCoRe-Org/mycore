@@ -102,7 +102,7 @@ public abstract class MCRDigest {
     /**
      * Digest Algorithm
      */
-    public static abstract class Algorithm {
+    public static class Algorithm {
 
         final String name;
 

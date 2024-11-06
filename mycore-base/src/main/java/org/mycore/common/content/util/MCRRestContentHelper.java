@@ -45,12 +45,15 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 /**
  * @author Thomas Scheffler (yagee)
  */
-public abstract class MCRRestContentHelper {
+public final class MCRRestContentHelper {
 
     public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(Date.class);
 
     private static Logger LOGGER = LogManager.getLogger();
+
+    private MCRRestContentHelper() {
+    }
 
     public static Response serveContent(final MCRContent content, final UriInfo uriInfo,
         final HttpHeaders requestHeader, List<Map.Entry<String, String>> responseHeader)
