@@ -51,16 +51,19 @@ import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Some solr search utils.
- * 
+ *
  * @author Matthias Eichner
  */
-public abstract class MCRSolrSearchUtils {
+public final class MCRSolrSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
+    private MCRSolrSearchUtils() {
+    }
+
     /**
      * Returns the first document.
-     * 
+     *
      * @param solrClient solr server connection
      * @param query solr query
      * @return first solr document or null
@@ -117,7 +120,7 @@ public abstract class MCRSolrSearchUtils {
     /**
      * Returns a list of ids found by the given query. Returns an empty list
      * when nothing is found.
-     * 
+     *
      * @param solrClient solr server connection
      * @param query solr query
      * @return list of id's
@@ -131,7 +134,7 @@ public abstract class MCRSolrSearchUtils {
 
     /**
      * Creates a stream of SolrDocument's.
-     * 
+     *
      * @param solrClient the client to query
      * @param params solr parameter
      * @return stream of solr documents

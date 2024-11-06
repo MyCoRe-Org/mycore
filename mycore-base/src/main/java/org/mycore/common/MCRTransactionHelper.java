@@ -23,7 +23,10 @@ package org.mycore.common;
  * Use {@link MCRTransactionManager} instead.
  */
 @Deprecated
-public abstract class MCRTransactionHelper {
+public final class MCRTransactionHelper {
+
+    private MCRTransactionHelper() {
+    }
 
     /**
      * commits the database transaction. Commit is only done if {@link #isTransactionActive()} returns true.

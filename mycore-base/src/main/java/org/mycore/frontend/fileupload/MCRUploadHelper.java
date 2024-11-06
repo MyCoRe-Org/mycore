@@ -62,11 +62,11 @@ import jakarta.persistence.EntityTransaction;
 
 /**
  * Common helper class for all services handling file upload.
- * 
+ *
  * @author Frank Lützenkirchen
- * 
+ *
  */
-public abstract class MCRUploadHelper {
+public final class MCRUploadHelper {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRUploadHelper.class);
 
@@ -94,6 +94,9 @@ public abstract class MCRUploadHelper {
         "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "con", "nul", "prn", "aux" };
 
     private static final int SAVE_LENGTH = Stream.of(RESERVED_NAMES).mapToInt(String::length).max().getAsInt();
+
+    private MCRUploadHelper() {
+    }
 
     /**
      * checks if path contains reserved URI characters or path starts or ends with whitespace. There are some characters

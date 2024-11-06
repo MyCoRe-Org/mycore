@@ -39,7 +39,10 @@ import org.mycore.util.concurrent.MCRRunnableComperator;
  *
  * @author Matthias Eichner
  */
-public abstract class MCRProcessableFactory {
+public final class MCRProcessableFactory {
+
+    private MCRProcessableFactory() {
+    }
 
     /**
      * Returns a {@link Callable} object that, when

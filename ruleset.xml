@@ -15,10 +15,7 @@
   <rule ref="category/xsl/codestyle.xml/UseConcatOnce"/>
 
   <!-- Best Practices Rules -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/AbstractClassWithoutAbstractMethod"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/bestpractices.xml/ArrayIsStoredDirectly"/>

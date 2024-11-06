@@ -42,7 +42,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  *
  * @author Matthias Eichner
  */
-public abstract class MCRMETSGeneratorFactory {
+public final class MCRMETSGeneratorFactory {
 
     private static MCRMETSGeneratorSelector GENERATOR_SELECTOR;
 
@@ -64,6 +64,9 @@ public abstract class MCRMETSGeneratorFactory {
                     + " Using default MCRMETSPropertyGeneratorSelector.",
                 cause);
         }
+    }
+
+    private MCRMETSGeneratorFactory() {
     }
 
     /**
