@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl;
 
+import java.io.IOException;
+
 import org.mycore.common.MCRTestCase;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
@@ -25,10 +27,8 @@ public class MCROCFLTestCase extends MCRTestCase {
 
     protected MCROCFLRepository repository;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        this.repository = MCROCFLTestCaseHelper.setUp();
+    public void setUpRepository(boolean remote) throws IOException {
+        this.repository = MCROCFLTestCaseHelper.setUp(remote);
     }
 
     @Override
