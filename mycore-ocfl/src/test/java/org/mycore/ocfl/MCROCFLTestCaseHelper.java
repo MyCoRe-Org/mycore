@@ -30,19 +30,26 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.SizeDigestAlgorithm;
 import io.ocfl.api.model.VersionInfo;
+import io.ocfl.core.OcflRepositoryBuilder;
 
 public abstract class MCROCFLTestCaseHelper {
 
-    public static MCROCFLRepository setUp() throws IOException {
+    public static MCROCFLRepository setUp(boolean remote) throws IOException {
         String repositoryId = MCRConfiguration2.getString("MCR.Content.Manager.Repository").orElseThrow();
         MCROCFLRepositoryProvider repositoryProvider = MCROCFLRepositoryProvider.getProvider(repositoryId);
-        repositoryProvider.init(MCROCFLRepositoryProvider.REPOSITORY_PROPERTY_PREFIX + repositoryId);
+        if (!(repositoryProvider instanceof RepositoryProviderMock repositoryProviderMock)) {
+            throw new MCROCFLException("Invalid provider. Should be RepositoryProviderMock, but is "
+                + repositoryProvider.getClass().getSimpleName());
+        }
+        repositoryProviderMock.setRemote(remote);
+        repositoryProviderMock.init(MCROCFLRepositoryProvider.REPOSITORY_PROPERTY_PREFIX + repositoryId);
         return repositoryProvider.getRepository();
     }
 
@@ -72,6 +79,20 @@ public abstract class MCROCFLTestCaseHelper {
         final Path sourcePath = Path.of(derivateURL.toURI());
         final MCRVersionedPath targetPath = MCRVersionedPath.head(derivateId, "/");
         Files.walkFileTree(sourcePath, new CopyFileVisitor(targetPath));
+    }
+
+    public static class RepositoryProviderMock extends MCROCFLHashRepositoryProvider {
+
+        private boolean remote;
+
+        public void setRemote(boolean remote) {
+            this.remote = remote;
+        }
+
+        protected MCROCFLRepository createRepository(String id, OcflRepositoryBuilder builder) {
+            return new MCROCFLRepository(id, builder.build(), this.remote);
+        }
+
     }
 
     private static class CopyFileVisitor extends SimpleFileVisitor<Path> {
