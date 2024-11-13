@@ -44,6 +44,7 @@ public class MCROCFLReadableByteChannelTest extends MCROCFLTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        this.setUpRepository(false);
         ObjectVersionId channelTestId = MCROCFLTestCaseHelper.writeFile(repository, "channelTest", "file", TEST_DATA);
         OcflObjectVersion channelTest = repository.getObject(channelTestId);
         channel = new MCROCFLReadableByteChannel(channelTest.getFile("file"));

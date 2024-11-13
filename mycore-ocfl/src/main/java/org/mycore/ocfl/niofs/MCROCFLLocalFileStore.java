@@ -18,17 +18,19 @@
 
 package org.mycore.ocfl.niofs;
 
-import org.mycore.common.MCRException;
-import org.mycore.datamodel.niofs.MCRAbstractFileStore;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.datamodel.niofs.MCRVersionedPath;
-
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
+
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.niofs.MCRAbstractFileStore;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.MCROCFLException;
+import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
 
 /**
  * A local file store implementation for the OCFL file system.
@@ -86,8 +88,7 @@ public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
     public long getTotalSpace() throws IOException {
         return Math.max(
             repositoryFileStore().getTotalSpace(),
-            localStorageFileStore().getTotalSpace()
-        );
+            localStorageFileStore().getTotalSpace());
     }
 
     /**
@@ -97,8 +98,7 @@ public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
     public long getUsableSpace() throws IOException {
         return Math.max(
             repositoryFileStore().getUsableSpace(),
-            localStorageFileStore().getUsableSpace()
-        );
+            localStorageFileStore().getUsableSpace());
     }
 
     /**
@@ -108,8 +108,7 @@ public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
     public long getUnallocatedSpace() throws IOException {
         return Math.max(
             repositoryFileStore().getUnallocatedSpace(),
-            localStorageFileStore().getUnallocatedSpace()
-        );
+            localStorageFileStore().getUnallocatedSpace());
     }
 
     /**
@@ -179,7 +178,12 @@ public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
      * @throws IOException if an I/O error occurs.
      */
     private FileStore repositoryFileStore() throws IOException {
-        return Files.getFileStore(this.fileSystemProvider.getRepositoryProvider().getRepositoryRoot());
+        if (this.fileSystemProvider
+            .getRepositoryProvider() instanceof MCROCFLLocalRepositoryProvider localRepositoryProvider) {
+            return Files.getFileStore(localRepositoryProvider.getRepositoryRoot());
+        }
+        throw new MCROCFLException("Excepted instance of MCROCFLLocalRepositoryProvider, but got "
+            + this.fileSystemProvider.getRepositoryProvider().getClass().getSimpleName());
     }
 
     /**

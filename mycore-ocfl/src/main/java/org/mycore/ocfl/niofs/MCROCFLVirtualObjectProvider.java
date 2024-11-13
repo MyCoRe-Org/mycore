@@ -60,20 +60,16 @@ public class MCROCFLVirtualObjectProvider {
 
     private final MCROCFLTransactionalTempFileStorage localStorage;
 
-    private final boolean remote;
-
     /**
      * Constructs a new {@code MCROCFLVirtualObjectProvider}.
      *
      * @param repository the OCFL repository.
      * @param localStorage the local temporary file storage.
-     * @param remote whether the provider handles remote storage.
      */
     public MCROCFLVirtualObjectProvider(MCROCFLRepository repository,
-        MCROCFLTransactionalTempFileStorage localStorage, boolean remote) {
+        MCROCFLTransactionalTempFileStorage localStorage) {
         this.repository = repository;
         this.localStorage = localStorage;
-        this.remote = remote;
         this.readMap = new ConcurrentHashMap<>();
         this.readQueue = new ConcurrentLinkedDeque<>();
         this.writeMap = new ConcurrentHashMap<>();
@@ -166,7 +162,7 @@ public class MCROCFLVirtualObjectProvider {
                     MCROCFLVirtualObject readableVirtualObject = getOrCreateReadable(id);
                     return readableVirtualObject.deepClone(false);
                 } catch (NotFoundException ignore) {
-                    return remote ? new MCROCFLRemoteVirtualObject(repository, id, localStorage, false)
+                    return repository.isRemote() ? new MCROCFLRemoteVirtualObject(repository, id, localStorage, false)
                         : new MCROCFLLocalVirtualObject(repository, id, localStorage, false);
                 }
             });
@@ -198,15 +194,6 @@ public class MCROCFLVirtualObjectProvider {
         return object.getFiles().stream()
             .map(OcflObjectVersionFile::getPath)
             .anyMatch(path -> path.startsWith(MCROCFLVirtualObject.FILES_DIRECTORY));
-    }
-
-    /**
-     * Returns whether this provider handles a remote OCFL repository.
-     *
-     * @return {@code true} if the provider handles a remote OCFL repository, {@code false} otherwise.
-     */
-    public boolean isRemote() {
-        return remote;
     }
 
     /**
@@ -265,7 +252,7 @@ public class MCROCFLVirtualObjectProvider {
         return this.readMap.computeIfAbsent(id, (key) -> {
             updateReadCache(id);
             OcflObjectVersion object = repository.getObject(id);
-            return remote ? new MCROCFLRemoteVirtualObject(repository, object, localStorage, true)
+            return repository.isRemote() ? new MCROCFLRemoteVirtualObject(repository, object, localStorage, true)
                 : new MCROCFLLocalVirtualObject(repository, object, localStorage, true);
         });
     }
