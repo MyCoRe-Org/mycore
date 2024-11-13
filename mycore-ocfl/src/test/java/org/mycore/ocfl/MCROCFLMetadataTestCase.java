@@ -38,7 +38,7 @@ public abstract class MCROCFLMetadataTestCase extends MCRJPATestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        this.repository = MCROCFLTestCaseHelper.setUp();
+        this.repository = MCROCFLTestCaseHelper.setUp(false);
     }
 
     @Override
@@ -54,15 +54,14 @@ public abstract class MCROCFLMetadataTestCase extends MCRJPATestCase {
         // set jpa mappings, only use mycore-base
         testProperties.put("MCR.JPA.MappingFileNames", "META-INF/mycore-base-mappings.xml");
         // use ocfl metadata
-        testProperties.put("MCR.Metadata.Manager.Repository", "Test");
-        testProperties.put("MCR.Metadata.Manager.Class", "org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager");
+        testProperties.put("MCR.Metadata.Manager.Repository","Test");
+        testProperties.put("MCR.Metadata.Manager.Class","org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager");
         testProperties.put("MCR.Metadata.Type.object", "true");
         testProperties.put("MCR.Metadata.Type.derivate", "true");
         // set free access
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         testProperties.put("MCR.Access.Strategy.Class", AlwaysTrueStrategy.class.getName());
-        // set remote to false -> change later!
-        testProperties.put("MCR.OCFL.Repository.Test.FS.Remote", "false");
+
         return testProperties;
     }
 
