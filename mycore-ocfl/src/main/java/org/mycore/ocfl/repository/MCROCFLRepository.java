@@ -57,6 +57,8 @@ public class MCROCFLRepository implements OcflRepository {
 
     private final OcflRepository base;
 
+    private final boolean remote;
+
     private final PercentEscaper percentEscaper;
 
     /**
@@ -64,10 +66,12 @@ public class MCROCFLRepository implements OcflRepository {
      *
      * @param id the unique identifier for the repository.
      * @param repository the base OCFL repository to delegate operations to.
+     * @param remote if this is a remote or local repository
      */
-    public MCROCFLRepository(String id, OcflRepository repository) {
+    public MCROCFLRepository(String id, OcflRepository repository, boolean remote) {
         this.id = id;
         this.base = repository;
+        this.remote = remote;
         this.percentEscaper = PercentEscaper.builderWithSafeAlphaNumeric()
             .addSafeChars("-_")
             .plusForSpace(false)
@@ -190,7 +194,7 @@ public class MCROCFLRepository implements OcflRepository {
      * Retrieves the complete directory change history for a logical path within an object. Each entry in the change
      * history marks a directory version where the contents at the logical path were changed or the logical path was
      * removed.
-     * Object versions where there were no changes to the logical path are not included.
+     * Object versions without changes to the logical path are not included.
      * 
      * @param objectId  the id of the object
      * @param logicalPath the logical path
@@ -367,6 +371,10 @@ public class MCROCFLRepository implements OcflRepository {
     @Override
     public void invalidateCache() {
         base.invalidateCache();
+    }
+
+    public boolean isRemote() {
+        return remote;
     }
 
 }

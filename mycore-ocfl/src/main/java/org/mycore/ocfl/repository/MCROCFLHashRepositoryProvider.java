@@ -21,22 +21,16 @@ package org.mycore.ocfl.repository;
 import io.ocfl.api.OcflRepository;
 import io.ocfl.core.extension.OcflExtensionConfig;
 import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
-import io.ocfl.core.storage.OcflStorageBuilder;
 import jakarta.inject.Singleton;
 
 /**
  * Simple way to provide a {@link OcflRepository}
  */
 @Singleton
-public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
+public class MCROCFLHashRepositoryProvider extends MCROCFLLocalRepositoryProvider {
 
     public OcflExtensionConfig getExtensionConfig() {
         return new HashedNTupleIdEncapsulationLayoutConfig();
-    }
-
-    @Override
-    public OcflStorageBuilder getStorage(OcflStorageBuilder storageBuilder) {
-        return storageBuilder.fileSystem(repositoryRoot);
     }
 
 }
