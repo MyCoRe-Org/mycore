@@ -854,7 +854,8 @@ public abstract class MCROCFLVirtualObject {
         String type = this.objectVersion == null ? MESSAGE_CREATED : MESSAGE_UPDATED;
         AtomicBoolean updatedFiles = new AtomicBoolean(false);
         AtomicBoolean updatedDirectories = new AtomicBoolean(false);
-        // TODO property?
+        // TODO: This should be removed when the metadata is also included in the transaction system!
+        // TODO: we should not always write to head instead we should not accept new versions if a newer one exists.
         boolean alwaysWriteToHead = true;
         ObjectVersionId targetVersionId = alwaysWriteToHead ? ObjectVersionId.head(objectId) : objectVersionId;
         repository.updateObject(targetVersionId, new VersionInfo().setMessage(type), (updater) -> {
