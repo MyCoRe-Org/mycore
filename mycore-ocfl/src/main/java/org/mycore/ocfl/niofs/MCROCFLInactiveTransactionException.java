@@ -18,13 +18,13 @@
 
 package org.mycore.ocfl.niofs;
 
-import org.mycore.common.MCRException;
+import org.mycore.ocfl.MCROCFLException;
 
 /**
  * Exception thrown to indicate that an operation requires an active OCFL transaction, but no active transaction is
  * available.
  */
-public class MCROCFLInactiveTransactionException extends MCRException {
+public class MCROCFLInactiveTransactionException extends MCROCFLException {
 
     /**
      * Constructs a new {@code MCROCFLInactiveTransactionException} with the specified detail message.
