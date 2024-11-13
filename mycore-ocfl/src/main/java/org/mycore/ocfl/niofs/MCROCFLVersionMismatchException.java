@@ -20,6 +20,7 @@ package org.mycore.ocfl.niofs;
 
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.MCROCFLException;
 
 /**
  * This exception is thrown when there is a mismatch between the expected 
@@ -32,7 +33,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
  * @see MCRVersionedPath
  * @see MCRException
  */
-public class MCROCFLVersionMismatchException extends MCRException {
+public class MCROCFLVersionMismatchException extends MCROCFLException {
 
     /**
      * Constructs a new exception with the specified detail message.
