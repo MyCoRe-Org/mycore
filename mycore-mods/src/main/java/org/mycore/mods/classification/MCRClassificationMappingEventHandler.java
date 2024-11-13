@@ -97,6 +97,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             String label = labelOptional.get().getText();
             return Stream.of(label.split("\\s"))
                 .map(categIdString -> categIdString.split(":"))
+                .filter(categIdArr -> categIdArr != null && categIdArr.length > 1)
                 .map(categIdArr -> new MCRCategoryID(categIdArr[0], categIdArr[1]))
                 .filter(dao::exist)
                 .map(mappingTarget -> new AbstractMap.SimpleEntry<>(category.getId(), mappingTarget))
