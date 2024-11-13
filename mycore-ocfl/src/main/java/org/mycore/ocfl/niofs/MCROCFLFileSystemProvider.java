@@ -50,6 +50,7 @@ import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystemProvider;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
+import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -93,16 +94,12 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      */
     void init() throws IOException {
         try {
-            String configurationPrefix = getRepositoryProvider().getConfigurationPrefix();
-            String tempFileClassProperty = configurationPrefix + "FS.TempStorage";
+            String tempStorageProperty = "MCR.Content.TempStorage";
             this.localStorage = MCRConfiguration2
-                .getSingleInstanceOfOrThrow(MCROCFLTransactionalTempFileStorage.class, tempFileClassProperty);
+                .getSingleInstanceOfOrThrow(MCROCFLTransactionalTempFileStorage.class, tempStorageProperty);
             Files.createDirectories(this.localStorage.getRoot());
             this.localStorage.clearTransactional();
-            boolean remote = MCRConfiguration2.getBoolean(configurationPrefix + "FS.Remote")
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(configurationPrefix + "FS.Remote"));
-            this.virtualObjectProvider
-                = new MCROCFLVirtualObjectProvider(getRepository(), localStorage, remote);
+            this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), localStorage);
         } catch (Exception exception) {
             throw new IOException("Unable to create MCROCFLFileSystem.", exception);
         }
@@ -452,7 +449,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     /**
      * Returns the repository provider.
      *
-     * @return the {@link MCROCFLRepositoryProvider}.
+     * @return the {@link MCROCFLLocalRepositoryProvider}.
      */
     public MCROCFLRepositoryProvider getRepositoryProvider() {
         return MCROCFLRepositoryProvider.getProvider(getRepositoryId());

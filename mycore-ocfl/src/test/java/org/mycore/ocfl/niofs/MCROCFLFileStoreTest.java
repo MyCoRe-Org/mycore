@@ -1,12 +1,12 @@
 package org.mycore.ocfl.niofs;
 
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+
+import org.junit.Test;
 
 public class MCROCFLFileStoreTest extends MCROCFLNioTestCase {
 

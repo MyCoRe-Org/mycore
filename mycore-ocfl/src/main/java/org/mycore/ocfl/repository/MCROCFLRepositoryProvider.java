@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See https://www.mycore.de/ for details.
+ * See http://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,85 +18,67 @@
 
 package org.mycore.ocfl.repository;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
-
-import io.ocfl.api.OcflRepository;
-import io.ocfl.core.OcflRepositoryBuilder;
-import io.ocfl.core.extension.OcflExtensionConfig;
-import io.ocfl.core.storage.OcflStorageBuilder;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Base Class to provide a {@link OcflRepository}. A {@link MCROCFLRepositoryProvider} will be loaded from the property
- * <code>MCR.OCFL.Repository.%id%</code> and the Method getRepository will be executed.
+ * Provider interface for managing access to OCFL repositories.
+ * <p>
+ * This interface defines methods to obtain and configure {@link MCROCFLRepository} instances,
+ * enabling interaction with OCFL-compliant storage backends.
+ * </p>
+ * <p>
+ * The {@code MCROCFLRepositoryProvider} interface also offers static utility methods to retrieve
+ * repository providers based on unique repository identifiers, facilitating centralized access
+ * to different repositories configured within the application.
+ * </p>
+ *
+ * <h2>Configuration</h2>
+ * Each repository provider is associated with a configuration prefix, {@code REPOSITORY_PROPERTY_PREFIX},
+ * which defines the configuration path used to initialize specific repository instances within MyCoRe.
  */
-public abstract class MCROCFLRepositoryProvider {
+public interface MCROCFLRepositoryProvider {
 
-    public static final String REPOSITORY_PROPERTY_PREFIX = "MCR.OCFL.Repository.";
+    /**
+     * Configuration property prefix for OCFL repository settings.
+     */
+    String REPOSITORY_PROPERTY_PREFIX = "MCR.OCFL.Repository.";
 
-    protected Path repositoryRoot;
+    /**
+     * Retrieves an instance of {@link MCROCFLRepository} associated with this provider.
+     *
+     * @return the OCFL repository managed by this provider.
+     */
+    MCROCFLRepository getRepository();
 
-    protected Path workDir;
-
-    protected MCROCFLRepository repository;
-
-    @MCRPostConstruction
-    public void init(String prop) throws IOException {
-        Files.createDirectories(workDir);
-        Files.createDirectories(repositoryRoot);
-        OcflRepositoryBuilder builder = new OcflRepositoryBuilder()
-            .defaultLayoutConfig(getExtensionConfig())
-            .storage(this::getStorage)
-            .workDir(workDir);
-        String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
-        this.repository = new MCROCFLRepository(id, builder.build());
-    }
-
-    public MCROCFLRepository getRepository() {
-        return repository;
-    }
-
-    public Path getRepositoryRoot() {
-        return repositoryRoot;
-    }
-
-    public Path getWorkDir() {
-        return workDir;
-    }
-
-    @MCRProperty(name = "RepositoryRoot")
-    public MCROCFLRepositoryProvider setRepositoryRoot(String repositoryRoot) {
-        this.repositoryRoot = Paths.get(repositoryRoot);
-        return this;
-    }
-
-    @MCRProperty(name = "WorkDir")
-    public MCROCFLRepositoryProvider setWorkDir(String workDir) {
-        this.workDir = Paths.get(workDir);
-        return this;
-    }
-
-    public String getConfigurationPrefix() {
-        return REPOSITORY_PROPERTY_PREFIX + repository.getId() + ".";
-    }
-
-    public static MCROCFLRepository getRepository(String id) {
+    /**
+     * Returns the {@link MCROCFLRepository} associated with the specified repository ID.
+     * <p>
+     * This method retrieves the provider configured for the specified repository ID, then
+     * returns the OCFL repository instance managed by that provider.
+     * </p>
+     *
+     * @param id the unique identifier for the desired repository.
+     * @return the {@link MCROCFLRepository} instance associated with the given ID.
+     */
+    static MCROCFLRepository getRepository(String id) {
         return getProvider(id).getRepository();
     }
 
-    public static MCROCFLRepositoryProvider getProvider(String id) {
+    /**
+     * Retrieves the {@link MCROCFLRepositoryProvider} configured for the specified repository ID.
+     * <p>
+     * This method uses MyCoRe's configuration system to dynamically locate and return the provider
+     * instance matching the given repository ID.
+     * </p>
+     *
+     * @param id the unique identifier for the desired repository provider.
+     * @return the {@link MCROCFLRepositoryProvider} instance for the specified ID.
+     * @throws MCRConfigurationException if no provider is configured for the specified ID.
+     */
+    static MCROCFLRepositoryProvider getProvider(String id) {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCROCFLRepositoryProvider.class, REPOSITORY_PROPERTY_PREFIX + id);
+            MCROCFLLocalRepositoryProvider.class, REPOSITORY_PROPERTY_PREFIX + id);
     }
-
-    public abstract OcflExtensionConfig getExtensionConfig();
-
-    public abstract OcflStorageBuilder getStorage(OcflStorageBuilder storageBuilder);
 
 }

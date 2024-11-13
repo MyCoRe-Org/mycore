@@ -1,8 +1,6 @@
 package org.mycore.ocfl.niofs;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -40,15 +38,9 @@ public abstract class MCROCFLNioTestCase extends MCROCFLTestCase {
     }
 
     @Override
-    protected Map<String, String> getTestProperties() {
-        HashMap<String, String> properties = new HashMap<>();
-        properties.put("MCR.OCFL.Repository.Test.FS.Remote", remote ? "true" : "false");
-        return properties;
-    }
-
-    @Override
     public void setUp() throws Exception {
         super.setUp();
+        this.setUpRepository(remote);
         MCROCFLFileSystemProvider.get().init();
         MCRTransactionManager.beginTransactions(MCROCFLFileSystemTransaction.class);
         MCROCFLTestCaseHelper.loadDerivate(DERIVATE_1);
