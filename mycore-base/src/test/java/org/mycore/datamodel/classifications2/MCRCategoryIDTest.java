@@ -19,16 +19,19 @@
 package org.mycore.datamodel.classifications2;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRTestCase;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRCategoryIDTest extends MCRTestCase {
+public class MCRCategoryIDTest {
     private static final String invalidID = "identifier:.sub";
 
     private static final String validRootID = "rootID";
@@ -56,23 +59,36 @@ public class MCRCategoryIDTest extends MCRTestCase {
         assertEquals("RootIds do not match", validRootID, MCRCategoryID.rootID(validRootID).getRootID());
     }
 
-    @Test(expected = MCRException.class)
+    @Test
     public void testInvalidRootID() {
-        new MCRCategoryID(invalidID, validCategID);
+        assertThrows(MCRException.class, () -> new MCRCategoryID(invalidID, validCategID));
     }
 
-    @Test(expected = MCRException.class)
+    @Test
     public void testInvalidCategID() {
-        new MCRCategoryID(validRootID, invalidID);
+        assertThrows(MCRException.class, () -> new MCRCategoryID(validRootID, invalidID));
     }
 
-    @Test(expected = MCRException.class)
+    @Test
     public void testLongCategID() {
-        new MCRCategoryID(validRootID, toLongCategID);
+        assertThrows(MCRException.class, () -> new MCRCategoryID(validRootID, toLongCategID));
     }
 
-    @Test(expected = MCRException.class)
+    @Test
     public void testLongRootID() {
-        new MCRCategoryID(toLongRootID, validCategID);
+        assertThrows(MCRException.class, () -> new MCRCategoryID(toLongRootID, validCategID));
     }
+
+    /**
+     * @see <a href="https://mycore.atlassian.net/browse/MCR-3302">MCR-3302</a>
+     */
+    @ParameterizedTest
+    @Tag("MCR-3302")
+    @ValueSource(strings = {
+        "", "foo:bar:baz", ":bar", ":bar:", ":bar:baz", "foo::bar", "foo::bar::", "foo::bar::baz", "::bar", "::bar::baz"
+    })
+    public void testInvalidEdgeCases(String invalidCategoryId) {
+        assertThrows(IllegalArgumentException.class, () -> MCRCategoryID.fromString(invalidCategoryId));
+    }
+
 }

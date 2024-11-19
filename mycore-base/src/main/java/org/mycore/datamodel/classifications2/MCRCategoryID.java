@@ -21,7 +21,6 @@ package org.mycore.datamodel.classifications2;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.mycore.common.MCRException;
@@ -40,7 +39,7 @@ import jakarta.persistence.Transient;
 /**
  * The composite identifier of a MCRCategory. If <code>rootID == ID</code> the
  * associated MCRCategory instance is a root category (a classification).
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2.0
  */
@@ -88,19 +87,20 @@ public class MCRCategoryID implements Serializable {
     /**
      * @param categoryId must be in format classificationId:categoryId
      * @return the {@link MCRCategoryID} if any
+     * @throws IllegalArgumentException if the given categoryId is invalid
      */
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static MCRCategoryID fromString(String categoryId) {
-        StringTokenizer tok = new StringTokenizer(categoryId, ":");
-        String rootId = tok.nextToken();
-        if (!tok.hasMoreTokens()) {
-            return rootID(rootId);
+        String[] parts = categoryId.split(":");
+        try {
+            return switch (parts.length) {
+                case 1 -> rootID(parts[0]);
+                case 2 -> new MCRCategoryID(parts[0], parts[1]);
+                default -> throw new IllegalArgumentException("CategoryId is ambiguous: " + categoryId);
+            };
+        } catch (MCRException e) {
+            throw new IllegalArgumentException("Invalid category ID: " + categoryId, e);
         }
-        String categId = tok.nextToken();
-        if (tok.hasMoreTokens()) {
-            throw new IllegalArgumentException("CategoryId is ambiguous: " + categoryId);
-        }
-        return new MCRCategoryID(rootId, categId);
     }
 
     @Transient
@@ -110,7 +110,7 @@ public class MCRCategoryID implements Serializable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -124,7 +124,7 @@ public class MCRCategoryID implements Serializable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -228,7 +228,7 @@ public class MCRCategoryID implements Serializable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
