@@ -57,6 +57,7 @@ public class MCRSecureTokenV2 {
 
     private String[] queryParameters;
 
+    @SuppressWarnings("PMD.ArrayIsStoredDirectly") //queryParameters are safe to store directly here
     public MCRSecureTokenV2(String contentPath, String ipAddress, String sharedSecret, String... queryParameters) {
         this.contentPath = Objects.requireNonNull(contentPath, "'contentPath' may not be null");
         this.ipAddress = Objects.requireNonNull(ipAddress, "'ipAddress' may not be null");

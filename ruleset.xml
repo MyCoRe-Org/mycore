@@ -16,10 +16,7 @@
 
   <!-- Best Practices Rules -->
   <rule ref="category/java/bestpractices.xml/AbstractClassWithoutAbstractMethod"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/ArrayIsStoredDirectly"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/bestpractices.xml/AvoidMessageDigestField"/>
