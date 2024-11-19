@@ -32,7 +32,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-public class MCRRestAccessKeyExceptionMapper implements ExceptionMapper<MCRAccessKeyException> {
+public class MCRAccessKeyRestExceptionMapper implements ExceptionMapper<MCRAccessKeyException> {
 
     @Context
     Request request;
