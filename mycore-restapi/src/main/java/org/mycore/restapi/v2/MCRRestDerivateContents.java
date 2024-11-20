@@ -53,6 +53,7 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.util.MCRRestContentHelper;
+import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
@@ -257,19 +258,8 @@ public class MCRRestDerivateContents {
     }
 
     private static byte[] getMD5Digest(String md5sum) {
-        final char[] data = md5sum.toCharArray();
-        final int len = data.length;
-
-        // two characters form the hex value.
-        final byte[] md5Bytes = new byte[len >> 1];
-        for (int i = 0, j = 0; j < len; i++) {
-            int f = Character.digit(data[j], 16) << 4;
-            j++;
-            f = f | Character.digit(data[j], 16);
-            j++;
-            md5Bytes[i] = (byte) (f & 0xFF);
-        }
-        return md5Bytes;
+        MCRMD5Digest md5 = new MCRMD5Digest(md5sum);
+        return md5.getValue();
     }
 
     @HEAD
@@ -432,7 +422,7 @@ public class MCRRestDerivateContents {
         MCRPath mcrPath = getPath();
         try {
             if (Files.exists(mcrPath) && Files.isDirectory(mcrPath)) {
-                //delete (sub-)directory and all its containing files and dirs 
+                //delete (sub-)directory and all its containing files and dirs
                 Files.walkFileTree(mcrPath, MCRRecursiveDeleter.instance());
                 return Response.noContent().build();
             } else if (Files.deleteIfExists(mcrPath)) {

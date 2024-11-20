@@ -66,6 +66,15 @@ public abstract class MCRDigest {
         return MCRUtils.toHexString(this.value);
     }
 
+    /**
+     * Returns the value of the digest.
+     *
+     * @return Digest value.
+     */
+    public byte[] getValue() {
+        return Arrays.copyOf(value, value.length);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof MCRDigest mcrDigest)) {
