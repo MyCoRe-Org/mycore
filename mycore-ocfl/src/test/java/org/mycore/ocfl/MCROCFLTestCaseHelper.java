@@ -37,7 +37,6 @@ import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.SizeDigestAlgorithm;
 import io.ocfl.api.model.VersionInfo;
-import io.ocfl.core.OcflRepositoryBuilder;
 
 public abstract class MCROCFLTestCaseHelper {
 
@@ -89,10 +88,10 @@ public abstract class MCROCFLTestCaseHelper {
             this.remote = remote;
         }
 
-        protected MCROCFLRepository createRepository(String id, OcflRepositoryBuilder builder) {
-            return new MCROCFLRepository(id, builder.build(), this.remote);
+        @Override
+        public boolean isRemote() {
+            return remote;
         }
-
     }
 
     private static class CopyFileVisitor extends SimpleFileVisitor<Path> {

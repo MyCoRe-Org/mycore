@@ -78,7 +78,7 @@ public interface MCROCFLRepositoryProvider {
      */
     static MCROCFLRepositoryProvider getProvider(String id) {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCROCFLLocalRepositoryProvider.class, REPOSITORY_PROPERTY_PREFIX + id);
+            MCROCFLRepositoryProvider.class, REPOSITORY_PROPERTY_PREFIX + id);
     }
 
 }

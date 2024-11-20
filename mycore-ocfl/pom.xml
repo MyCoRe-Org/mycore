@@ -37,7 +37,17 @@
     </dependency>
     <dependency>
       <groupId>io.ocfl</groupId>
+      <artifactId>ocfl-java-aws</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.ocfl</groupId>
       <artifactId>ocfl-java-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>netty-nio-client</artifactId>
+      <!-- use same version as ocfl-java -->
+      <version>2.26.21</version>
     </dependency>
     <dependency>
       <groupId>jakarta.inject</groupId>
