@@ -26,7 +26,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import io.ocfl.api.OcflConfig;
-import io.ocfl.api.OcflConstants;
 import io.ocfl.api.OcflObjectUpdater;
 import io.ocfl.api.OcflOption;
 import io.ocfl.api.OcflRepository;
@@ -42,7 +41,8 @@ import io.ocfl.api.model.ValidationResults;
 import io.ocfl.api.model.VersionDetails;
 import io.ocfl.api.model.VersionInfo;
 import io.ocfl.api.model.VersionNum;
-import io.ocfl.core.util.PercentEscaper;
+import io.ocfl.core.model.Inventory;
+import io.ocfl.core.storage.OcflStorage;
 
 /**
  * A wrapper class for an OCFL repository that adds custom functionality specific to MyCoRe.
@@ -59,7 +59,7 @@ public class MCROCFLRepository implements OcflRepository {
 
     private final boolean remote;
 
-    private final PercentEscaper percentEscaper;
+    private final OcflStorage storage;
 
     /**
      * Constructs a new {@code MCROCFLRepository}.
@@ -68,15 +68,11 @@ public class MCROCFLRepository implements OcflRepository {
      * @param repository the base OCFL repository to delegate operations to.
      * @param remote if this is a remote or local repository
      */
-    public MCROCFLRepository(String id, OcflRepository repository, boolean remote) {
+    public MCROCFLRepository(String id, OcflRepository repository, boolean remote, OcflStorage storage) {
         this.id = id;
         this.base = repository;
         this.remote = remote;
-        this.percentEscaper = PercentEscaper.builderWithSafeAlphaNumeric()
-            .addSafeChars("-_")
-            .plusForSpace(false)
-            .useUppercase(false)
-            .build();
+        this.storage = storage;
     }
 
     /**
@@ -204,6 +200,9 @@ public class MCROCFLRepository implements OcflRepository {
      */
     public FileChangeHistory directoryChangeHistory(String objectId, String logicalPath, VersionNum targetVersion)
         throws NotFoundException {
+
+        var inventory = requireInventory(ObjectVersionId.version(objectId, targetVersion));
+
         String relativeDirectoryPath = logicalPath.startsWith("/") ? logicalPath.substring(1) : logicalPath;
 
         VersionNum tailVersionNumber = VersionNum.V1;
@@ -219,7 +218,8 @@ public class MCROCFLRepository implements OcflRepository {
             VersionDetails details = describeVersion(ObjectVersionId.version(objectId, versionNum));
             List<String> directoryContent = details.getFiles().stream()
                 .map(FileDetails::getPath)
-                .map(filePath -> toDirectoryContent(relativeDirectoryPath, filePath))
+                .map(
+                    filePath -> toDirectoryContent(relativeDirectoryPath, filePath))
                 .filter(Objects::nonNull)
                 .toList();
             if ((empty && !directoryContent.isEmpty()) || (!empty && directoryContent.isEmpty())) {
@@ -232,8 +232,7 @@ public class MCROCFLRepository implements OcflRepository {
                 directoryChange.setObjectVersionId(details.getObjectVersionId());
                 String finalVersion = versionNum.toString();
                 details.getFiles().stream().findAny().ifPresent(fileDetails -> {
-                    String fileRelativePath = fileDetails.getStorageRelativePath();
-                    String relativeStoragePath = getStorageRelativePath(fileRelativePath, objectId, finalVersion);
+                    String relativeStoragePath = getStorageRelativePath(inventory, finalVersion);
                     String directoryStoragePath = relativeDirectoryPath.isEmpty() ? relativeStoragePath
                         : relativeStoragePath + "/" + relativeDirectoryPath;
                     directoryChange.setStorageRelativePath(directoryStoragePath);
@@ -255,10 +254,20 @@ public class MCROCFLRepository implements OcflRepository {
         return nextPathSegmentIndex != -1 ? relativePath.substring(0, nextPathSegmentIndex) : relativePath;
     }
 
-    private String getStorageRelativePath(String fileRelativePath, String objectId, String version) {
-        String encodedObjectId = this.percentEscaper.escape(objectId);
-        String layoutConfigPath = fileRelativePath.substring(0, fileRelativePath.indexOf("/" + encodedObjectId));
-        return layoutConfigPath + "/" + encodedObjectId + "/" + version + "/" + OcflConstants.DEFAULT_CONTENT_DIRECTORY;
+    private String getStorageRelativePath(Inventory inventory, String version) {
+        return inventory.getObjectRootPath() + "/" + version + "/" + inventory.getContentDirectory();
+    }
+
+    protected Inventory requireInventory(ObjectVersionId objectId) {
+        var inventory = loadInventory(objectId);
+        if (inventory == null) {
+            throw new NotFoundException(String.format("Object %s was not found.", objectId));
+        }
+        return inventory;
+    }
+
+    protected Inventory loadInventory(ObjectVersionId objectId) {
+        return storage.loadInventory(objectId.getObjectId());
     }
 
     /**
