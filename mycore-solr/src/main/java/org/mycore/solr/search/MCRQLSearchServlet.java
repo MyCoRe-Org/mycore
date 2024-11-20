@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
@@ -60,7 +61,13 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String searchString = getReqParameter(request, "search", null);
+        if (searchString != null) {
+            searchString = ClientUtils.escapeQueryChars(searchString);
+        }
         String queryString = getReqParameter(request, "query", null);
+        if (queryString != null) {
+            queryString = ClientUtils.escapeQueryChars(queryString);
+        }
 
         Document input = (Document) request.getAttribute("MCRXEditorSubmission");
         MCRQuery query;
