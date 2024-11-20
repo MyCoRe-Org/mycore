@@ -44,12 +44,6 @@
       <artifactId>ocfl-java-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>netty-nio-client</artifactId>
-      <!-- use same version as ocfl-java -->
-      <version>2.26.21</version>
-    </dependency>
-    <dependency>
       <groupId>jakarta.inject</groupId>
       <artifactId>jakarta.inject-api</artifactId>
     </dependency>
@@ -78,13 +72,15 @@
       <artifactId>mycore-user2</artifactId>
     </dependency>
     <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>netty-nio-client</artifactId>
+      <!-- use same version as ocfl-java -->
+      <version>2.26.21</version>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mycore</groupId>
-      <artifactId>mycore-user2</artifactId>
     </dependency>
   </dependencies>
 </project>
