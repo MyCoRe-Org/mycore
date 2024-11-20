@@ -254,7 +254,7 @@ public class MCRRestDerivateContents {
      */
     private static String getDigestHeader(String md5sum) {
         final String md5Base64 = Base64.getEncoder().encodeToString(HexFormat.of().parseHex(md5sum));
-        return "MD5=" + md5Base64;
+        return "md5=:" + md5Base64 + ":";
     }
 
     @HEAD
@@ -298,7 +298,7 @@ public class MCRRestDerivateContents {
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .tag(getETag(fileAttributes))
-            .header("Digest", getDigestHeader(fileAttributes.digest().toHexString()))
+            .header("Repr-Digest", getDigestHeader(fileAttributes.digest().toHexString()))
             .build();
     }
 
@@ -338,7 +338,7 @@ public class MCRRestDerivateContents {
                 content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
                 try {
                     final List<Map.Entry<String, String>> responseHeader = List
-                        .of(Map.entry("Digest", getDigestHeader(fileAttributes.digest().toHexString())));
+                        .of(Map.entry("Repr-Digest", getDigestHeader(fileAttributes.digest().toHexString())));
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader, responseHeader);
                 } catch (IOException e) {
                     throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
