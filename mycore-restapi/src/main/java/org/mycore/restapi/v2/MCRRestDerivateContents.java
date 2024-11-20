@@ -252,7 +252,7 @@ public class MCRRestDerivateContents {
      * @see <a href="https://tools.ietf.org/html/rfc3230">RFC 3230</a>
      * @see <a href="https://tools.ietf.org/html/rfc5843">RFC 45843</a>
      */
-    private static String getDigestHeader(MCRDigest digest) {
+    private static String getReprDigestHeaderValue(MCRDigest digest) {
         final String algorithm = digest.getAlgorithm().toLowerCase();
         final String encodedValue = Base64.getEncoder().encodeToString(digest.toBytes());
         return algorithm + "=:" + encodedValue + ":";
@@ -299,7 +299,7 @@ public class MCRRestDerivateContents {
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .tag(getETag(fileAttributes))
-            .header("Repr-Digest", getDigestHeader(fileAttributes.digest()))
+            .header("Repr-Digest", getReprDigestHeaderValue(fileAttributes.digest()))
             .build();
     }
 
@@ -339,7 +339,7 @@ public class MCRRestDerivateContents {
                 content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
                 try {
                     final List<Map.Entry<String, String>> responseHeader = List
-                        .of(Map.entry("Repr-Digest", getDigestHeader(fileAttributes.digest())));
+                        .of(Map.entry("Repr-Digest", getReprDigestHeaderValue(fileAttributes.digest())));
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader, responseHeader);
                 } catch (IOException e) {
                     throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
