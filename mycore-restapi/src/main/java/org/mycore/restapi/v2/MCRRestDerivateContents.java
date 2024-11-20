@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +54,6 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.util.MCRRestContentHelper;
-import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
@@ -253,13 +253,8 @@ public class MCRRestDerivateContents {
      * @see <a href="https://tools.ietf.org/html/rfc5843">RFC 45843</a>
      */
     private static String getDigestHeader(String md5sum) {
-        final String md5Base64 = Base64.getEncoder().encodeToString(getMD5Digest(md5sum));
+        final String md5Base64 = Base64.getEncoder().encodeToString(HexFormat.of().parseHex(md5sum));
         return "MD5=" + md5Base64;
-    }
-
-    private static byte[] getMD5Digest(String md5sum) {
-        MCRMD5Digest md5 = new MCRMD5Digest(md5sum);
-        return md5.getValue();
     }
 
     @HEAD
