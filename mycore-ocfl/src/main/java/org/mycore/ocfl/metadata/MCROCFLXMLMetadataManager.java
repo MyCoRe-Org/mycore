@@ -18,6 +18,11 @@
 
 package org.mycore.ocfl.metadata;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -26,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,10 +60,10 @@ import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
+import org.mycore.ocfl.MCROCFLException;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
-import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
-import org.mycore.ocfl.repository.MCROCFLMCRRepositoryProvider;
+import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
@@ -71,6 +75,7 @@ import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.exception.OverwriteException;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.OcflObjectVersionFile;
 import io.ocfl.api.model.VersionDetails;
 import io.ocfl.api.model.VersionInfo;
 import io.ocfl.api.model.VersionNum;
@@ -84,25 +89,7 @@ import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationL
  */
 public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
-    private static final String MESSAGE_CREATED = "Created";
-
-    private static final String MESSAGE_UPDATED = "Updated";
-
-    private static final String MESSAGE_DELETED = "Deleted";
-
-    private static final Map<String, Character> MESSAGE_TYPE_MAPPING = Collections.unmodifiableMap(Map.ofEntries(
-        Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
-        Map.entry(MESSAGE_UPDATED, MCROCFLMetadataVersion.UPDATED),
-        Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED)));
-
     private String repositoryKey = "Default";
-
-    private static char convertMessageToType(String message) throws MCRPersistenceException {
-        if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
-            throw new MCRPersistenceException("Cannot identify version type from message '" + message + "'");
-        }
-        return MESSAGE_TYPE_MAPPING.get(message);
-    }
 
     public OcflRepository getRepository() {
         return MCROCFLRepositoryProvider.getRepository(getRepositoryKey());
@@ -244,7 +231,12 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
-        return storeObject.getFile(buildFilePath(mcrid)).getStream();
+        String path = buildFilePath(mcrid);
+        OcflObjectVersionFile file = storeObject.getFile(path);
+        if (file == null) {
+            throw new IOException("Couldn't find path '" + path + "' in '" + storeObject.getObjectId() + "'.");
+        }
+        return file.getStream();
     }
 
     @Override
@@ -341,23 +333,28 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public int getHighestStoredID(String project, String type) {
         int highestStoredID = 0;
         int maxDepth = Integer.MAX_VALUE;
-        MCROCFLRepositoryProvider oclfRepoProvider = MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCROCFLRepositoryProvider.class, "MCR.OCFL.Repository." + repositoryKey);
 
-        OcflExtensionConfig config = oclfRepoProvider.getExtensionConfig();
-        Path basePath = null;
+        MCROCFLRepositoryProvider ocflRepoProvider = MCROCFLRepositoryProvider.getProvider(repositoryKey);
+        if (!(ocflRepoProvider instanceof MCROCFLLocalRepositoryProvider localRepositoryProvider)) {
+            throw new MCROCFLException("Cannot call getHighestStoredID() on non local repository. Set "
+                + "MCR.Metadata.ObjectID.Generator.Class=org.mycore.datamodel.common.MCRFileBaseCacheObjectIDGenerator "
+                + "instead!");
+        }
+
+        OcflExtensionConfig config = localRepositoryProvider.getExtensionConfig();
+        Path basePath;
 
         // optimization for known layouts
         if (Objects.equals(config.getExtensionName(), MCRStorageLayoutExtension.EXTENSION_NAME)) {
             maxDepth = ((MCRStorageLayoutConfig) config).getSlotLayout().split("-").length;
-            basePath = ((MCROCFLMCRRepositoryProvider) oclfRepoProvider).getRepositoryRoot()
+            basePath = localRepositoryProvider.getRepositoryRoot()
                 .resolve(MCROCFLObjectIDPrefixHelper.MCROBJECT.replace(":", ""))
                 .resolve(project).resolve(type);
             highestStoredID = traverseMCRStorageDirectory(basePath, maxDepth);
         } else if (Objects.equals(config.getExtensionName(),
             HashedNTupleIdEncapsulationLayoutExtension.EXTENSION_NAME)) {
             maxDepth = ((HashedNTupleIdEncapsulationLayoutConfig) config).getNumberOfTuples() + 1;
-            basePath = ((MCROCFLHashRepositoryProvider) oclfRepoProvider).getRepositoryRoot();
+            basePath = localRepositoryProvider.getRepositoryRoot();
         } else {
             //for other repository provider implementation start with root directory
             basePath = MCRConfiguration2.getString("MCR.OCFL.Repository." + repositoryKey + ".RepositoryRoot")
