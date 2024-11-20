@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 
-import io.ocfl.core.OcflRepositoryBuilder;
 import io.ocfl.core.extension.OcflExtensionConfig;
 import io.ocfl.core.storage.OcflStorageBuilder;
 
@@ -67,23 +66,18 @@ public abstract class MCROCFLLocalRepositoryProvider implements MCROCFLRepositor
     public void init(String prop) throws IOException {
         Files.createDirectories(workDir);
         Files.createDirectories(repositoryRoot);
-        OcflRepositoryBuilder builder = new OcflRepositoryBuilder()
+        String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
+        repository = new MCROCFLRepositoryBuilder()
+            .id(id)
+            .remote(isRemote())
             .defaultLayoutConfig(getExtensionConfig())
             .storage(this::configureStorage)
-            .workDir(workDir);
-        String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
-        this.repository = createRepository(id, builder);
+            .workDir(workDir)
+            .buildMCR();
     }
 
-    /**
-     * Creates and initializes an OCFL repository with the specified repository ID and builder configuration.
-     *
-     * @param id the unique identifier for the OCFL repository.
-     * @param builder the {@link OcflRepositoryBuilder} to build and configure the repository.
-     * @return a new {@link MCROCFLRepository} instance.
-     */
-    protected MCROCFLRepository createRepository(String id, OcflRepositoryBuilder builder) {
-        return new MCROCFLRepository(id, builder.build(), false);
+    public boolean isRemote() {
+        return false;
     }
 
     /**
