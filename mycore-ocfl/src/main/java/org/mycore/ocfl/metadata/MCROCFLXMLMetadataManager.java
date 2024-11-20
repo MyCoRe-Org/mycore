@@ -230,7 +230,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
         String path = buildFilePath(mcrid);
         OcflObjectVersionFile file = storeObject.getFile(path);
-        if(file == null) {
+        if (file == null) {
             throw new IOException("Couldn't find path '" + path + "' in '" + storeObject.getObjectId() + "'.");
         }
         return file.getStream();
@@ -332,9 +332,10 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         int maxDepth = Integer.MAX_VALUE;
 
         MCROCFLRepositoryProvider ocflRepoProvider = MCROCFLRepositoryProvider.getProvider(repositoryKey);
-        if(!(ocflRepoProvider instanceof MCROCFLLocalRepositoryProvider localRepositoryProvider)) {
-            throw new MCROCFLException("Cannot call getHighestStoredID() on non local repository."
-                + " Use MCRFileBaseCacheObjectIDGenerator instead!");
+        if (!(ocflRepoProvider instanceof MCROCFLLocalRepositoryProvider localRepositoryProvider)) {
+            throw new MCROCFLException("Cannot call getHighestStoredID() on non local repository. Set "
+                + "MCR.Metadata.ObjectID.Generator.Class=org.mycore.datamodel.common.MCRFileBaseCacheObjectIDGenerator "
+                + "instead!");
         }
 
         OcflExtensionConfig config = localRepositoryProvider.getExtensionConfig();
