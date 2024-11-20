@@ -30,10 +30,7 @@
   <rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitch"/>
   <rule ref="category/java/bestpractices.xml/DoubleBraceInitialization"/>
   <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/ForLoopVariableCount"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/bestpractices.xml/GuardLogStatement"/>

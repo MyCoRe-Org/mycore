@@ -53,7 +53,8 @@ public class MCRXEditorValidator {
         NamedNodeMap attributes = ruleElement.getAttributes();
         Attr enableReplacementNode = (Attr) attributes.getNamedItem("enable-replacements");
         if (enableReplacementNode != null && enableReplacementNode.getValue().equals("true")) {
-            for (int i = 0, n = attributes.getLength(); i < n; i++) {
+            int attributesLength = attributes.getLength();
+            for (int i = 0; i < attributesLength; i++) {
                 Attr attribute = (Attr) attributes.item(i);
                 String oldValue = attribute.getNodeValue();
                 String newValue = session.replaceParameters(oldValue);
