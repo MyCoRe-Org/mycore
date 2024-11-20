@@ -57,8 +57,18 @@ public abstract class MCRDigest {
         validate();
     }
 
+
     /**
-     * Returns the value of the digest.
+     * Returns the value of the digest as a byte array.
+     *
+     * @return Digest value.
+     */
+    public byte[] toBytes() {
+        return Arrays.copyOf(value, value.length);
+    }
+
+    /**
+     * Returns the value of the digest as a hex encoded string.
      *
      * @return Digest value.
      */
