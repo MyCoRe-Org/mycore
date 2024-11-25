@@ -10,7 +10,7 @@
   <xsl:key name="relacode" match="code" use="@key" />
 
   <xsl:variable name="ifs">
-    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[document(concat('solrwr:isWorldReadable:', @xlink:href))/text() = 'true']">
+    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[document(concat('userobjectrights:isWorldReadable:', @xlink:href))/boolean/text() = 'true']">
       <der id="{@xlink:href}">
         <xsl:copy-of select="document(concat('xslStyle:mcr_directory-recursive:ifs:',@xlink:href,'/'))" />
       </der>
