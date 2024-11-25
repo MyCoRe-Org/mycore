@@ -165,40 +165,62 @@ public class MCRPDFAFunctions {
      */
 
     private static List<Element> createExceptionElements(Document document, Throwable throwable) {
-        List<Element> exceptionElementList = new ArrayList<>();
         Queue<Throwable> exceptionsQueue = new LinkedList<>();
-        exceptionsQueue.add(throwable);
+        return buildExceptionTree(document, throwable, exceptionsQueue);
+    }
 
-        while (!exceptionsQueue.isEmpty()) {
-            Throwable currentException = exceptionsQueue.poll();
-            Element exceptionElement = document.createElement("exception");
-
-            Element classElement = document.createElement("class");
-            classElement.setAttribute("name", currentException.getClass().getName());
-            exceptionElement.appendChild(classElement);
-
-            if (currentException.getMessage() != null) {
-                Element messageElement = document.createElement("message");
-                messageElement.setAttribute("message", currentException.getMessage());
-                exceptionElement.appendChild(messageElement);
-            }
-
-            Element stackTraceElement = document.createElement("stackTrace");
-            for (StackTraceElement ste : currentException.getStackTrace()) {
-                Element frameElement = document.createElement("frame");
-                frameElement.setAttribute("text", ste.toString());
-                stackTraceElement.appendChild(frameElement);
-            }
-            exceptionElement.appendChild(stackTraceElement);
-
-            exceptionElementList.add(exceptionElement);
-
-            exceptionsQueue.addAll(List.of(currentException.getSuppressed()));
-            if (currentException.getCause() != null &&
-                !currentException.getCause().equals(currentException)) {
-                exceptionsQueue.add(currentException.getCause());
-            }
+    /**
+     * Recursive helper method to build the exception tree.
+     */
+    private static List<Element> buildExceptionTree(Document document, Throwable currentException,
+        Queue<Throwable> exceptionsQueue) {
+        List<Element> exceptionElementList = new ArrayList<>();
+        if (currentException == null || exceptionsQueue.contains(currentException)) {
+            return exceptionElementList;
         }
+        exceptionsQueue.add(currentException);
+        Element exceptionElement = document.createElement("exception");
+        Element classElement = document.createElement("class");
+        classElement.setAttribute("name", currentException.getClass().getName());
+        exceptionElement.appendChild(classElement);
+
+        if (currentException.getMessage() != null) {
+            Element messageElement = document.createElement("message");
+            messageElement.setAttribute("message", currentException.getMessage());
+            exceptionElement.appendChild(messageElement);
+        }
+
+        Element stackTraceElement = document.createElement("stackTrace");
+        for (StackTraceElement ste : currentException.getStackTrace()) {
+            Element frameElement = document.createElement("frame");
+            frameElement.setAttribute("text", ste.toString());
+            stackTraceElement.appendChild(frameElement);
+        }
+        exceptionElement.appendChild(stackTraceElement);
+
+        Throwable[] suppressedExceptions = currentException.getSuppressed();
+        if (suppressedExceptions.length > 0) {
+            Element suppressedElement = document.createElement("suppressed");
+            for (Throwable suppressed : suppressedExceptions) {
+                List<Element> suppressedElements = buildExceptionTree(document, suppressed, exceptionsQueue);
+                for (Element suppressedChild : suppressedElements) {
+                    suppressedElement.appendChild(suppressedChild);
+                }
+            }
+            exceptionElement.appendChild(suppressedElement);
+        }
+
+        Throwable cause = currentException.getCause();
+        if (cause != null && !cause.equals(currentException)) {
+            Element causeElement = document.createElement("cause");
+            List<Element> causeElements = buildExceptionTree(document, cause, exceptionsQueue);
+            for (Element causeChild : causeElements) {
+                causeElement.appendChild(causeChild);
+            }
+            exceptionElement.appendChild(causeElement);
+        }
+
+        exceptionElementList.add(exceptionElement);
 
         return exceptionElementList;
     }
@@ -278,9 +300,10 @@ public class MCRPDFAFunctions {
         return "https://github.com/veraPDF/veraPDF-validation-profiles/wiki/" + firstPart + "#rule-" + secondPart + "-"
             + ruleId.getTestNumber();
     }
+
     private record PDFAValidationResult(
-            String name,
-            ValidationResult result,
-            Throwable exception
-    ) {}
+        String name,
+        ValidationResult result,
+        Throwable exception) {
+    }
 }
