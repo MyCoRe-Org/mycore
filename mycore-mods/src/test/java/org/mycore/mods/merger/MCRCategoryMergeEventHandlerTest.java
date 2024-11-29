@@ -9,8 +9,6 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRJPATestCase;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -18,6 +16,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.resource.MCRResourceHelper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -41,21 +40,18 @@ public class MCRCategoryMergeEventHandlerTest extends MCRJPATestCase {
     }
 
     /**
-     * Tests if parent genres are succesfully removed from mods.
+     * Tests if parent genres are successfully removed from mods.
      */
     @Test
     public void testHandleObjectCreatedMultipleGenres() throws IOException, JDOMException, URISyntaxException {
 
-        MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
-        ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 
         MCRCategory category = MCRXMLTransformer
-            .getCategory(saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "genre.xml")));
+            .getCategory(saxBuilder.build(MCRResourceHelper.getResourceAsStream(TEST_DIRECTORY + "genre.xml")));
         getDAO().addCategory(null, category);
 
-        Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods.xml"));
+        Document document = saxBuilder.build(MCRResourceHelper.getResourceAsStream(TEST_DIRECTORY + "testMods.xml"));
         MCRObject mcro = new MCRObject();
 
         MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
@@ -70,7 +66,7 @@ public class MCRCategoryMergeEventHandlerTest extends MCRJPATestCase {
 
         List<Element> genres = mw.getMODS().getChildren("genre", MCRConstants.MODS_NAMESPACE);
         assertEquals(2, genres.size());
-        String url = genres.get(0).getAttribute("valueURI").getValue();
+        String url = genres.getFirst().getAttribute("valueURI").getValue();
         String genre = url.substring(url.indexOf('#') + 1);
         assertEquals("book", genre);
 
