@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  This file is part of ***  M y C o R e  ***
-  ~  See http://www.mycore.de/ for details.
+  ~  See https://www.mycore.de/ for details.
   ~
   ~  This program is free software; you can use it, redistribute it
   ~  and / or modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2024.06.0-SNAPSHOT</version>
+    <version>2024.11-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-webcli</artifactId>

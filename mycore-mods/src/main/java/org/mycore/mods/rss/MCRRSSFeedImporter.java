@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,8 +56,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;

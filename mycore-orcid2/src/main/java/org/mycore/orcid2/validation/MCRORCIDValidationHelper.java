@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,10 +48,7 @@ public class MCRORCIDValidationHelper {
         }
         final char checkDigit = orcid.charAt(orcid.length() - 1);
         final String rawORCID = orcid.substring(0, orcid.length() - 1).replaceAll("\\D+", "");
-        if (rawORCID.length() != 15) {
-            return false;
-        }
-        return checkDigit == generateCheckDigit(rawORCID);
+        return rawORCID.length() == 15 && checkDigit == generateCheckDigit(rawORCID);
     }
 
     /**

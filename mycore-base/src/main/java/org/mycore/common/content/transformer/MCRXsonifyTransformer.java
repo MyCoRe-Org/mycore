@@ -1,9 +1,46 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.common.content.transformer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.inject.Singleton;
+import static org.mycore.xsonify.serialize.SerializerSettings.AdditionalNamespaceDeclarationStrategy;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ADDITIONAL_NAMESPACE_DECLARATION_STRATEGY;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ATTRIBUTE_PREFIX_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ELEMENT_PREFIX_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_JSON_STRUCTURE;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_MIXED_CONTENT_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NAMESPACE_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NORMALIZE_TEXT;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_OMIT_ROOT_ELEMENT;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_PLAIN_TEXT_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_XS_ANY_NAMESPACE_STRATEGY;
+import static org.mycore.xsonify.serialize.SerializerSettings.JsonStructure;
+import static org.mycore.xsonify.serialize.SerializerSettings.MixedContentHandling;
+import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceDeclaration;
+import static org.mycore.xsonify.serialize.SerializerSettings.PlainTextHandling;
+import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
+import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
+
+import java.io.IOException;
+import java.util.Locale;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRPostConstruction;
@@ -27,27 +64,11 @@ import org.mycore.xsonify.xsd.XsdParseException;
 import org.mycore.xsonify.xsd.XsdParser;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.Locale;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.mycore.xsonify.serialize.SerializerSettings.AdditionalNamespaceDeclarationStrategy;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ADDITIONAL_NAMESPACE_DECLARATION_STRATEGY;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ATTRIBUTE_PREFIX_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ELEMENT_PREFIX_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_JSON_STRUCTURE;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_MIXED_CONTENT_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NAMESPACE_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NORMALIZE_TEXT;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_OMIT_ROOT_ELEMENT;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_PLAIN_TEXT_HANDLING;
-import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_XS_ANY_NAMESPACE_STRATEGY;
-import static org.mycore.xsonify.serialize.SerializerSettings.JsonStructure;
-import static org.mycore.xsonify.serialize.SerializerSettings.MixedContentHandling;
-import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceDeclaration;
-import static org.mycore.xsonify.serialize.SerializerSettings.PlainTextHandling;
-import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
-import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
+import jakarta.inject.Singleton;
 
 /**
  * <p>Content Transformer to convert XML to JSON and vice versa.
@@ -275,8 +296,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 PlainTextHandling.valueOf(plainTextHandling),
                 MixedContentHandling.valueOf(mixedContentHandling),
                 AdditionalNamespaceDeclarationStrategy.valueOf(additionalNamespaceDeclarationStrategy),
-                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy)
-            );
+                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy));
         }
 
     }
@@ -312,8 +332,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 textKey,
                 mixedContentKey,
                 mixedContentElementNameKey,
-                indexKey
-            );
+                indexKey);
         }
 
     }

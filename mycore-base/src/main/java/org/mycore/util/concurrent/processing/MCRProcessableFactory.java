@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,8 +100,8 @@ public abstract class MCRProcessableFactory {
     }
 
     /**
-     * Creates new PriorityBlockingQueue for runnables. Uses the {@link MCRRunnableComperator}
-     * for comparision.
+     * Creates new PriorityBlockingQueue for <code>Runnable</code>. Uses the {@link MCRRunnableComperator}
+     * for comparison.
      *
      * @return a new priority blocking queue
      */
@@ -115,9 +115,9 @@ public abstract class MCRProcessableFactory {
      */
     private static class MCRProcessableThreadPoolExecutorHelper implements MCRProcessableExecutor {
 
-        private ExecutorService executor;
+        private final ExecutorService executor;
 
-        private MCRProcessableCollection collection;
+        private final MCRProcessableCollection collection;
 
         MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate) {
             this(delegate, null);

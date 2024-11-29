@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
 
 package org.mycore.user2.hash.bouncycastle;
 
+import static com.google.common.primitives.Chars.max;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -31,9 +34,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
-
-import static com.google.common.primitives.Chars.max;
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
  * {@link MCRBCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the BCrypt algorithm.
@@ -80,7 +80,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
 
     static {
 
-        char[] base64Alphabet = new char[]{
+        char[] base64Alphabet = new char[] {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -90,7 +90,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
             '=',
         };
 
-        char[] radix64Alphabet = new char[]{
+        char[] radix64Alphabet = new char[] {
             '.', '/',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',

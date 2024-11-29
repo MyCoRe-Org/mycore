@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 
 package org.mycore.user2.hash;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,8 +36,6 @@ import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.resource.MCRResourceHelper;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Helper class that performs optional configuration checks for instances of {@link MCRPasswordCheckManager}.

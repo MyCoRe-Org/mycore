@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,12 @@
 
 package org.mycore.webtools.properties;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.transform.TransformerException;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -29,10 +33,8 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.servlets.MCRContentServlet;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class MCRPropertyHelperContentServlet extends MCRContentServlet {
 

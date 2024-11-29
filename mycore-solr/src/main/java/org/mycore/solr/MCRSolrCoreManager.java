@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ public final class MCRSolrCoreManager {
             + MCRSolrConstants.SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX;
 
         final String shardCountKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID
-                + MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
+            + MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
 
         String coreName = MCRConfiguration2.getString(coreNameKey)
             .orElseThrow(() -> new MCRConfigurationException("Missing property " + coreNameKey));
@@ -97,9 +97,8 @@ public final class MCRSolrCoreManager {
 
         String coreTypeKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_TYPE_SUFFIX;
         Set<MCRSolrCoreType> coreTypes = MCRConfiguration2.getOrThrow(coreTypeKey, MCRConfiguration2::splitValue)
-                .map(MCRSolrCoreType::new)
-                .collect(Collectors.toSet());
-
+            .map(MCRSolrCoreType::new)
+            .collect(Collectors.toSet());
 
         return new MCRSolrCore(coreServer, coreName, configSetTemplate, shardCount, coreTypes);
     }

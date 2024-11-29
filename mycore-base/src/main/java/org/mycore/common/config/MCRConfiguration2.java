@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -334,9 +334,9 @@ public class MCRConfiguration2 {
                 boolean result;
                 String s = es.getKey();
                 if (!s.contains(".")) {
-                    result= true;
-                }else{
-                    result= (s.endsWith(".class") || s.endsWith(".Class")) &&
+                    result = true;
+                } else {
+                    result = (s.endsWith(".class") || s.endsWith(".Class")) &&
                         !s.substring(0, s.length() - ".class".length()).contains(".");
                 }
                 return result;
@@ -357,7 +357,6 @@ public class MCRConfiguration2 {
                 k -> MCRInstanceName.of(k).canonical().substring(prefix.length()),
                 v -> () -> (T) getInstanceOf(v).orElse(null)));
     }
-
 
     /**
      * Returns the configuration property with the specified name as an <CODE>

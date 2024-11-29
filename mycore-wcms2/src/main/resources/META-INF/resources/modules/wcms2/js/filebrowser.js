@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var WCMS2FileBrowser = function () {
+var WCMS2FileBrowser = function() {
   let currentPath = "";
   let type = "files";
   let baseHref = "";
@@ -32,7 +32,7 @@ var WCMS2FileBrowser = function () {
 
   function loadImage(imgSrc) {
     const image = new Image();
-    image.onload = function () {
+    image.onload = function() {
       $("#wcms2-lightbox-img").remove();
       $(image).attr("id", "wcms2-lightbox-img");
       $("#wcms2-lightbox-content").prepend(image);
@@ -52,12 +52,12 @@ var WCMS2FileBrowser = function () {
       url: "filebrowser/folder",
       type: "GET",
       dataType: "json",
-      success: function (data) {
+      success: function(data) {
         createFolder($("#folder-list-ul"), data.folders, "start");
         $("#folder-list-ul > li").addClass("aktiv");
         changeFolder(currentPath);
       },
-      error: function (error) {
+      error: function(error) {
         alert(error);
       }
     });
@@ -68,10 +68,10 @@ var WCMS2FileBrowser = function () {
       url: "filebrowser/files?path=" + path + "&type=" + type,
       type: "GET",
       dataType: "json",
-      success: function (data) {
+      success: function(data) {
         createFiles($("#files"), data.files, path)
       },
-      error: function (error) {
+      error: function(error) {
         alert(error);
       }
     });
@@ -83,10 +83,10 @@ var WCMS2FileBrowser = function () {
     const formData = new FormData();
     xhr.open('POST', url, true);
 
-    xhr.upload.addEventListener("progress", function (e) {
+    xhr.upload.addEventListener("progress", function(e) {
       updateProgress(i, (e.loaded * 100.0 / e.total) || 100);
     });
-    xhr.addEventListener('readystatechange', function (e) {
+    xhr.addEventListener('readystatechange', function(e) {
       if (xhr.readyState === 4 && xhr.status === 200) {
         updateFileView(currentPath);
       } else if (xhr.readyState === 4 && xhr.status !== 200) {
@@ -110,7 +110,7 @@ var WCMS2FileBrowser = function () {
   function updateProgress(fileNumber, percent) {
     uploadProgress[fileNumber] = percent;
     progressBar.value = uploadProgress.reduce((tot, curr) => tot + curr, 0) / uploadProgress.length;
-    if(progressBar.value >= 100) {
+    if (progressBar.value >= 100) {
       progressBar.style.opacity = "0";
     }
   }
@@ -119,10 +119,10 @@ var WCMS2FileBrowser = function () {
     $.ajax({
       url: "filebrowser?path=" + path,
       type: "DELETE",
-      success: function (data) {
+      success: function(data) {
         updateFileView(currentPath);
       },
-      error: function (error) {
+      error: function(error) {
         alert(error);
       }
     });
@@ -132,14 +132,14 @@ var WCMS2FileBrowser = function () {
     $.ajax({
       url: "filebrowser/folder?path=" + path,
       type: "POST",
-      success: function (data) {
+      success: function(data) {
         var name = $(node).find("input").val();
         $(node).find("div.folder-name").html(name);
         var parent = $(node).parents(".folder")[0];
         $(node).data("path", $(parent).data("path") + "/" + name);
         $("li.edit").removeClass("edit");
       },
-      error: function (error) {
+      error: function(error) {
         alert(error);
       }
     });
@@ -150,16 +150,16 @@ var WCMS2FileBrowser = function () {
       url: "filebrowser/folder?path=" + path,
       type: "DELETE",
       statusCode: {
-        200: function () {
+        200: function() {
           removeFolder(node);
         },
-        409: function () {
+        409: function() {
           alert(geti18n("component.wcms.navigation.fileBrowser.errorDelete"));
         },
-        403: function () {
+        403: function() {
           alert(geti18n("component.wcms.navigation.fileBrowser.folderNotEmpty"));
         },
-        500: function (error) {
+        500: function(error) {
           alert(error);
         }
       }
@@ -187,7 +187,7 @@ var WCMS2FileBrowser = function () {
       $(li).prepend("<span class='glyphicon glyphicon-plus button button-expand'></span>");
       const ul = $("<ul class='hide-folder children'></ul>");
       $(li).append(ul);
-      $.each(data.children, function (i, node) {
+      $.each(data.children, function(i, node) {
         if (node.type == "folder") {
           createFolder(ul, node, $(li).data("path"));
         }
@@ -205,7 +205,7 @@ var WCMS2FileBrowser = function () {
     if (data.length == 0 && $(".aktiv").data("allowed")) {
       $(parent).html(noFiles);
     }
-    $.each(data, function (i, node) {
+    $.each(data, function(i, node) {
       if (node.type != "folder") {
         var file = fileTemp.clone();
         if (node.type == "image") {
@@ -262,10 +262,10 @@ var WCMS2FileBrowser = function () {
   }
 
   function changeFolder(folderPath) {
-    const folder = $("li").filter(function () {
+    const folder = $("li").filter(function() {
       return $(this).data("path") == folderPath;
     });
-    $(folder).parents(".folder").each(function () {
+    $(folder).parents(".folder").each(function() {
       expandFolder($(this));
     });
     updateFileView(folder.data("path"));
@@ -304,15 +304,15 @@ var WCMS2FileBrowser = function () {
   }
 
   return {
-    init: function () {
+    init: function() {
       const $body = $("body");
       const $aktiv = $(".aktiv");
 
-      $body.on("click", ".button-expand", function () {
+      $body.on("click", ".button-expand", function() {
         expandFolder($(this).closest(".folder"));
       });
 
-      $body.on("click", ".button-contract", function () {
+      $body.on("click", ".button-contract", function() {
         $(this).siblings("ul.children").addClass("hide-folder");
         $(this).siblings(".icon").removeClass("glyphicon-folder-open");
         $(this).siblings(".icon").addClass("glyphicon-folder-close");
@@ -321,13 +321,13 @@ var WCMS2FileBrowser = function () {
 
       });
 
-      $body.on("click", ".folder-name, .folder > span.icon", function () {
+      $body.on("click", ".folder-name, .folder > span.icon", function() {
         if (!$(this).parent().hasClass("edit")) {
           changeFolder($(this).parent().data("path"));
         }
       });
 
-      $body.on("click", ".file-image-cotainer", function () {
+      $body.on("click", ".file-image-cotainer", function() {
         if (type === "images") {
           window.callback(getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());
         } else {
@@ -358,22 +358,22 @@ var WCMS2FileBrowser = function () {
         this.uploadFiles(files);
       }, false)
 
-      $body.on("mouseenter", ".file", function () {
+      $body.on("mouseenter", ".file", function() {
         $(this).find(".wcms2-image-button").removeClass("hidden");
       });
 
-      $body.on("mouseleave", ".file", function () {
+      $body.on("mouseleave", ".file", function() {
         $(this).find(".wcms2-image-button").addClass("hidden");
       });
 
-      $body.on("click", ".button-remove", function () {
+      $body.on("click", ".button-remove", function() {
         const parent = $(this).parent();
         if (confirm(geti18n("component.wcms.navigation.fileBrowser.confirmDeleteFile", parent.find("h5").html()))) {
           deleteFile(currentPath + "/" + parent.find(".file-title").html());
         }
       });
 
-      $body.on("click", "#add-folder", function () {
+      $body.on("click", "#add-folder", function() {
         if ($aktiv.data("allowed")) {
           expandFolder($aktiv);
           if (!$aktiv.children("ul.children").length) {
@@ -394,7 +394,7 @@ var WCMS2FileBrowser = function () {
         }
       });
 
-      $body.on("keydown", ".add-folder-input", function (key) {
+      $body.on("keydown", ".add-folder-input", function(key) {
         if (key.which === 13 && $(this).val() !== "") {
           addFolder(currentPath + "/" + $(this).val(), $(this).parents(".folder")[0]);
         }
@@ -403,7 +403,7 @@ var WCMS2FileBrowser = function () {
         }
       });
 
-      $body.on("click", "#delete-folder", function () {
+      $body.on("click", "#delete-folder", function() {
         if ($aktiv.data("allowed")) {
           if (confirm(geti18n("component.wcms.navigation.fileBrowser.confirmDeleteFolder", $aktiv.find(".folder-name").html()))) {
             deleteFolder(currentPath, $aktiv);
@@ -413,12 +413,12 @@ var WCMS2FileBrowser = function () {
         }
       });
 
-      $body.on("click", ".wcms2-lightbox", function (evt) {
+      $body.on("click", ".wcms2-lightbox", function(evt) {
         evt.preventDefault();
         showLightbox($(this));
       });
 
-      $body.on("click", "#wcms2-lightbox-close", function () {
+      $body.on("click", "#wcms2-lightbox-close", function() {
         hideLightbox();
       });
 
@@ -426,7 +426,7 @@ var WCMS2FileBrowser = function () {
       currentPath = qpara["href"] != undefined ? qpara["href"] : "";
       type = qpara["type"] != undefined ? qpara["type"] : "files";
       baseHref = qpara["basehref"] != undefined ? qpara["basehref"] : "";
-      jQuery.getJSON("../../rsc/locale/translate/" + qpara["langCode"] + "/component.wcms.navigation.fileBrowser.*", function (data) {
+      jQuery.getJSON("../../rsc/locale/translate/" + qpara["langCode"] + "/component.wcms.navigation.fileBrowser.*", function(data) {
         i18nKeys = data;
         $("#folder-label").html(geti18n("component.wcms.navigation.fileBrowser.folder"));
         $("#drag-and-drop-info").append(geti18n("component.wcms.navigation.fileBrowser.dragDropInfo"));
@@ -436,7 +436,7 @@ var WCMS2FileBrowser = function () {
       });
     },
 
-    uploadFiles: function (files) {
+    uploadFiles: function(files) {
       files = [...files];
       initializeProgress(files.length);
       files.forEach(uploadFile);
@@ -446,7 +446,7 @@ var WCMS2FileBrowser = function () {
 
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
   window.wcms2FileBrowser = new WCMS2FileBrowser();
   window.wcms2FileBrowser.init();
 });

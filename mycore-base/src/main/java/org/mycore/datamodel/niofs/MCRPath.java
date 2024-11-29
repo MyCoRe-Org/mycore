@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -184,7 +184,6 @@ public abstract class MCRPath implements Path {
         return sb.toString();
     }
 
-
     /* (non-Javadoc)
      * @see java.nio.file.Path#compareTo(java.nio.file.Path)
      */
@@ -234,19 +233,19 @@ public abstract class MCRPath implements Path {
                         thisPos = offsets[thisOffsetStart];
                         thatPos = that.offsets[0];
 
-                    if (thisPathLength - thisPos == thatPathLength - thatPos) {
-                        while (thisPos < thisPathLength) {
-                            if (path.charAt(thisPos++) != that.path.charAt(thatPos++)) {
-                                return false;
+                        if (thisPathLength - thisPos == thatPathLength - thatPos) {
+                            while (thisPos < thisPathLength) {
+                                if (path.charAt(thisPos++) != that.path.charAt(thatPos++)) {
+                                    return false;
+                                }
                             }
+                            return that.getFileSystem().equals(getFileSystem());
                         }
-                        return that.getFileSystem().equals(getFileSystem());
                     }
                 }
             }
         }
-    }
-    return false;
+        return false;
     }
 
     private int createThisOffsetStart(MCRPath that) {
@@ -280,9 +279,9 @@ public abstract class MCRPath implements Path {
     public boolean equals(final Object obj) {
         boolean result;
         if (!(obj instanceof MCRPath that) || !getFileSystem().equals(that.getFileSystem())) {
-            result= false;
+            result = false;
         } else {
-            result= stringValue.equals(that.stringValue);
+            result = stringValue.equals(that.stringValue);
         }
         return result;
     }

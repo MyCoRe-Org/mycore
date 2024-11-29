@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.MCRConfigurationException;
@@ -252,12 +252,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     public void runAsJobUser(PIRunnable task) throws MCRPersistentIdentifierException {
         final boolean jobUserPresent = isJobUserPresent();
-        final String jobUser = getJobUser();
-        MCRSession session = null;
+        MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRUserInformation savedUserInformation = null;
-        session = MCRSessionMgr.getCurrentSession();
 
         if (jobUserPresent) {
+            final String jobUser = getJobUser();
             savedUserInformation = session.getUserInformation();
             MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(jobUser);
 
@@ -271,15 +270,15 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
         }
 
-        boolean transactionActive = !MCRTransactionHelper.isTransactionActive();
+        boolean transactionActive = !MCRTransactionManager.hasActiveTransactions();
         try {
             if (transactionActive) {
-                MCRTransactionHelper.beginTransaction();
+                MCRTransactionManager.beginTransactions();
             }
             task.run();
         } finally {
-            if (transactionActive && MCRTransactionHelper.isTransactionActive()) {
-                MCRTransactionHelper.commitTransaction();
+            if (transactionActive && MCRTransactionManager.hasActiveTransactions()) {
+                MCRTransactionManager.commitTransactions();
             }
 
             if (jobUserPresent) {
@@ -295,7 +294,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     private String getJobUser() {
         String jobApiUser = this.getProperties().get(JOB_API_USER_PROPERTY);
         // try to remain compatible with values configured before MCR-3033
-        if (!jobApiUser.contains(":")) {
+        if (jobApiUser != null && !jobApiUser.contains(":")) {
             String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user";
             String userProviderClass = "org.mycore.user2.MCRUserProvider";
             if (this.getProperties().get(userProviderKey).equals(userProviderClass)) {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {UploadTarget} from "./UploadTarget";
+import { UploadTarget } from "./UploadTarget";
 
 
 if (!("mycore" in window)) {
-    window["mycore"] = {};
+  window["mycore"] = {};
 }
 
 /**
@@ -28,14 +28,14 @@ if (!("mycore" in window)) {
  * @param {HTMLElement} element
  */
 (<any>window).mycore.upload = {
-    enable: (element: HTMLElement) => {
-        (<HTMLElement[]>Array.prototype.slice.call(element.querySelectorAll("[data-upload-target]")))
-            .forEach(element => {
-                const fileBoxToggle = element.querySelector(".mcr-upload-show");
-                new UploadTarget(element, <HTMLElement>fileBoxToggle);
-            })
+  enable: (element: HTMLElement) => {
+    (<HTMLElement[]>Array.prototype.slice.call(element.querySelectorAll("[data-upload-target]")))
+      .forEach(element => {
+        const fileBoxToggle = element.querySelector(".mcr-upload-show");
+        new UploadTarget(element, <HTMLElement>fileBoxToggle);
+      })
 
-    },
+  },
 }
 
 

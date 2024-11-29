@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,35 +16,35 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ViewerComponent} from "../ViewerComponent";
-import {ViewerParameterMap} from "../../Utils";
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { ViewerParameterMap } from "../../Utils";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
 
 export class RequestStateEvent extends MyCoReImageViewerEvent {
-    /**
-     * ImageViewer States Versions:
-     *
-     *  Legacy : (not supported)
-     *      receive/{objId}?page={pageHref}?derivate={derivateId}&zoom={zoomLevel}&x={vpX}&y={vpY}&tosize={mode}&maximized={maximized}&rotation={rotation}
-     *
-     *      zoomLevel = The tile zoom level (no scaling)
-     *      vpX = The x coordinate of the left upper corner, but not scaled to the original resolution.
-     *      vpY = The y coordinate of the left upper corner, but not scaled to the original resolution.
-     *      mode = The display mode. none = normal ,screen = fit to screen, width = fit to width,
-     *      maximized = display metadata page or the maximized viewer
-     *      rotation = rotation of the image in deg (0|90|180|270)
-     *
-     * v0.2 :
-     *      /rsc/iview/client/{derivate}/{file}/x1={rect.x}&x2={rect.x+rect.width}&y1={rect.y}&y2={rect.y+rect.height}&rotation={rotation}&layout={layoutId}[&page={pdfPageNumber}]
-     *      rect = The rectangle representing the viewport
-     *      layoutId = singlePageLayout |  doublePageLayout | doublePageRelocatedLayout
-     *
-     *
-     */
-    constructor(component: ViewerComponent, public stateMap: ViewerParameterMap, public deepState: boolean = true) {
-        super(component, RequestStateEvent.TYPE);
-    }
+  /**
+   * ImageViewer States Versions:
+   *
+   *  Legacy : (not supported)
+   *      receive/{objId}?page={pageHref}?derivate={derivateId}&zoom={zoomLevel}&x={vpX}&y={vpY}&tosize={mode}&maximized={maximized}&rotation={rotation}
+   *
+   *      zoomLevel = The tile zoom level (no scaling)
+   *      vpX = The x coordinate of the left upper corner, but not scaled to the original resolution.
+   *      vpY = The y coordinate of the left upper corner, but not scaled to the original resolution.
+   *      mode = The display mode. none = normal ,screen = fit to screen, width = fit to width,
+   *      maximized = display metadata page or the maximized viewer
+   *      rotation = rotation of the image in deg (0|90|180|270)
+   *
+   * v0.2 :
+   *      /rsc/iview/client/{derivate}/{file}/x1={rect.x}&x2={rect.x+rect.width}&y1={rect.y}&y2={rect.y+rect.height}&rotation={rotation}&layout={layoutId}[&page={pdfPageNumber}]
+   *      rect = The rectangle representing the viewport
+   *      layoutId = singlePageLayout |  doublePageLayout | doublePageRelocatedLayout
+   *
+   *
+   */
+  constructor(component: ViewerComponent, public stateMap: ViewerParameterMap, public deepState: boolean = true) {
+    super(component, RequestStateEvent.TYPE);
+  }
 
-    public static TYPE: string = "RequestStateEvent";
+  public static TYPE: string = "RequestStateEvent";
 
 }

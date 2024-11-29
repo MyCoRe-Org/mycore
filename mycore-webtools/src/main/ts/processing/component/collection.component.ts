@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,33 +16,33 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, Input} from '@angular/core';
-import {Collection} from '../model/model';
-import {HtmlService} from './../service/html.service';
+import { Component, Input } from '@angular/core';
+import { Collection } from '../model/model';
+import { HtmlService } from './../service/html.service';
 
 @Component({
-    selector: 'collection',
-    templateUrl: 'html/collection.html',
-    styleUrls: ['css/collection.css'],
-    providers: [HtmlService]
+  selector: 'collection',
+  templateUrl: 'html/collection.html',
+  styleUrls: ['css/collection.css'],
+  providers: [HtmlService]
 })
 export class CollectionComponent {
 
-    @Input()
-    public model: Collection;
+  @Input()
+  public model: Collection;
 
-    public showAll: boolean;
+  public showAll: boolean;
 
-    constructor(private html: HtmlService) {
-        this.showAll = false;
-    }
+  constructor(private html: HtmlService) {
+    this.showAll = false;
+  }
 
-    public showCreatedProcessables() {
-        this.showAll = true;
-    }
+  public showCreatedProcessables() {
+    this.showAll = true;
+  }
 
-    public hideCreatedProcessables() {
-        this.showAll = false;
-    }
+  public hideCreatedProcessables() {
+    this.showAll = false;
+  }
 
 }

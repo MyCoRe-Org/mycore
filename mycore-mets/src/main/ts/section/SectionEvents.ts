@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,19 @@
 ///<reference path="../model/simple/MCRMetsSection.ts"/>
 namespace org.mycore.mets.controller {
 
-    import MCRMetsSection = org.mycore.mets.model.simple.MCRMetsSection;
+  import MCRMetsSection = org.mycore.mets.model.simple.MCRMetsSection;
 
-    export interface StartEditLabel {
-        ofSection: MCRMetsSection;
-    }
+  export interface StartEditLabel {
+    ofSection: MCRMetsSection;
+  }
 
-    export interface EditLabelStarted {
-        ofSection: MCRMetsSection;
-    }
+  export interface EditLabelStarted {
+    ofSection: MCRMetsSection;
+  }
 
-    export interface SectionAdded {
-        parent: MCRMetsSection;
-        addedSection: MCRMetsSection;
-    }
+  export interface SectionAdded {
+    parent: MCRMetsSection;
+    addedSection: MCRMetsSection;
+  }
 
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -76,9 +76,9 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 public class MCRSessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final Logger LOGGER = LogManager.getLogger();
-
+    public static final String BASIC_AUTH_PREFIX = "Basic ";
     private static final String PROP_RENEW_JWT = "mcr:renewJWT";
-
+    private static final String BEARER_AUTH_PREFIX = "Bearer ";
     private static final List<String> ALLOWED_JWT_SESSION_ATTRIBUTES = MCRConfiguration2
         .getString("MCR.RestAPI.JWT.AllowedSessionAttributePrefixes").stream()
         .flatMap(MCRConfiguration2::splitValue)
@@ -104,10 +104,10 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             .map(Boolean.class::cast)
             .orElse(Boolean.FALSE);
         Optional.ofNullable(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION))
-            .filter(s -> s.startsWith("Bearer "))
+            .filter(s -> s.startsWith(BEARER_AUTH_PREFIX))
             .filter(s -> !responseContext.getStatusInfo().getFamily().equals(Response.Status.Family.CLIENT_ERROR))
             .filter(s -> responseContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null)
-            .map(h -> renewJWT ? ("Bearer " + MCRRestAPIAuthentication
+            .map(h -> renewJWT ? (BEARER_AUTH_PREFIX + MCRRestAPIAuthentication
                 .getToken(currentSession, currentSession.getCurrentIP())
                 .orElseThrow(() -> new InternalServerErrorException("Could not get JSON Web Token"))) : h)
             .ifPresent(h -> {
@@ -124,114 +124,6 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             });
     }
 
-    @Override
-    public void filter(ContainerRequestContext requestContext) {
-        LOGGER.debug("Filter start.");
-        boolean isSecure = requestContext.getSecurityContext().isSecure();
-        if (MCRSessionMgr.hasCurrentSession()) {
-            throw new InternalServerErrorException("Session is already attached.");
-        }
-        MCRSessionMgr.unlock();
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession(); //bind to this request
-        currentSession.setCurrentIP(MCRFrontendUtil.getRemoteAddr(httpServletRequest));
-        MCRTransactionHelper.beginTransaction();
-        //3 cases for authentication
-        Optional<MCRUserInformation> userInformation = Optional.empty();
-        String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-        //1. no authentication
-        if (authorization == null) {
-            LOGGER.debug("No 'Authorization' header");
-            return;
-        }
-        //2. Basic Authentification
-        String basicPrefix = "Basic ";
-        if (authorization.startsWith(basicPrefix)) {
-            LOGGER.debug("Using 'Basic' authentication.");
-            byte[] encodedAuth = authorization.substring(basicPrefix.length()).trim()
-                .getBytes(StandardCharsets.ISO_8859_1);
-            String userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
-            if (userPwd.contains(":") && userPwd.length() > 1) {
-                String[] upSplit = userPwd.split(":");
-                String username = upSplit[0];
-                String password = upSplit[1];
-                userInformation = Optional.ofNullable(MCRUserManager.checkPassword(username, password))
-                    .map(MCRUserInformation.class::cast)
-                    .map(Optional::of)
-                    .orElseThrow(() -> {
-                        LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
-                        attrs.put("error", "invalid_login");
-                        attrs.put("error_description", "Wrong login or password.");
-                        return new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED)
-                            .header(HttpHeaders.WWW_AUTHENTICATE,
-                                MCRRestAPIUtil.getWWWAuthenticateHeader(null, attrs, app))
-                            .build());
-                    });
-            }
-        }
-        //3. JWT
-        String bearerPrefix = "Bearer ";
-        if (authorization.startsWith(bearerPrefix)) {
-            LOGGER.debug("Using 'JSON Web Token' authentication.");
-            //get JWT
-            String token = authorization.substring(bearerPrefix.length()).trim();
-            //validate against secret
-            try {
-                DecodedJWT jwt = JWT.require(MCRJWTUtil.getJWTAlgorithm())
-                    .build()
-                    .verify(token);
-                //validate ip
-                checkIPClaim(jwt.getClaim(MCRJWTUtil.JWT_CLAIM_IP), MCRFrontendUtil.getRemoteAddr(httpServletRequest));
-                //validate in audience
-                Optional<String> audience = jwt.getAudience().stream()
-                    .filter(s -> MCRJWTResource.AUDIENCE.equals(s) || MCRRestAPIAuthentication.AUDIENCE.equals(s))
-                    .findAny();
-                if (audience.isPresent()) {
-                    switch (audience.get()) {
-                        case MCRJWTResource.AUDIENCE -> MCRJWTResource.validate(token);
-                        case MCRRestAPIAuthentication.AUDIENCE -> {
-                            requestContext.setProperty(PROP_RENEW_JWT, true);
-                            MCRRestAPIAuthentication.validate(token);
-                        }
-                        default -> LOGGER.warn("Cannot validate JWT for '{}' audience.", audience.get());
-                    }
-                }
-                userInformation = Optional.of(new MCRJWTUserInformation(jwt));
-                if (!ALLOWED_JWT_SESSION_ATTRIBUTES.isEmpty()) {
-                    for (Map.Entry<String, Claim> entry : jwt.getClaims().entrySet()) {
-                        if (entry.getKey().startsWith(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX)) {
-                            final String key = entry.getKey()
-                                .substring(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX.length());
-                            for (String prefix : ALLOWED_JWT_SESSION_ATTRIBUTES) {
-                                if (key.startsWith(prefix)) {
-                                    currentSession.put(key, entry.getValue().asString());
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (JWTVerificationException e) {
-                LOGGER.error(e.getMessage());
-                LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
-                attrs.put("error", "invalid_token");
-                attrs.put("error_description", e.getMessage());
-                throw new NotAuthorizedException(e.getMessage(), e,
-                    MCRRestAPIUtil.getWWWAuthenticateHeader("Bearer", attrs, app));
-            }
-        }
-
-        if (userInformation.isEmpty()) {
-            LOGGER.warn(() -> "Unsupported " + HttpHeaders.AUTHORIZATION + " header: " + authorization);
-        }
-
-        userInformation
-            .ifPresent(ui -> {
-                currentSession.setUserInformation(ui);
-                requestContext.setSecurityContext(new MCRRestSecurityContext(ui, isSecure));
-            });
-        LOGGER.info("user detected: " + currentSession.getUserInformation().getUserID());
-    }
-
     private static void checkIPClaim(Claim ipClaim, String remoteAddr) {
         try {
             if (ipClaim.isNull() || !MCRFrontendUtil.isIPAddrAllowed(ipClaim.asString(), remoteAddr)) {
@@ -244,12 +136,161 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         }
     }
 
+    private static boolean isUnAuthorized(ContainerRequestContext requestContext) {
+        return requestContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null;
+    }
+
+    //returns true for Ajax-Requests or requests for embedded images
+    private static boolean doNotWWWAuthenticate(ContainerRequestContext requestContext) {
+        return !"ServiceWorker".equals(requestContext.getHeaderString("X-Requested-With")) &&
+            ("XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With")) ||
+                requestContext.getAcceptableMediaTypes()
+                    .stream()
+                    .findFirst()
+                    .filter(m -> "image".equals(m.getType()))
+                    .isPresent());
+    }
+
+    private static void closeSessionIfNeeded() {
+        if (MCRSessionMgr.hasCurrentSession()) {
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            try {
+                if (MCRTransactionManager.hasActiveTransactions()) {
+                    LOGGER.debug("Active MCRSession and JPA-Transaction found. Clearing up");
+                    if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+                        MCRTransactionManager.rollbackTransactions();
+                    } else {
+                        MCRTransactionManager.commitTransactions();
+                    }
+                } else {
+                    LOGGER.debug("Active MCRSession found. Clearing up");
+                }
+            } finally {
+                MCRSessionMgr.releaseCurrentSession();
+                currentSession.close();
+                LOGGER.debug("Session closed.");
+            }
+        }
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext) {
+        LOGGER.debug("Filter start.");
+        boolean isSecure = requestContext.getSecurityContext().isSecure();
+        if (MCRSessionMgr.hasCurrentSession()) {
+            throw new InternalServerErrorException("Session is already attached.");
+        }
+        MCRSessionMgr.unlock();
+        MCRSession currentSession = MCRSessionMgr.getCurrentSession(); //bind to this request
+        currentSession.setCurrentIP(MCRFrontendUtil.getRemoteAddr(httpServletRequest));
+        MCRTransactionManager.beginTransactions();
+        //3 cases for authentication
+        String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        //1. no authentication
+        if (authorization == null) {
+            LOGGER.debug("No 'Authorization' header");
+            return;
+        }
+        //2. Basic Authentification
+
+        MCRUserInformation userInformation;
+
+        if (authorization.startsWith(BASIC_AUTH_PREFIX)) {
+            userInformation = extractUserFromBasicAuth(authorization);
+        } else if (authorization.startsWith(BEARER_AUTH_PREFIX)) {
+            userInformation = extractUserFromBearerAuth(requestContext, authorization, currentSession);
+        } else {
+            LOGGER.warn(() -> "Unsupported " + HttpHeaders.AUTHORIZATION + " header: " + authorization);
+            return;
+        }
+
+        currentSession.setUserInformation(userInformation);
+        requestContext.setSecurityContext(new MCRRestSecurityContext(userInformation, isSecure));
+        LOGGER.info("user detected: " + currentSession.getUserInformation().getUserID());
+
+    }
+
+    private MCRUserInformation extractUserFromBasicAuth(String authorization) {
+        LOGGER.debug("Using 'Basic' authentication.");
+        byte[] encodedAuth = authorization.substring(BASIC_AUTH_PREFIX.length()).trim()
+            .getBytes(StandardCharsets.ISO_8859_1);
+        String userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
+        if (userPwd.contains(":") && userPwd.length() > 1) {
+            String[] upSplit = userPwd.split(":");
+            String username = upSplit[0];
+            String password = upSplit[1];
+            return Optional.ofNullable(MCRUserManager.checkPassword(username, password))
+                .map(MCRUserInformation.class::cast)
+                .orElseThrow(() -> {
+                    LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
+                    attrs.put("error", "invalid_login");
+                    attrs.put("error_description", "Wrong login or password.");
+                    return new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED)
+                        .header(HttpHeaders.WWW_AUTHENTICATE,
+                            MCRRestAPIUtil.getWWWAuthenticateHeader(null, attrs, app))
+                        .build());
+                });
+        }
+        return null;
+    }
+
+    private MCRUserInformation extractUserFromBearerAuth(ContainerRequestContext requestContext,
+        String authorization, MCRSession currentSession) {
+        MCRUserInformation userInformation;
+        LOGGER.debug("Using 'JSON Web Token' authentication.");
+        String token = authorization.substring(BEARER_AUTH_PREFIX.length()).trim();
+        try {
+            DecodedJWT jwt = JWT.require(MCRJWTUtil.getJWTAlgorithm())
+                .build()
+                .verify(token);
+            //validate ip
+            checkIPClaim(jwt.getClaim(MCRJWTUtil.JWT_CLAIM_IP), MCRFrontendUtil.getRemoteAddr(httpServletRequest));
+            //validate in audience
+            Optional<String> audience = jwt.getAudience().stream()
+                .filter(s -> MCRJWTResource.AUDIENCE.equals(s) || MCRRestAPIAuthentication.AUDIENCE.equals(s))
+                .findAny();
+            if (audience.isPresent()) {
+                switch (audience.get()) {
+                    case MCRJWTResource.AUDIENCE -> MCRJWTResource.validate(token);
+                    case MCRRestAPIAuthentication.AUDIENCE -> {
+                        requestContext.setProperty(PROP_RENEW_JWT, true);
+                        MCRRestAPIAuthentication.validate(token);
+                    }
+                    default -> LOGGER.warn("Cannot validate JWT for '{}' audience.", audience.get());
+                }
+            }
+            userInformation = new MCRJWTUserInformation(jwt);
+            if (!ALLOWED_JWT_SESSION_ATTRIBUTES.isEmpty()) {
+                for (Map.Entry<String, Claim> entry : jwt.getClaims().entrySet()) {
+                    if (entry.getKey().startsWith(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX)) {
+                        final String key = entry.getKey()
+                            .substring(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX.length());
+                        for (String prefix : ALLOWED_JWT_SESSION_ATTRIBUTES) {
+                            if (key.startsWith(prefix)) {
+                                currentSession.put(key, entry.getValue().asString());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (JWTVerificationException e) {
+            LOGGER.error(e.getMessage());
+            LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
+            attrs.put("error", "invalid_token");
+            attrs.put("error_description", e.getMessage());
+            throw new NotAuthorizedException(e.getMessage(), e,
+                MCRRestAPIUtil.getWWWAuthenticateHeader("Bearer", attrs, app));
+        }
+        return userInformation;
+    }
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         LOGGER.debug("ResponseFilter start");
         try {
             MCRSessionMgr.unlock();
-            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            MCRSessionMgr.getCurrentSession();
             if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode()
                 && isUnAuthorized(requestContext)) {
                 LOGGER.debug("Guest detected, change response from FORBIDDEN to UNAUTHORIZED.");
@@ -285,43 +326,6 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         }
     }
 
-    private static boolean isUnAuthorized(ContainerRequestContext requestContext) {
-        return requestContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null;
-    }
-
-    //returns true for Ajax-Requests or requests for embedded images
-    private static boolean doNotWWWAuthenticate(ContainerRequestContext requestContext) {
-        return !"ServiceWorker".equals(requestContext.getHeaderString("X-Requested-With")) &&
-            ("XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With")) ||
-                requestContext.getAcceptableMediaTypes()
-                    .stream()
-                    .findFirst()
-                    .filter(m -> "image".equals(m.getType()))
-                    .isPresent());
-    }
-
-    private static void closeSessionIfNeeded() {
-        if (MCRSessionMgr.hasCurrentSession()) {
-            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-            try {
-                if (MCRTransactionHelper.isTransactionActive()) {
-                    LOGGER.debug("Active MCRSession and JPA-Transaction found. Clearing up");
-                    if (MCRTransactionHelper.transactionRequiresRollback()) {
-                        MCRTransactionHelper.rollbackTransaction();
-                    } else {
-                        MCRTransactionHelper.commitTransaction();
-                    }
-                } else {
-                    LOGGER.debug("Active MCRSession found. Clearing up");
-                }
-            } finally {
-                MCRSessionMgr.releaseCurrentSession();
-                currentSession.close();
-                LOGGER.debug("Session closed.");
-            }
-        }
-    }
-
     private static class MCRJWTUserInformation implements MCRUserInformation {
 
         private final DecodedJWT jwt;
@@ -343,8 +347,8 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         @Override
         public String getUserAttribute(String attribute) {
             return switch (attribute) {
-                case MCRUserInformation.ATT_REAL_NAME -> jwt.getClaim("name").asString();
-                case MCRUserInformation.ATT_EMAIL -> jwt.getClaim("email").asString();
+                case ATT_REAL_NAME -> jwt.getClaim("name").asString();
+                case ATT_EMAIL -> jwt.getClaim("email").asString();
                 case MCRRealm.USER_INFORMATION_ATTR -> {
                     if (getUserID().contains("@")) {
                         yield getUserID().substring(getUserID().lastIndexOf("@") + 1);
@@ -390,7 +394,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 return null;
             }
             if (ui instanceof MCRUser) {
-                return SecurityContext.BASIC_AUTH;
+                return BASIC_AUTH;
             }
             if (ui instanceof MCRJWTUserInformation) {
                 return "BEARER";

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ public abstract class MCRCipher {
     private boolean checkPermission(String action) {
         boolean result;
         if (aclEnabled) {
-            result= MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
+            result = MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
         } else {
             result = true;
         }

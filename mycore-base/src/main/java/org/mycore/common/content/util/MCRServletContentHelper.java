@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,8 +130,8 @@ public abstract class MCRServletContentHelper {
     private static void prepareAndSetupResponse(MCRContent content, HttpServletRequest request,
         HttpServletResponse httpServletResponse, Config config, boolean serveContent, boolean isError,
         String contentType, long contentLength) throws IOException {
-        HttpServletResponse response
-            = configureResponseHeaders(content, serveContent, request, httpServletResponse, config);
+        HttpServletResponse response =
+            configureResponseHeaders(content, serveContent, request, httpServletResponse, config);
         try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {
             if (serveContent) {
                 response.setBufferSize(config.outputBufferSize);

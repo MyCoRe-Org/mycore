@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +20,21 @@
 
 namespace org.mycore.mets.controller {
 
-    export class MetsEditorChangeListController {
-        private modalInstance: any;
+  export class MetsEditorChangeListController {
+    private modalInstance: any;
 
-        constructor($scope: any, $modalInstance: any, public i18nModel: any) {
-            $scope.ctrl = this;
-            this.modalInstance = $modalInstance;
-        }
-
-        public get changes(): model.state.ModelChange[] {
-            return this.modalInstance.changes;
-        }
-
-        public closeClicked() {
-            this.modalInstance.close({});
-        }
+    constructor($scope: any, $modalInstance: any, public i18nModel: any) {
+      $scope.ctrl = this;
+      this.modalInstance = $modalInstance;
     }
+
+    public get changes(): model.state.ModelChange[] {
+      return this.modalInstance.changes;
+    }
+
+    public closeClicked() {
+      this.modalInstance.close({});
+    }
+  }
 
 }

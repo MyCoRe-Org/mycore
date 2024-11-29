@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,26 +49,19 @@ public interface MCRPersistenceTransaction {
     void rollback();
 
     /**
-     * Determine whether the current transaction has been
-     * marked for rollback.
-     * @return boolean indicating whether the transaction has been
-     *         marked for rollback
-     * @throws IllegalStateException if <code>isActive()</code> is false
-     */
-    boolean getRollbackOnly();
-
-    /**
-     * Mark the current resource transaction so that the only possible outcome of the transaction is for the
-     * transaction to be rolled back.
+     * Returns the commit priority of this transaction.
      *
-     * @throws IllegalStateException if <code>isActive()</code> is false
+     * <p>This priority determines the order in which transactions are committed
+     * when multiple transactions are active. Transactions with higher priority
+     * values will be committed before those with lower values.</p>
+     *
+     * <p>The commit priority can be useful when managing transactions across
+     * multiple backends, ensuring that more critical transactions are finalized
+     * first to maintain data consistency and integrity.</p>
+     *
+     * @return an integer representing the commit priority of the transaction,
+     *         where higher values indicate higher priority.
      */
-    void setRollbackOnly() throws IllegalStateException;
+    int getCommitPriority();
 
-    /**
-     * Indicate whether a transaction is in progress.
-     * @return boolean indicating whether transaction is
-     *         in progress
-     */
-    boolean isActive();
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,6 +85,7 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         String hello = jersey.target("locale/translate/junit.hello").request().get(String.class);
         assertEquals("Hallo Welt", hello);
     }
+
     @Test
     public void translateToLocale() {
         String hello = jersey.target("locale/translate/en/junit.hello").request(MediaType.TEXT_PLAIN).get(String.class);

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,27 +20,27 @@
 ///<reference path="../model/simple/MCRMetsSection.ts"/>
 
 namespace org.mycore.mets.model.state {
-    export class SectionAddChange extends ModelChange {
-        private label: string;
-        private parentLabel: string;
+  export class SectionAddChange extends ModelChange {
+    private label: string;
+    private parentLabel: string;
 
-        constructor(private sectionToAdd: simple.MCRMetsSection, private parent: simple.MCRMetsSection) {
-            super();
-            this.label = this.sectionToAdd.label;
-            this.parentLabel = this.parent.label;
-        }
-
-        public doChange() {
-            this.parent.addSection(this.sectionToAdd);
-        }
-
-        public unDoChange() {
-            this.parent.removeSection(this.sectionToAdd);
-        }
-
-        public getDescription(messages: any): string {
-            const description = messages.SectionAddDescription || '???SectionAddDescription??? {new} {parent}';
-            return description.replace('{new}', this.label).replace('{parent}', this.parentLabel);
-        }
+    constructor(private sectionToAdd: simple.MCRMetsSection, private parent: simple.MCRMetsSection) {
+      super();
+      this.label = this.sectionToAdd.label;
+      this.parentLabel = this.parent.label;
     }
+
+    public doChange() {
+      this.parent.addSection(this.sectionToAdd);
+    }
+
+    public unDoChange() {
+      this.parent.removeSection(this.sectionToAdd);
+    }
+
+    public getDescription(messages: any): string {
+      const description = messages.SectionAddDescription || '???SectionAddDescription??? {new} {parent}';
+      return description.replace('{new}', this.label).replace('{parent}', this.parentLabel);
+    }
+  }
 }

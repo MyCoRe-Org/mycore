@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public class MCRMODSSorter implements URIResolver {
     public Source resolve(String href, String base) {
         String subHref = href.substring(href.indexOf(":") + 1);
         Element mods = MCRURIResolver.instance().resolve(subHref);
-        MCRMODSSorter.sort(mods);
+        sort(mods);
         return new JDOMSource(mods);
     }
 

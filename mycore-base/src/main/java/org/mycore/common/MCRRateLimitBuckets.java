@@ -1,9 +1,22 @@
-package org.mycore.common;
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.local.LocalBucketBuilder;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
+package org.mycore.common;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -11,6 +24,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.local.LocalBucketBuilder;
 
 /**
  * Manages the {@link Bucket Buckets} for different configurations.

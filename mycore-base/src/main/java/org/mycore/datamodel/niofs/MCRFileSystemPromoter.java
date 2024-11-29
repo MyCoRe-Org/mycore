@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ import jakarta.servlet.ServletContext;
 public class MCRFileSystemPromoter implements AutoExecutable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRFileSystemPromoter.class);
-
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#getName()

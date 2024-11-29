@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,58 +16,58 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TextInputView} from "../../../../../base/widgets/toolbar/view/input/TextInputView";
+import { TextInputView } from "../../../../../base/widgets/toolbar/view/input/TextInputView";
 
 
 export class BootstrapTextInputView implements TextInputView {
 
-    constructor(private _id: string) {
-        this.element = jQuery("<form></form>");
-        this.element.addClass("navbar-form");
-        this.element.css({display: "inline-block"});
+  constructor(private _id: string) {
+    this.element = jQuery("<form></form>");
+    this.element.addClass("navbar-form");
+    this.element.css({ display: "inline-block" });
 
-        this.childText = jQuery("<input type='text' class='form-control'/>");
-        this.childText.appendTo(this.element);
+    this.childText = jQuery("<input type='text' class='form-control'/>");
+    this.childText.appendTo(this.element);
 
-        this.childText.keydown((e) => {
-            if (e.keyCode == 13) {
-                e.preventDefault();
-            }
-        });
+    this.childText.keydown((e) => {
+      if (e.keyCode == 13) {
+        e.preventDefault();
+      }
+    });
 
-        this.childText.keyup((e) => {
-            if (e.keyCode) {
-                if (e.keyCode == 27) { // Unfocus when pressing escape
-                    this.childText.val("");
-                    this.childText.blur()
-                }
-            }
+    this.childText.keyup((e) => {
+      if (e.keyCode) {
+        if (e.keyCode == 27) { // Unfocus when pressing escape
+          this.childText.val("");
+          this.childText.blur()
+        }
+      }
 
-            if (this.onChange != null) {
-                this.onChange();
-            }
-        });
-    }
+      if (this.onChange != null) {
+        this.onChange();
+      }
+    });
+  }
 
-    private element: JQuery;
-    private childText: JQuery;
+  private element: JQuery;
+  private childText: JQuery;
 
-    public onChange: () => void = null;
+  public onChange: () => void = null;
 
-    updateValue(value: string): void {
-        this.childText.val(value);
-    }
+  updateValue(value: string): void {
+    this.childText.val(value);
+  }
 
-    getValue(): string {
-        return this.childText.val() + "";
-    }
+  getValue(): string {
+    return this.childText.val() + "";
+  }
 
-    getElement(): JQuery {
-        return this.element;
-    }
+  getElement(): JQuery {
+    return this.element;
+  }
 
-    updatePlaceholder(placeHolder: string): void {
-        this.childText.attr("placeholder", placeHolder);
-    }
+  updatePlaceholder(placeHolder: string): void {
+    this.childText.attr("placeholder", placeHolder);
+  }
 }
 

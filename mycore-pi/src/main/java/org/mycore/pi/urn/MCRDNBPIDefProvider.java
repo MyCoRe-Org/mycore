@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.util.MCRHttpUtils;
 
 public class MCRDNBPIDefProvider {
-    private static final String RESOLVING_URL_TEMPLATE
-        = "https://nbn-resolving.org/resolver?identifier={urn}&verb=full&xml=on";
+    private static final String RESOLVING_URL_TEMPLATE =
+        "https://nbn-resolving.org/resolver?identifier={urn}&verb=full&xml=on";
 
     public static Document get(MCRDNBURN urn) throws MCRIdentifierUnresolvableException {
         return get(urn.asString());

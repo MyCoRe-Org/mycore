@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,6 @@ public class MCRRequestDebugFilter implements Filter {
     /* (non-Javadoc)
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
-
 
     /* (non-Javadoc)
      * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)

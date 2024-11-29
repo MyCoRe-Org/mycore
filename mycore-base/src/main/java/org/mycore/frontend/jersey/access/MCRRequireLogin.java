@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public class MCRRequireLogin implements MCRResourceAccessChecker {
     public boolean isPermitted(ContainerRequestContext request) {
         boolean result = false;
         if (MCRSessionMgr.hasCurrentSession()) {
-            result= !MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(
+            result = !MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(
                 MCRSystemUserInformation.getGuestInstance().getUserID());
         }
         return result;

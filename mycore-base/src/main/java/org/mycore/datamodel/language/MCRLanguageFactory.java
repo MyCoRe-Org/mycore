@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -117,8 +117,8 @@ public class MCRLanguageFactory {
         String languageCode;
         if ((!languageByCode.containsKey(code)) && code.contains("-") && !code.startsWith("x-")) {
             languageCode = code.split("-")[0];
-        }else{
-            languageCode=code;
+        } else {
+            languageCode = code;
         }
         if (!languageByCode.containsKey(languageCode)) {
             LOGGER.warn("Unknown language: {}", languageCode);
@@ -218,10 +218,10 @@ public class MCRLanguageFactory {
      * Reads in the language classification and builds language objects from its categories
      */
     private void readLanguageClassification() {
-        if (!MCRTransactionHelper.isTransactionActive()) {
-            MCRTransactionHelper.beginTransaction();
+        if (!MCRTransactionManager.hasActiveTransactions()) {
+            MCRTransactionManager.beginTransactions();
             buildLanguagesFromClassification();
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
         } else {
             buildLanguagesFromClassification();
         }

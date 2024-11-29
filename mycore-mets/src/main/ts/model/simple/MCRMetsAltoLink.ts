@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 ///<reference path="MCRMetsFile.ts"/>
 namespace org.mycore.mets.model.simple {
-    export class MCRMetsAltoLink {
-        constructor(public altoFile: MCRMetsFile, public begin: string, public end: string) {
-        }
-
-        public static copy(file: MCRMetsAltoLink) {
-            return new MCRMetsAltoLink(file.altoFile, file.begin, file.end);
-        }
+  export class MCRMetsAltoLink {
+    constructor(public altoFile: MCRMetsFile, public begin: string, public end: string) {
     }
+
+    public static copy(file: MCRMetsAltoLink) {
+      return new MCRMetsAltoLink(file.altoFile, file.begin, file.end);
+    }
+  }
 }

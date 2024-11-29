@@ -1,4 +1,26 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.common.events;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,16 +38,12 @@ import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Map;
 
 public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
@@ -51,7 +69,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testXMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 
@@ -66,44 +84,40 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 
-        String expression1
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='diniPublType' and @categid='article']";
+        String expression1 =
+            "//mappings[@class='MCRMetaClassification']/mapping[@classid='diniPublType' and @categid='article']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression1, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for diniPublType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression2
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='schemaOrg' "
-                + "and @categid='Article']";
+        String expression2 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='schemaOrg' "
+            + "and @categid='Article']";
         expressionObject = XPathFactory.instance()
             .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for schemaOrg should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression3
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
-                + "and @categid='journal-article']";
+        String expression3 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
+            + "and @categid='journal-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression4
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
-                + "and @categid='dummy-article']";
+        String expression4 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+            + "and @categid='dummy-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression4, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression5
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
-                + "and @categid='dummy-placeholder']";
+        String expression5 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+            + "and @categid='dummy-placeholder']";
         expressionObject = XPathFactory.instance()
             .compile(expression5, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped placeholder classification should be in the MyCoReObject now!",
@@ -123,7 +137,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 
@@ -137,18 +151,16 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 
-        String expression1
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
-                + "and @categid='journal-article']";
+        String expression1 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
+            + "and @categid='journal-article']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression1, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification for orcidWorkType should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
 
-        String expression2
-            = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
-                + "and @categid='dummy-article']";
+        String expression2 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+            + "and @categid='dummy-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",

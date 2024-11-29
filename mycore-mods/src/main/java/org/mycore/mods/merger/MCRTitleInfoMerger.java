@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ import org.mycore.common.MCRConstants;
 public class MCRTitleInfoMerger extends MCRMerger {
 
     private String originalText;
-    
+
     private String normalizedText;
 
     public void setElement(Element element) {
@@ -62,7 +62,7 @@ public class MCRTitleInfoMerger extends MCRMerger {
         if (normalizedText.equals(otherTitle.normalizedText)) {
             return true;
         }
-        return normalizedText.startsWith(otherTitle.normalizedText) 
+        return normalizedText.startsWith(otherTitle.normalizedText)
             || otherTitle.normalizedText.startsWith(normalizedText);
     }
 
@@ -77,7 +77,7 @@ public class MCRTitleInfoMerger extends MCRMerger {
 
         if (!weHaveSubTitleOtherHasNot && (otherHasSubTitleAndWeNot || otherTitleIsLonger)) {
             this.element.setContent(other.element.cloneContent());
-        } 
+        }
 
     }
 

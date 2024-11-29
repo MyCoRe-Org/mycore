@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,7 +129,6 @@ public class MCREventManager {
      *            the order in which the event handlers are called
      */
 
-
     public void handleEvent(MCREvent evt, boolean direction) {
         final String objectType = evt.getObjectType() == MCREvent.ObjectType.CUSTOM ? evt.getCustomObjectType()
             : evt.getObjectType().getClassName();
@@ -139,36 +138,36 @@ public class MCREventManager {
         }
         int first = direction ? 0 : list.size() - 1;
         int undoPos = first;
-         Exception handleEventExceptionCaught= processEventHandlersAndUndo( evt,  direction,  undoPos);
+        Exception handleEventExceptionCaught = processEventHandlersAndUndo(evt, direction, undoPos);
         if (handleEventExceptionCaught != null) {
             String msg = "Exception caught in EventHandler, rollback by calling undo of successfull handlers done.";
             throw new MCRException(msg, handleEventExceptionCaught);
         }
     }
 
-
-    private Exception processEventHandlersAndUndo(MCREvent evt, boolean direction, int undoPos){
+    private Exception processEventHandlersAndUndo(MCREvent evt, boolean direction, int undoPos) {
         final String objectType = evt.getObjectType() == MCREvent.ObjectType.CUSTOM ? evt.getCustomObjectType()
-                : evt.getObjectType().getClassName();
+            : evt.getObjectType().getClassName();
         List<MCREventHandler> list = handlers.get(objectType);
         int first = direction ? 0 : list.size() - 1;
         int last = direction ? list.size() - 1 : 0;
         int step = direction ? 1 : -1;
-        int pos =undoPos;
+        int pos = undoPos;
         final String eventType = evt.getEventType() == MCREvent.EventType.CUSTOM ? evt.getCustomEventType()
-                : evt.getEventType().name();
+            : evt.getEventType().name();
         Exception handleEventExceptionCaught = null;
         for (int i = first; i != last + step; i += step) {
             MCREventHandler eh = list.get(i);
             logger.debug("EventManager {} {} calling handler {}", objectType, eventType,
-                    eh.getClass().getName());
+                eh.getClass().getName());
             handleEventExceptionCaught = handleEventAndUndoOnException(eh, evt);
             if (handleEventExceptionCaught != null) {
                 pos = i;
                 break;
             }
-        }  for (int i = pos - step; i != first - step; i -= step) {
-            rollbackByUndoingHandlers( list.get(i), evt);
+        }
+        for (int i = pos - step; i != first - step; i -= step) {
+            rollbackByUndoingHandlers(list.get(i), evt);
         }
         return handleEventExceptionCaught;
     }
@@ -181,25 +180,25 @@ public class MCREventManager {
             handleEventExceptionCaught = ex;
             logger.error("Exception caught while calling event handler", ex);
             logger.error("Trying rollback by calling undo method of event handlers");
-    }
-    return handleEventExceptionCaught;
+        }
+        return handleEventExceptionCaught;
 
-}
+    }
 
     private void rollbackByUndoingHandlers(MCREventHandler eh, MCREvent evt) {
         final String objectType = evt.getObjectType() == MCREvent.ObjectType.CUSTOM ? evt.getCustomObjectType()
             : evt.getObjectType().getClassName();
         final String eventType = evt.getEventType() == MCREvent.EventType.CUSTOM ? evt.getCustomEventType()
             : evt.getEventType().name();
-            logger.debug("EventManager {} {} calling undo of handler {}", objectType, eventType,
-                eh.getClass().getName());
-            try {
-                eh.undoHandleEvent(evt);
-            } catch (Exception ex) {
-                logger.error("Exception caught while calling undo of event handler", ex);
-            }
-
+        logger.debug("EventManager {} {} calling undo of handler {}", objectType, eventType,
+            eh.getClass().getName());
+        try {
+            eh.undoHandleEvent(evt);
+        } catch (Exception ex) {
+            logger.error("Exception caught while calling undo of event handler", ex);
         }
+
+    }
 
     /** Same as handleEvent( evt, MCREventManager.FORWARD ) */
     public void handleEvent(MCREvent evt) throws MCRException {

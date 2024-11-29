@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     public MCRClassificationMappingEventHandler() {
         this.xPathMappingClassifications = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs")
-               .orElse("");
+            .orElse("");
     }
 
     @Override
@@ -267,8 +267,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             });
             // If category is in list, the XPath is already successfully evaluated
             category.getLabel(LABEL_LANG_XPATH_MAPPING).ifPresent(label -> {
-                MCRMetaClassification metaClass
-                    = new MCRMetaClassification("mapping", 0, null, category.getId().getRootID(),
+                MCRMetaClassification metaClass =
+                    new MCRMetaClassification("mapping", 0, null, category.getId().getRootID(),
                         category.getId().getId());
                 mappings.addMetaObject(metaClass);
             });
@@ -297,7 +297,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         while (matcher.find()) {
             String patternName = matcher.group(1);
             String placeholderText = MCRConfiguration2.getSubPropertiesMap("MCR.Category.XPathMapping.Pattern.")
-                    .get(patternName);
+                .get(patternName);
             if (placeholderText != null) {
                 if (!matcher.group(2).isEmpty()) { // if there are values to substitute
                     String[] placeholderValues = matcher.group(2).split(",");

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,16 @@
 
 package org.mycore.common.util;
 
-import net.sf.saxon.jaxp.TransformerImpl;
-import net.sf.saxon.s9api.Message;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,14 +38,8 @@ import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.xml.MCRURIResolver;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import net.sf.saxon.jaxp.TransformerImpl;
+import net.sf.saxon.s9api.Message;
 
 /**
  * Provides utility methods for testing XSLT functions. The general process for XSL testing is as follows:

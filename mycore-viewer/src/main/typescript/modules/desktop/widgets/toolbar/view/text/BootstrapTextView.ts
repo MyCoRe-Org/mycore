@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,23 @@
  */
 
 
-import {TextView} from "../../../../../base/widgets/toolbar/view/text/TextView";
+import { TextView } from "../../../../../base/widgets/toolbar/view/text/TextView";
 
 export class BootstrapTextView implements TextView {
 
-    constructor(private _id: string) {
-        this.element = jQuery("<p></p>");
-        this.element.addClass("navbar-text");
-    }
+  constructor(private _id: string) {
+    this.element = jQuery("<p></p>");
+    this.element.addClass("navbar-text");
+  }
 
-    private element: JQuery;
+  private element: JQuery;
 
-    updateText(text: string): void {
-        this.element.text(text);
-    }
+  updateText(text: string): void {
+    this.element.text(text);
+  }
 
-    getElement(): JQuery {
-        return this.element;
-    }
+  getElement(): JQuery {
+    return this.element;
+  }
 }
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         handleAddOrModify(der);
     }
+
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         handleAddOrModify(der);
@@ -66,7 +67,6 @@ public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         handleDelete(der);
     }
-
 
     private void handleAddOrModify(MCRBase base) {
         long start = System.currentTimeMillis();

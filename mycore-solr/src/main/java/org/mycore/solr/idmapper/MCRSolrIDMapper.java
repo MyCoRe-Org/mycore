@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
 import org.mycore.frontend.idmapper.MCRIDMapper;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * implementation of an MCRIDMapper
@@ -58,16 +58,15 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
     @MCRProperty(name = "ObjectSolrFields", required = false,
         defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys")
     public void setObjectSolrFields(String fields) {
-        objectSolrFields
-            = Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+        objectSolrFields = Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
     }
 
     //property MCR.RestAPI.V2.AlternativeIdentifier.Derivate.Keys deprecated in 2024.06
     @MCRProperty(name = "DerivateSolrFields", required = false,
         defaultName = "MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys")
     public void setDerivateSolrFields(String fields) {
-        derivateSolrFields
-            = Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+        derivateSolrFields =
+            Stream.ofNullable(fields).flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
     }
 
     @Override

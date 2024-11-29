@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,74 +17,74 @@
  */
 
 
-import {Position2D} from "../../../Utils";
+import { Position2D } from "../../../Utils";
 
 export interface DesktopInputListener {
-    keydown(e: JQuery.KeyboardEventBase): void;
+  keydown(e: JQuery.KeyboardEventBase): void;
 
-    keypress(e: JQuery.KeyboardEventBase): void;
+  keypress(e: JQuery.KeyboardEventBase): void;
 
-    keyup(e: JQuery.KeyboardEventBase): void;
+  keyup(e: JQuery.KeyboardEventBase): void;
 
-    mouseClick(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseClick(position: Position2D, e: JQuery.MouseEventBase): void;
 
-    mouseDoubleClick(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseDoubleClick(position: Position2D, e: JQuery.MouseEventBase): void;
 
-    mouseDown(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseDown(position: Position2D, e: JQuery.MouseEventBase): void;
 
-    mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
-              e: JQuery.MouseEventBase): void;
+  mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
+    e: JQuery.MouseEventBase): void;
 
-    mouseMove(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseMove(position: Position2D, e: JQuery.MouseEventBase): void;
 
-    mouseUp(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseUp(position: Position2D, e: JQuery.MouseEventBase): void;
 
-    scroll(e: {
-        deltaX: number;
-        deltaY: number;
-        orig: any;
-        pos: Position2D;
-        altKey?: boolean
-    }):void;
+  scroll(e: {
+    deltaX: number;
+    deltaY: number;
+    orig: any;
+    pos: Position2D;
+    altKey?: boolean
+  }): void;
 }
 
 export abstract class DesktopInputAdapter implements DesktopInputListener {
 
-    mouseDown(position: Position2D, e: JQuery.MouseEventBase): void {
-    }
+  mouseDown(position: Position2D, e: JQuery.MouseEventBase): void {
+  }
 
-    mouseUp(position: Position2D, e: JQuery.MouseEventBase): void {
-    }
+  mouseUp(position: Position2D, e: JQuery.MouseEventBase): void {
+  }
 
-    mouseClick(position: Position2D, e: JQuery.MouseEventBase): void {
-    }
+  mouseClick(position: Position2D, e: JQuery.MouseEventBase): void {
+  }
 
-    mouseDoubleClick(position: Position2D, e: JQuery.MouseEventBase): void {
-    }
+  mouseDoubleClick(position: Position2D, e: JQuery.MouseEventBase): void {
+  }
 
-    mouseMove(position: Position2D, e: JQuery.MouseEventBase): void {
-    }
+  mouseMove(position: Position2D, e: JQuery.MouseEventBase): void {
+  }
 
-    mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
-              e: JQuery.MouseEventBase): void {
-    }
+  mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
+    e: JQuery.MouseEventBase): void {
+  }
 
-    scroll(e: {
-        deltaX: number;
-        deltaY: number;
-        orig: any;
-        pos: Position2D;
-        altKey?: boolean
-    }) {
-    }
+  scroll(e: {
+    deltaX: number;
+    deltaY: number;
+    orig: any;
+    pos: Position2D;
+    altKey?: boolean
+  }) {
+  }
 
-    keydown(e: JQuery.KeyboardEventBase): void {
-    }
+  keydown(e: JQuery.KeyboardEventBase): void {
+  }
 
-    keypress(e: JQuery.KeyboardEventBase): void {
-    }
+  keypress(e: JQuery.KeyboardEventBase): void {
+  }
 
-    keyup(e: JQuery.KeyboardEventBase): void {
-    }
+  keyup(e: JQuery.KeyboardEventBase): void {
+  }
 }
 

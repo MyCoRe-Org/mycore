@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,20 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {StructureImage} from "../model/StructureImage";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { StructureImage } from "../model/StructureImage";
 
 export class ImageChangedEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, private _image: StructureImage) {
-        super(component, ImageChangedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, private _image: StructureImage) {
+    super(component, ImageChangedEvent.TYPE);
+  }
 
-    public get image() {
-        return this._image;
-    }
+  public get image() {
+    return this._image;
+  }
 
-    public static TYPE: string = "ImageChangedEvent";
+  public static TYPE: string = "ImageChangedEvent";
 
 }
 

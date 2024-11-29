@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public class MCRSolrConfigSetHelper {
      * @throws IOException If an error occurs while fetching the config sets.
      */
     public static List<String> getRemoteConfigSetNames(MCRSolrCore core) throws URISyntaxException, IOException,
-            SolrServerException {
+        SolrServerException {
         ConfigSetAdminRequest.List listRequest = new ConfigSetAdminRequest.List();
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(listRequest,
             MCRSolrAuthenticationLevel.ADMIN);
@@ -124,7 +124,7 @@ public class MCRSolrConfigSetHelper {
             }
 
             @Override
-            public InputStream getStream()  {
+            public InputStream getStream() {
                 return configSetProvider.getStreamSupplier().get();
             }
         });

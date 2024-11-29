@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,12 +66,12 @@ final class MCRPaths {
         StringBuilder pathBuilder = new StringBuilder();
         pathBuilder.append(MCRAbstractFileSystem.SEPARATOR_STRING);
         pathBuilder.append(owner);
-        if(version != null) {
+        if (version != null) {
             pathBuilder.append(MCRVersionedPath.OWNER_VERSION_SEPARATOR);
             pathBuilder.append(version);
         }
         pathBuilder.append(':');
-        if(path.isEmpty() || path.charAt(0) != MCRAbstractFileSystem.SEPARATOR) {
+        if (path.isEmpty() || path.charAt(0) != MCRAbstractFileSystem.SEPARATOR) {
             pathBuilder.append(MCRAbstractFileSystem.SEPARATOR_STRING);
         }
         pathBuilder.append(path);

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,32 +26,32 @@ wcms.common = wcms.common || {};
  * A collection of undoable edits.
  */
 wcms.common.CompoundEdit = function() {
-	this.undoableEditList = [];
+  this.undoableEditList = [];
 };
 
-( function() {
+(function() {
 
-	function addEdit(/*UndoableEdit*/ edit) {
-		this.undoableEditList.push(edit);
-	}
+  function addEdit(/*UndoableEdit*/ edit) {
+    this.undoableEditList.push(edit);
+  }
 
-	function undo() {
-		for(var i = this.undoableEditList.length - 1; i >= 0; i--) {
-			this.undoableEditList[i].undo();
-		}
-	}
+  function undo() {
+    for (var i = this.undoableEditList.length - 1; i >= 0; i--) {
+      this.undoableEditList[i].undo();
+    }
+  }
 
-	function redo() {
-		for(var i = 0; i < this.undoableEditList.length; i++) {
-			this.undoableEditList[i].redo();
-		}
-	}
+  function redo() {
+    for (var i = 0; i < this.undoableEditList.length; i++) {
+      this.undoableEditList[i].redo();
+    }
+  }
 
-	// inheritance
-	wcms.common.UndoableEdit.prototype = new wcms.common.CompoundEdit;
+  // inheritance
+  wcms.common.UndoableEdit.prototype = new wcms.common.CompoundEdit;
 
-	wcms.common.CompoundEdit.prototype.addEdit = addEdit;
-	wcms.common.CompoundEdit.prototype.undo = undo;
-	wcms.common.CompoundEdit.prototype.redo = redo;
+  wcms.common.CompoundEdit.prototype.addEdit = addEdit;
+  wcms.common.CompoundEdit.prototype.undo = undo;
+  wcms.common.CompoundEdit.prototype.redo = redo;
 
 })();

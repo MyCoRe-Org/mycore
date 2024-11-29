@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ import static org.junit.Assert.assertNull;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import org.junit.Test;
 
 public class MCRISO8601DateTest {
-
 
     @Test
     public void getDate() {

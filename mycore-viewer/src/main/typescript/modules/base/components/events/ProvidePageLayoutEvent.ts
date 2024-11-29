@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,19 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {PageLayout} from "../../widgets/canvas/PageLayout";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { PageLayout } from "../../widgets/canvas/PageLayout";
 
 /**
  * Used to provide a PageLayout wich can be used by the MyCoReImageScrollComponent.
  */
 export class ProvidePageLayoutEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public pageLayout: PageLayout, public isDefault = false) {
-        super(component, ProvidePageLayoutEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public pageLayout: PageLayout, public isDefault = false) {
+    super(component, ProvidePageLayoutEvent.TYPE);
+  }
 
-    public static TYPE = "ProvidePageLayoutEvent";
+  public static TYPE = "ProvidePageLayoutEvent";
 
 }

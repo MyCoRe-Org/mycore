@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,130 +17,130 @@
  */
 
 
-import {LanguageModel} from "../../components/model/LanguageModel";
+import { LanguageModel } from "../../components/model/LanguageModel";
 
 export class ViewerModalWindow {
-    constructor(private _mobile: boolean, _title: string, parent: HTMLElement = document.body) {
-        let that = this;
+  constructor(private _mobile: boolean, _title: string, parent: HTMLElement = document.body) {
+    let that = this;
 
-        this._wrapper = jQuery("<div></div>");
-        this._wrapper.addClass("modal fade bs-modal-sm");
-        this._wrapper.attr("tabindex", "-1");
-        this._wrapper.attr("role", "dialog");
-        this._wrapper.attr("aria-labeleby", "permalinkLabel");
-        this._wrapper.attr("aria-hidden", "true");
-        this._wrapper.on("click", function (e) {
-            if (e.target == that._wrapper[0]) {
-                that.hide();
-            }
-        });
+    this._wrapper = jQuery("<div></div>");
+    this._wrapper.addClass("modal fade bs-modal-sm");
+    this._wrapper.attr("tabindex", "-1");
+    this._wrapper.attr("role", "dialog");
+    this._wrapper.attr("aria-labeleby", "permalinkLabel");
+    this._wrapper.attr("aria-hidden", "true");
+    this._wrapper.on("click", function(e) {
+      if (e.target == that._wrapper[0]) {
+        that.hide();
+      }
+    });
 
-        this._box = jQuery("<div></div>");
-        this._box.addClass("modal-dialog modal-sm");
-        this._box.appendTo(this._wrapper);
+    this._box = jQuery("<div></div>");
+    this._box.addClass("modal-dialog modal-sm");
+    this._box.appendTo(this._wrapper);
 
-        this._content = jQuery("<div></div>");
-        this._content.addClass("modal-content");
-        this._content.appendTo(this._box);
+    this._content = jQuery("<div></div>");
+    this._content.addClass("modal-content");
+    this._content.appendTo(this._box);
 
-        this._header = jQuery("<div><h4 class='modal-title' data-i18n='" + _title + "'>" + _title + "</h4></div>");
-        this._header.addClass("modal-header");
-        this._header.appendTo(this._content);
+    this._header = jQuery("<div><h4 class='modal-title' data-i18n='" + _title + "'>" + _title + "</h4></div>");
+    this._header.addClass("modal-header");
+    this._header.appendTo(this._content);
 
-        this._body = jQuery("<div></div>");
-        this._body.addClass("modal-body");
-        this._body.appendTo(this._content);
+    this._body = jQuery("<div></div>");
+    this._body.addClass("modal-body");
+    this._body.appendTo(this._content);
 
-        this._footer = jQuery("<div></div>");
-        this._footer.addClass("modal-footer");
-        this._footer.appendTo(this._content);
+    this._footer = jQuery("<div></div>");
+    this._footer.addClass("modal-footer");
+    this._footer.appendTo(this._content);
 
-        this._close = jQuery("<button data-i18n='modal.close'>Close</button>");
-        this._close.attr("type", "button");
-        this._close.addClass("btn btn-secondary");
-        this._close.appendTo(this._footer);
+    this._close = jQuery("<button data-i18n='modal.close'>Close</button>");
+    this._close.attr("type", "button");
+    this._close.addClass("btn btn-secondary");
+    this._close.appendTo(this._footer);
 
-        this._close.click(() => {
-            that.hide();
-        });
+    this._close.click(() => {
+      that.hide();
+    });
 
-        if (!this._mobile) {
-            (<any>this._wrapper).modal({show: false});
-        } else {
-            this.hide();
-        }
-
-        jQuery(parent).prepend(this._wrapper);
+    if (!this._mobile) {
+      (<any>this._wrapper).modal({ show: false });
+    } else {
+      this.hide();
     }
 
-    private _wrapper: JQuery;
-    private _box: JQuery;
-    private _content: JQuery;
-    private _header: JQuery;
-    private _body: JQuery;
-    private _footer: JQuery;
-    private _close: JQuery;
+    jQuery(parent).prepend(this._wrapper);
+  }
 
-    public get box() {
-        return this._box;
-    }
+  private _wrapper: JQuery;
+  private _box: JQuery;
+  private _content: JQuery;
+  private _header: JQuery;
+  private _body: JQuery;
+  private _footer: JQuery;
+  private _close: JQuery;
 
-    public get wrapper() {
-        return this._wrapper;
-    }
+  public get box() {
+    return this._box;
+  }
 
-    public get modalContent() {
-        return this._content;
-    }
+  public get wrapper() {
+    return this._wrapper;
+  }
 
-    public get modalHeader() {
-        return this._header;
-    }
+  public get modalContent() {
+    return this._content;
+  }
 
-    public get modalBody() {
-        return this._body;
-    }
+  public get modalHeader() {
+    return this._header;
+  }
 
-    public get modalFooter() {
-        return this._footer;
-    }
+  public get modalBody() {
+    return this._body;
+  }
 
-    public show(): void {
-        if (!this._mobile) {
-            (<any>this._wrapper).modal("show");
-        } else {
-            this._wrapper.show();
-        }
-    }
+  public get modalFooter() {
+    return this._footer;
+  }
 
-    public hide(): void {
-        if (!this._mobile) {
-            (<any>this._wrapper).modal("hide");
-        } else {
-            this._wrapper.hide();
-        }
+  public show(): void {
+    if (!this._mobile) {
+      (<any>this._wrapper).modal("show");
+    } else {
+      this._wrapper.show();
     }
+  }
 
-    public get closeButton() {
-        return this._close;
+  public hide(): void {
+    if (!this._mobile) {
+      (<any>this._wrapper).modal("hide");
+    } else {
+      this._wrapper.hide();
     }
+  }
 
-    public set closeLabel(label: string) {
-        this._close.text(label);
-    }
+  public get closeButton() {
+    return this._close;
+  }
 
-    public get title() {
-        return <string>this._header.find(".modal-title").text();
-    }
+  public set closeLabel(label: string) {
+    this._close.text(label);
+  }
 
-    public set title(title: string) {
-        this._header.find(".modal-title").text(title);
-    }
+  public get title() {
+    return <string>this._header.find(".modal-title").text();
+  }
 
-    public updateI18n(languageModel: LanguageModel): ViewerModalWindow {
-        languageModel.translate(this._wrapper);
-        return this;
-    }
+  public set title(title: string) {
+    this._header.find(".modal-title").text(title);
+  }
+
+  public updateI18n(languageModel: LanguageModel): ViewerModalWindow {
+    languageModel.translate(this._wrapper);
+    return this;
+  }
 
 }
 

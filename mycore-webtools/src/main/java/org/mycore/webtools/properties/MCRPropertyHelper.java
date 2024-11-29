@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class MCRPropertyHelper {
             byte[] value = componentContentEntry.getValue();
             List<MCRProperty> componentList = analyzedProperties.computeIfAbsent(component, k1 -> new LinkedList<>());
 
-            try(ByteArrayInputStream bais = new ByteArrayInputStream(value)){
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(value)) {
                 properties.load(bais);
                 bais.reset();
                 currentProperties.load(bais);
@@ -63,7 +63,7 @@ class MCRPropertyHelper {
                 String propertyName = (String) k;
                 String propertyValue = properties.getProperty(propertyName);
                 String oldValue = Optional.ofNullable(oldProperties.get()).map(op -> op.getProperty(propertyName))
-                        .orElse(null);
+                    .orElse(null);
 
                 componentList.add(new MCRProperty(component, propertyName, oldValue, propertyValue));
                 currentProperties.put(propertyName, propertyValue);

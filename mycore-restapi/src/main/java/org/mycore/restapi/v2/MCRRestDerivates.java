@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -417,20 +417,39 @@ public class MCRRestDerivates {
 
         LOGGER.debug(der);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
+        boolean modified = updateIfModified(der, derivate);
+        if (modified) {
+            try {
+                MCRMetadataManager.update(derivate);
+            } catch (MCRAccessException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                    .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
+            }
+        }
+
+        return Response.noContent().build();
+    }
+
+    private static boolean updateIfModified(DerivateMetadata der, MCRDerivate derivate) {
         boolean modified = false;
 
-        if (der.getOrder() != -1
-            && derivate.getOrder() != der.getOrder()) {
+        // Check if the 'order' field has been updated
+        if (der.getOrder() != -1 && derivate.getOrder() != der.getOrder()) {
             modified = true;
             derivate.setOrder(der.getOrder());
         }
 
-        if (der.getMainDoc() != null
-            && !der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
+        // Check if the 'mainDoc' field has been updated
+        if (der.getMainDoc() != null && !der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
             modified = true;
             derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
         }
 
+        // Check if the 'classifications' field has been updated
         List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
             .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
             .collect(Collectors.toList());
@@ -445,6 +464,7 @@ public class MCRRestDerivates {
                     .collect(Collectors.toList()));
         }
 
+        // Check if the 'titles' field has been updated
         List<MCRMetaLangText> newTitles = der.getTitles().stream()
             .map(DerivateTitle::toMetaLangText)
             .collect(Collectors.toList());
@@ -455,20 +475,7 @@ public class MCRRestDerivates {
             derivate.getDerivate().getTitles().clear();
             derivate.getDerivate().getTitles().addAll(newTitles);
         }
-
-        if (modified) {
-            try {
-                MCRMetadataManager.update(derivate);
-            } catch (MCRAccessException e) {
-                throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
-                    .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
-                    .withDetail(e.getMessage())
-                    .withCause(e)
-                    .toException();
-            }
-        }
-        return Response.noContent().build();
+        return modified;
     }
 
     @PUT

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,8 @@
 
 package org.mycore.frontend.jersey.filter;
 
-
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -31,17 +30,17 @@ public class MCRDBTransactionFilter implements ContainerRequestFilter, Container
 
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
-        if (MCRTransactionHelper.transactionRequiresRollback()) {
-            MCRTransactionHelper.rollbackTransaction();
+        if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+            MCRTransactionManager.rollbackTransactions();
         } else {
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
         }
     }
 
     @Override
     public void filter(ContainerRequestContext request) {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
     }
 
 }

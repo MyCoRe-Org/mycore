@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -70,7 +71,7 @@ public enum MCRMODSDateFormat {
 
     MCRMODSDateFormat(String encoding, String dateFormat) {
         this.encoding = encoding;
-        this.attributeValue = encoding == "iso8601" ? encoding : encoding.split("-")[0];
+        this.attributeValue = Objects.equals(encoding, "iso8601") ? encoding : encoding.split("-")[0];
         this.dateFormat = dateFormat;
         this.dateOnly = dateFormat != null && !dateFormat.endsWith("ss"); //see above
     }
@@ -120,8 +121,8 @@ public enum MCRMODSDateFormat {
     }
 
     public SimpleDateFormat getDateFormat() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(this.dateFormat, MCRMODSDateFormat.DATE_LOCALE);
-        dateFormat.setTimeZone(MCRMODSDateFormat.MODS_TIMEZONE);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(this.dateFormat, DATE_LOCALE);
+        dateFormat.setTimeZone(MODS_TIMEZONE);
         return dateFormat;
     }
 }

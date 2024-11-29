@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
     private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-            MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.getInstance();
 
     @Override
     public String getDescription() {

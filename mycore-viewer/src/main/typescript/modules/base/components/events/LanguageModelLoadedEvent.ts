@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,20 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {LanguageModel} from "../model/LanguageModel";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { LanguageModel } from "../model/LanguageModel";
 
 export class LanguageModelLoadedEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, private _languageModel: LanguageModel) {
-        super(component, LanguageModelLoadedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, private _languageModel: LanguageModel) {
+    super(component, LanguageModelLoadedEvent.TYPE);
+  }
 
-    public get languageModel(): LanguageModel {
-        return this._languageModel;
-    }
+  public get languageModel(): LanguageModel {
+    return this._languageModel;
+  }
 
-    public static TYPE: string = "LanguageModelLoadedEvent";
+  public static TYPE: string = "LanguageModelLoadedEvent";
 
 
 }

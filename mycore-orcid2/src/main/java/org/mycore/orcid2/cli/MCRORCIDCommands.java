@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,8 +55,7 @@ public class MCRORCIDCommands {
     @MCRCommand(syntax = "migrate all orcid access token attributes",
         help = "Migrates orcid user access token attributes to orcid2 oauth credential")
     public static void migrateORCIDTokenAttributes() {
-        final List<MCRUser> users
-            = MCRUserManager.listUsers(null, null, null, null, ORCID_TOKEN_ATTRIBUTE_NAME,
+        final List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null, ORCID_TOKEN_ATTRIBUTE_NAME,
             null, 0, Integer.MAX_VALUE);
         for (MCRUser user : users) {
             String orcid = null;

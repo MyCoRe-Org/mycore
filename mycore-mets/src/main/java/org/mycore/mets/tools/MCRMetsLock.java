@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package org.mycore.mets.tools;
 
 import java.util.Hashtable;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,8 +48,8 @@ public class MCRMetsLock {
      */
     public static synchronized boolean isLocked(String derivateIdString) {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
-        if (MCRMetsLock.metsAccessSessionTable.containsKey(derivateId)) {
-            String lastAccessID = MCRMetsLock.metsAccessSessionTable.get(derivateId);
+        if (metsAccessSessionTable.containsKey(derivateId)) {
+            String lastAccessID = metsAccessSessionTable.get(derivateId);
             MCRSession lastSession = MCRSessionMgr.getSession(lastAccessID);
             LOGGER.debug("{} is locked : {}", derivateIdString, lastSession != null);
             return lastSession != null;
@@ -66,12 +67,12 @@ public class MCRMetsLock {
     public static synchronized boolean doLock(String derivateIdString) {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
         if (isLocked(derivateIdString)
-            && MCRMetsLock.metsAccessSessionTable.get(derivateId) != MCRSessionMgr.getCurrentSessionID()) {
+            && !Objects.equals(metsAccessSessionTable.get(derivateId), MCRSessionMgr.getCurrentSessionID())) {
             LOGGER.info("Could not lock {}, because its already locked.", derivateIdString);
             return false;
         } else {
             LOGGER.info("{} is now locked", derivateIdString);
-            MCRMetsLock.metsAccessSessionTable.put(derivateId, MCRSessionMgr.getCurrentSessionID());
+            metsAccessSessionTable.put(derivateId, MCRSessionMgr.getCurrentSessionID());
             return true;
         }
     }
@@ -84,10 +85,10 @@ public class MCRMetsLock {
     public static synchronized void doUnlock(String derivateIdString) throws MCRException {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
         if (isLocked(derivateIdString)) {
-            String sessionId = MCRMetsLock.metsAccessSessionTable.get(MCRObjectID.getInstance(derivateIdString));
+            String sessionId = metsAccessSessionTable.get(MCRObjectID.getInstance(derivateIdString));
             if (MCRSessionMgr.getCurrentSessionID().equals(sessionId)) {
                 LOGGER.info("{} is not locked anymore", derivateIdString);
-                MCRMetsLock.metsAccessSessionTable.remove(derivateId);
+                metsAccessSessionTable.remove(derivateId);
             } else {
                 LOGGER.error("could not unlock {} because session id is different", derivateIdString);
                 String message = String.format(Locale.ENGLISH,

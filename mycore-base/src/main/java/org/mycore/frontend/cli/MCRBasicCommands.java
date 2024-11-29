@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,8 +65,8 @@ public class MCRBasicCommands {
     private static Logger LOGGER = LogManager.getLogger(MCRBasicCommands.class);
 
     // default value as defined in src/main/resources/configdir.template/resources/META-INF/persistence.xml
-    private static final String PERSISTENCE_DEFAULT_H2_URL
-        = "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
+    private static final String PERSISTENCE_DEFAULT_H2_URL =
+        "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
 
     /**
      * Shows a list of commands understood by the command line interface and

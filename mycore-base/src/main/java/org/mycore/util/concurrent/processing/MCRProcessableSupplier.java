@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     }
 
     /**
-     * Returns a human readable text indicating the state of the progress.
+     * Returns a human-readable text indicating the state of the progress.
      * 
      * @return progress text
      */
@@ -170,7 +170,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
      * Returns the name of this process. If no name is set
      * this returns the simplified class name of the task.
      * 
-     * @return a human readable name of this processable task
+     * @return a human-readable name of this processable task
      */
     @Override
     public String getName() {

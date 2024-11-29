@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@ package org.mycore.restapi;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -42,21 +41,21 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
         if (MCRSessionMgr.isLocked()) {
             return;
         }
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        if (MCRTransactionHelper.isTransactionActive()) {
+        MCRSessionMgr.getCurrentSession();
+        if (MCRTransactionManager.hasActiveTransactions()) {
             LOGGER.debug("Filter scoped JPA transaction is active.");
-            if (MCRTransactionHelper.transactionRequiresRollback()) {
+            if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
                 try {
-                    MCRTransactionHelper.rollbackTransaction();
+                    MCRTransactionManager.rollbackTransactions();
                 } finally {
                     throw new InternalServerErrorException("Transaction rollback was required.");
                 }
             }
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
         }
         if (Boolean.TRUE.equals(requestContext.getProperty(PROP_REQUIRE_TRANSACTION))) {
             LOGGER.debug("Starting user JPA transaction.");
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
         }
     }
 }

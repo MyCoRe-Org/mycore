@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,18 @@
  */
 
 namespace org.mycore.mets.model {
-    import PaginationMethod = org.mycore.mets.model.pagination.PaginationMethod;
+  import PaginationMethod = org.mycore.mets.model.pagination.PaginationMethod;
 
-    export class PaginationModalModel {
-        public methods: PaginationMethod[] = org.mycore.mets.model.pagination.paginationMethods;
-        public reverse: boolean = false;
+  export class PaginationModalModel {
+    public methods: PaginationMethod[] = org.mycore.mets.model.pagination.paginationMethods;
+    public reverse: boolean = false;
 
-        constructor(public messages: { [key: string]: string },
-                    public selectedPages: simple.MCRMetsPage[],
-                    public selectedPagesIndex: number,
-                    public begin: number = 0,
-                    public method: PaginationMethod = null,
-                    public value: string = '1') {
-        }
+    constructor(public messages: { [key: string]: string },
+      public selectedPages: simple.MCRMetsPage[],
+      public selectedPagesIndex: number,
+      public begin: number = 0,
+      public method: PaginationMethod = null,
+      public value: string = '1') {
     }
+  }
 }

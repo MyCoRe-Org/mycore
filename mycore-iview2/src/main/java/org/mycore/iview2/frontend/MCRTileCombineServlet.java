@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -155,20 +155,7 @@ public class MCRTileCombineServlet extends MCRServlet {
                 };
                 HttpServletResponse response = job.getResponse();
                 if (zoomLevel > maxZoomLevel) {
-                    zoomAlias = switch (maxZoomLevel) {
-                        case 2 -> "MID";
-                        case 1 -> "MIN";
-                        default -> "THUMB";
-                    };
-                    if (!imagePath.startsWith("/")) {
-                        imagePath = "/" + imagePath;
-                    }
-                    String redirectURL = response.encodeRedirectURL(new MessageFormat("{0}{1}/{2}/{3}{4}", Locale.ROOT)
-                        .format(new Object[] { request.getContextPath(), request.getServletPath(), zoomAlias, derivate,
-                            MCRXMLFunctions.encodeURIPath(imagePath) }));
-                    response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                    response.setHeader("Location", redirectURL);
-                    response.flushBuffer();
+                    redirectToMaxZoomLevelAvailable(maxZoomLevel, derivate, imagePath, request, response);
                     return;
                 }
                 if (zoomLevel == 0 && footerImpl == null) {
@@ -196,6 +183,22 @@ public class MCRTileCombineServlet extends MCRServlet {
         } finally {
             LOGGER.info("Finished sending {}", request.getPathInfo());
         }
+    }
+
+    private static void redirectToMaxZoomLevelAvailable(int maxZoomLevel, String derivate, String imagePath,
+        HttpServletRequest request, HttpServletResponse response) throws URISyntaxException, IOException {
+        String zoomAlias;
+        zoomAlias = switch (maxZoomLevel) {
+            case 2 -> "MID";
+            case 1 -> "MIN";
+            default -> "THUMB";
+        };
+        String redirectURL = response.encodeRedirectURL(new MessageFormat("{0}{1}/{2}/{3}{4}", Locale.ROOT)
+            .format(new Object[] { request.getContextPath(), request.getServletPath(), zoomAlias, derivate,
+                MCRXMLFunctions.encodeURIPath(imagePath.charAt(0) == '/' ? imagePath : "/" + imagePath) }));
+        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+        response.setHeader("Location", redirectURL);
+        response.flushBuffer();
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
+
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 /**
@@ -40,7 +41,6 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRPathContent extends MCRContent implements MCRSeekableChannelContent {
-
 
     private Path path;
 

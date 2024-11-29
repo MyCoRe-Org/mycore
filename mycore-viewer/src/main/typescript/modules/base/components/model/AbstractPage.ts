@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
  */
 
 
-import {Rect, Size2D} from "../../Utils";
+import { Rect, Size2D } from "../../Utils";
 
 export interface AbstractPage {
-        id:string;
-        size: Size2D;
-        draw(ctx:CanvasRenderingContext2D, rect:Rect, sourceScale, preview?:boolean, infoScale?:number): void;
-        refreshCallback: () => void;
-        clear(): void;
-        toString(): string;
-    }
+  id: string;
+  size: Size2D;
+  draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, preview?: boolean, infoScale?: number): void;
+  refreshCallback: () => void;
+  clear(): void;
+  toString(): string;
+}
 
 

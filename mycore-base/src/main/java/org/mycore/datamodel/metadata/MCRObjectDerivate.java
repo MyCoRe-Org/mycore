@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -134,7 +134,6 @@ public class MCRObjectDerivate {
         }
     }
 
-
     private void setTitleFromDOM(Element derivate) {
         Element titlesElement = derivate.getChild("titles");
         titles.clear();
@@ -180,7 +179,6 @@ public class MCRObjectDerivate {
         link.setFromDOM(linkmetaElement);
         linkmeta = link;
     }
-
 
     /**
      * returns link to the MCRObject.
@@ -419,8 +417,8 @@ public class MCRObjectDerivate {
         titEl.setAttribute("class", "MCRMetaLangText");
         titEl.setAttribute("heritable", "false");
         titles.stream()
-                .map(MCRMetaLangText::createXML)
-                .forEach(titEl::addContent);
+            .map(MCRMetaLangText::createXML)
+            .forEach(titEl::addContent);
         return titEl;
     }
 
@@ -430,8 +428,8 @@ public class MCRObjectDerivate {
         clazzElement.setAttribute("heritable", "false");
 
         classifications.stream()
-                .map(MCRMetaClassification::createXML)
-                .forEach(clazzElement::addContent);
+            .map(MCRMetaClassification::createXML)
+            .forEach(clazzElement::addContent);
         return clazzElement;
     }
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
+
 import java.io.File;
 import java.util.List;
 import java.util.function.Supplier;
@@ -25,8 +27,6 @@ import java.util.function.Supplier;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 /**
  * {@link MCRDeveloperOverrideResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up
@@ -78,6 +78,5 @@ public class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceP
         }
 
     }
-
 
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,320 +18,320 @@
 
 
 
-import {FileTransferQueue} from "./FileTransferQueue";
-import {FileTransfer} from "./FileTransfer";
-import {Utils} from "./Utils";
-import {I18N} from "./I18N";
-import {TransferSession} from "./TransferSession";
+import { FileTransferQueue } from "./FileTransferQueue";
+import { FileTransfer } from "./FileTransfer";
+import { Utils } from "./Utils";
+import { I18N } from "./I18N";
+import { TransferSession } from "./TransferSession";
 interface FileTransferProgress {
-    transfer: FileTransfer,
-    loaded:number,
-    total: number
+  transfer: FileTransfer,
+  loaded: number,
+  total: number
 }
 export class FileTransferGUI {
 
 
-    private _uploadBox: HTMLElement = null;
-    private _transferElementMap: Map<FileTransfer, HTMLElement> = new Map<FileTransfer, HTMLElement>();
-    private _entryFileTransferMap: Map<HTMLElement, FileTransfer> = new Map<HTMLElement, FileTransfer>();
-    private transferProgressMap = new Map<FileTransfer, FileTransferProgress>();
-    private runningCommitList: Array<TransferSession> = [];
-    private elementsToAddQueue: Array<HTMLElement> = [];
+  private _uploadBox: HTMLElement = null;
+  private _transferElementMap: Map<FileTransfer, HTMLElement> = new Map<FileTransfer, HTMLElement>();
+  private _entryFileTransferMap: Map<HTMLElement, FileTransfer> = new Map<HTMLElement, FileTransfer>();
+  private transferProgressMap = new Map<FileTransfer, FileTransferProgress>();
+  private runningCommitList: Array<TransferSession> = [];
+  private elementsToAddQueue: Array<HTMLElement> = [];
 
-    constructor() {
-        this.registerEventHandler();
-    }
+  constructor() {
+    this.registerEventHandler();
+  }
 
-    static start() {
-        new FileTransferGUI();
-    }
+  static start() {
+    new FileTransferGUI();
+  }
 
-    private inititalizeBox(): void {
-        this._uploadBox = Helper.htmlToElement(FileTransferGUITemplates.boxTemplate);
-        this.translateElements();
-        window.document.body.appendChild(this._uploadBox);
+  private inititalizeBox(): void {
+    this._uploadBox = Helper.htmlToElement(FileTransferGUITemplates.boxTemplate);
+    this.translateElements();
+    window.document.body.appendChild(this._uploadBox);
 
-        (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-abort")).addEventListener('click', () => {
-            FileTransferQueue.getQueue().abortAll();
-        });
+    (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-abort")).addEventListener('click', () => {
+      FileTransferQueue.getQueue().abortAll();
+    });
 
-        this._uploadBox.querySelector('.minimize').addEventListener('click', () => {
-            this._uploadBox.classList.toggle('minimized');
-        });
-    }
+    this._uploadBox.querySelector('.minimize').addEventListener('click', () => {
+      this._uploadBox.classList.toggle('minimized');
+    });
+  }
 
-    private translateElements() {
-        I18N.translateElements(this._uploadBox);
-    }
+  private translateElements() {
+    I18N.translateElements(this._uploadBox);
+  }
 
-    private registerEventHandler(): void {
-        const queue = FileTransferQueue.getQueue();
+  private registerEventHandler(): void {
+    const queue = FileTransferQueue.getQueue();
 
-        queue.addValidatingHandler((validating) => {
-           this.handleTransferValidating(validating);
-        });
-
-
-        queue.addAddedHandler((ft) => {
-            this.handleTransferAdded(ft);
-        });
-
-        queue.addStartedHandler((ft) => {
-            this.handleTransferStarted(ft);
-        });
-
-        queue.addCompleteHandler((ft) => {
-            this.handleTransferCompleted(ft);
-        });
-
-        queue.addErrorHandler((ft) => {
-            this.handleTransferError(ft);
-        });
-
-        queue.addRestartHandler((ft) => {
-            this.handleTransferRestart(ft);
-        });
-
-        queue.addAbortHandler((ft) => {
-            this.handleTransferAbort(ft);
-        });
-
-        queue.addStartCommitHandler((session: TransferSession) => {
-            this.handleCommitStartet(session);
-        });
-
-        queue.addCommitCompleteHandler((session: TransferSession, error: boolean, message: string, location: string) => {
-            this.handleCommitCompleted(session, error, message, location);
-        });
-
-        queue.addProgressHandler((ft) => this.handleTransferProgress(ft));
-
-        queue.addBeginSessionErrorHandler((session, message) => {
-           this.handleSessionBeginError(session, message);
-        });
-
-        queue.addValidationHandler((ft) => {
-           this.showError(ft);
-        });
-
-        window.setInterval(() => {
-            this.transferProgressMap.forEach((progress) => {
-                this.setTransferProgress(this.getEntry(progress.transfer), progress.loaded, progress.total);
-            });
-        }, 250);
-
-        let lastLoaded:Map<FileTransfer, number> = new Map<FileTransfer, number>();
-        window.setInterval(() => {
-            let allRate = 0;
-
-            this.transferProgressMap.forEach((progress) => {
-                if (lastLoaded.has(progress.transfer)) {
-                    let bytesInSecond = (progress.loaded - lastLoaded.get(progress.transfer))*2;
-                    allRate += bytesInSecond;
-                    this.setTransferRate(this.getEntry(progress.transfer), bytesInSecond);
-                }
-                lastLoaded.set(progress.transfer, progress.loaded);
-            })
+    queue.addValidatingHandler((validating) => {
+      this.handleTransferValidating(validating);
+    });
 
 
-            this.setAllProgress(allRate);
-        }, 500);
+    queue.addAddedHandler((ft) => {
+      this.handleTransferAdded(ft);
+    });
 
-    }
+    queue.addStartedHandler((ft) => {
+      this.handleTransferStarted(ft);
+    });
 
-    private handleTransferValidating(validating: boolean) {
-        if (this._uploadBox == null) {
-            this.inititalizeBox();
+    queue.addCompleteHandler((ft) => {
+      this.handleTransferCompleted(ft);
+    });
+
+    queue.addErrorHandler((ft) => {
+      this.handleTransferError(ft);
+    });
+
+    queue.addRestartHandler((ft) => {
+      this.handleTransferRestart(ft);
+    });
+
+    queue.addAbortHandler((ft) => {
+      this.handleTransferAbort(ft);
+    });
+
+    queue.addStartCommitHandler((session: TransferSession) => {
+      this.handleCommitStartet(session);
+    });
+
+    queue.addCommitCompleteHandler((session: TransferSession, error: boolean, message: string, location: string) => {
+      this.handleCommitCompleted(session, error, message, location);
+    });
+
+    queue.addProgressHandler((ft) => this.handleTransferProgress(ft));
+
+    queue.addBeginSessionErrorHandler((session, message) => {
+      this.handleSessionBeginError(session, message);
+    });
+
+    queue.addValidationHandler((ft) => {
+      this.showError(ft);
+    });
+
+    window.setInterval(() => {
+      this.transferProgressMap.forEach((progress) => {
+        this.setTransferProgress(this.getEntry(progress.transfer), progress.loaded, progress.total);
+      });
+    }, 250);
+
+    let lastLoaded: Map<FileTransfer, number> = new Map<FileTransfer, number>();
+    window.setInterval(() => {
+      let allRate = 0;
+
+      this.transferProgressMap.forEach((progress) => {
+        if (lastLoaded.has(progress.transfer)) {
+          let bytesInSecond = (progress.loaded - lastLoaded.get(progress.transfer)) * 2;
+          allRate += bytesInSecond;
+          this.setTransferRate(this.getEntry(progress.transfer), bytesInSecond);
         }
-        const validatingMessageElement = this._uploadBox.querySelector(".mcr-validating");
+        lastLoaded.set(progress.transfer, progress.loaded);
+      })
 
-        if (validating && validatingMessageElement.classList.contains("d-none")) {
-            validatingMessageElement.classList.remove("d-none");
-        } else if (!validating && !validatingMessageElement.classList.contains("d-none")) {
-            validatingMessageElement.classList.add("d-none");
-        }
+
+      this.setAllProgress(allRate);
+    }, 500);
+
+  }
+
+  private handleTransferValidating(validating: boolean) {
+    if (this._uploadBox == null) {
+      this.inititalizeBox();
     }
+    const validatingMessageElement = this._uploadBox.querySelector(".mcr-validating");
 
-    private handleTransferAdded(transfer: FileTransfer) {
-        if (this._uploadBox == null) {
-            this.inititalizeBox();
-        }
-        this.createFileTransferEntry(transfer);
+    if (validating && validatingMessageElement.classList.contains("d-none")) {
+      validatingMessageElement.classList.remove("d-none");
+    } else if (!validating && !validatingMessageElement.classList.contains("d-none")) {
+      validatingMessageElement.classList.add("d-none");
     }
+  }
 
-    private getEntryListElement() {
-        return <HTMLElement>this._uploadBox.querySelector(".mcr-upload-entry-list");
+  private handleTransferAdded(transfer: FileTransfer) {
+    if (this._uploadBox == null) {
+      this.inititalizeBox();
     }
+    this.createFileTransferEntry(transfer);
+  }
 
-    private getActiveInsertMarkerElement() {
-        return <HTMLElement>this._uploadBox.querySelector(".mcr-upload-active-insert-marker");
+  private getEntryListElement() {
+    return <HTMLElement>this._uploadBox.querySelector(".mcr-upload-entry-list");
+  }
+
+  private getActiveInsertMarkerElement() {
+    return <HTMLElement>this._uploadBox.querySelector(".mcr-upload-active-insert-marker");
+  }
+
+  private handleTransferStarted(transfer: FileTransfer) {
+    const entry = this.getEntry(transfer);
+    const markerElement = this.getActiveInsertMarkerElement();
+    markerElement.parentElement.insertBefore(entry, markerElement);
+  }
+
+  private getEntry(transfer: FileTransfer) {
+    return this._transferElementMap.get(transfer);
+  }
+
+  private handleTransferCompleted(transfer: FileTransfer) {
+    this.removeTransferEntry(transfer);
+  }
+
+  private removeTransferEntry(transfer: FileTransfer) {
+    const entry = this.getEntry(transfer);
+    this._entryFileTransferMap.delete(entry);
+    entry.remove();
+    if (this.transferProgressMap.has(transfer)) {
+      this.transferProgressMap.delete(transfer);
     }
+  }
 
-    private handleTransferStarted(transfer: FileTransfer) {
-        const entry = this.getEntry(transfer);
-        const markerElement = this.getActiveInsertMarkerElement();
-        markerElement.parentElement.insertBefore(entry, markerElement);
+  private handleTransferError(transfer: FileTransfer) {
+    this.getEntry(transfer).classList.add("bg-danger")
+  }
+
+  private handleTransferRestart(transfer: FileTransfer) {
+    // no error handling yet
+  }
+
+  private handleTransferAbort(transfer: FileTransfer) {
+    this.removeTransferEntry(transfer);
+  }
+
+  private handleTransferProgress(transfer: FileTransfer) {
+    this.transferProgressMap.set(transfer,
+      {
+        transfer: transfer,
+        loaded: transfer.loaded,
+        total: transfer.total
+      });
+  }
+
+  private setFileName(entry: HTMLElement, name: string) {
+    (entry.querySelector(".mcr-upload-file-name") as HTMLElement).innerText = name;
+  }
+
+  private setTransferProgress(entry: HTMLElement, current: number, all: number) {
+    if (entry instanceof HTMLElement) {
+      const sizeStr = Helper.formatBytes(all, 1);
+      const currentStr = Helper.formatBytes(current, 1);
+      const percent = (current / all * 100).toPrecision(1);
+
+      (<HTMLElement>entry.querySelector(".mcr-upload-file-size")).innerText = currentStr + " / " + sizeStr;
+      const progressBarElement = (<HTMLElement>entry.querySelector(".mcr-upload-progressbar"));
+      progressBarElement.style.width = percent + "%";
+      progressBarElement.setAttribute("aria-valuenow", percent);
     }
+  }
 
-    private getEntry(transfer: FileTransfer) {
-        return this._transferElementMap.get(transfer);
+  private createFileTransferEntry(transfer: FileTransfer): HTMLElement {
+    const newEntry = Helper.htmlToElement(FileTransferGUITemplates.entryTemplate);
+    this._transferElementMap.set(transfer, newEntry);
+    this.setFileName(newEntry, transfer.fileName);
+    this._entryFileTransferMap.set(newEntry, transfer);
+    (<HTMLElement>newEntry.querySelector(".mcr-upload-abort-transfer")).addEventListener("click", () => {
+      FileTransferQueue.getQueue().abort(transfer);
+    });
+
+    return newEntry;
+  }
+
+  private setTransferRate(entry: HTMLElement, bytesInSecond: number) {
+    if (entry instanceof HTMLElement) {
+      const rateText = Helper.formatBytes(bytesInSecond, 1) + "/s";
+      (entry.querySelector(".mcr-upload-transfer-rate") as HTMLElement).innerText = rateText;
     }
+  }
 
-    private handleTransferCompleted(transfer: FileTransfer) {
-        this.removeTransferEntry(transfer);
+  private setAllProgress(allRate: number) {
+    if (this._uploadBox != null) {
+      (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-rate")).innerText = Helper.formatBytes(allRate, 1) + "/s";
+      (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-progress")).innerText = FileTransferQueue.getQueue().getAllCount().toString();
     }
+  }
 
-    private removeTransferEntry(transfer: FileTransfer) {
-        const entry = this.getEntry(transfer);
-        this._entryFileTransferMap.delete(entry);
-        entry.remove();
-        if(this.transferProgressMap.has(transfer)){
-            this.transferProgressMap.delete(transfer);
-        }
-    }
+  private handleCommitStartet(session: TransferSession) {
+    this.runningCommitList.push(session);
+    this.showCommitWarning(true);
+  }
 
-    private handleTransferError(transfer: FileTransfer) {
-        this.getEntry(transfer).classList.add("bg-danger")
-    }
+  private handleCommitCompleted(session: TransferSession, error: boolean, message: string, location: string) {
+    this.runningCommitList.splice(this.runningCommitList.indexOf(session), 1);
+    if (!error) {
+      if (this.runningCommitList.length === 0) {
+        this.showCommitWarning(false);
 
-    private handleTransferRestart(transfer: FileTransfer) {
-        // no error handling yet
-    }
-
-    private handleTransferAbort(transfer: FileTransfer) {
-        this.removeTransferEntry(transfer);
-    }
-
-    private handleTransferProgress(transfer: FileTransfer) {
-        this.transferProgressMap.set(transfer,
-            {
-                transfer: transfer,
-                loaded: transfer.loaded,
-                total: transfer.total
-            });
-    }
-
-    private setFileName(entry: HTMLElement, name: string) {
-        (entry.querySelector(".mcr-upload-file-name") as HTMLElement).innerText = name;
-    }
-
-    private setTransferProgress(entry: HTMLElement, current: number, all: number) {
-        if (entry instanceof HTMLElement) {
-            const sizeStr = Helper.formatBytes(all, 1);
-            const currentStr = Helper.formatBytes(current, 1);
-            const percent = (current / all * 100).toPrecision(1);
-
-            (<HTMLElement>entry.querySelector(".mcr-upload-file-size")).innerText = currentStr + " / " + sizeStr;
-            const progressBarElement = (<HTMLElement>entry.querySelector(".mcr-upload-progressbar"));
-            progressBarElement.style.width = percent + "%";
-            progressBarElement.setAttribute("aria-valuenow", percent);
-        }
-    }
-
-    private createFileTransferEntry(transfer: FileTransfer): HTMLElement {
-        const newEntry = Helper.htmlToElement(FileTransferGUITemplates.entryTemplate);
-        this._transferElementMap.set(transfer, newEntry);
-        this.setFileName(newEntry, transfer.fileName);
-        this._entryFileTransferMap.set(newEntry, transfer);
-        (<HTMLElement>newEntry.querySelector(".mcr-upload-abort-transfer")).addEventListener("click", () => {
-            FileTransferQueue.getQueue().abort(transfer);
-        });
-
-        return newEntry;
-    }
-
-    private setTransferRate(entry: HTMLElement, bytesInSecond: number) {
-        if (entry instanceof HTMLElement) {
-            const rateText = Helper.formatBytes(bytesInSecond, 1) + "/s";
-            (entry.querySelector(".mcr-upload-transfer-rate") as HTMLElement).innerText = rateText;
-        }
-    }
-
-    private setAllProgress(allRate: number) {
-        if (this._uploadBox != null) {
-            (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-rate")).innerText = Helper.formatBytes(allRate, 1) + "/s";
-            (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-progress")).innerText = FileTransferQueue.getQueue().getAllCount().toString();
-        }
-    }
-
-    private handleCommitStartet(session: TransferSession) {
-        this.runningCommitList.push(session);
-        this.showCommitWarning(true);
-    }
-
-    private handleCommitCompleted(session: TransferSession, error: boolean, message: string, location: string) {
-        this.runningCommitList.splice(this.runningCommitList.indexOf(session), 1);
-        if (!error) {
-            if (this.runningCommitList.length === 0) {
-                this.showCommitWarning(false);
-
-                if (!location) {
-                    window.location.reload();
-                } else {
-                    window.location.assign(location);
-                }
-            }
+        if (!location) {
+          window.location.reload();
         } else {
-            this.showCommitWarning(false);
-            this.showError(message);
+          window.location.assign(location);
         }
+      }
+    } else {
+      this.showCommitWarning(false);
+      this.showError(message);
+    }
+  }
+
+  public showError(message: string) {
+    const error = this._uploadBox.querySelector(".mcr-commit-error");
+    if (error.classList.contains("d-none")) {
+      error.classList.remove("d-none");
     }
 
-    public showError(message: string) {
-        const error = this._uploadBox.querySelector(".mcr-commit-error");
-        if (error.classList.contains("d-none")) {
-            error.classList.remove("d-none");
-        }
+    const errorMessageElement = error.querySelector(".mcr-error-message");
+    errorMessageElement.textContent = message;
+  }
 
-        const errorMessageElement = error.querySelector(".mcr-error-message");
-        errorMessageElement.textContent = message;
+  private showCommitWarning(show: boolean) {
+    const warning = this._uploadBox.querySelector(".mcr-commit-warn");
+
+    if (show && warning.classList.contains("d-none")) {
+      warning.classList.remove("d-none");
+    } else if (!show && !warning.classList.contains("d-none")) {
+      warning.classList.add("d-none");
     }
+  }
 
-    private showCommitWarning(show: boolean) {
-        const warning = this._uploadBox.querySelector(".mcr-commit-warn");
-
-        if (show && warning.classList.contains("d-none")) {
-            warning.classList.remove("d-none");
-        } else if (!show && !warning.classList.contains("d-none")) {
-            warning.classList.add("d-none");
-        }
-    }
-
-    private handleSessionBeginError(session: TransferSession, message: string) {
-        this.showError(message);
-    }
+  private handleSessionBeginError(session: TransferSession, message: string) {
+    this.showError(message);
+  }
 }
 
 class Helper {
 
-    static isString(s) {
-        return typeof (s) === 'string' || s instanceof String;
-    }
+  static isString(s) {
+    return typeof (s) === 'string' || s instanceof String;
+  }
 
-    static htmlToElement(html: string): HTMLElement {
-        const template = document.createElement('template');
-        html = html.trim();
-        template.innerHTML = html;
+  static htmlToElement(html: string): HTMLElement {
+    const template = document.createElement('template');
+    html = html.trim();
+    template.innerHTML = html;
 
-        return <HTMLElement>template.content.firstElementChild;
-    }
+    return <HTMLElement>template.content.firstElementChild;
+  }
 
-    static formatBytes(bytes: number, decimals?: number) {
-        if (bytes == 0) return '0 Bytes';
-        const base = 1024;
-        const dm = decimals || 2;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(base));
-        return parseFloat((bytes / Math.pow(base, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
+  static formatBytes(bytes: number, decimals?: number) {
+    if (bytes == 0) return '0 Bytes';
+    const base = 1024;
+    const dm = decimals || 2;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(base));
+    return parseFloat((bytes / Math.pow(base, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
 
 
 }
 
 class FileTransferGUITemplates {
 
-    private static _boxTemplate =
-        `<div class="mcr-upload">
+  private static _boxTemplate =
+    `<div class="mcr-upload">
     <div class="card" style="height: 100%;">
         <div class="card-header">
             <span class="mcr-upload-title" data-i18n="component.webtools.upload.title"></span>
@@ -362,11 +362,11 @@ class FileTransferGUITemplates {
     </div>
 </div>`;
 
-    public static get boxTemplate(): string {
-        return FileTransferGUITemplates._boxTemplate;
-    }
+  public static get boxTemplate(): string {
+    return FileTransferGUITemplates._boxTemplate;
+  }
 
-    private static _entryTemplate = `<div class="entry row">
+  private static _entryTemplate = `<div class="entry row">
     <span class="col mcr-upload-file-name"></span>
     <small class="col-2 mcr-upload-file-size"></small>
     <small class="col-2 mcr-upload-transfer-rate"></small>
@@ -382,9 +382,9 @@ class FileTransferGUITemplates {
     </div>
 </div>`;
 
-    public static get entryTemplate(): string {
-        return FileTransferGUITemplates._entryTemplate;
-    }
+  public static get entryTemplate(): string {
+    return FileTransferGUITemplates._entryTemplate;
+  }
 
 }
 

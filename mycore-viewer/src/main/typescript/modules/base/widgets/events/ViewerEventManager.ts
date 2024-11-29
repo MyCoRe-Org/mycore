@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,31 @@
  */
 
 
-import {ViewerEvent} from "./ViewerEvent";
+import { ViewerEvent } from "./ViewerEvent";
 
 export class ViewerEventManager {
 
-    constructor() {
-        this._callBackArray = new Array<any>();
-    }
+  constructor() {
+    this._callBackArray = new Array<any>();
+  }
 
-    private _callBackArray: Array<(e: ViewerEvent) => void>;
+  private _callBackArray: Array<(e: ViewerEvent) => void>;
 
-    public bind(callback: (e: ViewerEvent) => void) {
-        this._callBackArray.push(callback);
-    }
+  public bind(callback: (e: ViewerEvent) => void) {
+    this._callBackArray.push(callback);
+  }
 
-    public trigger(e: ViewerEvent) {
-        for (const callback of this._callBackArray) {
-            // if one handler throws a error it will be catched
-            callback(e);
-        }
+  public trigger(e: ViewerEvent) {
+    for (const callback of this._callBackArray) {
+      // if one handler throws a error it will be catched
+      callback(e);
     }
+  }
 
-    public unbind(callback: (e: ViewerEvent) => void) {
-        const index = this._callBackArray.lastIndexOf(callback);
-        this._callBackArray.splice(index, 1);
-    }
+  public unbind(callback: (e: ViewerEvent) => void) {
+    const index = this._callBackArray.lastIndexOf(callback);
+    this._callBackArray.splice(index, 1);
+  }
 
 }
 

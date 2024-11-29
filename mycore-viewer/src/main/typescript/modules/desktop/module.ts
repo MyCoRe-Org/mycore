@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReDesktopToolbarProviderComponent} from "./components/MyCoReDesktopToolbarProviderComponent";
-import {MyCoReImageInformationComponent} from "./components/MyCoReImageInformationComponent";
-import {MyCoRePageDesktopLayoutProviderComponent} from "./components/MyCoRePageDesktopLayoutProviderComponent";
-import {MyCoReSearchComponent} from "./components/MyCoReSearchComponent";
-import {MyCoReLocalViewerIndexSearcherProvider} from "./components/MyCoReLocalViewerIndexSearcherProvider";
-import {MyCoReSolrSearcherProvider} from "./components/MyCoReSolrSearcherProvider";
-import {register as registerToolbarFactory} from "./widgets/toolbar/view/BootstrapToolbarViewFactory";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReDesktopToolbarProviderComponent } from "./components/MyCoReDesktopToolbarProviderComponent";
+import { MyCoReImageInformationComponent } from "./components/MyCoReImageInformationComponent";
+import { MyCoRePageDesktopLayoutProviderComponent } from "./components/MyCoRePageDesktopLayoutProviderComponent";
+import { MyCoReSearchComponent } from "./components/MyCoReSearchComponent";
+import { MyCoReLocalViewerIndexSearcherProvider } from "./components/MyCoReLocalViewerIndexSearcherProvider";
+import { MyCoReSolrSearcherProvider } from "./components/MyCoReSolrSearcherProvider";
+import { register as registerToolbarFactory } from "./widgets/toolbar/view/BootstrapToolbarViewFactory";
 
 addViewerComponent(MyCoReDesktopToolbarProviderComponent);
 addViewerComponent(MyCoReImageInformationComponent);

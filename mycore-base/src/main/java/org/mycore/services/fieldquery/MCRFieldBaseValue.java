@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.Objects;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-
-import java.util.Objects;
 
 public class MCRFieldBaseValue {
 
@@ -46,7 +46,7 @@ public class MCRFieldBaseValue {
     }
 
     public void setFieldName(String fieldName) {
-        Objects.requireNonNull(fieldName,"field name cannot be null.");
+        Objects.requireNonNull(fieldName, "field name cannot be null.");
         this.fieldName = fieldName;
     }
 

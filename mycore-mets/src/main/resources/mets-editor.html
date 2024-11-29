@@ -1,48 +1,46 @@
 <!doctype html>
 <html lang="de">
 <head>
-    <meta charset="utf-8">
-    <title>Mets-Editor</title>
-    <link rel="stylesheet" href="{baseURL}shared/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="{baseURL}module/mets/css/mets-editor.css">
-    <link rel="stylesheet" href="{baseURL}shared/angular-borderlayout2/dist/borderLayout.css">
-    <link rel="stylesheet" href="{baseURL}shared/angular-hotkeys/build/hotkeys.min.css">
-    <script src="{baseURL}shared/jquery/dist/jquery.js"></script>
-    <script src="{baseURL}shared/angular/angular.js"></script>
-    <script src="{baseURL}shared/angular-resource/angular-resource.js"></script>
-    <script src="{baseURL}shared/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="{baseURL}shared/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="{baseURL}shared/ngDraggable/0.1.8/ngDraggable.js"></script>
-    <script src="{baseURL}shared/angular-borderlayout2/dist/borderLayout.js"></script>
-    <script src="{baseURL}shared/angular-lazy-image/release/lazy-image.js"></script>
-    <script src="{baseURL}shared/angular-hotkeys/build/hotkeys.min.js"></script>
-    <script src="{baseURL}module/mets/lib/ng-image-zoom.js"></script>
-    <script src="{baseURL}module/mets/js/MetsEditor.min.js"></script>
-    <script src="{baseURL}module/mets/js/MetsEditor-templates.min.js"></script>
-    <link rel="additionalJS" />
+  <meta charset="utf-8">
+  <title>Mets-Editor</title>
+  <link rel="stylesheet" href="{baseURL}shared/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="{baseURL}module/mets/css/mets-editor.css">
+  <link rel="stylesheet" href="{baseURL}shared/angular-borderlayout2/dist/borderLayout.css">
+  <link rel="stylesheet" href="{baseURL}shared/angular-hotkeys/build/hotkeys.min.css">
+  <script src="{baseURL}shared/jquery/dist/jquery.js"></script>
+  <script src="{baseURL}shared/angular/angular.js"></script>
+  <script src="{baseURL}shared/angular-resource/angular-resource.js"></script>
+  <script src="{baseURL}shared/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <script src="{baseURL}shared/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="{baseURL}shared/ngDraggable/0.1.8/ngDraggable.js"></script>
+  <script src="{baseURL}shared/angular-borderlayout2/dist/borderLayout.js"></script>
+  <script src="{baseURL}shared/angular-lazy-image/release/lazy-image.js"></script>
+  <script src="{baseURL}shared/angular-hotkeys/build/hotkeys.min.js"></script>
+  <script src="{baseURL}module/mets/lib/ng-image-zoom.js"></script>
+  <script src="{baseURL}module/mets/js/MetsEditor.min.js"></script>
+  <script src="{baseURL}module/mets/js/MetsEditor-templates.min.js"></script>
+  <link rel="additionalJS" />
 
-    <meta charset="utf-8">
-    <script>
-    	var baseURL = "{baseURL}";
-    	var derivateID = "{derivateID}";
+  <script>
+    var baseURL = "{baseURL}";
+    var derivateID = "{derivateID}";
 
-        // Global Configuration tells the editor where to find i18n stuff and resources
-        angular.module('MetsEditorConfiguration', []).factory("MetsEditorConfiguration", function () {
-            return {
-                i18URL: "{baseURL}rsc/locale/translate/component.mets.*",
-                resources: "{baseURL}module/mets/",
-                imageLocationPattern: "{baseURL}servlets/MCRTileCombineServlet/{quality}/{derivateID}/{image}"
-            };
-        });
+    // Global Configuration tells the editor where to find i18n stuff and resources
+    angular.module('MetsEditorConfiguration', []).factory("MetsEditorConfiguration", function() {
+      return {
+        i18URL : "{baseURL}rsc/locale/translate/component.mets.*",
+        resources : "{baseURL}module/mets/",
+        imageLocationPattern : "{baseURL}servlets/MCRTileCombineServlet/{quality}/{derivateID}/{image}"
+      };
+    });
 
-        window.onload = function () {
-            angular.bootstrap(document.getElementById("instance2"), ["MetsEditorApp"]);
-        };
-
-    </script>
+    window.onload = function() {
+      angular.bootstrap(document.getElementById("instance2"), [ "MetsEditorApp" ]);
+    };
+  </script>
 </head>
 <body>
-<div id="instance2">
+  <div id="instance2">
     <div ng-controller="MetsEditorController as metsEditorCtrl"
          ng-init="metsEditorCtrl.init({
             sourceMetsURL: '{baseURL}rsc/mets/crud/{derivateID}',
@@ -51,9 +49,8 @@
             'lockURL' : '{baseURL}rsc/mets/editor/lock/{derivateID}',
             'unLockURL' : '{baseURL}rsc/mets/editor/unlock/{derivateID}'
             });"
-         ng-include="'mets-editor-main.html'">
-    </div>
-</div>
+         ng-include="'mets-editor-main.html'"></div>
+  </div>
 
 </body>
 </html>

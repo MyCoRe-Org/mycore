@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -132,10 +132,10 @@ public class MCRNameMergerTest extends MCRTestCase {
     @Test
     public void testMergeSubElements() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE']]";
-        String b
-            = "[mods:name[@type='personal'][mods:namePart='Mueller, T'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
-        String e
-            = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
+        String b =
+            "[mods:name[@type='personal'][mods:namePart='Mueller, T'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
+        String e =
+            "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
         MCRMergerTest.test(a, b, e);
     }
 
@@ -149,8 +149,8 @@ public class MCRNameMergerTest extends MCRTestCase {
     @Test
     public void testPreferFamilyGiven() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']]";
-        String b
-            = "[mods:name[@type='personal'][mods:namePart[@type='family']='Müller'][mods:namePart[@type='given']='T.']]";
+        String b =
+            "[mods:name[@type='personal'][mods:namePart[@type='family']='Müller'][mods:namePart[@type='given']='T.']]";
         MCRMergerTest.test(a, b, b);
     }
 

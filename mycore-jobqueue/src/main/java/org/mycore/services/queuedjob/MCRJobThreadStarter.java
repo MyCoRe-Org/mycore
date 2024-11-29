@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package org.mycore.services.queuedjob;
 
 import java.lang.reflect.Constructor;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -95,12 +96,20 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         jobQueue.addListener(listener);
 
         maxJobThreadCount = config.maxJobThreadCount(action).orElseGet(config::maxJobThreadCount);
+        Integer maxTryCount = config.maxTryCount(action).orElseGet(config::maxTryCount);
+        Boolean activated = config.activated(action).orElseGet(config::activated);
+        Duration timeTillReset = config.timeTillReset(action).orElseGet(config::timeTillReset);
 
         jobExecutor = new ActiveCountingThreadPoolExecutor(maxJobThreadCount, workQueue,
             new JobThreadFactory(getSimpleActionName()), activeThreads);
 
         MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         processableCollection = new MCRProcessableDefaultCollection(getName());
+        processableCollection.setProperty("activated", activated);
+        processableCollection.setProperty("maxTryCount", maxTryCount);
+        processableCollection.setProperty("maxJobThreadCount", maxJobThreadCount);
+        processableCollection.setProperty("timeTillReset", timeTillReset.toString());
+
         registry.register(processableCollection);
     }
 

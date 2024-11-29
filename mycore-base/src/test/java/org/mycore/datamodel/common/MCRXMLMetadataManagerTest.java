@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -207,6 +207,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         testProperties.put("MCR.Metadata.ObjectID.NumberPattern", "00000000");
         return testProperties;
     }
+
     private static class XMLInfo {
         MCRObjectID id;
         byte[] blob;
@@ -218,8 +219,6 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
             this.lastModified = lastModified;
         }
 
-
     }
-
 
 }

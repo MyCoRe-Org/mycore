@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ export class Settings {
   public autoscroll: boolean;
   public continueIfOneFails: boolean;
 
-  constructor(hS: number, cHS: number, aS: boolean, c: boolean){
+  constructor(hS: number, cHS: number, aS: boolean, c: boolean) {
     this.historySize = hS;
     this.comHistorySize = cHS;
     this.autoscroll = aS;

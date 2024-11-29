@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
 
 package org.mycore.viewer.configuration;
 
-import com.google.common.collect.Multimap;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Map;
+
 import org.mycore.viewer.configuration.MCRViewerConfiguration.ResourceType;
 
-import java.util.Map;
+import com.google.common.collect.Multimap;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Use this class to build your {@link MCRViewerConfiguration}.
@@ -75,7 +77,7 @@ public class MCRViewerConfigurationBuilder {
         for (Map.Entry<ResourceType, String> resource : resources.entries()) {
             if (ResourceType.script.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), false);
-            }else if (ResourceType.module.equals(resource.getKey())) {
+            } else if (ResourceType.module.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), true);
             } else if (ResourceType.css.equals(resource.getKey())) {
                 conf1.addCSS(resource.getValue());

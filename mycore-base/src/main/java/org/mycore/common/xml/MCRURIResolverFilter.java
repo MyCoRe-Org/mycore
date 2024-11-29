@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,8 +82,8 @@ public class MCRURIResolverFilter implements Filter {
             if (!uriList.get().isEmpty() && origOutput.length() > 0
                 && (response.getContentType().contains("text/html")
                     || response.getContentType().contains("text/xml"))) {
-                final StringBuilder buf
-                    = new StringBuilder("\n<!-- \nThe following includes where resolved by MCRURIResolver:\n\n");
+                final StringBuilder buf =
+                    new StringBuilder("\n<!-- \nThe following includes where resolved by MCRURIResolver:\n\n");
                 for (String obj : uriList.get()) {
                     buf.append(obj);
                     buf.append('\n');

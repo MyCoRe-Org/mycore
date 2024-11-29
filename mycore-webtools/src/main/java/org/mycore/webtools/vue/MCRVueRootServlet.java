@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,21 @@
  */
 package org.mycore.webtools.vue;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.xml.transform.TransformerException;
+
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -35,19 +48,8 @@ import org.mycore.frontend.servlets.MCRContentServlet;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * <p>This Servlet can be bound to a URL where a Vue Build App with a createWebHistory() router is present.</p>

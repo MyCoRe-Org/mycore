@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,12 @@ package org.mycore.datamodel.metadata.history;
 import java.io.Serializable;
 import java.time.Instant;
 
-import jakarta.persistence.Basic;
 import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;

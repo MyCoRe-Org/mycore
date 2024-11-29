@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,10 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.frontend.servlets.MCRClassificationBrowser2.MCRQueryAdapter;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 import jakarta.servlet.http.HttpServletRequest;
 

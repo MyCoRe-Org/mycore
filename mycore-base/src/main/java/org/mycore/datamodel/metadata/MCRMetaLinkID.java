@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -240,16 +240,15 @@ public class MCRMetaLinkID extends MCRMetaLink {
     public boolean equals(Object obj) {
         boolean result;
         MCRMetaLinkID other = (MCRMetaLinkID) obj;
-        if (!super.equals(obj)||(!Objects.equals(from, other.from)
-                ||!Objects.equals(href, other.href)
-                ||!Objects.equals(label, other.label)
-                ||!Objects.equals(linktype, other.linktype)
-                ||!Objects.equals(title, other.title)
-                ||!Objects.equals(role, other.role))
-        ){
-            result= false;
+        if (!super.equals(obj) || (!Objects.equals(from, other.from)
+            || !Objects.equals(href, other.href)
+            || !Objects.equals(label, other.label)
+            || !Objects.equals(linktype, other.linktype)
+            || !Objects.equals(title, other.title)
+            || !Objects.equals(role, other.role))) {
+            result = false;
         } else {
-            result= Objects.equals(to, other.to);
+            result = Objects.equals(to, other.to);
         }
         return result;
     }

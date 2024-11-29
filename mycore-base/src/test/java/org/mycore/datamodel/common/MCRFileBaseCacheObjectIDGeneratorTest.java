@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,7 @@
 
 package org.mycore.datamodel.common;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +26,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Test;
+import org.mycore.common.MCRTestCase;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 public class MCRFileBaseCacheObjectIDGeneratorTest extends MCRTestCase {
 
@@ -59,7 +59,6 @@ public class MCRFileBaseCacheObjectIDGeneratorTest extends MCRTestCase {
                 generatedIds.add(id);
             });
 
-
         // check if all ids are unique
         assertEquals(TEST_IDS, generatedIds.size());
         assertEquals(TEST_IDS, generatedIds.stream().distinct().count());
@@ -68,7 +67,7 @@ public class MCRFileBaseCacheObjectIDGeneratorTest extends MCRTestCase {
         var sortedIds = new ArrayList<>(generatedIds);
         Collections.sort(sortedIds);
         for (int i = 0; i < sortedIds.size() - 1; i++) {
-            assertEquals(i+1, sortedIds.get(i).getNumberAsInteger());
+            assertEquals(i + 1, sortedIds.get(i).getNumberAsInteger());
         }
 
     }

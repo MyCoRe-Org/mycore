@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -219,7 +219,7 @@ public class MCRMigrationCommands {
     }
 
     private static boolean tryRawPath(MCRObjectID objectID, Element derivateLinkElement,
-                                      MCRMetaDerivateLink link, String owner) {
+        MCRMetaDerivateLink link, String owner) {
         String rawPath = link.getRawPath();
         MCRPath mcrPath = MCRPath.getPath(owner, rawPath);
         if (Files.exists(mcrPath)) {

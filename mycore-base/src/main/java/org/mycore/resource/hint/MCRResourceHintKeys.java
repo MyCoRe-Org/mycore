@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,28 +33,24 @@ public final class MCRResourceHintKeys {
     public static final MCRHintKey<File> CONFIG_DIR = new MCRHintKey<>(
         File.class,
         "CONFIG_DIR",
-        File::getAbsolutePath
-    );
+        File::getAbsolutePath);
 
     public static final MCRHintKey<ClassLoader> CLASS_LOADER = new MCRHintKey<>(
         ClassLoader.class,
         "CLASS_LOADER",
-        ClassLoader::getName
-    );
+        ClassLoader::getName);
 
     public static final MCRHintKey<ServletContext> SERVLET_CONTEXT = new MCRHintKey<>(
         ServletContext.class,
         "SERVLET_CONTEXT",
-        ServletContext::getServletContextName
-    );
+        ServletContext::getServletContextName);
 
     public static final MCRHintKey<File> WEBAPP_DIR = new MCRHintKey<>(
         File.class,
         "WEBAPP_DIR",
-        File::getAbsolutePath
-    );
+        File::getAbsolutePath);
 
-    private MCRResourceHintKeys(){
+    private MCRResourceHintKeys() {
     }
 
 }

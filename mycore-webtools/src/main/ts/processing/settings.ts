@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 
 export class Settings {
 
-    private static PREFIX: string = 'mcr.processables.';
+  private static PREFIX: string = 'mcr.processables.';
 
-    public static set(name: string, value: any) {
-        localStorage.setItem(Settings.PREFIX + name, value);
-    }
+  public static set(name: string, value: any) {
+    localStorage.setItem(Settings.PREFIX + name, value);
+  }
 
-    public static get(name: string, optionalDefault?: any): any {
-        const value = localStorage.getItem(Settings.PREFIX + name);
-        return value == null ? optionalDefault : value;
-    }
+  public static get(name: string, optionalDefault?: any): any {
+    const value = localStorage.getItem(Settings.PREFIX + name);
+    return value == null ? optionalDefault : value;
+  }
 
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {TextContentModel} from "../model/TextContent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { TextContentModel } from "../model/TextContent";
 
 export class RequestTextContentEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public _href: string, public _onResolve: (href: string, abstractPage: TextContentModel) => void) {
-        super(component, RequestTextContentEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public _href: string, public _onResolve: (href: string, abstractPage: TextContentModel) => void) {
+    super(component, RequestTextContentEvent.TYPE);
+  }
 
-    public static TYPE: string = "RequestTextContentEvent";
+  public static TYPE: string = "RequestTextContentEvent";
 }
 

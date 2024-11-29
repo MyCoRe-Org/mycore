@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,17 +45,8 @@ public class MCREntityTransaction implements MCRPersistenceTransaction {
     }
 
     @Override
-    public boolean getRollbackOnly() {
-        return MCREntityManagerProvider.getCurrentEntityManager().getTransaction().getRollbackOnly();
+    public int getCommitPriority() {
+        return 4000;
     }
 
-    @Override
-    public void setRollbackOnly() throws IllegalStateException {
-        MCREntityManagerProvider.getCurrentEntityManager().getTransaction().setRollbackOnly();
-    }
-
-    @Override
-    public boolean isActive() {
-        return MCREntityManagerProvider.getCurrentEntityManager().getTransaction().isActive();
-    }
 }

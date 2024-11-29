@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {CanvasPageLayer} from "../../widgets/canvas/CanvasPageLayer";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { CanvasPageLayer } from "../../widgets/canvas/CanvasPageLayer";
 
 export class AddCanvasPageLayerEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public zIndex: number, public canvasPageLayer: CanvasPageLayer) {
-        super(component, AddCanvasPageLayerEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public zIndex: number, public canvasPageLayer: CanvasPageLayer) {
+    super(component, AddCanvasPageLayerEvent.TYPE);
+  }
 
-    public static TYPE: string = "AddCanvasPageLayerEvent";
+  public static TYPE: string = "AddCanvasPageLayerEvent";
 
 }
 

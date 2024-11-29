@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,57 +16,57 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IviewChapterTree} from "./IviewChapterTree";
+import { IviewChapterTree } from "./IviewChapterTree";
 
 export interface ChapterTreeInputHandler {
-        // called from ctrl
-        register(ctrl: IviewChapterTree): void;
+  // called from ctrl
+  register(ctrl: IviewChapterTree): void;
 
-        /**
-        * Called if a chapter was inserted in the tree. 
-        * Use this to register events. e.g. onclick.
-        * 
-        * node is the label of the node.
-        * id is the id of the node.
-        */
-        registerNode(node: JQuery, id: string): void;
-        
-        /**
-         * Called if a chapter was inserted and the chapter can hold children.
-         * Use this to register events. e.g. onclick.
-         * 
-         * expander is the "arrow" to expand the tree.
-         * id is the id of the node with has the expander.
-         */
-        registerExpander(expander: JQuery, id: string): void;
-    }
+  /**
+  * Called if a chapter was inserted in the tree. 
+  * Use this to register events. e.g. onclick.
+  * 
+  * node is the label of the node.
+  * id is the id of the node.
+  */
+  registerNode(node: JQuery, id: string): void;
 
-    export class DefaultChapterTreeInputHandler implements ChapterTreeInputHandler {
+  /**
+   * Called if a chapter was inserted and the chapter can hold children.
+   * Use this to register events. e.g. onclick.
+   * 
+   * expander is the "arrow" to expand the tree.
+   * id is the id of the node with has the expander.
+   */
+  registerExpander(expander: JQuery, id: string): void;
+}
 
-        constructor() {
-        }
+export class DefaultChapterTreeInputHandler implements ChapterTreeInputHandler {
+
+  constructor() {
+  }
 
 
 
-        private _ctrl: IviewChapterTree;
+  private _ctrl: IviewChapterTree;
 
-        register(ctrl: IviewChapterTree): void {
-            this._ctrl = ctrl;
-        }
+  register(ctrl: IviewChapterTree): void {
+    this._ctrl = ctrl;
+  }
 
-        registerNode(node: JQuery, id: string): void {
-            node.click(() => {
-                const newSelectedChapter = this._ctrl.getChapterById(id);
-                this._ctrl.setChapterSelected(newSelectedChapter);
-            });
-        }
+  registerNode(node: JQuery, id: string): void {
+    node.click(() => {
+      const newSelectedChapter = this._ctrl.getChapterById(id);
+      this._ctrl.setChapterSelected(newSelectedChapter);
+    });
+  }
 
-        registerExpander(expander: JQuery, id: string): void {
-            expander.click(() => {
-                const chapterToChange = this._ctrl.getChapterById(id);
-                this._ctrl.setChapterExpanded(chapterToChange, !this._ctrl.getChapterExpanded(chapterToChange));
-            });
-        }
-    }
+  registerExpander(expander: JQuery, id: string): void {
+    expander.click(() => {
+      const chapterToChange = this._ctrl.getChapterById(id);
+      this._ctrl.setChapterExpanded(chapterToChange, !this._ctrl.getChapterExpanded(chapterToChange));
+    });
+  }
+}
 
 

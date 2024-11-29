@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addViewerComponent} from "../base/Utils";
-import {MyCoReMetsComponent} from "./components/MyCoReMetsComponent";
-import {MyCoReAltoModelProvider} from "./components/MyCoReAltoModelProvider";
-import {MyCoReMetsPageProviderComponent} from "./components/MyCoReMetsPageProviderComponent";
-import {MyCoRePrintComponent} from "./components/MyCoRePrintComponent";
-import {MyCoReHighlightAltoComponent} from "./components/MyCoReHighlightAltoComponent";
-import {MyCoReAltoEditorComponent} from "./components/MyCoReAltoEditorComponent";
+import { addViewerComponent } from "../base/Utils";
+import { MyCoReMetsComponent } from "./components/MyCoReMetsComponent";
+import { MyCoReAltoModelProvider } from "./components/MyCoReAltoModelProvider";
+import { MyCoReMetsPageProviderComponent } from "./components/MyCoReMetsPageProviderComponent";
+import { MyCoRePrintComponent } from "./components/MyCoRePrintComponent";
+import { MyCoReHighlightAltoComponent } from "./components/MyCoReHighlightAltoComponent";
+import { MyCoReAltoEditorComponent } from "./components/MyCoReAltoEditorComponent";
 
 addViewerComponent(MyCoReMetsComponent);
 addViewerComponent(MyCoReAltoModelProvider)

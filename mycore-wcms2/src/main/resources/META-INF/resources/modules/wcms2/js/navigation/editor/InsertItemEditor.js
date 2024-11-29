@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,79 +24,81 @@ var wcms = wcms || {};
 wcms.navigation = wcms.navigation || {};
 
 wcms.navigation.InsertItemEditor = function() {
-	this.constructor();
+  this.constructor();
 
-	// uri
-	this.uriComboBox = null;
+  // uri
+  this.uriComboBox = null;
 };
 
-( function() {
+(function() {
 
-	// i18n text
-	// ie-bug: use var instead of const
-	var mainHeaderText = "component.wcms.navigation.insertItemEditor.mainHeader";
-	var uriText = "component.wcms.navigation.insertItemEditor.uri";
+  // i18n text
+  // ie-bug: use var instead of const
+  var mainHeaderText = "component.wcms.navigation.insertItemEditor.mainHeader";
+  var uriText = "component.wcms.navigation.insertItemEditor.uri";
 
-	function create() {
-		// create dijit components
-		this.refRadio = new dijit.form.RadioButton();
-		var refStore = new dojo.data.ItemFileReadStore({
-			data: {"identifier": "id", "items": [
-					{"id":0,"text":"component:search"},
-				 	{"id":1,"text":"component:editor"},
-			        {"id":2,"text":"component:workflow"}
-				  ]}
-	    });
-		this.uriComboBox = new dijit.form.ComboBox({
-	        store: refStore,
-	        searchAttr: 'text',
-	        intermediateChanges: true,
-	    });
-		dojo.addClass(this.uriComboBox.domNode, "largeComponent");
+  function create() {
+    // create dijit components
+    this.refRadio = new dijit.form.RadioButton();
+    var refStore = new dojo.data.ItemFileReadStore({
+      data: {
+        "identifier": "id", "items": [
+          { "id": 0, "text": "component:search" },
+          { "id": 1, "text": "component:editor" },
+          { "id": 2, "text": "component:workflow" }
+        ]
+      }
+    });
+    this.uriComboBox = new dijit.form.ComboBox({
+      store: refStore,
+      searchAttr: 'text',
+      intermediateChanges: true,
+    });
+    dojo.addClass(this.uriComboBox.domNode, "largeComponent");
 
-		// caption
-		this.setHeader(mainHeaderText);
-		// add uri combobox
-		this.addElement(uriText, this.uriComboBox.domNode);
-		// update i18n texts
-		this.updateLang();
+    // caption
+    this.setHeader(mainHeaderText);
+    // add uri combobox
+    this.addElement(uriText, this.uriComboBox.domNode);
+    // update i18n texts
+    this.updateLang();
 
-		// -uri
-		dojo.connect(this.uriComboBox, "onChange", this, function(/*String*/ value) {
-			if(this.currentItem == null)
-				return;
-			if(!equal(this.currentItem.uri, value)) {
-				this.currentItem.uri = value;
-				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
-			}
-		});
+    // -uri
+    dojo.connect(this.uriComboBox, "onChange", this, function(/*String*/ value) {
+      if (this.currentItem == null)
+        return;
+      if (!equal(this.currentItem.uri, value)) {
+        this.currentItem.uri = value;
+        this.eventHandler.notify({ "type": "itemUpdated", "item": this.currentItem });
+      }
+    });
 
-	}
+  }
 
-	function updateEditor(/*JSON*/ item) {
-		this.currentItem = item;
-		// general
-		this.setValue(this.uriComboBox, item.uri);
-	}
+  function updateEditor(/*JSON*/ item) {
+    this.currentItem = item;
+    // general
+    this.setValue(this.uriComboBox, item.uri);
+  }
 
-	function reset() {
-		if(this.currentItem != null)
-			this.currentItem = null;
-		this.uriComboBox.set("value", "");
-	}
+  function reset() {
+    if (this.currentItem != null)
+      this.currentItem = null;
+    this.uriComboBox.set("value", "");
+  }
 
-	function setDisabled(/*boolean*/ value) {
-		this.disabled = value;
-		// general
-		this.uriComboBox.set("disabled", this.disabled);
-	}
+  function setDisabled(/*boolean*/ value) {
+    this.disabled = value;
+    // general
+    this.uriComboBox.set("disabled", this.disabled);
+  }
 
-	// inheritance
-	wcms.navigation.InsertItemEditor.prototype = new wcms.gui.ContentEditor;
+  // inheritance
+  wcms.navigation.InsertItemEditor.prototype = new wcms.gui.ContentEditor;
 
-	// own methods
-	wcms.navigation.InsertItemEditor.prototype.create = create;
-	wcms.navigation.InsertItemEditor.prototype.updateEditor = updateEditor;
-	wcms.navigation.InsertItemEditor.prototype.reset = reset;
-	wcms.navigation.InsertItemEditor.prototype.setDisabled = setDisabled;
+  // own methods
+  wcms.navigation.InsertItemEditor.prototype.create = create;
+  wcms.navigation.InsertItemEditor.prototype.updateEditor = updateEditor;
+  wcms.navigation.InsertItemEditor.prototype.reset = reset;
+  wcms.navigation.InsertItemEditor.prototype.setDisabled = setDisabled;
 })();

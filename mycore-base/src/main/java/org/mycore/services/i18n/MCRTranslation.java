@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -321,8 +321,8 @@ public class MCRTranslation {
             // Java doesn't work with id
             adjustedLanguage = "in";
             LOGGER.debug("Translation for current locale: {}", adjustedLanguage);
-        }else {
-            adjustedLanguage= language;
+        } else {
+            adjustedLanguage = language;
         }
         return Locale.forLanguageTag(adjustedLanguage);
     }

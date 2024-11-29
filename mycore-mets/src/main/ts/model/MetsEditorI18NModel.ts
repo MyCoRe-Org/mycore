@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,35 +19,35 @@
 ///<reference path="MetsEditorConfiguration.ts"/>
 
 namespace org.mycore.mets.model {
-    export function i18n($http: ng.IHttpService,
-                         $location: ng.ILocationService,
-                         $log: ng.ILogService, editorConfiguration: MetsEditorConfiguration) {
-        const metsEditorMessageModel = {
-            get : function (str: string) {
-                return this.messages[ str ];
-            }, messages : []
-        };
+  export function i18n($http: ng.IHttpService,
+    $location: ng.ILocationService,
+    $log: ng.ILogService, editorConfiguration: MetsEditorConfiguration) {
+    const metsEditorMessageModel = {
+      get: function(str: string) {
+        return this.messages[str];
+      }, messages: []
+    };
 
-        (<any> $http.get(editorConfiguration.i18URL)).then((data) => {
-            const i18nData = data.data;
-            for (const index in i18nData) {
-                if (i18nData.hasOwnProperty(index)) {
-                    let betterKey = index;
-                    if (index.indexOf('component.mets.editor') === 0) {
-                        betterKey = index.substr('component.mets.editor.'.length);
-                    } else if (index.indexOf('component.mets.dfgStructureSet') === 0) {
-                        betterKey = index.substr('component.mets.dfgStructureSet.'.length);
-                    }
-                    metsEditorMessageModel.messages[ betterKey ] = i18nData[ index ];
-                }
-            }
-        });
+    (<any>$http.get(editorConfiguration.i18URL)).then((data) => {
+      const i18nData = data.data;
+      for (const index in i18nData) {
+        if (i18nData.hasOwnProperty(index)) {
+          let betterKey = index;
+          if (index.indexOf('component.mets.editor') === 0) {
+            betterKey = index.substr('component.mets.editor.'.length);
+          } else if (index.indexOf('component.mets.dfgStructureSet') === 0) {
+            betterKey = index.substr('component.mets.dfgStructureSet.'.length);
+          }
+          metsEditorMessageModel.messages[betterKey] = i18nData[index];
+        }
+      }
+    });
 
-        return metsEditorMessageModel;
-    }
+    return metsEditorMessageModel;
+  }
 
-    export interface I18nModel {
-        messages: any;
-        get(str: string): string;
-    }
+  export interface I18nModel {
+    messages: any;
+    get(str: string): string;
+  }
 }

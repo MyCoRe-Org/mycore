@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,17 +27,17 @@ class MCRAndConditionTest {
 
     @Test
     void matches() {
-        MCRAndCondition xor=new MCRAndCondition();
-        xor.add(new MCRTestCondition(()->false));
+        MCRAndCondition xor = new MCRAndCondition();
+        xor.add(new MCRTestCondition(() -> false));
         assertFalse(xor.matches(null));
-        xor.add(new MCRTestCondition(()->false));
+        xor.add(new MCRTestCondition(() -> false));
         assertFalse(xor.matches(null));
         xor.getChildConditions().clear();
-        xor.add(new MCRTestCondition(()->true));
+        xor.add(new MCRTestCondition(() -> true));
         assertTrue(xor.matches(null));
-        xor.add(new MCRTestCondition(()->true));
+        xor.add(new MCRTestCondition(() -> true));
         assertTrue(xor.matches(null));
-        xor.add(new MCRTestCondition(()->false));
+        xor.add(new MCRTestCondition(() -> false));
         assertFalse(xor.matches(null));
         xor.add(new MCRTestCondition(() -> {
             throw new UnsupportedOperationException("Should not be checked");

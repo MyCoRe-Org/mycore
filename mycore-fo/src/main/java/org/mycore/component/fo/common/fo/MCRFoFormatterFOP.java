@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,9 +58,9 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRErrorListener;
+import org.mycore.resource.MCRResourceHelper;
 
 /**
  * This class implements the interface to use configured XSL-FO formatters for the layout service.

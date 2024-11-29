@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,25 +20,25 @@
 ///<reference path="../model/simple/MCRMetsSection.ts"/>
 
 namespace org.mycore.mets.model.state {
-    export class SectionLabelChange extends ModelChange {
-        private from: string;
+  export class SectionLabelChange extends ModelChange {
+    private from: string;
 
-        constructor(private section: simple.MCRMetsSection, private to: string, from?: string) {
-            super();
-            this.from = from || this.section.label;
-        }
-
-        public doChange() {
-            this.section.label = this.to;
-        }
-
-        public unDoChange() {
-            this.section.label = this.from;
-        }
-
-        public getDescription(messages: any): string {
-            const description = messages.SectionLabelChangeDescription || '???SectionLabelChangeDescription??? {from} {to}';
-            return description.replace('{from}', this.from).replace('{to}', this.to);
-        }
+    constructor(private section: simple.MCRMetsSection, private to: string, from?: string) {
+      super();
+      this.from = from || this.section.label;
     }
+
+    public doChange() {
+      this.section.label = this.to;
+    }
+
+    public unDoChange() {
+      this.section.label = this.from;
+    }
+
+    public getDescription(messages: any): string {
+      const description = messages.SectionLabelChangeDescription || '???SectionLabelChangeDescription??? {from} {to}';
+      return description.replace('{from}', this.from).replace('{to}', this.to);
+    }
+  }
 }

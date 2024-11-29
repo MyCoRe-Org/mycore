@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,76 +16,76 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {defineConfig} from 'vite';
-import {viteStaticCopy} from 'vite-plugin-static-copy';
+import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const inputs = {
-    base: 'src/main/typescript/modules/base/module.ts',
-    desktop: 'src/main/typescript/modules/desktop/module.ts',
-    mets: 'src/main/typescript/modules/mets/module.ts',
-    pdf: 'src/main/typescript/modules/pdf/module.ts',
-    frame: 'src/main/typescript/modules/frame/module.ts',
-    logo: 'src/main/typescript/modules/logo/module.ts',
-    metadata: 'src/main/typescript/modules/metadata/module.ts',
-    piwik: 'src/main/typescript/modules/piwik/module.ts',
-    "toolbar-extender": 'src/main/typescript/modules/toolbar-extender/module.ts',
-    epub: 'src/main/typescript/modules/epub/module.ts',
-    iiif: 'src/main/typescript/modules/iiif/module.ts',
-    style_default: 'src/main/less/templates/default/Iview.less',
-    style_tei: 'src/main/less/tei.less',
+  base: 'src/main/typescript/modules/base/module.ts',
+  desktop: 'src/main/typescript/modules/desktop/module.ts',
+  mets: 'src/main/typescript/modules/mets/module.ts',
+  pdf: 'src/main/typescript/modules/pdf/module.ts',
+  frame: 'src/main/typescript/modules/frame/module.ts',
+  logo: 'src/main/typescript/modules/logo/module.ts',
+  metadata: 'src/main/typescript/modules/metadata/module.ts',
+  piwik: 'src/main/typescript/modules/piwik/module.ts',
+  "toolbar-extender": 'src/main/typescript/modules/toolbar-extender/module.ts',
+  epub: 'src/main/typescript/modules/epub/module.ts',
+  iiif: 'src/main/typescript/modules/iiif/module.ts',
+  style_default: 'src/main/less/templates/default/Iview.less',
+  style_tei: 'src/main/less/tei.less',
 };
 export default defineConfig({
-    plugins: [
-        viteStaticCopy({
+  plugins: [
+    viteStaticCopy({
 
-            targets: [
-                {
-                    src: 'node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs',
-                    dest: 'js/lib/',
-                    rename: 'pdf.worker.min.js'
-                },
-                {
-                    src: 'node_modules/epubjs/dist/*',
-                    dest: 'js/lib/epubjs/'
-                },
-                {
-                    src: 'node_modules/jszip/dist/*',
-                    dest: 'js/lib/jszip/'
-                },
-                {
-                    src: 'node_modules/jquery/dist/*',
-                    dest: 'js/lib/'
-                },
-                {
-                    src: 'node_modules/pdfjs-dist/cmaps/*',
-                    dest: 'cmaps/'
-                }
-            ]
-        })
-    ],
-    build: {
-        emptyOutDir: false,
-        lib: {
-            entry: inputs,
-            fileName: (format, entryName) => {
-                return "js/iview-client-" + entryName + "." + format + ".js";
-            }
+      targets: [
+        {
+          src: 'node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs',
+          dest: 'js/lib/',
+          rename: 'pdf.worker.min.js'
         },
-        cssCodeSplit: true,
-        rollupOptions: {
-            input: inputs,
-            output: {
-                assetFileNames: (assetInfo) => {
-                    switch (assetInfo.name) {
-                        case "style_tei.css":
-                            return "css/tei.css";
-                        case "style_default.css":
-                            return "css/default.css";
-                    }
-                }
-            }
-
+        {
+          src: 'node_modules/epubjs/dist/*',
+          dest: 'js/lib/epubjs/'
         },
-        outDir: 'target/classes/META-INF/resources/modules/iview2/',
+        {
+          src: 'node_modules/jszip/dist/*',
+          dest: 'js/lib/jszip/'
+        },
+        {
+          src: 'node_modules/jquery/dist/*',
+          dest: 'js/lib/'
+        },
+        {
+          src: 'node_modules/pdfjs-dist/cmaps/*',
+          dest: 'cmaps/'
+        }
+      ]
+    })
+  ],
+  build: {
+    emptyOutDir: false,
+    lib: {
+      entry: inputs,
+      fileName: (format, entryName) => {
+        return "js/iview-client-" + entryName + "." + format + ".js";
+      }
     },
+    cssCodeSplit: true,
+    rollupOptions: {
+      input: inputs,
+      output: {
+        assetFileNames: (assetInfo) => {
+          switch (assetInfo.name) {
+            case "style_tei.css":
+              return "css/tei.css";
+            case "style_default.css":
+              return "css/default.css";
+          }
+        }
+      }
+
+    },
+    outDir: 'target/classes/META-INF/resources/modules/iview2/',
+  },
 });

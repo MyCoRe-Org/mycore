@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {Viewport} from "../../widgets/canvas/viewport/Viewport";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { Viewport } from "../../widgets/canvas/viewport/Viewport";
 
 export class ViewportInitializedEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public viewport: Viewport) {
-        super(component, ViewportInitializedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public viewport: Viewport) {
+    super(component, ViewportInitializedEvent.TYPE);
+  }
 
-    public static TYPE = "ViewportInitializedEvent";
+  public static TYPE = "ViewportInitializedEvent";
 }
 

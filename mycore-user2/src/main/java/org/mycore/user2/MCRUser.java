@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -523,10 +523,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public String getUserAttribute(String attribute) {
         switch (attribute) {
-            case MCRUserInformation.ATT_REAL_NAME -> {
+            case ATT_REAL_NAME -> {
                 return getRealName();
             }
-            case MCRUserInformation.ATT_EMAIL -> {
+            case ATT_EMAIL -> {
                 return getEMailAddress();
             }
             default -> {
@@ -546,17 +546,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public boolean isUserInRole(final String role) {
         boolean directMember = getSystemRoleIDs().contains(role) || getExternalRoleIDs().contains(role);
-        if (directMember) {
-            return true;
-        }
-        return MCRRoleManager.isAssignedToRole(this, role);
-    }
-
-    /**
-     * @param attributes the attributes to set
-     */
-    public void setAttributes(SortedSet<MCRUserAttribute> attributes) {
-        this.attributes = attributes;
+        return directMember || MCRRoleManager.isAssignedToRole(this, role);
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -569,6 +559,13 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @XmlElement(name = "attribute")
     public SortedSet<MCRUserAttribute> getAttributes() {
         return this.attributes;
+    }
+
+    /**
+     * @param attributes the attributes to set
+     */
+    public void setAttributes(SortedSet<MCRUserAttribute> attributes) {
+        this.attributes = attributes;
     }
 
     /**
@@ -718,6 +715,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             .forEach(this::assignRole);
     }
 
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
     public void setUserAttribute(String name, String value) {
         Optional<MCRUserAttribute> anyMatch = getAttributes().stream()
             .filter(a -> a.getName().equals(Objects.requireNonNull(name)))
@@ -733,6 +731,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     @Transient
     @XmlElement(name = "owner")
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private UserIdentifier getOwnerId() {
         if (owner == null) {
             return null;

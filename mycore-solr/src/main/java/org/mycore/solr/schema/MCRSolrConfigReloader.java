@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -218,7 +218,7 @@ public class MCRSolrConfigReloader {
      * @throws UnsupportedEncodingException if command encoding is not supported
      */
     private static void executeSolrCommand(String coreURL, JsonObject command) throws UnsupportedEncodingException {
-        HttpRequest.Builder requestBuilder = MCRHttpUtils.getRequestBuilder()
+        HttpRequest.Builder requestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config"))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(command.toString()));
@@ -227,8 +227,8 @@ public class MCRSolrConfigReloader {
             MCRSolrAuthenticationLevel.ADMIN);
         String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
         try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            HttpResponse<String> response
-                = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response =
+                httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 LOGGER.debug(() -> "SOLR config " + commandprefix + " command was successful \n" + response.body());
             } else {
@@ -264,7 +264,7 @@ public class MCRSolrConfigReloader {
      * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
-        HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+        HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config"));
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
             MCRSolrAuthenticationLevel.ADMIN);
@@ -277,7 +277,7 @@ public class MCRSolrConfigReloader {
      * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
-        HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+        HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config/overlay"));
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
             MCRSolrAuthenticationLevel.ADMIN);

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {Layer} from "../model/Layer";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { Layer } from "../model/Layer";
 
 export class ProvideLayerEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public layer: Layer) {
-        super(component, ProvideLayerEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public layer: Layer) {
+    super(component, ProvideLayerEvent.TYPE);
+  }
 
-    public static TYPE = "ProvideLayerEvent";
+  public static TYPE = "ProvideLayerEvent";
 
 }
 

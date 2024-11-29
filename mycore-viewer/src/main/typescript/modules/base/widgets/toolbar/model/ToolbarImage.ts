@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,20 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ToolbarComponent} from "./ToolbarComponent";
-import {ViewerProperty} from "../../../Utils";
+import { ToolbarComponent } from "./ToolbarComponent";
+import { ViewerProperty } from "../../../Utils";
 
 export class ToolbarImage extends ToolbarComponent {
-    constructor(id: string, href: string) {
-        super(id);
-        this.addProperty(new ViewerProperty<string>(this, "href", href));
-    }
+  constructor(id: string, href: string) {
+    super(id);
+    this.addProperty(new ViewerProperty<string>(this, "href", href));
+  }
 
-    public get href(): string {
-        return this.getProperty("href").value;
-    }
+  public get href(): string {
+    return this.getProperty("href").value;
+  }
 
-    public set href(href: string) {
-        this.getProperty("href").value = href;
-    }
+  public set href(href: string) {
+    this.getProperty("href").value = href;
+  }
 }

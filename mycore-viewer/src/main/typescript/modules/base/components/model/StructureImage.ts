@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,41 +16,41 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReMap} from "../../Utils";
+import { MyCoReMap } from "../../Utils";
 
 export class StructureImage {
 
-    /**
-     * Creates a new StructureImage.
-     * @param type of image (currently not actively used)
-     * @param id
-     * @param order
-     * @param orderLabel
-     * @param href
-     * @param mimetype
-     * @param requestImgdataUrl
-     * @param additionalHrefs
-     * @param uniqueIdentifier like a persistent identifier (URN, PURL or DOI)
-     */
-    constructor(public type: string,
-                public id: string,
-                public order: number,
-                public orderLabel: string,
-                public href: string,
-                public mimetype: string,
-                public requestImgdataUrl: (callback: (imgdata: string) => void) => void,
-                public additionalHrefs = new MyCoReMap<string, string>(),
-                uniqueIdentifier?: string,
-                public width?: number,
-                public height?: number) {
-        if (typeof uniqueIdentifier == "undefined" || uniqueIdentifier == null || uniqueIdentifier == "") {
-            this.uniqueIdentifier = null;
-        } else {
-            this.uniqueIdentifier = uniqueIdentifier;
-        }
+  /**
+   * Creates a new StructureImage.
+   * @param type of image (currently not actively used)
+   * @param id
+   * @param order
+   * @param orderLabel
+   * @param href
+   * @param mimetype
+   * @param requestImgdataUrl
+   * @param additionalHrefs
+   * @param uniqueIdentifier like a persistent identifier (URN, PURL or DOI)
+   */
+  constructor(public type: string,
+    public id: string,
+    public order: number,
+    public orderLabel: string,
+    public href: string,
+    public mimetype: string,
+    public requestImgdataUrl: (callback: (imgdata: string) => void) => void,
+    public additionalHrefs = new MyCoReMap<string, string>(),
+    uniqueIdentifier?: string,
+    public width?: number,
+    public height?: number) {
+    if (typeof uniqueIdentifier == "undefined" || uniqueIdentifier == null || uniqueIdentifier == "") {
+      this.uniqueIdentifier = null;
+    } else {
+      this.uniqueIdentifier = uniqueIdentifier;
     }
+  }
 
-    public uniqueIdentifier: string
+  public uniqueIdentifier: string
 
 
 }

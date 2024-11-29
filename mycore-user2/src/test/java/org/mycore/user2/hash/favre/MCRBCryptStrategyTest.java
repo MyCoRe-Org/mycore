@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 
 package org.mycore.user2.hash.favre;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.security.SecureRandom;
 
 import org.junit.Test;
@@ -25,10 +29,6 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.user2.hash.MCRPasswordCheckData;
 import org.mycore.user2.hash.MCRPasswordCheckResult;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class MCRBCryptStrategyTest extends MCRTestCase {
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -100,9 +99,9 @@ public class MCRRestAPIUploadHelper {
      * uploads a MyCoRe Object
      * based upon:
      * http://puspendu.wordpress.com/2012/08/23/restful-webservice-file-upload-with-jersey/
-     * 
+     *
      * @param info - the Jersey UriInfo object
-     * @param request - the HTTPServletRequest object 
+     * @param request - the HTTPServletRequest object
      * @param uploadedInputStream - the inputstream from HTTP Post request
      * @param fileDetails - the file information from HTTP Post request
      * @return a Jersey Response object
@@ -146,119 +145,164 @@ public class MCRRestAPIUploadHelper {
     /**
      * creates or updates a MyCoRe derivate
      * @param info - the Jersey UriInfo object
-     * @param request - the HTTPServletRequest object 
+     * @param request - the HTTPServletRequest object
      * @param mcrObjID - the MyCoRe Object ID
      * @param label - the label of the new derivate
      * @param overwriteOnExisting, if true, an existing MyCoRe derivate
-     *        with the given label or classification will be returned 
+     *        with the given label or classification will be returned
      * @return a Jersey Response object
      */
-    public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID, String label,
-        String classifications, boolean overwriteOnExisting) {
-        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
-        //  File fXML = null;
+    public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID,
+        String label, String classifications, boolean overwriteOnExisting) {
         MCRObjectID mcrObjIDObj = MCRObjectID.getInstance(mcrObjID);
-
+        MCRObjectID derID = null;
         try {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjIDObj);
-            MCRObjectID derID = null;
-            final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             if (overwriteOnExisting) {
-                final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
-                if (label != null && label.length() > 0) {
-                    for (MCRMetaLinkID derLink : currentDerivates) {
-                        if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
-                            derID = derLink.getXLinkHrefID();
-                        }
-                    }
-                }
-                if (derID == null && classifications != null && classifications.length() > 0) {
-                    final List<MCRCategoryID> categories = Stream.of(classifications.split(" "))
-                        .map(MCRCategoryID::fromString)
-                        .collect(Collectors.toList());
-
-                    final List<MCRCategoryID> notExisting = categories.stream().filter(Predicate.not(dao::exist))
-                        .collect(Collectors.toList());
-
-                    if (notExisting.size() > 0) {
-                        final String missingIDS = notExisting.stream()
-                            .map(MCRCategoryID::toString).collect(Collectors.joining(", "));
-                        throw new MCRRestAPIException(Status.NOT_FOUND,
-                            new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
-                                "There are no classification with the IDs: " + missingIDS));
-                    }
-                    final Optional<MCRMetaEnrichedLinkID> matchingDerivate = currentDerivates.stream()
-                        .filter(derLink -> {
-                            final Set<MCRCategoryID> clazzSet = new HashSet<>(derLink.getClassifications());
-                            return categories.stream().allMatch(clazzSet::contains);
-                        }).findFirst();
-                    if (matchingDerivate.isPresent()) {
-                        derID = matchingDerivate.get().getXLinkHrefID();
-                    }
-                }
+                derID = findDerivateID(mcrObj, label, classifications);
             }
-
             if (derID == null) {
-                MCRDerivate mcrDerivate = new MCRDerivate();
-                if (label != null && label.length() > 0) {
-                    mcrDerivate.getDerivate().getTitles()
-                        .add(new MCRMetaLangText("title", null, null, 0, null, label));
-                }
-                MCRObjectID zeroDerId = MCRObjectID
-                    .getInstance(MCRObjectID.formatID(mcrObjIDObj.getProjectId() + "_derivate", 0));
-                mcrDerivate.setId(zeroDerId);
-                mcrDerivate.setSchema("datamodel-derivate.xsd");
-                mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
-                mcrDerivate.getDerivate().setInternals(new MCRMetaIFS("internal", null));
-
-                if (classifications != null && classifications.length() > 0) {
-                    final List<MCRMetaClassification> currentClassifications;
-                    currentClassifications = mcrDerivate.getDerivate().getClassifications();
-                    Stream.of(classifications.split(" "))
-                        .map(MCRCategoryID::fromString)
-                        .filter(dao::exist)
-                        .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID))
-                        .forEach(currentClassifications::add);
-                }
-
-                MCRMetadataManager.create(mcrDerivate);
-                MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                    MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate),
-                    mcrDerivate.isImportMode());
-                derID = mcrDerivate.getId();
+                derID = createNewDerivate(mcrObjIDObj, label, classifications);
             }
+            return buildResponse(info, mcrObjIDObj, String.valueOf(derID));
 
-            response = Response
-                .created(info.getBaseUriBuilder().path("objects/" + mcrObjID + "/derivates/" + derID).build())
-                .type("application/xml; charset=UTF-8")
-                .build();
         } catch (Exception e) {
-            LOGGER.error("Exeption while uploading derivate", e);
+            LOGGER.error("Exception while uploading derivate", e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
-        return response;
+    }
+
+    private static MCRObjectID findDerivateID(MCRObject mcrObj, String label, String classifications)
+        throws MCRRestAPIException {
+        MCRObjectID derID = null;
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
+        if (label != null && !label.isEmpty()) {
+            derID = findDerIDByLabel(currentDerivates, label);
+        }
+        if (derID == null && classifications != null && !classifications.isEmpty()) {
+            derID = filterDerivateIDByClassifications(currentDerivates, classifications, dao);
+        }
+        return derID;
+    }
+
+    private static MCRObjectID findDerIDByLabel(List<MCRMetaEnrichedLinkID> derivates, String label) {
+        for (MCRMetaLinkID derLink : derivates) {
+            if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
+                return derLink.getXLinkHrefID();
+
+            }
+        }
+        return null;
+    }
+
+    private static MCRObjectID filterDerivateIDByClassifications(List<MCRMetaEnrichedLinkID> derivates,
+        String classifications,
+        MCRCategoryDAO dao) throws MCRRestAPIException {
+        final List<MCRCategoryID> categories = Stream.of(classifications.split(" "))
+            .map(MCRCategoryID::fromString)
+            .collect(Collectors.toList());
+
+        final List<MCRCategoryID> notExisting = categories.stream()
+            .filter(Predicate.not(dao::exist))
+            .collect(Collectors.toList());
+
+        if (!notExisting.isEmpty()) {
+            throw new MCRRestAPIException(Status.NOT_FOUND,
+                new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
+                    "There are no classifications with the IDs: " +
+                        notExisting.stream().map(MCRCategoryID::toString).collect(Collectors.joining(", "))));
+        }
+
+        return derivates.stream()
+            .filter(derLink -> {
+                final Set<MCRCategoryID> clazzSet = new HashSet<>(derLink.getClassifications());
+                return categories.stream().allMatch(clazzSet::contains);
+            })
+            .findFirst()
+            .map(MCRMetaLinkID::getXLinkHrefID)
+            .orElse(null);
+    }
+
+    private static MCRObjectID createNewDerivate(MCRObjectID mcrObjIDObj, String label, String classifications)
+        throws MCRPersistenceException, MCRAccessException {
+        MCRDerivate mcrDerivate = new MCRDerivate();
+
+        if (label != null && !label.isEmpty()) {
+            mcrDerivate.getDerivate().getTitles()
+                .add(new MCRMetaLangText("title", null, null, 0, null, label));
+        }
+
+        MCRObjectID zeroDerId =
+            MCRObjectID.getInstance(MCRObjectID.formatID(mcrObjIDObj.getProjectId() + "_derivate", 0));
+        mcrDerivate.setId(zeroDerId);
+        mcrDerivate.setSchema("datamodel-derivate.xsd");
+        mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
+        mcrDerivate.getDerivate().setInternals(new MCRMetaIFS("internal", null));
+        if (classifications != null && !classifications.isEmpty()) {
+            addClassificationsToDerivate(mcrDerivate, classifications);
+        }
+        MCRMetadataManager.create(mcrDerivate);
+        MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
+            MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate),
+            mcrDerivate.isImportMode());
+
+        return mcrDerivate.getId();
+    }
+
+    private static void addClassificationsToDerivate(MCRDerivate mcrDerivate, String classifications) {
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final List<MCRMetaClassification> currentClassifications = mcrDerivate.getDerivate().getClassifications();
+
+        Stream.of(classifications.split(" "))
+            .map(MCRCategoryID::fromString)
+            .filter(dao::exist)
+            .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID))
+            .forEach(currentClassifications::add);
     }
 
     /**
      * uploads a file into a given derivate
-     * @param info - the Jersey UriInfo object
-     * @param request - the HTTPServletRequest object 
-     * @param pathParamMcrObjID - a MyCoRe Object ID
-     * @param pathParamMcrDerID - a MyCoRe Derivate ID
+     *
+     * @param info                - the Jersey UriInfo object
+     * @param pathParamMcrObjID   - a MyCoRe Object ID
+     * @param pathParamMcrDerID   - a MyCoRe Derivate ID
      * @param uploadedInputStream - the inputstream from HTTP Post request
-     * @param fileDetails - the file information from HTTP Post request
-     * @param formParamPath - the path of the file inside the derivate
-     * @param formParamMaindoc - true, if this file should be marked as maindoc
-     * @param formParamUnzip - true, if the upload is zip file that should be unzipped inside the derivate
-     * @param formParamMD5 - the MD5 sum of the uploaded file 
-     * @param formParamSize - the size of the uploaded file
+     * @param formParamPath       - the path of the file inside the derivate
+     * @param formParamMaindoc    - true, if this file should be marked as maindoc
+     * @param formParamUnzip      - true, if the upload is zip file that should be unzipped inside the derivate
+     * @param formParamMD5        - the MD5 sum of the uploaded file
+     * @param formParamSize       - the size of the uploaded file
      * @return a Jersey Response object
      */
-    public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
-        String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
-        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5,
-        Long formParamSize) throws MCRRestAPIException {
 
+    public static Response uploadFile(UriInfo info, String pathParamMcrObjID,
+        String pathParamMcrDerID, InputStream uploadedInputStream,
+        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip,
+        String formParamMD5, Long formParamSize) throws MCRRestAPIException {
+        createParameterMap(pathParamMcrObjID, pathParamMcrDerID, formParamPath,
+            formParamMaindoc, formParamUnzip, formParamMD5, formParamSize);
+
+        MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
+        MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
+        MCRDerivate der = retrieveAndValidateDerivate(objID, derID);
+
+        try {
+            handleFileUpload(uploadedInputStream, formParamPath, formParamMaindoc, formParamUnzip, derID, der);
+        } catch (IOException | MCRPersistenceException | MCRAccessException e) {
+            LOGGER.error(e);
+            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
+        }
+
+        return buildResponse(info, objID, derID + "/contents");
+    }
+
+    private static SortedMap<String, String> createParameterMap(String pathParamMcrObjID, String pathParamMcrDerID,
+        String formParamPath, boolean formParamMaindoc,
+        boolean formParamUnzip, String formParamMD5,
+        Long formParamSize) {
         SortedMap<String, String> parameter = new TreeMap<>();
         parameter.put("mcrObjectID", pathParamMcrObjID);
         parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -267,81 +311,100 @@ public class MCRRestAPIUploadHelper {
         parameter.put("unzip", Boolean.toString(formParamUnzip));
         parameter.put("md5", formParamMD5);
         parameter.put("size", Long.toString(formParamSize));
+        return parameter;
+    }
 
-        MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
-        MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
-
+    private static MCRDerivate retrieveAndValidateDerivate(MCRObjectID objID, MCRObjectID derID)
+        throws MCRRestAPIException {
         if (!MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
             throw new MCRRestAPIException(Status.FORBIDDEN,
                 new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "Could not add file to derivate",
                     "You do not have the permission to write to " + derID));
         }
+
         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
-        java.nio.file.Path derDir = null;
-
-        String path = null;
         if (!der.getOwnerID().equals(objID)) {
             throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Derivate object mismatch",
                     "Derivate " + derID + " belongs to a different object: " + objID));
         }
-        try {
-            derDir = UPLOAD_DIR.resolve(derID.toString());
-            if (Files.exists(derDir)) {
-                Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
-            }
-            path = formParamPath.replace("\\", "/").replace("../", "");
-            while (path.startsWith("/")) {
-                path = path.substring(1);
-            }
 
-            MCRPath derRoot = MCRPath.getPath(derID.toString(), "/");
-            if (Files.notExists(derRoot)) {
-                derRoot.getFileSystem().createRoot(derID.toString());
-            }
+        return der;
+    }
 
-            if (formParamUnzip) {
-                String maindoc = null;
-                try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
-                    ZipEntry entry;
-                    while ((entry = zis.getNextEntry()) != null) {
-                        LOGGER.debug("Unzipping: {}", entry.getName());
-                        java.nio.file.Path target = MCRUtils.safeResolve(derDir, entry.getName());
-                        Files.createDirectories(target.getParent());
-                        Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
-                        if (maindoc == null && !entry.isDirectory()) {
-                            maindoc = entry.getName();
-                        }
-                    }
-                } catch (IOException e) {
-                    LOGGER.error(e);
-                }
+    private static void handleFileUpload(InputStream uploadedInputStream, String formParamPath,
+        boolean formParamMaindoc,
+        boolean formParamUnzip, MCRObjectID derID, MCRDerivate der)
+        throws IOException, MCRPersistenceException, MCRAccessException {
+        java.nio.file.Path derDir = UPLOAD_DIR.resolve(derID.toString());
+        MCRPath derRoot = MCRPath.getPath(derID.toString(), "/");
 
-                Files.walkFileTree(derDir, new MCRTreeCopier(derDir, derRoot, true));
-                if (formParamMaindoc) {
-                    der.getDerivate().getInternals().setMainDoc(maindoc);
-                }
-            } else {
-                java.nio.file.Path saveFile = MCRUtils.safeResolve(derDir, path);
-                Files.createDirectories(saveFile.getParent());
-                Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
+        cleanUploadDirectory(derDir);
 
-                Files.walkFileTree(derDir, new MCRTreeCopier(derDir, derRoot, true));
-                if (formParamMaindoc) {
-                    der.getDerivate().getInternals().setMainDoc(path);
-                }
-            }
+        String sanitizedPath = sanitizePath(formParamPath);
 
-            MCRMetadataManager.update(der);
-            Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
-        } catch (IOException | MCRPersistenceException | MCRAccessException e) {
-            LOGGER.error(e);
-            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
-                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
+        if (formParamUnzip) {
+            unzipAndProcessFiles(uploadedInputStream, derDir, derRoot, formParamMaindoc, der);
+        } else {
+            saveSingleFile(uploadedInputStream, derDir, sanitizedPath, derRoot, formParamMaindoc, der);
         }
+
+        MCRMetadataManager.update(der);
+        cleanUploadDirectory(derDir);
+    }
+
+    private static void cleanUploadDirectory(java.nio.file.Path dir) throws IOException {
+        if (Files.exists(dir)) {
+            Files.walkFileTree(dir, MCRRecursiveDeleter.instance());
+        }
+    }
+
+    private static String sanitizePath(String path) {
+        String newPath = path.replace("\\", "/").replace("../", "");
+        while (newPath.startsWith("/")) {
+            newPath = newPath.substring(1);
+        }
+        return newPath;
+    }
+
+    private static void unzipAndProcessFiles(InputStream uploadedInputStream, java.nio.file.Path derDir,
+        MCRPath derRoot,
+        boolean formParamMaindoc, MCRDerivate der) throws IOException {
+        String maindoc = null;
+        try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                LOGGER.debug("Unzipping: {}", entry.getName());
+                java.nio.file.Path target = MCRUtils.safeResolve(derDir, entry.getName());
+                Files.createDirectories(target.getParent());
+                Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
+                if (maindoc == null && !entry.isDirectory()) {
+                    maindoc = entry.getName();
+                }
+            }
+        }
+        Files.walkFileTree(derDir, new MCRTreeCopier(derDir, derRoot, true));
+        if (formParamMaindoc) {
+            der.getDerivate().getInternals().setMainDoc(maindoc);
+        }
+    }
+
+    private static void saveSingleFile(InputStream uploadedInputStream, java.nio.file.Path derDir, String path,
+        MCRPath derRoot,
+        boolean formParamMaindoc, MCRDerivate der) throws IOException {
+        java.nio.file.Path saveFile = MCRUtils.safeResolve(derDir, path);
+        Files.createDirectories(saveFile.getParent());
+        Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
+        Files.walkFileTree(derDir, new MCRTreeCopier(derDir, derRoot, true));
+        if (formParamMaindoc) {
+            der.getDerivate().getInternals().setMainDoc(path);
+        }
+    }
+
+    private static Response buildResponse(UriInfo info, MCRObjectID objID, String derID) {
         return Response
-            .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates/" + derID + "/contents").build())
+            .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates/" + derID).build())
             .type("application/xml; charset=UTF-8").build();
     }
 

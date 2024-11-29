@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,60 +17,60 @@
  */
 
 
-import {ToolbarViewFactory} from "../../../../base/widgets/toolbar/view/ToolbarViewFactory";
-import {ToolbarView} from "../../../../base/widgets/toolbar/view/ToolbarView";
-import {TextView} from "../../../../base/widgets/toolbar/view/text/TextView";
-import {ImageView} from "../../../../base/widgets/toolbar/view/image/ImageView";
-import {GroupView} from "../../../../base/widgets/toolbar/view/group/GroupView";
-import {DropdownView} from "../../../../base/widgets/toolbar/view/dropdown/DropdownView";
-import {ButtonView} from "../../../../base/widgets/toolbar/view/button/ButtonView";
-import {TextInputView} from "../../../../base/widgets/toolbar/view/input/TextInputView";
-import {BootstrapToolbarView} from "./BootstrapToolbarView";
-import {BootstrapTextView} from "./text/BootstrapTextView";
-import {BootstrapImageView} from "./image/BootstrapImageView";
-import {BootstrapGroupView} from "./group/BootstrapGroupView";
-import {BootstrapDropdownView} from "./dropdown/BootstrapDropdownView";
-import {BootstrapLargeDropdownView} from "./dropdown/BootstrapLargeDropdownView";
-import {BootstrapButtonView} from "./button/BootstrapButtonView";
-import {BootstrapTextInputView} from "./input/BootstrapTextInputView";
+import { ToolbarViewFactory } from "../../../../base/widgets/toolbar/view/ToolbarViewFactory";
+import { ToolbarView } from "../../../../base/widgets/toolbar/view/ToolbarView";
+import { TextView } from "../../../../base/widgets/toolbar/view/text/TextView";
+import { ImageView } from "../../../../base/widgets/toolbar/view/image/ImageView";
+import { GroupView } from "../../../../base/widgets/toolbar/view/group/GroupView";
+import { DropdownView } from "../../../../base/widgets/toolbar/view/dropdown/DropdownView";
+import { ButtonView } from "../../../../base/widgets/toolbar/view/button/ButtonView";
+import { TextInputView } from "../../../../base/widgets/toolbar/view/input/TextInputView";
+import { BootstrapToolbarView } from "./BootstrapToolbarView";
+import { BootstrapTextView } from "./text/BootstrapTextView";
+import { BootstrapImageView } from "./image/BootstrapImageView";
+import { BootstrapGroupView } from "./group/BootstrapGroupView";
+import { BootstrapDropdownView } from "./dropdown/BootstrapDropdownView";
+import { BootstrapLargeDropdownView } from "./dropdown/BootstrapLargeDropdownView";
+import { BootstrapButtonView } from "./button/BootstrapButtonView";
+import { BootstrapTextInputView } from "./input/BootstrapTextInputView";
 
 export class BootstrapToolbarViewFactory implements ToolbarViewFactory {
 
-    createToolbarView(): ToolbarView {
-        return new BootstrapToolbarView();
-    }
+  createToolbarView(): ToolbarView {
+    return new BootstrapToolbarView();
+  }
 
-    createTextView(id: string): TextView {
-        return new BootstrapTextView(id);
-    }
+  createTextView(id: string): TextView {
+    return new BootstrapTextView(id);
+  }
 
-    createImageView(id: string): ImageView {
-        return new BootstrapImageView(id);
-    }
+  createImageView(id: string): ImageView {
+    return new BootstrapImageView(id);
+  }
 
-    createGroupView(id: string, order: number, align: string): GroupView {
-        return new BootstrapGroupView(id, order, align);
-    }
+  createGroupView(id: string, order: number, align: string): GroupView {
+    return new BootstrapGroupView(id, order, align);
+  }
 
-    createDropdownView(id: string): DropdownView {
-        return new BootstrapDropdownView(id);
-    }
+  createDropdownView(id: string): DropdownView {
+    return new BootstrapDropdownView(id);
+  }
 
-    createLargeDropdownView(id: string): DropdownView {
-        return new BootstrapLargeDropdownView(id);
-    }
+  createLargeDropdownView(id: string): DropdownView {
+    return new BootstrapLargeDropdownView(id);
+  }
 
-    createButtonView(id: string): ButtonView {
-        return new BootstrapButtonView(id);
-    }
+  createButtonView(id: string): ButtonView {
+    return new BootstrapButtonView(id);
+  }
 
-    createTextInputView(id: string): TextInputView {
-        return new BootstrapTextInputView(id);
-    }
+  createTextInputView(id: string): TextInputView {
+    return new BootstrapTextInputView(id);
+  }
 }
 
-export function register(){
-    ((window as any).ToolbarViewFactoryImpl as ToolbarViewFactory)=new BootstrapToolbarViewFactory();
+export function register() {
+  ((window as any).ToolbarViewFactoryImpl as ToolbarViewFactory) = new BootstrapToolbarViewFactory();
 }
 
 

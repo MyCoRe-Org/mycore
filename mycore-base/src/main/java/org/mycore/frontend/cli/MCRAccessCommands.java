@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,26 +53,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 public class MCRAccessCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = LogManager.getLogger(MCRAccessCommands.class.getName());
-
-    /**
-     * Check the file name
-     * 
-     * @param filename
-     *            the filename of the user data input
-     * @return true if the file name is okay
-     */
-    private static boolean checkFilename(String filename) {
-        if (!filename.endsWith(".xml")) {
-            LOGGER.warn("{} ignored, does not end with *.xml", filename);
-            return false;
-        }
-
-        if (!new File(filename).isFile()) {
-            LOGGER.warn("{} ignored, is not a file.", filename);
-            return false;
-        }
-        return true;
-    }
 
     /**
      * This method deletes the old permissions (if given any) and sets the new
@@ -128,7 +108,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         Element permissions = getPermissionsFromUri(permissionsUri);
 
-        if(permissions != null) {
+        if (permissions != null) {
             for (Element permission : permissions.getChildren("mcrpermission")) {
                 String permissionName = permission.getAttributeValue("name").trim();
                 String ruleDescription = permission.getAttributeValue("ruledescription");

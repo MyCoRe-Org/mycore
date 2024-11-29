@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,37 +55,21 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     private final String threadId = Thread.currentThread().toString();
 
-    private boolean rollbackOnly;
-
-    private boolean active;
-
-    public MCROCFLPersistenceTransaction() {
-        rollbackOnly = false;
-        active = false;
-    }
-
     @Override
     public boolean isReady() {
         LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, MANAGER != null);
-        return MANAGER != null && !isActive();
+        return MANAGER != null;
     }
 
     @Override
     public void begin() {
         LOGGER.debug("TRANSACTION {} BEGIN", threadId);
-        if (isActive()) {
-            throw new IllegalStateException("TRANSACTION ALREADY ACTIVE");
-        }
         CATEGORY_WORKSPACE.set(new HashMap<>());
-        active = true;
     }
 
     @Override
     public void commit() {
         LOGGER.debug("TRANSACTION {} COMMIT", threadId);
-        if (!isActive() || getRollbackOnly()) {
-            throw new IllegalStateException("TRANSACTION NOT ACTIVE OR MARKED FOR ROLLBACK");
-        }
         final Map<MCRCategoryID, Character> mapOfChanges = CATEGORY_WORKSPACE.get();
         // save new OCFL version of classifications
         // value is category if classification should not be deleted
@@ -106,7 +90,6 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
                 }
             }));
         CATEGORY_WORKSPACE.remove();
-        active = false;
     }
 
     private static void createOrUpdateOCFLClassification(MCRCategoryID categoryID, Character eventType)
@@ -135,36 +118,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     @Override
     public void rollback() {
         LOGGER.debug("TRANSACTION {} ROLLBACK", threadId);
-        if (!isActive()) {
-            throw new IllegalStateException("TRANSACTION NOT ACTIVE");
-        }
         CATEGORY_WORKSPACE.remove();
-        rollbackOnly = false;
-        active = false;
-    }
-
-    @Override
-    public boolean getRollbackOnly() {
-        LOGGER.debug("TRANSACTION {} ROLLBACK CHECK - {}", threadId, rollbackOnly);
-        if (!isActive()) {
-            throw new IllegalStateException("TRANSACTION NOT ACTIVE");
-        }
-        return rollbackOnly;
-    }
-
-    @Override
-    public void setRollbackOnly() throws IllegalStateException {
-        LOGGER.debug("TRANSACTION {} SET ROLLBACK - {}", threadId, rollbackOnly);
-        if (!isActive()) {
-            throw new IllegalStateException("TRANSACTION NOT ACTIVE");
-        }
-        rollbackOnly = true;
-    }
-
-    @Override
-    public boolean isActive() {
-        LOGGER.debug("TRANSACTION {} ACTIVE CHECK - {}", threadId, active);
-        return active;
     }
 
     /**
@@ -198,6 +152,11 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             default -> throw new IllegalStateException(
                 "Unsupported event type for classification found: " + type + ", " + id);
         }
+    }
+
+    @Override
+    public int getCommitPriority() {
+        return 6000;
     }
 
 }

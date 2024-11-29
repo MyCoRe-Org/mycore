@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,6 @@
  */
 
 package org.mycore.datamodel.niofs.ifs2;
-
-import com.google.common.collect.Sets;
-import org.mycore.common.events.MCRPathEventHelper;
-import org.mycore.datamodel.ifs2.MCRDirectory;
-import org.mycore.datamodel.ifs2.MCRFile;
-import org.mycore.datamodel.ifs2.MCRFileCollection;
-import org.mycore.datamodel.ifs2.MCRStoredNode;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
-import org.mycore.datamodel.niofs.MCRAbstractFileSystemProvider;
-import org.mycore.datamodel.niofs.MCRBasicFileAttributeViewProperties;
-import org.mycore.datamodel.niofs.MCRFileAttributes;
-import org.mycore.datamodel.niofs.MCRDigestAttributeView;
-import org.mycore.datamodel.niofs.MCRPath;
 
 import java.io.IOException;
 import java.net.URI;
@@ -60,6 +46,21 @@ import java.nio.file.attribute.FileAttributeView;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.mycore.common.events.MCRPathEventHelper;
+import org.mycore.datamodel.ifs2.MCRDirectory;
+import org.mycore.datamodel.ifs2.MCRFile;
+import org.mycore.datamodel.ifs2.MCRFileCollection;
+import org.mycore.datamodel.ifs2.MCRStoredNode;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystemProvider;
+import org.mycore.datamodel.niofs.MCRBasicFileAttributeViewProperties;
+import org.mycore.datamodel.niofs.MCRDigestAttributeView;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
+import org.mycore.datamodel.niofs.MCRPath;
+
+import com.google.common.collect.Sets;
 
 /**
  * MyCoRe IFS2 FileSystemProvider implementation
@@ -451,7 +452,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      */
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
         return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? MCRAbstractFileSystem.getInstance(SCHEME)
-                                                                : FILE_SYSTEM_INSTANCE);
+            : FILE_SYSTEM_INSTANCE);
     }
 
     static abstract class BaseBasicFileAttributeView extends MCRBasicFileAttributeViewImpl {
@@ -524,8 +525,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
 
         private static final Set<String> ALLOWED_ATTRIBUTES = Sets.union(
             MCRBasicFileAttributeViewProperties.ALLOWED_ATTRIBUTES,
-            Sets.newHashSet(MD5_NAME)
-        );
+            Sets.newHashSet(MD5_NAME));
 
         MD5FileAttributeViewProperties(MD5FileAttributeViewImpl view) {
             super(view);

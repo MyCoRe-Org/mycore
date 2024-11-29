@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,15 +48,14 @@ import java.util.stream.StreamSupport;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.util.MCRRestContentHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRDigestAttributeView;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.jersey.MCRCacheControl;
@@ -149,15 +148,15 @@ public class MCRRestDerivateContents {
     }
 
     private static void doWithinTransaction(IOOperation op) throws IOException {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        MCRSessionMgr.getCurrentSession();
         try {
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
             op.run();
         } finally {
-            if (MCRTransactionHelper.transactionRequiresRollback()) {
-                MCRTransactionHelper.rollbackTransaction();
+            if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+                MCRTransactionManager.rollbackTransactions();
             } else {
-                MCRTransactionHelper.commitTransaction();
+                MCRTransactionManager.commitTransactions();
             }
         }
     }

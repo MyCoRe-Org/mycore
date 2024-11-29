@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -190,11 +190,11 @@ public class MCRSwordUtil {
                         zipArchiveEntry = new ZipArchiveEntry(fileName);
                         zipArchiveEntry.setSize(Files.size(p));
                         zipOutputStream.putArchiveEntry(zipArchiveEntry);
-                        if (MCRTransactionHelper.isTransactionActive()) {
-                            MCRTransactionHelper.commitTransaction();
+                        if (MCRTransactionManager.hasActiveTransactions()) {
+                            MCRTransactionManager.commitTransactions();
                         }
                         Files.copy(p, zipOutputStream);
-                        MCRTransactionHelper.beginTransaction();
+                        MCRTransactionManager.beginTransactions();
                         zipOutputStream.closeArchiveEntry();
                     }
                 } catch (IOException e) {
@@ -220,19 +220,19 @@ public class MCRSwordUtil {
      */
     public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5)
         throws IOException {
-        if (MCRTransactionHelper.isTransactionActive()) {
-            MCRTransactionHelper.commitTransaction();
+        if (MCRTransactionManager.hasActiveTransactions()) {
+            MCRTransactionManager.commitTransactions();
         }
 
         final Path zipTempFile = Files.createTempFile("swordv2_", fileName);
         MessageDigest md5Digest = null;
-        InputStream digestedInputStream=inputStream;
+        InputStream digestedInputStream = inputStream;
         if (checkMd5 != null) {
             try {
                 md5Digest = MessageDigest.getInstance("MD5");
                 digestedInputStream = new DigestInputStream(inputStream, md5Digest);
             } catch (NoSuchAlgorithmException e) {
-                MCRTransactionHelper.beginTransaction();
+                MCRTransactionManager.beginTransactions();
                 throw new MCRConfigurationException("No MD5 available!", e);
             }
         }
@@ -242,12 +242,12 @@ public class MCRSwordUtil {
         if (checkMd5 != null) {
             final String md5String = MCRUtils.toHexString(md5Digest.digest());
             if (!md5String.equals(checkMd5)) {
-                MCRTransactionHelper.beginTransaction();
+                MCRTransactionManager.beginTransactions();
                 throw new IOException("MD5 mismatch, expected " + checkMd5 + " got " + md5String);
             }
         }
 
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         return zipTempFile;
     }
 
@@ -286,8 +286,8 @@ public class MCRSwordUtil {
                         try (SeekableByteChannel destinationChannel = Files.newByteChannel(targetFilePath,
                             StandardOpenOption.WRITE, StandardOpenOption.SYNC, StandardOpenOption.CREATE);
                             SeekableByteChannel sourceChannel = Files.newByteChannel(file, StandardOpenOption.READ)) {
-                            if (MCRTransactionHelper.isTransactionActive()) {
-                                MCRTransactionHelper.commitTransaction();
+                            if (MCRTransactionManager.hasActiveTransactions()) {
+                                MCRTransactionManager.commitTransactions();
                             }
                             ByteBuffer buffer = ByteBuffer.allocateDirect(COPY_BUFFER_SIZE);
                             while (sourceChannel.read(buffer) != -1 || buffer.position() > 0) {
@@ -296,8 +296,8 @@ public class MCRSwordUtil {
                                 buffer.compact();
                             }
                         } finally {
-                            if (!MCRTransactionHelper.isTransactionActive()) {
-                                MCRTransactionHelper.beginTransaction();
+                            if (!MCRTransactionManager.hasActiveTransactions()) {
+                                MCRTransactionManager.beginTransactions();
                             }
                         }
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
  */
 
 export interface ChapterTreeView {
-    addNode(parentId: string, id: string, label: string, childLabel: string, expandable: boolean);
+  addNode(parentId: string, id: string, label: string, childLabel: string, expandable: boolean);
 
-    setOpened(id: string, opened: boolean);
+  setOpened(id: string, opened: boolean);
 
-    setSelected(id: string, selected: boolean);
+  setSelected(id: string, selected: boolean);
 
-    jumpTo(id: string);
+  jumpTo(id: string);
 }
 

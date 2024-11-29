@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ public class MCRIView2Tools {
     private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
         .orElse("");
 
-    private static Path TILE_DIR = Paths.get(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
+    private static Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
 
     private static Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
 

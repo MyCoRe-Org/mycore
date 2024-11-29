@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 
 package org.mycore.user2.hash;
 
-import java.security.SecureRandom;
-
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.security.SecureRandom;
+
+import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 
 public class MCRSHA512StrategyTest extends MCRTestCase {
 

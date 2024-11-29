@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -58,7 +58,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 
@@ -75,8 +75,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
         mapper.handleObjectUpdated(null, mcro);
 
-        String expression
-            = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
+        String expression =
+            "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
         Document xml = mcro.createXML();
@@ -104,7 +104,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 
@@ -161,7 +161,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 
@@ -221,7 +221,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     @Test
     public void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.isTransactionActive();
+        MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 

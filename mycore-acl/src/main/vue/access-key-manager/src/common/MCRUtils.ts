@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ export async function fetchJWT(webApplicationBaseURL: string, objectID: string,
   return axios.get(`${webApplicationBaseURL}rsc/jwt`, { params });
 }
 
-export async function fetchDict(baseURL:string, locale: string): Promise<AxiosResponse> {
+export async function fetchDict(baseURL: string, locale: string): Promise<AxiosResponse> {
   return axios.get(`${baseURL}rsc/locale/translate/${locale}/component.acl.accesskey*`);
 }
 

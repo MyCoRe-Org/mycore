@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 
 package org.mycore.backend.jpa;
 
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.spi.LoadState;
-import jakarta.persistence.spi.PersistenceProvider;
-import jakarta.persistence.spi.PersistenceUnitInfo;
-import jakarta.persistence.spi.ProviderUtil;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
@@ -32,10 +32,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.log.MCRTableMessage;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.spi.LoadState;
+import jakarta.persistence.spi.PersistenceProvider;
+import jakarta.persistence.spi.PersistenceUnitInfo;
+import jakarta.persistence.spi.ProviderUtil;
 
 /**
  * This class is used to provide a custom persistence provider for MyCoRe. It uses Hibernate under the hood.

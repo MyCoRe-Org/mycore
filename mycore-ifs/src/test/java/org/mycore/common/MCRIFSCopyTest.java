@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         // create derivate
         create();
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
 
         // execute threads
         MCRSystemUserInformation systemUser = MCRSystemUserInformation.getSystemUserInstance();

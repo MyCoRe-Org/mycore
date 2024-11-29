@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        String builder
-            = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
+        String builder =
+            "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);
         new Document(document);
         Map<String, Object> variables = new HashMap<>();

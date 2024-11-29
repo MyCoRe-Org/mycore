@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,9 +45,8 @@ public interface MCRSolrAuthenticationManager {
      */
     void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level);
 
-
-     static MCRSolrAuthenticationManager getInstance() {
-         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationManager.class,
-                 MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Manager.Class");
-     }
+    static MCRSolrAuthenticationManager getInstance() {
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationManager.class,
+            MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Manager.Class");
+    }
 }

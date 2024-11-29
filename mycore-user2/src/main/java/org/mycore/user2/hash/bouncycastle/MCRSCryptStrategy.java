@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 
 package org.mycore.user2.hash.bouncycastle;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.HexFormat;
@@ -28,8 +30,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
-
-import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
  * {@link MCRSCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the SCrypt algorithm.
@@ -87,7 +87,6 @@ public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
     private final int blockSize;
 
     private final int cost;
-
 
     public MCRSCryptStrategy(int saltSizeBytes, int hashSizeBytes, int parallelism, int blockSize, int cost) {
         if (saltSizeBytes < 1) {
@@ -167,7 +166,7 @@ public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
 
         @Override
         public MCRSCryptStrategy get() {
-            return new MCRSCryptStrategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes), 
+            return new MCRSCryptStrategy(Integer.parseInt(saltSizeBytes), Integer.parseInt(hashSizeBytes),
                 Integer.parseInt(parallelism), Integer.parseInt(blockSize), Integer.parseInt(cost));
         }
 

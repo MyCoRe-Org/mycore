@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,10 +49,10 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
 
     /** Creates a new upload handler and registers it at the handler manager * */
     protected MCRUploadHandler() {
+        super();
         if (MCRWebsiteWriteProtection.isActive()) {
             throw new MCRException("System is currently in read-only mode");
         }
-
         uploadID = Long.toString(System.currentTimeMillis(), 36);
         MCRUploadHandlerManager.register(this);
         this.setName(uploadID);

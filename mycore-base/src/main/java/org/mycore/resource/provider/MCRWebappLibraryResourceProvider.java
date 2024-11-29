@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,13 +68,10 @@ public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvid
             new MCRClassLoaderResourceLocator(),
             new MCRCombinedResourceFilter(
                 new MCRLibraryResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-                new MCRWebappLibraryResourceFilter(mode)
-            ),
+                new MCRWebappLibraryResourceFilter(mode)),
             new MCRCombinedResourceSelector(
                 new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstLibraryJarResourceSelector()
-            )
-        );
+                new MCRFirstLibraryJarResourceSelector()));
         this.mode = mode;
     }
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ class MCRCategoryChildList extends ArrayList<MCRCategory> {
     @Override
     public MCRCategory set(int index, MCRCategory element) {
         MCRCategory category = super.set(index, element);
-        if (!Objects.equals(category,element)) {
+        if (!Objects.equals(category, element)) {
             removeAncestorReferences(category);
         }
         return category;

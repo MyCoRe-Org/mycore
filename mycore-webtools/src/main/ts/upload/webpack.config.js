@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +19,27 @@
 const path = require('path');
 
 module.exports = {
-    entry: {
-        "upload-api" :'./src/upload-api.ts',
-        "upload-gui" : {
-            dependOn: 'upload-api',
-            import: './src/upload-gui.ts'
-        },
+  entry: {
+    "upload-api": './src/upload-api.ts',
+    "upload-gui": {
+      dependOn: 'upload-api',
+      import: './src/upload-gui.ts'
     },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            },
-        ],
-    },
-    resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
-    },
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, '../../../../target/classes/META-INF/resources/modules/webtools/upload/js'),
-    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, '../../../../target/classes/META-INF/resources/modules/webtools/upload/js'),
+  },
 };

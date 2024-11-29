@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ public class MCRMODSDateHelper {
                 return test;
             }
         }
-        throw new NullPointerException();
+        throw new IllegalArgumentException("All provided values are null.");
     }
 
     public static GregorianCalendar getCalendar(Element element) {

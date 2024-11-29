@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 import org.mycore.services.http.MCRHttpUtils;
+import org.mycore.solr.MCRSolrUtils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
@@ -49,7 +50,7 @@ public class MCRTikaHttpClient {
 
     public <T extends Throwable> void extractText(InputStream is, ThrowingConsumer<TreeNode, T> responseConsumer)
         throws IOException, T {
-        HttpRequest httpPut = MCRHttpUtils.getRequestBuilder()
+        HttpRequest httpPut = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(url + "tika/text"))
             .setHeader("Accept", "application/json")
             .PUT(HttpRequest.BodyPublishers.ofInputStream(() -> is))

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ public abstract class MCRUploadHelper {
 
         //sort files by name
         ArrayList<Path> paths = visitor.getPaths();
-        if(paths.isEmpty()) {
+        if (paths.isEmpty()) {
             return Optional.empty();
         }
         paths.sort(Comparator.comparing(Path::getNameCount)

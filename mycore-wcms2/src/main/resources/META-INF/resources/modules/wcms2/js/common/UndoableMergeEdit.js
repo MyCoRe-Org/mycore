@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,26 +28,26 @@ wcms.common = wcms.common || {};
 wcms.common.UndoableMergeEdit = function() {
 };
 
-( function() {
+(function() {
 
-	function merge(/*UndoableEdit*/ mergeWith) {
-		// overwrite this method!
-	}
+  function merge(/*UndoableEdit*/ mergeWith) {
+    // overwrite this method!
+  }
 
-	/**
-	 * This method checks if the given edit is associated with
-	 * the merge edit. In general this method is called by the
-	 * UndoManager to check if both edits are merged.
-	 */
-	function isAssociated(/*UndoableEdit*/ edit) {
-		// overwrite this method!
-		return false;
-	}
+  /**
+   * This method checks if the given edit is associated with
+   * the merge edit. In general this method is called by the
+   * UndoManager to check if both edits are merged.
+   */
+  function isAssociated(/*UndoableEdit*/ edit) {
+    // overwrite this method!
+    return false;
+  }
 
-	// inheritance
-	wcms.common.UndoableEdit.prototype = new wcms.common.UndoableMergeEdit;
+  // inheritance
+  wcms.common.UndoableEdit.prototype = new wcms.common.UndoableMergeEdit;
 
-	wcms.common.UndoableMergeEdit.prototype.merge = merge;
-	wcms.common.UndoableMergeEdit.prototype.isAssociated = isAssociated;
+  wcms.common.UndoableMergeEdit.prototype.merge = merge;
+  wcms.common.UndoableMergeEdit.prototype.isAssociated = isAssociated;
 
 })();

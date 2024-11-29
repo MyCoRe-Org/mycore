@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,18 @@ public final class MCRUser2Constants {
      * {@link MCRCategoryID} root ID for system roles.
      */
     public static final String ROLE_ROOT_ID = "mcr-roles";
-
+    /**
+     * {@link MCRConfiguration2} prefix for all properties used by this MyCoRe component.
+     */
+    public static final String CONFIG_PREFIX = "MCR.user2.";
     static final String USER_ADMIN_PERMISSION = "administrate-users";
-
     static final String USER_CREATE_PERMISSION = "create-users";
+    static final MCRCategoryID ROLE_CLASSID = MCRCategoryID.rootID(ROLE_ROOT_ID);
+    static final String CATEG_LINK_TYPE = "mcr-user";
+
+    private MCRUser2Constants() {
+        //do not allow instantiation
+    }
 
     /**
      * @return the userAdminPermission
@@ -55,18 +63,5 @@ public final class MCRUser2Constants {
      */
     public static String getRoleRootId() {
         return ROLE_ROOT_ID;
-    }
-
-    static final MCRCategoryID ROLE_CLASSID = MCRCategoryID.rootID(ROLE_ROOT_ID);
-
-    static final String CATEG_LINK_TYPE = "mcr-user";
-
-    /**
-     * {@link MCRConfiguration2} prefix for all properties used by this MyCoRe component.
-     */
-    public static final String CONFIG_PREFIX = "MCR.user2.";
-
-    private MCRUser2Constants() {
-        //do not allow instantiation
     }
 }

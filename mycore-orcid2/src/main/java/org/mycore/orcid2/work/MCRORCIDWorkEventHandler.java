@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,6 @@ import org.orcid.jaxb.model.message.ScopeConstants;
 public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
 
     private static final String WORK_EVENT_HANDLER_PROPERTY_PREFIX = "MCR.ORCID2.WorkEventHandler.";
 

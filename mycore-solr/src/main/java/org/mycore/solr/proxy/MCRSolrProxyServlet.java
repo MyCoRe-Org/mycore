@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
@@ -62,6 +63,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.xml.sax.SAXException;
@@ -105,10 +107,15 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public static final String QUERY_CORE_PARAMETER = "core";
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-            MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.getInstance();
 
-    private static Map<String, String> NEW_HTTP_RESPONSE_HEADER = MCRConfiguration2
-        .getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader.");
+    private static final Map<String, String> NEW_HTTP_RESPONSE_HEADER;
+
+    static {
+        Map<String, String> newRespHeader = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        newRespHeader.putAll(MCRConfiguration2.getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader."));
+        NEW_HTTP_RESPONSE_HEADER = Collections.unmodifiableMap(newRespHeader);
+    }
 
     private HttpClient httpClient;
 
@@ -229,8 +236,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
         try {
             solrRequest = solrHttpMethod.build();
             LOGGER.info("Sending Request: {}", solrRequest.uri());
-            HttpResponse<InputStream> response
-                = httpClient.send(solrRequest, HttpResponse.BodyHandlers.ofInputStream());
+            HttpResponse<InputStream> response =
+                httpClient.send(solrRequest, HttpResponse.BodyHandlers.ofInputStream());
             int statusCode = response.statusCode();
 
             // set status code
@@ -240,7 +247,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
             boolean justCopyInput = !isXML;
 
             // set all headers
-            response.headers().map().forEach((headerName, headerValues) -> {
+            MCRHttpUtils.filterHopByHop(response.headers()).map().forEach((headerName, headerValues) -> {
                 LOGGER.debug("SOLR response header: {} - {}", headerName, headerValues);
                 if (NEW_HTTP_RESPONSE_HEADER.containsKey(headerName)) {
                     String headerValue = NEW_HTTP_RESPONSE_HEADER.get(headerName);
@@ -302,7 +309,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         String type) {
         String serverURL = MCRSolrCoreManager.get(type).get().getV1CoreURL();
 
-        return MCRHttpUtils.getRequestBuilder()
+        return MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(serverURL + queryHandlerPath + params.toQueryString()));
     }
 

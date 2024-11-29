@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,14 @@
 
 package org.mycore.resource;
 
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -33,14 +41,6 @@ import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
-
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * A {@link MCRResourceResolver} is a component that uses a {@link MCRResourceProvider} instance to lookup resources.
@@ -249,8 +249,7 @@ public final class MCRResourceResolver {
         if (LOGGER.isDebugEnabled()) {
             resourceUrl.ifPresentOrElse(
                 url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url),
-                () -> LOGGER.debug("Unable to resolve resource URL for path {}", path)
-            );
+                () -> LOGGER.debug("Unable to resolve resource URL for path {}", path));
         }
         return resourceUrl;
     }
@@ -263,8 +262,7 @@ public final class MCRResourceResolver {
                 LOGGER.debug("Unable to resolve resource URL for path {}", path);
             } else {
                 resourceUrls.forEach(
-                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url)
-                );
+                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url));
             }
         }
         return resourceUrls;

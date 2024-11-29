@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,20 @@
  */
 
 namespace org.mycore.mets.model.simple {
-    /**
-     * Represents a File in a mets.xml
-     */
-    export class MCRMetsFile {
+  /**
+   * Represents a File in a mets.xml
+   */
+  export class MCRMetsFile {
 
-        constructor(public id: string,
-                    public href: string,
-                    public mimeType: string,
-                    public use: string) {
-        }
-
-        public static copy(file: MCRMetsFile) {
-            return new MCRMetsFile(file.id, file.href, file.mimeType, file.use);
-        }
-
+    constructor(public id: string,
+      public href: string,
+      public mimeType: string,
+      public use: string) {
     }
+
+    public static copy(file: MCRMetsFile) {
+      return new MCRMetsFile(file.id, file.href, file.mimeType, file.use);
+    }
+
+  }
 }

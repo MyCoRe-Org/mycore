@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ButtonPressedEvent} from "./ButtonPressedEvent";
-import {ToolbarDropdownButton} from "../model/ToolbarDropdownButton";
+import { ButtonPressedEvent } from "./ButtonPressedEvent";
+import { ToolbarDropdownButton } from "../model/ToolbarDropdownButton";
 
 export class DropdownButtonPressedEvent extends ButtonPressedEvent {
-    constructor(button: ToolbarDropdownButton, private _childId: string) {
-        super(button, DropdownButtonPressedEvent.TYPE);
-    }
+  constructor(button: ToolbarDropdownButton, private _childId: string) {
+    super(button, DropdownButtonPressedEvent.TYPE);
+  }
 
-    public get childId() {
-        return this._childId;
-    }
+  public get childId() {
+    return this._childId;
+  }
 
-    public static TYPE: string = "DropdownButtonPressedEvent";
+  public static TYPE: string = "DropdownButtonPressedEvent";
 
 }
 

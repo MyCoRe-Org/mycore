@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,17 +144,17 @@ public class MCRSecureTokenV2 {
         if (this == obj) {
             return true;
         }
-        if (obj == null||getClass() != obj.getClass()) {
-            result= false;
-        } else{
+        if (obj == null || getClass() != obj.getClass()) {
+            result = false;
+        } else {
             MCRSecureTokenV2 other = (MCRSecureTokenV2) obj;
-            if(!hash.equals(other.hash)||
-                    !contentPath.equals(other.contentPath)||
-                    !ipAddress.equals(other.ipAddress)||
-                    !sharedSecret.equals(other.sharedSecret)) {
+            if (!hash.equals(other.hash) ||
+                !contentPath.equals(other.contentPath) ||
+                !ipAddress.equals(other.ipAddress) ||
+                !sharedSecret.equals(other.sharedSecret)) {
                 result = false;
             } else {
-                result= Arrays.equals(queryParameters, other.queryParameters);
+                result = Arrays.equals(queryParameters, other.queryParameters);
             }
         }
 

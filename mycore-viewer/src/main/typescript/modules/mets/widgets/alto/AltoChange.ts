@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +18,31 @@
 
 
 export interface AltoChangeSet {
-    wordChanges: Array<AltoWordChange>;
-    derivateID: string;
+  wordChanges: Array<AltoWordChange>;
+  derivateID: string;
 }
 
 export class AltoChange {
-    constructor(public file: string, public type: string, public pageOrder: number) {
+  constructor(public file: string, public type: string, public pageOrder: number) {
 
-    }
+  }
 
 
 }
 
 export class AltoWordChange extends AltoChange {
-    public static TYPE = "AltoWordChange";
+  public static TYPE = "AltoWordChange";
 
-    constructor(file: string,
-                public hpos: number,
-                public vpos: number,
-                public width: number,
-                public height: number,
-                public from: string,
-                public to: string,
-                pageOrder: number) {
-        super(file, AltoWordChange.TYPE, pageOrder);
-    }
+  constructor(file: string,
+    public hpos: number,
+    public vpos: number,
+    public width: number,
+    public height: number,
+    public from: string,
+    public to: string,
+    pageOrder: number) {
+    super(file, AltoWordChange.TYPE, pageOrder);
+  }
 
 
 }

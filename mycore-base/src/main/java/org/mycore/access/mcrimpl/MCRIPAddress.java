@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,15 +70,14 @@ public class MCRIPAddress {
     }
 
     public boolean contains(MCRIPAddress other) {
-        boolean result=false;
+        boolean result = false;
         if (address.length == other.address.length) {
             result = IntStream.range(0, address.length)
-                    .noneMatch(t -> (address[t] & mask[t]) != (other.address[t] & mask[t]));
+                .noneMatch(t -> (address[t] & mask[t]) != (other.address[t] & mask[t]));
         }
 
         return result;
     }
-
 
     public byte[] getAddress() {
         return address;

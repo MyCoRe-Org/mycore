@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
     @MCRProperty(name = "XPath", required = true)
     public void setXpath(String xpath) {
         this.xpath = MCRConstants.XPATH_FACTORY.compile(xpath, Filters.content(), null,
-                MCRConstants.getStandardNamespaces());
+            MCRConstants.getStandardNamespaces());
     }
 
     public void setXpath(XPathExpression<Content> xpath) {
@@ -169,10 +169,10 @@ public class MCROCFLCombineIgnoreXPathPruner extends MCROCFLCombineComparePruner
     @Override
     public String toString() {
         return "MCROCFLCombineIgnoreXPathPruner{" +
-                "xpath=" + xpath.getExpression() +
+            "xpath=" + xpath.getExpression() +
             ", firstAuthorWins=" + firstAuthorWins +
-                ", firstDateWins=" + firstDateWins +
+            ", firstDateWins=" + firstDateWins +
             ", needSameAuthor=" + needSameAuthor +
-                '}';
+            '}';
     }
 }

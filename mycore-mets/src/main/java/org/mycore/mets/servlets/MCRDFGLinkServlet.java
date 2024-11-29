@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 package org.mycore.mets.servlets;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -69,59 +70,6 @@ public class MCRDFGLinkServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRDFGLinkServlet.class);
-
-    @Override
-    protected void doGetPost(MCRServletJob job) throws Exception {
-        HttpServletRequest request = job.getRequest();
-        HttpServletResponse response = job.getResponse();
-        String filePath = request.getParameter("file") == null ? "" : request.getParameter("file");
-        String derivateID = request.getParameter("deriv") == null ? "" : request.getParameter("deriv");
-
-        if (Objects.equals(derivateID, "")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
-        }
-
-        String encodedMetsURL = URLEncoder.encode(MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivateID
-            + "?XSL.Style=dfg", StandardCharsets.UTF_8);
-        LOGGER.info(request.getPathInfo());
-
-        MCRPath rootPath = MCRPath.getPath(derivateID, "/");
-
-        if (!Files.isDirectory(rootPath)) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                String.format(Locale.ENGLISH, "Derivate %s does not exist.", derivateID));
-            return;
-        }
-        request.setAttribute("XSL.derivateID", derivateID);
-        Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
-        if (linkList.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.format(Locale.ENGLISH,
-                "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));
-            return;
-        }
-
-        if (filePath.isEmpty()) {
-            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
-            filePath = derivate.getDerivate().getInternals().getMainDoc();
-        }
-
-        MCRPath metsPath = (MCRPath) rootPath.resolve("mets.xml");
-        int imageNumber = -2;
-        if (Files.exists(metsPath)) {
-            imageNumber = getOrderNumber(new MCRPathContent(metsPath).asXML(), filePath);
-        } else {
-            MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivateID);
-            imageNumber = getOrderNumber(metsContent.asXML(), filePath);
-        }
-
-        switch (imageNumber) {
-            case -1 -> response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
-                "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
-            case -2 -> response.sendRedirect("https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL);
-            default -> response.sendRedirect(
-                "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber);
-        }
-    }
 
     private static int getOrderNumber(Document metsDoc, String fileHref) {
         int orderNumber = -1;
@@ -190,12 +138,78 @@ public class MCRDFGLinkServlet extends MCRServlet {
         }
     }
 
+    @Override
+    protected void doGetPost(MCRServletJob job) throws Exception {
+        HttpServletRequest request = job.getRequest();
+        HttpServletResponse response = job.getResponse();
+        String filePath = request.getParameter("file") == null ? "" : request.getParameter("file");
+        String derivateID = request.getParameter("deriv") == null ? "" : request.getParameter("deriv");
+
+        if (Objects.equals(derivateID, "")) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
+        }
+
+        String encodedMetsURL = URLEncoder.encode(getServletBaseURL() + "MCRMETSServlet/" + derivateID
+            + "?XSL.Style=dfg", StandardCharsets.UTF_8);
+        LOGGER.info(request.getPathInfo());
+
+        MCRPath rootPath = MCRPath.getPath(derivateID, "/");
+
+        if (!Files.isDirectory(rootPath)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                String.format(Locale.ENGLISH, "Derivate %s does not exist.", derivateID));
+            return;
+        }
+        request.setAttribute("XSL.derivateID", derivateID);
+        Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
+        if (linkList.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.format(Locale.ENGLISH,
+                "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));
+            return;
+        }
+
+        if (filePath.isEmpty()) {
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
+            filePath = derivate.getDerivate().getInternals().getMainDoc();
+        }
+
+        int imageNumber = getImageNumber(filePath, rootPath, job, request, derivateID);
+
+        handleRedirectOrError(imageNumber, filePath, response, encodedMetsURL);
+    }
+
+    private int getImageNumber(String filePath, MCRPath rootPath, MCRServletJob job, HttpServletRequest request,
+        String derivateID) throws Exception {
+        MCRPath metsPath = (MCRPath) rootPath.resolve("mets.xml");
+        if (Files.exists(metsPath)) {
+            return getOrderNumber(new MCRPathContent(metsPath).asXML(), filePath);
+        } else {
+            MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivateID);
+            return getOrderNumber(metsContent.asXML(), filePath);
+        }
+    }
+
+    private void handleRedirectOrError(int imageNumber, String filePath, HttpServletResponse response,
+        String encodedMetsURL) {
+        try {
+            switch (imageNumber) {
+                case -1 -> response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
+                    "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
+                case -2 -> {
+                    response.sendRedirect("https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL);
+                }
+                default -> response.sendRedirect(
+                    "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while handling redirect or error response", e);
+        }
+    }
+
     private boolean useExistingMets(HttpServletRequest request) {
         String useExistingMetsParam = request.getParameter("useExistingMets");
-        if (useExistingMetsParam == null) {
-            return true;
-        }
-        return Boolean.parseBoolean(useExistingMetsParam);
+        return useExistingMetsParam == null
+            || Boolean.parseBoolean(useExistingMetsParam);
     }
 
 }

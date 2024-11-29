@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
@@ -93,7 +93,7 @@ public class MCRIViewZipResource {
         @Override
         public void write(OutputStream out) throws WebApplicationException {
             MCRSessionMgr.getCurrentSession();
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
             try {
                 final ZipArchiveOutputStream zipStream = new ZipArchiveOutputStream(new BufferedOutputStream(out));
                 zipStream.setLevel(Deflater.BEST_SPEED);
@@ -128,7 +128,7 @@ public class MCRIViewZipResource {
                 throw new WebApplicationException(exc);
             } finally {
                 MCRSessionMgr.getCurrentSession();
-                MCRTransactionHelper.commitTransaction();
+                MCRTransactionManager.commitTransactions();
             }
         }
     }

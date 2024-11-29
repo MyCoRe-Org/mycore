@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,10 +105,6 @@ public class MCRLDAPClient {
 
     private Hashtable<String, String> ldapEnv;
 
-    public static MCRLDAPClient instance() {
-        return instance;
-    }
-
     private MCRLDAPClient() {
         String prefix = "MCR.user2.LDAP.";
         /* Timeout when connecting to LDAP server */
@@ -138,6 +134,25 @@ public class MCRLDAPClient {
         ldapEnv.put(Context.SECURITY_AUTHENTICATION, "simple");
         ldapEnv.put(Context.SECURITY_PRINCIPAL, securityPrincipal);
         ldapEnv.put(Context.SECURITY_CREDENTIALS, securityCredentials);
+    }
+
+    public static MCRLDAPClient instance() {
+        return instance;
+    }
+
+    public static void main(String[] args) throws Exception {
+        String userName = args[0];
+        String realmID = args[1];
+        MCRUser user = MCRUserManager.getUser(userName, realmID);
+        if (user == null) {
+            user = new MCRUser(userName, realmID);
+        }
+
+        LOGGER.info("\n{}",
+            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+        instance().updateUserProperties(user);
+        LOGGER.info("\n{}",
+            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
     }
 
     public boolean updateUserProperties(MCRUser user) throws NamingException {
@@ -214,29 +229,15 @@ public class MCRLDAPClient {
      * Formats a user name into "lastname, firstname" syntax.
      */
     private String formatName(String name) {
-        name = name.replaceAll("\\s+", " ").trim();
-        if (name.contains(",")) {
-            return name;
+        String trimmedName = name.replaceAll("\\s+", " ").trim();
+        if (trimmedName.contains(",")) {
+            return trimmedName;
         }
         int pos = name.lastIndexOf(' ');
         if (pos == -1) {
-            return name;
+            return trimmedName;
         }
-        return name.substring(pos + 1) + ", " + name.substring(0, pos);
+        return trimmedName.substring(pos + 1) + ", " + trimmedName.substring(0, pos);
     }
 
-    public static void main(String[] args) throws Exception {
-        String userName = args[0];
-        String realmID = args[1];
-        MCRUser user = MCRUserManager.getUser(userName, realmID);
-        if (user == null) {
-            user = new MCRUser(userName, realmID);
-        }
-
-        LOGGER.info("\n{}",
-            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
-        MCRLDAPClient.instance().updateUserProperties(user);
-        LOGGER.info("\n{}",
-            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
-    }
 }

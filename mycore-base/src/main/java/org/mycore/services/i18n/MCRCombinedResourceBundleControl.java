@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,8 +59,8 @@ public class MCRCombinedResourceBundleControl extends Control {
         if (locale.equals(Locale.ROOT)) {
             //MCR-1064 fallback should be default language, if property key does not exist
             resolvedLocale = defaultLocale;
-        }else{
-            resolvedLocale= locale;
+        } else {
+            resolvedLocale = locale;
         }
         String bundleName = baseName.substring(baseName.indexOf(':') + 1);
         String filename = CONTROL_HELPER.toBundleName(bundleName, resolvedLocale) + ".properties";

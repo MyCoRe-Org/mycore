@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public class MCRORCIDWorkService {
 
     /**
      * Creates new MCRORCIDWorkService instance.
-     * 
+     *
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
      */
@@ -116,7 +116,7 @@ public class MCRORCIDWorkService {
 
     /**
      * Deletes Work in ORCID profile and updates flag.
-     * 
+     *
      * @param object the MCRObject
      * @throws MCRORCIDException if delete fails
      */
@@ -142,21 +142,24 @@ public class MCRORCIDWorkService {
     }
 
     /**
-     * Checks if Work is published in ORCID profile.
-     * 
-     * @param identifiers the identifiers
-     * @return true if found matching own work in profile
-     * @throws MCRORCIDException look up request fails
+     * Searches an ORCID profile for works that match the given set of identifiers and builds a
+     * {@link MCRORCIDPutCodeInfo} object containing information about the found works.
+     *
+     * @param identifiers A {@link Set} of {@link MCRIdentifier} objects representing the identifiers
+     *                    used to search for works in the ORCID profile. These identifiers can include
+     *                    things like DOI, ISBN, or other unique work identifiers
+     * @return An {@link MCRORCIDPutCodeInfo} object containing information about the works found
+     *         in the ORCID profile that match the given identifiers
      */
-    public boolean checkOwnWorkExists(Set<MCRIdentifier> identifiers) {
+    public MCRORCIDPutCodeInfo getPutCodeInfo(Set<MCRIdentifier> identifiers) {
         final MCRORCIDPutCodeInfo workInfo = new MCRORCIDPutCodeInfo();
         doUpdateWorkInfo(identifiers, workInfo, orcid, credential);
-        return workInfo.hasOwnPutCode();
+        return workInfo;
     }
 
     /**
      * Deletes Work in ORCID profile and updates MCRORCIDPutCodeInfo.
-     * 
+     *
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
@@ -171,7 +174,7 @@ public class MCRORCIDWorkService {
 
     /**
      * Creates Work and updates MCRORCIDPutCodeInfo.
-     * 
+     *
      * @param work the Work
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -186,7 +189,7 @@ public class MCRORCIDWorkService {
 
     /**
      * Updates Work and MCRORCIDPutCodeInfo.
-     * 
+     *
      * @param putCode the putCode
      * @param work the Work
      * @param orcid the ORCID iD
@@ -206,7 +209,7 @@ public class MCRORCIDWorkService {
 
     /**
      * Lists matching ORCID iDs based on search via Work.
-     * 
+     *
      * @param identifiers Set of MCRIdentifier
      * @return Set of ORCID iDs as String
      * @throws MCRORCIDException if request fails
@@ -224,7 +227,7 @@ public class MCRORCIDWorkService {
 
     /**
      * Updates work info for MCRORCIDCredential with MCRIdentifier as reference.
-     * 
+     *
      * @param identifiers the identifiers
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -250,7 +253,7 @@ public class MCRORCIDWorkService {
 
     /**
      * Updates work info for ORCID iD with MCRIdentifier as reference.
-     * 
+     *
      * @param identifiers the identifiers
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD

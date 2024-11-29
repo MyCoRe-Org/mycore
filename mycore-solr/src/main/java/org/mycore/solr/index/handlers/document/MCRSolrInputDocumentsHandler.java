@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             try {
                 UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
                 getSolrAuthenticationFactory().applyAuthentication(updateRequest,
-                        MCRSolrAuthenticationLevel.INDEX);
+                    MCRSolrAuthenticationLevel.INDEX);
                 updateRequest.add(documents);
                 updateResponse = updateRequest.process(client);
             } catch (Exception e) {
@@ -96,21 +96,20 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             }
             if (updateResponse.getStatus() != 0) {
                 LOGGER.error("Error while indexing document collection. Split and retry: {}",
-                        updateResponse.getResponse());
+                    updateResponse.getResponse());
                 splitDocuments();
             } else {
                 LOGGER.info("Sending {} documents was successful in {} ms.", totalCount,
-                        updateResponse.getElapsedTime());
+                    updateResponse.getElapsedTime());
             }
         }
     }
-
 
     private void splitDocuments() {
         subHandlerList = new ArrayList<>(documents.size());
         for (SolrInputDocument document : documents) {
             MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(() -> document,
-                    String.valueOf(document.getFieldValue("id")), getCoreType());
+                String.valueOf(document.getFieldValue("id")), getCoreType());
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }

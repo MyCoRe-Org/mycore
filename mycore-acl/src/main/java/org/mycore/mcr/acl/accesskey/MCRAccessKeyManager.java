@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public final class MCRAccessKeyManager {
     public static synchronized List<MCRAccessKey> listAccessKeys(final MCRObjectID objectId) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithObjectId", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
+            .setParameter("objectId", objectId.toString())
             .getResultList();
         for (MCRAccessKey accessKey : accessKeys) {
             em.detach(accessKey);
@@ -177,7 +177,7 @@ public final class MCRAccessKeyManager {
             throw new MCRAccessKeyInvalidTypeException("Invalid permission type.");
         }
         if (getAccessKeyWithSecret(objectId, secret) == null) {
-            accessKey.setId(0); //prevent collision
+            accessKey.setId(null); // prevent collision
             accessKey.setObjectId(objectId);
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);
@@ -219,7 +219,7 @@ public final class MCRAccessKeyManager {
     public static void clearAccessKeys(final MCRObjectID objectId) {
         MCREntityManagerProvider.getCurrentEntityManager()
             .createNamedQuery("MCRAccessKey.clearWithObjectId")
-            .setParameter("objectId", objectId)
+            .setParameter("objectId", objectId.toString())
             .executeUpdate();
     }
 
@@ -246,7 +246,7 @@ public final class MCRAccessKeyManager {
      * Updates {@link MCRAccessKey}
      *
      * @param objectId the {@link MCRObjectID}
-     * @param secret the access key secret 
+     * @param secret the access key secret
      * @param updatedAccessKey access key
      * @throws MCRException if update fails
      */
@@ -292,13 +292,13 @@ public final class MCRAccessKeyManager {
      * Return the {@link MCRAccessKey} for given {@link MCRObjectID} and secret.
      *
      * @param objectId the {@link MCRObjectID}
-     * @param secret the hashed secret 
+     * @param secret the hashed secret
      * @return the {@link MCRAccessKey}
      */
     public static synchronized MCRAccessKey getAccessKeyWithSecret(final MCRObjectID objectId, final String secret) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final MCRAccessKey accessKey = em.createNamedQuery("MCRAccessKey.getWithSecret", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
+            .setParameter("objectId", objectId.toString())
             .setParameter("secret", secret)
             .getResultList()
             .stream()
@@ -321,7 +321,7 @@ public final class MCRAccessKeyManager {
         final String type) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)
-            .setParameter("objectId", objectId)
+            .setParameter("objectId", objectId.toString())
             .setParameter("type", type)
             .getResultList();
         for (MCRAccessKey accessKey : accessKeys) {

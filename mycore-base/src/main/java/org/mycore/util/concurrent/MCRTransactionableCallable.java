@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 /**
  * Encapsulates a {@link Callable} with a mycore session and a database transaction.
@@ -80,15 +80,15 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
         SessionType type = typedSession.type();
         onBeforeTransaction(session, type);
         try {
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
             return this.callable.call();
         } finally {
             try {
-                MCRTransactionHelper.commitTransaction();
+                MCRTransactionManager.commitTransactions();
             } catch (Exception commitException) {
                 LOGGER.error("Error while committing transaction.", commitException);
                 try {
-                    MCRTransactionHelper.rollbackTransaction();
+                    MCRTransactionManager.rollbackTransactions();
                 } catch (Exception rollbackException) {
                     LOGGER.error("Error while rolling back transaction.", rollbackException);
                 }
@@ -148,7 +148,6 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
         return callable;
     }
 
-
     protected enum SessionType {
 
         PROVIDED,
@@ -162,6 +161,5 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
     private record TypedSession(MCRSession session, SessionType type) {
 
     }
-
 
 }

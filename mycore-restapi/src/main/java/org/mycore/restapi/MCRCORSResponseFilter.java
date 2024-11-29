@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,6 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     private static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 
-
     @Context
     ResourceInfo resourceInfo;
 
@@ -110,42 +109,50 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, authenticatedRequest ? origin : "*");
         if (!handlePreFlight(requestContext, responseHeaders)) {
             //not a CORS preflight request
-            ArrayList<String> exposedHeaders = new ArrayList<>();
-            //MCR-3041 expose all header starting with X-
-            responseHeaders.keySet().stream()
-                .filter(name -> name.startsWith("x-") || name.startsWith("X-"))
-                .forEach(exposedHeaders::add);
-            if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
-                exposedHeaders.add(HttpHeaders.AUTHORIZATION);
-            }
-            if ("ServiceWorker".equals(requestContext.getHeaderString("X-Requested-With"))) {
-                exposedHeaders.add(HttpHeaders.WWW_AUTHENTICATE);
-            }
-            Optional.ofNullable(resourceInfo)
-                .map(ResourceInfo::getResourceMethod)
-                .map(method -> method.getAnnotation(MCRAccessControlExposeHeaders.class))
-                .map(MCRAccessControlExposeHeaders::value)
-                .map(Stream::of)
-                .orElse(Stream.empty())
-                .forEach(exposedHeaders::add);
-            if (!exposedHeaders.isEmpty()) {
-                responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
-                    exposedHeaders.stream().collect(Collectors.joining(",")));
-            }
+            addExposedHeadersToResponseHeaders(requestContext, responseHeaders, authenticatedRequest);
         }
         if (!Objects.equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN), "*")) {
-            String vary = Stream
-                .concat(Stream.of(ORIGIN),
-                    responseHeaders.getOrDefault(HttpHeaders.VARY, Collections.emptyList())
-                        .stream()
-                        .map(Object::toString)
-                        .flatMap(s -> Stream.of(s.split(",")))
-                        .map(String::trim))
-                .distinct()
-                .collect(Collectors.joining(","));
-            responseHeaders.putSingle(HttpHeaders.VARY, vary);
+            setVaryHeader(responseHeaders);
         }
         LOGGER.debug("Response-Header: {}", responseHeaders);
     }
 
+    private void addExposedHeadersToResponseHeaders(ContainerRequestContext requestContext, MultivaluedMap<String,
+        Object> responseHeaders, boolean authenticatedRequest) {
+        ArrayList<String> exposedHeaders = new ArrayList<>();
+        //MCR-3041 expose all header starting with X-
+        responseHeaders.keySet().stream()
+            .filter(name -> name.startsWith("x-") || name.startsWith("X-"))
+            .forEach(exposedHeaders::add);
+        if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
+            exposedHeaders.add(HttpHeaders.AUTHORIZATION);
+        }
+        if ("ServiceWorker".equals(requestContext.getHeaderString("X-Requested-With"))) {
+            exposedHeaders.add(HttpHeaders.WWW_AUTHENTICATE);
+        }
+        Optional.ofNullable(resourceInfo)
+            .map(ResourceInfo::getResourceMethod)
+            .map(method -> method.getAnnotation(MCRAccessControlExposeHeaders.class))
+            .map(MCRAccessControlExposeHeaders::value)
+            .map(Stream::of)
+            .orElse(Stream.empty())
+            .forEach(exposedHeaders::add);
+        if (!exposedHeaders.isEmpty()) {
+            responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
+                exposedHeaders.stream().collect(Collectors.joining(",")));
+        }
+    }
+
+    private void setVaryHeader(MultivaluedMap<String, Object> responseHeaders) {
+        String vary = Stream
+            .concat(Stream.of(ORIGIN),
+                responseHeaders.getOrDefault(HttpHeaders.VARY, Collections.emptyList())
+                    .stream()
+                    .map(Object::toString)
+                    .flatMap(s -> Stream.of(s.split(",")))
+                    .map(String::trim))
+            .distinct()
+            .collect(Collectors.joining(","));
+        responseHeaders.putSingle(HttpHeaders.VARY, vary);
+    }
 }

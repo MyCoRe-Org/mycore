@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,8 +75,8 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
     private static final Logger LOGGER = LogManager.getLogger();
     public static final String UNIQUE_OBJECT_TRANSLATION_KEY = "component.webtools.upload.invalid.parameter.unique";
     public static final String INVALID_OBJECT_TRANSLATION_KEY = "component.webtools.upload.invalid.parameter.object";
-    public static final String OBJECT_DOES_NOT_EXIST_TRANSLATION_KEY
-        = "component.webtools.upload.invalid.parameter.object.not.exist";
+    public static final String OBJECT_DOES_NOT_EXIST_TRANSLATION_KEY =
+        "component.webtools.upload.invalid.parameter.object.not.exist";
     public static final String INVALID_FILE_NAME_TRANSLATION_KEY = "component.webtools.upload.invalid.fileName";
     public static final String INVALID_FILE_SIZE_TRANSLATION_KEY = "component.webtools.upload.invalid.fileSize";
 

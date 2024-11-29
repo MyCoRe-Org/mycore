@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,13 +37,12 @@ public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
     protected InputStream getContentStream(MCRContent xml) throws IOException {
         InputStream contentStream = super.getContentStream(xml);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try(GZIPOutputStream out = new GZIPOutputStream(baos)){
+        try (GZIPOutputStream out = new GZIPOutputStream(baos)) {
             contentStream.transferTo(out);
         }
         byte[] byteArray = baos.toByteArray();
         return new ByteArrayInputStream(byteArray);
     }
-
 
     @Override
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
@@ -54,7 +53,7 @@ public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
     @Override
     protected MCROCFLContent getContent(MCRObjectID id, String ocflObjectID, VersionNum key) {
         return new MCRGZIPOCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
-                key.toString());
+            key.toString());
     }
 
     @Override

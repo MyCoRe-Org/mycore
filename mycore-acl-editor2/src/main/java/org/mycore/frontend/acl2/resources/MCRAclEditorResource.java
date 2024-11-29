@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
-import org.mycore.resource.MCRResourceHelper;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.mycore.resource.MCRResourceHelper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -352,5 +352,5 @@ public class MCRAclEditorResource {
     private InputStream getAclEditorGuiResource(String filename) {
         return MCRResourceHelper.getWebResourceAsStream("/modules/acl-editor2/gui/" + filename);
     }
-    
+
 }

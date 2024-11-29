@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ public class MCRRoleManager {
      * This method will fail if any objects (e.g. users) are linked to it.
      */
     public static void deleteRole(String roleID) {
-        MCRRole role = MCRRoleManager.getRole(roleID);
+        MCRRole role = getRole(roleID);
         if (role == null) {
             //unknown role
             return;

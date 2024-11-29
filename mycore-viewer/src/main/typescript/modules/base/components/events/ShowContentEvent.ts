@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,21 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
 
 export class ShowContentEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public content: JQuery, public containerDirection: number, public size = 300, public text: JQuery = null) {
-        super(component, ShowContentEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public content: JQuery, public containerDirection: number, public size = 300, public text: JQuery = null) {
+    super(component, ShowContentEvent.TYPE);
+  }
 
-    public static DIRECTION_CENTER = 0;
-    public static DIRECTION_EAST = 1;
-    public static DIRECTION_SOUTH = 2;
-    public static DIRECTION_WEST = 3;
-    public static DIRECTION_NORTH = 4;
+  public static DIRECTION_CENTER = 0;
+  public static DIRECTION_EAST = 1;
+  public static DIRECTION_SOUTH = 2;
+  public static DIRECTION_WEST = 3;
+  public static DIRECTION_NORTH = 4;
 
-    public static TYPE = "ShowContentEvent";
+  public static TYPE = "ShowContentEvent";
 }
 

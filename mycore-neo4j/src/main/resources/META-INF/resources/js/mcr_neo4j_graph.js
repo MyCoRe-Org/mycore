@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -142,8 +142,8 @@ const getBrightness = (hexColor) => {
 const isColorDifferent = (color1, color2, threshold) => {
   const distance = Math.sqrt(
     Math.pow(parseInt(color1.slice(1, 3), 16) - parseInt(color2.slice(1, 3), 16), 2) +
-      Math.pow(parseInt(color1.slice(3, 5), 16) - parseInt(color2.slice(3, 5), 16), 2) +
-      Math.pow(parseInt(color1.slice(5, 7), 16) - parseInt(color2.slice(5, 7), 16), 2)
+    Math.pow(parseInt(color1.slice(3, 5), 16) - parseInt(color2.slice(3, 5), 16), 2) +
+    Math.pow(parseInt(color1.slice(5, 7), 16) - parseInt(color2.slice(5, 7), 16), 2)
   )
 
   return distance > threshold

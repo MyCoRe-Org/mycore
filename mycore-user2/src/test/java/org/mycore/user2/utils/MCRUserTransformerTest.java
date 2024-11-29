@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,8 +119,8 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
         m.marshal(mp, System.out);
 
         Unmarshaller u = jc.createUnmarshaller();
-        String xmlStr
-            = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><root><entry key=\"key2\">value2</entry><entry key=\"key1\">value1</entry></root>";
+        String xmlStr =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><root><entry key=\"key2\">value2</entry><entry key=\"key1\">value1</entry></root>";
         HashMapTest2 mp2 = (HashMapTest2) u.unmarshal(new StreamSource(new StringReader(xmlStr)));
         m.marshal(mp2, System.out);
     }

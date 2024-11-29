@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,35 +17,35 @@
  */
 
 
-import {ViewerModalWindow} from "./ViewerModalWindow";
+import { ViewerModalWindow } from "./ViewerModalWindow";
 
 export class ViewerConfirmModal extends ViewerModalWindow {
 
-    constructor(_mobile: boolean, confirmTitle: string, confirmText: string, callback: Function, parent: HTMLElement = document.body) {
-        super(_mobile, confirmTitle, parent);
-        this.modalHeader.children("h4").addClass("text-info");
-        this.modalBody.append("<p><span data-i18n='" + confirmText + "'>" + confirmText + "</span></p>");
+  constructor(_mobile: boolean, confirmTitle: string, confirmText: string, callback: Function, parent: HTMLElement = document.body) {
+    super(_mobile, confirmTitle, parent);
+    this.modalHeader.children("h4").addClass("text-info");
+    this.modalBody.append("<p><span data-i18n='" + confirmText + "'>" + confirmText + "</span></p>");
 
-        this.modalFooter.empty();
+    this.modalFooter.empty();
 
-        this.createButton(true, callback);
-        this.createButton(false, callback);
-    }
+    this.createButton(true, callback);
+    this.createButton(false, callback);
+  }
 
-    private createButton(confirm: boolean, callback: Function): void {
-        let key = confirm ? "yes" : "no";
-        let button = jQuery("<a data-i18n='modal." + key + "'></a>");
-        button.attr("type", "button");
-        button.addClass("btn btn-secondary");
-        button.appendTo(this.modalFooter);
+  private createButton(confirm: boolean, callback: Function): void {
+    let key = confirm ? "yes" : "no";
+    let button = jQuery("<a data-i18n='modal." + key + "'></a>");
+    button.attr("type", "button");
+    button.addClass("btn btn-secondary");
+    button.appendTo(this.modalFooter);
 
-        button.click(() => {
-            if (callback) {
-                callback(confirm);
-            }
-            this.hide();
-        });
-    }
+    button.click(() => {
+      if (callback) {
+        callback(confirm);
+      }
+      this.hide();
+    });
+  }
 }
 
 

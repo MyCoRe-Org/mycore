@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,24 @@
  */
 
 
-import {ImageView} from "../../../../../base/widgets/toolbar/view/image/ImageView";
+import { ImageView } from "../../../../../base/widgets/toolbar/view/image/ImageView";
 
 export class BootstrapImageView implements ImageView {
 
-    constructor(id: string) {
-        this._element = jQuery("<img />");
-        this._element.attr("data-id", id);
-    }
+  constructor(id: string) {
+    this._element = jQuery("<img />");
+    this._element.attr("data-id", id);
+  }
 
-    private _element: JQuery;
+  private _element: JQuery;
 
-    updateHref(href: string): void {
-        this._element.attr("src", href);
-    }
+  updateHref(href: string): void {
+    this._element.attr("src", href);
+  }
 
-    getElement(): JQuery {
-        return this._element;
-    }
+  getElement(): JQuery {
+    return this._element;
+  }
 
 }
 

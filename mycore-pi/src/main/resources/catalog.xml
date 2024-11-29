@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  This file is part of ***  M y C o R e  ***
-  ~  See http://www.mycore.de/ for details.
+  ~  See https://www.mycore.de/ for details.
   ~
   ~  This program is free software; you can use it, redistribute it
   ~  and / or modify it under the terms of the GNU General Public License
@@ -107,7 +107,7 @@
   <!-- Crossref 4.4.1 -->
   <system systemId="http://data.crossref.org/schemas/crossref4.4.1.xsd" uri="xsd/crossref/4.4.1/crossref4.4.1.xsd" />
   <system systemId="http://data.crossref.org/schemas/common4.4.1.xsd" uri="xsd/crossref/4.4.1/common4.4.1.xsd" />
-  <system systemId="http://data.crossref.org/schemas/common4.3.5.xsd" uri="xsd/crossref/4.3.5/common4.3.5.xsd" />
+  <system systemId="http://data.crossref.org/schemas/common4.3.5.xsd" uri="xsd/crossref/4.4.1/common4.3.5.xsd" />
   <system systemId="http://data.crossref.org/schemas/JATS-journalpublishing1.xsd" uri="xsd/crossref/4.4.1/JATS-journalpublishing1.xsd" />
   <system systemId="http://data.crossref.org/schemas/relations.xsd" uri="xsd/crossref/4.4.1/relations.xsd" />
   <system systemId="http://data.crossref.org/schemas/fundref.xsd" uri="xsd/crossref/4.4.1/fundref.xsd" />

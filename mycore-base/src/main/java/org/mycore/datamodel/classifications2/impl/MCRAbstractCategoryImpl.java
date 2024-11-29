@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         setChildrenUnlocked(MCRCategoryDAOFactory.getInstance().getChildren(id));
     }
 
-    protected void setChildrenUnlocked(List<MCRCategory> children){
+    protected void setChildrenUnlocked(List<MCRCategory> children) {
         //Does nothing. Please override
     }
 
@@ -143,7 +143,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public void setParent(MCRCategory parent) {
-        if (Objects.equals(this.parent,parent)) {
+        if (Objects.equals(this.parent, parent)) {
             return;
         }
         detachFromParent();

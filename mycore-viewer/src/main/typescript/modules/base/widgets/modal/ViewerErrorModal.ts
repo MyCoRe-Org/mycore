@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  */
 
 
-import {ViewerModalWindow} from "./ViewerModalWindow";
+import { ViewerModalWindow } from "./ViewerModalWindow";
 
 export class ViewerErrorModal extends ViewerModalWindow {
 
-    constructor(_mobile: boolean, errorTitle: string, errorText: string, imageUrl?: string, parent: HTMLElement = document.body) {
-        super(_mobile, errorTitle, parent);
-        this.modalHeader.children("h4").addClass("text-danger");
-        const img = imageUrl != null ? `<img class='thumbnail error-image' src='${imageUrl}' />` : "";
-        this.modalBody.append(`<div class='error-image-holder'> ${img} <span data-i18n='" + text + "'>${errorText}</span></div>`)
-    }
+  constructor(_mobile: boolean, errorTitle: string, errorText: string, imageUrl?: string, parent: HTMLElement = document.body) {
+    super(_mobile, errorTitle, parent);
+    this.modalHeader.children("h4").addClass("text-danger");
+    const img = imageUrl != null ? `<img class='thumbnail error-image' src='${imageUrl}' />` : "";
+    this.modalBody.append(`<div class='error-image-holder'> ${img} <span data-i18n='" + text + "'>${errorText}</span></div>`)
+  }
 }
 
 

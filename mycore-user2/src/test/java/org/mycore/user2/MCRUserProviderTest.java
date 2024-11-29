@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 
 package org.mycore.user2;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
-
-import static org.junit.Assert.assertEquals;
 
 public class MCRUserProviderTest extends MCRUserTestCase {
 
@@ -43,7 +43,6 @@ public class MCRUserProviderTest extends MCRUserTestCase {
         userWithRealm.setRealm(MCRRealmFactory.getRealm("mycore.de"));
         MCRUserManager.createUser(userWithRealm);
     }
-
 
     @Test
     public final void testGetUserWithoutRealm() {

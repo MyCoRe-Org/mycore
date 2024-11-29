@@ -1,12 +1,11 @@
- <html>
-    <head>
-    	<title>Tree test</title>
-        <link rel="stylesheet" type="text/css" href="node_modules/dijit/themes/tundra/tundra.css">
-        <link rel="stylesheet" type="text/css" href="css/style.css">
-    </head>
-        <script type="text/javascript" src="node_modules/dojo/dojo.js"
-    djConfig="parseOnLoad: true, isDebug: true"></script>
-     <script type="text/javascript">
+<html>
+<head>
+  <title>Tree test</title>
+  <link rel="stylesheet" type="text/css" href="node_modules/dijit/themes/tundra/tundra.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="node_modules/dojo/dojo.js"
+          djConfig="parseOnLoad: true, isDebug: true"></script>
+  <script type="text/javascript">
        dojo.require("dojo.parser");
        dojo.require(
          "dijit.layout.ContentPane");
@@ -16,8 +15,7 @@
        dojo.addOnLoad(function() {
          var container = new
          dijit.layout.BorderContainer(
-           {style: "height:100px;
-           width:150px;border:solid 2px"},
+           {style: "height:100px; width:150px;border:solid 2px"},
            "container"
          );
          var div1 =
@@ -27,19 +25,16 @@
          var div2 =
          document.createElement("div");
          div2.appendChild(document
-         .createTextNode("Center
-         region"));
+         .createTextNode("Center region"));
          var div3 =
          document.createElement("div");
          div3.appendChild(document
-         .createTextNode("Bottom
-         region"));
+         .createTextNode("Bottom region"));
          var top = new
          dijit.layout.ContentPane(
          {
            region: "top",
-           style: "background-
-             color:pink;height:30px;",
+           style: "background-color:pink;height:30px;",
            splitter: true,
            minSize : 10,
            maxSize : 80
@@ -57,8 +52,7 @@
            dijit.layout.ContentPane(
          {
            region: "bottom",
-           style: "background-color:cyan;
-             height:30px",
+           style: "background-color:cyan; height:30px",
            splitter: true
         },
         div3
@@ -68,14 +62,11 @@
         container.addChild(center);
         container.addChild(bottom);
        });
-     </script>
-
-   
-   <body class="tundra">
-     <h1>Creating Border Containers in
-        Code</h1>
-     <br>
-     <div id="container">
-     </div>
-   </body>
- </html>
+  </script>
+</head>
+<body class="tundra">
+  <h1>Creating Border Containers in Code</h1>
+  <br>
+  <div id="container"></div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,6 @@ import org.mycore.resource.selector.MCRResourceSelector;
  * the result of the <em>filter</em>-phase. If, after the <em>select</em>-phase, multiple candidates are
  * till available, the first candidate is chosen.
  */
-
 
 /**
  * {@link MCRLFSResourceProvider} is an implementation of {@link MCRResourceProvider} that splits the lookup
@@ -101,7 +100,7 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     private final MCRResourceSelector selector;
 
     public MCRLFSResourceProvider(String coverage, MCRResourceLocator locator, MCRResourceFilter filter,
-                                  MCRResourceSelector selector) {
+        MCRResourceSelector selector) {
         super(coverage);
         this.locator = Objects.requireNonNull(locator);
         this.filter = Objects.requireNonNull(filter);

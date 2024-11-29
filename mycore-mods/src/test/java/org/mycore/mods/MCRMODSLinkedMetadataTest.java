@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
 
-    MCRObjectID seriesID, bookID;
+    MCRObjectID seriesID;
+    MCRObjectID bookID;
 
     @Before
     public void setUp() throws Exception {

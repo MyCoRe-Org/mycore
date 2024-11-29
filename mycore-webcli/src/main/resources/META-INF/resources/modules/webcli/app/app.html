@@ -8,38 +8,32 @@
       </li>
       <li class="nav-item">
         <span class="nav-link" (click)="clearLog()">
-          <i class="fa fa-eraser"></i>
-          Clear Logs
+          <i class="fa fa-eraser"></i> Clear Logs
         </span>
       </li>
       <li class="nav-item" [hidden]="refreshRunning">
         <span class="nav-link" (click)="setRefresh(true)">
-          <i class="fa fa-play"></i>
-          Refresh
+          <i class="fa fa-play"></i> Refresh
         </span>
       </li>
       <li class="nav-item" [hidden]="!refreshRunning">
         <span class="nav-link with-spinner" (click)="setRefresh(false)">
-          <i class="fa fa-pause"></i>
-          Stop Refresh
+          <i class="fa fa-pause"></i> Stop Refresh
         </span>
       </li>
       <li class="nav-item">
         <span class="nav-link" (click)="clearCommandList()">
-          <i class="fa fa-stop"></i>
-          Clear Command Queue
+          <i class="fa fa-stop"></i> Clear Command Queue
         </span>
       </li>
       <li class="nav-item" (click)="showCommandHistory()" [hidden]="commandHistory.length <= 0">
         <span class="nav-link">
-          <i class="fa fa-archive"></i>
-          Command History
+           <i class="fa fa-archive"></i> Command History
         </span>
       </li>
       <li class="nav-item" data-toggle="collapse" data-target="#exCollapsingNavbar">
         <span class="nav-link">
-          <i class="fa fa-cog"></i>
-          Settings
+          <i class="fa fa-cog"></i> Settings
         </span>
       </li>
     </ul>
@@ -79,20 +73,21 @@
   <div class="row tab-pane fade in active" id="log" role="tabpanel" web-cli-log></div>
   <div class="row tab-pane fade" id="queue" role="tabpanel" web-cli-queue></div>
 </div>
-  <div class="modal fade" id="comHistoryModal">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h5 class="modal-title">Command History</h5>
-        </div>
-        <div class="modal-body">
-          <ul class="comHistoryList list-group" *ngIf="commandHistory">
-            <li *ngFor="let com of commandHistory" class="list-group-item list-group-item-action"><a href="#" (click)="onSelectCommand(com)" onclick='return false;' title="{{com}}">{{com}}</a></li>
-          </ul>
-        </div>
+<div class="modal fade" id="comHistoryModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h5 class="modal-title">Command History</h5>
+      </div>
+      <div class="modal-body">
+        <ul class="comHistoryList list-group" *ngIf="commandHistory">
+          <li *ngFor="let com of commandHistory" class="list-group-item list-group-item-action"><a href="#"
+            (click)="onSelectCommand(com)" onclick='return false;' title="{{com}}">{{com}}</a></li>
+        </ul>
       </div>
     </div>
   </div>
+</div>

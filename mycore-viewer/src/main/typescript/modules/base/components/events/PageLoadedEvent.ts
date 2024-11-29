@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  */
 
 
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {AbstractPage} from "../model/AbstractPage";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { AbstractPage } from "../model/AbstractPage";
 
 export class PageLoadedEvent extends MyCoReImageViewerEvent {
-    constructor(component: ViewerComponent, public _pageId: string, public abstractPage: AbstractPage) {
-        super(component, PageLoadedEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public _pageId: string, public abstractPage: AbstractPage) {
+    super(component, PageLoadedEvent.TYPE);
+  }
 
-    public static TYPE: string = "PageLoadedEvent";
+  public static TYPE: string = "PageLoadedEvent";
 
 }
 

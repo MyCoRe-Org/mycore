@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
         for (SolrClient client : getClients()) {
             UpdateResponse response = updateRequest.process(client, null);
             LOGGER.info("Optimize was {}({}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
-                    response.getElapsedTime());
+                response.getElapsedTime());
         }
     }
 

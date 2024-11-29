@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,27 +24,27 @@ var wcms = wcms || {};
 wcms.util = wcms.util || {};
 
 wcms.common.EventHandler = function(/*Object*/ src) {
-	this.source = src;
-	this.listeners = [];
+  this.source = src;
+  this.listeners = [];
 };
 
-( function() {
-	function attach(/*function*/ listener) {
-		this.listeners.push(listener);
-	}
+(function() {
+  function attach(/*function*/ listener) {
+    this.listeners.push(listener);
+  }
 
-	function detach(/*function*/ listener) {
-		for (var i = 0; i < this.listeners.length; i++)
-			if (this.listeners[i] == listener)
-				this.listeners[i].splice(i,1);
-	}
+  function detach(/*function*/ listener) {
+    for (var i = 0; i < this.listeners.length; i++)
+      if (this.listeners[i] == listener)
+        this.listeners[i].splice(i, 1);
+  }
 
-	function notify(args) {
-		for (var i = 0; i < this.listeners.length; i++)
-			this.listeners[i](this.source, args);
-	}
+  function notify(args) {
+    for (var i = 0; i < this.listeners.length; i++)
+      this.listeners[i](this.source, args);
+  }
 
-	wcms.common.EventHandler.prototype.attach = attach;
-	wcms.common.EventHandler.prototype.detach = detach;
-	wcms.common.EventHandler.prototype.notify = notify;
+  wcms.common.EventHandler.prototype.attach = attach;
+  wcms.common.EventHandler.prototype.detach = detach;
+  wcms.common.EventHandler.prototype.notify = notify;
 })();

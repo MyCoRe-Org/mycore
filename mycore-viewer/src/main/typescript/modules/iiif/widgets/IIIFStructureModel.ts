@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,22 @@
  */
 
 
-import {MyCoReMap} from "../../base/Utils";
-import {StructureChapter} from "../../base/components/model/StructureChapter";
-import {StructureImage} from "../../base/components/model/StructureImage";
-import {StructureModel} from "../../base/components/model/StructureModel";
+import { MyCoReMap } from "../../base/Utils";
+import { StructureChapter } from "../../base/components/model/StructureChapter";
+import { StructureImage } from "../../base/components/model/StructureImage";
+import { StructureModel } from "../../base/components/model/StructureModel";
 
 export class IIIFStructureModel extends StructureModel {
 
-    constructor(
-        public smLinkMap: MyCoReMap<string, string[]>,
-        rootChapter: StructureChapter,
-        imageList: StructureImage[],
-        chapterToImageMap: MyCoReMap<string, StructureImage>,
-        imageToChapterMap: MyCoReMap<string, StructureChapter>,
-        imageHrefImageMap: MyCoReMap<string, StructureImage>) {
-        super(rootChapter, imageList, chapterToImageMap, imageToChapterMap, imageHrefImageMap, false);
-    }
+  constructor(
+    public smLinkMap: MyCoReMap<string, string[]>,
+    rootChapter: StructureChapter,
+    imageList: StructureImage[],
+    chapterToImageMap: MyCoReMap<string, StructureImage>,
+    imageToChapterMap: MyCoReMap<string, StructureChapter>,
+    imageHrefImageMap: MyCoReMap<string, StructureImage>) {
+    super(rootChapter, imageList, chapterToImageMap, imageToChapterMap, imageHrefImageMap, false);
+  }
 
 }
 

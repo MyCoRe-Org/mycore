@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,9 +167,9 @@ public class MCRQLSearchUtils {
 
             // Skip irrelevant parameters
             if (name.endsWith(".operator")
-                    || name.contains(".sortField")
-                    || SEARCH_PARAMETER.contains(name)
-                    || name.startsWith("XSL.")) {
+                || name.contains(".sortField")
+                || SEARCH_PARAMETER.contains(name)
+                || name.startsWith("XSL.")) {
                 continue;
             }
 

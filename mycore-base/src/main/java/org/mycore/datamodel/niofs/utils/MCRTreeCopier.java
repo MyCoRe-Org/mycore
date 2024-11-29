@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityTransaction;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 
 /**
  * Simple {@link FileVisitor} that recursive copies a directory
@@ -101,12 +101,12 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                     newName = prefixString + nameTry++ + suffixString;
                     newTarget = parent.resolve(newName);
                 } while (Files.exists(newTarget));
-            }else{
-                newTarget= target;
+            } else {
+                newTarget = target;
             }
             if (restartDatabaseTransaction && MCRSessionMgr.hasCurrentSession()) {
-                MCRTransactionHelper.commitTransaction(MCREntityTransaction.class);
-                MCRTransactionHelper.beginTransaction(MCREntityTransaction.class);
+                MCRTransactionManager.commitTransactions(MCREntityTransaction.class);
+                MCRTransactionManager.beginTransactions(MCREntityTransaction.class);
             }
             Files.copy(source, newTarget, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, OnInit} from '@angular/core';
-import {RESTService} from '../service/rest.service';
-import {CommunicationService} from '../service/communication.service';
-import {Commands} from './commands';
+import { Component, OnInit } from '@angular/core';
+import { RESTService } from '../service/rest.service';
+import { CommunicationService } from '../service/communication.service';
+import { Commands } from './commands';
 
 @Component({
   selector: '[webcli-commands]',
@@ -30,11 +30,11 @@ export class WebCliCommandsComponent implements OnInit {
   currentCommand: string;
 
   constructor(private _restService: RESTService,
-              private _comunicationService: CommunicationService){
-                this._restService.currentCommandList.subscribe(
-                  commandList => this.commandList = commandList
-                );
-              }
+    private _comunicationService: CommunicationService) {
+    this._restService.currentCommandList.subscribe(
+      commandList => this.commandList = commandList
+    );
+  }
 
   ngOnInit() {
     this._restService.getCommands();

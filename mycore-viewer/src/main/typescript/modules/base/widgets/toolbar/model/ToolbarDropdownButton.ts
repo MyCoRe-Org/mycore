@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,42 +16,42 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ToolbarButton} from "./ToolbarButton";
-import {ViewerProperty} from "../../../Utils";
+import { ToolbarButton } from "./ToolbarButton";
+import { ViewerProperty } from "../../../Utils";
 
 export class ToolbarDropdownButton extends ToolbarButton {
 
-    constructor(id: string, label: string, children: Array<ToolbarDropdownButtonChild>, icon: string = null, largeContent: boolean = false, buttonClass: string = "default", disabled: boolean = false, active: boolean = false) {
-        super(id, label, null, icon, buttonClass, disabled, active);
-        this.addProperty(new ViewerProperty<Array<ToolbarDropdownButtonChild>>(this, "children", children));
-        this.addProperty(new ViewerProperty<boolean>(this, "largeContent", largeContent));
-    }
+  constructor(id: string, label: string, children: Array<ToolbarDropdownButtonChild>, icon: string = null, largeContent: boolean = false, buttonClass: string = "default", disabled: boolean = false, active: boolean = false) {
+    super(id, label, null, icon, buttonClass, disabled, active);
+    this.addProperty(new ViewerProperty<Array<ToolbarDropdownButtonChild>>(this, "children", children));
+    this.addProperty(new ViewerProperty<boolean>(this, "largeContent", largeContent));
+  }
 
-    public get children(): Array<ToolbarDropdownButtonChild> {
-        return this.getProperty("children").value;
-    }
+  public get children(): Array<ToolbarDropdownButtonChild> {
+    return this.getProperty("children").value;
+  }
 
-    public set children(childs: Array<ToolbarDropdownButtonChild>) {
-        this.getProperty("children").value = childs;
-    }
+  public set children(childs: Array<ToolbarDropdownButtonChild>) {
+    this.getProperty("children").value = childs;
+  }
 
-    public get largeContent(): boolean {
-        return this.getProperty("largeContent").value;
-    }
+  public get largeContent(): boolean {
+    return this.getProperty("largeContent").value;
+  }
 
-    public set largeContent(largeContent: boolean) {
-        this.getProperty("largeContent").value = largeContent;
-    }
+  public set largeContent(largeContent: boolean) {
+    this.getProperty("largeContent").value = largeContent;
+  }
 
-    //public addChild(child: ToolbarDropdownButtonChild) {
-    //}
+  //public addChild(child: ToolbarDropdownButtonChild) {
+  //}
 
 }
 
 export interface ToolbarDropdownButtonChild {
-    id: string;
-    label: string;
-    isHeader?: boolean;
-    icon?: string;
+  id: string;
+  label: string;
+  isHeader?: boolean;
+  icon?: string;
 }
 

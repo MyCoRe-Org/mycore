@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,15 +23,15 @@ import java.util.Map;
  * @author René Adler (eagle)
  *
  */
-public interface MCRUserAttributeConverter<ValueType, BoundType> {
+public interface MCRUserAttributeConverter<V, B> {
 
     /**
      * Convert a given value to the specified type.
-     * 
-     * @param value the value of type <code>&lt;ValueType&gt;</code>, to convert
+     *
+     * @param value the value of type <code>&lt;V&gt;</code>, to convert
      * @param separator the value separator or <code>null</code>
      * @param valueMapping the value mapping or <code>null</code>
-     * @return the converted value of type <code>&lt;BoundType&gt;</code>
+     * @return the converted value of type <code>&lt;B&gt;</code>
      */
-    BoundType convert(ValueType value, String separator, Map<String, String> valueMapping);
+    B convert(V value, String separator, Map<String, String> valueMapping);
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,9 +59,9 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     @MCRPostConstruction
     public void initializeName(String property) {
-       this.name = property.substring(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME.length())
-               .split("\\.")[0];
-       LOGGER.info("Initialized persistence unit {}", this.name);
+        this.name = property.substring(MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME.length())
+            .split("\\.")[0];
+        LOGGER.info("Initialized persistence unit {}", this.name);
     }
 
     @MCRProperty(name = "PersistenceProviderClassName", required = false,
@@ -98,7 +98,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
     @Override
     public URL getPersistenceUnitRootUrl() {
-       return null;
+        return null;
     }
 
     @Override

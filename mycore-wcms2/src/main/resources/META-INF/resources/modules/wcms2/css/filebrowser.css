@@ -1,348 +1,345 @@
-html,body{
-	width: 100%;
-	height: 100%;
+html, body {
+  width: 100%;
+  height: 100%;
 }
 
-#filebrowser{
-	padding: 15px;
-	width: 100%;
-	height: 100%;
+#filebrowser {
+  padding: 15px;
+  width: 100%;
+  height: 100%;
 }
 
 .hide-folder {
-    display: none;
+  display: none;
 }
 
-ul{
-	list-style: none outside none;
+ul {
+  list-style: none outside none;
 }
 
-.button{
-	cursor: pointer;
-	padding-right: 5px;
+.button {
+  cursor: pointer;
+  padding-right: 5px;
 }
 
-.icon{
-	padding-right: 5px;
-	cursor: default;
+.icon {
+  padding-right: 5px;
+  cursor: default;
 }
 
-.no-button{
-	min-width: 19px;
-	padding-right: 5px;
-	display: inline-block;
+.no-button {
+  min-width: 19px;
+  padding-right: 5px;
+  display: inline-block;
 }
 
-.folder-name{
-	display: inline;
-	position: relative;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+.folder-name {
+  display: inline;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.folder{
-	white-space: nowrap;
+.folder {
+  white-space: nowrap;
 }
 
-.file{
-	border: 1px solid #000;
-	width: 110px;
-	height: 150px;
-	display: inline-block;
-	float: left;
-	margin-right: 10px;
-	margin-bottom: 10px;
-	text-align: center;
-	position: relative;
-	background-color: white;
+.file {
+  border: 1px solid #000;
+  width: 110px;
+  height: 150px;
+  display: inline-block;
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  position: relative;
+  background-color: white;
 }
 
-.file-image{
-	position: absolute;
-	margin: auto;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	width: auto;
-	height: auto;
-	max-width: 100px;
-	max-height: 100px;
+.file-image {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: auto;
+  height: auto;
+  max-width: 100px;
+  max-height: 100px;
 }
 
-.file-image-cotainer{
-	display: block;
-	width: 100px;
-	height: 100px;
-	position: relative;
-	margin: auto;
+.file-image-cotainer {
+  display: block;
+  width: 100px;
+  height: 100px;
+  position: relative;
+  margin: auto;
 }
 
-.file-title{
-	width: 100px;
-	padding-right: 5px;
-	padding-left: 5px;
-	position: absolute;
-	bottom: 0;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-
+.file-title {
+  width: 100px;
+  padding-right: 5px;
+  padding-left: 5px;
+  position: absolute;
+  bottom: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-#file-view{
-	display: inline-block;
-	width: 70%;
-	height: 100%;
-	overflow: auto;
-	margin-bottom: 0px;
+#file-view {
+  display: inline-block;
+  width: 70%;
+  height: 100%;
+  overflow: auto;
+  margin-bottom: 0px;
 }
 
-#files{
-	height: 100%;
-	position: relative;
+#files {
+  height: 100%;
+  position: relative;
 }
 
-#folder-list-div{
-	margin-bottom: 0px;
-	display: inline-block;
-	width: 30%;
-	height: 100%;
-	float: left;
-	position: relative;
+#folder-list-div {
+  margin-bottom: 0px;
+  display: inline-block;
+  width: 30%;
+  height: 100%;
+  float: left;
+  position: relative;
 }
 
-.statusbar{
-	border: 1px solid #000;
-	width: 100%;
-	height: 70px;
-	display: inline-block;
-	float: left;
-	margin-right: 10px;
-	margin-bottom: 10px;
-	text-align: center;
-	position: relative;
+.statusbar {
+  border: 1px solid #000;
+  width: 100%;
+  height: 70px;
+  display: inline-block;
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  position: relative;
 }
 
-.statusbar-image{
-	position: absolute;
-	margin: auto;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	width: auto;
-	height: auto;
-	max-width: 50px;
-	max-height: 50px;
+.statusbar-image {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: auto;
+  height: auto;
+  max-width: 50px;
+  max-height: 50px;
 }
 
-.statusbar-image-cotainer{
-	display: inline-block;
-	width: 50px;
-	height: 50px;
-	position: relative;
-	float: left;
-	margin-left: 5px;
+.statusbar-image-cotainer {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: relative;
+  float: left;
+  margin-left: 5px;
 }
 
-.statusbar-progress{
-	width: 520px;
-	height: 20px;
-	border: 1px solid #000;
+.statusbar-progress {
+  width: 520px;
+  height: 20px;
+  border: 1px solid #000;
 }
 
-.statusbar-progress-container{
-	display: inline-block;
+.statusbar-progress-container {
+  display: inline-block;
 }
 
-.statusbar-progress-status{
-	background-color: #F4AB75;
-	width: 0%;
-	height: 100%;
+.statusbar-progress-status {
+  background-color: #F4AB75;
+  width: 0%;
+  height: 100%;
 }
 
-.faded{
-    opacity: 0.3;
+.faded {
+  opacity: 0.3;
 }
 
 .aktiv:BEFORE {
-    background-color: #3276B1;
-    content: "";
-    height: 20px;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    left: 0;
+  background-color: #3276B1;
+  content: "";
+  height: 20px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  left: 0;
 }
 
-.aktiv{
-	position: relative;
+.aktiv {
+  position: relative;
 }
 
-li.aktiv > div.folder-name{
-	color: #FFFFFF;
+li.aktiv>div.folder-name {
+  color: #FFFFFF;
 }
 
-li.aktiv > span{
-	color: #FFFFFF;
+li.aktiv>span {
+  color: #FFFFFF;
 }
 
-#folder-list-ul{
-	padding-left: 0px;
-	overflow: auto;
-	max-height: 70%;
+#folder-list-ul {
+  padding-left: 0px;
+  overflow: auto;
+  max-height: 70%;
 }
 
-ul{
-	padding-left: 15px;
+ul {
+  padding-left: 15px;
 }
 
-#bottom-buttons{
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	padding-left: 20px;
-	padding-top: 5px;
-	width: 100%;
-	margin-bottom: 10px;
+#bottom-buttons {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding-left: 20px;
+  padding-top: 5px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
-#bottom-buttons > div{
-	cursor: pointer;
+#bottom-buttons>div {
+  cursor: pointer;
 }
 
-#bottom-buttons > div > span{
-	padding-right: 5px;
+#bottom-buttons>div>span {
+  padding-right: 5px;
 }
 
-.folder-name{
-	cursor: default;
+.folder-name {
+  cursor: default;
 }
 
-.file-file{
-	font-size: 50px;
-	padding-top: 20px;
-	text-align: center;
+.file-file {
+  font-size: 50px;
+  padding-top: 20px;
+  text-align: center;
 }
 
 #noFiles {
-    bottom: 0;
-    font-weight: bold;
-    height: 20px;
-    left: 0;
-    margin: auto;
-    opacity: 0.5;
-    position: absolute;
-    right: 0;
-    text-align: center;
-    top: 0;
+  bottom: 0;
+  font-weight: bold;
+  height: 20px;
+  left: 0;
+  margin: auto;
+  opacity: 0.5;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
 }
 
 /**********************************************************************
 * Upload Drop Area
 ***********************************************************************/
-
 #drop-area {
-	border: 2px dashed #ccc;
-	border-radius: 20px;
-	margin: 20px 0;
-	padding: 20px;
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  margin: 20px 0;
+  padding: 20px;
 }
 
 #drop-area.highlight {
-	border-color: purple;
+  border-color: purple;
 }
 
 #drop-area p {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 #gallery {
-	margin-top: 10px;
+  margin-top: 10px;
 }
 
 #gallery img {
-	width: 150px;
-	margin-bottom: 10px;
-	margin-right: 10px;
-	vertical-align: middle;
+  width: 150px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  vertical-align: middle;
 }
 
 #drop-area .button {
-	display: inline-block;
-	padding: 10px;
-	background: #ccc;
-	cursor: pointer;
-	border-radius: 5px;
-	border: 1px solid #ccc;
+  display: inline-block;
+  padding: 10px;
+  background: #ccc;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 #drop-area .button:hover {
-	background: #ddd;
+  background: #ddd;
 }
 
 #upload-file-input {
-	display: none;
+  display: none;
 }
 
 #upload-progress-bar {
-	width: 100%;
-	opacity: 0;
+  width: 100%;
+  opacity: 0;
 }
 
 /**********************************************************************
 * Lightbox
 ***********************************************************************/
-
 .wcms2-lightbox {
-	position: absolute;
-	top: 5px;
-	right: 5px;
-	cursor: pointer;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
 }
 
 #wcms2-lightbox {
-    background-color: rgba(0,0,0,0.8);
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 1050;
-    display: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  display: none;
 }
 
 #wcms2-lightbox-img {
-    width: auto;
-    max-width: calc(100% - 100px);
-    max-width: -webkit-calc(100% - 60px);
-    height: auto;
-    max-height: calc(100% - 160px);
-    max-height: -webkit-calc(100% - 60px);
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    -webkit-transform: translate(-50%, -50%);
-    margin-top: -5px;
-    z-index: 1070;
+  width: auto;
+  max-width: calc(100% - 100px);
+  max-width: -webkit-calc(100% - 60px);
+  height: auto;
+  max-height: calc(100% - 160px);
+  max-height: -webkit-calc(100% - 60px);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  margin-top: -5px;
+  z-index: 1070;
 }
 
 #wcms2-lightbox-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 #wcms2-lightbox-close {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #fff;
-    z-index: 1090;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #fff;
+  z-index: 1090;
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.frontend.jersey.access.MCRRequireLogin;
+import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -43,29 +45,39 @@ import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.oauth.MCRORCIDOAuthUserInformation;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
+import org.mycore.orcid2.user.MCRORCIDUserUtils;
+import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
- * Resource for ORCID OAuth methods.
+ * This class provides end points for handling the OAuth authentication process with ORCID.
+ * It manages the initiation of the OAuth flow, the handling of the authorization code or error
+ * returned by ORCID, and the exchange of the authorization code for an access token.
+ *
+ * @see <a href="https://members.orcid.org/api/oauth2">ORCID OAuth 2.0 Documentation</a> for more
+ *      information on the OAuth process and integration.
  */
 @Path("orcid/oauth")
 public class MCRORCIDOAuthResource {
@@ -85,18 +97,26 @@ public class MCRORCIDOAuthResource {
     private static final boolean PERSIST_USER = MCRConfiguration2
         .getOrThrow(CONFIG_PREFIX + "PersistUser", Boolean::parseBoolean);
 
-    private final String redirectURI = "rsc/orcid/oauth";
+    private static final String PATH_PARAM_ORCID = "orcid";
 
     @Context
-    HttpServletRequest req;
+    private HttpServletRequest req;
+
+    @Context
+    private UriInfo uriInfo;
 
     /**
-     * Returns authorization URI
+     * Generates a redirection URI for initiating an OAuth authentication request to ORCID, based
+     * on the provided scope and user session details.
      *
-     * @param scope the scope
-     * @return auth URI
-     * @throws ForbiddenException if user is not allowed to initiate authentication
-     * @throws BadRequestException if scope is null
+     * <p>If the current user is a guest and guest authentication is disabled, a {@link ForbiddenException}
+     * is thrown. Otherwise, the method attempts to build the OAuth
+     * request URI using the provided or default scope.</p>
+     *
+     * @param scope the OAuth scope defining the permissions. If null, default scope will be used (if available)
+     * @return a {@link Response} that redirects the user to the constructed OAuth request URI
+     * @throws ForbiddenException if the current user is a guest and guest authentication is not allowed
+     * @throws BadRequestException if both the provided scope and the default scope are null
      */
     @GET
     @Path("init")
@@ -115,23 +135,23 @@ public class MCRORCIDOAuthResource {
         if (scope != null) {
             return Response
                 .seeOther(
-                    buildRequestCodeURI(scope, state, langCode, MCRUserManager.getCurrentUser(), prefillRegistration))
+                    buildRequestCodeUri(scope, state, langCode, MCRUserManager.getCurrentUser(), prefillRegistration))
                 .build();
         } else if (SCOPE != null) {
             return Response
                 .seeOther(
-                    buildRequestCodeURI(SCOPE, state, langCode, MCRUserManager.getCurrentUser(), prefillRegistration))
+                    buildRequestCodeUri(SCOPE, state, langCode, MCRUserManager.getCurrentUser(), prefillRegistration))
                 .build();
         } else {
             throw new BadRequestException("Scope is required");
         }
     }
 
-    private URI buildRequestCodeURI(String scope, String state, String langCode, MCRUser user,
+    private URI buildRequestCodeUri(String scope, String state, String langCode, MCRUser user,
         boolean prefillRegistration) {
         final UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
         builder.path("oauth/authorize");
-        builder.queryParam("redirect_uri", MCRFrontendUtil.getBaseURL() + redirectURI);
+        builder.queryParam("redirect_uri", getRedirectUri());
         builder.queryParam("client_id", MCRORCIDOAuthClient.CLIENT_ID);
         builder.queryParam("response_type", "code");
         builder.queryParam("scope", scope);
@@ -145,12 +165,14 @@ public class MCRORCIDOAuthResource {
     }
 
     /**
-     *
-     * Adds current user's email address, first and last name as params to URIBuilder.
+     * Adds the current user's email address, first name, and last name as query parameters
+     * to the given {@link URIBuilder}. The email, first name, and last name are extracted
+     * from the provided {@link MCRUser}.
      *
      * @param builder the builder
      * @param user the user
-     * See <a href="https://members.orcid.org/api/resources/customize">ORCID documentation</a>
+     *
+     * @see <a href="https://members.orcid.org/api/resources/customize">ORCID documentation</a>
      */
     private static void preFillRegistrationForm(UriBuilder builder, MCRUser user) {
         String email = user.getEMailAddress();
@@ -182,15 +204,28 @@ public class MCRORCIDOAuthResource {
     }
 
     /**
-     * Handles ORCID code request.
+     * Handles the response from an OAuth authentication request. This method processes the query parameters
+     * returned from ORCID after a user has either successfully authenticated or encountered an error during
+     * the OAuth process.
      *
-     * @param code the code
-     * @param state the state
-     * @param error the error
-     * @param errorDescription the error description
-     * @return Response
-     * @throws BadRequestException if the request is invalid
-     * @throws InternalServerErrorException if an error occurs during processing the request
+     * <p>If a valid authorization code is provided, the method verifies the state parameter to prevent CSRF attacks,
+     * exchanges the code for an access token, and then either logs in the user or associates the token with the
+     * current session.</p>
+     *
+     * <p>If an error is encountered, the method logs the error and either redirects the guest user or returns
+     * a detailed error message for logged-in users.</p>
+     *
+     * @param code the authorization code returned from ORCID, or null if an error occurred
+     * @param state the state parameter used for CSRF protection, which must match the session state
+     * @param error the error code returned by ORCID if the authentication request failed, or null if no error occurred
+     * @param errorDescription a human-readable description of the error, if available
+     *
+     * @return a {@link Response} object representing the outcome of the OAuth request
+     *         This can either be a redirection to the home page or an HTML response
+     *
+     * @throws ForbiddenException if the current user is a guest and guest authentication is disabled
+     * @throws BadRequestException if the code or state is invalid, or if neither the code nor error is provided
+     * @throws InternalServerErrorException if an error occurs during the transformation of the response
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -206,7 +241,7 @@ public class MCRORCIDOAuthResource {
                 throw new BadRequestException();
             }
             final MCRORCIDOAuthAccessTokenResponse accessTokenResponse = MCRORCIDOAuthClient.getInstance()
-                .exchangeCode(codeTrimmed, MCRFrontendUtil.getBaseURL() + redirectURI);
+                .exchangeCode(codeTrimmed, getRedirectUri());
             final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
             if (checkCurrentUserIsGuest()) {
                 handleLogin(accessTokenResponse.getORCID(), accessTokenResponse.getName(), credential, PERSIST_USER);
@@ -235,6 +270,36 @@ public class MCRORCIDOAuthResource {
         } else {
             throw new BadRequestException();
         }
+    }
+
+    /**
+     * Revokes the ORCID credentials associated with a specific ORCID iD for the current user.
+     *
+     * <p>This method revokes the credentials linked to the given ORCID iD for the currently logged-in
+     * user. If the ORCID iD is null, a {@link BadRequestException} is thrown. If an error occurs
+     * while attempting to revoke the credentials, a {@link BadRequestException} is thrown with the
+     * underlying exception as the cause.
+     *
+     * @param orcid the ORCID iD to revoke credentials for
+     * @return a {@link Response} indicating a successful operation (HTTP 200 OK)
+     *
+     * @throws BadRequestException if an error occurs during revocation
+     */
+    @DELETE
+    @Path("{" + PATH_PARAM_ORCID + "}")
+    @MCRRequireTransaction
+    @MCRRestrictedAccess(MCRRequireLogin.class)
+    public Response revoke(@PathParam(PATH_PARAM_ORCID) String orcid) {
+        try {
+            MCRORCIDUserUtils.revokeCredentialByORCID(MCRORCIDSessionUtils.getCurrentUser(), orcid);
+        } catch (MCRORCIDException e) {
+            throw new BadRequestException(e);
+        }
+        return Response.ok().build();
+    }
+
+    private String getRedirectUri() {
+        return uriInfo.getBaseUri().toString() + getClass().getAnnotation(Path.class).value();
     }
 
     private boolean checkCurrentUserIsGuest() {

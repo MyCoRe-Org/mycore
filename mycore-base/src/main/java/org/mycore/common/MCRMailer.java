@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -395,7 +395,7 @@ public class MCRMailer extends MCRServlet {
         if (mail.parts != null && !mail.parts.isEmpty() || mail.msgParts != null && mail.msgParts.size() > 1) {
             Multipart multipart = new MimeMultipart("mixed");
             // Create the message part
-            MimeBodyPart messagePart= new MimeBodyPart();
+            MimeBodyPart messagePart = new MimeBodyPart();
             MimeMultipart alternative = new MimeMultipart("alternative");
             buildMessageBodyParts(mail, alternative);
             messagePart.setContent(alternative);
@@ -416,7 +416,7 @@ public class MCRMailer extends MCRServlet {
     }
 
     private static void addRecipientOptionals(MimeMessage msg, List<String> foo, Message.RecipientType bar)
-            throws MessagingException {
+        throws MessagingException {
         Optional<List<InternetAddress>> list = EMail.buildAddressList(foo);
         if (list.isPresent()) {
             if (bar == null) {
@@ -428,7 +428,7 @@ public class MCRMailer extends MCRServlet {
     }
 
     private static void buildMessageBodyParts(EMail mail, MimeMultipart alternative)
-            throws MessagingException {
+        throws MessagingException {
         MimeBodyPart messagePart = new MimeBodyPart();
         for (MessagePart m : mail.msgParts) {
             messagePart.setText(m.message, ENCODING, m.type.value());
@@ -437,7 +437,7 @@ public class MCRMailer extends MCRServlet {
     }
 
     private static void setMessageContent(EMail mail, Multipart multipart)
-            throws MessagingException, URISyntaxException, MalformedURLException {
+        throws MessagingException, URISyntaxException, MalformedURLException {
         for (String part : mail.parts) {
             MimeBodyPart messagePart = new MimeBodyPart();
             URL url = new URI(part).toURL();
@@ -453,7 +453,6 @@ public class MCRMailer extends MCRServlet {
             multipart.addBodyPart(messagePart);
         }
     }
-
 
     /**
      * Generates e-mail from the given input document by transforming it with an xsl stylesheet,

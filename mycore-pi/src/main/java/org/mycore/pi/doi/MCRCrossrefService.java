@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,6 @@ public class MCRCrossrefService extends MCRDOIBaseService {
         throw new MCRPersistentIdentifierException("Delete is not Supported!",
             new OperationNotSupportedException("Delete is not Supported!"));
     }
-
 
     protected void deleteJob(Map<String, String> parameters) {
         //TODO: should this method do something or can it be removed?

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +25,11 @@ import javax.crypto.SecretKeyFactory;
 
 import org.mycore.common.config.MCRConfigurationException;
 
-
 /**
  * Utility class providing functions commonly used by implementations of {@link MCRPasswordCheckStrategy}.
  */
 public abstract class MCRPasswordCheckUtils {
-    
+
     private MCRPasswordCheckUtils() {
     }
 

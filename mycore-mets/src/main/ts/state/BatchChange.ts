@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,29 @@
  */
 
 namespace org.mycore.mets.model.state {
-    export class BatchChange extends ModelChange {
-        constructor(private changes: ModelChange[]) {
-            super();
-        }
-
-        public getChanges() {
-            return this.changes;
-        }
-
-        public doChange() {
-            this.changes.forEach((change) => {
-                change.doChange();
-            });
-        }
-
-        public unDoChange() {
-            this.changes.forEach((change) => {
-                change.unDoChange();
-            });
-        }
-
-        public getDescription(messages: any): string {
-            return this.changes.map((change) => change.getDescription(messages)).join('; ');
-        }
+  export class BatchChange extends ModelChange {
+    constructor(private changes: ModelChange[]) {
+      super();
     }
+
+    public getChanges() {
+      return this.changes;
+    }
+
+    public doChange() {
+      this.changes.forEach((change) => {
+        change.doChange();
+      });
+    }
+
+    public unDoChange() {
+      this.changes.forEach((change) => {
+        change.unDoChange();
+      });
+    }
+
+    public getDescription(messages: any): string {
+      return this.changes.map((change) => change.getDescription(messages)).join('; ');
+    }
+  }
 }

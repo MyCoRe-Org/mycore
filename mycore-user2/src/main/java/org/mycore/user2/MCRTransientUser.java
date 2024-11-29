@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ public class MCRTransientUser extends MCRUser {
                 }
             }
         } else {
-            super.setRealName(getUserAttribute(MCRUserInformation.ATT_REAL_NAME));
+            super.setRealName(getUserAttribute(ATT_REAL_NAME));
             for (MCRRole role : MCRRoleManager.listSystemRoles()) {
                 LOGGER.debug("Test is in role: {}", role.getName());
                 if (userInfo.isUserInRole(role.getName())) {

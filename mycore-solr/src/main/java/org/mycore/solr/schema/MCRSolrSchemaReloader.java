@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ import com.google.gson.JsonParser;
  */
 public class MCRSolrSchemaReloader {
     private static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-            MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.getInstance();
 
     private static Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
 
@@ -197,7 +197,7 @@ public class MCRSolrSchemaReloader {
                     LOGGER.debug(e);
                     String command = e.toString();
 
-                    HttpRequest.Builder solrRequestBuilder = MCRHttpUtils.getRequestBuilder()
+                    HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
                         .uri(URI.create(solrCore.getV1CoreURL() + "/schema"))
                         .header("Content-type", "application/json")
                         .POST(HttpRequest.BodyPublishers.ofString(command));

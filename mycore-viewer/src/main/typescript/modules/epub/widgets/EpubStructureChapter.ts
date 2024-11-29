@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
  */
 
 
-import {StructureChapter} from "../../base/components/model/StructureChapter";
-import {MyCoReMap} from "../../base/Utils";
+import { StructureChapter } from "../../base/components/model/StructureChapter";
+import { MyCoReMap } from "../../base/Utils";
 
 export class EpubStructureChapter extends StructureChapter {
 
-    constructor(parent: StructureChapter,
-                type: string,
-                label: string,
-                chapter: StructureChapter[],
-                public epubChapter: any) {
-        super(parent, type, (epubChapter != null) ? epubChapter.href : 'root', label, chapter, new MyCoReMap(), (c) => c(null));
-    }
+  constructor(parent: StructureChapter,
+    type: string,
+    label: string,
+    chapter: StructureChapter[],
+    public epubChapter: any) {
+    super(parent, type, (epubChapter != null) ? epubChapter.href : 'root', label, chapter, new MyCoReMap(), (c) => c(null));
+  }
 
 }

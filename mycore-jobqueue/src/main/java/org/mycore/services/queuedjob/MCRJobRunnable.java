@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.processing.MCRAbstractProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
 
@@ -72,6 +72,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
         MCRJobConfig config,
         List<MCRJobStatusListener> additionalListeners,
         MCRJobAction actionInstance) {
+        super();
         this.job = job;
         this.config = config;
         this.actionInstance = actionInstance;
@@ -79,9 +80,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
             config.jobStatusListeners(job.getAction()))
             .flatMap(List::stream).toList();
         setName(this.job.getId() + " - " + this.job.getAction().getSimpleName());
-        setStatus(MCRProcessableStatus.created);
         job.getParameters().forEach((k, v) -> this.getProperties().put(k, v));
-
     }
 
     public void run() {
@@ -109,14 +108,14 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
             }
             if (executionException == null) {
                 //execute job
-                MCRTransactionHelper.beginTransaction();
+                MCRTransactionManager.beginTransactions();
                 localJob = em.merge(localJob);
                 try {
                     actionInstance.execute();
-                    MCRTransactionHelper.commitTransaction();
+                    MCRTransactionManager.commitTransactions();
                 } catch (Exception ex) {
                     executionException = ex;
-                    MCRTransactionHelper.rollbackTransaction();
+                    MCRTransactionManager.rollbackTransactions();
                     try {
                         actionInstance.rollback();
                     } catch (RuntimeException e) {

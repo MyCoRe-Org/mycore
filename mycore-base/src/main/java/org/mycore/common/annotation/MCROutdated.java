@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.METHOD,
-    ElementType.PACKAGE, ElementType.MODULE, ElementType.PARAMETER, ElementType.TYPE})
+@Target(value = { ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.METHOD,
+    ElementType.PACKAGE, ElementType.MODULE, ElementType.PARAMETER, ElementType.TYPE })
 public @interface MCROutdated {
 
 }

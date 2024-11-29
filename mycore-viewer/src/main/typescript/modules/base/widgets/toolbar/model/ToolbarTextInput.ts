@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,31 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ToolbarComponent} from "./ToolbarComponent";
-import {ViewerProperty} from "../../../Utils";
+import { ToolbarComponent } from "./ToolbarComponent";
+import { ViewerProperty } from "../../../Utils";
 
 export class ToolbarTextInput extends ToolbarComponent {
-    constructor(id: string, value: string, placeHolder: string) {
-        super(id);
-        this.addProperty(new ViewerProperty<string>(this, "value", value));
-        this.addProperty(new ViewerProperty<string>(this, "placeHolder", placeHolder))
-    }
+  constructor(id: string, value: string, placeHolder: string) {
+    super(id);
+    this.addProperty(new ViewerProperty<string>(this, "value", value));
+    this.addProperty(new ViewerProperty<string>(this, "placeHolder", placeHolder))
+  }
 
-    public get value(): string {
-        return this.getProperty("value").value;
-    }
+  public get value(): string {
+    return this.getProperty("value").value;
+  }
 
-    public set value(value: string) {
-        this.getProperty("value").value = value;
-    }
+  public set value(value: string) {
+    this.getProperty("value").value = value;
+  }
 
-    public get placeHolder(): string {
-        return this.getProperty("placeHolder").value;
-    }
+  public get placeHolder(): string {
+    return this.getProperty("placeHolder").value;
+  }
 
-    public set placeHolder(prefillText: string) {
-        this.getProperty("placeHolder").value = prefillText;
-    }
+  public set placeHolder(prefillText: string) {
+    this.getProperty("placeHolder").value = prefillText;
+  }
 
 }
 

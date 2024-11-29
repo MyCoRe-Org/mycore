@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,7 +141,6 @@ public final class MCRISO8601FormatChooser {
                 return COMPLETE_HH_MM_SS_SSS_FORMAT;
         }
     }
-
 
     /**
      * returns a String that has not more than 3 digits representing "fractions of a second". If isoString has no or not

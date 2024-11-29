@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
@@ -105,11 +105,11 @@ public class MCREpubZipResource {
                 e);
         } finally { // releases the session reliable
             try {
-                if (session != null && MCRTransactionHelper.isTransactionActive()) {
-                    if (MCRTransactionHelper.transactionRequiresRollback()) {
-                        MCRTransactionHelper.rollbackTransaction();
+                if (session != null && MCRTransactionManager.hasActiveTransactions()) {
+                    if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+                        MCRTransactionManager.rollbackTransactions();
                     } else {
-                        MCRTransactionHelper.commitTransaction();
+                        MCRTransactionManager.commitTransactions();
                     }
                 }
             } finally {

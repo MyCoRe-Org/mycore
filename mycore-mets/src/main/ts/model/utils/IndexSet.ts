@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,46 +18,46 @@
 
 namespace org.mycore.mets.model {
 
-    export class IndexSet<T> {
-        private privateSetObject: { [index: string]: T; };
+  export class IndexSet<T> {
+    private privateSetObject: { [index: string]: T; };
 
-        constructor(private indexingFunction: IndexingFunction<T>) {
-            this.privateSetObject = {};
-        }
-
-        public add(element: T) {
-            this.privateSetObject[ this.indexingFunction(element) ] = element;
-        }
-
-        public remove(element: T) {
-            delete this.privateSetObject[ this.indexingFunction(element) ];
-        }
-
-        public getCount(): number {
-            let count = 0;
-            for (const i in this.privateSetObject) {
-                if (this.privateSetObject.hasOwnProperty(i)) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        public has(key: T) {
-            return this.indexingFunction(key) in this.privateSetObject;
-        }
-
-        public getAllSelected() {
-            const arr = [];
-            for (const i in this.privateSetObject) {
-                if (this.privateSetObject.hasOwnProperty(i)) {
-                    arr.push(this.privateSetObject[ i ]);
-                }
-            }
-            return arr;
-        }
+    constructor(private indexingFunction: IndexingFunction<T>) {
+      this.privateSetObject = {};
     }
 
-    export type IndexingFunction<T> = (key: T) => string;
+    public add(element: T) {
+      this.privateSetObject[this.indexingFunction(element)] = element;
+    }
+
+    public remove(element: T) {
+      delete this.privateSetObject[this.indexingFunction(element)];
+    }
+
+    public getCount(): number {
+      let count = 0;
+      for (const i in this.privateSetObject) {
+        if (this.privateSetObject.hasOwnProperty(i)) {
+          count++;
+        }
+      }
+      return count;
+    }
+
+    public has(key: T) {
+      return this.indexingFunction(key) in this.privateSetObject;
+    }
+
+    public getAllSelected() {
+      const arr = [];
+      for (const i in this.privateSetObject) {
+        if (this.privateSetObject.hasOwnProperty(i)) {
+          arr.push(this.privateSetObject[i]);
+        }
+      }
+      return arr;
+    }
+  }
+
+  export type IndexingFunction<T> = (key: T) => string;
 
 }

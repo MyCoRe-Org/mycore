@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ public class MCRViewerConfiguration {
      * Adds a new javascript file which should be included by the image viewer.
      */
     public void addScript(final String url, boolean isModule) {
-        this.resources.put(isModule ? ResourceType.module: ResourceType.script, url);
+        this.resources.put(isModule ? ResourceType.module : ResourceType.script, url);
     }
 
     /**
@@ -240,7 +240,7 @@ public class MCRViewerConfiguration {
      * @param debugMode   if the debug mode is active or not
      */
     public void addLocalScript(final String file, final boolean hasMinified, final boolean isModule,
-                               final boolean debugMode) {
+        final boolean debugMode) {
         String baseURL = MCRFrontendUtil.getBaseURL();
         StringBuilder scriptURL = new StringBuilder(baseURL);
         scriptURL.append("modules/iview2/js/");
@@ -372,7 +372,7 @@ public class MCRViewerConfiguration {
         public boolean equals(Object obj) {
             if (obj instanceof MCRIViewClientResource rhs) {
                 return this == obj
-                        || new EqualsBuilder().append(type, rhs.type).append(url, rhs.url).isEquals();
+                    || new EqualsBuilder().append(type, rhs.type).append(url, rhs.url).isEquals();
             } else {
                 return false;
             }

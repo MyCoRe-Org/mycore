@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,10 +82,10 @@ public class MCRXMLCleanerTest extends MCRTestCase {
 
     @Test
     public void testOverwriteDefaultRules() throws JDOMException, JaxenException {
-        String xPath2i
-            = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
-        String xPath2o
-            = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:relatedItem/@xlink:href='test']]";
+        String xPath2i =
+            "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
+        String xPath2o =
+            "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:relatedItem/@xlink:href='test']]";
 
         MCRCleaningRule removeElementsWithoutChildrenOrText = new MCRCleaningRule("//*",
             "* or (string-length(text()) > 0)");

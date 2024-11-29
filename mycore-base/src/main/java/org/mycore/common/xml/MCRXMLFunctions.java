@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -796,8 +796,7 @@ public class MCRXMLFunctions {
             LOGGER.debug("get next import step for {}", includePartSubString);
         }
         // get the parameters from mycore.properties
-        List<String> importList = MCRConfiguration2.getString
-                        ("MCR.URIResolver.xslImports." + includePartSubString)
+        List<String> importList = MCRConfiguration2.getString("MCR.URIResolver.xslImports." + includePartSubString)
             .map(MCRConfiguration2::splitValue)
             .map(s -> s.collect(Collectors.toList()))
             .orElseGet(Collections::emptyList);
@@ -887,7 +886,7 @@ public class MCRXMLFunctions {
      * @return approximately the usable space in the MCR.datadir
      * @throws IOException
      * */
-    public static long getUsableSpace() throws IOException{
+    public static long getUsableSpace() throws IOException {
         Path dataDir = Paths.get(MCRConfiguration2.getStringOrThrow("MCR.datadir"));
         dataDir = dataDir.toRealPath();
         FileStore fs = Files.getFileStore(dataDir);

@@ -219,9 +219,11 @@
         <field name="mods.relatedItem">
           <xsl:value-of select="$relatedID" />
         </field>
-        <field name="mods.relatedItem.{$type}">
-          <xsl:value-of select="$relatedID" />
-        </field>
+        <xsl:if test="string-length($type) &gt; 0">
+          <field name="mods.relatedItem.{$type}">
+            <xsl:value-of select="$relatedID"/>
+          </field>
+        </xsl:if>
       </xsl:if>
       <!-- END MCR-888 -->
     </xsl:for-each>
@@ -287,7 +289,7 @@
   <xsl:template name="printModsName">
     <xsl:choose>
       <xsl:when test="mods:displayForm">
-        <xsl:value-of select="fn:normalize-unicode(mods:displayForm)" />
+        <xsl:value-of select="fn:string-join(fn:normalize-unicode(mods:displayForm), ' ')" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">

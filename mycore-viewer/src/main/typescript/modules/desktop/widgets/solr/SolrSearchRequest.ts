@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,96 +17,96 @@
  */
 
 
-import {ViewerFormatString} from "../../../base/Utils";
+import { ViewerFormatString } from "../../../base/Utils";
 
 export class SolrSearchRequest {
 
-    constructor(private solrHandlerURL: string,
-                private derivateID: string,
-                public query: string,
-                public requestCallback: (success: boolean) => void) {
-    }
+  constructor(private solrHandlerURL: string,
+    private derivateID: string,
+    public query: string,
+    public requestCallback: (success: boolean) => void) {
+  }
 
-    public static BASE_TEMPLATE = "{solrHandlerURL}/{derivateID}?q={query}";
+  public static BASE_TEMPLATE = "{solrHandlerURL}/{derivateID}?q={query}";
 
-    private request: JQueryXHR = null;
+  private request: JQueryXHR = null;
 
-    private _solrRequestResult: Array<HighlightPage> = null;
-    private _isComplete: boolean = false;
+  private _solrRequestResult: Array<HighlightPage> = null;
+  private _isComplete: boolean = false;
 
-    public get solrRequestResult() {
-        return this._solrRequestResult;
-    }
+  public get solrRequestResult() {
+    return this._solrRequestResult;
+  }
 
-    public get isComplete() {
-        return this._isComplete;
-    }
+  public get isComplete() {
+    return this._isComplete;
+  }
 
-    public startRequest() {
-        let requestURL = this.buildRequestURL();
-        let ajaxSettings = {
-            url: requestURL,
-            async: true,
-            success: (response) => {
-                if (!this.isComplete) {
-                    this.processResponse(response);
-                    this.requestCallback(true);
-                }
-            },
-            error: (request, status, exception) => {
-                console.log(exception);
-                this.requestCallback(false);
-            }
-        };
-        this.request = jQuery.ajax(<JQueryAjaxSettings>ajaxSettings);
-    }
-
-    public abortRequest() {
-        if (this.isComplete) {
-            console.debug("request is already complete!");
-            return;
+  public startRequest() {
+    let requestURL = this.buildRequestURL();
+    let ajaxSettings = {
+      url: requestURL,
+      async: true,
+      success: (response) => {
+        if (!this.isComplete) {
+          this.processResponse(response);
+          this.requestCallback(true);
         }
+      },
+      error: (request, status, exception) => {
+        console.log(exception);
+        this.requestCallback(false);
+      }
+    };
+    this.request = jQuery.ajax(<JQueryAjaxSettings>ajaxSettings);
+  }
 
-        if (this.request == null || typeof this.request == "undefined") {
-            console.debug("request object is null!");
-            return;
-        }
-
-        this.requestCallback = () => {
-        };
-        this.request.abort("request abort");
+  public abortRequest() {
+    if (this.isComplete) {
+      console.debug("request is already complete!");
+      return;
     }
 
-    private processResponse(response: Array<HighlightPage>) {
-        this._isComplete = true;
-        this._solrRequestResult = response;
+    if (this.request == null || typeof this.request == "undefined") {
+      console.debug("request object is null!");
+      return;
     }
 
-    private buildRequestURL() {
-        return ViewerFormatString(SolrSearchRequest.BASE_TEMPLATE, {
-            solrHandlerURL: this.solrHandlerURL,
-            query: this.query,
-            derivateID: this.derivateID
-        });
-    }
+    this.requestCallback = () => {
+    };
+    this.request.abort("request abort");
+  }
+
+  private processResponse(response: Array<HighlightPage>) {
+    this._isComplete = true;
+    this._solrRequestResult = response;
+  }
+
+  private buildRequestURL() {
+    return ViewerFormatString(SolrSearchRequest.BASE_TEMPLATE, {
+      solrHandlerURL: this.solrHandlerURL,
+      query: this.query,
+      derivateID: this.derivateID
+    });
+  }
 }
 
 export interface HighlightPage {
-    id: string;
-    hits: Array<HighlightHit>;
+  id: string;
+  hits: Array<HighlightHit>;
 }
 
 export interface HighlightHit {
-    hl: string;
-    positions: Array<HighlightPosition>;
+  hl: string;
+  positions: Array<HighlightPosition>;
 }
 
 export interface HighlightPosition {
-    content: string;
-    xpos: number;
-    vpos: number;
-    width: number;
-    height: number;
+  content: string;
+  xpos: number;
+  vpos: number;
+  width: number;
+  height: number;
 }
 
 

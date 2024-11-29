@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,6 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -99,6 +98,9 @@ import jakarta.ws.rs.core.UriInfo;
  * 
  */
 public class MCRRestAPIObjectsHelper {
+    private enum Mode {
+        MCROBJECT, MCRDERIVATE
+    }
 
     private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
 
@@ -211,12 +213,11 @@ public class MCRRestAPIObjectsHelper {
         StringWriter sw = new StringWriter();
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
         root = MCRPath.toMCRPath(root.resolve(path));
-        if (depth == -1) {
-            depth = Integer.MAX_VALUE;
-        }
+        int finalDepth = (depth != -1) ? depth : Integer.MAX_VALUE;
+
         if (root != null) {
             JsonWriter writer = new JsonWriter(sw);
-            Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), depth,
+            Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), finalDepth,
                 new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId(), info, app));
             writer.close();
         }
@@ -230,22 +231,20 @@ public class MCRRestAPIObjectsHelper {
 
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
         root = MCRPath.toMCRPath(root.resolve(path));
-        if (depth == -1) {
-            depth = Integer.MAX_VALUE;
-        }
+        int finalDepth = (depth != -1) ? depth : Integer.MAX_VALUE;
+
         if (root != null) {
             Element eContents = new Element("contents");
             eContents.setAttribute("mycoreobject", derObj.getOwnerID().toString());
             eContents.setAttribute("mycorederivate", derObj.getId().toString());
             doc.addContent(eContents);
-            if (!path.endsWith("/")) {
-                path += "/";
-            }
-            MCRPath p = MCRPath.getPath(derObj.getId().toString(), path);
+            String finalPath = (path.endsWith("/")) ? path : path + "/";
+
+            MCRPath p = MCRPath.getPath(derObj.getId().toString(), finalPath);
             if (p != null && Files.exists(p)) {
                 Element eRoot = MCRPathXML.getDirectoryXML(p).getRootElement();
                 eContents.addContent(eRoot.detach());
-                createXMLForSubdirectories(p, eRoot, 1, depth);
+                createXMLForSubdirectories(p, eRoot, 1, finalDepth);
             }
 
             //add href Attributes
@@ -304,195 +303,113 @@ public class MCRRestAPIObjectsHelper {
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
      * 
      */
-    public static Response listObjects(UriInfo info, String format, String filter,
-        String sort) throws MCRRestAPIException {
+    public static Response listObjects(UriInfo info, String format, String filter, String sort)
+        throws MCRRestAPIException {
         List<MCRRestAPIError> errors = new ArrayList<>();
-        //analyze sort
-        MCRRestAPISortObject sortObj = null;
-        try {
-            sortObj = createSortObject(sort);
-        } catch (MCRRestAPIException rae) {
-            errors.addAll(rae.getErrors());
-        }
 
-        //analyze format
+        MCRRestAPISortObject sortObj = createSortObjectOrHandleError(sort, errors);
+        validateFormat(format, errors);
 
-        if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-            errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The parameter 'format' is wrong.",
-                "Allowed values for format are 'json' or 'xml'."));
-        }
+        FilterParams filterParams = parseFilterParams(filter, errors);
 
-        //analyze filter
-        List<String> projectIDs = new ArrayList<>();
-        List<String> typeIDs = new ArrayList<>();
-        String lastModifiedBefore = null;
-        String lastModifiedAfter = null;
-        if (filter != null) {
-            for (String s : filter.split(";")) {
-                if (s.startsWith("project:")) {
-                    projectIDs.add(s.substring(8));
-                    continue;
-                }
-                if (s.startsWith("type:")) {
-                    typeIDs.add(s.substring(5));
-                    continue;
-                }
-                if (s.startsWith("lastModifiedBefore:")) {
-                    if (!validateDateInput(s.substring(19))) {
-                        errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
-                            "The parameter 'filter' is wrong.",
-                            "The value of lastModifiedBefore could not be parsed. "
-                                + "Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
-                        continue;
-                    }
-                    if (lastModifiedBefore == null) {
-                        lastModifiedBefore = s.substring(19);
-                    } else if (s.substring(19).compareTo(lastModifiedBefore) < 0) {
-                        lastModifiedBefore = s.substring(19);
-                    }
-                    continue;
-                }
-
-                if (s.startsWith("lastModifiedAfter:")) {
-                    if (!validateDateInput(s.substring(18))) {
-                        errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
-                            "The parameter 'filter' is wrong.",
-                            "The value of lastModifiedAfter could not be parsed. "
-                                + "Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
-                        continue;
-                    }
-                    if (lastModifiedAfter == null) {
-                        lastModifiedAfter = s.substring(18);
-                    } else if (s.substring(18).compareTo(lastModifiedAfter) > 0) {
-                        lastModifiedAfter = s.substring(18);
-                    }
-                    continue;
-                }
-
-                errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The parameter 'filter' is wrong.",
-                    "The syntax of the filter '" + s
-                        + "'could not be parsed. The syntax should be [filterName]:[value]. "
-                        + "Allowed filterNames are 'project', 'type', 'lastModifiedBefore' and 'lastModifiedAfter'."));
-            }
-        }
-
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             throw new MCRRestAPIException(Status.BAD_REQUEST, errors);
         }
-        //Parameters are validated - continue to retrieve data
 
-        //retrieve MCRIDs by Type and Project ID
-        Set<String> mcrIDs = new HashSet<>();
-        if (projectIDs.isEmpty()) {
-            if (typeIDs.isEmpty()) {
-                mcrIDs = MCRXMLMetadataManager.instance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
-                    .collect(Collectors.toSet());
-            } else {
-                for (String t : typeIDs) {
-                    mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsOfType(t));
-                }
-            }
-        } else {
+        // Retrieve MCR IDs based on filter
+        Set<String> mcrIDs = retrieveMCRIDs(filterParams);
 
-            if (typeIDs.isEmpty()) {
-                for (String id : MCRXMLMetadataManager.instance().listIDs()) {
-                    String[] split = id.split("_");
-                    if (!split[1].equals("derivate") && projectIDs.contains(split[0])) {
-                        mcrIDs.add(id);
-                    }
-                }
-            } else {
-                for (String p : projectIDs) {
-                    for (String t : typeIDs) {
-                        mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsForBase(p + "_" + t));
-                    }
-                }
-            }
-        }
+        // Filter by modification dates
+        List<MCRObjectIDDate> objIdDates = filterByModificationDates(mcrIDs, filterParams);
 
-        //Filter by modifiedBefore and modifiedAfter
-        List<String> l = new ArrayList<>(mcrIDs);
-        List<MCRObjectIDDate> objIdDates = new ArrayList<>();
-        try {
-            objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(l);
-        } catch (IOException e) {
-            //TODO
-        }
-        if (lastModifiedAfter != null || lastModifiedBefore != null) {
-            List<MCRObjectIDDate> testObjIdDates = objIdDates;
-            objIdDates = new ArrayList<>();
-            for (MCRObjectIDDate oid : testObjIdDates) {
-                String test = SDF_UTC.format(oid.getLastModified());
-                if (lastModifiedAfter != null && test.compareTo(lastModifiedAfter) < 0) {
-                    continue;
-                }
-                if (lastModifiedBefore != null
-                    && lastModifiedBefore.compareTo(test.substring(0, lastModifiedBefore.length())) < 0) {
-                    continue;
-                }
-                objIdDates.add(oid);
-            }
-        }
-
-        //sort if necessary
         if (sortObj != null) {
             objIdDates.sort(new MCRRestAPISortObjectComparator(sortObj));
         }
+        return createListResponse(format, Mode.MCROBJECT, objIdDates, info);
+    }
 
-        //output as XML
-        if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
-            Element eMcrobjects = new Element("mycoreobjects");
-            Document docOut = new Document(eMcrobjects);
-            eMcrobjects.setAttribute("numFound", Integer.toString(objIdDates.size()));
-            for (MCRObjectIDDate oid : objIdDates) {
-                Element eMcrObject = new Element("mycoreobject");
-                eMcrObject.setAttribute("ID", oid.getId());
-                eMcrObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
-                eMcrObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
-
-                eMcrobjects.addContent(eMcrObject);
-            }
-            try {
-                StringWriter sw = new StringWriter();
-                XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                xout.output(docOut, sw);
-                return Response.ok(sw.toString())
-                    .type("application/xml; charset=UTF-8")
-                    .build();
-            } catch (IOException e) {
-                throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+    private static FilterParams parseFilterParams(String filter, List<MCRRestAPIError> errors) {
+        FilterParams params = new FilterParams();
+        if (filter != null) {
+            for (String s : filter.split(";")) {
+                if (s.startsWith("project:")) {
+                    params.projectIDs.add(s.substring(8));
+                } else if (s.startsWith("type:")) {
+                    params.typeIDs.add(s.substring(5));
+                } else if (s.startsWith("lastModifiedBefore:")) {
+                    params.lastModifiedBefore = validateDate(errors, s.substring(19), "lastModifiedBefore");
+                } else if (s.startsWith("lastModifiedAfter:")) {
+                    params.lastModifiedAfter = validateDate(errors, s.substring(18), "lastModifiedAfter");
+                } else {
+                    errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
+                        "The parameter 'filter' is wrong.", "Invalid filter syntax: " + s));
+                }
             }
         }
+        return params;
+    }
 
-        //output as JSON
-        if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-            StringWriter sw = new StringWriter();
-            try {
-                JsonWriter writer = new JsonWriter(sw);
-                writer.setIndent("    ");
-                writer.beginObject();
-                writer.name("numFound").value(objIdDates.size());
-                writer.name("mycoreobjects");
-                writer.beginArray();
-                for (MCRObjectIDDate oid : objIdDates) {
-                    writer.beginObject();
-                    writer.name("ID").value(oid.getId());
-                    writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
-                    writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
-                    writer.endObject();
+    private static String validateDate(List<MCRRestAPIError> errors, String date, String field) {
+        if (!validateDateInput(date)) {
+            errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
+                "The parameter 'filter' is wrong.",
+                "Invalid date format for " + field + ". Use UTC format: yyyy-MM-dd'T'HH:mm:ss'Z'."));
+            return null;
+        }
+        return date;
+    }
+
+    private static Set<String> retrieveMCRIDs(FilterParams params) {
+        Set<String> mcrIDs = new HashSet<>();
+        if (params.projectIDs.isEmpty()) {
+            if (params.typeIDs.isEmpty()) {
+                mcrIDs = MCRXMLMetadataManager.instance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
+                    .collect(Collectors.toSet());
+            } else {
+                for (String type : params.typeIDs) {
+                    mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsOfType(type));
                 }
-                writer.endArray();
-                writer.endObject();
-
-                writer.close();
-                return Response.ok(sw.toString())
-                    .type("application/json; charset=UTF-8")
-                    .build();
-            } catch (IOException e) {
-                throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
             }
+        } else {
+            for (String project : params.projectIDs) {
+                for (String type : params.typeIDs) {
+                    mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsForBase(project + "_" + type));
+                }
+            }
+        }
+        return mcrIDs;
+    }
+
+    private static List<MCRObjectIDDate> filterByModificationDates(Set<String> mcrIDs, FilterParams params)
+        throws MCRRestAPIException {
+        List<MCRObjectIDDate> objIdDates;
+        try {
+            objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(new ArrayList<>(mcrIDs));
+        } catch (IOException e) {
+            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+        }
+
+        if (params.lastModifiedBefore != null || params.lastModifiedAfter != null) {
+            return objIdDates.stream().filter(oid -> {
+                String lastModified = SDF_UTC.format(oid.getLastModified());
+                if (params.lastModifiedAfter != null && lastModified.compareTo(params.lastModifiedAfter) < 0) {
+                    return false;
+                }
+                return params.lastModifiedBefore == null || lastModified.compareTo(params.lastModifiedBefore) <= 0;
+            }).collect(Collectors.toList());
+        }
+
+        return objIdDates;
+    }
+
+    private static Response createListResponse(String format, Mode mode, List<MCRObjectIDDate> objIdDates, UriInfo info)
+        throws MCRRestAPIException {
+        if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
+            return createXmlListResponse(mode, info, objIdDates);
+        } else if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
+            return createJsonListResponse(mode, info, objIdDates);
+
         }
         throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
             new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "A problem in programm flow", null));
@@ -509,133 +426,168 @@ public class MCRRestAPIObjectsHelper {
      * @return a Jersey response object
      * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
-    public static Response listDerivates(UriInfo info, String paramMcrObjID, String format,
-        String sort) throws MCRRestAPIException {
+    public static Response listDerivates(UriInfo info, String paramMcrObjID, String format, String sort)
+        throws MCRRestAPIException {
         List<MCRRestAPIError> errors = new ArrayList<>();
 
-        MCRRestAPISortObject sortObj = null;
-        try {
-            sortObj = createSortObject(sort);
-        } catch (MCRRestAPIException rae) {
-            errors.addAll(rae.getErrors());
-        }
+        MCRRestAPISortObject sortObj = createSortObjectOrHandleError(sort, errors);
+        validateFormat(format, errors);
 
-        //analyze format
-
-        if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-            errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The Parameter format is wrong.",
-                "Allowed values for format are 'json' or 'xml'."));
-        }
-
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             throw new MCRRestAPIException(Status.BAD_REQUEST, errors);
         }
 
-        //Parameters are checked - continue to retrieve data
         MCRObjectID mcrObjId = retrieveMCRObjectID(paramMcrObjID);
-        List<MCRObjectIDDate> objIdDates = MCRMetadataManager.retrieveMCRObject(mcrObjId)
+        List<MCRObjectIDDate> objIdDates = getDerivateObjectIDDates(mcrObjId, sortObj);
+
+        return createListResponse(format, Mode.MCRDERIVATE, objIdDates, info);
+    }
+
+    protected static MCRRestAPISortObject createSortObjectOrHandleError(String sort, List<MCRRestAPIError> errors) {
+        try {
+            return createSortObject(sort);
+        } catch (MCRRestAPIException e) {
+            errors.addAll(e.getErrors());
+            return null;
+        }
+    }
+
+    private static void validateFormat(String format, List<MCRRestAPIError> errors) {
+        if (!MCRRestAPIObjects.FORMAT_JSON.equals(format) && !MCRRestAPIObjects.FORMAT_XML.equals(format)) {
+            errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The Parameter format is wrong.",
+                "Allowed values for format are 'json' or 'xml'."));
+        }
+    }
+
+    protected static List<MCRObjectIDDate> getDerivateObjectIDDates(MCRObjectID mcrObjId,
+        MCRRestAPISortObject sortObj) {
+        return MCRMetadataManager.retrieveMCRObject(mcrObjId)
             .getStructure().getDerivates().stream()
-            .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> new MCRObjectIDDate() {
-                long lastModified;
-                {
-                    try {
-                        lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-                    } catch (IOException e) {
-                        lastModified = 0;
-                        LOGGER.error(
-                            "Exception while getting last modified of {}",
-                            id, e);
-                    }
-                }
+            .map(MCRMetaLinkID::getXLinkHrefID)
+            .filter(MCRMetadataManager::exists)
+            .map(id -> createMCRObjectIDDate(id))
+            .sorted(new MCRRestAPISortObjectComparator(sortObj))
+            .collect(Collectors.toList());
+    }
 
-                @Override
-                public String getId() {
-                    return id.toString();
-                }
+    protected static MCRObjectIDDate createMCRObjectIDDate(MCRObjectID id) {
+        return new MCRObjectIDDate() {
+            long lastModified;
 
-                @Override
-                public Date getLastModified() {
-                    return new Date(lastModified);
+            {
+                try {
+                    lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+                } catch (IOException e) {
+                    lastModified = 0;
+                    LOGGER.error("Exception while getting last modified of {}", id, e);
                 }
-            }).sorted(new MCRRestAPISortObjectComparator(sortObj)).collect(Collectors.toList());
+            }
 
-        //output as XML
-        if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
-            Element eDerObjects = new Element("derobjects");
-            Document docOut = new Document(eDerObjects);
-            eDerObjects.setAttribute("numFound", Integer.toString(objIdDates.size()));
+            @Override
+            public String getId() {
+                return id.toString();
+            }
+
+            @Override
+            public Date getLastModified() {
+                return new Date(lastModified);
+            }
+        };
+    }
+
+    protected static Response createXmlListResponse(Mode mode, UriInfo info, List<MCRObjectIDDate> objIdDates)
+        throws MCRRestAPIException {
+        Element elem = switch (mode) {
+            case MCROBJECT -> new Element("mycoreobjects");
+            case MCRDERIVATE -> new Element("derobjects");
+        };
+        elem.setAttribute("numFound", Integer.toString(objIdDates.size()));
+
+        for (MCRObjectIDDate oid : objIdDates) {
+            elem.addContent(createXmlListElement(mode, info, oid));
+        }
+
+        return buildXmlResponse(new Document(elem));
+    }
+
+    private static Element createXmlListElement(Mode mode, UriInfo info, MCRObjectIDDate oid) {
+        Element elem = switch (mode) {
+            case MCROBJECT -> new Element("mycoreobject");
+            case MCRDERIVATE -> new Element("derobject");
+        };
+
+        elem.setAttribute("ID", oid.getId());
+        elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
+        elem.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
+
+        if (mode == Mode.MCRDERIVATE) {
+            MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
+            elem.setAttribute("metadata", der.getDerivate().getMetaLink().getXLinkHref());
+
+            if (!der.getDerivate().getClassifications().isEmpty()) {
+                String classifications = der.getDerivate().getClassifications().stream()
+                    .map(cl -> cl.getClassId() + ":" + cl.getCategId())
+                    .collect(Collectors.joining(" "));
+                elem.setAttribute("classifications", classifications);
+            }
+        }
+        return elem;
+    }
+
+    private static Response buildXmlResponse(Document docOut) throws MCRRestAPIException {
+        try (StringWriter sw = new StringWriter()) {
+            new XMLOutputter(Format.getPrettyFormat()).output(docOut, sw);
+            return Response.ok(sw.toString())
+                .type("application/xml; charset=UTF-8")
+                .build();
+        } catch (IOException e) {
+            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+        }
+    }
+
+    public static Response createJsonListResponse(Mode mode, UriInfo info, List<MCRObjectIDDate> objIdDates)
+        throws MCRRestAPIException {
+        try (StringWriter sw = new StringWriter(); JsonWriter writer = new JsonWriter(sw)) {
+            writer.setIndent("    ");
+            writer.beginObject();
+            writer.name("numFound").value(objIdDates.size());
+            switch (mode) {
+                case MCROBJECT -> writer.name("mycoreobjects");
+                case MCRDERIVATE -> writer.name("derobjects");
+            }
+            writer.beginArray();
             for (MCRObjectIDDate oid : objIdDates) {
-                Element eDerObject = new Element("derobject");
-                eDerObject.setAttribute("ID", oid.getId());
-                MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
-                String mcrID = der.getDerivate().getMetaLink().getXLinkHref();
-                eDerObject.setAttribute("metadata", mcrID);
-                if (der.getDerivate().getClassifications().size() > 0) {
-                    StringBuilder c = new StringBuilder();
-                    for (int i = 0; i < der.getDerivate().getClassifications().size(); i++) {
-                        if (i > 0) {
-                            c.append(' ');
-                        }
-                        MCRMetaClassification cl = der.getDerivate().getClassifications().get(i);
-                        c.append(cl.getClassId()).append(':').append(cl.getCategId());
-                    }
-                    eDerObject.setAttribute("classifications", c.toString());
-                }
-                eDerObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
-                eDerObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
-
-                eDerObjects.addContent(eDerObject);
-            }
-            try {
-                StringWriter sw = new StringWriter();
-                XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                xout.output(docOut, sw);
-                return Response.ok(sw.toString())
-                    .type("application/xml; charset=UTF-8")
-                    .build();
-            } catch (IOException e) {
-                throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
-            }
-        }
-
-        //output as JSON
-        if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-            StringWriter sw = new StringWriter();
-            try {
-                JsonWriter writer = new JsonWriter(sw);
-                writer.setIndent("    ");
                 writer.beginObject();
-                writer.name("numFound").value(objIdDates.size());
-                writer.name("mycoreobjects");
-                writer.beginArray();
-                for (MCRObjectIDDate oid : objIdDates) {
-                    writer.beginObject();
-                    writer.name("ID").value(oid.getId());
+                writer.name("ID").value(oid.getId());
+                writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
+                writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
+                if (mode == Mode.MCRDERIVATE) {
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
-                    String mcrID = der.getDerivate().getMetaLink().getXLinkHref();
-                    writer.name("metadata").value(mcrID);
-                    writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
-                    writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
-                    writer.endObject();
+                    writer.name("metadata").value(der.getDerivate().getMetaLink().getXLinkHref());
+                    if (!der.getDerivate().getClassifications().isEmpty()) {
+                        List<String> classifications = der.getDerivate().getClassifications().stream()
+                            .map(cl -> cl.getClassId() + ":" + cl.getCategId())
+                            .collect(Collectors.toList());
+                        writer.name("classifications").beginArray();
+                        for (String c : classifications) {
+                            writer.value(c);
+                        }
+                        writer.endArray();
+                    }
                 }
-                writer.endArray();
                 writer.endObject();
-
-                writer.close();
-
-                return Response.ok(sw.toString())
-                    .type("application/json; charset=UTF-8")
-                    .build();
-            } catch (IOException e) {
-                throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
             }
-        }
 
-        throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-            new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Unexepected program flow termination.",
-                "Please contact a developer!"));
+            writer.endArray();
+            writer.endObject();
+            return Response.ok(sw.toString())
+                .type("application/json; charset=UTF-8")
+                .build();
+        } catch (IOException e) {
+            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+        }
     }
 
     /**
@@ -682,15 +634,14 @@ public class MCRRestAPIObjectsHelper {
                                 e.getMessage()));
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
-                    if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-                        String result = listDerivateContentAsJson(derObj, path, depth, info, app);
-                        return response(result, "application/json", lastModified);
-                    }
+                    String result = listDerivateContentAsJson(derObj, path, depth, info, app);
+                    return response(result, "application/json", lastModified);
                 default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                         new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
                             "Unexepected program flow termination.",
                             "Please contact a developer!"));
+
             }
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
@@ -700,11 +651,11 @@ public class MCRRestAPIObjectsHelper {
 
     /**
      * returns the URL of the main document of a derivate
-     * 
+     *
      * @param info - the Jersey UriInfo object
      * @param paramMcrObjID - the MyCoRe object id
      * @param paramMcrDerID - the MyCoRe derivate id
-     * 
+     *
      * @return the Resolving URL for the main document of the derivate
      */
     public static String retrieveMaindocURL(UriInfo info, String paramMcrObjID, String paramMcrDerID, Application app) {
@@ -744,9 +695,8 @@ public class MCRRestAPIObjectsHelper {
         if (test.length() > base.length()) {
             return false;
         }
-        test = test + base.substring(test.length());
         try {
-            SDF_UTC.parse(test);
+            SDF_UTC.parse(test + base.substring(test.length()));
         } catch (ParseException e) {
             return false;
         }
@@ -812,7 +762,7 @@ public class MCRRestAPIObjectsHelper {
 
     /**
      * checks if the given path is a directory and contains children
-     * 
+     *
      * @param p - the path to check
      * @return true, if there are children
      */
@@ -828,5 +778,13 @@ public class MCRRestAPIObjectsHelper {
             LOGGER.error(e);
         }
         return false;
+    }
+
+    // Helper class for filter parameters
+    static class FilterParams {
+        List<String> projectIDs = new ArrayList<>();
+        List<String> typeIDs = new ArrayList<>();
+        String lastModifiedBefore = null;
+        String lastModifiedAfter = null;
     }
 }

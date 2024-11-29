@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ public class MCRXMLParserImpl implements MCRXMLParser {
 
     private static final String FEATURE_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
 
-    private static final String FEATURE_FULL_SCHEMA_SUPPORT
-        = "http://apache.org/xml/features/validation/schema-full-checking";
+    private static final String FEATURE_FULL_SCHEMA_SUPPORT =
+        "http://apache.org/xml/features/validation/schema-full-checking";
 
     private boolean validate;
 

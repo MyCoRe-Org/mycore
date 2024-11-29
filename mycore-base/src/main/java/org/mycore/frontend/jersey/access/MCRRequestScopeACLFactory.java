@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,9 +52,9 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
                 isPrivate = !MCRAccessManager.checkPermission(GUEST, () -> MCRAccessManager.checkPermission(privilege));
             }
             if (isPrivate()) {
-                result=  MCRAccessManager.checkPermission(privilege);
-            }else {
-            result= true;
+                result = MCRAccessManager.checkPermission(privilege);
+            } else {
+                result = true;
             }
             return result;
         }
@@ -64,12 +64,12 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
             boolean result;
             if (!isPrivate()) {
                 isPrivate = !MCRAccessManager.checkPermission(GUEST,
-                        () -> MCRAccessManager.checkPermission(id, permission));
+                    () -> MCRAccessManager.checkPermission(id, permission));
             }
             if (isPrivate()) {
                 LogManager.getLogger().debug("response is private");
-                result= MCRAccessManager.checkPermission(id, permission);
-            }else {
+                result = MCRAccessManager.checkPermission(id, permission);
+            } else {
                 result = true;
             }
             return result;

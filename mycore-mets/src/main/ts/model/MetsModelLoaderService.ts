@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,25 @@
 
 namespace org.mycore.mets.model {
 
-    import MetsModel = org.mycore.mets.model.simple.MCRMetsSimpleModel;
+  import MetsModel = org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
-    /**
-     * This is the service which loads the mets file and parses it into simple model.
-     */
-    export class MetsModelLoader {
-        constructor(private httpService: any) {
-        }
-
-        public load(url: string, callBack: (model: MetsModel) => void) {
-            const promise = this.httpService.get(url);
-
-            promise.then((data) => {
-                callBack(MetsModel.fromJson(data.data));
-            }, () => {
-                // TODO: ERROR HANDLING
-            });
-
-
-        }
+  /**
+   * This is the service which loads the mets file and parses it into simple model.
+   */
+  export class MetsModelLoader {
+    constructor(private httpService: any) {
     }
+
+    public load(url: string, callBack: (model: MetsModel) => void) {
+      const promise = this.httpService.get(url);
+
+      promise.then((data) => {
+        callBack(MetsModel.fromJson(data.data));
+      }, () => {
+        // TODO: ERROR HANDLING
+      });
+
+
+    }
+  }
 }

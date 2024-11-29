@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.frontend.servlets.MCRServlet;
 
 import jakarta.servlet.Filter;
@@ -83,7 +83,7 @@ public class MCRPersistenceServletFilter implements Filter {
         //get session for DB access
         MCRSession session = MCRServlet.getSession(req);
         MCRSessionMgr.setCurrentSession(session);
-        MCRTransactionHelper.beginTransaction();
+        MCRTransactionManager.beginTransactions();
         try {
             String url;
             String mcrId = MCRServlet.getProperty(req, "id");
@@ -96,7 +96,7 @@ public class MCRPersistenceServletFilter implements Filter {
             LOGGER.info("Matched URL: {}", url);
             return url;
         } finally {
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
             MCRSessionMgr.releaseCurrentSession();
         }
     }

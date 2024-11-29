@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,10 +112,10 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
         }
 
         long allJobCount = getAllJobs(dao, job1.getAction()).stream().count();
-        long finishedJobCount
-            = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count();
-        long errorJobCount
-            = getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
+        long finishedJobCount =
+            getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.FINISHED).count();
+        long errorJobCount =
+            getAllJobs(dao, job1.getAction()).stream().filter(j -> j.getStatus() == MCRJobStatus.ERROR).count();
 
         getAllJobs(dao, job1.getAction())
             .forEach(j -> LOGGER.info("Job in queue: {}", j));

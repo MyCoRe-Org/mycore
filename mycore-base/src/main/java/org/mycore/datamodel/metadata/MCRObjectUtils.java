@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public abstract class MCRObjectUtils {
      */
     public static List<MCRObject> getAncestors(MCRObject mcrObject) {
         List<MCRObject> ancestorList = new ArrayList<>();
-        MCRObject currentAncestor= mcrObject;
+        MCRObject currentAncestor = mcrObject;
         while (currentAncestor.hasParent()) {
             MCRObjectID parentID = currentAncestor.getStructure().getParentID();
             MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);

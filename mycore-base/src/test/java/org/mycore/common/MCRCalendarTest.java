@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,73 +145,60 @@ public class MCRCalendarTest extends MCRTestCase {
         assertCalEqualWithActual(cal, 2, GregorianCalendar.JANUARY, 4713, GregorianCalendar.BC);
         assertCalEqualWithJulianDay(cal, 1);
 
-
         // 01.01.0814 BC (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("-814", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 1, GregorianCalendar.JANUARY, 814, GregorianCalendar.BC);
         assertCalEqualWithJulianDay(cal, 1424110);
-
 
         // 01.01.0814 BC (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("-01.01.814", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 1, GregorianCalendar.JANUARY, 814, GregorianCalendar.BC);
         assertCalEqualWithJulianDay(cal, 1424110);
 
-
         // 15.03.0044 BC (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("BC 15.03.44", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 15, GregorianCalendar.MARCH, 44, GregorianCalendar.BC);
         assertCalEqualWithJulianDay(cal, 1705426);
-
 
         // 01.01.0001 BC (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("01.01.0001 BC", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 1, GregorianCalendar.JANUARY, 1, GregorianCalendar.BC);
         assertCalEqualWithJulianDay(cal, 1721058);
 
-
         // 31.12.0001 BC (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("31.12.0001 v. Chr", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 31, GregorianCalendar.DECEMBER, 1, GregorianCalendar.BC);
         assertCalEqualWithJulianDay(cal, 1721423);
-
 
         // 01.01.0000 -> 1.1.1 BC (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("01.01.0000", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 1, GregorianCalendar.JANUARY, 1, GregorianCalendar.BC);
         assertCalEqualWithJulianDay(cal, 1721058);
 
-
         // 01.01.0001 AD (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("01.01.01 AD", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 1, GregorianCalendar.JANUARY, 1, GregorianCalendar.AD);
         assertCalEqualWithJulianDay(cal, 1721424);
-
 
         // 04.10.1582 AD (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("04.10.1582 N. Chr", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 4, GregorianCalendar.OCTOBER, 1582, GregorianCalendar.AD);
         assertCalEqualWithJulianDay(cal, 2299160);
 
-
         // 05.10.1582 AD (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("05.10.1582", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 5, GregorianCalendar.OCTOBER, 1582, GregorianCalendar.AD);
         assertCalEqualWithJulianDay(cal, 2299161);
-
 
         // 06.10.1582 AD (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("06.10.1582", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 6, GregorianCalendar.OCTOBER, 1582, GregorianCalendar.AD);
         assertCalEqualWithJulianDay(cal, 2299162);
 
-
         // 15.10.1582 AD (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("15.10.1582", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 15, GregorianCalendar.OCTOBER, 1582, GregorianCalendar.AD);
         assertCalEqualWithJulianDay(cal, 2299171);
-
-
 
         // 16.10.1582 AD (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("16.10.1582", false, MCRCalendar.TAG_JULIAN);
@@ -227,7 +214,6 @@ public class MCRCalendarTest extends MCRTestCase {
         cal = MCRCalendar.getHistoryDateAsCalendar("29.02.1700", false, MCRCalendar.TAG_JULIAN);
         assertCalEqualWithActual(cal, 29, GregorianCalendar.FEBRUARY, 1700, GregorianCalendar.AD);
         assertCalEqualWithJulianDay(cal, 2342042);
-
 
         // 1 BC with last=true (jul)
         cal = MCRCalendar.getHistoryDateAsCalendar("1 BC", true, MCRCalendar.TAG_JULIAN);
@@ -470,7 +456,6 @@ public class MCRCalendarTest extends MCRTestCase {
         assertEquals(MCRCalendar.getJulianDayNumber(cal), 1523093);
         assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1523093");
 
-
         // year 0
         cal = MCRCalendar.getHistoryDateAsCalendar("0", false, MCRCalendar.TAG_BUDDHIST);
         greg = MCRCalendar.getHistoryDateAsCalendar("1.1.544 BC", false, MCRCalendar.TAG_GREGORIAN);
@@ -544,7 +529,6 @@ public class MCRCalendarTest extends MCRTestCase {
         assertGregEqualWithCal(greg, cal);
     }
 
-
     @Test
     public void testParsePersianDate() {
         Calendar cal;
@@ -605,7 +589,6 @@ public class MCRCalendarTest extends MCRTestCase {
         assertGregEqualWithCal(greg, cal);
     }
 
-
     @Test
     public void testParseArmenianDate() {
         assertHistoryDates("1.1.1", 13, GregorianCalendar.JULY, 552, "13.7.552", false);
@@ -632,7 +615,6 @@ public class MCRCalendarTest extends MCRTestCase {
 
         assertHistoryDates("-1", 12, GregorianCalendar.JULY, 552, "12.07.552", true);
     }
-
 
     @Test
     public void testParseEgyptianDate() {

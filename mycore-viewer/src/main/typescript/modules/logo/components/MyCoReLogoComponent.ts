@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  */
 
 
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
-import {ViewerComponent} from "../../base/components/ViewerComponent";
-import {ViewerEvent} from "../../base/widgets/events/ViewerEvent";
-import {ProvideToolbarModelEvent} from "../../base/components/events/ProvideToolbarModelEvent";
-import {ToolbarImage} from "../../base/widgets/toolbar/model/ToolbarImage";
-import {ToolbarGroup} from "../../base/widgets/toolbar/model/ToolbarGroup";
-import {WaitForEvent} from "../../base/components/events/WaitForEvent";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
+import { ViewerComponent } from "../../base/components/ViewerComponent";
+import { ViewerEvent } from "../../base/widgets/events/ViewerEvent";
+import { ProvideToolbarModelEvent } from "../../base/components/events/ProvideToolbarModelEvent";
+import { ToolbarImage } from "../../base/widgets/toolbar/model/ToolbarImage";
+import { ToolbarGroup } from "../../base/widgets/toolbar/model/ToolbarGroup";
+import { WaitForEvent } from "../../base/components/events/WaitForEvent";
 
 export interface LogoSettings extends MyCoReViewerSettings {
-    logoURL: string
+  logoURL: string
 }
 
 /**
@@ -36,37 +36,37 @@ export interface LogoSettings extends MyCoReViewerSettings {
  */
 export class MyCoReLogoComponent extends ViewerComponent {
 
-    constructor(private _settings: LogoSettings) {
-        super();
+  constructor(private _settings: LogoSettings) {
+    super();
+  }
+
+  public handle(e: ViewerEvent): void {
+    if (e.type == ProvideToolbarModelEvent.TYPE && !this._settings.mobile) {
+      if (this._settings.logoURL) {
+        const logoUrl = this._settings.logoURL;
+
+        const ptme = e as ProvideToolbarModelEvent;
+
+        const logoGroup = new ToolbarGroup('LogoGroup', 90, true);
+        const logo = new ToolbarImage('ToolbarImage', logoUrl);
+
+        logoGroup.addComponent(logo);
+
+        ptme.model.addGroup(logoGroup);
+      }
     }
+  }
 
-    public handle(e: ViewerEvent): void {
-        if (e.type == ProvideToolbarModelEvent.TYPE && !this._settings.mobile) {
-            if (this._settings.logoURL) {
-                const logoUrl = this._settings.logoURL;
-
-                const ptme = e as ProvideToolbarModelEvent;
-
-                const logoGroup = new ToolbarGroup('LogoGroup', 90, true);
-                const logo = new ToolbarImage('ToolbarImage', logoUrl);
-
-                logoGroup.addComponent(logo);
-
-                ptme.model.addGroup(logoGroup);
-            }
-        }
-    }
-
-    public get handlesEvents(): string[] {
-        const handleEvents: Array<string> = new Array<string>();
-        handleEvents.push(ProvideToolbarModelEvent.TYPE);
-        return handleEvents;
-    }
+  public get handlesEvents(): string[] {
+    const handleEvents: Array<string> = new Array<string>();
+    handleEvents.push(ProvideToolbarModelEvent.TYPE);
+    return handleEvents;
+  }
 
 
-    public init() {
-        this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
-    }
+  public init() {
+    this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
+  }
 
 }
 

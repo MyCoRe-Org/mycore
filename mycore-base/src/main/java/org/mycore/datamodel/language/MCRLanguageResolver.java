@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,16 @@
 
 package org.mycore.datamodel.language;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
-import org.mycore.tools.MCRLanguageOrientationHelper;
+import java.util.Map.Entry;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
-import java.util.Map.Entry;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
+import org.mycore.tools.MCRLanguageOrientationHelper;
 
 /**
  * Resolves languages by code. Syntax: language:{ISOCode}

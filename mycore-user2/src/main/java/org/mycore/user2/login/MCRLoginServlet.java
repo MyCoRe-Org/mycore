@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,25 +71,86 @@ public class MCRLoginServlet extends MCRServlet {
     protected static final String REALM_URL_PARAMETER = "realm";
 
     static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
-
-    static final String ALLOWED_ROLES_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginAllowedRoles";
-
-    private static final long serialVersionUID = 1L;
-
-    private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
-
-    private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
-
     protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration2
         .getOrThrow(HTTPS_ONLY_PROPERTY, Boolean::parseBoolean);
-
+    static final String ALLOWED_ROLES_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginAllowedRoles";
+    private static final long serialVersionUID = 1L;
+    private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
+    private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
     private static final List<String> ALLOWED_ROLES = MCRConfiguration2
-        .getString(MCRLoginServlet.ALLOWED_ROLES_PROPERTY)
+        .getString(ALLOWED_ROLES_PROPERTY)
         .map(MCRConfiguration2::splitValue)
         .map(s -> s.collect(Collectors.toList()))
         .orElse(Collections.emptyList());
 
     private static Logger LOGGER = LogManager.getLogger();
+
+    protected static String getReturnURL(HttpServletRequest req) {
+        String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
+        if (returnURL == null) {
+            String referer = req.getHeader("Referer");
+            returnURL = (referer != null) ? referer : req.getContextPath() + "/";
+        }
+        return returnURL;
+    }
+
+    protected static void addFormFields(MCRLogin login, String loginToRealm) {
+        ArrayList<org.mycore.frontend.support.MCRLogin.InputField> fields = new ArrayList<>();
+        if (loginToRealm != null) {
+            //realmParameter
+            MCRRealm realm = MCRRealmFactory.getRealm(loginToRealm);
+            InputField realmParameter = new InputField(realm.getRealmParameter(), loginToRealm, null, null, false,
+                true);
+            fields.add(realmParameter);
+        }
+        fields.add(new InputField("action", "login", null, null, false, true));
+        fields.add(new InputField("url", login.getReturnURL(), null, null, false, true));
+        String userNameText = MCRTranslation.translate("component.user2.login.form.userName");
+        fields.add(new InputField("uid", null, userNameText, userNameText, false, false));
+        String pwdText = MCRTranslation.translate("component.user2.login.form.password");
+        fields.add(new InputField("pwd", null, pwdText, pwdText, true, false));
+        login.getForm().getInput().addAll(fields);
+    }
+
+    static void addCurrentUserInfo(Element rootElement) {
+        MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
+        rootElement.setAttribute("user", userInfo.getUserID());
+        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
+            : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
+        if (realmId == null) {
+            realmId = MCRRealmFactory.getLocalRealm().getLabel();
+        }
+        rootElement.setAttribute(REALM_URL_PARAMETER, realmId);
+        rootElement.setAttribute("guest", String.valueOf(currentUserIsGuest()));
+    }
+
+    static void addCurrentUserInfo(MCRLogin login) {
+        MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
+        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
+            : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
+        if (realmId == null) {
+            realmId = MCRRealmFactory.getLocalRealm().getLabel();
+        }
+        login.setRealm(realmId);
+    }
+
+    private static boolean currentUserIsGuest() {
+        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+            .equals(MCRSystemUserInformation.getGuestInstance().getUserID());
+    }
+
+    /**
+     * Redirects the browser to the target url.
+     */
+    static void redirect(HttpServletResponse res) throws Exception {
+        String url = (String) (MCRSessionMgr.getCurrentSession().get(LOGIN_REDIRECT_URL_KEY));
+        if (url == null) {
+            LOGGER.warn("Could not get redirect URL from session.");
+            url = MCRFrontendUtil.getBaseURL();
+        }
+        LOGGER.info("Redirecting to url: {}", url);
+        res.sendRedirect(res.encodeRedirectURL(url));
+    }
 
     @Override
     public void init() throws ServletException {
@@ -102,11 +163,11 @@ public class MCRLoginServlet extends MCRServlet {
 
     /**
      * MCRLoginServlet handles four actions:
-     * 
+     *
      * MCRLoginServlet?url=foo
      * stores foo as redirect url and displays
      * a list of login method options.
-     * 
+     *
      * MCRLoginServlet?url=foo&amp;realm=ID
      * stores foo as redirect url and redirects
      * to the login URL of the given realm.
@@ -115,7 +176,7 @@ public class MCRLoginServlet extends MCRServlet {
      * checks input from editor login form and
      * changes the current login user and redirects
      * to the stored url.
-     * 
+     *
      * MCRLoginServlet?action=cancel
      * does not change login user, just
      * redirects to the target url
@@ -153,15 +214,6 @@ public class MCRLoginServlet extends MCRServlet {
         } else {
             listRealms(req, res);
         }
-    }
-
-    protected static String getReturnURL(HttpServletRequest req) {
-        String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
-        if (returnURL == null) {
-            String referer = req.getHeader("Referer");
-            returnURL = (referer != null) ? referer : req.getContextPath() + "/";
-        }
-        return returnURL;
     }
 
     private void redirectToUniqueRealm(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -219,51 +271,6 @@ public class MCRLoginServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(realmsDoc));
     }
 
-    protected static void addFormFields(MCRLogin login, String loginToRealm) {
-        ArrayList<org.mycore.frontend.support.MCRLogin.InputField> fields = new ArrayList<>();
-        if (loginToRealm != null) {
-            //realmParameter
-            MCRRealm realm = MCRRealmFactory.getRealm(loginToRealm);
-            InputField realmParameter = new InputField(realm.getRealmParameter(), loginToRealm, null, null, false,
-                true);
-            fields.add(realmParameter);
-        }
-        fields.add(new InputField("action", "login", null, null, false, true));
-        fields.add(new InputField("url", login.getReturnURL(), null, null, false, true));
-        String userNameText = MCRTranslation.translate("component.user2.login.form.userName");
-        fields.add(new InputField("uid", null, userNameText, userNameText, false, false));
-        String pwdText = MCRTranslation.translate("component.user2.login.form.password");
-        fields.add(new InputField("pwd", null, pwdText, pwdText, true, false));
-        login.getForm().getInput().addAll(fields);
-    }
-
-    static void addCurrentUserInfo(Element rootElement) {
-        MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
-        rootElement.setAttribute("user", userInfo.getUserID());
-        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
-            : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
-        if (realmId == null) {
-            realmId = MCRRealmFactory.getLocalRealm().getLabel();
-        }
-        rootElement.setAttribute(REALM_URL_PARAMETER, realmId);
-        rootElement.setAttribute("guest", String.valueOf(currentUserIsGuest()));
-    }
-
-    static void addCurrentUserInfo(MCRLogin login) {
-        MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
-        String realmId = userInfo instanceof MCRUser mcrUser ? mcrUser.getRealm().getLabel()
-            : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
-        if (realmId == null) {
-            realmId = MCRRealmFactory.getLocalRealm().getLabel();
-        }
-        login.setRealm(realmId);
-    }
-
-    private static boolean currentUserIsGuest() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getGuestInstance().getUserID());
-    }
-
     private int getNumLoginOptions() {
         int numOptions = 0;
         for (MCRRealm realm : MCRRealmFactory.listRealms()) {
@@ -285,24 +292,23 @@ public class MCRLoginServlet extends MCRServlet {
 
     /**
      * Stores the given url in MCRSession. When login is canceled, or after
-     * successful login, the browser is redirected to that url. 
+     * successful login, the browser is redirected to that url.
      */
     private void storeURL(String url) {
+        String storedUrl = url;
         if ((url == null) || (url.trim().length() == 0)) {
-            url = MCRFrontendUtil.getBaseURL();
+            storedUrl = MCRFrontendUtil.getBaseURL();
         } else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
             String rest = url.substring(MCRFrontendUtil.getBaseURL().length());
-            url = MCRFrontendUtil.getBaseURL() + encodePath(rest);
+            storedUrl = MCRFrontendUtil.getBaseURL() + encodePath(rest);
         }
-        LOGGER.info("Storing redirect URL to session: {}", url);
-        MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, url);
+        LOGGER.info("Storing redirect URL to session: {}", storedUrl);
+        MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, storedUrl);
     }
 
     private String encodePath(String path) {
-        path = path.replace('\\', '/');
-
         StringBuilder result = new StringBuilder();
-        StringTokenizer st = new StringTokenizer(path, " /?&=", true);
+        StringTokenizer st = new StringTokenizer(path.replace('\\', '/'), " /?&=", true);
 
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
@@ -314,18 +320,5 @@ public class MCRLoginServlet extends MCRServlet {
         }
 
         return result.toString();
-    }
-
-    /**
-     * Redirects the browser to the target url.
-     */
-    static void redirect(HttpServletResponse res) throws Exception {
-        String url = (String) (MCRSessionMgr.getCurrentSession().get(LOGIN_REDIRECT_URL_KEY));
-        if (url == null) {
-            LOGGER.warn("Could not get redirect URL from session.");
-            url = MCRFrontendUtil.getBaseURL();
-        }
-        LOGGER.info("Redirecting to url: {}", url);
-        res.sendRedirect(res.encodeRedirectURL(url));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -253,6 +253,7 @@ public class MCRRestObjects {
             description = "List of all or matched metadata object IDs with time of last modification",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRObjectIDDate.class)))),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     @MCRAccessControlExposeHeaders({ HEADER_X_TOTAL_COUNT, HttpHeaders.LINK })

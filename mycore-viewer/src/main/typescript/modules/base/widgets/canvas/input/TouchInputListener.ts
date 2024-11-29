@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,25 @@
  */
 
 
-import {TouchSession} from "./TouchSession";
+import { TouchSession } from "./TouchSession";
 
 export interface TouchInputListener {
-    touchStart(session: TouchSession): void;
+  touchStart(session: TouchSession): void;
 
-    touchMove(session: TouchSession): void;
+  touchMove(session: TouchSession): void;
 
-    touchEnd(session: TouchSession): void;
+  touchEnd(session: TouchSession): void;
 }
 
 export abstract class TouchInputAdapter implements TouchInputListener {
-    touchStart(session: TouchSession): void {
-    }
+  touchStart(session: TouchSession): void {
+  }
 
-    touchMove(session: TouchSession): void {
-    }
+  touchMove(session: TouchSession): void {
+  }
 
-    touchEnd(session: TouchSession): void {
-    }
+  touchEnd(session: TouchSession): void {
+  }
 }
 
 

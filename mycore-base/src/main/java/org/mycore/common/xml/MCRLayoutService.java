@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -174,11 +174,11 @@ public class MCRLayoutService {
 
     private void transform(HttpServletResponse response, MCRContentTransformer transformer, MCRContent source,
         MCRParameterCollector parameter, String filename) throws IOException, TransformerException, SAXException {
-        String fullFilename= filename;
+        String fullFilename = filename;
         try {
             String fileExtension = transformer.getFileExtension();
             if (fileExtension != null && fileExtension.length() > 0) {
-                fullFilename =filename+ "." + fileExtension;
+                fullFilename = filename + "." + fileExtension;
             }
             response.setHeader("Content-Disposition",
                 transformer.getContentDisposition() + ";filename=\"" + fullFilename + "\"");
@@ -255,6 +255,6 @@ public class MCRLayoutService {
      */
     private static void endCurrentTransaction() {
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
     }
 }

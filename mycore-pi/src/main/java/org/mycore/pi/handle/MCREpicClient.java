@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -149,8 +149,8 @@ public class MCREpicClient {
                     return switch (response.getCode()) {
                         case HttpStatus.SC_OK -> {
                             try (InputStream content = entity.getContent();
-                                InputStreamReader inputStreamReader
-                                    = new InputStreamReader(content, StandardCharsets.UTF_8);
+                                InputStreamReader inputStreamReader =
+                                    new InputStreamReader(content, StandardCharsets.UTF_8);
                                 BufferedReader br = new BufferedReader(inputStreamReader)) {
                                 yield MCRResultOrException.ofResult(
                                     br.lines().map(prefix2::concat).map(MCRHandle::new).collect(Collectors.toList()));

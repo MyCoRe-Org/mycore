@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,48 +16,48 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReMap} from "../Utils";
-import {ViewerEvent} from "../widgets/events/ViewerEvent";
-import {ViewerEventManager} from "../widgets/events/ViewerEventManager";
-import {WaitForEvent} from "./events/WaitForEvent";
+import { MyCoReMap } from "../Utils";
+import { ViewerEvent } from "../widgets/events/ViewerEvent";
+import { ViewerEventManager } from "../widgets/events/ViewerEventManager";
+import { WaitForEvent } from "./events/WaitForEvent";
 
 export class ViewerComponent extends ViewerEventManager {
 
-    constructor() {
-        super();
-        this._eventCache = new MyCoReMap<string, ViewerEvent>();
+  constructor() {
+    super();
+    this._eventCache = new MyCoReMap<string, ViewerEvent>();
+  }
+
+  private _eventCache: MyCoReMap<string, ViewerEvent>;
+
+  public init() {
+    console.info("Warning: IviewComponent doesnt implements init " + this);
+    return;
+  }
+
+  public get handlesEvents(): string[] {
+    return [];
+  }
+
+  public _handle(e: ViewerEvent): void {
+    if (e instanceof WaitForEvent) {
+
+      if (this._eventCache.has(e.eventType)) {
+        const cachedEvent = this._eventCache.get(e.eventType);
+        e.component.handle(cachedEvent);
+      }
     }
 
-    private _eventCache: MyCoReMap<string, ViewerEvent>;
+    this.handle(e);
+    return;
+  }
 
-    public init() {
-        console.info("Warning: IviewComponent doesnt implements init " + this);
-        return;
-    }
+  public handle(e: ViewerEvent): void {
+  }
 
-    public get handlesEvents(): string[] {
-        return [];
-    }
-
-    public _handle(e: ViewerEvent): void {
-        if (e instanceof WaitForEvent) {
-
-            if (this._eventCache.has(e.eventType)) {
-                const cachedEvent = this._eventCache.get(e.eventType);
-                e.component.handle(cachedEvent);
-            }
-        }
-
-        this.handle(e);
-        return;
-    }
-
-    public handle(e: ViewerEvent): void {
-    }
-
-    public trigger(e: ViewerEvent) {
-        this._eventCache.set(e.type, e);
-        super.trigger(e);
-    }
+  public trigger(e: ViewerEvent) {
+    this._eventCache.set(e.type, e);
+    super.trigger(e);
+  }
 
 }

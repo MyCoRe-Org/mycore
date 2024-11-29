@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,9 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
             switch (jsonReader.nextName()) {
                 case "from" -> ml.setFromString(jsonReader.nextString());
                 case "to" -> ml.setToString(jsonReader.nextString());
+                default -> {
+                    continue;
+                }
             }
         }
         jsonReader.endObject();
@@ -58,6 +61,7 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         return ml;
     }
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected static class MCRMetsLinkPlaceholder extends MCRMetsLink {
         public static final String PLACEHOLDER_EXCEPTION_MESSAGE = "this is a placeholder class";
 
@@ -87,17 +91,17 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         }
 
         @Override
+        public void setTo(MCRMetsPage to) {
+            throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
+        }
+
+        @Override
         public MCRMetsSection getFrom() {
             throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
         }
 
         @Override
         public void setFrom(MCRMetsSection from) {
-            throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
-        }
-
-        @Override
-        public void setTo(MCRMetsPage to) {
             throw new RuntimeException(PLACEHOLDER_EXCEPTION_MESSAGE);
         }
     }

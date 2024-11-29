@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import java.util.function.Function;
  *
  * @param <T> The type for values used in conjunction with this key.
  */
-public final class MCRHintKey<T> implements Comparable<MCRHintKey<?>>{
+public final class MCRHintKey<T> implements Comparable<MCRHintKey<?>> {
 
     private final String name;
 

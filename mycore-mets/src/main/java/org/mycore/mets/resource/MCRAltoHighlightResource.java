@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,9 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -96,8 +96,8 @@ import jakarta.ws.rs.core.Response;
 @Path("/alto/highlight")
 public class MCRAltoHighlightResource {
 
-    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
-            = MCRSolrAuthenticationManager.getInstance();
+    protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
+        MCRSolrAuthenticationManager.getInstance();
 
     @GET
     @Path("{derivateId}")

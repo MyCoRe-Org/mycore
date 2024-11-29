@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,24 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, Input} from '@angular/core';
-import {Processable} from '../model/model';
+import { Component, Input } from '@angular/core';
+import { Processable } from '../model/model';
 
 @Component({
-    selector: '[processable]',
-    templateUrl: 'html/processable.html',
-    styleUrls: ['css/processable.css']
+  selector: '[processable]',
+  templateUrl: 'html/processable.html',
+  styleUrls: ['css/processable.css']
 })
 export class ProcessableComponent {
 
-    @Input()
-    public model: Processable;
+  @Input()
+  public model: Processable;
 
-    constructor() {
-    }
+  constructor() {
+  }
 
-    public getProgress() {
-        return this.model.progress + '%';
-    }
+  public getProgress() {
+    return this.model.progress + '%';
+  }
 
 }

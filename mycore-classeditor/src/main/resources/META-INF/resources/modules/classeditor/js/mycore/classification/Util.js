@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,24 +23,24 @@ define([
   "exports",
   "dojo/_base/declare", // declare
   "dojo/_base/lang" // hitch, clone
-], function (exports, declare, lang) {
+], function(exports, declare, lang) {
 
-  exports.isClassification = function (/*dojo.data.item*/ item) {
+  exports.isClassification = function(/*dojo.data.item*/ item) {
     var id = item.id;
     return (id.categid == null || id.categid == "") && !item.fakeRoot;
   }
 
-  exports.getClassificationId = function (/*dojo.data.item*/ item) {
+  exports.getClassificationId = function(/*dojo.data.item*/ item) {
     var id = item.id;
     return id.rootid != null ? id.rootid : "";
   }
 
-  exports.getCategoryId = function (/*dojo.data.item*/ item) {
+  exports.getCategoryId = function(/*dojo.data.item*/ item) {
     var id = item.id;
     return id.categid != null ? id.categid : "";
   }
 
-  exports.formatId = function (/*dojo.data.item*/ item) {
+  exports.formatId = function(/*dojo.data.item*/ item) {
     if (item.fakeRoot || item.id == null) {
       return "";
     }
@@ -51,15 +51,15 @@ define([
     return id;
   }
 
-  exports.hasChildren = function (/*dojo.data.item*/ item) {
+  exports.hasChildren = function(/*dojo.data.item*/ item) {
     return item.haschildren || item.children;
   }
 
-  exports.isIdEqual = function (/*JSON*/ id, /*JSON*/ id2) {
+  exports.isIdEqual = function(/*JSON*/ id, /*JSON*/ id2) {
     return id.rootid == id2.rootid && id.categid == id2.categid;
   }
 
-  exports.toString = function (item) {
+  exports.toString = function(item) {
     var id = item.id != null ? item.id : item;
     if (lang.isString(id) || id.rootid == null) {
       return id;

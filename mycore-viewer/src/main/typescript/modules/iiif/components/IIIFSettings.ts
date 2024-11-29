@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
 
 export interface IIIFSettings extends MyCoReViewerSettings {
-    manifestURL: string;
-    imageAPIURL: string;
-    pageRange: number;
+  manifestURL: string;
+  imageAPIURL: string;
+  pageRange: number;
 }
 

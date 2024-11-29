@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ import org.mycore.mods.classification.MCRClassMapper;
  */
 public class MCRMODSWrapper {
 
+    public static final String MODS_OBJECT_TYPE = MCRConfiguration2.getStringOrThrow("MCR.MODS.NewObjectType");
     //ancestor::mycoreobject required for MCR-927
     static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host'"
         + " and ancestor::mycoreobject/structure/parents/parent or"
@@ -59,13 +60,8 @@ public class MCRMODSWrapper {
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
         + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and"
         + " (" + xPathRelationshipTypeTest() + ")]";
-
     private static final String MODS_CONTAINER = "modsContainer";
-
     private static final String DEF_MODS_CONTAINER = "def.modsContainer";
-
-    public static final String MODS_OBJECT_TYPE = MCRConfiguration2.getStringOrThrow("MCR.MODS.NewObjectType");
-
     private static final String MODS_DATAMODEL = "datamodel-mods.xsd";
 
     private static List<String> topLevelElementOrder = new ArrayList<>();
@@ -73,8 +69,6 @@ public class MCRMODSWrapper {
     private static Set<String> SUPPORTED_TYPES = MCRConfiguration2
         .getOrThrow("MCR.MODS.Types", MCRConfiguration2::splitValue)
         .collect(Collectors.toSet());
-
-    private MCRObject object;
 
     static {
         topLevelElementOrder.add("typeOfResource");
@@ -91,6 +85,19 @@ public class MCRMODSWrapper {
         topLevelElementOrder.add("identifier");
         topLevelElementOrder.add("location");
         topLevelElementOrder.add("accessCondition");
+    }
+
+    private MCRObject object;
+
+    public MCRMODSWrapper() {
+        this(new MCRObject());
+    }
+
+    public MCRMODSWrapper(MCRObject object) {
+        this.object = object;
+        if (object.getSchema() == null || object.getSchema().isEmpty()) {
+            object.setSchema(MODS_DATAMODEL);
+        }
     }
 
     private static int getRankOf(Element topLevelElement) {
@@ -110,11 +117,9 @@ public class MCRMODSWrapper {
      * @return true, if mods is supported
      */
     public static boolean isSupported(MCRObject obj) {
-        if (isSupported(obj.getId())) {
-            return true;
-        }
-        return obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
-            && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null;
+        return isSupported(obj.getId())
+            || (obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
+                && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null);
     }
 
     /**
@@ -126,15 +131,10 @@ public class MCRMODSWrapper {
         return SUPPORTED_TYPES.contains(id.getTypeId());
     }
 
-    public MCRMODSWrapper() {
-        this(new MCRObject());
-    }
-
-    public MCRMODSWrapper(MCRObject object) {
-        this.object = object;
-        if (object.getSchema() == null || object.getSchema().isEmpty()) {
-            object.setSchema(MODS_DATAMODEL);
-        }
+    private static String xPathRelationshipTypeTest() {
+        return Stream.of(MCRMODSRelationshipType.values())
+            .map(s -> String.format(Locale.ROOT, "@type='%s'", s))
+            .collect(Collectors.joining(" or "));
     }
 
     /**
@@ -154,16 +154,6 @@ public class MCRMODSWrapper {
         return null;
     }
 
-    public MCRObject getMCRObject() {
-        return object;
-    }
-
-    public MCRObjectID setID(String projectID, int id) {
-        MCRObjectID objID = MCRObjectID.getInstance(MCRObjectID.formatID(projectID, MODS_OBJECT_TYPE, id));
-        object.setId(objID);
-        return objID;
-    }
-
     public void setMODS(Element mods) {
         MCRObjectMetadata om = object.getMetadata();
         if (om.getMetadataElement(DEF_MODS_CONTAINER) != null) {
@@ -176,6 +166,16 @@ public class MCRMODSWrapper {
         om.setMetadataElement(defModsContainer);
 
         modsContainer.addContent(mods);
+    }
+
+    public MCRObject getMCRObject() {
+        return object;
+    }
+
+    public MCRObjectID setID(String projectID, int id) {
+        MCRObjectID objID = MCRObjectID.getInstance(MCRObjectID.formatID(projectID, MODS_OBJECT_TYPE, id));
+        object.setId(objID);
+        return objID;
     }
 
     private XPathExpression<Element> buildXPath(String xPath) {
@@ -340,11 +340,5 @@ public class MCRMODSWrapper {
         return getElements(
             "mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI)"
                 + " and not(ancestor::mods:relatedItem)]");
-    }
-
-    private static String xPathRelationshipTypeTest() {
-        return Stream.of(MCRMODSRelationshipType.values())
-            .map(s -> String.format(Locale.ROOT, "@type='%s'", s))
-            .collect(Collectors.joining(" or "));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package org.mycore.solr;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrUtils.USE_HTTP_1_1_PROPERTY;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -88,8 +89,8 @@ public class MCRSolrCore {
     @Deprecated
     public MCRSolrCore(String serverURL, String name) {
 
-        setup(serverURL, name, null, DEFAULT_SHARD_COUNT, name.equals("classification") ?
-                Set.of(MCRSolrCoreType.CLASSIFICATION) : Set.of(MCRSolrCoreType.MAIN));
+        setup(serverURL, name, null, DEFAULT_SHARD_COUNT,
+            name.equals("classification") ? Set.of(MCRSolrCoreType.CLASSIFICATION) : Set.of(MCRSolrCoreType.MAIN));
     }
 
     /**
@@ -105,12 +106,12 @@ public class MCRSolrCore {
      *            number of shards
      */
     public MCRSolrCore(String serverURL, String name, String configSet, Integer shardCount,
-                       Set<MCRSolrCoreType> types) {
+        Set<MCRSolrCoreType> types) {
         setup(serverURL, name, configSet, shardCount, types);
     }
 
     protected void setup(String serverURL, String name, String configSet,
-                         Integer shardCount, Set<MCRSolrCoreType> types) {
+        Integer shardCount, Set<MCRSolrCoreType> types) {
 
         this.serverURL = serverURL.endsWith("/") ? serverURL : serverURL + "/";
         this.name = name;
@@ -158,6 +159,13 @@ public class MCRSolrCore {
         int socketTimeout) {
         HttpSolrClientBuilderBase baseBuilder = useJettyHttpClient() ? new Http2SolrClient.Builder(baseSolrUrl)
             : new HttpJdkSolrClient.Builder(baseSolrUrl);
+
+        MCRConfiguration2.getBoolean(USE_HTTP_1_1_PROPERTY)
+            .filter(useHttp1_1 -> useHttp1_1)
+            .ifPresent(useHttp1_1 -> {
+                baseBuilder.useHttp1_1(true);
+            });
+
         return baseBuilder
             .withConnectionTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
             .withIdleTimeout(socketTimeout, TimeUnit.MILLISECONDS)

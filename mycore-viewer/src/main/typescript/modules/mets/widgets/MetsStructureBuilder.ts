@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,378 +19,378 @@
 /// <reference path="MetsStructureModel.ts" />
 
 
-import {getNodesShim, MyCoReMap, singleSelectShim, XMLUtil} from "../../base/Utils";
-import {StructureChapter} from "../../base/components/model/StructureChapter";
-import {StructureImage} from "../../base/components/model/StructureImage";
-import {MetsStructureModel} from "./MetsStructureModel";
-import {StructureModel} from "../../base/components/model/StructureModel";
+import { getNodesShim, MyCoReMap, singleSelectShim, XMLUtil } from "../../base/Utils";
+import { StructureChapter } from "../../base/components/model/StructureChapter";
+import { StructureImage } from "../../base/components/model/StructureImage";
+import { MetsStructureModel } from "./MetsStructureModel";
+import { StructureModel } from "../../base/components/model/StructureModel";
 
 export class MetsStructureBuilder {
 
-    private static METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
-    private static XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
-    private static ALTO_TEXT = "AltoHref";
-    private static TEI_TRANSCRIPTION = "TeiTranscriptionHref";
-    private static TEI_TRANSLATION = "TeiTranslationHref";
+  private static METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
+  private static XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
+  private static ALTO_TEXT = "AltoHref";
+  private static TEI_TRANSCRIPTION = "TeiTranscriptionHref";
+  private static TEI_TRANSLATION = "TeiTranslationHref";
 
-    private hrefResolverElement = document.createElement("a");
+  private hrefResolverElement = document.createElement("a");
 
-    private _smLinkMap: MyCoReMap<string, Array<string>>;
-    private _chapterIdMap: MyCoReMap<string, StructureChapter>;
-    private _idFileMap: MyCoReMap<string, Element>;
-    private _idPhysicalFileMap: MyCoReMap<string, Element>;
+  private _smLinkMap: MyCoReMap<string, Array<string>>;
+  private _chapterIdMap: MyCoReMap<string, StructureChapter>;
+  private _idFileMap: MyCoReMap<string, Element>;
+  private _idPhysicalFileMap: MyCoReMap<string, Element>;
 
-    private _chapterImageMap: MyCoReMap<string, StructureImage>;
-    private _imageChapterMap: MyCoReMap<string, StructureChapter>;
-    private _metsChapter: StructureChapter;
-    private _imageList: Array<StructureImage>;
-    private _structureModel: MetsStructureModel;
-    private _idImageMap: MyCoReMap<string, StructureImage>;
-    private _improvisationMap: MyCoReMap<string, boolean>;
-    private _imageHrefImageMap: MyCoReMap<string, StructureImage>;
+  private _chapterImageMap: MyCoReMap<string, StructureImage>;
+  private _imageChapterMap: MyCoReMap<string, StructureChapter>;
+  private _metsChapter: StructureChapter;
+  private _imageList: Array<StructureImage>;
+  private _structureModel: MetsStructureModel;
+  private _idImageMap: MyCoReMap<string, StructureImage>;
+  private _improvisationMap: MyCoReMap<string, boolean>;
+  private _imageHrefImageMap: MyCoReMap<string, StructureImage>;
 
-    private static NS_RESOLVER = {
-        lookupNamespaceURI: (nsPrefix: String) => {
-            if (nsPrefix == "mets") {
-                return MetsStructureBuilder.METS_NAMESPACE_URI;
-            }
-            return null;
-        }
-    };
-
-    private static NS_MAP = (() => {
-        let nsMap = new MyCoReMap<string, string>();
-        nsMap.set("mets", MetsStructureBuilder.METS_NAMESPACE_URI);
-        nsMap.set("xlink", MetsStructureBuilder.XLINK_NAMESPACE_URI);
-        return nsMap;
-    })();
-
-    constructor(private metsDocument: Document, private tilePathBuilder: (href: string) => string) {
-
+  private static NS_RESOLVER = {
+    lookupNamespaceURI: (nsPrefix: String) => {
+      if (nsPrefix == "mets") {
+        return MetsStructureBuilder.METS_NAMESPACE_URI;
+      }
+      return null;
     }
+  };
 
-    public processMets(): StructureModel {
-        let files = this.getFiles("IVIEW2");
+  private static NS_MAP = (() => {
+    let nsMap = new MyCoReMap<string, string>();
+    nsMap.set("mets", MetsStructureBuilder.METS_NAMESPACE_URI);
+    nsMap.set("xlink", MetsStructureBuilder.XLINK_NAMESPACE_URI);
+    return nsMap;
+  })();
 
-        if (files.length == 0) {
-            files = this.getFiles("MASTER");
-        }
-        this._idFileMap = this.getIdFileMap(files);
+  constructor(private metsDocument: Document, private tilePathBuilder: (href: string) => string) {
 
+  }
 
-        const useFilesMap = new MyCoReMap<string, Array<Node>>();
-        this.getGroups().map(node => {
-            return (<Element>node).getAttribute("USE");
-        })
-            .map(s => s.toUpperCase())
-            .filter(s => s != "MASTER")
-            .forEach(s => {
-                let files = this.getFiles(s);
-                useFilesMap.set(s, files);
-                this._idFileMap.mergeIn(this.getIdFileMap(files));
-            });
+  public processMets(): StructureModel {
+    let files = this.getFiles("IVIEW2");
 
-
-        this._chapterIdMap = new MyCoReMap<string, StructureChapter>();
-        this._idPhysicalFileMap = this.getIdPhysicalFileMap();
-
-        this._smLinkMap = new MyCoReMap<string, Array<string>>();
-        this._chapterImageMap = new MyCoReMap<string, StructureImage>();
-        this._imageChapterMap = new MyCoReMap<string, StructureChapter>();
-        this._improvisationMap = new MyCoReMap<string, boolean>(); // see makeLink
-        this._metsChapter = this.processChapter(null,
-            this.getFirstElementChild(<Element>this.getStructMap("LOGICAL")));
-        this._imageHrefImageMap = new MyCoReMap<string, StructureImage>();
-        this._imageList = [];
-
-        this._idImageMap = new MyCoReMap<string, StructureImage>();
-        this.processImages();
-
-        this._structureModel = new MetsStructureModel(
-            this._smLinkMap,
-            this._metsChapter,
-            this._imageList,
-            this._chapterImageMap,
-            this._imageChapterMap,
-            this._imageHrefImageMap,
-            useFilesMap.has("ALTO") && useFilesMap.get("ALTO").length > 0);
-
-        return this._structureModel;
+    if (files.length == 0) {
+      files = this.getFiles("MASTER");
     }
+    this._idFileMap = this.getIdFileMap(files);
 
-    public getStructMap(type: string): Node {
-        let logicalStructMapPath = "//mets:structMap[@TYPE='" + type + "']";
-        return singleSelectShim(this.metsDocument, logicalStructMapPath, MetsStructureBuilder.NS_MAP);
-    }
 
-    public getGroups() {
-        const fileGroupPath: string = '//mets:fileSec//mets:fileGrp';
-        return getNodesShim(this.metsDocument, fileGroupPath,
-            this.metsDocument.documentElement, MetsStructureBuilder.NS_MAP,
+    const useFilesMap = new MyCoReMap<string, Array<Node>>();
+    this.getGroups().map(node => {
+      return (<Element>node).getAttribute("USE");
+    })
+      .map(s => s.toUpperCase())
+      .filter(s => s != "MASTER")
+      .forEach(s => {
+        let files = this.getFiles(s);
+        useFilesMap.set(s, files);
+        this._idFileMap.mergeIn(this.getIdFileMap(files));
+      });
+
+
+    this._chapterIdMap = new MyCoReMap<string, StructureChapter>();
+    this._idPhysicalFileMap = this.getIdPhysicalFileMap();
+
+    this._smLinkMap = new MyCoReMap<string, Array<string>>();
+    this._chapterImageMap = new MyCoReMap<string, StructureImage>();
+    this._imageChapterMap = new MyCoReMap<string, StructureChapter>();
+    this._improvisationMap = new MyCoReMap<string, boolean>(); // see makeLink
+    this._metsChapter = this.processChapter(null,
+      this.getFirstElementChild(<Element>this.getStructMap("LOGICAL")));
+    this._imageHrefImageMap = new MyCoReMap<string, StructureImage>();
+    this._imageList = [];
+
+    this._idImageMap = new MyCoReMap<string, StructureImage>();
+    this.processImages();
+
+    this._structureModel = new MetsStructureModel(
+      this._smLinkMap,
+      this._metsChapter,
+      this._imageList,
+      this._chapterImageMap,
+      this._imageChapterMap,
+      this._imageHrefImageMap,
+      useFilesMap.has("ALTO") && useFilesMap.get("ALTO").length > 0);
+
+    return this._structureModel;
+  }
+
+  public getStructMap(type: string): Node {
+    let logicalStructMapPath = "//mets:structMap[@TYPE='" + type + "']";
+    return singleSelectShim(this.metsDocument, logicalStructMapPath, MetsStructureBuilder.NS_MAP);
+  }
+
+  public getGroups() {
+    const fileGroupPath: string = '//mets:fileSec//mets:fileGrp';
+    return getNodesShim(this.metsDocument, fileGroupPath,
+      this.metsDocument.documentElement, MetsStructureBuilder.NS_MAP,
             /* XPathResult.UNORDERED_NODE_ITERATOR_TYPE */ 4, null);
+  }
+
+  /**
+   * Reads all files from a specific group
+   * @param group {string} the group from wich the files should be selected
+   * return the files a Array of nodes
+   */
+  public getFiles(group: string): Array<Node> {
+    let fileGroupPath = "//mets:fileSec//mets:fileGrp[@USE='" + group + "']";
+    let fileSectionResult = singleSelectShim(this.metsDocument, fileGroupPath, MetsStructureBuilder.NS_MAP);
+    let nodeArray: Array<Node> = [];
+    if (fileSectionResult != null) {
+      nodeArray = XMLUtil.nodeListToNodeArray(fileSectionResult.childNodes);
+    }
+    return nodeArray;
+  }
+
+  public getStructLinks(): Array<Element> {
+    let structLinkPath = "//mets:structLink";
+    let structLinkResult: Node = singleSelectShim(this.metsDocument, structLinkPath, MetsStructureBuilder.NS_MAP);
+    let nodeArray: Array<Element> = [];
+
+    XMLUtil.iterateChildNodes(structLinkResult, (currentChild: Node) => {
+      if (currentChild instanceof Element || "getAttribute" in currentChild) {
+        nodeArray.push(<Element>currentChild);
+      }
+    });
+
+    return nodeArray;
+  }
+
+  private processChapter(parent: StructureChapter, chapter: Element): StructureChapter {
+    if (chapter.nodeName.toString() == "mets:mptr") {
+      return;
     }
 
-    /**
-     * Reads all files from a specific group
-     * @param group {string} the group from wich the files should be selected
-     * return the files a Array of nodes
-     */
-    public getFiles(group: string): Array<Node> {
-        let fileGroupPath = "//mets:fileSec//mets:fileGrp[@USE='" + group + "']";
-        let fileSectionResult = singleSelectShim(this.metsDocument, fileGroupPath, MetsStructureBuilder.NS_MAP);
-        let nodeArray: Array<Node> = [];
-        if (fileSectionResult != null) {
-            nodeArray = XMLUtil.nodeListToNodeArray(fileSectionResult.childNodes);
+    let chapterObject = new StructureChapter(parent, chapter.getAttribute("TYPE"), chapter.getAttribute("ID"), chapter.getAttribute("LABEL"));
+    let chapterChildren = chapter.childNodes;
+
+    this._chapterIdMap.set(chapterObject.id, chapterObject);
+
+    for (let i = 0; i < chapterChildren.length; i++) {
+      let elem = chapterChildren[i];
+      if ((elem instanceof Element || "getAttribute" in elem)) {
+        if (elem.nodeName.indexOf("fptr") != -1) {
+          this.processFPTR(chapterObject, <Element>elem);
+        } else if (elem.nodeName.indexOf("div") != -1) {
+          chapterObject.chapter.push(this.processChapter(chapterObject, <Element>elem));
         }
-        return nodeArray;
+      }
+
     }
 
-    public getStructLinks(): Array<Element> {
-        let structLinkPath = "//mets:structLink";
-        let structLinkResult: Node = singleSelectShim(this.metsDocument, structLinkPath, MetsStructureBuilder.NS_MAP);
-        let nodeArray: Array<Element> = [];
+    return chapterObject;
+  }
 
-        XMLUtil.iterateChildNodes(structLinkResult, (currentChild: Node) => {
-            if (currentChild instanceof Element || "getAttribute" in currentChild) {
-                nodeArray.push(<Element>currentChild);
-            }
-        });
+  private processFPTR(parent: StructureChapter, fptrElem: Element) {
+    let elem = this.getFirstElementChild(fptrElem);
 
-        return nodeArray;
-    }
-
-    private processChapter(parent: StructureChapter, chapter: Element): StructureChapter {
-        if (chapter.nodeName.toString() == "mets:mptr") {
-            return;
+    if (elem.nodeName.indexOf("seq")) {
+      XMLUtil.iterateChildNodes(elem, (child: Node) => {
+        if ((child instanceof Element || "getAttribute" in child)) {
+          this.parseArea(parent, <Element>child);
         }
+      });
+    } else if (elem.nodeName.indexOf("area")) {
+      this.parseArea(parent, elem);
+    }
+  }
 
-        let chapterObject = new StructureChapter(parent, chapter.getAttribute("TYPE"), chapter.getAttribute("ID"), chapter.getAttribute("LABEL"));
-        let chapterChildren = chapter.childNodes;
+  private parseArea(parent: StructureChapter, area: Element) {
+    // create blocklist if not exist
+    let blockList: Array<{ fileId: string; fromId: string; toId: string }>;
+    if (!parent.additional.has("blocklist")) {
+      blockList = [];
+      parent.additional.set("blocklist", blockList);
+    } else {
+      blockList = parent.additional.get("blocklist");
+    }
+    let fileID = area.getAttribute("FILEID");
+    if (fileID == null) {
+      throw `@FILEID of mets:area is required but not set!`;
+    }
+    let href: string = this.getAttributeNs(this.getFirstElementChild(this._idFileMap.get(fileID)), "xlink", "href");
+    if (href == null) {
+      throw `couldn't find href of @FILEID in mets:area! ${fileID}`;
+    }
+    let blockEntry: any = {
+      fileId: href
+    };
+    let beType = area.getAttribute("BETYPE");
+    if (beType == "IDREF") {
+      blockEntry.fromId = area.getAttribute("BEGIN");
+      blockEntry.toId = area.getAttribute("END");
+    } else {
+      console.warn("mets:area/@FILEID='" + href + "' has no BETYPE attribute");
+    }
+    blockList.push(blockEntry);
+  }
 
-        this._chapterIdMap.set(chapterObject.id, chapterObject);
+  private getIdFileMap(fileGrpChildren: Array<Node>): MyCoReMap<string, Element> {
+    let map = new MyCoReMap<string, Element>();
+    fileGrpChildren.forEach((node: Node, childrenIndex: Number) => {
+      if (node instanceof Element || "getAttribute" in node) {
+        let element: Element = <Element>node;
+        map.set(element.getAttribute("ID"), element);
+      }
+    });
+    return map;
+  }
 
-        for (let i = 0; i < chapterChildren.length; i++) {
-            let elem = chapterChildren[i];
-            if ((elem instanceof Element || "getAttribute" in elem)) {
-                if (elem.nodeName.indexOf("fptr") != -1) {
-                    this.processFPTR(chapterObject, <Element>elem);
-                } else if (elem.nodeName.indexOf("div") != -1) {
-                    chapterObject.chapter.push(this.processChapter(chapterObject, <Element>elem));
-                }
-            }
+  private getIdPhysicalFileMap(): MyCoReMap<string, Element> {
+    let map = new MyCoReMap<string, Element>();
+    let physicalStructMap = <Element>this.getStructMap("PHYSICAL");
 
-        }
+    let metsDivs = this.getFirstElementChild(physicalStructMap).childNodes;
 
-        return chapterObject;
+    for (let i = 0; i < metsDivs.length; i++) {
+      let child = <Element>metsDivs[i];
+      if ("getAttribute" in child) {
+        map.set(child.getAttribute("ID"), child);
+      }
     }
 
-    private processFPTR(parent: StructureChapter, fptrElem: Element) {
-        let elem = this.getFirstElementChild(fptrElem);
+    return map;
+  }
 
-        if (elem.nodeName.indexOf("seq")) {
-            XMLUtil.iterateChildNodes(elem, (child: Node) => {
-                if ((child instanceof Element || "getAttribute" in child)) {
-                    this.parseArea(parent, <Element>child);
-                }
-            });
-        } else if (elem.nodeName.indexOf("area")) {
-            this.parseArea(parent, elem);
-        }
+  private getFirstElementChild(node: Node): Element {
+    if ("firstElementChild" in node) {
+      return (<any>node).firstElementChild;
+    } else {
+      return <Element>node.firstChild;
+    }
+  }
+
+  private getAttributeNs(element: any, namespaceKey: string, attribute: string) {
+    if ("getAttributeNS" in element) {
+      return element.getAttributeNS(MetsStructureBuilder.NS_MAP.get(namespaceKey), attribute);
+    } else {
+      return element.getAttribute(namespaceKey + ":" + attribute);
+    }
+  }
+
+  private processImages() {
+    let count = 1;
+    this._idPhysicalFileMap.forEach((k: string, v: Element) => {
+      const physFileDiv = this._idPhysicalFileMap.get(k);
+      const image = this.parseFile(physFileDiv, count++);
+      if (image != null) {
+        this._imageList.push(image);
+        this._idImageMap.set(k, image);
+      }
+    });
+
+    this._imageList = this._imageList.sort((x, y) => x.order - y.order);
+
+    this.makeLinks();
+
+    this._imageList = this._imageList.filter((el => this._imageChapterMap.has(el.id)));
+    this._imageList.forEach((image, i) => {
+      // fix order
+      image.order = i + 1;
+      // build href map
+      this._imageHrefImageMap.set(image.href, image);
+    });
+  }
+
+  private makeLinks() {
+    this.getStructLinks().forEach((elem: Element) => {
+      let chapterId = this.getAttributeNs(elem, "xlink", "from");
+      let physFileId = this.getAttributeNs(elem, "xlink", "to");
+      this.makeDirectLink(this._chapterIdMap.get(chapterId), this._idImageMap.get(physFileId));
+    });
+  }
+
+  private linkParentsIndirect(chapter: StructureChapter, image: StructureImage) {
+    if (chapter.parent != null && !this._chapterImageMap.has(chapter.parent.id)) {
+      this.linkParentsIndirect(chapter.parent, image);
+      this._improvisationMap.set(chapter.parent.id, true); // we flag this link as improvisation
+      this._chapterImageMap.set(chapter.parent.id, image);
+    }
+  }
+
+  private makeDirectLink(chapter: StructureChapter, image: StructureImage) {
+    this.linkParentsIndirect(chapter, image);
+
+    const hasNoLink = !this._chapterImageMap.has(chapter.id);
+    const currentLinkPosition = this._imageList.indexOf(this._chapterImageMap.get(chapter.id));
+    const currentIsImprovised = this._improvisationMap.has(chapter.id) && this._improvisationMap.get(chapter.id);
+
+    if (hasNoLink || currentLinkPosition > this._imageList.indexOf(image) || currentIsImprovised) {
+      this._chapterImageMap.set(chapter.id, image);
+      this._improvisationMap.set(chapter.id, false);
     }
 
-    private parseArea(parent: StructureChapter, area: Element) {
-        // create blocklist if not exist
-        let blockList: Array<{ fileId: string; fromId: string; toId: string }>;
-        if (!parent.additional.has("blocklist")) {
-            blockList = [];
-            parent.additional.set("blocklist", blockList);
+    if (!this._imageChapterMap.has(image.id)) {
+      this._imageChapterMap.set(image.id, chapter);
+    }
+
+    if (!this._smLinkMap.has(chapter.id)) {
+      this._smLinkMap.set(chapter.id, []);
+    }
+    this._smLinkMap.get(chapter.id).push(image.href);
+  }
+
+  // tei/translation.de/THULB_129846422_1801_1802_LLZ_001_18010701_001.xml -> de
+  private extractTranslationLanguage(href: string): string {
+    return href.split("/")[1].split(".")[1];
+  }
+
+  private parseFile(physFileDiv: Element, defaultOrder: number): StructureImage {
+    const type: string = physFileDiv.getAttribute('TYPE');
+    const id: string = physFileDiv.getAttribute('ID');
+    const order: number = parseInt(physFileDiv.getAttribute('ORDER') || '' + defaultOrder, 10);
+    const orderLabel: string = physFileDiv.getAttribute('ORDERLABEL');
+    const contentIds: string = physFileDiv.getAttribute('CONTENTIDS');
+    const additionalHrefs = new MyCoReMap<string, string>();
+
+    let imgHref: string = null;
+    let imgMimeType: string = null;
+    this.hrefResolverElement.href = './';
+    const base = this.hrefResolverElement.href;
+
+    XMLUtil.iterateChildNodes(physFileDiv, (child) => {
+      if (child instanceof Element || 'getAttribute' in child) {
+        const childElement = <Element>child;
+        const fileId = childElement.getAttribute('FILEID');
+        const file = this._idFileMap.get(fileId);
+        let href: string = this.getAttributeNs(this.getFirstElementChild(file), 'xlink', 'href');
+        const mimetype: string = file.getAttribute('MIMETYPE');
+
+        this.hrefResolverElement.href = href;
+        href = this.hrefResolverElement.href.substr(base.length);
+
+        const use = (<Element>file.parentNode).getAttribute('USE');
+        if (use === 'MASTER' || use === 'IVIEW2') {
+          imgHref = href;
+          imgMimeType = mimetype;
+        } else if (use === 'ALTO') {
+          additionalHrefs.set(MetsStructureBuilder.ALTO_TEXT, href);
+        } else if (use.indexOf("TEI.") == 0) {
+          additionalHrefs.set(use, href);
         } else {
-            blockList = parent.additional.get("blocklist");
+          console.warn('Unknown File Group : ' + use);
         }
-        let fileID = area.getAttribute("FILEID");
-        if (fileID == null) {
-            throw `@FILEID of mets:area is required but not set!`;
-        }
-        let href: string = this.getAttributeNs(this.getFirstElementChild(this._idFileMap.get(fileID)), "xlink", "href");
-        if (href == null) {
-            throw `couldn't find href of @FILEID in mets:area! ${fileID}`;
-        }
-        let blockEntry: any = {
-            fileId: href
-        };
-        let beType = area.getAttribute("BETYPE");
-        if (beType == "IDREF") {
-            blockEntry.fromId = area.getAttribute("BEGIN");
-            blockEntry.toId = area.getAttribute("END");
-        } else {
-            console.warn("mets:area/@FILEID='" + href + "' has no BETYPE attribute");
-        }
-        blockList.push(blockEntry);
+      }
+    });
+
+    if (imgHref === null) {
+      console.warn('Unable to find MASTER|IVIEW2 file for ' + id);
+      return null;
     }
 
-    private getIdFileMap(fileGrpChildren: Array<Node>): MyCoReMap<string, Element> {
-        let map = new MyCoReMap<string, Element>();
-        fileGrpChildren.forEach((node: Node, childrenIndex: Number) => {
-            if (node instanceof Element || "getAttribute" in node) {
-                let element: Element = <Element>node;
-                map.set(element.getAttribute("ID"), element);
-            }
-        });
-        return map;
+    // TODO: Fix in mycore (we need a valid URL)
+    if (imgHref.indexOf('http:') + imgHref.indexOf('file:') + imgHref.indexOf('urn:') !== -3) {
+      const parser = document.createElement('a');
+      parser.href = imgHref;
+      imgHref = parser.pathname;
     }
 
-    private getIdPhysicalFileMap(): MyCoReMap<string, Element> {
-        let map = new MyCoReMap<string, Element>();
-        let physicalStructMap = <Element>this.getStructMap("PHYSICAL");
-
-        let metsDivs = this.getFirstElementChild(physicalStructMap).childNodes;
-
-        for (let i = 0; i < metsDivs.length; i++) {
-            let child = <Element>metsDivs[i];
-            if ("getAttribute" in child) {
-                map.set(child.getAttribute("ID"), child);
-            }
-        }
-
-        return map;
-    }
-
-    private getFirstElementChild(node: Node): Element {
-        if ("firstElementChild" in node) {
-            return (<any>node).firstElementChild;
-        } else {
-            return <Element>node.firstChild;
-        }
-    }
-
-    private getAttributeNs(element: any, namespaceKey: string, attribute: string) {
-        if ("getAttributeNS" in element) {
-            return element.getAttributeNS(MetsStructureBuilder.NS_MAP.get(namespaceKey), attribute);
-        } else {
-            return element.getAttribute(namespaceKey + ":" + attribute);
-        }
-    }
-
-    private processImages() {
-        let count = 1;
-        this._idPhysicalFileMap.forEach((k: string, v: Element) => {
-            const physFileDiv = this._idPhysicalFileMap.get(k);
-            const image = this.parseFile(physFileDiv, count++);
-            if (image != null) {
-                this._imageList.push(image);
-                this._idImageMap.set(k, image);
-            }
-        });
-
-        this._imageList = this._imageList.sort((x, y) => x.order - y.order);
-
-        this.makeLinks();
-
-        this._imageList = this._imageList.filter((el => this._imageChapterMap.has(el.id)));
-        this._imageList.forEach((image, i) => {
-            // fix order
-            image.order = i + 1;
-            // build href map
-            this._imageHrefImageMap.set(image.href, image);
-        });
-    }
-
-    private makeLinks() {
-        this.getStructLinks().forEach((elem: Element) => {
-            let chapterId = this.getAttributeNs(elem, "xlink", "from");
-            let physFileId = this.getAttributeNs(elem, "xlink", "to");
-            this.makeDirectLink(this._chapterIdMap.get(chapterId), this._idImageMap.get(physFileId));
-        });
-    }
-
-    private linkParentsIndirect(chapter: StructureChapter, image: StructureImage) {
-        if (chapter.parent != null && !this._chapterImageMap.has(chapter.parent.id)) {
-            this.linkParentsIndirect(chapter.parent, image);
-            this._improvisationMap.set(chapter.parent.id, true); // we flag this link as improvisation
-            this._chapterImageMap.set(chapter.parent.id, image);
-        }
-    }
-
-    private makeDirectLink(chapter: StructureChapter, image: StructureImage) {
-        this.linkParentsIndirect(chapter, image);
-
-        const hasNoLink = !this._chapterImageMap.has(chapter.id);
-        const currentLinkPosition = this._imageList.indexOf(this._chapterImageMap.get(chapter.id));
-        const currentIsImprovised = this._improvisationMap.has(chapter.id) && this._improvisationMap.get(chapter.id);
-
-        if (hasNoLink || currentLinkPosition > this._imageList.indexOf(image) || currentIsImprovised) {
-            this._chapterImageMap.set(chapter.id, image);
-            this._improvisationMap.set(chapter.id, false);
-        }
-
-        if (!this._imageChapterMap.has(image.id)) {
-            this._imageChapterMap.set(image.id, chapter);
-        }
-
-        if (!this._smLinkMap.has(chapter.id)) {
-            this._smLinkMap.set(chapter.id, []);
-        }
-        this._smLinkMap.get(chapter.id).push(image.href);
-    }
-
-    // tei/translation.de/THULB_129846422_1801_1802_LLZ_001_18010701_001.xml -> de
-    private extractTranslationLanguage(href: string): string {
-        return href.split("/")[1].split(".")[1];
-    }
-
-    private parseFile(physFileDiv: Element, defaultOrder: number): StructureImage {
-        const type: string = physFileDiv.getAttribute('TYPE');
-        const id: string = physFileDiv.getAttribute('ID');
-        const order: number = parseInt(physFileDiv.getAttribute('ORDER') || '' + defaultOrder, 10);
-        const orderLabel: string = physFileDiv.getAttribute('ORDERLABEL');
-        const contentIds: string = physFileDiv.getAttribute('CONTENTIDS');
-        const additionalHrefs = new MyCoReMap<string, string>();
-
-        let imgHref: string = null;
-        let imgMimeType: string = null;
-        this.hrefResolverElement.href = './';
-        const base = this.hrefResolverElement.href;
-
-        XMLUtil.iterateChildNodes(physFileDiv, (child) => {
-            if (child instanceof Element || 'getAttribute' in child) {
-                const childElement = <Element>child;
-                const fileId = childElement.getAttribute('FILEID');
-                const file = this._idFileMap.get(fileId);
-                let href: string = this.getAttributeNs(this.getFirstElementChild(file), 'xlink', 'href');
-                const mimetype: string = file.getAttribute('MIMETYPE');
-
-                this.hrefResolverElement.href = href;
-                href = this.hrefResolverElement.href.substr(base.length);
-
-                const use = (<Element>file.parentNode).getAttribute('USE');
-                if (use === 'MASTER' || use === 'IVIEW2') {
-                    imgHref = href;
-                    imgMimeType = mimetype;
-                } else if (use === 'ALTO') {
-                    additionalHrefs.set(MetsStructureBuilder.ALTO_TEXT, href);
-                } else if (use.indexOf("TEI.") == 0) {
-                    additionalHrefs.set(use, href);
-                } else {
-                    console.warn('Unknown File Group : ' + use);
-                }
-            }
-        });
-
-        if (imgHref === null) {
-            console.warn('Unable to find MASTER|IVIEW2 file for ' + id);
-            return null;
-        }
-
-        // TODO: Fix in mycore (we need a valid URL)
-        if (imgHref.indexOf('http:') + imgHref.indexOf('file:') + imgHref.indexOf('urn:') !== -3) {
-            const parser = document.createElement('a');
-            parser.href = imgHref;
-            imgHref = parser.pathname;
-        }
-
-        return new StructureImage(type, id, order, orderLabel, imgHref, imgMimeType, (cb) => {
-            cb(this.tilePathBuilder(imgHref));
-        }, additionalHrefs, contentIds);
-    }
+    return new StructureImage(type, id, order, orderLabel, imgHref, imgMimeType, (cb) => {
+      cb(this.tilePathBuilder(imgHref));
+    }, additionalHrefs, contentIds);
+  }
 }
 

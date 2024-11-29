@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -653,7 +653,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static void setUserAttribute(String name, String userID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
-            user.getAttributes().removeIf(a->a.getName().equals(name));
+            user.getAttributes().removeIf(a -> a.getName().equals(name));
             MCRUserManager.updateUser(user);
         } catch (Exception e) {
             throw new MCRException("Error while removing attribute " + name +

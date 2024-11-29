@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,21 +48,19 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static String storedrules = MCRConfiguration2.getString("MCR.Access.StorePermissions")
         .orElse("read,write,delete");
 
-
     private static Element readrule;
-
 
     private static Element editrule;
     static {
         try {
             // get the standard read rule from config or it's the true rule
             readrule = new MCRStringContent(MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-READ-RULE")
-                    .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>"))
-                    .asXML().getRootElement().detach();
+                .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>"))
+                .asXML().getRootElement().detach();
             // get the standard edit rule from config or it's the true rule
             editrule = new MCRStringContent(MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-EDIT-RULE")
-                    .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>"))
-                    .asXML().getRootElement().detach();
+                .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>"))
+                .asXML().getRootElement().detach();
         } catch (RuntimeException rte) {
             throw rte;
         } catch (Exception e) {

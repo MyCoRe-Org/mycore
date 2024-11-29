@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  */
 
 package org.mycore.services.queuedjob;
+
+import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -37,8 +39,6 @@ import org.mycore.common.config.annotation.MCRProperty;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 /**
  * A {@link MCRSimpleJobSelector} is a {@link MCRJobSelector} that combines multiple simple but commonly required
@@ -99,7 +99,7 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
     private final int ageDays;
 
     public MCRSimpleJobSelector(List<Class<? extends MCRJobAction>> actions, Mode actionMode,
-                                List<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
+        List<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
         this.actions = new ArrayList<>(Objects.requireNonNull(actions, "Actions must not be null"));
         this.actions.forEach(obj -> Objects.requireNonNull(obj, "Action must not be null"));
         this.actionMode = Objects.requireNonNull(actionMode, "Action mode must not be null");

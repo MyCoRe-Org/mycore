@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@ public class MCRCategoryIDTest extends MCRTestCase {
 
     private static final String toLongRootID = "012345678901234567890123456789012";
 
-    private static final String toLongCategID
-        = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678";
+    private static final String toLongCategID =
+        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678";
 
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.MCRCategoryID#MCRCategoryID(java.lang.String, java.lang.String)}.

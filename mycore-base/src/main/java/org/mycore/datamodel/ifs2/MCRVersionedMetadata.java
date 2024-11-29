@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -291,8 +291,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             String path = getFilePath();
             String dir = getDirectory();
             @SuppressWarnings("unchecked")
-            Collection<SVNLogEntry> log = repository.log(new String[]{dir},
-                    null, lastPresentRevision, lastPresentRevision, true, true);
+            Collection<SVNLogEntry> log = repository.log(new String[] { dir },
+                null, lastPresentRevision, lastPresentRevision, true, true);
             for (SVNLogEntry logEntry : log) {
                 SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {

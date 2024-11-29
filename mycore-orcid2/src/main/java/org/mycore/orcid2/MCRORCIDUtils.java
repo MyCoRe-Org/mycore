@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,10 +91,7 @@ public class MCRORCIDUtils {
      * @return true if state is ready to publish
      */
     public static boolean checkPublishState(String state) {
-        if (PUBLISH_STATES.contains(state)) {
-            return true;
-        }
-        return PUBLISH_STATES.size() == 1 && PUBLISH_STATES.contains("*");
+        return PUBLISH_STATES.contains(state) || PUBLISH_STATES.size() == 1 && PUBLISH_STATES.contains("*");
     }
 
     /**
@@ -203,10 +200,7 @@ public class MCRORCIDUtils {
      * @return true if identifier is trusted
      */
     public static boolean checkTrustedIdentifier(String name) {
-        if (TRUSTED_IDENTIFIER_TYPES.size() > 0) {
-            return TRUSTED_IDENTIFIER_TYPES.contains(name);
-        }
-        return true;
+        return TRUSTED_IDENTIFIER_TYPES.isEmpty() || TRUSTED_IDENTIFIER_TYPES.contains(name);
     }
 
     private static MCRIdentifier getIdentfierFromElement(Element element) {

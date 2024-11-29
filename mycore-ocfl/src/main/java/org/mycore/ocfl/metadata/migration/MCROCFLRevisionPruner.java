@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 
 package org.mycore.ocfl.metadata.migration;
 
-import org.jdom2.JDOMException;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.jdom2.JDOMException;
 
 /**
  * Prunes a list of revisions to remove any that are not needed.

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ public class MCRViewerEPUBConfiguration extends MCRViewerBaseConfiguration {
         final boolean debugMode = isDebugMode(request);
         addLocalScript("lib/epubjs/epub.js", true, debugMode);
         addLocalScript("lib/jszip/jszip.js", true, debugMode);
-        addLocalScript("iview-client-epub.js", false, true,debugMode);
+        addLocalScript("iview-client-epub.js", false, true, debugMode);
 
         final String derivate = getDerivate(request);
         final String filePath = getFilePath(request);

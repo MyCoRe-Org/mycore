@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,25 @@
 
 export class Util {
 
-    public static mixin(source: any, target: any) {
-        for (const prop in source) {
-            if (source.hasOwnProperty(prop)) {
-                target[prop] = source[prop];
-            }
-        }
+  public static mixin(source: any, target: any) {
+    for (const prop in source) {
+      if (source.hasOwnProperty(prop)) {
+        target[prop] = source[prop];
+      }
     }
+  }
 
-    public static remove(array: any[], element: any) {
-        const index = array.indexOf(element);
-        if (index > -1) {
-            array.splice(index, 1);
-        }
+  public static remove(array: any[], element: any) {
+    const index = array.indexOf(element);
+    if (index > -1) {
+      array.splice(index, 1);
     }
+  }
 
-    public static getBasePath(path: String) {
-        const pathArray = location.pathname.split('/');
-        pathArray.splice(-4);
-        return pathArray.join('/');
-    }
+  public static getBasePath(path: String) {
+    const pathArray = location.pathname.split('/');
+    pathArray.splice(-4);
+    return pathArray.join('/');
+  }
 
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,128 +30,128 @@ wcms.common = wcms.common || {};
  *            example
  */
 wcms.common.MenuBuilder = function(/*ItemFileRead*/ store, /*domNode*/ bindToNode, /*Object*/ actionManager) {
-	this.store = store;
-	this.bindToNode = bindToNode;
-	this.actionManager = actionManager;
-	this.menu = undefined;
-	this.menuItem = undefined;
+  this.store = store;
+  this.bindToNode = bindToNode;
+  this.actionManager = actionManager;
+  this.menu = undefined;
+  this.menuItem = undefined;
 
-	this.eventHandler = new wcms.common.EventHandler(this);
+  this.eventHandler = new wcms.common.EventHandler(this);
 };
 
-( function() {
+(function() {
 
-	function build() {
-		var instance = this;
-		this.store.fetch({
-			query: {type: new RegExp("ActionManager|Menu")},
-			onItem: function(item, i) {
-				var initParemeterFunc = dojo.hitch(instance, initParameter);
-				initParemeterFunc(item, i);
-			},
-			onComplete: function(item, i) {
-				var createMenuFunc = dojo.hitch(instance, createMenu);
-				createMenuFunc();
-				instance.eventHandler.notify({"type" : "complete"});
-			}
-		});
-	}
+  function build() {
+    var instance = this;
+    this.store.fetch({
+      query: { type: new RegExp("ActionManager|Menu") },
+      onItem: function(item, i) {
+        var initParemeterFunc = dojo.hitch(instance, initParameter);
+        initParemeterFunc(item, i);
+      },
+      onComplete: function(item, i) {
+        var createMenuFunc = dojo.hitch(instance, createMenu);
+        createMenuFunc();
+        instance.eventHandler.notify({ "type": "complete" });
+      }
+    });
+  }
 
-	/**
-	 * Initializes the action manager and the menuItem variable.
-	 */
-	function initParameter(item, i) {
-		var typeValue = this.store.getValue(item, "type");
-		if(typeValue == "ActionManager") {
-			this.actionManager = this.store.getValue(item, "name");
-		} else if(typeValue == "Menu") {
-			this.menuItem = item;
-		}
-	}
+  /**
+   * Initializes the action manager and the menuItem variable.
+   */
+  function initParameter(item, i) {
+    var typeValue = this.store.getValue(item, "type");
+    if (typeValue == "ActionManager") {
+      this.actionManager = this.store.getValue(item, "name");
+    } else if (typeValue == "Menu") {
+      this.menuItem = item;
+    }
+  }
 
-	/**
-	 * Creates the whole menu.
-	 */
-	function createMenu() {
-		console.log("MenuBuilder: create menu");
-		if (this.menuItem.type == "Menu") {
-			var instance = this;
-			this.menu = new dijit.Menu(this.menuItem.params);
-			dojo.forEach(this.menuItem.children, function(child, index, array) {
-				var addMenuItemFunc = dojo.hitch(instance, addMenuItem);
-				addMenuItemFunc(child, instance.menu);
-			});
+  /**
+   * Creates the whole menu.
+   */
+  function createMenu() {
+    console.log("MenuBuilder: create menu");
+    if (this.menuItem.type == "Menu") {
+      var instance = this;
+      this.menu = new dijit.Menu(this.menuItem.params);
+      dojo.forEach(this.menuItem.children, function(child, index, array) {
+        var addMenuItemFunc = dojo.hitch(instance, addMenuItem);
+        addMenuItemFunc(child, instance.menu);
+      });
 
-			this.menu.startup();
-			this.menu.bindDomNode(this.bindToNode);
-		} else {
-			console.log("MenuBuilder: Invalid type: " + menuItem.type);
-		}
-		console.log("MenuBuilder: menu successfully created");
-	}
+      this.menu.startup();
+      this.menu.bindDomNode(this.bindToNode);
+    } else {
+      console.log("MenuBuilder: Invalid type: " + menuItem.type);
+    }
+    console.log("MenuBuilder: menu successfully created");
+  }
 
-   	/**
-	 * Adds a menu item to a parent.
-	 * 
-	 * @param item
-	 *            the menu item to add
-	 * @param parent
-	 *            the parent
-	 * @return the added menu item
-	 */
-   	function addMenuItem(/* json */ item, /* Menu | PopupMenuItem */ parent) {
-   		var instance = this;
-		var widget = null;
-		var params = this.store.getValue(item, "params");
-		
-		if (item.type == "MenuItem") {
-			widget = new dijit.MenuItem(params);
-		} else if (item.type == "CheckedMenuItem") {
-			widget = new dijit.CheckedMenuItem(params);
-		} else if (item.type == "MenuSeparator") {
-			widget = new dijit.MenuSeparator(params);
-		} else if (item.type == "PopupMenuItem") {
-			widget = new dijit.Menu();
-			dojo.forEach(item.children, function(child, index, array) {
-				var addMenuItemFunc = dojo.hitch(instance, addMenuItem);
-				addMenuItemFunc(child, widget);
-			});
-		} else {
-			console.log("MenuBuilder (Error): invalid type: " + item.type);
-			return;
-		}
+  /**
+* Adds a menu item to a parent.
+* 
+* @param item
+*            the menu item to add
+* @param parent
+*            the parent
+* @return the added menu item
+*/
+  function addMenuItem(/* json */ item, /* Menu | PopupMenuItem */ parent) {
+    var instance = this;
+    var widget = null;
+    var params = this.store.getValue(item, "params");
 
-		// connect item to the action method
-		try {
-			if (params.action != null) {
-				widget.set("method", params.action);
-				dojo.connect(widget, "onClick", this, callActionMethod);
-			}
-		} catch (err) {}
+    if (item.type == "MenuItem") {
+      widget = new dijit.MenuItem(params);
+    } else if (item.type == "CheckedMenuItem") {
+      widget = new dijit.CheckedMenuItem(params);
+    } else if (item.type == "MenuSeparator") {
+      widget = new dijit.MenuSeparator(params);
+    } else if (item.type == "PopupMenuItem") {
+      widget = new dijit.Menu();
+      dojo.forEach(item.children, function(child, index, array) {
+        var addMenuItemFunc = dojo.hitch(instance, addMenuItem);
+        addMenuItemFunc(child, widget);
+      });
+    } else {
+      console.log("MenuBuilder (Error): invalid type: " + item.type);
+      return;
+    }
 
-		if (item.type == "PopupMenuItem") {
-			params.popup = widget;
-			var popupMenu = new dijit.PopupMenuItem(params);
-			parent.addChild(popupMenu);
-		} else {
-			parent.addChild(widget);
-		}
-		return widget;
-	}
+    // connect item to the action method
+    try {
+      if (params.action != null) {
+        widget.set("method", params.action);
+        dojo.connect(widget, "onClick", this, callActionMethod);
+      }
+    } catch (err) { }
 
-   	function callActionMethod(event) {
-   		var menuDijit = dijit.byId(event.currentTarget.id);
-   		var methodName = menuDijit.get("method");
-		var parameter = "(dijit.byId(\"" + this.bindToNode.id + "\"))";
-		var actionMethod = null;
-   		if(typeof this.actionManager == 'string') {
-   			actionMethod = this.actionManager + "." + methodName + parameter;
-   		} else if(typeof this.actionManager == 'object') {
-   			actionMethod = "this.actionManager." + methodName + parameter;
-   		}
-   		console.log("MenuBuilder: " + actionMethod);
-   		eval(actionMethod);
-	}
+    if (item.type == "PopupMenuItem") {
+      params.popup = widget;
+      var popupMenu = new dijit.PopupMenuItem(params);
+      parent.addChild(popupMenu);
+    } else {
+      parent.addChild(widget);
+    }
+    return widget;
+  }
 
-   	wcms.common.MenuBuilder.prototype.build = build;
+  function callActionMethod(event) {
+    var menuDijit = dijit.byId(event.currentTarget.id);
+    var methodName = menuDijit.get("method");
+    var parameter = "(dijit.byId(\"" + this.bindToNode.id + "\"))";
+    var actionMethod = null;
+    if (typeof this.actionManager == 'string') {
+      actionMethod = this.actionManager + "." + methodName + parameter;
+    } else if (typeof this.actionManager == 'object') {
+      actionMethod = "this.actionManager." + methodName + parameter;
+    }
+    console.log("MenuBuilder: " + actionMethod);
+    eval(actionMethod);
+  }
+
+  wcms.common.MenuBuilder.prototype.build = build;
 })();

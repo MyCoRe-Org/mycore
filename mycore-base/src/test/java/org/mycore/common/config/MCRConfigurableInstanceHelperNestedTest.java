@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 
 package org.mycore.common.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +34,6 @@ import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
@@ -125,7 +125,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         assertEquals("Value2", instance.nested.nested.string2);
 
     }
-
 
     @Test
     @MCRTestConfiguration(
@@ -421,7 +420,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
-
     @Test
     @MCRTestConfiguration(
         properties = {
@@ -463,7 +461,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
         assertEquals("23", instance.list.get(0).string);
         assertEquals("42", instance.list.get(1).string);
-
 
     }
 
@@ -633,7 +630,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         public Map<String, Entry> map2;
 
     }
-
 
     public static class TestClassWithNestedMapWithPrefixAndSentinel {
 

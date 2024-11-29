@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,8 @@ public abstract class MCRResourcePath {
     /**
      * Returns a path beginning with <code>/META-INF/resources</code> as a {@link String} without that prefix
      * and without a leading slash.
-     */    public Optional<String> asRelativeWebPath() {
+     */
+    public Optional<String> asRelativeWebPath() {
         return asAbsoluteWebPath().map(this::removeLeadingSlash);
     }
 

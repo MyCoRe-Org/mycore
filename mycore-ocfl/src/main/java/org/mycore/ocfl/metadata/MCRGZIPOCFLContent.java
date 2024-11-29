@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,13 @@
 
 package org.mycore.ocfl.metadata;
 
-import io.ocfl.api.OcflRepository;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
-public class MCRGZIPOCFLContent extends MCROCFLContent {
+import io.ocfl.api.OcflRepository;
 
+public class MCRGZIPOCFLContent extends MCROCFLContent {
 
     public MCRGZIPOCFLContent(OcflRepository repository, String objectid, String fileName, String version) {
         super(repository, objectid, fileName, version);

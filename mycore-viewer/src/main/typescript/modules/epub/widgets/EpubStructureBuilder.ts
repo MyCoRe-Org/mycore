@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,32 +17,32 @@
  */
 
 
-import {EpubStructureChapter} from "./EpubStructureChapter";
-import {StructureChapter} from "../../base/components/model/StructureChapter";
+import { EpubStructureChapter } from "./EpubStructureChapter";
+import { StructureChapter } from "../../base/components/model/StructureChapter";
 
 export class EpubStructureBuilder {
 
-    public convertToChapter(item: any, parent?: EpubStructureChapter): EpubStructureChapter {
-        const chapters: StructureChapter[] = [];
-        const chapter = new EpubStructureChapter(
-            parent,
-            typeof parent === 'undefined' ? 'root' : '',
-            item.label,
-            chapters,
-            item);
+  public convertToChapter(item: any, parent?: EpubStructureChapter): EpubStructureChapter {
+    const chapters: StructureChapter[] = [];
+    const chapter = new EpubStructureChapter(
+      parent,
+      typeof parent === 'undefined' ? 'root' : '',
+      item.label,
+      chapters,
+      item);
 
-        if (item.subitems != null) {
-            item.subitems
-                .map((childItem) => {
-                    return this.convertToChapter(childItem, chapter);
-                })
-                .forEach((childChapter) => {
-                    chapters.push(childChapter);
-                });
-        }
-
-        return chapter;
+    if (item.subitems != null) {
+      item.subitems
+        .map((childItem) => {
+          return this.convertToChapter(childItem, chapter);
+        })
+        .forEach((childChapter) => {
+          chapters.push(childChapter);
+        });
     }
+
+    return chapter;
+  }
 
 }
 

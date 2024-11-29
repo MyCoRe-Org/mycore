@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ public class MCRSolrIndexer {
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-            MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.getInstance();
 
     static {
         MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
@@ -309,7 +309,7 @@ public class MCRSolrIndexer {
         UpdateRequest commitRequest = new UpdateRequest();
         commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(commitRequest,
-                MCRSolrAuthenticationLevel.INDEX);
+            MCRSolrAuthenticationLevel.INDEX);
         commitRequest.process(solrClient);
     }
 
@@ -395,7 +395,7 @@ public class MCRSolrIndexer {
                 LOGGER.error("Error creating index thread for object {}", id, ex);
             }
         }
-        long durationInMilliSeconds = swatch.getTime();
+        long durationInMilliSeconds = swatch.getDuration().toMillis();
         if (statistic != null) {
             statistic.addTime(durationInMilliSeconds);
         }
@@ -574,14 +574,14 @@ public class MCRSolrIndexer {
     public static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String objectType)
         throws IOException, SolrServerException {
         synchronizeMetadataIndex(cores, objectType, () -> MCRXMLMetadataManager.instance().listIDsOfType(objectType),
-           "objectType:" + objectType);
+            "objectType:" + objectType);
     }
 
     public static void synchronizeMetadataIndexForObjectBase(List<MCRSolrCore> cores, String objectBase)
         throws IOException, SolrServerException {
         final String solrQuery = "objectType:" + objectBase.split("_")[1] + " _root_:" + objectBase + "_*";
         synchronizeMetadataIndex(cores, objectBase, () -> MCRXMLMetadataManager.instance().listIDsForBase(objectBase),
-                solrQuery);
+            solrQuery);
     }
 
     private static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String synchBase,
@@ -594,7 +594,7 @@ public class MCRSolrIndexer {
         LOGGER.info("there are {} mycore objects", storeList.size());
         // get ids from solr
         LOGGER.info("fetching solr...");
-        for(MCRSolrCore core : cores) {
+        for (MCRSolrCore core : cores) {
             List<String> solrList = MCRSolrSearchUtils.listIDs(core.getClient(), query);
             LOGGER.info("there are {} solr objects", solrList.size());
             // documents to remove

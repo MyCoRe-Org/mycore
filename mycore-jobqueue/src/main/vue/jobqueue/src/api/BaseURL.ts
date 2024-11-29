@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 const mode = import.meta.env.MODE;
 
 export const getBaseURL = () => {
-    const isDev = mode === 'development';
-    if(isDev){
-        return "http://localhost:8291/mir/";
-    } else {
-        return (window as any).webApplicationBaseURL as string;
-    }
+  const isDev = mode === 'development';
+  if (isDev) {
+    return "http://localhost:8291/mir/";
+  } else {
+    return (window as any).webApplicationBaseURL as string;
+  }
 }

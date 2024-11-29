@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -157,10 +157,8 @@ public class MCRMETSServlet extends MCRServlet {
 
     private boolean useExistingMets(HttpServletRequest request) {
         String useExistingMetsParam = request.getParameter("useExistingMets");
-        if (useExistingMetsParam == null) {
-            return true;
-        }
-        return Boolean.parseBoolean(useExistingMetsParam);
+        return useExistingMetsParam == null
+            || Boolean.parseBoolean(useExistingMetsParam);
     }
 
     public static String getOwnerID(String pathInfo) {
@@ -190,7 +188,7 @@ public class MCRMETSServlet extends MCRServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRPath metsPath = MCRPath.getPath(ownerID, "/mets.xml");
         try {
-            MCRTransactionHelper.beginTransaction();
+            MCRTransactionManager.beginTransactions();
             try {
                 if (Files.exists(metsPath)) {
                     return Files.getLastModifiedTime(metsPath).toMillis();
@@ -202,7 +200,7 @@ public class MCRMETSServlet extends MCRServlet {
             }
             return -1L;
         } finally {
-            MCRTransactionHelper.commitTransaction();
+            MCRTransactionManager.commitTransactions();
             MCRSessionMgr.releaseCurrentSession();
             session.close(); // just created session for db transaction
         }

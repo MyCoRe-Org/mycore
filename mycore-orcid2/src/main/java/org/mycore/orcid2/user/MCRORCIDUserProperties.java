@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,11 @@
 
 package org.mycore.orcid2.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
- * Model form MCRORCIDUser properties.
+ * Represents the properties associated with an ORCID user, controlling various settings
+ * related to works management.
  */
 public class MCRORCIDUserProperties {
 
@@ -32,13 +35,13 @@ public class MCRORCIDUserProperties {
     private Boolean recreateDeletedWork;
 
     /**
-     * Constructs new MCRORCIDUserProperties.
+     * Constructs a new instance of {@code MCRORCIDUserProperties} with default values.
      */
     public MCRORCIDUserProperties() {
     }
 
     /**
-     * Constructs new MCRORCIDUserProperties.
+     * Constructs a new instance of {@code MCRORCIDUserProperties} with specified values.
      *
      * @param alwaysUpdateWork if always update
      * @param createDuplicateWork if create own duplicate
@@ -58,6 +61,7 @@ public class MCRORCIDUserProperties {
      *
      * @return true if always update
      */
+    @JsonProperty("alwaysUpdateWork")
     public Boolean isAlwaysUpdateWork() {
         return alwaysUpdateWork;
     }
@@ -76,6 +80,7 @@ public class MCRORCIDUserProperties {
      *
      * @return true if create duplicate work
      */
+    @JsonProperty("createDuplicateWork")
     public Boolean isCreateDuplicateWork() {
         return createDuplicateWork;
     }
@@ -94,6 +99,7 @@ public class MCRORCIDUserProperties {
      *
      * @return true if create first work
      */
+    @JsonProperty("createFirstWork")
     public Boolean isCreateFirstWork() {
         return createFirstWork;
     }
@@ -112,6 +118,7 @@ public class MCRORCIDUserProperties {
      *
      * @return true if recreate deleted work
      */
+    @JsonProperty("recreateDeletedWork")
     public Boolean isRecreateDeletedWork() {
         return recreateDeletedWork;
     }

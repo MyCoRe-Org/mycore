@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,10 +86,9 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
         maxFileSize = MCRConfiguration2.getLong(TIKA_MAPPER_MAX_FILE_SIZE).orElseThrow(
             () -> MCRConfiguration2.createConfigurationException(TIKA_MAPPER_MAX_FILE_SIZE));
 
-
         this.tikaClients = MCRConfiguration2.splitValue(serverList.orElse(""))
-                .map(MCRTikaHttpClient::new)
-                .collect(Collectors.toSet());
+            .map(MCRTikaHttpClient::new)
+            .collect(Collectors.toSet());
         enabled = !tikaClients.isEmpty();
     }
 

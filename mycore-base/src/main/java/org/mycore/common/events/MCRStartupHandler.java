@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,9 @@
  */
 
 package org.mycore.common.events;
+
+import static jakarta.servlet.ServletContext.ORDERED_LIBS;
+import static org.mycore.common.config.MCRRuntimeComponentDetector.ComponentOrder.LOWEST_PRIORITY_FIRST;
 
 import java.io.IOException;
 import java.time.ZoneId;
@@ -38,9 +41,6 @@ import org.mycore.common.log.MCRTableMessage;
 import org.mycore.common.xml.MCRURIResolver;
 
 import jakarta.servlet.ServletContext;
-
-import static jakarta.servlet.ServletContext.ORDERED_LIBS;
-import static org.mycore.common.config.MCRRuntimeComponentDetector.ComponentOrder.LOWEST_PRIORITY_FIRST;
 
 /**
  * Initializes classes that implement {@link AutoExecutable} interface that are defined via
@@ -98,7 +98,7 @@ public class MCRStartupHandler {
             .toList();
         LOGGER.info(executableTable.logMessage("Detected auto executables:"));
         executables.forEach(autoExecutable -> startExecutable(servletContext, autoExecutable));
-        
+
         //initialize MCRURIResolver
         MCRURIResolver.init(servletContext);
     }
@@ -179,6 +179,6 @@ public class MCRStartupHandler {
         default int compareTo(AutoExecutable other) {
             return Integer.compare(other.getPriority(), getPriority());
         }
-        
+
     }
 }

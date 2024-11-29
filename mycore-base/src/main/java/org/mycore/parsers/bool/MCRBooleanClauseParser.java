@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,22 +128,23 @@ public class MCRBooleanClauseParser<T> {
      */
     public MCRCondition<T> parse(String s) throws MCRParseException {
         String cleanedString = s
-                .replaceAll("\t", " ")
-                .replaceAll("\n", " ")
-                .replaceAll("\r", " ");
+            .replaceAll("\t", " ")
+            .replaceAll("\n", " ")
+            .replaceAll("\r", " ");
 
         if (cleanedString.trim().length() == 0 || cleanedString.equals("()")) {
             return defaultRule();
         }
         return parse(cleanedString, null);
     }
+
     private MCRCondition<T> parse(String s, List<String> l) throws MCRParseException {
         // initialize if start parsing
         List<String> list;
         if (l == null) {
             list = new ArrayList<>();
-        }else{
-            list= l;
+        } else {
+            list = l;
         }
 
         // a empty condition
@@ -164,13 +165,12 @@ public class MCRBooleanClauseParser<T> {
             if (m.find()) {
                 String clause = m.group();
                 stringTrimmed = stringTrimmed.substring(0, m.start())
-                        + "@<" + list.size() + ">@" + stringTrimmed.substring(m.end());
+                    + "@<" + list.size() + ">@" + stringTrimmed.substring(m.end());
                 list.add(extendClauses(clause, list));
             } else {
                 break;
             }
         }
-
 
         // after replacing bracket pairs check for unmatched parenthis
         if ((stringTrimmed.indexOf('(') >= 0) ^ (stringTrimmed.indexOf(')') >= 0)) {
@@ -182,14 +182,14 @@ public class MCRBooleanClauseParser<T> {
 
         /* handle OR */
         MCROrCondition<T> orClause = new MCROrCondition<>();
-        orClause = (MCROrCondition<T>) handleAndORClause(stringTrimmed, list, orClause,or);
+        orClause = (MCROrCondition<T>) handleAndORClause(stringTrimmed, list, orClause, or);
         if (orClause != null) {
             return orClause;
         }
 
         /* handle AND */
         MCRAndCondition<T> andClause = new MCRAndCondition<>();
-        andClause = (MCRAndCondition<T>) handleAndORClause(stringTrimmed, list, andClause,and);
+        andClause = (MCRAndCondition<T>) handleAndORClause(stringTrimmed, list, andClause, and);
         if (andClause != null) {
             return andClause;
         }
@@ -248,9 +248,8 @@ public class MCRBooleanClauseParser<T> {
             str.substring(1, str.length() - 1).indexOf(')') < 0;
     }
 
-
     private MCRSetCondition handleAndORClause(String stringTrimmed, List<String> list, MCRSetCondition condition,
-                                              Pattern pattern) {
+        Pattern pattern) {
         Matcher m = pattern.matcher(stringTrimmed);
         int last = 0;
 

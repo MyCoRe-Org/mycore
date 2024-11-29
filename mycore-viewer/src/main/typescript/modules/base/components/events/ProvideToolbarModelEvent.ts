@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
  */
 
 
-import {MyCoReImageViewerEvent} from "./MyCoReImageViewerEvent";
-import {ViewerComponent} from "../ViewerComponent";
-import {MyCoReBasicToolbarModel} from "../model/MyCoReBasicToolbarModel";
+import { MyCoReImageViewerEvent } from "./MyCoReImageViewerEvent";
+import { ViewerComponent } from "../ViewerComponent";
+import { MyCoReBasicToolbarModel } from "../model/MyCoReBasicToolbarModel";
 
 export class ProvideToolbarModelEvent extends MyCoReImageViewerEvent {
 
-    constructor(component: ViewerComponent, public model: MyCoReBasicToolbarModel) {
-        super(component, ProvideToolbarModelEvent.TYPE);
-    }
+  constructor(component: ViewerComponent, public model: MyCoReBasicToolbarModel) {
+    super(component, ProvideToolbarModelEvent.TYPE);
+  }
 
-    public static TYPE = "ProvideToolbarModelEvent";
+  public static TYPE = "ProvideToolbarModelEvent";
 
 }
 

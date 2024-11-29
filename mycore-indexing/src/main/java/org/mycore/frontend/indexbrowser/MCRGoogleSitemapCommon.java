@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,9 +44,9 @@ import org.jdom2.Namespace;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
+import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * This class implements all common methods to create the sitemap data.
@@ -86,11 +86,11 @@ public final class MCRGoogleSitemapCommon {
 
     private static final Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
 
-    private static final String SITEINDEX_SCHEMA
-        = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
+    private static final String SITEINDEX_SCHEMA =
+        "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
 
-    private static final String SITEMAP_SCHEMA
-        = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
+    private static final String SITEMAP_SCHEMA =
+        "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
 
     /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
     private static final String CDIR = MCRConfiguration2.getString("MCR.GoogleSitemap.Directory").orElse("");
@@ -108,8 +108,8 @@ public final class MCRGoogleSitemapCommon {
     /** The filter query for selecting objects to present in google sitemap */
     private static final String SOLR_QUERY = MCRConfiguration2.getStringOrThrow("MCR.GoogleSitemap.SolrQuery");
 
-    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER
-            = MCRSolrAuthenticationManager.getInstance();
+    public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
+        MCRSolrAuthenticationManager.getInstance();
 
     /** The logger */
     private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());

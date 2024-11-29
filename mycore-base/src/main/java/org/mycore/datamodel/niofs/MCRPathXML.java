@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 
 package org.mycore.datamodel.niofs;
+
 //@TODO TEST: testclass and test (0% coverage)
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
@@ -178,9 +179,9 @@ public class MCRPathXML {
         root.setAttribute("path", absolutePath);
         root.setAttribute("extension", getFileExtension(fileName));
         root.setAttribute("returnId", MCRMetadataManager
-                .getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
+            .getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
         Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
-                .getLinksFromReference(new MCRCategLinkReference(path));
+            .getLinksFromReference(new MCRCategLinkReference(path));
         for (MCRCategoryID category : linksFromReference) {
             Element catEl = new Element("category");
             catEl.setAttribute("id", category.toString());

@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -108,7 +108,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
         }
 
         MCRSessionMgr.getCurrentSession();
-        MCRTransactionHelper.commitTransaction();
+        MCRTransactionManager.commitTransactions();
         return resultRessource;
     }
 

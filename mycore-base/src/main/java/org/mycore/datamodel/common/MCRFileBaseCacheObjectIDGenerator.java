@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         synchronized (MCRFileBaseCacheObjectIDGenerator.class) {
             if (!Files.exists(cacheFile)) {
                 try {
-                   return Files.createFile(cacheFile);
+                    return Files.createFile(cacheFile);
                 } catch (IOException e) {
                     throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
                 }
@@ -125,10 +125,10 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         int idLengthInBytes = MCRObjectID.formatID(baseId, 1).getBytes(StandardCharsets.UTF_8).length;
         try (
             FileChannel channel = FileChannel.open(cacheFile, StandardOpenOption.WRITE,
-                StandardOpenOption.SYNC, StandardOpenOption.CREATE);){
+                StandardOpenOption.SYNC, StandardOpenOption.CREATE);) {
             ByteBuffer buffer = ByteBuffer.allocate(idLengthInBytes);
             channel.position(0);
-            writeNewID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, next-1)), buffer, channel, cacheFile);
+            writeNewID(MCRObjectID.getInstance(MCRObjectID.formatID(baseId, next - 1)), buffer, channel, cacheFile);
         } catch (FileNotFoundException e) {
             throw new MCRException("Could not create " + cacheFile.toAbsolutePath(), e);
         } catch (IOException e) {
@@ -226,8 +226,8 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
         try (Stream<Path> list = Files.list(cacheDir);) {
             List<String> baseIdList = list.filter(Files::isRegularFile)
-                    .map(Path::getFileName).map(Path::toString)
-                    .collect(Collectors.toList());
+                .map(Path::getFileName).map(Path::toString)
+                .collect(Collectors.toList());
             return baseIdList;
         } catch (IOException e) {
             throw new MCRException("Could not detect cache files!", e);

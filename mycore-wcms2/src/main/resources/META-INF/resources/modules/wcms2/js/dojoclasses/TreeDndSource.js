@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * See https://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@ dojo.require("dijit.tree.dndSource");
 
 dojo.declare("dojoclasses.TreeDndSource", dijit.tree.dndSource, {
 
-	onMouseDown: function(e) {
-		// this is a workaround to fix dnd support in tree
-		// the id is only set if the scrollbar is hit, this allows us
-		// to abort the event and don't do an invalid drag
-		var element = document.elementFromPoint(e.clientX, e.clientY);
-		var id = element.id;
-		if(id != null && id != "") {
-			return;
-		}
-		this.inherited("onMouseDown", arguments);		
-	},
+  onMouseDown: function(e) {
+    // this is a workaround to fix dnd support in tree
+    // the id is only set if the scrollbar is hit, this allows us
+    // to abort the event and don't do an invalid drag
+    var element = document.elementFromPoint(e.clientX, e.clientY);
+    var id = element.id;
+    if (id != null && id != "") {
+      return;
+    }
+    this.inherited("onMouseDown", arguments);
+  },
 
 });
