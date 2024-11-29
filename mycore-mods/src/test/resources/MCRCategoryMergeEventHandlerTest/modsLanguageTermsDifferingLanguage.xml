@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:language>
+    <mods:languageTerm authority="rfc5646" type="code">x</mods:languageTerm>
+  </mods:language>
+  <mods:language>
+    <mods:languageTerm authority="rfc5646" type="code">x-1</mods:languageTerm>
+  </mods:language>
+  <mods:language>
+    <mods:languageTerm authority="rfc5646" type="code">x-1-1</mods:languageTerm>
+  </mods:language>
+  <mods:language>
+    <mods:languageTerm authority="rfc5646" type="code">y</mods:languageTerm>
+  </mods:language>
+</mods:mods>

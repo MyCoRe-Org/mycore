@@ -11,6 +11,7 @@ import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.classification.MCRClassMapper;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Checks for and removes redundant classifications in Mods-Documents. If a classification category and
@@ -36,6 +37,17 @@ public class MCRCategoryMergeEventHandler extends MCREventHandlerBase {
         mergeCategories(obj);
     }
 
+    public static List<Element> getAllDescendants(Element element) {
+        List<Element> descendants = new ArrayList<>();
+
+        for (Element child : element.getChildren()) {
+            descendants.add(child);
+            descendants.addAll(getAllDescendants(child));
+        }
+
+        return descendants;
+    }
+
     private void mergeCategories(MCRObject obj) {
         MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
         if (mcrmodsWrapper.getMODS() == null) {
@@ -44,7 +56,8 @@ public class MCRCategoryMergeEventHandler extends MCREventHandlerBase {
         LOGGER.info("merge redundant classification categories for {}", obj.getId());
 
         Element filledMods = mcrmodsWrapper.getMODS();
-        List<Element> supportedElements = filledMods.getChildren().stream()
+        List<Element> supportedElements = getAllDescendants(filledMods).stream()
+        //List<Element> supportedElements = filledMods.getChildren().stream()
             .filter(element -> MCRClassMapper.getCategoryID(element) != null).toList();
 
         for (int i = 0; i < supportedElements.size(); i++) {
