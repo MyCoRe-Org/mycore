@@ -28,7 +28,8 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
+import org.mycore.mcr.acl.accesskey.config.MCRAccessKeyConfig;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -40,8 +41,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Servlet filter that extracts access key value from query string and includes value if valid as
- * an attribute into the session
+ * Servlet filter that extracts access key secret from query string for object and
+ * activates access key by secret if valid as for current session.
  */
 public class MCRAccessKeyFilter implements Filter {
 
@@ -49,28 +50,29 @@ public class MCRAccessKeyFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
-            LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}",
-                String.join(",", MCRAccessKeyUtils.getAllowedSessionPermissionTypes()));
+        if (LOGGER.isInfoEnabled() && !MCRAccessKeyConfig.getAllowedSessionPermissionTypes().isEmpty()) {
+            LOGGER.info("MCRAccessKeyObjectServletFilter is enabled and the following permssions are allowed: {}",
+                String.join(",", MCRAccessKeyConfig.getAllowedSessionPermissionTypes()));
         }
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
+        if (!MCRAccessKeyConfig.getAllowedSessionPermissionTypes().isEmpty()) {
             final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             final MCRObjectID objectId = extractObjectId(httpServletRequest);
             if (objectId != null) {
-                String value = httpServletRequest.getParameter("accesskey");
-                if (value != null) {
+                final String secret = httpServletRequest.getParameter("accesskey");
+                if (secret != null) {
                     try {
                         MCRServlet.initializeMCRSession(httpServletRequest, getFilterName());
                         MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest,
                             (HttpServletResponse) response);
-                        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, value);
+                        MCRAccessKeyServiceFactory.getAccessKeySessionService()
+                            .activateAccessKey(objectId.toString(), secret);
                     } catch (Exception e) {
-                        LOGGER.debug("Cannot set access key to session", e);
+                        LOGGER.error("Cannot set access key '{}' for {} to session", secret, objectId, e);
                         MCRTransactionManager.rollbackTransactions();
                     } finally {
                         MCRServlet.cleanupMCRSession(httpServletRequest, getFilterName());
@@ -85,21 +87,21 @@ public class MCRAccessKeyFilter implements Filter {
 
     @Override
     public void destroy() {
-        //not needed
+        // not needed
     }
 
     private String getFilterName() {
         return this.getClass().getSimpleName();
     }
 
-    private static MCRObjectID extractObjectId(final HttpServletRequest request) {
+    private static MCRObjectID extractObjectId(HttpServletRequest request) {
         final String pathInfo = request.getPathInfo();
         final String id = pathInfo == null ? null : pathInfo.substring(1);
         if (id != null) {
             try {
                 return MCRObjectID.getInstance(id);
-            } catch (final MCRException e) {
-                LOGGER.debug("Cannot convert {} to MCRObjectID", id);
+            } catch (MCRException e) {
+                LOGGER.error("Cannot convert {} to MCRObjectID", id);
             }
         }
         return null;

@@ -20,11 +20,9 @@ package org.mycore.mcr.acl.accesskey;
 
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
 import org.mycore.access.MCRAccessBaseImpl;
+import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.common.MCRStoreTestCase;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -34,75 +32,44 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 public class MCRAccessKeyTestCase extends MCRStoreTestCase {
 
-    private static final String ACCESS_KEY_STRATEGY_PROP = "MCR.ACL.AccessKey.Strategy";
-
-    protected static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP + ".AllowedObjectTypes";
-
-    protected static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP =
-        ACCESS_KEY_STRATEGY_PROP + ".AllowedSessionPermissionTypes";
-
-    private static final String OBJECT_ID = "mcr_object_00000001";
-
-    private static final String DERIVATE_ID = "mcr_derivate_00000001";
-
-    private MCRObject object;
-
-    private MCRDerivate derivate;
-
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.datadir", "%MCR.basedir%/data");
         testProperties
             .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.Metadata.Type.document", "true");
-        testProperties.put("MCR.Metadata.Type.object", Boolean.TRUE.toString());
-        testProperties.put("MCR.Metadata.Type.derivate", Boolean.TRUE.toString());
-        testProperties.put("MCR.Metadata.ObjectID.NumberPattern", "00000000");
+        testProperties.put("MCR.Access.Strategy.Class", AlwaysTrueStrategy.class.getName());
+        testProperties.put("MCR.Metadata.Type.object", "true");
+        testProperties.put("MCR.Metadata.Type.derivate", "true");
         return testProperties;
     }
 
-    protected void setUpInstanceDefaultProperties() {
-        MCRConfiguration2.set(ALLOWED_OBJECT_TYPES_PROP, "object,derivate");
-        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read,writedb");
-    }
-
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        object = new MCRObject();
+    public static MCRObject createObject() {
+        MCRObject object = new MCRObject();
+        object.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("mycore_object"));
         object.setSchema("noSchema");
-        final MCRObjectID objectId = MCRObjectID.getInstance(OBJECT_ID);
-        object.setId(objectId);
-        MCRMetadataManager.create(object);
-
-        derivate = new MCRDerivate();
-        derivate.setSchema("datamodel-derivate.xsd");
-        final MCRObjectID derivateId = MCRObjectID.getInstance(DERIVATE_ID);
-        derivate.setId(derivateId);
-        final MCRMetaIFS ifs = new MCRMetaIFS("internal", null);
-        derivate.getDerivate().setInternals(ifs);
-        MCRMetaLinkID metaLinkID = new MCRMetaLinkID("internal", 0);
-        metaLinkID.setReference(objectId.toString(), null, null);
-        derivate.getDerivate().setLinkMeta(metaLinkID);
-        MCRMetadataManager.create(derivate);
-        setUpInstanceDefaultProperties();
-    }
-
-    @After
-    @Override
-    public void tearDown() throws Exception {
-        MCRMetadataManager.delete(derivate);
-        MCRMetadataManager.delete(object);
-        super.tearDown();
-    }
-
-    public MCRObject getObject() {
         return object;
     }
 
-    public MCRDerivate getDerivate() {
+    public static MCRDerivate createDerivate(MCRObjectID objectHrefId) {
+        MCRDerivate derivate = new MCRDerivate();
+        derivate.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("mycore_derivate"));
+        derivate.setSchema("datamodel-derivate.xsd");
+        final MCRMetaIFS ifs = new MCRMetaIFS("internal", null);
+        derivate.getDerivate().setInternals(ifs);
+        MCRMetaLinkID metaLinkID = new MCRMetaLinkID("internal", 0);
+        metaLinkID.setReference(objectHrefId.toString(), null, null);
+        derivate.getDerivate().setLinkMeta(metaLinkID);
         return derivate;
+    }
+
+    public static class AlwaysTrueStrategy implements MCRAccessCheckStrategy {
+
+        @Override
+        public boolean checkPermission(String id, String permission) {
+            return true;
+        }
+
     }
 }

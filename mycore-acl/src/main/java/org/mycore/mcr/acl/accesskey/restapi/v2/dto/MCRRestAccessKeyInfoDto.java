@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mcr.acl.accesskey.restapi.v2.model;
+package org.mycore.mcr.acl.accesskey.restapi.v2.dto;
 
 import java.util.List;
 
@@ -24,32 +24,7 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MCRAccessKeyInformation {
+public record MCRRestAccessKeyInfoDto(@JsonProperty("items") List<MCRAccessKey> accessKeyDtos,
+    @JsonProperty("totalResults") int totalAccessKeyCount) {
 
-    private List<MCRAccessKey> accessKeys;
-
-    private int totalAccessKeyCount;
-
-    public MCRAccessKeyInformation(List<MCRAccessKey> accessKeys, int totalAccessKeyCount) {
-        setAccessKeys(accessKeys);
-        setTotalAccessKeyCount(totalAccessKeyCount);
-    }
-
-    public void setAccessKeys(List<MCRAccessKey> accessKeys) {
-        this.accessKeys = accessKeys;
-    }
-
-    @JsonProperty("items")
-    public List<MCRAccessKey> getAccessKeys() {
-        return this.accessKeys;
-    }
-
-    public void setTotalAccessKeyCount(int totalAccessKeyCount) {
-        this.totalAccessKeyCount = totalAccessKeyCount;
-    }
-
-    @JsonProperty("totalResults")
-    public int getTotalAccessKeyCount() {
-        return this.totalAccessKeyCount;
-    }
 }
