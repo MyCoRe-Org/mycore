@@ -294,7 +294,7 @@ public class MCRCategoryMergeEventHandlerTest extends MCRJPATestCase {
 
         Element mods = loadMods("modsClassificationSameAuthorityDifferingLabel.xml");
 
-        List<Element> accessConditions = mods.getChildren("accessCondition", MODS_NAMESPACE);
+        List<Element> accessConditions = mods.getChildren("classification", MODS_NAMESPACE);
 
         assertEquals(4, accessConditions.size());
         assertEquals("foo:x", getLabelFromAttributeAndCategoryIdFromTextValue(accessConditions.get(0)));
@@ -309,7 +309,7 @@ public class MCRCategoryMergeEventHandlerTest extends MCRJPATestCase {
 
         Element mods = loadMods("modsClassificationDifferingAuthority.xml");
 
-        List<Element> accessConditions = mods.getChildren("accessCondition", MODS_NAMESPACE);
+        List<Element> accessConditions = mods.getChildren("classification", MODS_NAMESPACE);
 
         assertEquals(4, accessConditions.size());
         assertEquals("foo:x", getLabelFromAttributeAndCategoryIdFromTextValue(accessConditions.get(0)));
