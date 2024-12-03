@@ -33,35 +33,39 @@ public class MCRORCIDPutCodeInfo {
 
     private long[] otherPutCodes;
 
+    private static final long[] NO_OTHER_PUT_CODES = new long[0];
+
     /**
      * Initialises a new MCRORCIDPutCodeInfo with own and other put codes.
-     * 
+     *
      * @param ownPutCode own put code
      * @param otherPutCodes List of other put codes
      */
     public MCRORCIDPutCodeInfo(long ownPutCode, long[] otherPutCodes) {
         this.ownPutCode = ownPutCode;
-        this.otherPutCodes = otherPutCodes;
+        this.otherPutCodes = Arrays.copyOf(otherPutCodes, otherPutCodes.length);
     }
 
     /**
      * Initialises a new MCRORCIDPutCodeInfo with own put code.
-     * 
+     *
      * @param ownPutCode own put code
      */
     public MCRORCIDPutCodeInfo(long ownPutCode) {
         this.ownPutCode = ownPutCode;
+        this.otherPutCodes = NO_OTHER_PUT_CODES;
     }
 
     /**
      * Initialises a new MCRORCIDPutCodeInfo.
      */
     public MCRORCIDPutCodeInfo() {
+        this(0);
     }
 
     /**
      * Returns own put code.
-     * 
+     *
      * @return own put code
      */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -72,7 +76,7 @@ public class MCRORCIDPutCodeInfo {
 
     /**
      * Checks if object has own put code.
-     * 
+     *
      * @return true if there is an own put code
      */
     public boolean hasOwnPutCode() {
@@ -81,7 +85,7 @@ public class MCRORCIDPutCodeInfo {
 
     /**
      * Checks if object had own put code.
-     * 
+     *
      * @return true if put code is -1
      */
     public boolean hadOwnPutCode() {
@@ -90,7 +94,7 @@ public class MCRORCIDPutCodeInfo {
 
     /**
      * Sets own put code.
-     * 
+     *
      * @param putCode own put code
      */
     public void setOwnPutCode(long putCode) {
@@ -99,13 +103,13 @@ public class MCRORCIDPutCodeInfo {
 
     /**
      * Returns other put codes.
-     * 
+     *
      * @return other put codes
      */
     @JsonProperty("other")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public long[] getOtherPutCodes() {
-        return otherPutCodes;
+        return Arrays.copyOf(otherPutCodes, otherPutCodes.length);
     }
 
     /**
@@ -114,31 +118,26 @@ public class MCRORCIDPutCodeInfo {
      * @param putCodes other put codes
      */
     public void setOtherPutCodes(long[] putCodes) {
-        this.otherPutCodes = putCodes;
+        this.otherPutCodes = Arrays.copyOf(putCodes, putCodes.length);
     }
 
     /**
      * Checks if there are other put codes.
-     * 
+     *
      * @return true if there are other put codes
      */
     public boolean hasOtherPutCodes() {
-        return otherPutCodes != null && otherPutCodes.length > 0;
+        return otherPutCodes.length != 0;
     }
 
     /**
      * Adds put code to other put codes.
-     * 
+     *
      * @param putCode put code
      */
     public void addOtherPutCode(long putCode) {
-        if (otherPutCodes == null) {
-            otherPutCodes = new long[1];
-            otherPutCodes[0] = putCode;
-        } else {
-            otherPutCodes = Arrays.copyOf(otherPutCodes, otherPutCodes.length + 1);
-            otherPutCodes[otherPutCodes.length - 1] = putCode;
-        }
+        otherPutCodes = Arrays.copyOf(otherPutCodes, otherPutCodes.length + 1);
+        otherPutCodes[otherPutCodes.length - 1] = putCode;
     }
 
     @Override
@@ -148,16 +147,9 @@ public class MCRORCIDPutCodeInfo {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
+        if (!(obj instanceof MCRORCIDPutCodeInfo other)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        MCRORCIDPutCodeInfo other = (MCRORCIDPutCodeInfo) obj;
-        return (ownPutCode == other.ownPutCode) && Arrays.equals(otherPutCodes, other.otherPutCodes);
+        return ownPutCode == other.ownPutCode && Arrays.equals(otherPutCodes, other.otherPutCodes);
     }
 }

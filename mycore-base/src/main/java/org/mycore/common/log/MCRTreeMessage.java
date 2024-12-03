@@ -67,15 +67,16 @@ public final class MCRTreeMessage {
 
     private void treeLines(List<Indent> prefix, List<String> lines) {
         prefix.add(Indent.LEAD);
-        for (int i = 0, n = entries.size(); i < n; i++) {
+        int entriesCount = entries.size();
+        for (int i = 0; i < entriesCount; i++) {
             Entry entry = entries.get(i);
-            if (i == n - 1) {
-                prefix.remove(prefix.size() - 1);
+            if (i == entriesCount - 1) {
+                prefix.removeLast();
                 prefix.add(Indent.LAST);
             }
             entry.treeLines(prefix, lines);
         }
-        prefix.remove(prefix.size() - 1);
+        prefix.removeLast();
     }
 
     private enum Indent {
@@ -101,9 +102,10 @@ public final class MCRTreeMessage {
 
         protected String prefixString(List<Indent> prefix) {
             StringBuilder builder = new StringBuilder();
-            for (int i = 0, n = prefix.size(); i < n; i++) {
+            int prefixCount = prefix.size();
+            for (int i = 0; i < prefixCount; i++) {
                 Indent indent = prefix.get(i);
-                String symbol = i == n - 1 ? indent.lastSymbol : indent.leadSymbol;
+                String symbol = i == prefixCount - 1 ? indent.lastSymbol : indent.leadSymbol;
                 builder.append(symbol);
             }
             return builder.toString();

@@ -41,6 +41,7 @@ public class MCRCollection {
         return actions;
     }
 
+    @SuppressWarnings("PMD.ArrayIsStoredDirectly")//only POJO
     public void setActions(MCRAction... actions) {
         this.actions = actions;
     }

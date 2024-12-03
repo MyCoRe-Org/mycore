@@ -37,7 +37,7 @@ import org.apache.logging.log4j.LogManager;
  * @author Thomas Scheffler (yagee)
  *
  */
-public abstract class MCRPathUtils {
+public final class MCRPathUtils {
 
     private MCRPathUtils() {
 
@@ -45,9 +45,9 @@ public abstract class MCRPathUtils {
 
     /**
      * Returns requested {@link BasicFileAttributes} or null if file does not exist.
-     * 
+     *
      * Same as {@link Files#readAttributes(Path, Class, LinkOption...)} without throwing {@link IOException}.
-     * 
+     *
      * @param   path
      *          the path to the file
      * @param   type

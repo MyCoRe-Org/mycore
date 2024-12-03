@@ -32,15 +32,18 @@ import jakarta.websocket.Session;
 
 /**
  * Starting class for all mycore websocket endpoints.
- * 
+ *
  * @author Michel Buechner (mcrmibue)
  * @author Matthias Eichner
  */
-public abstract class MCRAbstractEndpoint {
+public class MCRAbstractEndpoint {
+
+    protected MCRAbstractEndpoint() {
+    }
 
     /**
      * Encapsulates a supplier with a mycore session.
-     * 
+     *
      * @param session the websocket session
      * @param supplier the supplier
      * @return the result of the supplier
@@ -56,7 +59,7 @@ public abstract class MCRAbstractEndpoint {
 
     /**
      * Encapsulates a function with a mycore session.
-     * 
+     *
      * @param session the websocket session
      * @param runnable the runnable
      */
@@ -72,7 +75,7 @@ public abstract class MCRAbstractEndpoint {
     /**
      * Retrieves the mycore session id from the websocket session and binds
      * the current thread with this mycore session.
-     * 
+     *
      * @param session the websocket session
      */
     protected void activate(Session session) {
@@ -95,7 +98,7 @@ public abstract class MCRAbstractEndpoint {
 
     /**
      * Releases the mycore session from this thread.
-     * 
+     *
      * @param session the websocket session
      */
     protected void passivate(Session session) {

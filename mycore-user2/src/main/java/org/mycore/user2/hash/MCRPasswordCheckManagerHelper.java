@@ -53,7 +53,7 @@ import org.mycore.resource.MCRResourceHelper;
  * configuration directory. The content of this file is compared to the corresponding values, when a strategy is
  * encountered again. For build-in strategies, corresponding files are provided as a ressource.
  */
-abstract class MCRPasswordCheckManagerHelper {
+final class MCRPasswordCheckManagerHelper {
 
     private static final String DATA_DIRECTORY_NAME = "passwordCheckStrategies";
 

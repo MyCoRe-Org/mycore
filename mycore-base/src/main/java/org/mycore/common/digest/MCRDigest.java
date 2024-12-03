@@ -41,7 +41,7 @@ public abstract class MCRDigest {
      * @param value The string representation of the digest.
      * @throws MCRDigestValidationException If the digest value is invalid.
      */
-    public MCRDigest(String value) throws MCRDigestValidationException {
+    protected MCRDigest(String value) throws MCRDigestValidationException {
         this.value = HexFormat.of().parseHex(value);
         validate();
     }
@@ -52,13 +52,23 @@ public abstract class MCRDigest {
      * @param value The string representation of the digest.
      * @throws MCRDigestValidationException If the digest value is invalid.
      */
-    public MCRDigest(byte[] value) throws MCRDigestValidationException {
-        this.value = value;
+    protected MCRDigest(byte[] value) throws MCRDigestValidationException {
+        this.value = Arrays.copyOf(value, value.length); //as we validate the value
         validate();
     }
 
+
     /**
-     * Returns the value of the digest.
+     * Returns the value of the digest as a byte array.
+     *
+     * @return Digest value.
+     */
+    public byte[] toBytes() {
+        return Arrays.copyOf(value, value.length);
+    }
+
+    /**
+     * Returns the value of the digest as a hex encoded string.
      *
      * @return Digest value.
      */
@@ -68,14 +78,10 @@ public abstract class MCRDigest {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof MCRDigest mcrDigest)) {
             return false;
         }
-        MCRDigest mcrDigest = (MCRDigest) o;
-        return Arrays.equals(value, mcrDigest.value);
+        return Arrays.equals(value, mcrDigest.value) && getAlgorithm().equals(mcrDigest.getAlgorithm());
     }
 
     @Override
@@ -102,12 +108,12 @@ public abstract class MCRDigest {
     /**
      * Digest Algorithm
      */
-    public static abstract class Algorithm {
+    public static class Algorithm {
 
         final String name;
 
         protected Algorithm(String name) {
-            this.name = name;
+            this.name = Objects.requireNonNull(name);
         }
 
         public String toLowerCase() {
@@ -118,6 +124,17 @@ public abstract class MCRDigest {
             return name.toUpperCase(Locale.ROOT);
         }
 
-    }
+        @Override
+        public final boolean equals(Object o) {
+            if (!(o instanceof Algorithm algorithm)) {
+                return false;
+            }
+            return name.equals(algorithm.name);
+        }
 
+        @Override
+        public int hashCode() {
+            return name.hashCode();
+        }
+    }
 }

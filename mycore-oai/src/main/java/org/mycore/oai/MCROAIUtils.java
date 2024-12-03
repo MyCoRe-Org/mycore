@@ -20,7 +20,10 @@ package org.mycore.oai;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 
-public abstract class MCROAIUtils {
+public final class MCROAIUtils {
+
+    private MCROAIUtils() {
+    }
 
     public static String getDefaultRestriction(String configPrefix) {
         return MCRConfiguration2.getString(configPrefix + "Search.Restriction").orElse(null);

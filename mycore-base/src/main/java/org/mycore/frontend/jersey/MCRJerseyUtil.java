@@ -48,18 +48,21 @@ import jakarta.ws.rs.core.UriInfo;
 
 /**
  * Contains some jersey utility methods.
- * 
+ *
  * @author Matthias Eichner
  */
-public abstract class MCRJerseyUtil {
+public final class MCRJerseyUtil {
 
     public static final String APPLICATION_JSON_UTF8 = MediaType.APPLICATION_JSON + ";charset=utf-8";
 
     public static final String APPLICATION_XML_UTF8 = MediaType.APPLICATION_XML + ";charset=utf-8";
 
+    private MCRJerseyUtil() {
+    }
+
     /**
      * Transforms a jdom document to a <code>MCRContent</code> via the <code>MCRLayoutService</code>.
-     * 
+     *
      * @param document
      *            the document to transform
      * @param request
@@ -80,7 +83,7 @@ public abstract class MCRJerseyUtil {
 
     /**
      * Returns the mycore id. Throws a web application exception if the id is invalid or not found.
-     * 
+     *
      * @param id
      *            id as string
      * @return mycore object id
@@ -100,7 +103,7 @@ public abstract class MCRJerseyUtil {
 
     /**
      * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
-     * 
+     *
      * @param id
      *            mycore object id
      * @param permission
@@ -115,7 +118,7 @@ public abstract class MCRJerseyUtil {
     /**
      * Checks if the current user has the read permission on the given derivate content.
      * Throws an unauthorized exception otherwise.
-     * 
+     *
      * @param id
      *            mycore object id
      * @see MCRAccessManager#checkDerivateContentPermission(MCRObjectID, String)
@@ -128,7 +131,7 @@ public abstract class MCRJerseyUtil {
 
     /**
      * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
-     * 
+     *
      * @param id
      *            mycore object id
      * @param permission
@@ -142,7 +145,7 @@ public abstract class MCRJerseyUtil {
 
     /**
      * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
-     * 
+     *
      * @param permission
      *            permission to check
      */
@@ -156,7 +159,7 @@ public abstract class MCRJerseyUtil {
      * Throws a {@link WebApplicationException} with status and message.
      * This exception will be handled by the {@link MCRJerseyExceptionMapper}.
      * See <a href="http://stackoverflow.com/questions/29414041/exceptionmapper-for-webapplicationexceptions-thrown-with-entity">stackoverflow</a>.
-     * 
+     *
      * @param status the http return status
      * @param message the message to print
      */
@@ -166,7 +169,7 @@ public abstract class MCRJerseyUtil {
 
     /**
      * Returns a human readable message of a http status code.
-     * 
+     *
      * @param statusCode
      *            http status code
      * @return human readable string

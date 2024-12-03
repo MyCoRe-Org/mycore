@@ -23,10 +23,13 @@ import java.net.URI;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
 
-public abstract class MCRJerseyResource {
+public class MCRJerseyResource {
 
     @Context
     protected UriInfo uriInfo;
+
+    protected MCRJerseyResource() {
+    }
 
     protected URI getBaseURI() {
         return uriInfo.getBaseUri();

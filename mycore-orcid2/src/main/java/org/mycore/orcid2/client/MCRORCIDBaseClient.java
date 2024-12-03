@@ -40,7 +40,7 @@ import jakarta.ws.rs.core.Response;
  * Basic ORCID client.
  * Defines basic setup and reading methods.
  */
-abstract class MCRORCIDBaseClient {
+class MCRORCIDBaseClient {
 
     /**
      * ORCID XML media type.
@@ -54,7 +54,7 @@ abstract class MCRORCIDBaseClient {
 
     /**
      * Creates MCRORCIDBaseClient with rest url and token.
-     * 
+     *
      * @param restURL rest url
      * @param token the token
      */
@@ -68,7 +68,7 @@ abstract class MCRORCIDBaseClient {
 
     /**
      * Registers error handler.
-     * 
+     *
      * @param errorHandler the error handler
      */
     public void registerErrorHandler(MCRORCIDClientErrorHandler errorHandler) {
@@ -77,7 +77,7 @@ abstract class MCRORCIDBaseClient {
 
     /**
      * Fetches ORCID with given query params.
-     * 
+     *
      * @param path the path
      * @param queryMap the query params
      * @return the Response
@@ -92,7 +92,7 @@ abstract class MCRORCIDBaseClient {
 
     /**
      * Fetches section/object of orcid profile and wraps response into type.
-     * 
+     *
      * @param orcid the ORCID iD
      * @param section the ORCID section
      * @param <T> the result class
@@ -113,7 +113,7 @@ abstract class MCRORCIDBaseClient {
 
     /**
      * Handles error response.
-     * 
+     *
      * @param response the error response
      * @throws MCRORCIDRequestException always
      */
@@ -126,7 +126,7 @@ abstract class MCRORCIDBaseClient {
 
     /**
      * Returns the base WebTarget of client.
-     * 
+     *
      * @return base WebTarget
      */
     protected WebTarget getBaseTarget() {

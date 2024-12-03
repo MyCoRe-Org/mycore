@@ -34,6 +34,7 @@ public class MCRActionMappings {
     @XmlElement(name = "collection")
     MCRCollection[] collections;
 
+    @SuppressWarnings("PMD.ArrayIsStoredDirectly")//only POJO
     public void setCollections(MCRCollection... collections) {
         this.collections = collections;
     }

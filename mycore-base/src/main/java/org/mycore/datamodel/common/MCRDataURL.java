@@ -94,7 +94,7 @@ public class MCRDataURL implements Serializable {
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
         final Map<String, String> parameters) throws MalformedURLException {
-        this.data = data;
+        this.data = Arrays.copyOf(data, data.length);
         this.encoding = encoding != null ? encoding : MCRDataURLEncoding.URL;
         this.mimeType = mimeType != null && !mimeType.isEmpty() ? mimeType : DEFAULT_MIMETYPE;
 
@@ -129,7 +129,7 @@ public class MCRDataURL implements Serializable {
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
         final Charset charset) throws MalformedURLException {
-        this.data = data;
+        this.data = Arrays.copyOf(data, data.length);
         this.encoding = encoding != null ? encoding : MCRDataURLEncoding.URL;
         this.mimeType = mimeType != null && !mimeType.isEmpty() ? mimeType : DEFAULT_MIMETYPE;
 

@@ -101,12 +101,12 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
         };
 
         BASE_64_TO_RADIX_64_MAP = new char[max(base64Alphabet) + 1];
-        for (int i = 0, n = base64Alphabet.length; i < n; i++) {
+        for (int i = 0; i < base64Alphabet.length; i++) {
             BASE_64_TO_RADIX_64_MAP[base64Alphabet[i]] = radix64Alphabet[i];
         }
 
         RADIX_64_TO_BASE_64_MAP = new char[max(radix64Alphabet) + 1];
-        for (int i = 0, n = radix64Alphabet.length; i < n; i++) {
+        for (int i = 0; i < radix64Alphabet.length; i++) {
             RADIX_64_TO_BASE_64_MAP[radix64Alphabet[i]] = base64Alphabet[i];
         }
 

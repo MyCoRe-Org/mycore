@@ -140,12 +140,13 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
         int digestLength = digest.getDigestLength();
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        for (int i = 0, n = hashSizeBytes / digestLength; i < n; i++) {
+        int hashIterations = hashSizeBytes / digestLength;
+        for (int i = 0; i < hashIterations; i++) {
             buffer.write(getHash(digest, source, numberOfBytes, i));
             digest.reset();
         }
-        buffer.write(getHash(digest, source, numberOfBytes, hashSizeBytes / digestLength),
-            0, hashSizeBytes - (hashSizeBytes / digestLength) * digestLength);
+        buffer.write(getHash(digest, source, numberOfBytes, hashIterations), 0,
+            hashSizeBytes - hashIterations * digestLength);
 
         return buffer.toByteArray();
 
@@ -157,10 +158,11 @@ public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
             digest.update((byte) 0);
         }
 
-        for (long i = 0, n = numberOfBytes / source.length; i < n; i++) {
+        long iterations = numberOfBytes / source.length;
+        for (long i = 0; i < iterations; i++) {
             digest.update(source);
         }
-        digest.update(source, 0, (int) (numberOfBytes - (numberOfBytes / source.length) * source.length));
+        digest.update(source, 0, (int) (numberOfBytes - iterations * source.length));
 
         return digest.digest();
 
