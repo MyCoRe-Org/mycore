@@ -62,7 +62,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
 
     static {
         if (!ENABLED) {
-            LOGGER.info("Neo4J Indexing is disabled");
+            LOGGER.info("Neo4J Indexing is disabled, because {} is not set.", MCRNeo4JConstants.DEFAULT_NEO4J_SERVER_URL);
         } else {
             NEO4J_TASK_EXECUTOR.scheduleWithFixedDelay(() -> {
                 LOGGER.debug("NEO4J Task Executor invoked: {} Nodes to process", NEO4J_TASK_QUEUE.size());
