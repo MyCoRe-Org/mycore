@@ -53,8 +53,8 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
             String logMessage = new MessageFormat("""
                 There are inconsistencies found between the classifications %s and %s.
                 They have the same authority "%s", but %s has the displayLabel "%s" and %s has the displayLabel "%s".
-                """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName, classificationName1,
-                displayLabel1, classificationName2, displayLabel2});
+                """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName,
+                classificationName1, displayLabel1, classificationName2, displayLabel2});
 
             LOGGER.warn(logMessage);
             return false;
