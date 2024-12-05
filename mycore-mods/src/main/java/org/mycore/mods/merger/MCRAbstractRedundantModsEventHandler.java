@@ -21,7 +21,7 @@ import java.util.List;
  * This abstract class can be extended by overriding the following abstract methods:
  * <ol>
  *     <li>{@link MCRAbstractRedundantModsEventHandler#isConsistent(Element, Element)}: custom checks for
- *     the two classifications' consistency, default return-value is true.</li>
+ *     the two classifications' consistency.</li>
  *     <li>{@link MCRAbstractRedundantModsEventHandler#getClassificationElementName()}: the name of
  *     the mods-element that the EventHandler is checking duplicates for.</li>
  * </ol>
@@ -45,6 +45,12 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
         mergeCategories(obj);
     }
 
+    /**
+     * Merging classifications by detaching parent-categories inside an {@link MCRObject}.
+     * Mods-element is traversed for classifications, found relatedItems are processed separately from
+     * the rest of the document. Processed document is sorted.
+     * @param obj the handled object
+     */
     protected void mergeCategories(MCRObject obj) {
         MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
         if (mcrmodsWrapper.getMODS() == null) {
@@ -68,6 +74,11 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
         MCRMODSSorter.sort(mods);
     }
 
+    /**
+     * Recursively writes all child-elements of a given element into a list and returns the list once completed.
+     * @param element the parent element for which all children should be listed
+     * @return a list with all child-elements
+     */
     protected static List<Element> getAllDescendants(Element element) {
         List<Element> descendants = new ArrayList<>();
 
@@ -91,6 +102,13 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
             .toList();
     }
 
+    /**
+     * Iterates through a list of classification elements and for each element pair checks if one of the element
+     * is a parent category of the other. Calls
+     * {@link MCRAbstractRedundantModsEventHandler#isConsistent(Element, Element)} and only detaches parent element
+     * if the method returns true.
+     * @param elements a list of classification elements that are all compared to each other in pairs
+     */
     protected void dropRedundantCategories(List<Element> elements) {
         for (int i = 0; i < elements.size(); i++) {
             for (int j = i + 1; j < elements.size(); j++) {
@@ -113,5 +131,9 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
      */
     protected abstract boolean isConsistent(Element element1, Element element2);
 
+    /**
+     * Returns the name of the classification element that the specific EventHandler is handling.
+     * @return name of the classification element
+     */
     protected abstract String getClassificationElementName();
 }

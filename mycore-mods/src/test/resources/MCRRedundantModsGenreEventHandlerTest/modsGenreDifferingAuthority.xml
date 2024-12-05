@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres2" valueURI="http://www.mycore.org/classifications/mir_genres2#y"/>
+    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres2" valueURI="http://www.mycore.org/classifications/mir_genres2#x-1-1"/>
+    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#x-1"/>
+    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#x"/>
+</mods:mods>

@@ -1,7 +1,6 @@
 package org.mycore.mods.merger;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mycore.common.MCRConstants.MODS_NAMESPACE;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,7 +20,6 @@ import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.resource.MCRResourceHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCase {
@@ -38,7 +36,6 @@ public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCa
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb.xml")));
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb2.xml")));
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb3.xml")));
-
     }
 
     private Element loadMods(String fileName) throws Exception {
@@ -65,22 +62,17 @@ public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCa
 
     @Test
     public void redundantClassificationsWithSameAuthorityAndLabelAreRemoved() throws Exception {
-
         Element mods = loadMods("modsClassificationSameAuthoritySameLabel.xml");
-
         List<Element> classifications = mods.getChildren("classification", MODS_NAMESPACE);
 
         assertEquals(2, classifications.size());
         assertEquals("foo:x-1-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(0)));
         assertEquals("foo:y", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(1)));
-
     }
 
     @Test
     public void redundantClassificationsWithSameAuthorityAndDifferingLabelAreKept() throws Exception {
-
         Element mods = loadMods("modsClassificationSameAuthorityDifferingLabel.xml");
-
         List<Element> classifications = mods.getChildren("classification", MODS_NAMESPACE);
 
         assertEquals(4, classifications.size());
@@ -88,14 +80,11 @@ public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCa
         assertEquals("bar:x-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(1)));
         assertEquals("baz:x-1-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(2)));
         assertEquals("foo:y", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(3)));
-
     }
 
     @Test
     public void redundantClassificationsWithDifferingAuthorityAreKept() throws Exception {
-
         Element mods = loadMods("modsClassificationDifferingAuthority.xml");
-
         List<Element> classifications = mods.getChildren("classification", MODS_NAMESPACE);
 
         assertEquals(4, classifications.size());
@@ -103,11 +92,39 @@ public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCa
         assertEquals("foo:x-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(1)));
         assertEquals("foo:x-1-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(2)));
         assertEquals("foo:y", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(3)));
+    }
 
+    @Test
+    public void redundantClassificationsInRelatedItemAreKept() throws Exception {
+        Element mods = loadMods("modsClassificationsInRelatedItem.xml");
+        Element relatedItem = mods.getChildren("relatedItem", MODS_NAMESPACE).getFirst();
+        List<Element> classifications = relatedItem.getChildren("classification", MODS_NAMESPACE);
+
+        assertEquals(4, classifications.size());
+        assertEquals("foo:x", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(0)));
+        assertEquals("foo:x-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(1)));
+        assertEquals("foo:x-1-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(2)));
+        assertEquals("foo:y", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(3)));
+    }
+
+    @Test
+    public void redundantClassificationsInRelatedItemWithoutXlinkAreRemoved() throws Exception {
+        Element mods = loadMods("modsClassificationsInRelatedItemNoXlink.xml");
+        Element relatedItem = mods.getChildren("relatedItem", MODS_NAMESPACE).getFirst();
+        List<Element> classifications = relatedItem.getChildren("classification", MODS_NAMESPACE);
+
+        assertEquals(2, classifications.size());
+        assertEquals("foo:x-1-1", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(0)));
+        assertEquals("foo:y", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(1)));
     }
 
     private String getLabelFromAttributeAndCategoryIdFromTextValue(Element element) {
         return element.getAttributeValue("displayLabel") + ":" + element.getText().trim();
+    }
+
+    private String getCategoryIdFromValueUri(Element element) {
+        String uri = element.getAttribute("valueURI").getValue();
+        return uri.substring(uri.indexOf('#') + 1);
     }
 
 }

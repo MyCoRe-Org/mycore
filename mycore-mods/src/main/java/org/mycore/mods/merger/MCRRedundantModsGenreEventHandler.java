@@ -28,10 +28,11 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
     }
 
     /**
-     * TODO
+     * Returns false if the authorities of the two genre elements are the same, but
+     * the displayLabels or the types differ from each other.
      * @param el1 the first element to be compared
      * @param el2 the first element to be compared
-     * @return
+     * @return false if inconsistent
      */
     @Override
     protected boolean isConsistent(Element el1, Element el2) {
@@ -57,10 +58,10 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
         if (hasSameAuthority && !Objects.equals(displayLabel1, displayLabel2)) {
 
             String logMessage = new MessageFormat("""
-            There are inconsistencies found between the classifications %s and %s. They have the same authority "%s",
-            but %s has the displayLabel "%s" and %s has the displayLabel "%s".
-            """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName,
-                classificationName1, displayLabel1, classificationName2, displayLabel2});
+            There are inconsistencies found between the classifications {0} and {1}. They have the same authority "{2}",
+            but {0} has the displayLabel "{3}" and {1} has the displayLabel "{4}".""", Locale.ROOT)
+                .format(new Object[] {classificationName1, classificationName2, authorityName,
+                    displayLabel1, displayLabel2});
 
             LOGGER.warn(logMessage);
             return false;
@@ -68,10 +69,9 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
         if (hasSameAuthority && !Objects.equals(type1,type2)) {
 
             String logMessage = new MessageFormat("""
-            There are inconsistencies found between the classifications %s and %s. They have the same authority "%s",
-            but %s has the type "%s" and %s has the type "%s".
-            """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName,
-                classificationName1, type1, classificationName2, type2});
+            There are inconsistencies found between the classifications {0} and {1}. They have the same authority "{2}",
+            but {0} has the type "{3}" and {1} has the type "{4}".""", Locale.ROOT)
+                .format(new Object[] {classificationName1, classificationName2, authorityName, type1, type2});
 
             LOGGER.warn(logMessage);
             return false;

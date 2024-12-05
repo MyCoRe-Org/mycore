@@ -28,10 +28,11 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
     }
 
     /**
-     * TODO
+     * Returns false if the authorities of the two classification elements are the same, but
+     * the displayLabels differ from each other.
      * @param el1 the first element to be compared
      * @param el2 the first element to be compared
-     * @return
+     * @return false if inconsistent
      */
     @Override
     protected boolean isConsistent(Element el1, Element el2) {
@@ -51,10 +52,10 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
             final String classificationName2 = cat2 != null ? cat2.toString() : "unknown";
 
             String logMessage = new MessageFormat("""
-                There are inconsistencies found between the classifications %s and %s.
-                They have the same authority "%s", but %s has the displayLabel "%s" and %s has the displayLabel "%s".
-                """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName,
-                classificationName1, displayLabel1, classificationName2, displayLabel2});
+                There are inconsistencies found between the classifications {0} and {1}.
+                They have the same authority "{2}", but {0} has the displayLabel "{3}" and {1}
+                has the displayLabel "{4}".""", Locale.ROOT).format(new Object[] {classificationName1,
+                classificationName2, authorityName, displayLabel1, displayLabel2});
 
             LOGGER.warn(logMessage);
             return false;
