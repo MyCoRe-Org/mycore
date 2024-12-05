@@ -7,6 +7,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.classification.MCRClassMapper;
 
+import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -48,11 +50,11 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
             final String classificationName1 = cat1 != null ? cat1.toString() : "unknown";
             final String classificationName2 = cat2 != null ? cat2.toString() : "unknown";
 
-            String logMessage = """
-                There are inconsistencies found between the classifications %s and %s. They have the same authority "%s",
-                but %s has the displayLabel "%s" and %s has the displayLabel "%s".
-                """.formatted(classificationName1, classificationName2, authorityName, classificationName1,
-                displayLabel1, classificationName2, displayLabel2);
+            String logMessage = new MessageFormat("""
+                There are inconsistencies found between the classifications %s and %s.
+                They have the same authority "%s", but %s has the displayLabel "%s" and %s has the displayLabel "%s".
+                """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName, classificationName1,
+                displayLabel1, classificationName2, displayLabel2});
 
             LOGGER.warn(logMessage);
             return false;

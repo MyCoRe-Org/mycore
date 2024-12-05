@@ -7,6 +7,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.classification.MCRClassMapper;
 
+import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -54,22 +56,22 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
 
         if (hasSameAuthority && !Objects.equals(displayLabel1, displayLabel2)) {
 
-            String logMessage = """
+            String logMessage = new MessageFormat("""
             There are inconsistencies found between the classifications %s and %s. They have the same authority "%s",
             but %s has the displayLabel "%s" and %s has the displayLabel "%s".
-            """.formatted(classificationName1, classificationName2, authorityName, classificationName1,
-                displayLabel1, classificationName2, displayLabel2);
+            """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName,
+                classificationName1, displayLabel1, classificationName2, displayLabel2});
 
             LOGGER.warn(logMessage);
             return false;
         }
         if (hasSameAuthority && !Objects.equals(type1,type2)) {
 
-            String logMessage = """
+            String logMessage = new MessageFormat("""
             There are inconsistencies found between the classifications %s and %s. They have the same authority "%s",
             but %s has the type "%s" and %s has the type "%s".
-            """.formatted(classificationName1, classificationName2, authorityName, classificationName1,
-                type1, classificationName2, type2);
+            """, Locale.ROOT).format(new Object[] {classificationName1, classificationName2, authorityName,
+                classificationName1, type1, classificationName2, type2});
 
             LOGGER.warn(logMessage);
             return false;
