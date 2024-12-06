@@ -18,155 +18,55 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
-import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.common.xml.MCRXPathBuilder;
+import org.mycore.frontend.xeditor.mapper.MCRField;
+import org.mycore.frontend.xeditor.mapper.MCRFieldMapping;
+import org.mycore.frontend.xeditor.mapper.MCRMappingDecoder;
 
 public class MCREditorSubmission {
 
-    public static final String PREFIX_DEFAULT_VALUE = "_xed_default_";
-
-    public static final String PREFIX_CHECK_RESUBMISSION = "_xed_check";
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    private Set<String> xPaths2CheckResubmission = new LinkedHashSet<>();
-
-    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<>();
-
     private MCREditorSession session;
+
+    private MCRFieldMapping fieldMapping = new MCRFieldMapping();
 
     public MCREditorSubmission(MCREditorSession session) {
         this.session = session;
+        MCRMappingDecoder decoder = new MCRMappingDecoder();
+        fieldMapping = decoder.decode(session.getEditedXML());
     }
 
-    public void clear() {
-        xPaths2CheckResubmission.clear();
-        xPath2DefaultValue.clear();
-    }
+    public void setSubmittedValues(Map<String, String[]> params) throws JaxenException, JDOMException {
+        handleLegacySubmissions(params);
 
-    public void mark2checkResubmission(MCRBinding binding) {
-        for (Object node : binding.getBoundNodes()) {
-            xPaths2CheckResubmission.add(MCRXPathBuilder.buildXPath(node));
-        }
-    }
-
-    public String getXPaths2CheckResubmission() {
-        StringBuilder sb = new StringBuilder();
-        for (String xPath : xPaths2CheckResubmission) {
-            String path = xPath.substring(xPath.indexOf("/", 1) + 1);
-            sb.append(path).append(' ');
-        }
-        return sb.toString().trim();
-    }
-
-    public void setXPaths2CheckResubmission(String xPaths) {
-        xPaths2CheckResubmission.clear();
-        String rootXPath = MCRXPathBuilder.buildXPath(session.getEditedXML().getRootElement()) + "/";
-        if (xPaths != null) {
-            for (String xPath : xPaths.split(" ")) {
-                xPaths2CheckResubmission.add(rootXPath + xPath);
-            }
-        }
-    }
-
-    public void emptyNotResubmittedNodes() throws JaxenException {
-        for (String xPath : xPaths2CheckResubmission) {
-            MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-            if (!binding.getBoundNodes().isEmpty()) {
-                binding.setValue("");
-            } else {
-                LOGGER.warn("Binding does not contain a bound node [MCR-2558]");
-            }
-            binding.detach();
-        }
-    }
-
-    public void markDefaultValue(String xPath, String defaultValue) {
-        xPath2DefaultValue.put(xPath, defaultValue);
-    }
-
-    public Map<String, String> getDefaultValues() {
-        return xPath2DefaultValue;
-    }
-
-    public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
-        String[] xPaths2Check = values.get(PREFIX_CHECK_RESUBMISSION);
-        if ((xPaths2Check != null) && (xPaths2Check.length > 0)) {
-            setXPaths2CheckResubmission(xPaths2Check[0]);
-        }
-
-        xPath2DefaultValue.clear();
-
-        Map<MCRBinding, String[]> valuesToSet = new HashMap<>();
-
-        for (String paramName : values.keySet()) {
-            if (paramName.startsWith("/")) {
-                MCRBinding binding = new MCRBinding(paramName, true, session.getRootBinding());
-                valuesToSet.put(binding, values.get(paramName));
-            } else if (paramName.startsWith(PREFIX_DEFAULT_VALUE)) {
-                String xPath = paramName.substring(PREFIX_DEFAULT_VALUE.length());
-
-                MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-                boolean noSuchNode = binding.getBoundNodes().isEmpty();
-                binding.detach();
-                if (noSuchNode) {
-                    continue;
-                }
-
-                String defaultValue = values.get(paramName)[0];
-                markDefaultValue(xPath, defaultValue);
-            }
-        }
-
-        for (MCRBinding binding : valuesToSet.keySet()) {
-            setSubmittedValues(binding, valuesToSet.get(binding));
-        }
-
-        emptyNotResubmittedNodes();
-        setDefaultValues();
+        setSubmittedFields(params);
+        fieldMapping.setFieldsWithoutValues();
 
         session.setBreakpoint("After setting submitted values");
     }
 
-    private void setSubmittedValues(MCRBinding binding, String[] values) {
-        List<Object> boundNodes = binding.getBoundNodes();
-
-        while (boundNodes.size() < values.length) {
-            binding.cloneBoundElement(boundNodes.size() - 1);
+    /** Legacy submission use absolute XPath as field name **/
+    private void handleLegacySubmissions(Map<String, String[]> params) throws JaxenException {
+        for (String paramName : params.keySet()) {
+            if (paramName.startsWith("/")) {
+                MCRBinding binding = new MCRBinding(paramName, true, session.getRootBinding());
+                binding.setValues(params.get(paramName));
+                session.getChangeTracker().track(binding.getChanges());
+                binding.detach();
+            }
         }
-
-        for (int i = 0; i < values.length; i++) {
-            String value = values[i] == null ? "" : values[i].trim();
-            value = MCRXMLFunctions.normalizeUnicode(value);
-            value = MCRXMLHelper.removeIllegalChars(value);
-            binding.setValue(i, value);
-
-            Object node = binding.getBoundNodes().get(i);
-            xPaths2CheckResubmission.remove(MCRXPathBuilder.buildXPath(node));
-        }
-
-        binding.detach();
     }
 
-    public void setDefaultValues() throws JaxenException {
-        MCRBinding rootBinding = session.getRootBinding();
-        for (String xPath : xPath2DefaultValue.keySet()) {
-            String defaultValue = xPath2DefaultValue.get(xPath);
-            MCRBinding binding = new MCRBinding(xPath, false, rootBinding);
-            binding.setDefault(defaultValue);
-            binding.detach();
-        }
+    private void setSubmittedFields(Map<String, String[]> params) {
+        params.keySet().stream().filter(name -> fieldMapping.hasField(name)).forEach(name -> {
+            MCRField field = fieldMapping.getField(name);
+            MCRNodes nodes = new MCRNodes(field.getNodes());
+            String[] values = params.get(name);
+            nodes.setValues(values);
+            session.getChangeTracker().track(nodes.getChanges());
+            fieldMapping.removeField(field);
+        });
     }
 }
