@@ -5,7 +5,9 @@
   <categories>
     <category ID="x">
       <category ID="x-1">
-        <category ID="x-1-1"/>
+        <category ID="x-1-1">
+          <category ID="x-1-1-1"/>
+        </category>
       </category>
     </category>
     <category ID="y"/>

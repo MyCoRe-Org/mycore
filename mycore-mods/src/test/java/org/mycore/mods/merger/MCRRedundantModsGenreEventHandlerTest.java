@@ -130,14 +130,29 @@ public class MCRRedundantModsGenreEventHandlerTest extends MCRJPATestCase {
     @Test
     public void redundantGenresWithDifferingAuthorityAreKept() throws Exception {
         Element mods = loadMods("modsGenreDifferingAuthority.xml");
-        List<Element> classifications = mods.getChildren("genre", MODS_NAMESPACE);
+        List<Element> genres = mods.getChildren("genre", MODS_NAMESPACE);
 
-        assertEquals(3, classifications.size());
-        assertEquals("intern:y", getTypeFromAttributeAndCategoryIdFromValueUri(classifications.get(0)));
-        assertEquals("intern:x-1-1", getTypeFromAttributeAndCategoryIdFromValueUri(classifications.get(1)));
-        assertEquals("intern:x-1", getTypeFromAttributeAndCategoryIdFromValueUri(classifications.get(2)));
+        assertEquals(3, genres.size());
+        assertEquals("intern:y", getTypeFromAttributeAndCategoryIdFromValueUri(genres.get(0)));
+        assertEquals("intern:x-1-1", getTypeFromAttributeAndCategoryIdFromValueUri(genres.get(1)));
+        assertEquals("intern:x-1", getTypeFromAttributeAndCategoryIdFromValueUri(genres.get(2)));
+    }
+
+    @Test
+    public void redundantGenresInModsAndRelatedItemNoInteraction() throws Exception {
+        Element mods = loadMods("modsGenresInAndOutsideRelatedItem.xml");
+        List<Element> genresOutside = mods.getChildren("genre", MODS_NAMESPACE);
 
 
+        assertEquals(1, genresOutside.size());
+        assertEquals("intern:x-1", getTypeFromAttributeAndCategoryIdFromValueUri(genresOutside.getFirst()));
+
+        List<Element> genresInside = mods.getChild("relatedItem", MODS_NAMESPACE)
+            .getChildren("genre", MODS_NAMESPACE);
+
+        assertEquals(2, genresInside.size());
+        assertEquals("intern:x-1-1-1", getTypeFromAttributeAndCategoryIdFromValueUri(genresInside.get(0)));
+        assertEquals("intern:y", getTypeFromAttributeAndCategoryIdFromValueUri(genresInside.get(1)));
     }
 
     private String getCategoryIdFromValueUri(Element element) {

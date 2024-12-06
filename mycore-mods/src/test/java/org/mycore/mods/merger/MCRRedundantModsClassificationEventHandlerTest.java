@@ -118,6 +118,23 @@ public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCa
         assertEquals("foo:y", getLabelFromAttributeAndCategoryIdFromTextValue(classifications.get(1)));
     }
 
+    @Test
+    public void redundantClassificationsInModsAndRelatedItemNoInteraction() throws Exception {
+        Element mods = loadMods("modsClassificationsInAndOutsideRelatedItem.xml");
+        List<Element> classificationsOutside = mods.getChildren("classification", MODS_NAMESPACE);
+
+        assertEquals(1, classificationsOutside.size());
+        assertEquals("foo:x-1", getLabelFromAttributeAndCategoryIdFromTextValue(classificationsOutside.getFirst()));
+
+        List<Element> classificationsInside = mods.getChild("relatedItem", MODS_NAMESPACE)
+            .getChildren("classification", MODS_NAMESPACE);
+
+        assertEquals(3, classificationsInside.size());
+        assertEquals("foo:x-1-1", getLabelFromAttributeAndCategoryIdFromTextValue(classificationsInside.get(0)));
+        assertEquals("foo:x-1-1-1", getLabelFromAttributeAndCategoryIdFromTextValue(classificationsInside.get(1)));
+        assertEquals("foo:y", getLabelFromAttributeAndCategoryIdFromTextValue(classificationsInside.get(2)));
+    }
+
     private String getLabelFromAttributeAndCategoryIdFromTextValue(Element element) {
         return element.getAttributeValue("displayLabel") + ":" + element.getText().trim();
     }
