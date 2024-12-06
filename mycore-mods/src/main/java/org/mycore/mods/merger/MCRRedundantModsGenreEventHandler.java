@@ -51,8 +51,8 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
         if (!Objects.equals(displayLabel1, displayLabel2)) {
 
             String logMessage = """
-                There are inconsistencies found between the classifications {} and {}. They have the same authority "{}",
-                but {} has the displayLabel "{}" and {} has the displayLabel "{}".""";
+                There are inconsistencies found between the classifications {} and {}.
+                They have the same authority "{}" but {} has the displayLabel "{}" and {} has the displayLabel "{}".""";
 
             LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
                 classificationName1, displayLabel1, classificationName2, displayLabel2);
@@ -76,8 +76,8 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
 
         if (!Objects.equals(type1, type2)) {
             String logMessage = """
-                There are inconsistencies found between the classifications {} and {}. They have the same authority "{}",
-                but {} has the type "{}" and {} has the type "{}".""";
+                There are inconsistencies found between the classifications {} and {}.
+                They have the same authority "{}" but {} has the type "{}" and {} has the type "{}".""";
 
             LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
                 classificationName1, type1, classificationName2, type2);

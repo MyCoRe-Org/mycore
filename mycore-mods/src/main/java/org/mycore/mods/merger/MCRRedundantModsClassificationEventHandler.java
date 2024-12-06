@@ -50,8 +50,8 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
         if (!Objects.equals(displayLabel1, displayLabel2)) {
 
             String logMessage = """
-                There are inconsistencies found between the classifications {} and {}. They have the same authority "{}",
-                but {} has the displayLabel "{}" and {} has the displayLabel "{}".""";
+                There are inconsistencies found between the classifications {} and {}.
+                They have the same authority "{}" but {} has the displayLabel "{}" and {} has the displayLabel "{}".""";
 
             LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
                 classificationName1, displayLabel1, classificationName2, displayLabel2);
