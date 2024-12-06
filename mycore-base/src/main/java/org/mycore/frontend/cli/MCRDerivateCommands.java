@@ -80,6 +80,7 @@ import org.mycore.datamodel.niofs.utils.MCRDerivateUtil;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.frontend.fileupload.MCRUploadHelper;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -863,6 +864,54 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                         categoryID.getId()))
                     .collect(Collectors.toList()));
         MCRMetadataManager.update(derivate);
+    }
+
+    @MCRCommand(syntax = "set default classification of derivate {0} to {1}",
+        help = "Sets the classification of derivate {0} to the categories {1} (comma separated) "
+            + "of classification 'derivate_types' or any fully qualified category, if no classification is present.")
+    public static void setClassificationOfDerivateIfNotPresent(String derivateIDStr, String categoriesCommaList)
+        throws MCRAccessException {
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
+
+        if (!MCRMetadataManager.exists(derivateID)) {
+            throw new MCRException("The derivate " + derivateIDStr + " does not exist!");
+        }
+
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        final List<MCRMetaClassification> classifications = derivate.getDerivate().getClassifications();
+        if (classifications.isEmpty()) {
+            setClassificationOfDerivate(derivateIDStr, categoriesCommaList);
+        } else {
+            LOGGER.info("Derivate {} already has classifications, skipping.", derivateIDStr);
+        }
+    }
+
+    @MCRCommand(syntax = "set default main file of derivate {0}",
+        help = "Sets the main file of the derivate {0} to the first file found in the derivate")
+    public static void setDefaultMainFile(String derID) throws IOException {
+        MCRObjectID derivateID = MCRObjectID.getInstance(derID);
+
+        if (!MCRMetadataManager.exists(derivateID)) {
+            LOGGER.error("Derivate with ID {} does not exist", derID);
+            return;
+        }
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        String mainDoc = derivate.getDerivate().getInternals().getMainDoc();
+        if (mainDoc != null && !mainDoc.isEmpty()) {
+            LOGGER.info("{} already has a main file set to {}", derID, mainDoc);
+            return;
+        }
+
+        MCRPath path = MCRPath.getPath(derivateID.toString(), "/");
+        MCRUploadHelper.detectMainFile(path).ifPresent(file -> {
+            LOGGER.info("Setting main file of {} to {}", derID, file.toUri().toString());
+            derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
+            try {
+                MCRMetadataManager.update(derivate);
+            } catch (MCRPersistenceException | MCRAccessException e) {
+                LOGGER.error("Could not set main file!", e);
+            }
+        });
     }
 
     @MCRCommand(syntax = "clear derivate export transformer cache",
