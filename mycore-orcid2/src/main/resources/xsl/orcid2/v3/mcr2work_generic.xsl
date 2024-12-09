@@ -13,6 +13,7 @@
 
   <xsl:param name="MCR.ORCID2.Work.SourceURL" />
   <xsl:variable name="short-description-max-length" select="5000"/>
+  <xsl:variable name="string-150-max-length" select="150"/>
 
   <xsl:template match="mycoreobject">
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
@@ -225,18 +226,21 @@
 
   <xsl:template name="creditName">
     <xsl:if test="mods:namePart">
-      <work:credit-name>
+      <xsl:variable name="creditname">
         <xsl:choose>
           <xsl:when test="mods:namePart[@type='given'] and mods:namePart[@type='family']">
-            <xsl:value-of select="substring(normalize-space(concat(mods:namePart[@type='given'][1], ' ', mods:namePart[@type='family'][1])),1,150)" />
+            <xsl:value-of select="concat(mods:namePart[@type='given'][1], ' ', mods:namePart[@type='family'][1])" />
           </xsl:when>
           <xsl:when test="mods:namePart[@type='given'] or mods:namePart[@type='family']">
-            <xsl:value-of select="substring(normalize-space(concat(mods:namePart[@type='given'][1], mods:namePart[@type='family'][1])),1,150)" />
+            <xsl:value-of select="concat(mods:namePart[@type='given'][1], mods:namePart[@type='family'][1])" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="substring(normalize-space(mods:namePart),1,150)" />
+            <xsl:value-of select="mods:namePart" />
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:variable>
+      <work:credit-name>
+        <xsl:value-of select="mcrstring:shorten($creditname, ($string-150-max-length - 1), '…')" />
       </work:credit-name>
     </xsl:if>
   </xsl:template>
