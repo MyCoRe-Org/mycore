@@ -31,10 +31,7 @@
   <rule ref="category/java/bestpractices.xml/DoubleBraceInitialization"/>
   <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach"/>
   <rule ref="category/java/bestpractices.xml/ForLoopVariableCount"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/GuardLogStatement"/>
-  -->
   <rule ref="category/java/bestpractices.xml/JUnit4SuitesShouldUseSuiteAnnotation"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseAfterAnnotation"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseBeforeAnnotation"/>

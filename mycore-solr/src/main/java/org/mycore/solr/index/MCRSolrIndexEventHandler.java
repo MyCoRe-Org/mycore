@@ -76,7 +76,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         MCRSolrIndexer.SOLR_EXECUTOR.submit(() -> null);
 
         SOLR_TASK_EXECUTOR.scheduleWithFixedDelay(() -> {
-            LOGGER.debug("SOLR Task Executor invoked: " + SOLR_TASK_QUEUE.size() + " Documents to process");
+            LOGGER.debug(() -> "SOLR Task Executor invoked: " + SOLR_TASK_QUEUE.size() + " Documents to process");
             processSolrTaskQueue();
 
         }, DELAY_IN_MS * 2, DELAY_IN_MS * 2, TimeUnit.MILLISECONDS);
@@ -100,7 +100,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
                 if (!SOLR_TASK_QUEUE.isEmpty()) {
                     LOGGER.info("There are still {} solr indexing tasks to complete before shutdown",
-                        SOLR_TASK_QUEUE.size());
+                        SOLR_TASK_QUEUE::size);
                     processSolrTaskQueue();
                 }
             }
@@ -117,7 +117,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             try {
                 MCRDelayedRunnable processingTask = SOLR_TASK_QUEUE.poll(DELAY_IN_MS, TimeUnit.MILLISECONDS);
                 if (processingTask != null) {
-                    LOGGER.info("Sending {} to SOLR...", processingTask.getId());
+                    LOGGER.info("Sending {} to SOLR...", processingTask::getId);
                     processingTask.run();
                 }
             } catch (InterruptedException e) {
@@ -255,7 +255,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void deleteDerivate(MCRDerivate derivate) {
-        LOGGER.debug("Solr: submitting data of \"{}\" for derivate", derivate.getId());
+        LOGGER.debug("Solr: submitting data of \"{}\" for derivate", derivate::getId);
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             //MCR-2349 initialize solr client early enough
             final SolrClient mainSolrClient = MCRSolrCoreManager.getMainSolrClient();

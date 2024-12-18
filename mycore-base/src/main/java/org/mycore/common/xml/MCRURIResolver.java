@@ -326,7 +326,7 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
                 if (entity != null) {
-                    LOGGER.debug("Resolved via EntityResolver: {}", entity.getSystemId());
+                    LOGGER.debug("Resolved via EntityResolver: {}", entity::getSystemId);
                     return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
                 }
             } catch (IOException e) {
@@ -369,8 +369,9 @@ public final class MCRURIResolver implements URIResolver {
         Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource")
             .resolve("resource:" + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
-            LOGGER.warn(UNIQUE_MARKER, "The Stylesheet {} has include {} which only works with an old " +
-                "absolute include mechanism. Please change the include to relative!", base, href);
+            LOGGER.warn(UNIQUE_MARKER,
+                () -> "The Stylesheet " + base + " has include " + href + " which only works with an old " +
+                    "absolute include mechanism. Please change the include to relative!");
         }
         return oldResolveMethodResult;
     }
@@ -614,7 +615,7 @@ public final class MCRURIResolver implements URIResolver {
                     reader.setEntityResolver(MCREntityResolver.instance());
                     InputSource input = new InputSource(resource.toString());
                     SAXSource saxSource = new SAXSource(reader, input);
-                    LOGGER.debug("include stylesheet: {}", saxSource.getSystemId());
+                    LOGGER.debug("include stylesheet: {}", saxSource::getSystemId);
                     return saxSource;
                 } else {
                     return instance().resolve(resource.toString(), base);
@@ -970,7 +971,7 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 return instance().resolve(target, base);
             } catch (Exception ex) {
-                LOGGER.debug("Caught {}. Put it into XML to process in XSL!", ex.getClass().getName());
+                LOGGER.debug("Caught {}. Put it into XML to process in XSL!", () -> ex.getClass().getName());
                 Element exception = new Element("exception");
                 Element message = new Element("message");
                 Element stacktraceElement = new Element("stacktrace");
@@ -1024,8 +1025,8 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(new Element("null"));
                 }
             } catch (Exception ex) {
-                LOGGER.info("MCRNotNullResolver caught exception: {}", ex.getLocalizedMessage());
-                LOGGER.debug(ex.getStackTrace());
+                LOGGER.info("MCRNotNullResolver caught exception: {}", ex::getLocalizedMessage);
+                LOGGER.debug(ex::getLocalizedMessage, ex);
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
                 return new JDOMSource(new Element("null"));
             }
@@ -1446,7 +1447,7 @@ public final class MCRURIResolver implements URIResolver {
                 MCRURLQueryParameter.parse(req).forEach(nv -> {
                     if (nv.name().equals("attribute")) {
                         if (suppliedAttributes.contains(nv.value())) {
-                            LOGGER.warn("Duplicate attribute {} in user info request", nv.value());
+                            LOGGER.warn("Duplicate attribute {} in user info request", nv::value);
                             return;
                         }
                         suppliedAttributes.add(nv.value());
@@ -1456,7 +1457,7 @@ public final class MCRURIResolver implements URIResolver {
                         root.addContent(attribute);
                     } else if (nv.name().equals("role")) {
                         if (suppliedRoles.contains(nv.value())) {
-                            LOGGER.warn("Duplicate role {} in user info request", nv.value());
+                            LOGGER.warn("Duplicate role {} in user info request", nv::value);
                             return;
                         }
                         suppliedRoles.add(nv.value());
@@ -1859,17 +1860,17 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) {
             String hrefToCache = href.substring(href.indexOf(":") + 1);
-            LOGGER.debug("resolving: " + hrefToCache);
+            LOGGER.debug(() -> "resolving: " + hrefToCache);
 
             long maxDateCached = System.currentTimeMillis() - maxAge;
             Element resolvedXML = cache.getIfUpToDate(hrefToCache, maxDateCached);
 
             if (resolvedXML == null) {
-                LOGGER.debug(hrefToCache + " not in cache, must resolve");
+                LOGGER.debug(() -> hrefToCache + " not in cache, must resolve");
                 resolvedXML = instance().resolve(hrefToCache);
                 cache.put(hrefToCache, resolvedXML);
             } else {
-                LOGGER.debug(hrefToCache + " already in cache");
+                LOGGER.debug(() -> hrefToCache + " already in cache");
             }
 
             return new JDOMSource(resolvedXML);

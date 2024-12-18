@@ -75,7 +75,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * This class implements a proxy for access to the SOLR backend.<br><br>
  *
- * With the following configuration properties 
+ * With the following configuration properties
  * you can manipulate the response header. The entries will be replace the attributes of the incomming header.
  * If the new attribute text is empty, it will be remove the attribute.<br><br>
  * MCR.Solr.HTTPResponseHeader.{response_header_attribute_name}={new_response_header_attribute}
@@ -235,7 +235,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         HttpRequest solrRequest;
         try {
             solrRequest = solrHttpMethod.build();
-            LOGGER.info("Sending Request: {}", solrRequest.uri());
+            LOGGER.info("Sending Request: {}", solrRequest::uri);
             HttpResponse<InputStream> response =
                 httpClient.send(solrRequest, HttpResponse.BodyHandlers.ofInputStream());
             int statusCode = response.statusCode();

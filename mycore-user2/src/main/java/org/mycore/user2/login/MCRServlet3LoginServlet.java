@@ -54,7 +54,7 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
     @Override
     public void init() throws ServletException {
         if (!LOCAL_LOGIN_SECURE_ONLY) {
-            LOGGER.warn("Login over unsecure connection is permitted. Set '" + HTTPS_ONLY_PROPERTY
+            LOGGER.warn(() -> "Login over unsecure connection is permitted. Set '" + HTTPS_ONLY_PROPERTY
                 + "=true' to prevent cleartext transmissions of passwords.");
         }
         super.init();
@@ -76,7 +76,7 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
             req.login(uid, pwd);
             session.setUserInformation(new Servlet3ContainerUserInformation(session, realm));
             req.getSession().setAttribute(MCRRequestAuthenticationFilter.SESSION_KEY, Boolean.TRUE);
-            LOGGER.info("Logged in: {}", session.getUserInformation().getUserID());
+            LOGGER.info("Logged in: {}", () -> session.getUserInformation().getUserID());
         }
     }
 

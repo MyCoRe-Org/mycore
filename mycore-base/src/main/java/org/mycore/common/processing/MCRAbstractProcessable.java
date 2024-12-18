@@ -31,13 +31,13 @@ import org.mycore.common.MCRSessionMgr;
 /**
  * Can be used as base class for an {@link MCRProcessable}. This class offers some
  * convenient methods but does not handle everything.
- * 
+ *
  * <p>
  * If you extend this class make sure to call {@link #setStatus(MCRProcessableStatus)},
  * {@link #setProgress(Integer)} and {@link #setProgressText(String)}. Otherwise the
  * event handlers are not fired.
  * </p>
- * 
+ *
  * @author Matthias Eichner
  */
 public abstract class MCRAbstractProcessable extends MCRAbstractProgressable implements MCRProcessable {
@@ -91,7 +91,7 @@ public abstract class MCRAbstractProcessable extends MCRAbstractProgressable imp
 
     /**
      * Sets the user identifier responsible for this processable.
-     * 
+     *
      * @param userId the user id
      */
     public void setUserId(String userId) {
@@ -110,7 +110,7 @@ public abstract class MCRAbstractProcessable extends MCRAbstractProgressable imp
 
     /**
      * Sets the internal processable error. This will set the status to failed.
-     * 
+     *
      * @param error the error
      */
     public void setError(Throwable error) {
@@ -121,7 +121,7 @@ public abstract class MCRAbstractProcessable extends MCRAbstractProgressable imp
     /**
      * Sets the new status. If the status is equal "processing" the startTime is set, if the status is equal
      * "successful", "failed" or "canceled" the endTime is set. This will call the fireStatusChanged method.
-     * 
+     *
      * @param status the new status
      */
     public void setStatus(MCRProcessableStatus status) {
@@ -178,8 +178,8 @@ public abstract class MCRAbstractProcessable extends MCRAbstractProgressable imp
                 try {
                     listener.onStatusChange(this, oldStatus, getStatus());
                 } catch (Exception exc) {
-                    LogManager.getLogger().error("Unable to execute onStatusChange() on listener '{}' for '{}'",
-                        listener.getClass().getName(), getName(), exc);
+                    LogManager.getLogger().error(() -> "Unable to execute onStatusChange() on listener '"
+                        + listener.getClass().getName() + "' for '" + getName() + "'", exc);
                 }
             });
         }

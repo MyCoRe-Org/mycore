@@ -140,9 +140,8 @@ public class MCREditorOutValidator {
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         for (Entry<String, String> entry : props.entrySet()) {
             try {
-                String className = entry.getKey();
-                className = className.substring(className.lastIndexOf('.') + 1);
-                LOGGER.info("Adding Validator {} for class {}", entry.getValue(), className);
+                String className = entry.getKey().substring(entry.getKey().lastIndexOf('.') + 1);
+                LOGGER.info("Adding Validator {} for class {}", entry::getValue, () -> className);
                 @SuppressWarnings("unchecked")
                 Class<? extends MCREditorMetadataValidator> cl = (Class<? extends MCREditorMetadataValidator>) Class
                     .forName(entry.getValue());
@@ -186,7 +185,7 @@ public class MCREditorOutValidator {
     public static String checkMetaObjectWithLang(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         if (datasubtag.getAttribute("lang") != null) {
             datasubtag.getAttribute("lang").setNamespace(XML_NAMESPACE);
-            LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag.getName());
+            LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag::getName);
         }
         return checkMetaObject(datasubtag, metaClass, true);
     }
@@ -210,21 +209,21 @@ public class MCREditorOutValidator {
         } else if (datasubtag.getAttribute("type") != null
             && datasubtag.getAttribute("type", XLINK_NAMESPACE) == null) {
             datasubtag.getAttribute("type").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:type attribute in {}", datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:type attribute in {}", datasubtag::getName);
         }
         if (datasubtag.getAttribute("href") != null) {
             datasubtag.getAttribute("href").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:href attribute in {}", datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:href attribute in {}", datasubtag::getName);
         }
 
         if (datasubtag.getAttribute("title") != null) {
             datasubtag.getAttribute("title").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:title attribute in {}", datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:title attribute in {}", datasubtag::getName);
         }
 
         if (datasubtag.getAttribute("label") != null) {
             datasubtag.getAttribute("label").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:label attribute in {}", datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:label attribute in {}", datasubtag::getName);
         }
         return checkMetaObject(datasubtag, metaClass, false);
     }
@@ -284,7 +283,7 @@ public class MCREditorOutValidator {
             obj = new MCRObject(xml, true);
         } catch (JDOMException e) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            LOGGER.warn("Failure while parsing document:\n{}", xout.outputString(input));
+            LOGGER.warn("Failure while parsing document:\n{}", () -> xout.outputString(input));
             throw e;
         }
         // remove that, because its set in MCRMetadataManager, and we need the information (MCR-2603).
@@ -349,7 +348,7 @@ public class MCREditorOutValidator {
                 returns = validator.checkDataSubTag(datasubtag);
             } else {
                 LOGGER.warn("Tag <{}> of type {} has no validator defined, fallback to default behaviour",
-                    datatag.getName(), mcrclass);
+                    datatag::getName, () -> mcrclass);
                 // try to create MCRMetaInterface instance
                 try {
                     Class<? extends MCRMetaInterface> metaClass = getClass(mcrclass);
@@ -454,8 +453,8 @@ public class MCREditorOutValidator {
         if (aclxml == null) {
             aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
             if (aclxml == null) {
-                LOGGER.warn("Can't find default object ACL file {} or {}", resourcebase.substring(1),
-                    resourcetype.substring(1));
+                LOGGER.warn("Can't find default object ACL file {} or {}",
+                    () -> resourcebase.substring(1), () -> resourcetype.substring(1));
                 String resource = "/editor_default_acls.xml"; // fallback
                 aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
                 if (aclxml == null) {
@@ -478,7 +477,7 @@ public class MCREditorOutValidator {
             Element datatag = metaIt.next();
             if (!checkMetaTags(datatag)) {
                 // e.g. datatag is empty
-                LOGGER.debug("Removing element :{}", datatag.getName());
+                LOGGER.debug("Removing element :{}", datatag::getName);
                 metaIt.remove();
             }
         }
@@ -503,7 +502,7 @@ public class MCREditorOutValidator {
                 }
                 if (child.getAttribute("lang") != null) {
                     child.getAttribute("lang").setNamespace(XML_NAMESPACE);
-                    LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag.getName());
+                    LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag::getName);
                 }
             }
             if (textCount == 0) {

@@ -97,7 +97,7 @@ public class MCRRateLimitResolver implements URIResolver {
     private Source probeAccessLimit(String href, String base, BucketConfig config) throws TransformerException {
         ConsumptionProbe probe = config.bucket().tryConsumeAndReturnRemaining(1);
         if (probe.isConsumed()) {
-            LOGGER.debug("There are " + probe.getRemainingTokens() + " accesses remaining");
+            LOGGER.debug(() -> "There are " + probe.getRemainingTokens() + " accesses remaining");
             return MCRURIResolver.instance().resolve(href, base);
         } else {
             return handleError(probe, config);

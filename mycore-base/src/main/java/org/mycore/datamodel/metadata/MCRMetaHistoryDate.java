@@ -292,7 +292,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             von = MCRCalendar.getHistoryDateAsCalendar(date, false, calendar);
             ivon = von.get(Calendar.JULIAN_DAY);
         } catch (Exception e) {
-            LOGGER.debug(e.getMessage());
+            LOGGER.debug(e::getMessage);
             LOGGER.warn("The von date {} for calendar {} is false. Set to default!", date, calendar);
             setDefaultVon();
         }

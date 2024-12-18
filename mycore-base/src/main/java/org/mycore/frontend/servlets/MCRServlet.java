@@ -66,7 +66,7 @@ import jakarta.servlet.http.HttpSession;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for logging and managing the current
  * session data. Part of the code has been taken from MilessServlet.java written by Frank Lützenkirchen.
- * 
+ *
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
@@ -292,7 +292,7 @@ public class MCRServlet extends HttpServlet {
 
     /**
      * This private method handles both GET and POST requests and is invoked by doGet() and doPost().
-     * 
+     *
      * @param req
      *            the HTTP request instance
      * @param res
@@ -353,7 +353,7 @@ public class MCRServlet extends HttpServlet {
         if (ex.getMessage() == null) {
             LOGGER.error("Exception while in rendering phase.", ex);
         } else {
-            LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
+            LOGGER.error("Exception while in rendering phase: {}", ex::getMessage);
         }
         return false;
     }
@@ -361,7 +361,7 @@ public class MCRServlet extends HttpServlet {
     /**
      * Code to initialize a MyCoRe Session
      * may be reused in ServletFilter, MVC controller, etc.
-     * 
+     *
      * @param req - the HTTP request
      * @param servletName - the servletName
      */
@@ -388,7 +388,7 @@ public class MCRServlet extends HttpServlet {
 
     /**
      * Code to cleanup a MyCoRe Session
-     * may be reused in ServletFilter, MVC controller, etc. 
+     * may be reused in ServletFilter, MVC controller, etc.
      * @param req - the HTTP Request
      * @param servletName - the Servlet name
      */
@@ -455,7 +455,7 @@ public class MCRServlet extends HttpServlet {
     /**
      * 1st phase of doGetPost. This method has a seperate transaction. Per default id does nothing as a fallback to the
      * old behaviour.
-     * 
+     *
      * @see #render(MCRServletJob, Exception)
      */
     protected void think(MCRServletJob job) throws Exception {
@@ -491,7 +491,7 @@ public class MCRServlet extends HttpServlet {
      * 2nd phase of doGetPost This method has a seperate transaction and gets the same MCRServletJob from the first
      * phase (think) and any exception that occurs at the first phase. By default this method calls
      * doGetPost(MCRServletJob) as a fallback to the old behaviour.
-     * 
+     *
      * @param job
      *            same instance as of think(MCRServlet job)
      * @param ex
@@ -539,7 +539,7 @@ public class MCRServlet extends HttpServlet {
     /**
      * This method builds a URL that can be used to redirect the client browser to another page, thereby including http
      * request parameters. The request parameters will be encoded as http get request.
-     * 
+     *
      * @param baseURL
      *            the base url of the target webpage
      * @param parameters
@@ -590,7 +590,7 @@ public class MCRServlet extends HttpServlet {
     /**
      * returns a translated error message for the current Servlet. I18N keys are of form
      * {prefix}'.'{SimpleServletClassName}'.'{subIdentifier}
-     * 
+     *
      * @param prefix
      *            a prefix of the message property like component.base.error
      * @param subIdentifier

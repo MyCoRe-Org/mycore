@@ -132,7 +132,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
 
     public static void setSelectedObjectIDs(List<String> selected) {
-        LOGGER.info("{} objects selected", selected.size());
+        LOGGER.info("{} objects selected", selected::size);
         MCRSessionMgr.getCurrentSession().put("mcrSelectedObjects", selected);
     }
 
@@ -287,14 +287,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         AtomicInteger counter = new AtomicInteger(0);
         MCRObjectUtils.removeLinks(mcrId).forEach(linkedObject -> {
             try {
-                LOGGER.info("removing link '{}' of '{}'.", mcrId, linkedObject.getId());
+                LOGGER.info("removing link '{}' of '{}'.", () -> mcrId, linkedObject::getId);
                 MCRMetadataManager.update(linkedObject);
                 counter.incrementAndGet();
             } catch (Exception exc) {
-                LOGGER.error(String.format(Locale.ROOT, "Unable to update object '%s'", linkedObject), exc);
+                LOGGER.error(() -> String.format(Locale.ROOT, "Unable to update object '%s'", linkedObject), exc);
             }
         });
-        LOGGER.info("{} link(s) removed of {}.", counter.get(), mcrId);
+        LOGGER.info("{} link(s) removed of {}.", counter::get, () -> mcrId);
     }
 
     /**
@@ -513,7 +513,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return null;
         }
 
-        LOGGER.info("Reading file {} ...", file);
+        LOGGER.info("Reading file {} …", file);
 
         MCRObject mcrObject = new MCRObject(file.toURI());
         if (mcrObject.hasParent()) {
@@ -523,14 +523,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             }
         }
         mcrObject.setImportMode(importMode);
-        LOGGER.debug("Label --> {}", mcrObject.getLabel());
+        LOGGER.debug("Label --> {}", mcrObject::getLabel);
 
         if (update) {
             MCRMetadataManager.update(mcrObject);
-            LOGGER.info("{} updated.", mcrObject.getId());
+            LOGGER.info("{} updated.", mcrObject::getId);
         } else {
             MCRMetadataManager.create(mcrObject);
-            LOGGER.info("{} loaded.", mcrObject.getId());
+            LOGGER.info("{} loaded.", mcrObject::getId);
         }
 
         return mcrObject;
@@ -545,9 +545,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void showNextID(String base) {
 
         try {
-            LOGGER.info("The next free ID  is {}", MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base));
+            LOGGER.info("The next free ID  is {}",
+                () -> MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base));
         } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
+            LOGGER.error(ex::getMessage);
         }
     }
 
@@ -560,9 +561,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void showLastID(String base) {
         try {
             LOGGER.info("The last used ID  is {}",
-                MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
+                () -> MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
         } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
+            LOGGER.error(ex::getMessage);
         }
     }
 
@@ -675,7 +676,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         try {
             fid = MCRObjectID.getInstance(fromID);
         } catch (Exception ex) {
-            LOGGER.error("FromID : {}", ex.getMessage());
+            LOGGER.error("FromID : {}", ex::getMessage);
             return;
         }
 
@@ -684,7 +685,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         try {
             tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
-            LOGGER.error("ToID : {}", ex.getMessage());
+            LOGGER.error("ToID : {}", ex::getMessage);
             return;
         }
 
@@ -708,10 +709,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 k++;
             }
         } catch (Exception ex) {
-            LOGGER.error("Exception while storing object to " + dir.getAbsolutePath(), ex);
+            LOGGER.error(() -> "Exception while storing object to " + dir.getAbsolutePath(), ex);
             return;
         }
-        LOGGER.info("{} Object's stored under {}.", k, dir.getAbsolutePath());
+        int exportCount = k;
+        LOGGER.info("{} Object's stored under {}.", () -> exportCount, dir::getAbsolutePath);
     }
 
     /**
@@ -835,7 +837,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } else {
             content.sendTo(xmlOutput);
         }
-        LOGGER.info("Object {} saved to {}.", nid, xmlOutput.getCanonicalPath());
+        LOGGER.info("Object {} saved to {}.", () -> nid, () -> {
+            try {
+                return xmlOutput.getCanonicalPath();
+            } catch (IOException e) {
+                return xmlOutput.getAbsolutePath();
+            }
+        });
         return true;
     }
 
@@ -851,9 +859,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 150)
     public static void getNextID(String base) {
         try {
-            LOGGER.info(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base));
+            MCRObjectID nextFreeId = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base);
+            LOGGER.info(nextFreeId);
         } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
+            LOGGER.error(ex::getMessage);
         }
     }
 
@@ -869,7 +878,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Returns the last used MCRObjectID for the ID base {0}.",
         order = 140)
     public static void getLastID(String base) {
-        LOGGER.info(MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
+        LOGGER.info(() -> MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
     }
 
     /**
@@ -886,11 +895,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 " or \"select objects with xpath {0}\" to build one");
             return;
         }
-        StringBuilder out = new StringBuilder();
-        for (String id : getSelectedObjectIDs()) {
-            out.append(id).append(' ');
-        }
-        LOGGER.info(out.toString());
+        LOGGER.info(() -> {
+            StringBuilder out = new StringBuilder();
+            for (String id : getSelectedObjectIDs()) {
+                out.append(id).append(' ');
+            }
+            return out.toString();
+        });
     }
 
     /**
@@ -907,17 +918,19 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         try {
-            StringBuilder log = new StringBuilder("Revisions:\n");
             List<? extends MCRAbstractMetadataVersion<?>> revisions = MCRXMLMetadataManager.instance()
                 .listRevisions(mcrId);
-            for (MCRAbstractMetadataVersion<?> revision : revisions) {
-                log.append(revision.getRevision()).append(' ');
-                log.append(revision.getType()).append(' ');
-                log.append(sdf.format(revision.getDate())).append(' ');
-                log.append(revision.getUser());
-                log.append('\n');
-            }
-            LOGGER.info(log.toString());
+            LOGGER.info(() -> {
+                StringBuilder log = new StringBuilder("Revisions:\n");
+                for (MCRAbstractMetadataVersion<?> revision : revisions) {
+                    log.append(revision.getRevision()).append(' ');
+                    log.append(revision.getType()).append(' ');
+                    log.append(sdf.format(revision.getDate())).append(' ');
+                    log.append(revision.getUser());
+                    log.append('\n');
+                }
+                return log.toString();
+            });
         } catch (Exception exc) {
             LOGGER.error("While print revisions.", exc);
         }
@@ -1168,7 +1181,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "check in all objects with MCR base ID {0} for existing linked derivates",
         order = 400)
     public static void checkDerivatesInObjects(String baseId) {
-        if (baseId == null || baseId.length() == 0) {
+        if (baseId == null || baseId.isEmpty()) {
             LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
             return;
         }
@@ -1190,7 +1203,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 }
             }
         }
-        LOGGER.info("Check done for {} entries", Integer.toString(counter));
+        LOGGER.info("Check done for {} entries", counter);
     }
 
     /**
@@ -1253,14 +1266,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             + "after being transformed through {1}.xsl.",
         order = 403)
     public static void validateObjectWithTransformer(String objectID, String transformerType) {
-        if (objectID == null || objectID.length() == 0) {
+        if (objectID == null || objectID.isEmpty()) {
             throw new MCRException("ID of an object required to check its schema validity.");
         }
-        LOGGER.info("validate object schema for ID " + objectID);
+        LOGGER.info(() -> "validate object schema for ID " + objectID);
         Transformer trafo = null;
         if (transformerType != null) {
             // getTransformer with non-existent input successfully returns a working transformer
-            // that "successfully transforms", an error would be preferable 
+            // that "successfully transforms", an error would be preferable
             trafo = getTransformer(transformerType);
             LOGGER.debug("Transformer {} has been loaded.", transformerType);
         }
@@ -1313,7 +1326,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                     + " could not be transformed, unable to validate against schema!",
                     e);
             }
-            LOGGER.info("Object {} successfully transformed.", objID.toString());
+            LOGGER.info("Object {} successfully transformed.", objID);
         }
         try {
             MCRXMLParserFactory.getValidatingParser().parseXML(new MCRJDOMContent(doc));

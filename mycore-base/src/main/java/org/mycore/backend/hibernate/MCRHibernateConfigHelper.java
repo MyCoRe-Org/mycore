@@ -43,7 +43,7 @@ import jakarta.persistence.UniqueConstraint;
 
 /**
  * Helper class to check if EntityManagerFactory is correctly configured.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRHibernateConfigHelper {
@@ -58,7 +58,7 @@ public class MCRHibernateConfigHelper {
             }
         } catch (PersistenceException e) {
             LogManager.getLogger()
-                .warn("Unsupported EntityManagerFactory found: {}", entityManagerFactory.getClass().getName());
+                .warn("Unsupported EntityManagerFactory found: {}", () -> entityManagerFactory.getClass().getName());
         }
     }
 

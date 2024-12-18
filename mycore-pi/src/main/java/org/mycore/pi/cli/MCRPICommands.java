@@ -83,7 +83,7 @@ public class MCRPICommands {
         boolean addedAFlag = false;
         for (MCRPIRegistrationInfo registrationInfo : piRegistrationInfos) {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
-                LOGGER.info("Add PI-Flag to " + mycoreIDString);
+                LOGGER.info(() -> "Add PI-Flag to " + mycoreIDString);
                 MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
                 addedAFlag = true;
             }
@@ -257,7 +257,7 @@ public class MCRPICommands {
         }
         final MCRBase object = MCRMetadataManager.retrieve(objectID);
         final MCRPersistentIdentifier doi = registrationService.register(object, additional);
-        LOGGER.info("Registered pi with {}: {} for object {}", serviceID, doi.asString(), objectID);
+        LOGGER.info("Registered pi with {}: {} for object {}", () -> serviceID, doi::asString, () -> objectID);
     }
 
     @MCRCommand(syntax = "create pi with {0} for object {1}",

@@ -38,7 +38,7 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Automatically closes HttpSession of certain user agents.
- * 
+ *
  * If the <code>User-Agent</code> header matches a regular expression
  * defined by the property <code>MCR.Filter.UserAgent.Pattern</code> the
  * HTTP session is closed after the request.
@@ -89,18 +89,18 @@ public class MCRUserAgentFilter implements Filter {
             if (session != null && newSession) {
                 try {
                     if (invalidUserAgent) {
-                        LOGGER.info("Closing session {}, invalid User-Agent: {}", session.getId(), userAgent);
+                        LOGGER.info("Closing session {}, invalid User-Agent: {}", session::getId, () -> userAgent);
                         session.invalidate();
                     } else if (agentPattern.matcher(userAgent).find()) {
-                        LOGGER.info("Closing session {}, {} matches {}", session.getId(), userAgent,
-                            agentPattern);
+                        LOGGER.info("Closing session {}, {} matches {}",
+                            session::getId, () -> userAgent, () -> agentPattern);
                         session.invalidate();
                     } else {
-                        LOGGER.debug("Keeping session {}, {} doesn't match {}", session.getId(), userAgent,
-                            agentPattern);
+                        LOGGER.debug("Keeping session {}, {} doesn't match {}",
+                            session::getId, () -> userAgent, () -> agentPattern);
                     }
                 } catch (IllegalStateException e) {
-                    LOGGER.warn("Session " + session.getId() + " was already closed");
+                    LOGGER.warn(() -> "Session " + session.getId() + " was already closed");
                 }
             }
         }

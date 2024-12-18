@@ -30,29 +30,29 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Provides functionality to export content. 
- * The content to export can be selected by specifying one or more 
- * URIs to read from, or by giving the ID of a basket to export. 
+ * Provides functionality to export content.
+ * The content to export can be selected by specifying one or more
+ * URIs to read from, or by giving the ID of a basket to export.
  * The selected content is collected as MCRExportCollection thats
- * root element name can be specified. 
+ * root element name can be specified.
  * The content is then transformed using an MCRContentTransformer instance
  * and forwarded to the requesting client.
- * 
+ *
  * Request Parameters:
- *   uri=... 
+ *   uri=...
  *     can be repeated to include content from one or more URIs to read XML from
  *   basket=...
- *     the ID of a basket to read XML from  
+ *     the ID of a basket to read XML from
  *   root=...
  *     optional, name of the root element that wraps the selected content
  *   ns=...
  *     optional, URI of the namespace of the root element
  *   transformer=...
  *     the ID of the transformer to use to export the selected content.
- *          
+ *
  * @see MCRExportCollection
  * @see MCRContentTransformer
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRExportServlet extends MCRServlet {
@@ -88,14 +88,14 @@ public class MCRExportServlet extends MCRServlet {
         if (basketID != null) {
             MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(basketID);
             collection.add(basket);
-            LOGGER.info("exporting basket {} via {}", basketID, req.getParameter("transformer"));
+            LOGGER.info("exporting basket {} via {}", () -> basketID, () -> req.getParameter("transformer"));
         }
 
         if (req.getParameter("uri") != null) {
             for (String uri : req.getParameterValues("uri")) {
                 if (isAllowed(uri)) {
                     collection.add(uri);
-                    LOGGER.info("exporting {} via {}", uri, req.getParameter("transformer"));
+                    LOGGER.info("exporting {} via {}", () -> uri, () -> req.getParameter("transformer"));
                 }
             }
         }

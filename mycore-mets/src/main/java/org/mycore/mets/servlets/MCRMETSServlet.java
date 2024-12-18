@@ -69,7 +69,7 @@ public class MCRMETSServlet extends MCRServlet {
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
-        LOGGER.info(request.getPathInfo());
+        LOGGER.info(request::getPathInfo);
 
         String derivate = getOwnerID(request.getPathInfo());
         MCRPath rootPath = MCRPath.getPath(derivate, "/");
@@ -102,8 +102,8 @@ public class MCRMETSServlet extends MCRServlet {
         long start = System.currentTimeMillis();
         MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
         MCRLayoutService.instance().doLayout(request, response, metsContent);
-        LOGGER.info("Generation of code by {} took {} ms", this.getClass().getSimpleName(),
-            System.currentTimeMillis() - start);
+        LOGGER.info("Generation of code by {} took {} ms",
+            () -> this.getClass().getSimpleName(), () -> System.currentTimeMillis() - start);
     }
 
     /**
@@ -143,7 +143,7 @@ public class MCRMETSServlet extends MCRServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.frontend.servlets.MCRServlet#init()
      */
     @Override
@@ -176,7 +176,7 @@ public class MCRMETSServlet extends MCRServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.mycore.frontend.servlets.MCRServlet#getLastModified(jakarta.servlet
      * .http.HttpServletRequest)

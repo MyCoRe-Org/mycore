@@ -169,8 +169,8 @@ public class MCRDOIService extends MCRDOIBaseService {
             throw new MCRPersistentIdentifierException("There is more then one identifier with type DOI!");
         } else if (doiList.size() == 1) {
             Element doiElement = doiList.stream().findAny().get();
-            LOGGER.warn("Found existing DOI({}) in Document will be replaced with {}", doiElement.getTextTrim(),
-                doi);
+            LOGGER.warn("Found existing DOI({}) in Document will be replaced with {}", doiElement::getTextTrim,
+                () -> doi);
             doiElement.setText(doi);
         } else {
             // must be 0
@@ -301,8 +301,8 @@ public class MCRDOIService extends MCRDOIBaseService {
     @Override
     public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional) {
         if (hasRegistrationStarted(obj.getId(), additional) || this.isRegistered(obj.getId(), additional)) {
-            LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj.getId(),
-                doi.asString());
+            LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj::getId,
+                doi::asString);
             if (this.isRegistered(obj.getId(), additional)) {
                 HashMap<String, String> contextParameters = new HashMap<>();
                 contextParameters.put(CONTEXT_DOI, doi.asString());
@@ -319,7 +319,7 @@ public class MCRDOIService extends MCRDOIBaseService {
         try {
             getDataciteClient().deleteMetadata(doi);
         } catch (MCRPersistentIdentifierException e) {
-            LOGGER.error("Error while setting {} inactive! Delete of object should continue!", doi.asString());
+            LOGGER.error("Error while setting {} inactive! Delete of object should continue!", doi::asString);
         }
     }
 

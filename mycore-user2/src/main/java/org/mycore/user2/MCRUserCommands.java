@@ -201,13 +201,13 @@ public class MCRUserCommands extends MCRAbstractCommands {
         help = "Imports a role from file, if that role does not exist",
         order = 90)
     public static void addRole(String fileName) throws IOException, JDOMException {
-        LOGGER.info("Reading file {} ...", fileName);
+        LOGGER.info("Reading file {} …", fileName);
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
         MCRRole role = MCRRoleTransformer.buildMCRRole(doc.getRootElement());
         if (MCRRoleManager.getRole(role.getName()) == null) {
             MCRRoleManager.addRole(role);
         } else {
-            LOGGER.info("Role {} does already exist.", role.getName());
+            LOGGER.info("Role {} does already exist.", role::getName);
         }
     }
 
@@ -260,7 +260,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (inputFile == null) {
             return;
         }
-        LOGGER.info("Reading file {} ...", inputFile.getAbsolutePath());
+        LOGGER.info("Reading file {} …", inputFile::getAbsolutePath);
 
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(inputFile));
         Element rootelm = doc.getRootElement();
@@ -357,10 +357,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static void exportUserToFile(String userID, String filename) throws IOException {
         MCRUser user = MCRUserManager.getUser(userID);
         if (user.getSystemRoleIDs().isEmpty()) {
-            LOGGER.warn("User {} has not any system roles.", user.getUserID());
+            LOGGER.warn("User {} has not any system roles.", user::getUserID);
         }
         try (FileOutputStream outFile = new FileOutputStream(filename)) {
-            LOGGER.info("Writing to file {} ...", filename);
+            LOGGER.info("Writing to file {} …", filename);
             saveToXMLFile(user, outFile);
         }
     }
@@ -404,7 +404,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         File[] listFiles = dir
             .listFiles(pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
         if (listFiles.length == 0) {
-            LOGGER.warn("Did not find any user files in {}", dir.getAbsolutePath());
+            LOGGER.warn("Did not find any user files in {}", dir::getAbsolutePath);
             return null;
         }
         Arrays.sort(listFiles);
@@ -467,16 +467,18 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     public static void listRole(MCRRole role) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("       role=").append(role.getName());
-        for (MCRLabel label : role.getLabels()) {
-            sb.append("\n         ").append(label);
-        }
-        Collection<String> userIds = MCRRoleManager.listUserIDs(role);
-        for (String userId : userIds) {
-            sb.append("\n          user assigned to role=").append(userId);
-        }
-        LOGGER.info(sb.toString());
+        LOGGER.info(() -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("       role=").append(role.getName());
+            for (MCRLabel label : role.getLabels()) {
+                sb.append("\n         ").append(label);
+            }
+            Collection<String> userIds = MCRRoleManager.listUserIDs(role);
+            for (String userId : userIds) {
+                sb.append("\n          user assigned to role=").append(userId);
+            }
+            return sb.toString();
+        });
     }
 
     /**
@@ -496,15 +498,17 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     public static void listUser(MCRUser user) {
-        StringBuilder sb = new StringBuilder("\n");
-        sb.append("       user=").append(user.getUserName()).append("   real name=").append(user.getRealName())
-            .append('\n').append("   loginAllowed=").append(user.loginAllowed()).append('\n');
-        List<String> roles = new ArrayList<>(user.getSystemRoleIDs());
-        roles.addAll(user.getExternalRoleIDs());
-        for (String rid : roles) {
-            sb.append("          assigned to role=").append(rid).append('\n');
-        }
-        LOGGER.info(sb.toString());
+        LOGGER.info(() -> {
+            StringBuilder sb = new StringBuilder("\n");
+            sb.append("       user=").append(user.getUserName()).append("   real name=").append(user.getRealName())
+                .append('\n').append("   loginAllowed=").append(user.loginAllowed()).append('\n');
+            List<String> roles = new ArrayList<>(user.getSystemRoleIDs());
+            roles.addAll(user.getExternalRoleIDs());
+            for (String rid : roles) {
+                sb.append("          assigned to role=").append(rid).append('\n');
+            }
+            return sb.toString();
+        });
     }
 
     /**
@@ -564,7 +568,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (inputFile == null) {
             return null;
         }
-        LOGGER.info("Reading file {} ...", inputFile.getAbsolutePath());
+        LOGGER.info("Reading file {} …", inputFile::getAbsolutePath);
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(inputFile));
         return MCRUserTransformer.buildMCRUser(doc.getRootElement());
     }

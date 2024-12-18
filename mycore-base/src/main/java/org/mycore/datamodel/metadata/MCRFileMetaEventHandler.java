@@ -83,7 +83,8 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
             try {
                 attrs = Files.readAttributes(file, BasicFileAttributes.class);
             } catch (IOException e) {
-                LOGGER.warn("File is linked to category but cannot be read:{}{}", der.getId(), ref.getObjectID(), e);
+                LOGGER.warn(() -> "File is linked to category but cannot be read:" + der.getId() + ref.getObjectID(),
+                    e);
                 continue;
             }
             MCREvent fileEvent = new MCREvent(MCREvent.ObjectType.PATH, MCREvent.EventType.INDEX);

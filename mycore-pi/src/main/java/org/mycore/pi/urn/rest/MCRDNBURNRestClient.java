@@ -176,7 +176,7 @@ public class MCRDNBURNRestClient {
                         JsonElement jsonElement = JsonParser.parseReader(reader);
                         return Optional.of(jsonElement.getAsJsonObject());
                     } catch (Exception e) {
-                        LOGGER.error("Could not read Response from " + url);
+                        LOGGER.error(() -> "Could not read Response from " + url, e);
                     }
                 }
                 default -> {
@@ -248,7 +248,7 @@ public class MCRDNBURNRestClient {
             String identifier = urn.getIdentifier();
             switch (patchStatus) {
                 case HttpStatus.SC_NO_CONTENT -> {
-                    LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
+                    LOGGER.info("URN {} updated to {}", () -> identifier, bundle::getUrl);
                     return Optional.ofNullable(response.getFirstHeader("date"))
                         .map(Header::getValue)
                         .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)

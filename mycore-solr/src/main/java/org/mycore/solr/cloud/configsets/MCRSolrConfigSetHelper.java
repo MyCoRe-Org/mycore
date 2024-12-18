@@ -161,7 +161,7 @@ public class MCRSolrConfigSetHelper {
             throw new MCRConfigurationException("Error while deleting config set from remote Solr server.", e);
         }
 
-        LOGGER.info("Config set {} deleted from remote Solr server.", core.getConfigSet());
+        LOGGER.info("Config set {} deleted from remote Solr server.", core::getConfigSet);
     }
 
 }

@@ -264,7 +264,7 @@ public class MCRMailer extends MCRServlet {
         try {
             send(email, false);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e::getMessage);
         }
     }
 
@@ -466,7 +466,7 @@ public class MCRMailer extends MCRServlet {
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet, Map<String, String> parameters) throws Exception {
-        LOGGER.info("Generating e-mail from {} using {}.xsl", input.getRootElement().getName(), stylesheet);
+        LOGGER.info("Generating e-mail from {} using {}.xsl", () -> input.getRootElement().getName(), () -> stylesheet);
         if (LOGGER.isDebugEnabled()) {
             debug(input.getRootElement());
         }
@@ -479,7 +479,8 @@ public class MCRMailer extends MCRServlet {
         if (eMail.getChildren("to").isEmpty()) {
             LOGGER.warn("Will not send e-mail, no 'to' address specified");
         } else {
-            LOGGER.info("Sending e-mail to {}: {}", eMail.getChildText("to"), eMail.getChildText("subject"));
+            LOGGER.info("Sending e-mail to {}: {}", () -> eMail.getChildText("to"),
+                () -> eMail.getChildText("subject"));
             send(eMail);
         }
 
@@ -522,7 +523,7 @@ public class MCRMailer extends MCRServlet {
     /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        LOGGER.debug(DELIMITER + "{}" + DELIMITER, xout.outputString(xml));
+        LOGGER.debug(() -> DELIMITER + xout.outputString(xml) + DELIMITER);
     }
 
     @XmlRootElement(name = "email")

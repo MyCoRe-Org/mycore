@@ -76,65 +76,65 @@ public class MCRPURLManager {
      * @param password      - the user's password
      */
     public void login(String purlServerURL, String user, String password) {
-        HttpURLConnection conn = null;
+        purlServerBaseURL = purlServerURL;
+        // Get Cookie
         try {
-            purlServerBaseURL = purlServerURL;
-            // Get Cookie
             URL url = new URI(purlServerBaseURL + ADMIN_PATH + "/login/login.bsh?referrer=/docs/index.html").toURL();
-            conn = (HttpURLConnection) url.openConnection();
-            conn.connect();
+            HttpURLConnection cookieCon = (HttpURLConnection) url.openConnection();
+            try {
+                cookieCon.connect();
 
-            conn.getHeaderFields()
-                .getOrDefault("Set-Cookie", List.of())
-                .forEach(cookie -> {
-                    this.cookie = cookie;
-                    LOGGER.debug("Cookie: " + cookie);
-                });
-            conn.disconnect();
-
+                cookieCon.getHeaderFields()
+                    .getOrDefault("Set-Cookie", List.of())
+                    .forEach(cookie -> {
+                        this.cookie = cookie;
+                        LOGGER.debug(() -> "Cookie: " + cookie);
+                    });
+            } finally {
+                cookieCon.disconnect();
+            }
             // Login
             String data = "id=" + URLEncoder.encode(user, StandardCharsets.UTF_8);
             data += "&passwd=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
 
             url = new URI(purlServerBaseURL + ADMIN_PATH + "/login/login-submit.bsh").toURL();
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            try {
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
 
-            conn.setDoOutput(true);
-            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
-                wr.write(data);
-                wr.flush();
-                if (conn.getResponseCode() == 200) {
-                    LOGGER.info(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
-                } else {
-                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
-                }
+                conn.setDoOutput(true);
+                try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
+                    wr.write(data);
+                    wr.flush();
+                    int responseCode = conn.getResponseCode();
+                    if (responseCode == 200) {
+                        LOGGER.info(() -> conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode);
+                    } else {
+                        LOGGER.error(() -> conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode);
+                    }
 
-                // Get the response
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),
-                    StandardCharsets.UTF_8))) {
+                    // Get the response
+                    try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),
+                        StandardCharsets.UTF_8))) {
 
-                    String line;
-                    while ((line = rd.readLine()) != null) {
-                        if ("PURL User Login Failure".equals(line.trim())) {
-                            cookie = null;
-                            break;
+                        String line;
+                        while ((line = rd.readLine()) != null) {
+                            if ("PURL User Login Failure".equals(line.trim())) {
+                                cookie = null;
+                                break;
+                            }
                         }
-
                     }
                 }
+            } finally {
+                conn.disconnect();
             }
-            conn.disconnect();
-
         } catch (IOException | URISyntaxException e) {
+            //TODO: ugly, ugly, ugly: check responseCode instead of message
             if (!e.getMessage().contains(
                 "Server returned HTTP response code: 403 for URL: ")) {
-                LOGGER.error(e);
-            }
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
+                LOGGER.error(e::getMessage, e);
             }
         }
     }
@@ -143,28 +143,31 @@ public class MCRPURLManager {
      * logout from PURL server
      */
     public void logout() {
-        HttpURLConnection conn = null;
+        String requestMethod = "POST";
+        URI uri = URI.create(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html");
         int responseCode = -1;
         try {
-            URL url = new URI(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html").toURL();
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
+            URL url = uri.toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            try {
+                conn.setRequestMethod(requestMethod);
+                conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
 
-            conn.setDoOutput(true);
-            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
-                wr.flush();
+                conn.setDoOutput(true);
+                try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
+                    wr.flush();
+                }
+                responseCode = conn.getResponseCode();
+                int finalResponseCode = responseCode;
+                LOGGER.debug(() -> conn.getRequestMethod() + " " + conn.getURL() + " -> " + finalResponseCode);
+            } finally {
+                conn.disconnect();
             }
-            responseCode = conn.getResponseCode();
-            LOGGER.debug(conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             if (!e.getMessage().contains(
                 "Server returned HTTP response code: 403 for URL: ")) {
-                LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode, e);
-            }
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
+                int finalResponseCode = responseCode;
+                LOGGER.error(() -> requestMethod + " " + uri + " -> " + finalResponseCode, e);
             }
         }
     }
@@ -189,7 +192,7 @@ public class MCRPURLManager {
             // Create a 410 purl
 
             URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
-            LOGGER.debug(url.toString());
+            LOGGER.debug(url);
 
             StringBuilder data = new StringBuilder();
             data.append("target=").append(URLEncoder.encode(target, StandardCharsets.UTF_8));
@@ -254,7 +257,7 @@ public class MCRPURLManager {
                 + "&type=" + type;
 
             URL url = new URI(strURL).toURL();
-            LOGGER.debug(url.toString());
+            LOGGER.debug(url);
 
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
@@ -291,7 +294,7 @@ public class MCRPURLManager {
         HttpURLConnection conn = null;
         try {
             URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
-            LOGGER.debug(url.toString());
+            LOGGER.debug(url);
 
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);

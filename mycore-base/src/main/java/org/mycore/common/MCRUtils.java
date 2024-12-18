@@ -474,11 +474,12 @@ public class MCRUtils {
                 }
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException ex) {
-                LOGGER.warn("Exception while initializing exception {}", mainExceptionClass.getCanonicalName(), ex);
+                LOGGER.warn(() -> "Exception while initializing exception " + mainExceptionClass.getCanonicalName(),
+                    ex);
                 return e;
             }
         }
-        LOGGER.warn("Could not instanciate Exception {}", mainExceptionClass.getCanonicalName());
+        LOGGER.warn("Could not instanciate Exception {}", mainExceptionClass::getCanonicalName);
         return e;
     }
 

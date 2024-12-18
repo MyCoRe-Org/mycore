@@ -62,7 +62,7 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
         common.removeSitemapFiles();
         // compute number of files
         int number = common.checkSitemapFile();
-        LOGGER.debug("Build Google number of URL files {}.", Integer.toString(number));
+        LOGGER.debug("Build Google number of URL files {}.", number);
         if (number == 1) {
             String fn = common.getFileName(1, true);
             File xml = new File(fn);
@@ -84,7 +84,7 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
             }
         }
         // check time
-        LOGGER.debug("Google sitemap request took {}ms.", System.currentTimeMillis() - start);
+        LOGGER.debug("Google sitemap request took {}ms.", () -> System.currentTimeMillis() - start);
     }
 
 }

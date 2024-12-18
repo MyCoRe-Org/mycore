@@ -50,7 +50,7 @@ public class MCRSolrCollectionHelper {
                 collectionAdminResponse.getErrorMessages());
         }
 
-        LOGGER.info("Collection {} created.", core.getName());
+        LOGGER.info("Collection {} created.", core::getName);
     }
 
     public static void removeCollection(MCRSolrCore core) throws SolrServerException,
@@ -66,7 +66,7 @@ public class MCRSolrCollectionHelper {
                 collectionAdminResponse.getErrorMessages());
         }
 
-        LOGGER.info("Collection {} deleted.", core.getName());
+        LOGGER.info("Collection {} deleted.", core::getName);
     }
 
 }

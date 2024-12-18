@@ -81,7 +81,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
         final HttpServletResponse response = job.getResponse();
 
         if (request.getParameterMap().keySet().stream().noneMatch(KEY_LIST::contains)) {
-            LOGGER.info("No valid query parameter {}", request.getParameterMap().keySet());
+            LOGGER.info("No valid query parameter {}", () -> request.getParameterMap().keySet());
             response.sendError(400, "Query parameter \"id\" or \"q\" must be set.");
             return;
         }

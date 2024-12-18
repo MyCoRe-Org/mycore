@@ -91,7 +91,8 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
         String username = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Login").orElse(null);
         String password = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Password").orElse(null);
         if (username == null || password == null || username.isBlank() || password.isBlank()) {
-            LOGGER.warn("Could not instantiate {} as required credentials are not set", this.getClass().getName());
+            LOGGER.warn("Could not instantiate {} as required credentials are not set",
+                () -> this.getClass().getName());
             return Optional.empty();
         }
         return Optional.of(new UsernamePasswordCredentials(username, password.toCharArray()));

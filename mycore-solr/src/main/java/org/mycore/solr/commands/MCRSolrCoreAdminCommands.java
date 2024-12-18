@@ -64,7 +64,7 @@ public class MCRSolrCoreAdminCommands {
         help = "displays MyCoRe properties for the current Solr configuration",
         order = 10)
     public static void listConfig() {
-        LOGGER.info("List core configuration: {}", getSolrConfiguration().entrySet().stream()
+        LOGGER.info("List core configuration: {}", () -> getSolrConfiguration().entrySet().stream()
             .map(entry -> String.format(Locale.ROOT, "%s=%s", entry.getKey(), entry.getValue()))
             .collect(Collectors.joining("\n")));
     }

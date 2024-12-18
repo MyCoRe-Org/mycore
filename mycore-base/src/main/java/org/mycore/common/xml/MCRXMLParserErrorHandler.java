@@ -49,7 +49,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
     @Override
     public void warning(SAXParseException ex) {
         if (!silent) {
-            LOGGER.warn(getSAXErrorMessage(ex), ex);
+            LOGGER.warn(() -> getSAXErrorMessage(ex), ex);
         }
     }
 
@@ -59,7 +59,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
     @Override
     public void error(SAXParseException ex) {
         if (!silent) {
-            LOGGER.error(getSAXErrorMessage(ex), ex);
+            LOGGER.error(() -> getSAXErrorMessage(ex));
         }
         throw new MCRException(ex);
     }
@@ -70,7 +70,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
     @Override
     public void fatalError(SAXParseException ex) {
         if (!silent) {
-            LOGGER.fatal(getSAXErrorMessage(ex));
+            LOGGER.fatal(() -> getSAXErrorMessage(ex));
         }
         throw new MCRException(ex);
     }

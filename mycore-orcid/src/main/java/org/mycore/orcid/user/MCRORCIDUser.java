@@ -116,7 +116,7 @@ public class MCRORCIDUser {
 
         if (!nameIdentifierKeys.isEmpty()) {
             for (String key : nameIdentifierKeys) {
-                LOGGER.info("user's identifier occurs in publication: " + key);
+                LOGGER.info(() -> "user's identifier occurs in publication: " + key);
             }
         }
         return !nameIdentifierKeys.isEmpty();
@@ -128,7 +128,7 @@ public class MCRORCIDUser {
             if (attribute.getName().startsWith("id_")) {
                 String idType = attribute.getName().substring(3);
                 String key = buildNameIdentifierKey(idType, attribute.getValue());
-                LOGGER.info("user has name identifier: " + key);
+                LOGGER.info(() -> "user has name identifier: " + key);
                 identifierKeys.add(key);
             }
         }
@@ -147,7 +147,7 @@ public class MCRORCIDUser {
         for (Element nameIdentifier : nameIdentifiers) {
             if (!"".equals(nameIdentifier.getAttributeValue("type"))) {
                 String key = buildNameIdentifierKey(nameIdentifier.getAttributeValue("type"), nameIdentifier.getText());
-                LOGGER.info("found name identifier in publication: " + key);
+                LOGGER.info(() -> "found name identifier in publication: " + key);
                 identifierKeys.add(key);
             } else {
                 LOGGER.info("found name identifier without type, skipping");

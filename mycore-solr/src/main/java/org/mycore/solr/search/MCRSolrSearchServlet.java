@@ -324,16 +324,16 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TypeParameter.toString());
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TypeParameter);
             return SolrParameterGroup.TypeParameter;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter.toString());
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter);
             return SolrParameterGroup.SolrParameter;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter.toString());
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter);
             return SolrParameterGroup.SortParameter;
         } else {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QueryParameter.toString());
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QueryParameter);
             return SolrParameterGroup.QueryParameter;
         }
     }

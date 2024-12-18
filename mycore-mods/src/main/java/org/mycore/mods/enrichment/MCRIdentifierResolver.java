@@ -84,13 +84,13 @@ class MCRIdentifierResolver {
         try {
             resolved = MCRURIResolver.instance().resolve(uri);
         } catch (Exception ex) {
-            LOGGER.warn("Exception resolving " + uri, ex);
+            LOGGER.warn(() -> "Exception resolving " + uri, ex);
             return null;
         }
 
         // Normalize various error/not found cases
         if (resolved == null || !"mods".equals(resolved.getName()) || resolved.getChildren().isEmpty()) {
-            LOGGER.warn(ds + " returned none or empty MODS for " + idType + " " + identifier);
+            LOGGER.warn(() -> ds + " returned none or empty MODS for " + idType + " " + identifier);
             return null;
         }
 
@@ -98,7 +98,7 @@ class MCRIdentifierResolver {
             ensureIsValidMODS(resolved);
             return resolved;
         } catch (Exception ex) {
-            LOGGER.warn(ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage(), ex);
+            LOGGER.warn(() -> ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage(), ex);
             return null;
         }
     }

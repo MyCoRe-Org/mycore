@@ -237,7 +237,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     /** Write data to the logger for debugging purposes */
     public final void debug() {
         LOGGER.debug("SessionID = {}", sessionID);
-        LOGGER.debug("UserID    = {}", getUserInformation().getUserID());
+        LOGGER.debug("UserID    = {}", () -> getUserInformation().getUserID());
         LOGGER.debug("IP        = {}", ip);
         LOGGER.debug("language  = {}", language);
     }
@@ -351,7 +351,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
             MCRException e = new MCRException(
                 "Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
             LOGGER.warn("Too many activate() calls stacktrace:", e);
-            LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace.get());
+            LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace::get);
         }
     }
 
@@ -365,7 +365,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
             lastActivatedStackTrace.set(null);
             fireSessionEvent(passivated, concurrentAccess.decrementAndGet());
         } else {
-            LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
+            LOGGER.debug("deactivate currentThreadCount: {}", () -> currentThreadCount.get().get());
         }
         if (firstURI == null) {
             firstURI = DEFAULT_URI;

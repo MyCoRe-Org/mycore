@@ -71,7 +71,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         String path)
         throws MCRRestAPIException {
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
-        LogManager.getLogger().warn(path + ": Checking API access: " + permission);
+        LogManager.getLogger().warn(() -> path + ": Checking API access: " + permission);
         String thePath = path.startsWith("/") ? path : "/" + path;
 
         MCRAccessInterface acl = MCRAccessManager.getAccessImpl();

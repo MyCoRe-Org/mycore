@@ -479,9 +479,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     .event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
                 default -> {
                     if (KNOWN_UNMAPPED_PERSON_ROLES.contains(role)) {
-                        LOGGER.trace("Unmapped person role " + role + " in " + this.id);
+                        LOGGER.trace(() -> "Unmapped person role " + role + " in " + this.id);
                     } else {
-                        LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                        LOGGER.warn(() -> "Unknown person role " + role + " in " + this.id);
                     }
                 }
             }
@@ -544,7 +544,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             Element displayForm = modsName.getChild("displayForm", MODS_NAMESPACE);
             if (typeContentsMap.isEmpty() && displayForm != null) {
                 LOGGER.warn("The displayForm ({}) is used, because no mods name elements are present in doc {}!",
-                    displayForm.getTextNormalize(), this.id);
+                    displayForm::getTextNormalize, () -> this.id);
                 nameBuilder.literal(displayForm.getTextNormalize());
             }
         } else {

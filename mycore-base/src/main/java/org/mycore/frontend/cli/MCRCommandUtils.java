@@ -41,7 +41,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Utilities intended to reduce redundant code when writing variants of CLI commands.
- * 
+ *
  * @author Christoph Neidahl (OPNA2608)
  *
  */
@@ -51,7 +51,7 @@ public class MCRCommandUtils {
 
     /**
      * Get a stream of MCRObjectIDs found for a type.
-     * 
+     *
      * @param type
      *     The type to look in the store for.
      * @return A (parallel) stream with found IDs. (may be empty if none were found)
@@ -72,7 +72,7 @@ public class MCRCommandUtils {
 
     /**
      * Get a stream of MCRObjectIDs found for a project &amp; type combination.
-     * 
+     *
      * @param project
      *     The project to look in the store for.
      * @param type
@@ -95,7 +95,7 @@ public class MCRCommandUtils {
 
     /**
      * Get a stream of MCRObjectIDs found for a base.
-     * 
+     *
      * @param base
      *     The base to look in the store for.
      * @return A (parallel) stream with found IDs. (may be empty if none were found)
@@ -116,7 +116,7 @@ public class MCRCommandUtils {
 
     /**
      * Get a stream of MCRObjectIDs found in range between two IDs, incrementing/decrementing by 1.
-     * 
+     *
      * @param startId
      *     The first ID to start iterating from.
      * @param endId
@@ -203,8 +203,10 @@ public class MCRCommandUtils {
                 LOGGER.warn("Couldn't load transformer from resource {} for style {}.", xslFilePath, style);
             }
         } catch (Exception e) {
-            LOGGER.warn("Error while loading transformer from resource " + xslFilePath
-                + " for style " + style + ".", e);
+            String finalXslFilePath = xslFilePath;
+            LOGGER.warn(() -> "Error while loading transformer from resource " + finalXslFilePath +
+                " for style " + style + ".",
+                e);
         }
         return null;
     }
