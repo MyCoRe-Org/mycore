@@ -460,7 +460,7 @@
     <xsl:variable name="owner">
       <xsl:choose>
         <!-- old XSLT1: <xsl:when test="mcrxml:isCurrentUserInRole('admin') or mcrxml:isCurrentUserInRole('editor')"> -->
-        <xsl:when test="document('solrwr:isCurrentUserInRole:admin')/text()='true' or document('solrwr:isCurrentUserInRole:editor')/text() = 'true'">
+        <xsl:when test="document('userobjectrights:isCurrentUserInRole:admin')/boolean/text()='true' or document('userobjectrights:isCurrentUserInRole:editor')/boolean/text() = 'true'">
           <xsl:text>*</xsl:text>
         </xsl:when>
         <xsl:otherwise>

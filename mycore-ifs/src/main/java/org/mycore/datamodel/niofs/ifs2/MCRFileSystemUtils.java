@@ -58,13 +58,16 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @author Thomas Scheffler
  *
  */
-abstract class MCRFileSystemUtils {
+final class MCRFileSystemUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRFileSystemUtils.class);
 
     private static final String DEFAULT_CONFIG_PREFIX = "MCR.IFS.ContentStore.IFS2."; //todo: rename
 
     public static final String STORE_ID_PREFIX = "IFS2_";
+
+    private MCRFileSystemUtils() {
+    }
 
     private static String getBaseDir() {
         return MCRConfiguration2.getStringOrThrow(DEFAULT_CONFIG_PREFIX + "BaseDir");

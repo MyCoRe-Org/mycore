@@ -28,7 +28,7 @@ import org.mycore.common.digest.MCRMD5Digest;
 
 /**
  * Reads MCRContent from a byte[] array.
- * 
+ *
  * @author Frank Lützenkichen
  */
 public class MCRByteContent extends MCRContent {
@@ -53,6 +53,7 @@ public class MCRByteContent extends MCRContent {
         this(bytes, 0, bytes.length, lastModified);
     }
 
+    @SuppressWarnings("PMD.ArrayIsStoredDirectly")
     public MCRByteContent(byte[] bytes, int offset, int length, long lastModified) {
         this.bytes = bytes;
         this.offset = offset;

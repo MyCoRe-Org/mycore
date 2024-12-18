@@ -63,6 +63,7 @@ public class MCRAction {
         return decisions;
     }
 
+    @SuppressWarnings("PMD.ArrayIsStoredDirectly")//is only POJO
     public void setDecisions(MCRDecision... decisions) {
         this.decisions = decisions;
     }

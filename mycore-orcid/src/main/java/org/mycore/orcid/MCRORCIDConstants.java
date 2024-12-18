@@ -30,7 +30,7 @@ import jakarta.ws.rs.core.MediaType;
  *
  * @author Frank Lützenkirchen
  */
-public abstract class MCRORCIDConstants {
+public final class MCRORCIDConstants {
 
     public static final MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
 
@@ -39,6 +39,9 @@ public abstract class MCRORCIDConstants {
     public static final Namespace NS_ACTIVITIES = buildNamespace("activities");
 
     public static final Namespace NS_WORK = buildNamespace("work");
+
+    private MCRORCIDConstants() {
+    }
 
     private static Namespace buildNamespace(String prefix) {
         Namespace namespace = Namespace.getNamespace(prefix, "http://www.orcid.org/ns/" + prefix);

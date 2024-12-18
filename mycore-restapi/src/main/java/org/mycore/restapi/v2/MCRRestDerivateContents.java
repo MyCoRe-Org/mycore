@@ -53,6 +53,7 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.util.MCRRestContentHelper;
+import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
@@ -251,25 +252,10 @@ public class MCRRestDerivateContents {
      * @see <a href="https://tools.ietf.org/html/rfc3230">RFC 3230</a>
      * @see <a href="https://tools.ietf.org/html/rfc5843">RFC 45843</a>
      */
-    private static String getDigestHeader(String md5sum) {
-        final String md5Base64 = Base64.getEncoder().encodeToString(getMD5Digest(md5sum));
-        return "MD5=" + md5Base64;
-    }
-
-    private static byte[] getMD5Digest(String md5sum) {
-        final char[] data = md5sum.toCharArray();
-        final int len = data.length;
-
-        // two characters form the hex value.
-        final byte[] md5Bytes = new byte[len >> 1];
-        for (int i = 0, j = 0; j < len; i++) {
-            int f = Character.digit(data[j], 16) << 4;
-            j++;
-            f = f | Character.digit(data[j], 16);
-            j++;
-            md5Bytes[i] = (byte) (f & 0xFF);
-        }
-        return md5Bytes;
+    private static String getReprDigestHeaderValue(MCRDigest digest) {
+        final String algorithm = digest.getAlgorithm().toLowerCase();
+        final String encodedValue = Base64.getEncoder().encodeToString(digest.toBytes());
+        return algorithm + "=:" + encodedValue + ":";
     }
 
     @HEAD
@@ -313,7 +299,7 @@ public class MCRRestDerivateContents {
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .tag(getETag(fileAttributes))
-            .header("Digest", getDigestHeader(fileAttributes.digest().toHexString()))
+            .header("Repr-Digest", getReprDigestHeaderValue(fileAttributes.digest()))
             .build();
     }
 
@@ -353,7 +339,7 @@ public class MCRRestDerivateContents {
                 content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
                 try {
                     final List<Map.Entry<String, String>> responseHeader = List
-                        .of(Map.entry("Digest", getDigestHeader(fileAttributes.digest().toHexString())));
+                        .of(Map.entry("Repr-Digest", getReprDigestHeaderValue(fileAttributes.digest())));
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader, responseHeader);
                 } catch (IOException e) {
                     throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
@@ -432,7 +418,7 @@ public class MCRRestDerivateContents {
         MCRPath mcrPath = getPath();
         try {
             if (Files.exists(mcrPath) && Files.isDirectory(mcrPath)) {
-                //delete (sub-)directory and all its containing files and dirs 
+                //delete (sub-)directory and all its containing files and dirs
                 Files.walkFileTree(mcrPath, MCRRecursiveDeleter.instance());
                 return Response.noContent().build();
             } else if (Files.deleteIfExists(mcrPath)) {

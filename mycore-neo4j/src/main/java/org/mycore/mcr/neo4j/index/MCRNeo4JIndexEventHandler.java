@@ -53,46 +53,51 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
     private static final long DELAY_IN_MS = MCRConfiguration2
         .getLong(MCRNeo4JConstants.NEO4J_CONFIG_PREFIX + "DelayIndexing_inMS").orElse(2000L);
 
+    private static final boolean ENABLED = MCRConfiguration2
+        .getString(MCRNeo4JConstants.DEFAULT_NEO4J_SERVER_URL).isPresent();
+
     private static final DelayQueue<MCRDelayedRunnable> NEO4J_TASK_QUEUE = new DelayQueue<>();
 
     private static final ScheduledExecutorService NEO4J_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
     static {
+        if (!ENABLED) {
+            LOGGER.info("Neo4J Indexing is disabled, because {} is not set.",
+                MCRNeo4JConstants.DEFAULT_NEO4J_SERVER_URL);
+        } else {
+            NEO4J_TASK_EXECUTOR.scheduleWithFixedDelay(() -> {
+                LOGGER.debug("NEO4J Task Executor invoked: {} Nodes to process", NEO4J_TASK_QUEUE.size());
+                processNeo4JTaskQueue();
+            }, DELAY_IN_MS * 2, DELAY_IN_MS * 2, TimeUnit.MILLISECONDS);
 
-        NEO4J_TASK_EXECUTOR.scheduleWithFixedDelay(() -> {
-            LOGGER.debug("NEO4J Task Executor invoked: {} Nodes to process", NEO4J_TASK_QUEUE.size());
-            processNeo4JTaskQueue();
-
-        }, DELAY_IN_MS * 2, DELAY_IN_MS * 2, TimeUnit.MILLISECONDS);
-
-        MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
-            @Override
-            public int getPriority() {
-                return Integer.MIN_VALUE + 10;
-            }
-
-            @Override
-            public void prepareClose() {
-                NEO4J_TASK_EXECUTOR.shutdown();
-                try {
-                    NEO4J_TASK_EXECUTOR.awaitTermination(10, TimeUnit.MINUTES);
-                } catch (InterruptedException e) {
-                    LOGGER.error("Could not shutdown Neo4J-Indexing", e);
+            MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
+                @Override
+                public int getPriority() {
+                    return Integer.MIN_VALUE + 10;
                 }
 
-                if (!NEO4J_TASK_QUEUE.isEmpty()) {
-                    LOGGER.info("There are still {} Neo4J indexing tasks to complete before shutdown",
-                        NEO4J_TASK_QUEUE.size());
-                    processNeo4JTaskQueue();
+                @Override
+                public void prepareClose() {
+                    NEO4J_TASK_EXECUTOR.shutdown();
+                    try {
+                        NEO4J_TASK_EXECUTOR.awaitTermination(10, TimeUnit.MINUTES);
+                    } catch (InterruptedException e) {
+                        LOGGER.error("Could not shutdown Neo4J-Indexing", e);
+                    }
+
+                    if (!NEO4J_TASK_QUEUE.isEmpty()) {
+                        LOGGER.info("There are still {} Neo4J indexing tasks to complete before shutdown",
+                            NEO4J_TASK_QUEUE.size());
+                        processNeo4JTaskQueue();
+                    }
                 }
-            }
 
-            @Override
-            public void close() {
-                //all work done in prepareClose phase
-            }
-        });
-
+                @Override
+                public void close() {
+                    //all work done in prepareClose phase
+                }
+            });
+        }
     }
 
     private final MCRNeo4JParser parser;
@@ -147,6 +152,9 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void updateObject(MCREvent evt, MCRObject mcrObject) {
+        if (!ENABLED) {
+            return;
+        }
         LOGGER.debug("Neo4j: update id {}", mcrObject.getId());
 
         // do not add objects marked for deletion
@@ -178,6 +186,9 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void addObject(MCREvent evt, MCRObject mcrObject) {
+        if (!ENABLED) {
+            return;
+        }
         LOGGER.debug("Neo4j: add id {}", mcrObject.getId());
 
         // do not add objects marked for deletion
@@ -205,6 +216,9 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void deleteObject(MCRObjectID id) {
+        if (!ENABLED) {
+            return;
+        }
         LOGGER.debug("Neo4j: delete id {}", id);
         MCRSessionMgr.getCurrentSession()
             .onCommit(() -> putIntoTaskQueue(new MCRDelayedRunnable(id.toString(), DELAY_IN_MS,

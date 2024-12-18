@@ -46,9 +46,12 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
-public abstract class MCRWCMSUtil {
+public final class MCRWCMSUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private MCRWCMSUtil() {
+    }
 
     public static File getWCMSDataDir() {
         return new File(MCRConfiguration2.getStringOrThrow("MCR.WCMS2.DataDir"));
