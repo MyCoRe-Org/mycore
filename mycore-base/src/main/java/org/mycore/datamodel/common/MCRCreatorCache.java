@@ -33,7 +33,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 /**
- * 
+ *
  * @author René Adler (eagle)
  *
  */
@@ -66,8 +66,7 @@ public class MCRCreatorCache {
                                 .map(version -> {
                                     LOGGER.info(
                                         "Found creator {} in revision {} of {}",
-                                        version.getUser(), version.getRevision(),
-                                        objectId);
+                                        version::getUser, version::getRevision, () -> objectId);
                                     return version.getUser();
                                 }).orElseGet(() -> {
                                     LOGGER.info("Could not get creator information of {}.", objectId);
@@ -86,7 +85,7 @@ public class MCRCreatorCache {
 
     /**
      * Returns the creator by given {@link MCRObjectID}.
-     * 
+     *
      * @param objectId the {@link MCRObjectID}
      * @return the creator of the object
      * @throws ExecutionException is thrown if any other exception occurs
@@ -97,7 +96,7 @@ public class MCRCreatorCache {
 
     /**
      * Returns the creator by given {@link MCRObjectID}.
-     * 
+     *
      * @param objectId the {@link MCRObjectID}
      * @return the creator of the object
      * @throws ExecutionException is thrown if any other exception occurs
@@ -108,7 +107,7 @@ public class MCRCreatorCache {
 
     /**
      * Discard the cached creator for given {@link MCRObjectID}.
-     *  
+     *
      * @param objectId the {@link MCRObjectID}
      */
     public static void invalidate(final MCRObjectID objectId) {
@@ -117,7 +116,7 @@ public class MCRCreatorCache {
 
     /**
      * Discard the cached creator for given {@link MCRObjectID}.
-     * 
+     *
      * @param objectId the {@link MCRObjectID}
      */
     public static void invalidate(final String objectId) {

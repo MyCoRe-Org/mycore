@@ -78,7 +78,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         MCRObjectID oid = object.getId();
         for (Element relatedItem : mods.getChildren("relatedItem", MCRConstants.MODS_NAMESPACE)) {
             String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-            LOGGER.info("Found related item in {}, href={}", object.getId(), href);
+            LOGGER.info("Found related item in {}, href={}", oid, href);
             //MCR-957: only create releated object if mycoreId
             MCRObjectID mcrIdCheck;
             try {

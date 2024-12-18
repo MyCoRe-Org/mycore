@@ -72,7 +72,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
     public Response toResponse(Exception exc) {
         Response response = getResponse(exc);
         if (exc instanceof WebApplicationException && !(exc instanceof InternalServerErrorException)) {
-            LOGGER.warn("{}: {}, {}", uriInfo.getRequestUri(), response.getStatus(), exc.getMessage());
+            LOGGER.warn("{}: {}, {}", uriInfo::getRequestUri, response::getStatus, exc::getMessage);
             LOGGER.debug("Exception: ", exc);
         } else {
             LOGGER.warn(() -> "Error while processing request " + uriInfo.getRequestUri(), exc);

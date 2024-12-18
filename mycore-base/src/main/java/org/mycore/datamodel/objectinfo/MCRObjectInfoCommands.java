@@ -78,21 +78,21 @@ public class MCRObjectInfoCommands {
         help = "creates the corresponding objectinfo for MCRObject {0}")
     public static void createObjectInfoForObject(String idStr) {
         MCRObjectID id = MCRObjectID.getInstance(idStr);
-        LogManager.getLogger().info("create objectinfo for object " + idStr);
+        LogManager.getLogger().info(() -> "create objectinfo for object " + idStr);
         if (id.getTypeId().equals("derivate")) {
             return;
         }
         try {
             if (MCRMetadataManager.exists(id)) {
                 MCRObjectInfoEntityManager.update(MCRMetadataManager.retrieveMCRObject(id));
-                LogManager.getLogger().info("objectinfo for object " + idStr + " created.");
+                LogManager.getLogger().info(() -> "objectinfo for object " + idStr + " created.");
 
             } else {
                 List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
                     .listRevisions(id);
                 if (versions == null || versions.isEmpty()) {
                     // we do not know if the object ever existed
-                    LOGGER.warn("Could not determine what happened to " + id);
+                    LOGGER.warn(() -> "Could not determine what happened to " + id);
                 } else {
                     MCRAbstractMetadataVersion<?> deleted = versions.getLast();
                     MCRAbstractMetadataVersion<?> lastExisting = versions.get(versions.size() - 2);
@@ -102,9 +102,9 @@ public class MCRObjectInfoCommands {
                         MCRObjectInfoEntityManager.update(obj);
                         MCRObjectInfoEntityManager.delete(obj,
                             deleted.getDate().toInstant(), deleted.getUser());
-                        LogManager.getLogger().info("objectinfo for object " + idStr + " created.");
+                        LogManager.getLogger().info(() -> "objectinfo for object " + idStr + " created.");
                     } catch (JDOMException e) {
-                        LOGGER.warn("Could not determine what happened to " + id, e);
+                        LOGGER.warn(() -> "Could not determine what happened to " + id, e);
                     }
                 }
             }

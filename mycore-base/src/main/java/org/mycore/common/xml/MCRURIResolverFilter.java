@@ -43,7 +43,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 
 /**
  * Servlet Filter for adding debug information to servlet output.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRURIResolverFilter implements Filter {
@@ -53,11 +53,11 @@ public class MCRURIResolverFilter implements Filter {
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
-     * 
+     *
      * The information includes all URIs resolved by MCRURIResolver by the
      * current request. The filter is triggered by the log4j statement of the
      * MCRURIResolver. To switch it on set the logger to DEBUG level.
-     * 
+     *
      * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest,
      *      jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)
      */
@@ -99,7 +99,7 @@ public class MCRURIResolverFilter implements Filter {
                     out.write(origOutput.substring(pos).getBytes(characterEncoding));
                     // delete debuglist
                     uriList.remove();
-                    LOGGER.debug("end filter: {}", origOutput.substring(origOutput.length() - 10));
+                    LOGGER.debug("end filter: {}", () -> origOutput.substring(origOutput.length() - 10));
                 }
             } else {
                 LOGGER.debug("Sending original response");
@@ -129,7 +129,7 @@ public class MCRURIResolverFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see jakarta.servlet.Filter#destroy()
      */
     public void destroy() {
@@ -139,7 +139,7 @@ public class MCRURIResolverFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
     public void init(FilterConfig arg0) {
@@ -148,7 +148,7 @@ public class MCRURIResolverFilter implements Filter {
 
     /**
      * wrapper arround the servlet response to change the output afterwards.
-     * 
+     *
      * @author Thomas Scheffler (yagee)
      */
     private static class MyResponseWrapper extends HttpServletResponseWrapper {

@@ -96,7 +96,7 @@ public class MCRMODSDistributeMetadataJobAction extends MCRJobAction {
             int maxTries = 10;
             List<MCRObjectID> notLocked = new ArrayList<>(objects);
             do {
-                LOGGER.info("Try to lock {} objects", notLocked.size());
+                LOGGER.info("Try to lock {} objects", notLocked::size);
                 objects.forEach(MCRObjectIDLockTable::lock);
                 notLocked.removeIf(MCRObjectIDLockTable::isLockedByCurrentSession);
                 if (!notLocked.isEmpty()) {

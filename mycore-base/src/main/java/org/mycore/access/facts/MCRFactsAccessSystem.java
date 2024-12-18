@@ -57,11 +57,11 @@ import jakarta.inject.Singleton;
 
 /**
  * base class for XML fact based access system
- * 
+ *
  * enabled it with the 2 properties:
  * MCR.Access.Class=org.mycore.access.facts.MCRFactsAccessSystem
  * MCR.Access.Strategy.Class=org.mycore.access.facts.MCRFactsAccessSystem
- * 
+ *
  */
 @Singleton
 public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckStrategy {
@@ -75,7 +75,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     private Collection<MCRFactComputable<MCRFact<?>>> computers;
 
     //RS: when introducing this feature in 2021.06.LTS it needed to be configured twice
-    //(as access system and as strategy). To simplify things during the transition period 
+    //(as access system and as strategy). To simplify things during the transition period
     //we are going to use the base property to initialize the rulesURI for both cases
     //By using the property MCR.Access.Strategy.RulesURI it could be overwritten if used for strategy.
     private String rulesURI = MCRConfiguration2.getString("MCR.Access.RulesURI").orElse("resource:rules.xml");
@@ -130,8 +130,8 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                 throw new IOException("MCRConfigurationDir is not available!");
             }
         } catch (IOException e) {
-            LOGGER.error("Could not write file '" + RESOLVED_RULES_FILE_NAME + "' to config directory", e);
-            LOGGER.info("Rules file is: \n" + new XMLOutputter(Format.getPrettyFormat()).outputString(eRules));
+            LOGGER.error(() -> "Could not write file '" + RESOLVED_RULES_FILE_NAME + "' to config directory", e);
+            LOGGER.info(() -> "Rules file is: \n" + new XMLOutputter(Format.getPrettyFormat()).outputString(eRules));
         }
         return MCRFactsAccessSystemHelper.parse(eRules);
     }
@@ -180,7 +180,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                         facts.add(new MCRObjectIDFact("objid", checkID, mcrId));
                     }
                 } else {
-                    LOGGER.debug("There is no object or derivate with id " + mcrId + " in metadata store");
+                    LOGGER.debug(() -> "There is no object or derivate with id " + mcrId + " in metadata store");
                 }
             } else {
                 target = "unknown";

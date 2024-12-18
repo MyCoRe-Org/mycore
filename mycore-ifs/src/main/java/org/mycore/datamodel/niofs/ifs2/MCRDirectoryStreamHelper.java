@@ -69,9 +69,9 @@ class MCRDirectoryStreamHelper {
     static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
-        LOGGER.debug("Dir {}, class {}, filter {}", path, dir.getClass(), filter.getClass());
+        LOGGER.debug("Dir {}, class {}, filter {}", () -> path, dir::getClass, filter::getClass);
         DirectoryStream<Path> baseDirectoryStream = Files.newDirectoryStream(dir.getLocalPath(), filter);
-        LOGGER.debug("baseStream {}", baseDirectoryStream.getClass());
+        LOGGER.debug("baseStream {}", baseDirectoryStream::getClass);
         if (baseDirectoryStream instanceof SecureDirectoryStream secureDirectoryStream) {
             LOGGER.debug("Returning SecureDirectoryStream");
             return new MCRSecureDirectoryStream(dir, path, secureDirectoryStream);

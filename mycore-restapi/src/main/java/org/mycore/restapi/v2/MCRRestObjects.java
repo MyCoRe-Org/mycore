@@ -594,7 +594,14 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        LogManager.getLogger().info("OK: {}", mcrContent.getETag());
+        LogManager.getLogger().info("OK: {}", () -> {
+            try {
+                return mcrContent.getETag();
+            } catch (IOException e) {
+                LogManager.getLogger().warn(e::getMessage);
+                return "no etag";
+            }
+        });
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory

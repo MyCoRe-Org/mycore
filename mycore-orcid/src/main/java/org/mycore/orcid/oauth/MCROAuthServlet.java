@@ -106,7 +106,7 @@ public class MCROAuthServlet extends MCRServlet {
         request.set("redirect_uri", redirectURL);
 
         MCRTokenResponse token = request.post();
-        LOGGER.info("access granted for " + token.getORCID() + " " + token.getAccessToken());
+        LOGGER.info(() -> "access granted for " + token.getORCID() + " " + token.getAccessToken());
         return token;
     }
 }

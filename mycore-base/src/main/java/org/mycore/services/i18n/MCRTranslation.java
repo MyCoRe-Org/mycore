@@ -55,7 +55,7 @@ import org.w3c.dom.Element;
 /**
  * provides services for internationalization in mycore application. You have to provide a property file named
  * messages.properties in your classpath for this class to work.
- * 
+ *
  * @author Radi Radichev
  * @author Thomas Scheffler (yagee)
  */
@@ -84,7 +84,7 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
-     * 
+     *
      * @param label property key
      * @return translated String
      */
@@ -94,7 +94,7 @@ public class MCRTranslation {
 
     /**
      * Checks whether there is a value for the given label and current locale.
-     * 
+     *
      * @param label property key
      * @return <code>true</code> if there is a value, <code>false</code> otherwise
      */
@@ -112,7 +112,7 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
-     * 
+     *
      * @param label property key
      * @param baseName
      *            a fully qualified class name
@@ -125,7 +125,7 @@ public class MCRTranslation {
 
     /**
      * provides translation for the given label (property key).
-     * 
+     *
      * @param label property key
      * @param locale
      *            target locale of translation
@@ -149,7 +149,7 @@ public class MCRTranslation {
 
     /**
      * provides translation for the given label (property key).
-     * 
+     *
      * @param label property key
      * @param locale
      *            target locale of translation
@@ -158,13 +158,13 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translateToLocale(String label, Locale locale, String baseName) {
-        LOGGER.debug("Translation for current locale: {}", locale.getLanguage());
+        LOGGER.debug("Translation for current locale: {}", locale::getLanguage);
         ResourceBundle message;
         try {
             message = getResourceBundle(baseName, locale);
         } catch (MissingResourceException mre) {
             //no messages.properties at all
-            LOGGER.debug(mre.getMessage());
+            LOGGER.debug(mre::getMessage);
             return "???" + label + "???";
         }
         String result = null;
@@ -188,7 +188,7 @@ public class MCRTranslation {
                 }
             }
             result = "???" + label + "???";
-            LOGGER.debug(mre.getMessage());
+            LOGGER.debug(mre::getMessage);
         }
         return result;
     }
@@ -196,7 +196,7 @@ public class MCRTranslation {
     /**
      * Returns a map of label/value pairs which match with the given prefix. The current locale that is needed for
      * translation is gathered by the language of the current MCRSession.
-     * 
+     *
      * @param prefix
      *            label starts with
      * @return map of labels with translated values
@@ -207,7 +207,7 @@ public class MCRTranslation {
 
     /**
      * Returns a map of label/value pairs which match with the given prefix.
-     * 
+     *
      * @param prefix
      *            label starts with
      * @param locale
@@ -215,7 +215,7 @@ public class MCRTranslation {
      * @return map of labels with translated values
      */
     public static Map<String, String> translatePrefixToLocale(String prefix, Locale locale) {
-        LOGGER.debug("Translation for locale: {}", locale.getLanguage());
+        LOGGER.debug("Translation for locale: {}", locale::getLanguage);
         HashMap<String, String> map = new HashMap<>();
         ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
@@ -231,7 +231,7 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
-     * 
+     *
      * @param label property key
      * @param arguments
      *            Objects that are inserted instead of placeholders in the property values
@@ -265,7 +265,7 @@ public class MCRTranslation {
      * gathered by the language of the current MCRSession. Be aware that any occurence of ';' and '\' in
      * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
      * result in {"foo","bar"} (the array)
-     * 
+     *
      * @param label property key
      * @param argument
      *            String that is inserted instead of placeholders in the property values
@@ -462,7 +462,7 @@ public class MCRTranslation {
                 try (OutputStream os = new FileOutputStream(resolvedMsgFile)) {
                     props.store(os, "MyCoRe Messages for Locale " + lang);
                 } catch (IOException e) {
-                    LOGGER.warn("Could not store resolved properties to {}", resolvedMsgFile.getAbsolutePath(), e);
+                    LOGGER.warn(() -> "Could not store resolved properties to " + resolvedMsgFile.getAbsolutePath(), e);
                 }
             }
         }

@@ -20,6 +20,7 @@ package org.mycore.user2.login;
 
 import java.util.Hashtable;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.naming.Context;
 import javax.naming.NameNotFoundException;
@@ -47,36 +48,36 @@ import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * Queries an LDAP server for the user's properties.
- * 
- *  # Timeout when connecting to LDAP server 
+ *
+ *  # Timeout when connecting to LDAP server
  *  MCR.user2.LDAP.ReadTimeout=5000
- *  
+ *
  *  # LDAP server
  *  MCR.user2.LDAP.ProviderURL=ldap://idp.uni-duisburg-essen.de
- *  
+ *
  *  # Security principal for logging in at LDAP server
  *  MCR.user2.LDAP.SecurityPrincipal=cn=duepublico,dc=idp
- *  
+ *
  *  # Security credentials for logging in at LDAP server
  *  MCR.user2.LDAP.SecurityCredentials=XXXXXX
- *  
+ *
  *  # Base DN
  *  MCR.user2.LDAP.BaseDN=ou=people,dc=idp
- *  
+ *
  *  # Filter for user ID
  *  MCR.user2.LDAP.UIDFilter=(uid=%s)
- *  
+ *
  *  # LDAP attribute mappings
- *  
+ *
  *  # Mapping from LDAP attribute to real name of user
  *  MCR.user2.LDAP.Mapping.Name=cn
- *  
+ *
  *  # Mapping from LDAP attribute to E-Mail address of user
  *  MCR.user2.LDAP.Mapping.E-Mail=mail
- *  
- *  # Mapping of any attribute.value combination to group membership of user 
+ *
+ *  # Mapping of any attribute.value combination to group membership of user
  *  MCR.user2.LDAP.Mapping.Group.eduPersonScopedAffiliation.staff@uni-duisburg-essen.de=creators
- *  
+ *
  *  # Default group membership (optional)
  *  MCR.user2.LDAP.Mapping.Group.DefaultGroup=submitters
  *
@@ -143,16 +144,16 @@ public class MCRLDAPClient {
     public static void main(String[] args) throws Exception {
         String userName = args[0];
         String realmID = args[1];
-        MCRUser user = MCRUserManager.getUser(userName, realmID);
-        if (user == null) {
-            user = new MCRUser(userName, realmID);
-        }
+        MCRUser user = Optional.ofNullable(MCRUserManager.getUser(userName, realmID))
+            .orElseGet(() -> new MCRUser(userName, realmID));
 
         LOGGER.info("\n{}",
-            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+            () -> new XMLOutputter(Format.getPrettyFormat())
+                .outputString(MCRUserTransformer.buildExportableSafeXML(user)));
         instance().updateUserProperties(user);
         LOGGER.info("\n{}",
-            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+            () -> new XMLOutputter(Format.getPrettyFormat())
+                .outputString(MCRUserTransformer.buildExportableSafeXML(user)));
     }
 
     public boolean updateUserProperties(MCRUser user) throws NamingException {

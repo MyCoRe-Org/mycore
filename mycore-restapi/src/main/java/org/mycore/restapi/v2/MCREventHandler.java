@@ -271,7 +271,7 @@ class MCREventHandler {
 
         public void sendEvent(MCREvent evt, Path path, BasicFileAttributes attrs) {
             if (!(path instanceof MCRPath) || !(attrs instanceof MCRFileAttributes)) {
-                LogManager.getLogger().warn("Cannot handle {} {}", path.getClass(), attrs.getClass());
+                LogManager.getLogger().warn("Cannot handle {} {}", path::getClass, attrs::getClass);
                 return;
             }
             JsonObject file = new JsonObject();

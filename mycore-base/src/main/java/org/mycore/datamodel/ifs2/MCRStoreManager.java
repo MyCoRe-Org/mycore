@@ -36,7 +36,7 @@ public class MCRStoreManager {
         T store = storeClass.getDeclaredConstructor().newInstance();
         store.init(config);
         try {
-            LOGGER.info("Adding instance of {} as MCRStore '{}'.", storeClass.getSimpleName(), store.getID());
+            LOGGER.info("Adding instance of {} as MCRStore '{}'.", storeClass::getSimpleName, store::getID);
             MCRStoreCenter.instance().addStore(store.getID(), store);
         } catch (Exception e) {
             throw new MCRException("Could not create store with ID " + config.getID() + ", store allready exists");
@@ -47,7 +47,7 @@ public class MCRStoreManager {
 
     /**
      * Returns the store with the given id
-     * 
+     *
      * @param id
      *            the ID of the store
      */

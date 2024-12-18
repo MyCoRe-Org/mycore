@@ -49,7 +49,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
     /**
      * This method implement the doGetPost method of MCRServlet. It build a XML
      * file for the Google search engine.
-     * 
+     *
      * @param job
      *            a MCRServletJob instance
      */
@@ -60,7 +60,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL(job.getRequest()),
             baseDir);
         int number = common.checkSitemapFile();
-        LOGGER.debug("Build Google number of URL files {}.", Integer.toString(number));
+        LOGGER.debug("Build Google number of URL files {}.", number);
         Document jdom = null;
         // check if sitemap_google.xml exist
         String fnsm = common.getFileName(1, true);

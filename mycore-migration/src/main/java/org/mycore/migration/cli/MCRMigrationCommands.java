@@ -287,13 +287,13 @@ public class MCRMigrationCommands {
         throws IOException, JDOMException {
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIdStr);
         if (!MCRMetadataManager.exists(derivateID)) {
-            LOGGER.info("Derivate " + derivateIdStr + " does not exist!");
+            LOGGER.info(() -> "Derivate " + derivateIdStr + " does not exist!");
             return;
         }
 
         final MCRPath metsPath = MCRPath.getPath(derivateIdStr, "mets.xml");
         if (!Files.exists(metsPath)) {
-            LOGGER.info("Derivate " + derivateIdStr + " has not mets.xml!");
+            LOGGER.info(() -> "Derivate " + derivateIdStr + " has no mets.xml!");
             return;
         }
 
@@ -312,7 +312,7 @@ public class MCRMigrationCommands {
 
         }
 
-        LOGGER.info("Migrated mets of " + derivateIdStr);
+        LOGGER.info(() -> "Migrated mets of " + derivateIdStr);
     }
 
     // 2018 -> 2019
@@ -366,7 +366,7 @@ public class MCRMigrationCommands {
 
         //migrate title:
         //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
-        if (derivate.getService().getFlags("title").size() > 0) {
+        if (!derivate.getService().getFlags("title").isEmpty()) {
             String title = derivate.getService().getFlags("title").getFirst();
             derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
             derivate.getService().removeFlags("title");

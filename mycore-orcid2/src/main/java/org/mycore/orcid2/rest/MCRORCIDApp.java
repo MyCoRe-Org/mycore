@@ -57,7 +57,7 @@ public class MCRORCIDApp extends ResourceConfig {
 
     private void initAppName() {
         setApplicationName("MyCoRe ORCID-API " + getVersion());
-        LogManager.getLogger().info("Initiialize {}", getApplicationName());
+        LogManager.getLogger().info("Initiialize {}", this::getApplicationName);
     }
 
     private String getVersion() {

@@ -103,7 +103,7 @@ public class MCRUnmappedCategoryRemover {
     private void initializeMapping(MCRCategory category) {
         final Optional<MCRLabel> mapping = category.getLabel("x-mapping");
 
-        LOGGER.info("Find mappings for category: {}", category.getId());
+        LOGGER.info("Find mappings for category: {}", category::getId);
 
         mapping.ifPresent(label -> {
             final String[] mappingTargets = label.text.split(" ");
@@ -111,7 +111,7 @@ public class MCRUnmappedCategoryRemover {
                 final String[] kv = mappingTarget.split(":");
                 String clazz = kv[0];
                 if (classificationID.equals(clazz)) {
-                    LOGGER.info("Found mapping from {} to {}", category.getId(), mappingTarget);
+                    LOGGER.info("Found mapping from {} to {}", category::getId, () -> mappingTarget);
                     toFromMapping.put(MCRCategoryID.fromString(mappingTarget), category.getId());
                 }
             }

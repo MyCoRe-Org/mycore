@@ -128,7 +128,7 @@ public class MCRRestAPIUploadHelper {
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (Exception e) {
-            LOGGER.error("Unable to Upload file: {}", String.valueOf(fXML), e);
+            LOGGER.error("Unable to Upload file: {}", fXML, e);
             throw new MCRRestAPIException(Status.BAD_REQUEST, new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
                 "Unable to Upload file: " + fXML, e.getMessage()));
         } finally {
@@ -136,7 +136,7 @@ public class MCRRestAPIUploadHelper {
                 try {
                     Files.delete(fXML);
                 } catch (IOException e) {
-                    LOGGER.error("Unable to delete temporary workflow file: {}", String.valueOf(fXML), e);
+                    LOGGER.error("Unable to delete temporary workflow file: {}", fXML, e);
                 }
             }
         }
@@ -375,7 +375,7 @@ public class MCRRestAPIUploadHelper {
         try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
-                LOGGER.debug("Unzipping: {}", entry.getName());
+                LOGGER.debug("Unzipping: {}", entry::getName);
                 java.nio.file.Path target = MCRUtils.safeResolve(derDir, entry.getName());
                 Files.createDirectories(target.getParent());
                 Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
@@ -411,7 +411,7 @@ public class MCRRestAPIUploadHelper {
     /**
      * deletes all files inside a given derivate
      * @param info - the Jersey UriInfo object
-     * @param request - the HTTPServletRequest object 
+     * @param request - the HTTPServletRequest object
      * @param pathParamMcrObjID - the MyCoRe Object ID
      * @param pathParamMcrDerID - the MyCoRe Derivate ID
      * @return a Jersey Response Object
@@ -447,7 +447,7 @@ public class MCRRestAPIUploadHelper {
     /**
      * deletes a whole derivate
      * @param info - the Jersey UriInfo object
-     * @param request - the HTTPServletRequest object 
+     * @param request - the HTTPServletRequest object
      * @param pathParamMcrObjID - the MyCoRe Object ID
      * @param pathParamMcrDerID - the MyCoRe Derivate ID
      * @return a Jersey Response Object
@@ -472,7 +472,7 @@ public class MCRRestAPIUploadHelper {
 
     /**
      * serializes a map of Strings into a compact JSON structure
-     * @param data a sorted Map of Strings 
+     * @param data a sorted Map of Strings
      * @return a compact JSON
      */
     public static String generateMessagesFromProperties(SortedMap<String, String> data) {

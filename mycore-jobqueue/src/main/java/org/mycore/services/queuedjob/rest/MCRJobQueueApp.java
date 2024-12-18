@@ -58,7 +58,7 @@ public class MCRJobQueueApp extends ResourceConfig {
      */
     protected void initAppName() {
         setApplicationName("MyCoRe JobQueue-API " + getVersion());
-        LogManager.getLogger().info("Initiialize {}", getApplicationName());
+        LogManager.getLogger().info("Initiialize {}", this::getApplicationName);
     }
 
     /**

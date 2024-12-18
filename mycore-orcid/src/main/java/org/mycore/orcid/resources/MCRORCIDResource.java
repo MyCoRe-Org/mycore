@@ -135,7 +135,7 @@ public class MCRORCIDResource {
 
             return publicationStatus(oid, user);
         } catch (Exception ex) {
-            LOGGER.warn("Exception publishing " + oid + " to ORCID", ex);
+            LOGGER.warn(() -> "Exception publishing " + oid + " to ORCID", ex);
             String msg = ex.getClass().getName() + " " + ex.getMessage();
             throw new InternalServerErrorException(msg);
         }

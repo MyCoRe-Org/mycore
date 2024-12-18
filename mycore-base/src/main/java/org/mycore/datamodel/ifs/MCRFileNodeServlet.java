@@ -49,13 +49,13 @@ import jakarta.servlet.http.HttpServletResponse;
  * sent to the browser. If the node is a directory, the contents of that
  * directory will be forwareded to MCRLayoutService as XML data to display a
  * detailed directory listing.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author A.Schaar
  * @author Robert Stephan
- * 
+ *
  */
 public class MCRFileNodeServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
@@ -74,12 +74,12 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         String ownerID = getOwnerID(request);
         if (ownerID != null && ownerID.length() > 0) {
-            //make sure, that numberpart of ownerID has correct length 
+            //make sure, that numberpart of ownerID has correct length
             ownerID = MCRObjectID.getInstance(ownerID).toString();
         }
         if (!MCRAccessManager.checkDerivateContentPermission(MCRObjectID.getInstance(ownerID),
             MCRAccessManager.PERMISSION_READ)) {
-            LOGGER.info("AccessForbidden to {}", request.getPathInfo());
+            LOGGER.info("AccessForbidden to {}", request::getPathInfo);
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;
         }
@@ -132,7 +132,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
 
     /**
      *  retrieves the derivate ID of the owning derivate from request path.
-     *  Attention: derivateID is not always at the first position in path 
+     *  Attention: derivateID is not always at the first position in path
      *  @param request - the http request object
      */
     public static String getOwnerID(HttpServletRequest request) {

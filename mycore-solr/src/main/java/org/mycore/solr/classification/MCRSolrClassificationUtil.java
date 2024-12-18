@@ -224,7 +224,7 @@ public final class MCRSolrClassificationUtil {
                     MCRSolrAuthenticationLevel.INDEX);
                 req.process(solrClient);
             } catch (Exception exc) {
-                LOGGER.error("Unable to reindex {}", category.getId(), exc);
+                LOGGER.error(() -> "Unable to reindex " + category.getId(), exc);
             }
         }
         try {

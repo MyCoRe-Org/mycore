@@ -66,7 +66,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
                 MCRNeo4JConstants.DEFAULT_NEO4J_SERVER_URL);
         } else {
             NEO4J_TASK_EXECUTOR.scheduleWithFixedDelay(() -> {
-                LOGGER.debug("NEO4J Task Executor invoked: {} Nodes to process", NEO4J_TASK_QUEUE.size());
+                LOGGER.debug("NEO4J Task Executor invoked: {} Nodes to process", NEO4J_TASK_QUEUE::size);
                 processNeo4JTaskQueue();
             }, DELAY_IN_MS * 2, DELAY_IN_MS * 2, TimeUnit.MILLISECONDS);
 
@@ -87,7 +87,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
 
                     if (!NEO4J_TASK_QUEUE.isEmpty()) {
                         LOGGER.info("There are still {} Neo4J indexing tasks to complete before shutdown",
-                            NEO4J_TASK_QUEUE.size());
+                            NEO4J_TASK_QUEUE::size);
                         processNeo4JTaskQueue();
                     }
                 }
@@ -116,7 +116,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
             try {
                 MCRDelayedRunnable processingTask = NEO4J_TASK_QUEUE.poll(DELAY_IN_MS, TimeUnit.MILLISECONDS);
                 if (processingTask != null) {
-                    LOGGER.info("Sending {} to neo4j...", processingTask.getId());
+                    LOGGER.info("Sending {} to neo4j...", processingTask::getId);
                     processingTask.run();
                 }
             } catch (InterruptedException e) {
@@ -127,7 +127,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected synchronized void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        LOGGER.info("Handle {}", obj.getId());
+        LOGGER.info("Handle {}", obj::getId);
         addObject(evt, obj);
     }
 
@@ -155,7 +155,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
         if (!ENABLED) {
             return;
         }
-        LOGGER.debug("Neo4j: update id {}", mcrObject.getId());
+        LOGGER.debug("Neo4j: update id {}", mcrObject::getId);
 
         // do not add objects marked for deletion
         if (MCRMarkManager.instance().isMarked(mcrObject.getId())) {
@@ -189,7 +189,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
         if (!ENABLED) {
             return;
         }
-        LOGGER.debug("Neo4j: add id {}", mcrObject.getId());
+        LOGGER.debug("Neo4j: add id {}", mcrObject::getId);
 
         // do not add objects marked for deletion
         if (MCRMarkManager.instance().isMarked(mcrObject.getId())) {

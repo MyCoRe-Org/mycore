@@ -48,7 +48,7 @@ public class MCRHighestComponentPriorityResourceSelector extends MCRResourceSele
         List<URL> highestPriorityModuleResourceUrls = new LinkedList<>();
         for (MCRComponent component : componentsByComponentPriority()) {
             int priority = component.getPriority();
-            getLogger().debug("Testing component " + component.getName() + " with priority " + priority);
+            getLogger().debug(() -> "Testing component " + component.getName() + " with priority " + priority);
             if (highestPriority != -1 && highestPriority != priority) {
                 getLogger().debug("Found component with priority lower than selected priority {}, stop looking",
                     highestPriority);

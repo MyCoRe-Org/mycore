@@ -127,8 +127,8 @@ public final class MCRPasswordCheckManager {
             checkConfigurationHasNoIncompatibleChange(strategies);
         }
 
-        LOGGER.info("Working with strategies: " + String.join(", ", strategies.keySet()));
-        LOGGER.info("Creating new password hashes with strategy: " + selectedStrategyType);
+        LOGGER.info(() -> "Working with strategies: " + String.join(", ", strategies.keySet()));
+        LOGGER.info(() -> "Creating new password hashes with strategy: " + selectedStrategyType);
 
     }
 

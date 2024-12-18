@@ -594,7 +594,7 @@ public class MCRUserManager {
         }
         if (!allowedRoles.isEmpty()) {
             Collection<String> userRoles = user.getSystemRoleIDs();
-            LOGGER.info("Comparing user roles " + userRoles + " against list of allowed roles " + allowedRoles);
+            LOGGER.info(() -> "Comparing user roles " + userRoles + " against list of allowed roles " + allowedRoles);
             boolean hasAnyAllowedRole = userRoles.stream().anyMatch(allowedRoles::contains);
             if (!hasAnyAllowedRole) {
                 return null;
@@ -643,10 +643,11 @@ public class MCRUserManager {
         }
         if (!user.loginAllowed()) {
             if (user.isDisabled()) {
-                LOGGER.warn("User {} was disabled!", user.getUserID());
+                LOGGER.warn("User {} was disabled!", user::getUserID);
             } else {
-                LOGGER.warn("Password expired for user {} on {}", user.getUserID(),
-                    MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.COMPLETE_HH_MM_SS.toString()));
+                LOGGER.warn("Password expired for user {} on {}", user::getUserID,
+                    () -> MCRXMLFunctions.getISODate(user.getValidUntil(),
+                        MCRISO8601Format.COMPLETE_HH_MM_SS.toString()));
             }
             return null;
         }

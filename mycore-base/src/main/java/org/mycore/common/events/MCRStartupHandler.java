@@ -79,10 +79,10 @@ public class MCRStartupHandler {
             new MCRTableMessage.Column<>("Build time", MCRStartupHandler::toManifestModificationDate),
             new MCRTableMessage.Column<>("Location", MCRStartupHandler::toJarFile));
         MCRRuntimeComponentDetector.getAllComponents(LOWEST_PRIORITY_FIRST).forEach(componentTable::add);
-        LOGGER.info(componentTable.logMessage("Detected components:"));
+        LOGGER.info(() -> componentTable.logMessage("Detected components:"));
 
         if (servletContext != null) {
-            LOGGER.info("Library order: {}", servletContext.getAttribute(ORDERED_LIBS));
+            LOGGER.info("Library order: {}", () -> servletContext.getAttribute(ORDERED_LIBS));
         }
 
         MCRTableMessage<AutoExecutable> executableTable = new MCRTableMessage<>(
@@ -96,7 +96,7 @@ public class MCRStartupHandler {
             .sorted()
             .peek(executableTable::add)
             .toList();
-        LOGGER.info(executableTable.logMessage("Detected auto executables:"));
+        LOGGER.info(() -> executableTable.logMessage("Detected auto executables:"));
         executables.forEach(autoExecutable -> startExecutable(servletContext, autoExecutable));
 
         //initialize MCRURIResolver
@@ -137,7 +137,7 @@ public class MCRStartupHandler {
     }
 
     private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable) {
-        LOGGER.info("{}: Starting {}", autoExecutable.getPriority(), autoExecutable.getName());
+        LOGGER.info("{}: Starting {}", () -> autoExecutable.getPriority(), () -> autoExecutable.getName());
         try {
             autoExecutable.startUp(servletContext);
         } catch (ExceptionInInitializerError | RuntimeException e) {
@@ -147,7 +147,7 @@ public class MCRStartupHandler {
             if (haltOnError) {
                 throw e;
             }
-            LOGGER.warn(e.toString());
+            LOGGER.warn(() -> e.toString());
         }
     }
 

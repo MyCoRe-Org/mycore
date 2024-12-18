@@ -41,7 +41,7 @@ import org.mycore.common.config.MCRConfigurationException;
 /**
  * Represents a command understood by the command line interface. A command has an external input syntax that the user
  * uses to invoke the command and points to a method in a class that implements the command.
- * 
+ *
  * @see MCRCommandLineInterface
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
@@ -79,7 +79,7 @@ public class MCRCommand {
 
     /**
      * Creates a new MCRCommand.
-     * 
+     *
      * @param format
      *            the command syntax, e.g. "save document {0} to directory {1}"
      * @param methodSignature
@@ -163,7 +163,7 @@ public class MCRCommand {
 
     /**
      * The method return the helpt text of this command.
-     * 
+     *
      * @return the help text as String
      */
     public String getHelpText() {
@@ -172,7 +172,7 @@ public class MCRCommand {
 
     /**
      * Parses an input string and tries to match it with the message format used to invoke this command.
-     * 
+     *
      * @param commandLine
      *            The input from the command line
      * @return null, if the input does not match the message format; otherwise an array holding the parameter values
@@ -189,7 +189,7 @@ public class MCRCommand {
     /**
      * Transforms the parameters found by the MessageFormat parse method into such that can be used to invoke the method
      * implementing this command
-     * 
+     *
      * @param commandParameters
      *            The parameters as returned by the <code>parseCommandLine</code> method
      */
@@ -205,7 +205,7 @@ public class MCRCommand {
     /**
      * Tries to invoke the method that implements the behavior of this command given the user input from the command
      * line. This is only done when the command line syntax matches the syntax used by this command.
-     * 
+     *
      * @return null, if the command syntax did not match and the command was not invoked, otherwise a List of commands
      *         is returned which may be empty or otherwise contains commands that should be processed next
      * @param input
@@ -234,10 +234,10 @@ public class MCRCommand {
         Object[] commandParameters = parseCommandLine(input);
 
         if (commandParameters == null) {
-            LOGGER.info("No match for syntax: {}", getSyntax());
+            LOGGER.info("No match for syntax: {}", this::getSyntax);
             return null;
         }
-        LOGGER.info("Syntax matched (executed): {}", getSyntax());
+        LOGGER.info("Syntax matched (executed): {}", this::getSyntax);
 
         initMethod(classLoader);
         prepareInvocationParameters(commandParameters);
@@ -251,7 +251,7 @@ public class MCRCommand {
 
     /**
      * Returns the input syntax to be used for invoking this command from the command prompt.
-     * 
+     *
      * @return the input syntax for this command
      */
     public final String getSyntax() {

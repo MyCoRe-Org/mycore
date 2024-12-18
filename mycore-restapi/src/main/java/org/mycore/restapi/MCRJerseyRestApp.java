@@ -46,7 +46,7 @@ public abstract class MCRJerseyRestApp extends ResourceConfig {
     protected void initAppName() {
         setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API "
             + getVersion());
-        LogManager.getLogger().info("Initiialize {}", getApplicationName());
+        LogManager.getLogger().info("Initiialize {}", this::getApplicationName);
     }
 
     protected abstract String getVersion();

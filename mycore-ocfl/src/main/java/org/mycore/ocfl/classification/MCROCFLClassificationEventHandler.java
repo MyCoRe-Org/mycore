@@ -39,7 +39,7 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
             MCRCategory mcrCg = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
-            LOGGER.debug("{} handling {} {}", getClass().getName(), mcrCg.getId(), evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), mcrCg::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
                 case UPDATE -> addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
@@ -60,11 +60,11 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
     @Override
     public void undoHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
-            LOGGER.debug("{} handling undo of {} {}", getClass().getName(),
-                ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
-                evt.getEventType());
-            LOGGER.info("Doing nothing for undo of {} {}", ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
-                evt.getEventType());
+            LOGGER.debug("{} handling undo of {} {}",
+                () -> getClass().getName(), () -> ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
+                evt::getEventType);
+            LOGGER.info("Doing nothing for undo of {} {}",
+                () -> ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(), evt::getEventType);
         }
     }
 }

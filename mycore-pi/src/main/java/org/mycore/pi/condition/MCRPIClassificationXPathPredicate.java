@@ -80,7 +80,7 @@ public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase
                 classificationDocument.setRootElement(resolver.resolve(classificationUri));
                 return expression.evaluateFirst(classificationDocument) == Boolean.TRUE;
             } catch (Exception e) {
-                LOGGER.warn("Failed to load " + classificationUri, e);
+                LOGGER.warn(() -> "Failed to load " + classificationUri, e);
                 return false;
             }
 

@@ -53,15 +53,15 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  * MCR.MODS.EnrichmentResolver.DataSources.import=(Scopus PubMed IEEE CrossRef DataCite) OADOI (LOBID GBV SWB) ZDB
  *
  * All data sources that support one of the identifiers present in the publication are queried.
- * 
- * Depending on the configuration properties  
+ *
+ * Depending on the configuration properties
  * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
  * and
  * MCR.MODS.EnrichmentResolver.DataSource.[ID].StopOnFirstResult=true|false
- * the data source will stop trying to resolve publication data after 
- * the first successful call with a given identifier and skip others, 
+ * the data source will stop trying to resolve publication data after
+ * the first successful call with a given identifier and skip others,
  * or will try to retrieve data for all given identifiers.
- * 
+ *
  * Should a data source return new, additional identifiers,
  * other data sources that support these identifiers will be tried again.
  *
@@ -185,7 +185,7 @@ public class MCREnricher {
                 MCRDataSourceCall call = id2call.get(token);
                 if (call.wasSuccessful()) {
                     call.getResults().forEach(result -> {
-                        LOGGER.info("merging data from " + token);
+                        LOGGER.info(() -> "merging data from " + token);
                         merge(publication, result);
                         debugger.debugResolved(token, result);
                         debugger.debugPublication("afterMerge", publication);

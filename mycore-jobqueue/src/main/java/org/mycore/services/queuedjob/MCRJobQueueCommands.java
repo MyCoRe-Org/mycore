@@ -50,12 +50,12 @@ public class MCRJobQueueCommands {
         List<MCRJob> jobs = dao.getJobs(null, null, List.of(MCRJobStatus.MAX_TRIES), null, null);
 
         jobs.forEach(job -> {
-            LOGGER.info("{}: {} {} {} {} {}", job.getId(), job.getAction(), job.getStatus(), job.getTries(),
-                job.getAdded(), job.getStart());
+            LOGGER.info("{}: {} {} {} {} {}", job::getId, job::getAction, job::getStatus, job::getTries, job::getAdded,
+                job::getStart);
             job.getParameters().forEach((key, value) -> {
-                LOGGER.info("{}: {}={}", job.getId(), key, value);
+                LOGGER.info("{}: {}={}", job::getId, () -> key, () -> value);
             });
-            LOGGER.info("Failed with Exception {}", job.getException());
+            LOGGER.info("Failed with Exception {}", job::getException);
         });
     }
 
@@ -134,7 +134,8 @@ public class MCRJobQueueCommands {
         order = 50)
     public static void cleanJobQueue() {
         MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
-        LOGGER.info("Removed {} jobs", cleaner.clean());
+        int cleaned = cleaner.clean();
+        LOGGER.info("Removed {} jobs", cleaned);
     }
 
     @MCRCommand(
@@ -143,7 +144,8 @@ public class MCRJobQueueCommands {
         order = 50)
     public static void cleanJobQueue(String selectorName) {
         MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
-        LOGGER.info("Removed {} jobs", cleaner.clean(selectorName));
+        int cleaned = cleaner.clean(selectorName);
+        LOGGER.info("Removed {} jobs", cleaned);
     }
 
 }

@@ -78,7 +78,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)}
      *        with piJobAction = 'DELETE'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
@@ -91,7 +91,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)}
      *        with piJobAction = 'UPDATE'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
@@ -104,7 +104,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
      *
-     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)} 
+     * @param parameters the parameters which was passed to {@link #addJob(PiJobAction, Map<String, String>)}
      *        with piJobAction = 'REGISTER'
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
      *                                          wrong during rollback
@@ -143,11 +143,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     /**
-     * Adds a job for a given PIAction, which will be called in the persistent {@link MCRJob} environment 
+     * Adds a job for a given PIAction, which will be called in the persistent {@link MCRJob} environment
      * in an extra thread.
      *
      * @param piJobAction      the action that the job executes (REGISTER, UPDATE, DELETE)
-     * 
+     *
      * @param contextParameters pass parameters which are needed to register the PI. The parameter action and
      *                          registrationServiceID will be added, because they are necessary to reassign the job to
      *                          the right {@link MCRPIJobService} and method.
@@ -282,7 +282,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             }
 
             if (jobUserPresent) {
-                LOGGER.info("Continue as previous User {}", savedUserInformation.getUserID());
+                LOGGER.info("Continue as previous User {}", savedUserInformation::getUserID);
 
                 /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
                 session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
@@ -298,14 +298,14 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             String userProviderKey = MCRUserInformationResolver.PROVIDERS_KEY + ".user";
             String userProviderClass = "org.mycore.user2.MCRUserProvider";
             if (this.getProperties().get(userProviderKey).equals(userProviderClass)) {
-                LOGGER.warn("JobApiUser references username '" + jobApiUser
+                LOGGER.warn(() -> "JobApiUser references username '" + jobApiUser
                     + "' directly. Switching to 'user:" + jobApiUser
                     + "' using the compatible user information provider "
                     + userProviderClass + " configured in "
                     + userProviderKey);
-                jobApiUser = "user:" + jobApiUser;
+                return "user:" + jobApiUser;
             } else {
-                LOGGER.error("JobApiUser references username '" + jobApiUser
+                LOGGER.error(() -> "JobApiUser references username '" + jobApiUser
                     + "' directly. Unable to switch to compatible user information provider "
                     + userProviderClass + " since it is not configured in "
                     + userProviderKey);

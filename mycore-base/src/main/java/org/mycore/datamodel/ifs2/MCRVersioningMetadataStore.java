@@ -189,8 +189,8 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
                         if (event.getRevision() % batchSize != 0 || event.getRevision() == 0) {
                             LOGGER.debug(event::getMessage);
                         } else {
-                            LOGGER.info("{} ({}% done)", event.getMessage(),
-                                (int) (event.getRevision() * 100.0 / latestRevision));
+                            LOGGER.info("{} ({}% done)", event::getMessage,
+                                () -> (int) (event.getRevision() * 100.0 / latestRevision));
                         }
                     }
                 }
@@ -254,7 +254,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
             editor.closeDir();
 
             info = editor.closeEdit();
-            LOGGER.info("SVN commit of delete finished, new revision {}", info.getNewRevision());
+            LOGGER.info("SVN commit of delete finished, new revision {}", info::getNewRevision);
         } catch (SVNException e) {
             LOGGER.error("Error while deleting {} in SVN ", id, e);
         } finally {

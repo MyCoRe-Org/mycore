@@ -189,7 +189,7 @@ public class MCRObjectService {
                     newItem.setFromDOM(elm);
                     items.add(newItem);
                 } catch (ReflectiveOperationException e) {
-                    LOGGER.error("Could not instantiate " + itemClass.getSimpleName(), e);
+                    LOGGER.error(() -> "Could not instantiate " + itemClass.getSimpleName(), e);
                 }
             }
         }
@@ -313,7 +313,7 @@ public class MCRObjectService {
      */
     public final void removeDate(String type) {
         if (DATE_TYPE_CREATEDATE.equals(type) || DATE_TYPE_MODIFYDATE.equals(type)) {
-            LOGGER.error("Cannot delete built-in date: " + type);
+            LOGGER.error(() -> "Cannot delete built-in date: " + type);
         } else {
             MCRMetaISO8601Date d = getISO8601Date(type);
             if (d != null) {
@@ -332,8 +332,8 @@ public class MCRObjectService {
             if (MCRCategoryDAOFactory.getInstance().exist(state)) {
                 this.state = state;
             } else {
-                LOGGER.warn("Error at setting servstate classification.",
-                    new MCRException("The category " + state + " does not exist."));
+                MCRException logEx = new MCRException("The category " + state + " does not exist.");
+                LOGGER.warn("Error at setting servstate classification.", logEx);
             }
         }
     }

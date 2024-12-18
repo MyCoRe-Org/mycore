@@ -114,7 +114,8 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         setup(derivateId);
         try {
             Mets mets = createMets();
-            LOGGER.info("mets creation for derivate {} took {}ms!", derivateId, System.currentTimeMillis() - startTime);
+            LOGGER.info("mets creation for derivate {} took {}ms!",
+                () -> derivateId, () -> System.currentTimeMillis() - startTime);
             return mets;
         } catch (Exception exc) {
             throw new MCRException("Unable to create mets.xml of " + derivateId, exc);
@@ -142,7 +143,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      * @throws IOException files of the path couldn't be read
      */
     protected Mets createMets() throws IOException {
-        LOGGER.info("create mets for derivate {}...", this.mcrDer.getId());
+        LOGGER.info("create mets for derivate {} …", mcrDer::getId);
 
         this.structLinkMap = new HashMap<>();
 
@@ -225,7 +226,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
                 LOGGER.warn(
                     "Unable to add file '{}' because cannot find corresponding group  with @USE='{}'. "
                         + "Ignore file and continue.",
-                    ref.toFileId(), use);
+                    ref::toFileId, () -> use);
                 continue;
             }
             addFile(ref, fileGrp);
@@ -242,7 +243,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
             imageFile.setFLocat(fLocat);
             fileGroup.addFile(imageFile);
         } catch (Exception exc) {
-            LOGGER.error("invalid href for " + fileRef.getPath(), exc);
+            LOGGER.error(() -> "invalid href for " + fileRef.getPath(), exc);
         }
     }
 

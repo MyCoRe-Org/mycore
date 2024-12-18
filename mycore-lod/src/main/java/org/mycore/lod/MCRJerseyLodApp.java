@@ -49,7 +49,7 @@ import jakarta.ws.rs.core.Response;
 
 /**
  * Basic configuration for the MyCoRe Linked Open Data Endpoint
- * 
+ *
  * @author Robert Stephan
  */
 @ApplicationPath("/open-data")
@@ -80,7 +80,7 @@ public class MCRJerseyLodApp extends ResourceConfig {
      */
     protected void initAppName() {
         setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " LOD-Endpoint");
-        LogManager.getLogger().info("Initiialize {}", getApplicationName());
+        LogManager.getLogger().info("Initiialize {}", this::getApplicationName);
     }
 
     /**
@@ -98,7 +98,7 @@ public class MCRJerseyLodApp extends ResourceConfig {
 
     /**
      * create a Response object that contains the linked data in the given format
-     * 
+     *
      * @param rdfxmlString - the linked data as String in RDFXML format
      * @param uri - the base URI of the document
      * @param mimeTypes - the mime types, sent with the request

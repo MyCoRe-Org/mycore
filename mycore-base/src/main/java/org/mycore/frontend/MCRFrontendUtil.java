@@ -195,7 +195,7 @@ public class MCRFrontendUtil {
 
     /**
      * @param request current request to get property from
-     * @param name of request {@link HttpServletRequest#getAttribute(String) attribute} or 
+     * @param name of request {@link HttpServletRequest#getAttribute(String) attribute} or
      * {@link HttpServletRequest#getParameter(String) parameter}
      * @return an Optional that is either empty or contains a trimmed non-empty String that is either
      *  the value of the request attribute or a parameter (in that order) with the given <code>name</code>.
@@ -299,8 +299,8 @@ public class MCRFrontendUtil {
                 // parameter is not empty -> store
                 if (!request.getParameter(name).trim().equals("")) {
                     mcrSession.put(key, request.getParameter(name));
-                    LOGGER.debug("Found HTTP-Req.-Parameter {}={} that should be saved in session, safed {}={}", name,
-                        request.getParameter(name), key, request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Parameter {}={} that should be saved in session, safed {}={}",
+                        () -> name, () -> request.getParameter(name), () -> key, () -> request.getParameter(name));
                 } else {
                     // paramter is empty -> do not store and if contained in
                     // session, remove from it
@@ -317,8 +317,8 @@ public class MCRFrontendUtil {
                 // attribute is not empty -> store
                 if (!request.getAttribute(name).toString().trim().equals("")) {
                     mcrSession.put(key, request.getAttribute(name));
-                    LOGGER.debug("Found HTTP-Req.-Attribute {}={} that should be saved in session, safed {}={}", name,
-                        request.getParameter(name), key, request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Attribute {}={} that should be saved in session, safed {}={}",
+                        () -> name, () -> request.getParameter(name), () -> key, () -> request.getParameter(name));
                 } else {
                     // attribute is empty -> do not store and if contained in
                     // session, remove from it
@@ -358,7 +358,7 @@ public class MCRFrontendUtil {
     /**
      * Sets cache-control, last-modified and expires parameter to the response header.
      * Use this method when the client should cache the response data.
-     * 
+     *
      * @param response the response data to cache
      * @param cacheTime how long to cache
      * @param lastModified when the data was last modified
@@ -370,7 +370,7 @@ public class MCRFrontendUtil {
         response.setDateHeader("Last-Modified", lastModified);
         if (useExpire) {
             Date expires = new Date(System.currentTimeMillis() + cacheTime * 1000);
-            LOGGER.debug("Last-Modified: {}, expire on: {}", new Date(lastModified), expires);
+            LOGGER.debug("Last-Modified: {}, expire on: {}", () -> new Date(lastModified), () -> expires);
             response.setDateHeader("Expires", expires.getTime());
         }
     }

@@ -126,7 +126,7 @@ public class MCRWorksFetcher {
     }
 
     private Response getResponse(WebTarget target, boolean usePersonalToken) {
-        LOGGER.info("get {}", target.getUri());
+        LOGGER.info("get {}", target::getUri);
         Response r = target.request().accept(MCRORCIDConstants.ORCID_XML_MEDIA_TYPE)
             .header("Authorization",
                 "Bearer " + (usePersonalToken ? orcid.getAccessToken() : MCRReadPublicTokenFactory.getToken()))
@@ -170,8 +170,7 @@ public class MCRWorksFetcher {
                 modsFromBibTeX.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
                 return Optional.of(modsFromBibTeX);
             } catch (Exception ex) {
-                String msg = "Exception parsing BibTeX: " + bibTeX;
-                LOGGER.warn("{} {}", msg, ex.getMessage());
+                LOGGER.warn(() -> "Exception parsing BibTeX: " + bibTeX + " " + ex.getMessage());
             }
         }
         return Optional.empty();

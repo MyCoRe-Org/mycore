@@ -56,7 +56,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * all required objects and checks if they are valid. Call {@link #getContent()}
  * to retrieve the content afterwards.
  * </p>
- * 
+ *
  * @author Silvio Hermann
  * @author Matthias Eichner
  */
@@ -92,7 +92,7 @@ public class MCRTransferPackage {
 
     /**
      * Builds the transfer package.
-     * 
+     *
      * @throws MCRUsageException is thrown if some of the referenced objects or derivates couldn't be retrieved
      */
     public void build() throws MCRUsageException {
@@ -108,7 +108,7 @@ public class MCRTransferPackage {
     /**
      * Fills the given objectMap with all children and links of the object. The object
      * itself is also added.
-     * 
+     *
      * @param object the source object
      * @param objectMap the map which will be created
      */
@@ -141,9 +141,9 @@ public class MCRTransferPackage {
     /**
      * Builds a list of {@link MCRTransferPackageFileContainer} for all derivate's of the
      * given object and all its descendants.
-     * 
+     *
      * <p>TODO: derivates of linked objects are not added</p>
-     * 
+     *
      * @param object the object
      * @return list of transfer packages file container
      */
@@ -168,8 +168,8 @@ public class MCRTransferPackage {
 
     /**
      * Generates an xml file, which contains import configuration.
-     * 
-     * @return import configuration document    
+     *
+     * @return import configuration document
      */
     public Document buildImportConfiguration() {
         Element configElement = new Element("config");
@@ -186,7 +186,7 @@ public class MCRTransferPackage {
     /**
      * Returns the content for this transfer package. You have to call {@link #build()}
      * before you can retrieve this data.
-     * 
+     *
      * @return a map where key = filename; value = MCRContent
      */
     public Map<String, MCRContent> getContent() throws IOException {
@@ -222,7 +222,7 @@ public class MCRTransferPackage {
         for (String classId : this.classifications) {
             Document classification = MCRClassificationUtils.asDocument(classId);
             if (classification == null) {
-                LogManager.getLogger().warn("Unable to get classification " + classId);
+                LogManager.getLogger().warn(() -> "Unable to get classification " + classId);
                 continue;
             }
             String path = CLASS_PATH + classId + ".xml";
@@ -233,7 +233,7 @@ public class MCRTransferPackage {
 
     /**
      * Returns the source of this transfer package.
-     * 
+     *
      * @return the source
      */
     public MCRObject getSource() {

@@ -77,13 +77,13 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
             if (imageContent != null) {
                 resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
                 Date expires = new Date(System.currentTimeMillis() + MAX_AGE * 1000);
-                LOGGER.debug("Last-Modified: {}, expire on: {}", new Date(attrs.lastModifiedTime().toMillis()),
-                    expires);
+                LOGGER.debug("Last-Modified: {}, expire on: {}", () -> new Date(attrs.lastModifiedTime().toMillis()),
+                    () -> expires);
                 resp.setDateHeader("Expires", expires.getTime());
             }
             return imageContent;
         } finally {
-            LOGGER.debug("Finished sending {}", req.getPathInfo());
+            LOGGER.debug("Finished sending {}", req::getPathInfo);
         }
     }
 
@@ -95,7 +95,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
             thumbnailSize = Integer.parseInt(thSize);
         }
         pdfTools = new MCRPDFTools();
-        LOGGER.info("{}: setting thumbnail size to {}", getServletName(), thumbnailSize);
+        LOGGER.info("{}: setting thumbnail size to {}", this::getServletName, () -> thumbnailSize);
     }
 
     @Override

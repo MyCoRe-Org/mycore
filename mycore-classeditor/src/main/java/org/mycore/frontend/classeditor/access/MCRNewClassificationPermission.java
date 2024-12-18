@@ -40,8 +40,8 @@ public class MCRNewClassificationPermission implements MCRResourceAccessChecker 
      */
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
-        LOGGER.info("{} has permission {}?", request.getUriInfo().getPath(),
-            MCRClassificationUtils.CREATE_CLASS_PERMISSION);
+        LOGGER.info("{} has permission {}?", () -> request.getUriInfo().getPath(),
+            () -> MCRClassificationUtils.CREATE_CLASS_PERMISSION);
         return MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION);
     }
 

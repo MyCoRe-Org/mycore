@@ -39,8 +39,7 @@ public class MCROCFLUserEventHandler implements MCREventHandler {
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (MCREvent.ObjectType.USER == evt.getObjectType()) {
             MCRUser user = (MCRUser) evt.get(MCREvent.USER_KEY);
-            LOGGER.debug("{} handling {} {}", getClass().getName(), user.getUserID(),
-                evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), user::getUserID, evt::getEventType);
             switch (evt.getEventType()) {
                 case UPDATE -> MANAGER.updateUser(user);
                 case CREATE -> MANAGER.createUser(user);

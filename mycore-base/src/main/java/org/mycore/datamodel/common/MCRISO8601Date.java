@@ -45,7 +45,7 @@ import org.mycore.common.config.MCRConfiguration2;
 /**
  * holds info about a specific point in time. This class is used for handling ISO 8601 like date and dateTime formatted
  * strings.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRISO8601Date {
@@ -69,7 +69,7 @@ public class MCRISO8601Date {
 
     /**
      * same as {@link #MCRISO8601Date()} and {@link #setDate(String)}.
-     * 
+     *
      * @param isoString
      *            a date or dateTime string as defined on <a href="http://www.w3.org/TR/NOTE-datetime">W3C Page</a>
      */
@@ -90,7 +90,7 @@ public class MCRISO8601Date {
 
     /**
      * formats the date to a String.
-     * 
+     *
      * @param format
      *            as in {@link MCRISO8601Format}
      * @param locale
@@ -103,7 +103,7 @@ public class MCRISO8601Date {
 
     /**
      * formats the date to a String.
-     * 
+     *
      * @param format
      *            as in {@link MCRISO8601Format}
      * @param locale
@@ -121,7 +121,7 @@ public class MCRISO8601Date {
             try {
                 zone = ZoneId.of(timeZone);
             } catch (DateTimeException e) {
-                LOGGER.warn(e.getMessage());
+                LOGGER.warn(e::getMessage);
             }
         }
         if (zone == null) {
@@ -145,7 +145,7 @@ public class MCRISO8601Date {
 
     /**
      * returns the Date representing this element.
-     * 
+     *
      * @return a new Date instance of the time set in this element
      */
     public final Date getDate() {
@@ -168,7 +168,7 @@ public class MCRISO8601Date {
 
     /**
      * returns a ISO 8601 conform String using the current set format.
-     * 
+     *
      * @return date in ISO 8601 format, or null if date is unset.
      */
     public final String getISOString() {
@@ -177,7 +177,7 @@ public class MCRISO8601Date {
 
     /**
      * sets the date for this meta data object.
-     * 
+     *
      * @param dt
      *            Date object representing date String in Element
      */
@@ -191,7 +191,7 @@ public class MCRISO8601Date {
 
     /**
      * sets the date for this meta data object
-     * 
+     *
      * @param isoString
      *            Date in any form that is a valid W3C dateTime
      */
@@ -229,7 +229,7 @@ public class MCRISO8601Date {
      * sets the input and output format. please use only the formats defined on the
      * <a href="http://www.w3.org/TR/NOTE-datetime">W3C Page</a>, which are also exported as static fields by this
      * class.
-     * 
+     *
      * @param format
      *            a format string that is valid conforming to xsd:duration schema type.
      */

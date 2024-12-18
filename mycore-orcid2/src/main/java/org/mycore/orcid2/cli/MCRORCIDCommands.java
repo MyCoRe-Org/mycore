@@ -48,7 +48,7 @@ public class MCRORCIDCommands {
 
     /**
      * Migrates all ORCID token user attributes to MCRORCIDCredential.
-     * 
+     *
      * @throws MCRORCIDException if migration fails
      * @throws MCRException if there is more than ORCiD attribute for one user
      */
@@ -62,7 +62,7 @@ public class MCRORCIDCommands {
             orcid = user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_ID);
             final String token = user.getUserAttribute(ORCID_TOKEN_ATTRIBUTE_NAME);
             if (orcid == null) {
-                LOGGER.info("Ignored {}, ORCiD attribute is missing.", user.getUserName());
+                LOGGER.info("Ignored {}, ORCiD attribute is missing.", user::getUserName);
                 continue;
             }
             final MCRORCIDCredential credential = new MCRORCIDCredential(token);

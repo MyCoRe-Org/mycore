@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Invalidates a session and sends redirect to referring page.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLogoutServlet extends HttpServlet {
@@ -52,7 +52,7 @@ public class MCRLogoutServlet extends HttpServlet {
         }
         HttpSession session = req.getSession(false);
         if (session != null) {
-            LOGGER.debug("Invalidate HTTP-Session: {}", session.getId());
+            LOGGER.debug("Invalidate HTTP-Session: {}", session::getId);
             session.invalidate();
         }
         String returnURL = getReturnURL(req);

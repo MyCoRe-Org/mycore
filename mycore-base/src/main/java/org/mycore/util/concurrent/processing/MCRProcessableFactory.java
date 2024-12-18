@@ -150,7 +150,8 @@ public final class MCRProcessableFactory {
                 supplier.getFuture().whenComplete((result, throwable) -> {
                     this.collection.remove(supplier);
                     if (throwable != null) {
-                        LogManager.getLogger().error("Error while processing '{}'", supplier.getName(), throwable);
+                        LogManager.getLogger().error(() -> "Error while processing '" + supplier.getName() + "'",
+                            throwable);
                     }
                 });
             }

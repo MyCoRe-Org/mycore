@@ -48,7 +48,9 @@ public class MCRStaticContentEventHandler extends MCREventHandlerBase {
                     cg.generate(obj);
                 } catch (Exception e) {
                     LOGGER.error(
-                        "Error while creating static content " + cg.getTransformer() + " for " + obj.getId() + "!", e);
+                        () -> "Error while creating static content " + cg.getTransformer() + " for " + obj.getId()
+                            + "!",
+                        e);
                 }
             });
     }

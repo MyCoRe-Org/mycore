@@ -38,7 +38,7 @@ public class MCRIIIFApp extends MCRJerseyRestApp {
     @Override
     protected void initAppName() {
         setApplicationName("MyCoRe IIIF-API " + getVersion());
-        LogManager.getLogger().info("Initiialize {}", getApplicationName());
+        LogManager.getLogger().info("Initiialize {}", this::getApplicationName);
     }
 
     @Override

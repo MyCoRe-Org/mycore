@@ -184,11 +184,12 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     static boolean objectIsHidden(MCRObject obj) {
         MCRCategoryID state = obj.getService().getState();
         if (state == null) {
-            LogManager.getLogger().debug("{} is visible as it does not use a service state.", obj.getId());
+            LogManager.getLogger().debug("{} is visible as it does not use a service state.", obj::getId);
             return false;
         }
         boolean hidden = !"published".equals(state.getId());
-        LogManager.getLogger().debug("{} is hidden due to service state '{}': {}", obj.getId(), state, hidden);
+        LogManager.getLogger().debug("{} is hidden due to service state '{}': {}",
+            obj::getId, () -> state, () -> hidden);
         return hidden;
     }
 

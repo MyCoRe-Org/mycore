@@ -108,7 +108,7 @@ public class MCRThumbnailServlet extends MCRServlet {
         if (thSize != null) {
             thumbnailSize = Integer.parseInt(thSize);
         }
-        LOGGER.info("{}: setting thumbnail size to {}", getServletName(), thumbnailSize);
+        LOGGER.info("{}: setting thumbnail size to {}", this::getServletName, () -> thumbnailSize);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", fileAttributes.lastModifiedTime().toMillis());
                 Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-                LOGGER.debug("Last-Modified: {}, expire on: {}", fileAttributes.lastModifiedTime(), expires);
+                LOGGER.debug("Last-Modified: {}, expire on: {}", fileAttributes::lastModifiedTime, () -> expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
 
                 ImageWriter imageWriter = getImageWriter();
@@ -157,7 +157,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                     ByteArrayOutputStream bout = new ByteArrayOutputStream(maxPngSize.get());
                     ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(bout)) {
                     imageWriter.setOutput(imageOutputStream);
-                    //tile = addWatermark(scaleBufferedImage(tile));        
+                    //tile = addWatermark(scaleBufferedImage(tile));
                     IIOImage iioImage = new IIOImage(thumbnail, null, null);
                     imageWriter.write(null, iioImage, imageWriteParam);
                     int contentLength = bout.size();
@@ -172,7 +172,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } finally {
-            LOGGER.debug("Finished sending {}", job.getRequest().getPathInfo());
+            LOGGER.debug("Finished sending {}", () -> job.getRequest().getPathInfo());
         }
     }
 

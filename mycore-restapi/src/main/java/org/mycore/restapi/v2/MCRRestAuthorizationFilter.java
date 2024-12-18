@@ -76,7 +76,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      */
     private void checkRestAPIAccess(ContainerRequestContext requestContext, String permission, String path)
         throws ForbiddenException {
-        LogManager.getLogger().warn(path + ": Checking API access: " + permission);
+        LogManager.getLogger().warn(() -> path + ": Checking API access: " + permission);
         final MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         if (MCRRestAccessManager.checkRestAPIAccess(aclProvider, permission, path)) {
             return;
