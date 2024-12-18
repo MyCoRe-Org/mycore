@@ -24,10 +24,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>56-SNAPSHOT</version>
+    <version>56</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2024.06.0-SNAPSHOT</version>
+  <version>2024.06.0</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -49,7 +49,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>2024.06.x</tag>
+    <tag>v2024.06.0</tag>
   </scm>
   <properties>
     <argLine />
@@ -1739,7 +1739,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>4.1-SNAPSHOT</version>
+        <version>4.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
@@ -2085,7 +2085,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.10-SNAPSHOT</version>
+        <version>0.10</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
