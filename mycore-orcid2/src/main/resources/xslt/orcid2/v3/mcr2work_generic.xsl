@@ -270,7 +270,7 @@
         </xsl:choose>
       </xsl:variable>
       <work:credit-name>
-        <xsl:value-of select="mcrstring:shorten($creditname, ($string-150-max-length - 1), '…')" />
+        <xsl:value-of select="mcrstring:shorten(normalize-space($creditname), ($string-150-max-length - 1), '…')" />
       </work:credit-name>
     </xsl:if>
   </xsl:template>
