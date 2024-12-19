@@ -20,6 +20,11 @@ package org.mycore.frontend.servlets;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import javax.xml.transform.TransformerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -33,12 +38,6 @@ import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.resource.MCRResourceHelper;
 import org.xml.sax.SAXException;
-
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 /**
  * This servlet displays static *.xml files stored in the web application by sending them to MCRLayoutService.
