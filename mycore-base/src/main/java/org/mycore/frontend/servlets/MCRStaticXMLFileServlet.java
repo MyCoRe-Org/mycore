@@ -18,13 +18,8 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
-import javax.xml.transform.TransformerException;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -39,8 +34,11 @@ import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.resource.MCRResourceHelper;
 import org.xml.sax.SAXException;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This servlet displays static *.xml files stored in the web application by sending them to MCRLayoutService.
@@ -81,13 +79,15 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
             MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
             if (REDIRECT_GUESTS && currentUser.equals(MCRSystemUserInformation.getGuestInstance())) {
                 String contextPath = job.getRequest().getContextPath();
-                String redirectTarget = contextPath + "/servlets/MCRLoginServlet?url="
-                    + URLEncoder.encode(contextPath + webpageID, StandardCharsets.UTF_8);
+                String encodedURL = URLEncoder.encode(contextPath + webpageID, StandardCharsets.UTF_8);
+                StringBuilder redirectTarget = new StringBuilder();
+                redirectTarget.append(contextPath).append("/servlets/MCRLoginServlet");
+                redirectTarget.append("?url=").append(encodedURL);
                 if (!REDIRECT_GUESTS_XSL_STATUS_MESSAGE.isEmpty() && !REDIRECT_GUESTS_XSL_STATUS_STYLE.isEmpty()) {
-                    redirectTarget += "&XSL.Status.Message=" + REDIRECT_GUESTS_XSL_STATUS_MESSAGE;
-                    redirectTarget += "&XSL.Status.Style=" + REDIRECT_GUESTS_XSL_STATUS_STYLE;
+                    redirectTarget.append("&XSL.Status.Message=").append(REDIRECT_GUESTS_XSL_STATUS_MESSAGE);
+                    redirectTarget.append("&XSL.Status.Style=").append(REDIRECT_GUESTS_XSL_STATUS_STYLE);
                 }
-                String redirectUrl = response.encodeRedirectURL(redirectTarget);
+                String redirectUrl = response.encodeRedirectURL(redirectTarget.toString());
                 response.setStatus(403);
                 response.sendRedirect(redirectUrl);
             } else {

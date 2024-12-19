@@ -18,13 +18,7 @@
 
 package org.mycore.orcid2.v3.work;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRJDOMContent;
@@ -52,7 +46,8 @@ import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.search.Search;
 
-import jakarta.ws.rs.core.Response;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Provides functionalities to create, update or delete works in ORCID profile.
@@ -311,16 +306,16 @@ public class MCRORCIDWorkService {
     }
 
     private static String buildORCIDIdentifierSearchQuery(Set<MCRIdentifier> identifiers) {
-        String query = "";
+        StringBuilder query = new StringBuilder();
         for (MCRIdentifier i : List.copyOf(identifiers)) {
             if (!query.isEmpty()) {
-                query += " OR ";
+                query.append(" OR ");
             }
             final String value = i.getValue();
-            query += String.format(Locale.ROOT, "%s-self:(%s OR %s OR %s)", i.getType(), value,
-                value.toUpperCase(Locale.ROOT), value.toLowerCase(Locale.ROOT));
+            query.append(String.format(Locale.ROOT, "%s-self:(%s OR %s OR %s)", i.getType(), value,
+                value.toUpperCase(Locale.ROOT), value.toLowerCase(Locale.ROOT)));
         }
-        return query;
+        return query.toString();
     }
 
     private static void checkScope(MCRORCIDCredential credential) {
