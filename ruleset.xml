@@ -441,10 +441,7 @@
   -->
   <rule ref="category/java/performance.xml/UseIOStreamsWithApacheCommonsFileItem"/>
   <rule ref="category/java/performance.xml/UselessStringValueOf"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/UseStringBufferForStringAppends"/>
-  -->
   <rule ref="category/java/performance.xml/UseStringBufferLength"/>
 
   <!-- Security Rules (Include entire ruleset) -->
