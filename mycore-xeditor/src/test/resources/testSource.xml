@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test>
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="session:{$paramA}{$paramB}" />
+      <xed:source uri="session:{$testID}" />
+      <xed:bind xpath="mods:mods">
+        <p>Hello World!</p>
+      </xed:bind>
+    </xed:form>
+  </xed>
+
+  <source id="test">
+    <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+      <mods:titleInfo>
+        <mods:title>Titel</mods:title>
+      </mods:titleInfo>
+    </mods:mods>
+  </source>
+
+  <test label="No params given, should start with empty document">
+    <transform />
+    <html>
+      <form action="http://localhost:8291/servlets/XEditor" method="post">
+        <p>Hello World!</p>
+        <div style="visibility:hidden">
+          <input value="1-2" name="_xed_session" type="hidden" />
+        </div>
+      </form>
+    </html>
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3" />
+    </xml>
+  </test>
+
+  <test label="Single param given, should load source XML from URI">
+    <param name="testID">test</param>
+    <transform />
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:titleInfo>
+          <mods:title>Titel</mods:title>
+        </mods:titleInfo>
+      </mods:mods>
+    </xml>
+  </test>
+
+  <test label="Incomplete params given, no source URI should match">
+    <param name="paramA">te</param>
+    <transform />
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3" />
+    </xml>
+  </test>
+
+  <test label="All params given, should load source XML from URI">
+    <param name="paramA">te</param>
+    <param name="paramB">st</param>
+    <transform />
+    <xml>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:titleInfo>
+          <mods:title>Titel</mods:title>
+        </mods:titleInfo>
+      </mods:mods>
+    </xml>
+  </test>
+
+</test>

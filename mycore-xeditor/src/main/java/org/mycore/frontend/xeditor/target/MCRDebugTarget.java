@@ -18,7 +18,6 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +32,9 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
+import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
+import org.mycore.frontend.xeditor.tracker.MCRChange;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 import jakarta.servlet.ServletContext;
@@ -44,43 +46,52 @@ public class MCRDebugTarget implements MCREditorTarget {
 
     private static final String USE_DEBUG_PERMISSION = "use-xeditor-debug";
 
+    private static final Format XML_OUTPUT_FORMAT
+        = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
+
+    private static final XMLOutputter XML_OUTPUTTER = new XMLOutputter(XML_OUTPUT_FORMAT);
+
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
         if (!MCRAccessManager.checkPermission(USE_DEBUG_PERMISSION)) {
             throw MCRAccessException.missingPrivilege("use xeditor debug target", USE_DEBUG_PERMISSION);
         }
+
         job.getResponse().setContentType("text/html; charset=UTF-8");
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
 
         Map<String, String[]> parameters = job.getRequest().getParameterMap();
-        session.getSubmission().setSubmittedValues(parameters);
+        new MCREditorSubmission(session).setSubmittedValues(parameters);
 
         Document result = session.getEditedXML().clone();
-        MCRChangeTracker tracker = session.getChangeTracker().clone();
 
-        List<Step> steps = new ArrayList<>();
-        for (String label = tracker.undoLastBreakpoint(result); label != null; label = tracker
-            .undoLastBreakpoint(result)) {
-            steps.add(0, new Step(label, result.clone()));
+        MCRChangeTracker tracker = session.getChangeTracker();
+
+        List<Object> steps = new ArrayList<Object>();
+        while (tracker.getChangeCount() > 0) {
+            MCRChange change = tracker.undoLastChange();
+            if (change instanceof MCRBreakpoint) {
+                steps.add(0, session.getEditedXML().clone());
+            }
+            steps.add(0, change);
         }
 
-        result = session.getEditedXML().clone();
-        result = MCRChangeTracker.removeChangeTracking(result);
-
         result = session.getXMLCleaner().clean(result);
-        steps.add(new Step("After cleaning", result));
+        steps.add(new MCRBreakpoint("After cleaning"));
+        steps.add(result.clone());
 
         result = session.getPostProcessor().process(result);
-        steps.add(new Step("After postprocessing", result));
+        steps.add(new MCRBreakpoint("After postprocessing"));
+        steps.add(result.clone());
 
         for (int i = 0; i < steps.size(); i++) {
-            if (i == steps.size() - 3) {
+            if (i == steps.size() - 6) {
                 outputParameters(parameters, out);
             }
 
-            steps.get(i).output(out);
+            output(steps.get(i), out);
         }
 
         out.println("</body></html>");
@@ -88,7 +99,7 @@ public class MCRDebugTarget implements MCREditorTarget {
     }
 
     private void outputParameters(Map<String, String[]> values, PrintWriter out) {
-        out.println("<h3>Submitted parameters:</h3>");
+        output(new MCRBreakpoint("Submitted parameters"), out);
         out.println("<p><pre>");
 
         List<String> names = new ArrayList<>(values.keySet());
@@ -103,27 +114,15 @@ public class MCRDebugTarget implements MCREditorTarget {
         out.println("</pre></p>");
     }
 
-    static class Step {
-
-        private String label;
-
-        private Document xml;
-
-        private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
-
-        Step(String label, Document xml) {
-            this.label = label;
-            this.xml = xml;
-        }
-
-        public void output(PrintWriter out) throws IOException {
-            out.println("<h3>" + label + ":</h3>");
-            XMLOutputter outputter = new XMLOutputter(format);
-            out.println("<p>");
-            Element pre = new Element("pre");
-            pre.addContent(outputter.outputString(xml));
-            outputter.output(pre, out);
-            out.println("</p>");
+    private void output(Object o, PrintWriter out) {
+        if (o instanceof MCRBreakpoint bp) {
+            out.println("<h3>" + bp.getMessage() + ":</h3>");
+        } else if (o instanceof MCRChange c) {
+            out.println("<p>" + c.getMessage() + "</p>");
+        } else if (o instanceof Document doc) {
+            Element pre = new Element("pre").setAttribute("lang", "xml");
+            pre.setText(XML_OUTPUTTER.outputString(doc));
+            out.println("<p>" + XML_OUTPUTTER.outputString(pre) + "</p>");
         }
     }
 }
