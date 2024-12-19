@@ -23,27 +23,45 @@ import java.util.List;
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
+import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
+import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
+import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
 
 /**
- * Returns a JSON string with all {@link MCRAccessKey} for an given {@link MCRObjectID}.
+ * Returns a JSON string with all {@link MCRAccessKey} for an given reference.
  * <p>Syntax:</p>
  * <ul>
- * <li><code>accesskeys:{objectId}</code> to resolve a access keys as json string and count as attribute</li>
+ * <li><code>accesskeys:{reference}</code> to resolve a access keys as JSON string and count as attribute</li>
  * </ul>
  */
 public class MCRAccessKeyURIResolver implements URIResolver {
 
-    /* (non-Javadoc)
-     * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
-     */
+    private static final String ELEMENT_NAME = "accesskeys";
+
     @Override
-    public Source resolve(String href, String base) throws MCRAccessKeyTransformationException {
-        final MCRObjectID objectId = MCRObjectID.getInstance(href.substring(href.indexOf(":") + 1));
-        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.listAccessKeys(objectId);
-        return new JDOMSource(MCRAccessKeyTransformer.elementFromAccessKeys(accessKeys));
+    public Source resolve(String href, String base) {
+        final String reference = extractReferenceFromHref(href);
+        final List<MCRAccessKeyDto> accessKeyDtos
+            = MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeysByReference(reference);
+        final String json = MCRAccessKeyJsonMapper.accessKeyDtosToJson(accessKeyDtos);
+        return createResultSource(json, accessKeyDtos.size());
+    }
+
+    private String extractReferenceFromHref(String href) {
+        int colonIndex = href.indexOf(':');
+        if (colonIndex == -1) {
+            throw new IllegalArgumentException("Invalid href format. Expected ':' in href: " + href);
+        }
+        return href.substring(colonIndex + 1);
+    }
+
+    private Source createResultSource(String json, int count) {
+        final Element element = new Element(ELEMENT_NAME);
+        element.setText(json);
+        element.setAttribute("count", Integer.toString(count));
+        return new JDOMSource(element);
     }
 }

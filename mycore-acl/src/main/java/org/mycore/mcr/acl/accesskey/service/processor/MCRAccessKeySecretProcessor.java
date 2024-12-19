@@ -16,16 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mcr.acl.accesskey.exception;
+package org.mycore.mcr.acl.accesskey.service.processor;
 
 /**
- * Exception that refers to an invalid secret.
+ * A {@link MCRAccessKeySecretProcessor} processes the secret for the database,
  */
-public class MCRAccessKeyInvalidSecretException extends MCRAccessKeyException {
+public interface MCRAccessKeySecretProcessor {
 
-    private static final long serialVersionUID = 1L;
-
-    public MCRAccessKeyInvalidSecretException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.invalidSecret");
-    }
+    /**
+     * Processes and returns the processed secret.
+     *
+     * @param reference the reference
+     * @param secret the secret
+     * @return the processed secret
+     */
+    String processSecret(String reference, String secret);
 }
