@@ -39,13 +39,13 @@ public class MCRNeo4JDatabaseDriver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static MCRNeo4JDatabaseDriver instance = null;
+    private static volatile MCRNeo4JDatabaseDriver instance = null;
 
     private final String url;
 
-    private String user;
+    private final String user;
 
-    private String password;
+    private final String password;
 
     private Driver driver;
 
@@ -65,9 +65,12 @@ public class MCRNeo4JDatabaseDriver {
     */
     public static MCRNeo4JDatabaseDriver getInstance() {
         if (instance == null) {
-            instance = new MCRNeo4JDatabaseDriver();
+            synchronized (MCRNeo4JDatabaseDriver.class) {
+                if (instance == null) {
+                    instance = new MCRNeo4JDatabaseDriver();
+                }
+            }
         }
-
         return instance;
     }
 

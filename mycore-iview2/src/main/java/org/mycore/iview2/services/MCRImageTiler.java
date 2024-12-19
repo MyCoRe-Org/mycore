@@ -55,9 +55,9 @@ import jakarta.persistence.PersistenceException;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRImageTiler implements Runnable, Closeable {
-    private static MCRImageTiler instance = null;
+    private static volatile MCRImageTiler instance = null;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
 
     private static final MCRTilingQueue TQ = MCRTilingQueue.getInstance();
 
@@ -96,7 +96,11 @@ public class MCRImageTiler implements Runnable, Closeable {
      */
     public static MCRImageTiler getInstance() {
         if (instance == null) {
-            instance = new MCRImageTiler();
+            synchronized (MCRImageTiler.class) {
+                if (instance == null) {
+                    instance = new MCRImageTiler();
+                }
+            }
         }
         return instance;
     }

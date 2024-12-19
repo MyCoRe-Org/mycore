@@ -22,9 +22,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class MCRJSONManager {
-    private GsonBuilder gsonBuilder;
 
-    private static MCRJSONManager instance;
+    private final GsonBuilder gsonBuilder;
+
+    private static volatile MCRJSONManager instance;
 
     private MCRJSONManager() {
         gsonBuilder = new GsonBuilder();
@@ -36,7 +37,11 @@ public class MCRJSONManager {
 
     public static MCRJSONManager instance() {
         if (instance == null) {
-            instance = new MCRJSONManager();
+            synchronized (MCRJSONManager.class) {
+                if (instance == null) {
+                    instance = new MCRJSONManager();
+                }
+            }
         }
         return instance;
     }
@@ -48,4 +53,5 @@ public class MCRJSONManager {
     public Gson createGson() {
         return gsonBuilder.create();
     }
+
 }
