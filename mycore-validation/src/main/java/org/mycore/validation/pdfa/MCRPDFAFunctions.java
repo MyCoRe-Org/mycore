@@ -23,14 +23,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.mycore.common.MCRException;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.results.ValidationResult;
 import org.verapdf.pdfa.validation.profiles.RuleId;
@@ -68,21 +69,23 @@ public class MCRPDFAFunctions {
      *
      * @param dir      The path to the directory containing the PDF files to validate.
      * @param objectId An identifier for the validation process or target.
-     * @return A Document object representing an XML structure containing validation results.
+     * @return A Document object representing an XML structure containing validation results, including
+     * both successful validations and errors encountered.
      * @throws ParserConfigurationException If a DocumentBuilder cannot be created.
      * @throws IOException                  If an I/O error occurs while processing the files.
-     * @throws MCRException                 If there is an issue with PDF validation or file processing.
      */
     public static Document getResults(Path dir, String objectId) throws ParserConfigurationException, IOException {
-        Map<String, ValidationResult> results = new HashMap<>();
+        List<PDFAValidationResult> results = new ArrayList<>();
         Files.walkFileTree(dir, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if (file.getFileName().toString().endsWith(".pdf")) {
                     try {
-                        results.put(dir.relativize(file).toString(), PDF_A_VALIDATOR.validate(file));
+                        results.add(new PDFAValidationResult(dir.relativize(file).toString(),
+                            PDF_A_VALIDATOR.validate(file), null));
                     } catch (MCRPDFAValidationException e) {
-                        throw new MCRException(e);
+                        results.add(new PDFAValidationResult(dir.relativize(file).toString(),
+                            null, e));
                     }
                 }
                 return FileVisitResult.CONTINUE;
@@ -104,15 +107,17 @@ public class MCRPDFAFunctions {
      * @return An XML Document representing the validation results.
      * @throws ParserConfigurationException If there is a configuration issue with the XML document builder.
      */
-    private static Document createXML(String objectId, Map<String, ValidationResult> results)
+    private static Document createXML(String objectId, List<PDFAValidationResult> results)
         throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
         Element derivateElement = createDerivateElement(document, objectId);
         document.appendChild(derivateElement);
-        for (Map.Entry<String, ValidationResult> resultEntry : results.entrySet()) {
-            createXMLTag(derivateElement, document, resultEntry);
+        if (results != null) {
+            for (PDFAValidationResult result : results) {
+                createXMLTag(derivateElement, document, result);
+            }
         }
         return document;
     }
@@ -125,11 +130,99 @@ public class MCRPDFAFunctions {
      * @param resultEntry     A map entry containing the file name and its validation result.
      */
     private static void createXMLTag(Element derivateElement, Document document,
-        Map.Entry<String, ValidationResult> resultEntry) {
-        String fileName = resultEntry.getKey();
-        ValidationResult result = resultEntry.getValue();
-        Element fileElement = createFileElement(document, fileName, result);
-        derivateElement.appendChild(fileElement);
+        PDFAValidationResult resultEntry) {
+        String fileName = resultEntry.name();
+        ValidationResult result = resultEntry.result();
+        if (result != null) {
+            Element fileElement = createFileElement(document, fileName, result);
+            derivateElement.appendChild(fileElement);
+        } else {
+            Element fileElement = document.createElement("file");
+            fileElement.setAttribute("name", fileName);
+            derivateElement.appendChild(fileElement);
+            fileElement.setAttribute("flavour", "Validation Error");
+            List<Element> exceptions = createExceptionElements(document, resultEntry.exception());
+            Element exceptionElements = document.createElement("exceptions");
+            for (Element exception : exceptions) {
+                exceptionElements.appendChild(exception);
+            }
+            fileElement.appendChild(exceptionElements);
+        }
+    }
+    /**
+     * Creates a list of XML elements that represent the hierarchy of exceptions and their details.
+     * Each exception is represented as an XML element containing information about its class,
+     * message, and stack trace. The method processes the main throwable and any nested causes
+     * or suppressed exceptions.
+     *
+     * @param document  The XML {@link Document} to which the exception elements will belong.
+     *                  This document is used to create elements representing each exception.
+     * @param throwable The root {@link Throwable} to be processed. This throwable and its
+     *                  causal chain (including suppressed exceptions) are converted into
+     *                  XML elements.
+     * @return A list of XML {@link Element} objects, each representing a throwable in the
+     *         exception chain. Each element includes the exception class, message, and stack trace.
+     */
+
+    private static List<Element> createExceptionElements(Document document, Throwable throwable) {
+        Queue<Throwable> exceptionsQueue = new LinkedList<>();
+        return buildExceptionTree(document, throwable, exceptionsQueue);
+    }
+
+    /**
+     * Recursive helper method to build the exception tree.
+     */
+    private static List<Element> buildExceptionTree(Document document, Throwable currentException,
+        Queue<Throwable> exceptionsQueue) {
+        List<Element> exceptionElementList = new ArrayList<>();
+        if (currentException == null || exceptionsQueue.contains(currentException)) {
+            return exceptionElementList;
+        }
+        exceptionsQueue.add(currentException);
+        Element exceptionElement = document.createElement("exception");
+        Element classElement = document.createElement("class");
+        classElement.setAttribute("name", currentException.getClass().getName());
+        exceptionElement.appendChild(classElement);
+
+        if (currentException.getMessage() != null) {
+            Element messageElement = document.createElement("message");
+            messageElement.setAttribute("message", currentException.getMessage());
+            exceptionElement.appendChild(messageElement);
+        }
+
+        Element stackTraceElement = document.createElement("stackTrace");
+        for (StackTraceElement ste : currentException.getStackTrace()) {
+            Element frameElement = document.createElement("frame");
+            frameElement.setAttribute("text", ste.toString());
+            stackTraceElement.appendChild(frameElement);
+        }
+        exceptionElement.appendChild(stackTraceElement);
+
+        Throwable[] suppressedExceptions = currentException.getSuppressed();
+        if (suppressedExceptions.length > 0) {
+            Element suppressedElement = document.createElement("suppressed");
+            for (Throwable suppressed : suppressedExceptions) {
+                List<Element> suppressedElements = buildExceptionTree(document, suppressed, exceptionsQueue);
+                for (Element suppressedChild : suppressedElements) {
+                    suppressedElement.appendChild(suppressedChild);
+                }
+            }
+            exceptionElement.appendChild(suppressedElement);
+        }
+
+        Throwable cause = currentException.getCause();
+        if (cause != null && !cause.equals(currentException)) {
+            Element causeElement = document.createElement("cause");
+            List<Element> causeElements = buildExceptionTree(document, cause, exceptionsQueue);
+            for (Element causeChild : causeElements) {
+                causeElement.appendChild(causeChild);
+            }
+            exceptionElement.appendChild(causeElement);
+        }
+
+        exceptionElementList.add(exceptionElement);
+
+        return exceptionElementList;
     }
 
     /**
@@ -206,5 +299,11 @@ public class MCRPDFAFunctions {
         String secondPart = ruleId.getClause().replaceAll("\\.", "");
         return "https://github.com/veraPDF/veraPDF-validation-profiles/wiki/" + firstPart + "#rule-" + secondPart + "-"
             + ruleId.getTestNumber();
+    }
+
+    private record PDFAValidationResult(
+        String name,
+        ValidationResult result,
+        Throwable exception) {
     }
 }
