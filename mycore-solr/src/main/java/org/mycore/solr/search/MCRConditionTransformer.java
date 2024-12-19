@@ -62,7 +62,7 @@ public class MCRConditionTransformer {
      */
     protected static final String MIXED = "--mixed--";
 
-    private static HashSet<String> joinFields = null;
+    private static volatile HashSet<String> joinFields = null;
 
     public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition,
         Set<String> usedFields) {
@@ -387,10 +387,14 @@ public class MCRConditionTransformer {
 
     private static HashSet<String> getJoinFields() {
         if (joinFields == null) {
-            joinFields = MCRConfiguration2.getString(SOLR_CONFIG_PREFIX + "JoinQueryFields")
-                .stream()
-                .flatMap(MCRConfiguration2::splitValue)
-                .collect(Collectors.toCollection(HashSet::new));
+            synchronized (MCRConditionTransformer.class) {
+                if (joinFields == null) {
+                    joinFields = MCRConfiguration2.getString(SOLR_CONFIG_PREFIX + "JoinQueryFields")
+                        .stream()
+                        .flatMap(MCRConfiguration2::splitValue)
+                        .collect(Collectors.toCollection(HashSet::new));
+                }
+            }
         }
         return joinFields;
     }
