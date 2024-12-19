@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,17 +59,17 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     public static final int MAX_LENGTH = 64;
 
-    private static NumberFormat NUMBER_FORMAT = initNumberFormat();
+    private static final NumberFormat NUMBER_FORMAT = initNumberFormat();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
     /** ID pattern with named capturing groups */
-    private static Pattern ID_PATTERN = Pattern
+    private static final Pattern ID_PATTERN = Pattern
         .compile("^(?<projectId>[a-zA-Z][a-zA-Z0-9]*)_(?<objectType>[a-zA-Z0-9]+)_(?<numberPart>[0-9]+)$");
 
-    private static HashSet<String> VALID_TYPE_LIST;
+    private static final HashSet<String> VALID_TYPE_LIST;
 
-    private static Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID = Comparator
+    private static final Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID = Comparator
         .comparing(MCRObjectID::getProjectId)
         .thenComparing(MCRObjectID::getTypeId)
         .thenComparingInt(MCRObjectID::getNumberAsInteger);
@@ -79,7 +80,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
             .entrySet()
             .stream()
             .filter(p -> Boolean.parseBoolean(p.getValue()))
-            .map(prop -> prop.getKey())
+            .map(Map.Entry::getKey)
             .collect(Collectors.toCollection(HashSet::new));
     }
 
@@ -161,7 +162,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (number < 0) {
             throw new IllegalArgumentException("number must be non negative integer");
         }
-        return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + NUMBER_FORMAT.format(number);
+        synchronized (NUMBER_FORMAT) {
+            return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + NUMBER_FORMAT.format(number);
+        }
     }
 
     /**
@@ -267,7 +270,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return the string of the number
      */
     public String getNumberAsString() {
-        return NUMBER_FORMAT.format(numberPart);
+        synchronized (NUMBER_FORMAT) {
+            return NUMBER_FORMAT.format(numberPart);
+        }
     }
 
     /**
