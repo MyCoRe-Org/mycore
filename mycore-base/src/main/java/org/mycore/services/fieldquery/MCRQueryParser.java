@@ -18,16 +18,25 @@
 
 package org.mycore.services.fieldquery;
 
-import org.jdom2.Element;
-import org.mycore.common.MCRException;
-import org.mycore.parsers.bool.*;
-
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jdom2.Element;
+import org.mycore.common.MCRException;
+import org.mycore.parsers.bool.MCRAndCondition;
+import org.mycore.parsers.bool.MCRBooleanClauseParser;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRNotCondition;
+import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.parsers.bool.MCRParseException;
+import org.mycore.parsers.bool.MCRSetCondition;
 
 /**
  * Parses query conditions for use in MCRSearcher.
