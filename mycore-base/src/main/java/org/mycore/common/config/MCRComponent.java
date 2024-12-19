@@ -97,8 +97,10 @@ public class MCRComponent implements Comparable<MCRComponent> {
         this.artifactId = artifactId;
         this.manifest = manifest;
         this.priority = calculatePriority(artifactId, manifest, this.type);
-        this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + this.name;
-        LOGGER.debug("{} is of type {} and named {}: {}", artifactId, type, this.name, jarFile);
+        synchronized (PRIORITY_FORMAT) {
+            this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + this.name;
+        }
+        LOGGER.debug("{} is of type {} and named {}: {}", artifactId, this.type, this.name, jarFile);
     }
 
     private static int calculatePriority(String artifactId, Manifest manifest, Type type) {
@@ -117,7 +119,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
             case base -> 100;
             case component -> 200;
             case module -> 300;
-            default -> throw new MCRException("Do not support MCRComponenty of type: " + type);
         };
         return priority;
     }

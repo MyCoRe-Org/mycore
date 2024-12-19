@@ -112,16 +112,16 @@ public final class MCRGoogleSitemapCommon {
         MCRSolrAuthenticationManager.getInstance();
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
 
     /** Number of URLs in one sitemap */
     private int numberOfURLs = MCRConfiguration2.getInt("MCR.GoogleSitemap.NumberOfURLs").orElse(10000);
 
     /** number format for parts */
-    private static NumberFormat number_format = getNumberFormat();
+    private static final NumberFormat NUMBER_FORMAT = getNumberFormat();
 
     /** date formatter */
-    private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", SITEMAP_LOCALE);
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd", SITEMAP_LOCALE);
 
     /** The webapps directory path from configuration */
     private final File webappBaseDir;
@@ -206,20 +206,22 @@ public final class MCRGoogleSitemapCommon {
      *
      * @param number
      *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
-     * @param withpath
+     * @param withPath
      *            true for the full path, false for the file name
      * @return a path to sitemap_google.xml
      */
-    protected String getFileName(int number, boolean withpath) {
+    String getFileName(int number, boolean withPath) {
         String fn = "sitemap_google.xml";
         if (number > 1) {
-            fn = "sitemap_google_" + number_format.format(number - 1) + ".xml";
+            synchronized (NUMBER_FORMAT) {
+                fn = "sitemap_google_" + NUMBER_FORMAT.format(number - 1) + ".xml";
+            }
         }
         String localPath = fn;
-        if (CDIR.length() != 0) {
+        if (!CDIR.isEmpty()) {
             localPath = CDIR + File.separator + fn;
         }
-        if (withpath) {
+        if (withPath) {
             return webappBaseDir + File.separator + localPath;
         }
         return localPath;
@@ -281,8 +283,10 @@ public final class MCRGoogleSitemapCommon {
         // build entry
         Element url = new Element("url", NS);
         url.addContent(new Element("loc", NS).addContent(sb.toString()));
-        String datestr = formatter.format(objectIDDate.getLastModified());
-        url.addContent(new Element("lastmod", NS).addContent(datestr));
+        synchronized (DATE_FORMATTER) {
+            String datestr = DATE_FORMATTER.format(objectIDDate.getLastModified());
+            url.addContent(new Element("lastmod", NS).addContent(datestr));
+        }
         url.addContent(new Element("changefreq", NS).addContent(FREQ));
         return url;
     }
@@ -306,8 +310,11 @@ public final class MCRGoogleSitemapCommon {
             Element sitemap = new Element("sitemap", NS);
             index.addContent(sitemap);
             sitemap.addContent(new Element("loc", NS).addContent((baseurl + getFileName(i + 2, false)).trim()));
-            String datestr = formatter.format((new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime());
-            sitemap.addContent(new Element("lastmod", NS).addContent(datestr.trim()));
+            synchronized (DATE_FORMATTER) {
+                String date =
+                    DATE_FORMATTER.format((new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime());
+                sitemap.addContent(new Element("lastmod", NS).addContent(date.trim()));
+            }
         }
         return jdom;
     }

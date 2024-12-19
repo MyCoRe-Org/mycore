@@ -365,10 +365,7 @@
   <rule ref="category/java/multithreading.xml/DoubleCheckedLocking"/>
   -->
   <rule ref="category/java/multithreading.xml/NonThreadSafeSingleton"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/multithreading.xml/UnsynchronizedStaticFormatter"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/multithreading.xml/UseConcurrentHashMap"/>
