@@ -171,10 +171,7 @@
   <rule ref="category/java/codestyle.xml/UseDiamondOperator"/>
   -->
   <rule ref="category/java/codestyle.xml/UselessQualifiedThis"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UseShortArrayInitializer"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/codestyle.xml/UseUnderscoresInNumericLiterals"/>
