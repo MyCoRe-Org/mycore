@@ -699,7 +699,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "check in all derivates of MCR base ID {0} for existing linked objects",
         order = 400)
     public static void checkObjectsInDerivates(String baseId) {
-        if (baseId == null || baseId.length() == 0) {
+        if (baseId == null || baseId.isEmpty()) {
             LOGGER.error("Base ID missed for check object entries in derivates for base {0}");
             return;
         }
@@ -905,7 +905,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         MCRPath path = MCRPath.getPath(derivateID.toString(), "/");
         MCRUploadHelper.detectMainFile(path).ifPresent(file -> {
-            LOGGER.info("Setting main file of {} to {}", () -> derID, () -> file.toUri());
+            LOGGER.info("Setting main file of {} to {}", () -> derID, file::toUri);
             derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
             try {
                 MCRMetadataManager.update(derivate);
