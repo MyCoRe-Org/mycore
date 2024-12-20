@@ -18,20 +18,18 @@
 
 package org.mycore.csl;
 
-import java.util.HashMap;
+import de.undercouch.citeproc.CSL;
+import de.undercouch.citeproc.output.Bibliography;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-
-import de.undercouch.citeproc.CSL;
-import de.undercouch.citeproc.output.Bibliography;
 
 public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
@@ -43,7 +41,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     private static final String CONFIG_PREFIX = "MCR.ContentTransformer.";
 
-    private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances;
+    private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances = new ConcurrentHashMap<>();
 
     private String configuredFormat;
 
@@ -52,10 +50,6 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     private String configuredItemProviderProperty;
 
     private boolean unsorted;
-
-    {
-        transformerInstances = new HashMap<>();
-    }
 
     @Override
     public void init(String id) {
