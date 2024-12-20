@@ -97,7 +97,9 @@ public class MCRComponent implements Comparable<MCRComponent> {
         this.artifactId = artifactId;
         this.manifest = manifest;
         this.priority = calculatePriority(artifactId, manifest, this.type);
-        this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + getName();
+        synchronized (PRIORITY_FORMAT) {
+            this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + getName();
+        }
         LOGGER.debug("{} is of type {} and named {}: {}", artifactId, type, getName(), jarFile);
     }
 

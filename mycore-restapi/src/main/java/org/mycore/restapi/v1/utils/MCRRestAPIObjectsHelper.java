@@ -106,7 +106,7 @@ public class MCRRestAPIObjectsHelper {
 
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
 
-    private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    private static final SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
     private static MCRIDMapper ID_MAPPER = MCRConfiguration2
         .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MCR_PROPERTY_CLASS).get();
@@ -392,11 +392,13 @@ public class MCRRestAPIObjectsHelper {
 
         if (params.lastModifiedBefore != null || params.lastModifiedAfter != null) {
             return objIdDates.stream().filter(oid -> {
-                String lastModified = SDF_UTC.format(oid.getLastModified());
-                if (params.lastModifiedAfter != null && lastModified.compareTo(params.lastModifiedAfter) < 0) {
-                    return false;
+                synchronized (SDF_UTC) {
+                    String lastModified = SDF_UTC.format(oid.getLastModified());
+                    if (params.lastModifiedAfter != null && lastModified.compareTo(params.lastModifiedAfter) < 0) {
+                        return false;
+                    }
+                    return params.lastModifiedBefore == null || lastModified.compareTo(params.lastModifiedBefore) <= 0;
                 }
-                return params.lastModifiedBefore == null || lastModified.compareTo(params.lastModifiedBefore) <= 0;
             }).collect(Collectors.toList());
         }
 
@@ -517,7 +519,9 @@ public class MCRRestAPIObjectsHelper {
         };
 
         elem.setAttribute("ID", oid.getId());
-        elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
+        synchronized (SDF_UTC) {
+            elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
+        }
         elem.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
 
         if (mode == Mode.MCRDERIVATE) {
@@ -560,7 +564,9 @@ public class MCRRestAPIObjectsHelper {
             for (MCRObjectIDDate oid : objIdDates) {
                 writer.beginObject();
                 writer.name("ID").value(oid.getId());
-                writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
+                synchronized (SDF_UTC) {
+                    writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
+                }
                 writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                 if (mode == Mode.MCRDERIVATE) {
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
@@ -696,7 +702,9 @@ public class MCRRestAPIObjectsHelper {
             return false;
         }
         try {
-            SDF_UTC.parse(test + base.substring(test.length()));
+            synchronized (SDF_UTC) {
+                SDF_UTC.parse(test + base.substring(test.length()));
+            }
         } catch (ParseException e) {
             return false;
         }
