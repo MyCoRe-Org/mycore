@@ -77,7 +77,7 @@ class MCRIdentifierResolver {
      * @return the publication data in MODS format, or null if the data source did not return data for this identifier
      */
     Element resolve(String identifier) {
-        Object[] params = new Object[] { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) };
+        Object[] params = { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) };
         String uri = new MessageFormat(uriPattern, Locale.ROOT).format(params);
 
         Element resolved = null;
