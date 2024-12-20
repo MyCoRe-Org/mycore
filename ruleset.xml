@@ -90,10 +90,7 @@
   <!--
   <rule ref="category/java/bestpractices.xml/UseCollectionIsEmpty"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/UseEnumCollections"/>
-  -->
   <rule ref="category/java/bestpractices.xml/UseStandardCharsets"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
