@@ -905,7 +905,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         MCRPath path = MCRPath.getPath(derivateID.toString(), "/");
         MCRUploadHelper.detectMainFile(path).ifPresent(file -> {
-            LOGGER.info("Setting main file of {} to {}", derID, file.toUri().toString());
+            LOGGER.info("Setting main file of {} to {}", () -> derID, file::toUri);
             derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
             try {
                 MCRMetadataManager.update(derivate);

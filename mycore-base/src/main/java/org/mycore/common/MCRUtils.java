@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -84,7 +85,7 @@ public class MCRUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
     // The file slash
-    private static String SLASH = System.getProperty("file.separator");
+    private static String SLASH = FileSystems.getDefault().getSeparator();
 
     /**
      * Reads exactly <code>len</code> bytes from the input stream into the byte array. This method reads repeatedly from
@@ -479,7 +480,7 @@ public class MCRUtils {
                 return e;
             }
         }
-        LOGGER.warn("Could not instanciate Exception {}", mainExceptionClass::getCanonicalName);
+        LOGGER.warn("Could not instantiate Exception {}", mainExceptionClass::getCanonicalName);
         return e;
     }
 
