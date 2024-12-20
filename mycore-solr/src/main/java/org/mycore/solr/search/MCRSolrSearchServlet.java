@@ -260,11 +260,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
         requestDispatcher.forward(request, response);
     }
 
-    @Override
-    public void init() throws ServletException {
-        super.init();
-    }
-
     /**
      * Splits the parameters into three groups.
      *

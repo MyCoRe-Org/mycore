@@ -111,11 +111,6 @@ public final class MCRDefaultResourceInterceptFilter extends HttpFilter {
         return new HttpServletRequestWrapper(request) {
 
             @Override
-            public String getContextPath() {
-                return super.getContextPath();
-            }
-
-            @Override
             public String getServletPath() {
                 return "/resources";
             }
