@@ -230,10 +230,7 @@
   <rule ref="category/java/design.xml/NPathComplexity"/>
   <rule ref="category/java/design.xml/SimplifyConditional"/>
   <rule ref="category/java/design.xml/SingularField"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/UselessOverridingMethod"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/design.xml/UseObjectForClearerAPI"/>
